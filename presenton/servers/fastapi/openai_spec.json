@@ -1,0 +1,270 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/ppt/presentation/generate": {
+      "post": {
+        "tags": ["Presentation"],
+        "summary": "Returns base URL of generated presentation's PDF or PPTX.",
+        "operationId": "generate_presentation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_generate_presentation_api_api_v1_ppt_presentation_generate_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationPathAndEditPath"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ppt/template/all": {
+      "get": {
+        "tags": ["Template"],
+        "summary": "Get all templates",
+        "description": "Returns built-in and custom templates for presentation creation.",
+        "operationId": "templates_list",
+        "parameters": [
+          {
+            "name": "include_defaults",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Defaults"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateDetail"
+                  },
+                  "title": "Response Get All Templates Api V1 Ppt Template All Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_generate_presentation_api_api_v1_ppt_presentation_generate_post": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "The content for generating the presentation"
+          },
+          "n_slides": {
+            "type": "integer",
+            "title": "N Slides",
+            "default": 8
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "English"
+          },
+          "template": {
+            "type": "string",
+            "title": "Template",
+            "default": "general"
+          },
+          "files": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Files"
+          },
+          "export_as": {
+            "type": "string",
+            "enum": ["pptx", "pdf"],
+            "title": "Export As",
+            "default": "pptx"
+          }
+        },
+        "type": "object",
+        "required": ["content"],
+        "title": "Body_generate_presentation_api_api_v1_ppt_presentation_generate_post"
+      },
+      "PresentationPathAndEditPath": {
+        "properties": {
+          "presentation_id": {
+            "type": "string",
+            "title": "Presentation Id"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "edit_path": {
+            "type": "string",
+            "title": "Edit Path"
+          }
+        },
+        "type": "object",
+        "required": ["presentation_id", "path", "edit_path"],
+        "title": "PresentationPathAndEditPath"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "TemplateDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "total_layouts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Layouts"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "TemplateDetail"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          }
+        },
+        "type": "object",
+        "required": ["detail"],
+        "title": "ErrorResponse"
+      }
+    }
+  }
+}
