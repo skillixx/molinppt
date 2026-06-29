@@ -43,6 +43,7 @@ All settings are injected through environment variables:
 
 - Moling base URL and internal token
 - application URL and port
+- session cookie lifetime through `SESSION_TTL_SECONDS` in seconds; default is 604800
 - database URL
 - queue URL
 - object storage credentials

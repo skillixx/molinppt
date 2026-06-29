@@ -27,6 +27,7 @@ Moling launch and billing configuration:
 - `MOLING_PRODUCT_ID` or compatibility alias `PPT_PRODUCT_ID`
 - `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
 - `APP_PORT` or compatibility alias `PORT`
+- `SESSION_TTL_SECONDS` optionally controls application session lifetime and defaults to 604800 seconds.
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
 

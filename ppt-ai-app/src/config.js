@@ -61,6 +61,7 @@ export function loadConfig(env = process.env) {
     },
     auth: {
       sessionCookieName: env.SESSION_COOKIE_NAME || "ppt_ai_session",
+      sessionTtlMs: readPositiveInteger(env.SESSION_TTL_SECONDS, 7 * 24 * 60 * 60, "SESSION_TTL_SECONDS") * 1000,
     },
   };
 }
