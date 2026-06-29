@@ -130,11 +130,11 @@ Returns owner-scoped call logs for generation, export, retry, and billing-adjace
 
 ### `POST /internal/reconcile`
 
-Retries pending billing settlement events. This is an operational endpoint and requires the backend `X-Internal-Token` header to match `INTERNAL_API_TOKEN`.
+Retries pending billing settlement and release events. This is an operational endpoint and requires the backend `X-Internal-Token` header to match `INTERNAL_API_TOKEN`.
 
 Request fields: optional `limit`.
 
-Response fields: `result.checked`, `result.settled`, `result.failed`.
+Response fields: `result.checked`, `result.settled`, `result.released`, `result.failed`.
 
 ## Internal Worker Interfaces
 

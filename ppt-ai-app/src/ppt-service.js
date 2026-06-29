@@ -111,7 +111,27 @@ export class PptService {
         slides,
       });
     } catch (error) {
-      await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      try {
+        await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      } catch (releaseError) {
+        await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "release", amount: "0", status: "release_pending", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+        await this.taskCenter.updateTask(task.id, { status: "failed", progress: 100, error: "Billing reconciliation pending" });
+        await this.database.update("generation_tasks", generationTask.id, {
+          status: "release_pending",
+          progress: 100,
+          retryable: false,
+          errorCode: "RELEASE_FAILED",
+          errorMessage: releaseError.message,
+          originalErrorMessage: error.message,
+        });
+        await this.#log({ ownerUserId, action: "billing_release_pending", resourceType: "task", resourceId: task.id, metadata: { error: releaseError.message, originalError: error.message } });
+        throw new AppError({
+          code: "BILLING_RECONCILIATION_PENDING",
+          status: 409,
+          message: "Billing reconciliation pending",
+          publicDetails: { task_id: task.id, retryable: false },
+        });
+      }
       await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
       await this.taskCenter.updateTask(task.id, { status: "failed", progress: 100, error: error.message });
       await this.database.update("generation_tasks", generationTask.id, { status: "failed", progress: 100, retryable: true, errorMessage: error.message });
@@ -181,36 +201,52 @@ export class PptService {
   /**
    * Reconciles pending billing settlement events after transient platform failures.
    * @param {{limit?: number}} input
-   * @returns {Promise<{checked: number, settled: number, failed: number}>}
+   * @returns {Promise<{checked: number, settled: number, released: number, failed: number}>}
    */
   async reconcileBillingEvents({ limit = 20 } = {}) {
-    const pendingEvents = (await this.database.find("billing_events", (event) => event.status === "settle_pending"))
+    const pendingEvents = (await this.database.find("billing_events", (event) => event.status === "settle_pending" || event.status === "release_pending"))
       .slice(0, normalizeLimit(limit));
-    const result = { checked: pendingEvents.length, settled: 0, failed: 0 };
+    const result = { checked: pendingEvents.length, settled: 0, released: 0, failed: 0 };
     for (const event of pendingEvents) {
       try {
-        const platformResponse = await this.billingClient.settleCredits({
-          holdId: event.holdId,
-          actualAmount: event.amount,
-          idempotencyKey: event.idempotencyKey,
-        });
+        const platformResponse = event.status === "settle_pending"
+          ? await this.billingClient.settleCredits({
+            holdId: event.holdId,
+            actualAmount: event.amount,
+            idempotencyKey: event.idempotencyKey,
+          })
+          : await this.billingClient.releaseCredits({
+            holdId: event.holdId,
+            idempotencyKey: event.idempotencyKey,
+          });
         await this.database.update("billing_events", event.id, {
-          status: "settled",
+          status: event.status === "settle_pending" ? "settled" : "released",
           platformResponse,
         });
         const task = await this.database.findOne("generation_tasks", (item) => item.id === event.taskId);
         if (task) {
-          await this.database.update("generation_tasks", task.id, {
-            status: "succeeded",
-            progress: 100,
-            retryable: false,
-            errorCode: null,
-            errorMessage: null,
-          });
-          if (task.deckId) await this.database.update("decks", task.deckId, { status: "ready" });
+          if (event.status === "settle_pending") {
+            await this.database.update("generation_tasks", task.id, {
+              status: "succeeded",
+              progress: 100,
+              retryable: false,
+              errorCode: null,
+              errorMessage: null,
+            });
+            if (task.deckId) await this.database.update("decks", task.deckId, { status: "ready" });
+          } else {
+            await this.database.update("generation_tasks", task.id, {
+              status: "failed",
+              progress: 100,
+              retryable: true,
+              errorCode: null,
+              errorMessage: task.originalErrorMessage || task.errorMessage,
+            });
+          }
           await this.#log({ ownerUserId: task.ownerUserId, action: "billing_reconciled", resourceType: "task", resourceId: task.id });
         }
-        result.settled += 1;
+        if (event.status === "settle_pending") result.settled += 1;
+        else result.released += 1;
       } catch (error) {
         await this.database.update("billing_events", event.id, {
           status: "reconcile_failed",

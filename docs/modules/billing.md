@@ -17,7 +17,7 @@ Third-stage usage:
 - `PptService.generateDeck` calls balance -> reserve -> settle/release.
 - `PptService.regenerateSlide` calls balance -> reserve -> settle/release.
 - billing events are recorded for reserve, settle, release, and consume.
-- `PptService.reconcileBillingEvents` retries `settle_pending` events and restores ready deck/task state after successful settlement.
+- `PptService.reconcileBillingEvents` retries `settle_pending` and `release_pending` events, restores ready deck/task state after successful settlement, and makes failed generation retryable after a delayed release succeeds.
 
 Future work:
 

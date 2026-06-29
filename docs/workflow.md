@@ -53,6 +53,7 @@ sequenceDiagram
 
 - If reserve fails, do not enqueue AI work.
 - If AI generation fails after reserve, release the hold.
+- If releasing a failed generation hold fails, mark the task as `release_pending` and retry release through `POST /internal/reconcile` before allowing generation retry.
 - Failed generation tasks are marked retryable and can be retried from the original outline.
 - If settle fails after successful generation, mark the task as `reconcile_pending`, keep the deck as `billing_pending`, block preview/export/slide regeneration, and retry settlement through `POST /internal/reconcile`.
 - If export fails, keep the editable deck and allow retry without regenerating content.
