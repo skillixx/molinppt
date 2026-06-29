@@ -245,6 +245,12 @@ export class PptService {
             });
           }
           await this.#log({ ownerUserId: task.ownerUserId, action: "billing_reconciled", resourceType: "task", resourceId: task.id });
+        } else if (event.status === "settle_pending") {
+          const deck = await this.database.findOne("decks", (item) => item.id === event.taskId);
+          if (deck) {
+            await this.database.update("decks", deck.id, { status: "ready" });
+            await this.#log({ ownerUserId: deck.ownerUserId, action: "billing_reconciled", resourceType: "deck", resourceId: deck.id });
+          }
         }
         if (event.status === "settle_pending") result.settled += 1;
         else result.released += 1;
@@ -280,19 +286,10 @@ export class PptService {
       idempotencyKey: reserveKey,
     });
     await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "reserve", amount: REGENERATE_SLIDE_AMOUNT, status: "reserved", holdId: reserve.hold_id, idempotencyKey: reserveKey });
+    let regenerated;
     try {
       const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
-      const regenerated = await this.aiProvider.regenerateSlide(prompt);
-      const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
-      const updatedDeck = await this.database.update("decks", deck.id, { slides });
-      await this.billingClient.settleCredits({
-        holdId: reserve.hold_id,
-        actualAmount: REGENERATE_SLIDE_AMOUNT,
-        idempotencyKey: settleKey,
-      });
-      await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "settle", amount: REGENERATE_SLIDE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
-      await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
-      return { deck: updatedDeck, slide: regenerated };
+      regenerated = await this.aiProvider.regenerateSlide(prompt);
     } catch (error) {
       try {
         await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
@@ -310,6 +307,28 @@ export class PptService {
       await this.#log({ ownerUserId, action: "slide_regeneration_failed", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message } });
       throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });
     }
+    const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
+    try {
+      await this.billingClient.settleCredits({
+        holdId: reserve.hold_id,
+        actualAmount: REGENERATE_SLIDE_AMOUNT,
+        idempotencyKey: settleKey,
+      });
+    } catch (error) {
+      await this.database.update("decks", deck.id, { slides, status: "billing_pending" });
+      await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "settle", amount: REGENERATE_SLIDE_AMOUNT, status: "settle_pending", holdId: reserve.hold_id, idempotencyKey: settleKey });
+      await this.#log({ ownerUserId, action: "billing_settle_pending", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message, slideId } });
+      throw new AppError({
+        code: "BILLING_RECONCILIATION_PENDING",
+        status: 409,
+        message: "Billing reconciliation pending",
+        publicDetails: { deck_id: deck.id, slide_id: slideId, retryable: false },
+      });
+    }
+    await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "settle", amount: REGENERATE_SLIDE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
+    const updatedDeck = await this.database.update("decks", deck.id, { slides, status: "ready" });
+    await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
+    return { deck: updatedDeck, slide: regenerated };
   }
 
   /**

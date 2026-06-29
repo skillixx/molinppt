@@ -201,6 +201,90 @@ test("PptService reconciles pending slide release events", async () => {
   assert.equal(context.billingCalls.filter((call) => call[0] === "release").length, 2);
 });
 
+test("PptService locks deck when slide regeneration settle fails", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        if (input.idempotencyKey.includes("ppt_slide_regenerate")) {
+          throw new Error("slide settle unavailable");
+        }
+        return { status: "settled", hold_id: input.holdId, settled_amount: input.actualAmount };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Slide settle failure",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deck.id,
+      slideId: deck.slides[0].id,
+      instruction: "paid edit",
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const lockedDeck = await context.database.findOne("decks", (item) => item.id === deck.id);
+  const settleEvent = await context.database.findOne("billing_events", (event) => event.eventType === "settle" && event.status === "settle_pending");
+
+  assert.equal(lockedDeck.status, "billing_pending");
+  assert.equal(lockedDeck.slides[0].title.includes("paid edit"), true);
+  assert.equal(settleEvent.taskId, deck.id);
+  await assert.rejects(
+    () => context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id }),
+    { code: "DECK_BILLING_PENDING" },
+  );
+});
+
+test("PptService reconciles pending slide settle events", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        if (input.idempotencyKey.includes("ppt_slide_regenerate")
+          && context.billingCalls.filter((call) => call[0] === "settle" && call[1].idempotencyKey.includes("ppt_slide_regenerate")).length === 1) {
+          throw new Error("slide settle unavailable");
+        }
+        return { status: "settled", hold_id: input.holdId, settled_amount: input.actualAmount };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Slide settle reconcile",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deck.id,
+      slideId: deck.slides[0].id,
+      instruction: "paid edit",
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const result = await context.pptService.reconcileBillingEvents({ limit: 10 });
+  const readyDeck = await context.database.findOne("decks", (item) => item.id === deck.id);
+  const settleEvent = await context.database.findOne("billing_events", (event) => event.eventType === "settle" && event.taskId === deck.id);
+
+  assert.deepEqual(result, { checked: 1, settled: 1, released: 0, failed: 0 });
+  assert.equal(readyDeck.status, "ready");
+  assert.equal(settleEvent.status, "settled");
+  assert.equal(context.billingCalls.filter((call) => call[0] === "settle" && call[1].idempotencyKey.includes("ppt_slide_regenerate")).length, 2);
+});
+
 test("PptService rejects unsupported deck export formats", async () => {
   const context = await createBusinessContext();
   const outline = await context.pptService.generateOutline({

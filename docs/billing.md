@@ -52,7 +52,7 @@ The application records billing events locally so operations can be retried safe
 
 States: `reserve_pending`, `reserved`, `settle_pending`, `settled`, `release_pending`, `released`, `reconcile_failed`.
 
-When AI generation succeeds but Moling `settle` fails, the deck is stored as `billing_pending`, the generation task is marked `reconcile_pending`, and the application records a `settle_pending` billing event with the original hold ID and idempotency key. The app does not release the hold in this case because the AI work has completed and the correct recovery action is to retry settlement.
+When AI generation succeeds but Moling `settle` fails, the deck is stored as `billing_pending`, the generation task is marked `reconcile_pending`, and the application records a `settle_pending` billing event with the original hold ID and idempotency key. Single-slide regeneration uses the same settlement rule: the regenerated slide is stored behind `billing_pending`, the deck is locked, and reconciliation retries settlement. The app does not release the hold in this case because the AI work has completed and the correct recovery action is to retry settlement.
 
 Decks in `billing_pending` are locked from user-facing preview, export, and slide regeneration. This prevents downloading or further modifying generated output before the prepaid hold has been settled.
 

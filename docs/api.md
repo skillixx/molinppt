@@ -118,6 +118,8 @@ Regenerates one slide using an instruction and consumes known-cost credits. Deck
 
 If slide regeneration fails and Moling release also fails, the API returns `BILLING_RECONCILIATION_PENDING` and records a `release_pending` billing event for reconciliation.
 
+If slide regeneration succeeds but Moling settle fails, the deck is locked as `billing_pending` with a `settle_pending` event until reconciliation succeeds.
+
 ### `POST /api/ppt/tasks/{task_id}/retry`
 
 Retries a failed generation task using the stored outline and a new billing operation.
