@@ -33,7 +33,6 @@ Current runtime in this branch is single-process: API, workspace, generation orc
 - A data volume mounted to `/data` for `json:/data/ppt-ai-db.json` and stored uploads
 - Optional reverse proxy (nginx/Traefik) and TLS termination
 - Reachable Moling and AI provider endpoints
--
 ## Configuration
 
 All settings are injected through environment variables:
