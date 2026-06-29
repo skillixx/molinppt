@@ -801,6 +801,51 @@ test("HTTP API rejects invalid outline edits before deck generation", async () =
   }
 });
 
+test("HTTP API keeps edited outline slide count within page limits", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Too many edited slides",
+      slide_count: 2,
+      template_id: "business",
+      theme: "modern",
+    });
+    const outlineBody = await outlineResponse.json();
+    const tooManySlides = Array.from({ length: 21 }, (_, index) => ({
+      title: `Slide ${index + 1}`,
+      bullets: ["A"],
+    }));
+    const editResponse = await fetch(`${baseUrl}/api/ppt/outlines/${outlineBody.outline.id}`, {
+      method: "PATCH",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ slides: tooManySlides }),
+    });
+    const editBody = await editResponse.json();
+    const storedOutline = await context.database.findOne("outlines", (outline) => outline.id === outlineBody.outline.id);
+
+    assert.equal(editResponse.status, 400);
+    assert.equal(editBody.error.code, "OUTLINE_INVALID");
+    assert.equal(storedOutline.slides.length, 2);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("workspace page exposes the AI PPT generation controls after login", async () => {
   const context = await createBusinessContext();
   const app = createApp({

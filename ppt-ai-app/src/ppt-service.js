@@ -481,6 +481,9 @@ function validateOutlineSlides(slides) {
   if (!Array.isArray(slides) || slides.length === 0) {
     throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: "Outline slides must be a non-empty array" });
   }
+  if (slides.length > MAX_SLIDE_COUNT) {
+    throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: `Outline slides must not exceed ${MAX_SLIDE_COUNT}` });
+  }
   for (const slide of slides) {
     const title = typeof slide?.title === "string" ? slide.title.trim() : "";
     const bullets = slide?.bullets;

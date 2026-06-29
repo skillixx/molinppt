@@ -94,7 +94,7 @@ Generates an editable AI outline from `topic` or `source_file_id`. Supports `sli
 
 ### `PATCH /api/ppt/outlines/{outline_id}`
 
-Updates outline slide titles and bullets before deck generation. `slides` must be a non-empty array; each slide must include a non-empty string `title` and a `bullets` array containing only strings. Invalid edits return `OUTLINE_INVALID` and leave the stored outline unchanged.
+Updates outline slide titles and bullets before deck generation. `slides` must be a non-empty array with no more than 20 items; each slide must include a non-empty string `title` and a `bullets` array containing only strings. Invalid edits return `OUTLINE_INVALID` and leave the stored outline unchanged.
 
 ### `POST /api/ppt/decks`
 
