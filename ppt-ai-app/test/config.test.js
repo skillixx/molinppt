@@ -110,3 +110,14 @@ test("loadConfig rejects invalid AI provider retry settings", () => {
     /LLM_MAX_RETRIES/,
   );
 });
+
+test("loadConfig rejects missing LLM API URL for HTTP provider", () => {
+  assert.throws(
+    () => loadConfig({
+      MOLING_API_BASE_URL: "http://moling.test",
+      INTERNAL_API_TOKEN: "token",
+      LLM_PROVIDER: "http",
+    }),
+    /LLM_API_URL/,
+  );
+});

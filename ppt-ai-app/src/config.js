@@ -8,6 +8,10 @@ export function loadConfig(env = process.env) {
   for (const name of ["MOLING_API_BASE_URL", "INTERNAL_API_TOKEN"]) {
     if (!env[name]) missing.push(name);
   }
+  const llmProvider = env.LLM_PROVIDER || "mock";
+  if (llmProvider === "http" && !env.LLM_API_URL) {
+    missing.push("LLM_API_URL");
+  }
   if (missing.length) {
     throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
   }
@@ -53,7 +57,7 @@ export function loadConfig(env = process.env) {
       level: env.LOG_LEVEL || "info",
     },
     ai: {
-      llmProvider: env.LLM_PROVIDER || "mock",
+      llmProvider,
       llmApiUrl: env.LLM_API_URL || "",
       llmApiKey: env.LLM_API_KEY || "",
       llmTimeoutMs: readPositiveInteger(env.LLM_TIMEOUT_MS, 30000, "LLM_TIMEOUT_MS"),
