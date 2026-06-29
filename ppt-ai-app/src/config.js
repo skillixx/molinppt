@@ -60,6 +60,7 @@ export function loadConfig(env = process.env) {
       llmProvider,
       llmApiUrl: env.LLM_API_URL || "",
       llmApiKey: env.LLM_API_KEY || "",
+      llmModel: env.LLM_MODEL || "",
       llmTimeoutMs: readPositiveInteger(env.LLM_TIMEOUT_MS, 30000, "LLM_TIMEOUT_MS"),
       llmMaxRetries: readNonNegativeInteger(env.LLM_MAX_RETRIES, 0, "LLM_MAX_RETRIES"),
       imageProvider: env.IMAGE_PROVIDER || "mock",

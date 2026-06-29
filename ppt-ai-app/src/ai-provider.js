@@ -75,12 +75,14 @@ export class HttpAiProvider {
    * Creates an HTTP AI provider.
    * @param {{endpoint: string, apiKey?: string, fetcher?: typeof fetch, timeoutMs?: number, maxRetries?: number}} input
    */
-  constructor({ endpoint, apiKey = "", fetcher = fetch, timeoutMs = 30000, maxRetries = 0 }) {
+  constructor({ endpoint, apiKey = "", model = "", fetcher = fetch, timeoutMs = 30000, maxRetries = 0 }) {
     this.endpoint = endpoint;
     this.apiKey = apiKey;
+    this.model = model;
     this.fetcher = fetcher;
     this.timeoutMs = timeoutMs;
     this.maxRetries = maxRetries;
+    this.useChatCompletionsPayload = isChatCompletionsEndpoint(endpoint);
   }
 
   /**
@@ -90,7 +92,8 @@ export class HttpAiProvider {
    */
   async generateOutline(input) {
     const response = await this.#post({ operation: "generate_outline", input });
-    return requireArray(response.outline, "outline");
+    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    return requireArray(payload.outline, "outline");
   }
 
   /**
@@ -100,7 +103,8 @@ export class HttpAiProvider {
    */
   async generateSlides(input) {
     const response = await this.#post({ operation: "generate_slides", input });
-    return requireArray(response.slides, "slides");
+    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    return requireArray(payload.slides, "slides");
   }
 
   /**
@@ -110,7 +114,8 @@ export class HttpAiProvider {
    */
   async regenerateSlide(input) {
     const response = await this.#post({ operation: "regenerate_slide", input });
-    return requireObject(response.slide, "slide");
+    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    return requireObject(payload.slide, "slide");
   }
 
   /**
@@ -123,13 +128,14 @@ export class HttpAiProvider {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
       try {
+        const payload = buildRequestPayload(body, this.model, this.useChatCompletionsPayload);
         const response = await this.fetcher(this.endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify(payload),
           signal: controller.signal,
         });
         if (!response.ok) {
@@ -144,6 +150,85 @@ export class HttpAiProvider {
       }
     }
     throw new Error("AI provider request failed");
+  }
+}
+
+const OPENAI_SYSTEM_PROMPT = "You are an internal PPT generation service. Return only JSON, no markdown. Include exactly one top-level field for the requested operation.";
+
+/**
+ * Builds the body sent to the configured provider.
+ * @param {{operation: string, input: object}} body
+ * @param {string} model
+ * @param {boolean} useChatCompletionsPayload
+ * @returns {object}
+ */
+function buildRequestPayload(body, model, useChatCompletionsPayload) {
+  if (!useChatCompletionsPayload) {
+    return model ? { ...body, model } : body;
+  }
+  const request = {
+    messages: [
+      { role: "system", content: OPENAI_SYSTEM_PROMPT },
+      { role: "user", content: JSON.stringify(body) },
+    ],
+  };
+  return model ? { ...request, model } : request;
+}
+
+/**
+ * Converts provider responses to the internal payload contract.
+ * @param {unknown} response
+ * @param {boolean} useChatCompletionsPayload
+ * @returns {{outline?: unknown, slides?: unknown, slide?: unknown}}
+ */
+function normalizeProviderResponse(response, useChatCompletionsPayload) {
+  if (!useChatCompletionsPayload) return response;
+  if (!response || typeof response !== "object") {
+    throw new Error("AI_PROVIDER_INVALID_RESPONSE: response must be an object");
+  }
+  const message = response.choices?.[0]?.message?.content;
+  if (typeof message !== "string") {
+    throw new Error("AI_PROVIDER_INVALID_RESPONSE: chat provider content missing or invalid");
+  }
+  const parsed = parseJSON(message);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("AI_PROVIDER_INVALID_RESPONSE: chat provider content must be an object");
+  }
+  return parsed;
+}
+
+/**
+ * Returns true when endpoint looks like an OpenAI chat completions endpoint.
+ * @param {string} endpoint
+ * @returns {boolean}
+ */
+function isChatCompletionsEndpoint(endpoint) {
+  try {
+    const path = new URL(endpoint).pathname.toLowerCase();
+    return /\/chat\/completions\/?$/.test(path);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Parse JSON from raw model output, accepting optional markdown code fences.
+ * @param {string} text
+ * @returns {unknown}
+ */
+function parseJSON(text) {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (!match) {
+      throw new Error("AI_PROVIDER_INVALID_RESPONSE: response content is not valid JSON");
+    }
+    try {
+      return JSON.parse(match[1]);
+    } catch {
+      throw new Error("AI_PROVIDER_INVALID_RESPONSE: response content is not valid JSON");
+    }
   }
 }
 

@@ -22,7 +22,14 @@ Future work:
 
 ## HTTP Provider Contract
 
-The HTTP provider receives JSON with `operation` and `input` fields. It must return:
+The HTTP provider supports two formats:
+
+- Legacy contract: JSON with `operation` and `input` fields.
+- OpenAI-compatible `chat/completions` contract when the URL is `/chat/completions`:
+  - payload uses `messages` and optional `model`
+  - response is read from `choices[0].message.content` and parsed as JSON
+
+For both modes, the parsed payload must finally contain:
 
 - `generate_outline`: `{ "outline": [...] }`
 - `generate_slides`: `{ "slides": [...] }`

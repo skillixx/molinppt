@@ -284,6 +284,74 @@ test("HttpAiProvider posts prompt requests to an external provider endpoint", as
   assert.equal(slide.title, "Regenerated");
 });
 
+test("HttpAiProvider supports OpenAI-compatible chat-completion responses", async () => {
+  const calls = [];
+  const provider = new HttpAiProvider({
+    endpoint: "https://api.deepseek.com/chat/completions",
+    apiKey: "ai-key",
+    model: "deepseek-v4-flash",
+    fetcher: async (url, init) => {
+      calls.push({ url, init });
+      const body = JSON.parse(init.body);
+      const input = JSON.parse(body.messages[1].content);
+
+      if (input.operation === "generate_outline") {
+        return Response.json({
+          choices: [{
+            message: {
+              content: JSON.stringify({ outline: [{ title: "Chat outline", bullets: ["A"] }] }),
+            },
+          }],
+        });
+      }
+      if (input.operation === "generate_slides") {
+        return Response.json({
+          choices: [{
+            message: {
+              content: JSON.stringify({ slides: [{ id: "slide_1", title: "Chat slide", bullets: ["B"] }] }),
+            },
+          }],
+        });
+      }
+      return Response.json({
+        choices: [{
+          message: {
+            content: JSON.stringify({ slide: { id: "slide_1", title: "Chat regenerated", bullets: ["C"] } }),
+          },
+        }],
+      });
+    },
+  });
+
+  const outline = await provider.generateOutline({ topic: "Provider", slideCount: 1 });
+  const slides = await provider.generateSlides({ outline: { slides: outline } });
+  const slide = await provider.regenerateSlide({ slide: slides[0], instruction: "shorten" });
+  const firstPayload = JSON.parse(calls[0].init.body);
+
+  assert.equal(calls[0].url, "https://api.deepseek.com/chat/completions");
+  assert.equal(calls[0].init.headers.Authorization, "Bearer ai-key");
+  assert.equal(firstPayload.model, "deepseek-v4-flash");
+  assert.equal(firstPayload.messages[0].role, "system");
+  assert.equal(firstPayload.messages[1].role, "user");
+  assert.equal(outline[0].title, "Chat outline");
+  assert.equal(slides[0].title, "Chat slide");
+  assert.equal(slide.title, "Chat regenerated");
+});
+
+test("HttpAiProvider rejects malformed OpenAI-compatible provider responses", async () => {
+  const provider = new HttpAiProvider({
+    endpoint: "https://api.deepseek.com/chat/completions",
+    fetcher: async () => Response.json({
+      choices: [{ message: { content: "not-a-json-object" } }],
+    }),
+  });
+
+  await assert.rejects(
+    () => provider.generateSlides({ outline: { slides: [] } }),
+    /AI_PROVIDER_INVALID_RESPONSE/,
+  );
+});
+
 test("HttpAiProvider rejects malformed provider responses", async () => {
   const provider = new HttpAiProvider({
     endpoint: "http://ai.test/generate",

@@ -31,6 +31,16 @@ Moling launch and billing configuration:
 - `SESSION_COOKIE_SECURE` optionally controls the cookie `Secure` attribute; it defaults to true when `APP_ENV=production`.
 - `LLM_TIMEOUT_MS` optionally controls HTTP AI provider request timeout and defaults to 30000 ms.
 - `LLM_MAX_RETRIES` optionally controls HTTP AI provider transient-failure retries and defaults to 0.
+- `LLM_MODEL` is the model name sent to the provider (for example `deepseek-v4-flash`).
+
+Deepseek/OpenAI-style providers should set:
+
+- `LLM_PROVIDER=http`
+- `LLM_API_URL=https://api.deepseek.com/chat/completions`
+- `LLM_API_KEY=<your token>`
+- `LLM_MODEL=deepseek-v4-flash`
+
+For legacy self-hosted adapters, keep `LLM_API_URL` in legacy format and return the legacy payload fields directly.
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
 

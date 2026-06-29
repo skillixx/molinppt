@@ -45,6 +45,7 @@ const aiProvider = config.ai.llmProvider === "http"
   ? new HttpAiProvider({
     endpoint: config.ai.llmApiUrl,
     apiKey: config.ai.llmApiKey,
+    model: config.ai.llmModel,
     timeoutMs: config.ai.llmTimeoutMs,
     maxRetries: config.ai.llmMaxRetries,
   })

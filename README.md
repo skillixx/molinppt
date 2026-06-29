@@ -74,6 +74,7 @@ Optional AI provider variables:
 
 - `LLM_PROVIDER=mock` for local deterministic generation
 - `LLM_PROVIDER=http` with `LLM_API_URL` and `LLM_API_KEY` for an external provider adapter
+- `LLM_MODEL` to select provider model (required for DeepSeek and other chat-completion style providers)
 
 For local end-to-end acceptance without real Moling credentials, set:
 

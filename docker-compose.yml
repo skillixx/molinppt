@@ -10,6 +10,10 @@ services:
       DATABASE_URL: json:/data/ppt-ai-db.json
       STORAGE_DIR: /data/storage
       LOG_LEVEL: info
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_API_URL: ${LLM_API_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
     ports:
       - "5177:5177"
     volumes:

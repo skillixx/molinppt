@@ -52,8 +52,13 @@ For HTTP AI provider deployment, set:
 - `LLM_PROVIDER=http`
 - `LLM_API_URL`
 - `LLM_API_KEY`
+- `LLM_MODEL` (for example `deepseek-v4-flash` when using DeepSeek)
 - `LLM_TIMEOUT_MS` to bound each provider request, default `30000`
 - `LLM_MAX_RETRIES` for transient 5xx/network failures, default `0`
+
+If `LLM_API_URL` points to `/chat/completions`, the app sends OpenAI-style requests automatically and parses the first choice JSON from:
+
+`choices[0].message.content`
 
 For local pre-production smoke tests without external Moling credentials, set `LOCAL_MOLING_MOCK=true` plus local user and entitlement IDs, then run `npm run acceptance`.
 

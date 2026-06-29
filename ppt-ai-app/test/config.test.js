@@ -21,6 +21,7 @@ test("loadConfig reads every framework setting from environment variables", () =
     LLM_PROVIDER: "mock",
     LLM_API_URL: "http://ai.test/generate",
     LLM_API_KEY: "llm-key",
+    LLM_MODEL: "deepseek-v4-flash",
     LLM_TIMEOUT_MS: "1500",
     LLM_MAX_RETRIES: "2",
     IMAGE_PROVIDER: "mock-image",
@@ -41,6 +42,7 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.storage.directory, "./tmp/storage");
   assert.equal(config.ai.llmProvider, "mock");
   assert.equal(config.ai.llmApiUrl, "http://ai.test/generate");
+  assert.equal(config.ai.llmModel, "deepseek-v4-flash");
   assert.equal(config.ai.llmTimeoutMs, 1500);
   assert.equal(config.ai.llmMaxRetries, 2);
 });

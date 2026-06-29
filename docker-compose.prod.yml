@@ -16,6 +16,9 @@ services:
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
       LLM_API_URL: ${LLM_API_URL:-}
       LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-30000}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-0}
       APP_BASE_URL: ${APP_BASE_URL:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
