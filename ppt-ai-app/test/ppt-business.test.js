@@ -116,6 +116,83 @@ test("PptService releases slide regeneration credits when AI fails", async () =>
   ]);
 });
 
+test("PptService marks successful generation for reconciliation when settle fails", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        throw new Error("settle unavailable");
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Settle failure",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const [task] = await context.database.find("generation_tasks");
+  const [deck] = await context.database.find("decks");
+  const events = await context.database.find("billing_events");
+
+  assert.equal(task.status, "reconcile_pending");
+  assert.equal(task.retryable, false);
+  assert.equal(task.deckId, deck.id);
+  assert.equal(task.errorCode, "SETTLE_FAILED");
+  assert.equal(deck.status, "billing_pending");
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle"]);
+  assert.deepEqual(events.map((event) => event.status), ["reserved", "settle_pending"]);
+});
+
+test("PptService reconciles pending settle events", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        if (context.billingCalls.filter((call) => call[0] === "settle").length === 1) {
+          throw new Error("settle unavailable");
+        }
+        return { status: "settled", settled_amount: input.actualAmount };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Reconcile settle",
+    slideCount: 2,
+    templateId: "business",
+  });
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const result = await context.pptService.reconcileBillingEvents({ limit: 10 });
+  const [task] = await context.database.find("generation_tasks");
+  const [deck] = await context.database.find("decks");
+  const settleEvent = await context.database.findOne("billing_events", (event) => event.eventType === "settle");
+
+  assert.deepEqual(result, { checked: 1, settled: 1, failed: 0 });
+  assert.equal(task.status, "succeeded");
+  assert.equal(deck.status, "ready");
+  assert.equal(settleEvent.status, "settled");
+  assert.equal(context.billingCalls.filter((call) => call[0] === "settle").length, 2);
+});
+
 test("PptService routes slide regeneration through PromptManager", async () => {
   const promptCalls = [];
   const aiCalls = [];
@@ -580,6 +657,7 @@ async function createBusinessContext(options = {}) {
       billingCalls.push(["consume", input]);
       return { status: "consumed", amount: input.amount };
     },
+    ...(options.billingOverrides || {}),
   };
   const aiProvider = options.aiProvider || new MockAiProvider();
   const pptService = new PptService({

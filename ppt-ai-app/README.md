@@ -81,5 +81,8 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 - `GET /api/ppt/tasks/{task_id}`
 - `POST /api/ppt/tasks/{task_id}/retry`
 - `GET /api/logs`
+- `POST /internal/reconcile`
 
 `POST /api/files` accepts canonical base64 content only. Files must be non-empty, no larger than 2 MiB, and use one of these MIME types: `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, or `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
+
+`POST /internal/reconcile` is for operations only. It requires `X-Internal-Token: <INTERNAL_API_TOKEN>` and retries pending Moling settlement events.

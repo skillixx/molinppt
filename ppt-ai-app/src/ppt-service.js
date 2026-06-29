@@ -96,29 +96,20 @@ export class PptService {
       idempotencyKey: reserveKey,
     });
     await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "reserve", amount: GENERATE_AMOUNT, status: "reserved", holdId: reserve.hold_id, idempotencyKey: reserveKey });
+    let deck;
     try {
       const template = this.templateManager.getTemplate(outline.templateId);
       const prompt = this.promptManager.buildDeckPrompt({ outline, template });
       const slides = await this.aiProvider.generateSlides(prompt);
-      const deck = await this.database.insert("decks", {
+      deck = await this.database.insert("decks", {
         ownerUserId,
         outlineId,
         title: outline.topic,
         templateId: outline.templateId,
         theme: outline.theme,
-        status: "ready",
+        status: "billing_pending",
         slides,
       });
-      await this.billingClient.settleCredits({
-        holdId: reserve.hold_id,
-        actualAmount: GENERATE_AMOUNT,
-        idempotencyKey: settleKey,
-      });
-      await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "settle", amount: GENERATE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
-      const completedTask = await this.taskCenter.updateTask(task.id, { status: "succeeded", progress: 100, result: { deckId: deck.id } });
-      await this.database.update("generation_tasks", generationTask.id, { status: "succeeded", progress: 100, deckId: deck.id });
-      await this.#log({ ownerUserId, action: "deck_generated", resourceType: "deck", resourceId: deck.id });
-      return { deck, task: completedTask };
     } catch (error) {
       await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
       await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
@@ -130,6 +121,37 @@ export class PptService {
         status: 502,
         message: `AI_PROVIDER_FAILED: ${error.message}`,
         publicDetails: { task_id: task.id, retryable: true },
+      });
+    }
+    try {
+      await this.billingClient.settleCredits({
+        holdId: reserve.hold_id,
+        actualAmount: GENERATE_AMOUNT,
+        idempotencyKey: settleKey,
+      });
+      await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "settle", amount: GENERATE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
+      const readyDeck = await this.database.update("decks", deck.id, { status: "ready" });
+      const completedTask = await this.taskCenter.updateTask(task.id, { status: "succeeded", progress: 100, result: { deckId: deck.id } });
+      await this.database.update("generation_tasks", generationTask.id, { status: "succeeded", progress: 100, deckId: deck.id });
+      await this.#log({ ownerUserId, action: "deck_generated", resourceType: "deck", resourceId: deck.id });
+      return { deck: readyDeck, task: completedTask };
+    } catch (error) {
+      await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "settle", amount: GENERATE_AMOUNT, status: "settle_pending", holdId: reserve.hold_id, idempotencyKey: settleKey });
+      await this.taskCenter.updateTask(task.id, { status: "failed", progress: 100, error: "Billing reconciliation pending" });
+      await this.database.update("generation_tasks", generationTask.id, {
+        status: "reconcile_pending",
+        progress: 100,
+        deckId: deck.id,
+        retryable: false,
+        errorCode: "SETTLE_FAILED",
+        errorMessage: error.message,
+      });
+      await this.#log({ ownerUserId, action: "billing_settle_pending", resourceType: "task", resourceId: task.id, metadata: { error: error.message, deckId: deck.id } });
+      throw new AppError({
+        code: "BILLING_RECONCILIATION_PENDING",
+        status: 409,
+        message: "Billing reconciliation pending",
+        publicDetails: { task_id: task.id, deck_id: deck.id, retryable: false },
       });
     }
   }
@@ -154,6 +176,50 @@ export class PptService {
    */
   async getGenerationTask({ ownerUserId, taskId }) {
     return this.#getOwned("generation_tasks", taskId, ownerUserId, "TASK_NOT_FOUND");
+  }
+
+  /**
+   * Reconciles pending billing settlement events after transient platform failures.
+   * @param {{limit?: number}} input
+   * @returns {Promise<{checked: number, settled: number, failed: number}>}
+   */
+  async reconcileBillingEvents({ limit = 20 } = {}) {
+    const pendingEvents = (await this.database.find("billing_events", (event) => event.status === "settle_pending"))
+      .slice(0, normalizeLimit(limit));
+    const result = { checked: pendingEvents.length, settled: 0, failed: 0 };
+    for (const event of pendingEvents) {
+      try {
+        const platformResponse = await this.billingClient.settleCredits({
+          holdId: event.holdId,
+          actualAmount: event.amount,
+          idempotencyKey: event.idempotencyKey,
+        });
+        await this.database.update("billing_events", event.id, {
+          status: "settled",
+          platformResponse,
+        });
+        const task = await this.database.findOne("generation_tasks", (item) => item.id === event.taskId);
+        if (task) {
+          await this.database.update("generation_tasks", task.id, {
+            status: "succeeded",
+            progress: 100,
+            retryable: false,
+            errorCode: null,
+            errorMessage: null,
+          });
+          if (task.deckId) await this.database.update("decks", task.deckId, { status: "ready" });
+          await this.#log({ ownerUserId: task.ownerUserId, action: "billing_reconciled", resourceType: "task", resourceId: task.id });
+        }
+        result.settled += 1;
+      } catch (error) {
+        await this.database.update("billing_events", event.id, {
+          status: "reconcile_failed",
+          errorMessage: error.message,
+        });
+        result.failed += 1;
+      }
+    }
+    return result;
   }
 
   /**
@@ -334,4 +400,15 @@ function validateTemplateTheme({ template, theme }) {
       message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
     });
   }
+}
+
+/**
+ * Normalizes an operational reconciliation batch limit.
+ * @param {unknown} value
+ * @returns {number}
+ */
+function normalizeLimit(value) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) return 20;
+  return Math.min(parsed, 100);
 }

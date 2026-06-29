@@ -35,7 +35,7 @@ Application errors should carry:
 - Retry transient provider, storage, and platform 5xx failures with bounded attempts.
 - Never change billing idempotency keys during retries.
 - Do not retry validation, authorization, or insufficient credit errors.
-- Reconciliation worker handles failed settle or release operations.
+- Reconciliation handles failed settle operations through `POST /internal/reconcile`; generated decks remain `billing_pending` until settlement succeeds.
 
 ## Fail-Closed Behavior
 

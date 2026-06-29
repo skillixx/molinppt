@@ -377,6 +377,55 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
   }
 });
 
+test("createApp protects the internal reconciliation endpoint", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "files", "tasks"],
+  });
+  await database.initialize();
+  let reconciled = 0;
+  const app = createApp({
+    database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager({ templates: [{ id: "business", name: "Business" }] }),
+    aiProvider: new MockAiProvider(),
+    pptService: {
+      reconcileBillingEvents: async () => {
+        reconciled += 1;
+        return { checked: 1, settled: 1, failed: 0 };
+      },
+    },
+    internalToken: "internal-secret",
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const forbidden = await fetch(`${baseUrl}/internal/reconcile`, {
+      method: "POST",
+      headers: { "X-Internal-Token": "wrong" },
+    });
+    assert.equal(forbidden.status, 403);
+
+    const accepted = await fetch(`${baseUrl}/internal/reconcile`, {
+      method: "POST",
+      headers: { "X-Internal-Token": "internal-secret", "Content-Type": "application/json" },
+      body: JSON.stringify({ limit: 10 }),
+    });
+    assert.equal(accepted.status, 200);
+    assert.deepEqual(await accepted.json(), { result: { checked: 1, settled: 1, failed: 0 } });
+    assert.equal(reconciled, 1);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp rejects Moling launch tickets for the wrong app or product", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

@@ -122,6 +122,14 @@ Returns the persisted PPT generation task record, including `status`, `progress`
 
 Returns owner-scoped call logs for generation, export, retry, and billing-adjacent actions.
 
+### `POST /internal/reconcile`
+
+Retries pending billing settlement events. This is an operational endpoint and requires the backend `X-Internal-Token` header to match `INTERNAL_API_TOKEN`.
+
+Request fields: optional `limit`.
+
+Response fields: `result.checked`, `result.settled`, `result.failed`.
+
 ## Internal Worker Interfaces
 
 Worker messages are not public HTTP APIs. Queue payloads must include `task_id`, `task_type`, `owner_user_id`, and `idempotency_key`. Workers load full state from the database before executing to avoid trusting queue payloads as the source of truth.

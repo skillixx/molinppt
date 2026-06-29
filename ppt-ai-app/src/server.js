@@ -68,6 +68,7 @@ const app = createApp({
   templateManager,
   aiProvider,
   pptService,
+  internalToken: config.moling.internalToken,
   sessionCookieName: config.auth.sessionCookieName,
 });
 

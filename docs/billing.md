@@ -50,6 +50,10 @@ The application records billing events locally so operations can be retried safe
 
 States: `reserve_pending`, `reserved`, `settle_pending`, `settled`, `release_pending`, `released`, `reconcile_failed`.
 
+When AI generation succeeds but Moling `settle` fails, the deck is stored as `billing_pending`, the generation task is marked `reconcile_pending`, and the application records a `settle_pending` billing event with the original hold ID and idempotency key. The app does not release the hold in this case because the AI work has completed and the correct recovery action is to retry settlement.
+
+Operations can call `POST /internal/reconcile` with `X-Internal-Token` to retry `settle_pending` events. Successful reconciliation marks the billing event `settled`, the deck `ready`, and the generation task `succeeded`. Failed retries are marked `reconcile_failed` for operator follow-up.
+
 ## Platform Boundary
 
 - `INTERNAL_API_TOKEN` is read from environment variables only.

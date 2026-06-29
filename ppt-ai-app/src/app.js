@@ -22,6 +22,14 @@ export function createApp(dependencies) {
         return;
       }
 
+      if (request.method === "POST" && url.pathname === "/internal/reconcile") {
+        requireInternalToken(request, dependencies.internalToken);
+        const body = await readJson(request);
+        const result = await dependencies.pptService.reconcileBillingEvents({ limit: body.limit });
+        sendJson(response, { result });
+        return;
+      }
+
       if (request.method === "GET" && url.pathname === "/enter") {
         const ticket = url.searchParams.get("ticket");
         if (!ticket) throw new AppError({ code: "MISSING_TICKET", status: 400, message: "Missing launch ticket" });
@@ -302,6 +310,21 @@ function requireSession(request, sessions, cookieName) {
   const session = sessionId ? sessions.get(sessionId) : null;
   if (!session) throw new AppError({ code: "UNAUTHORIZED", status: 401, message: "Unauthorized" });
   return session;
+}
+
+/**
+ * Requires the backend internal token for operational endpoints.
+ * @param {import("node:http").IncomingMessage} request
+ * @param {string | undefined} expectedToken
+ * @returns {void}
+ */
+function requireInternalToken(request, expectedToken) {
+  if (!expectedToken) {
+    throw new AppError({ code: "INTERNAL_TOKEN_NOT_CONFIGURED", status: 500, message: "Internal token is not configured" });
+  }
+  if (request.headers["x-internal-token"] !== expectedToken) {
+    throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
+  }
 }
 
 /**
