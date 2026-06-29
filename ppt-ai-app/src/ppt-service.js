@@ -56,6 +56,7 @@ export class PptService {
    */
   async updateOutline({ ownerUserId, outlineId, slides }) {
     const outline = await this.#getOwned("outlines", outlineId, ownerUserId, "OUTLINE_NOT_FOUND");
+    validateOutlineSlides(slides);
     const updated = await this.database.update("outlines", outline.id, {
       slides,
       status: "outline_edited",
@@ -438,6 +439,24 @@ function validateTemplateTheme({ template, theme }) {
       status: 400,
       message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
     });
+  }
+}
+
+/**
+ * Validates user-edited outline slides before chargeable deck generation.
+ * @param {unknown} slides
+ * @returns {void}
+ */
+function validateOutlineSlides(slides) {
+  if (!Array.isArray(slides) || slides.length === 0) {
+    throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: "Outline slides must be a non-empty array" });
+  }
+  for (const slide of slides) {
+    const title = typeof slide?.title === "string" ? slide.title.trim() : "";
+    const bullets = slide?.bullets;
+    if (!title || !Array.isArray(bullets) || !bullets.every((bullet) => typeof bullet === "string")) {
+      throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: "Each outline slide must include a title and string bullets" });
+    }
   }
 }
 
