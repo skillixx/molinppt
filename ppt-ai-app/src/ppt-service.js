@@ -294,7 +294,18 @@ export class PptService {
       await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
       return { deck: updatedDeck, slide: regenerated };
     } catch (error) {
-      await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      try {
+        await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      } catch (releaseError) {
+        await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "release", amount: "0", status: "release_pending", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+        await this.#log({ ownerUserId, action: "billing_release_pending", resourceType: "deck", resourceId: deck.id, metadata: { error: releaseError.message, originalError: error.message, slideId } });
+        throw new AppError({
+          code: "BILLING_RECONCILIATION_PENDING",
+          status: 409,
+          message: "Billing reconciliation pending",
+          publicDetails: { deck_id: deck.id, slide_id: slideId, retryable: false },
+        });
+      }
       await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
       await this.#log({ ownerUserId, action: "slide_regeneration_failed", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message } });
       throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });

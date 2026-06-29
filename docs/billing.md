@@ -58,7 +58,7 @@ Decks in `billing_pending` are locked from user-facing preview, export, and slid
 
 Operations can call `POST /internal/reconcile` with `X-Internal-Token` to retry `settle_pending` events. Successful reconciliation marks the billing event `settled`, the deck `ready`, and the generation task `succeeded`. Failed retries are marked `reconcile_failed` for operator follow-up.
 
-When AI generation fails and Moling `release` also fails, the task is marked `release_pending`, `retryable` stays false, and a `release_pending` billing event preserves the same hold ID and idempotency key. Reconciliation retries release; once it succeeds, the billing event becomes `released` and the generation task becomes retryable again.
+When AI generation fails and Moling `release` also fails, the task is marked `release_pending`, `retryable` stays false, and a `release_pending` billing event preserves the same hold ID and idempotency key. Slide regeneration follows the same fail-closed release path: the deck remains unchanged, a `release_pending` event is recorded against the deck ID, and reconciliation retries release. Once release succeeds, the billing event becomes `released`; for full generation the task becomes retryable again.
 
 ## Platform Boundary
 

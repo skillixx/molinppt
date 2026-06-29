@@ -116,6 +116,8 @@ Request field `format` must be `pptx` or `pdf`; other values return `EXPORT_FORM
 
 Regenerates one slide using an instruction and consumes known-cost credits. Decks in `billing_pending` state are blocked.
 
+If slide regeneration fails and Moling release also fails, the API returns `BILLING_RECONCILIATION_PENDING` and records a `release_pending` billing event for reconciliation.
+
 ### `POST /api/ppt/tasks/{task_id}/retry`
 
 Retries a failed generation task using the stored outline and a new billing operation.

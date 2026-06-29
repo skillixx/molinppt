@@ -116,6 +116,91 @@ test("PptService releases slide regeneration credits when AI fails", async () =>
   ]);
 });
 
+test("PptService records slide release reconciliation when regeneration release fails", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async () => {
+    throw new Error("slide provider failed");
+  };
+  const context = await createBusinessContext({
+    aiProvider,
+    billingOverrides: {
+      releaseCredits: async (input) => {
+        context.billingCalls.push(["release", input]);
+        throw new Error("slide release unavailable");
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Slide release failure",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deck.id,
+      slideId: deck.slides[0].id,
+      instruction: "fail release",
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const releaseEvent = await context.database.findOne("billing_events", (event) => event.eventType === "release" && event.status === "release_pending");
+  const logs = await context.database.find("call_logs", (log) => log.action === "billing_release_pending");
+
+  assert.equal(releaseEvent.taskId, deck.id);
+  assert.equal(releaseEvent.amount, "0");
+  assert.equal(logs.length, 1);
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle", "balance", "reserve", "release"]);
+});
+
+test("PptService reconciles pending slide release events", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async () => {
+    throw new Error("slide provider failed");
+  };
+  const context = await createBusinessContext({
+    aiProvider,
+    billingOverrides: {
+      releaseCredits: async (input) => {
+        context.billingCalls.push(["release", input]);
+        if (context.billingCalls.filter((call) => call[0] === "release").length === 1) {
+          throw new Error("slide release unavailable");
+        }
+        return { status: "released", hold_id: input.holdId };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Slide release reconcile",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deck.id,
+      slideId: deck.slides[0].id,
+      instruction: "fail release",
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+
+  const result = await context.pptService.reconcileBillingEvents({ limit: 10 });
+  const releaseEvent = await context.database.findOne("billing_events", (event) => event.eventType === "release");
+
+  assert.deepEqual(result, { checked: 1, settled: 0, released: 1, failed: 0 });
+  assert.equal(releaseEvent.status, "released");
+  assert.equal(context.billingCalls.filter((call) => call[0] === "release").length, 2);
+});
+
 test("PptService rejects unsupported deck export formats", async () => {
   const context = await createBusinessContext();
   const outline = await context.pptService.generateOutline({
