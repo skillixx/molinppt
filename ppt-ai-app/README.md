@@ -41,7 +41,7 @@ Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, 
 - local file upload/download
 - in-memory task center
 - AI provider abstraction
-- template manager
+- template manager with default `business`, `education`, and `pitch` catalog
 - HTTP API foundation
 - prompt manager
 - PPT generation service
@@ -51,6 +51,7 @@ Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, 
 ## Workspace Capabilities
 
 - topic and document-to-outline generation
+- dynamic template and theme selection from `/api/templates`
 - editable outline JSON before deck generation
 - deck generation with task status and balance refresh
 - single-slide regeneration

@@ -10,6 +10,10 @@ const entitlementId = Number(
 const launch = await fetch(`${baseUrl}/enter?ticket=local_acceptance`, { redirect: "manual" });
 if (launch.status !== 302) throw new Error(`launch failed: ${launch.status}`);
 const cookie = launch.headers.get("set-cookie").split(";")[0];
+const templates = await get("/api/templates");
+if (templates.templates.length < 3 || !templates.templates.every((template) => template.themes?.length)) {
+  throw new Error("template catalog failed");
+}
 const initialBalance = await get("/api/billing/balance");
 if (Number(initialBalance.entitlement_id) !== entitlementId) throw new Error("balance entitlement mismatch");
 

@@ -16,7 +16,7 @@ Owns user projects, decks, slides, edit state, and deck status.
 
 Owns template metadata, compatibility rules, and presentation style selection.
 
-Second-stage file: `src/templates.js`.
+Third-stage file: `src/templates.js` now provides a default multi-template catalog and theme metadata consumed by the workspace through `/api/templates`.
 
 ### Generation
 

@@ -420,7 +420,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         </div>
         <div>
           <label for="theme">主题风格</label>
-          <select id="theme"><option value="modern">Modern</option><option value="classic">Classic</option></select>
+          <select id="theme"><option value="modern">modern</option></select>
         </div>
       </div>
       <label for="document">上传文档内容</label>
@@ -465,6 +465,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const balanceStatusEl = document.querySelector("#balance-status");
     const previewEl = document.querySelector("#preview");
     const outlineEditorEl = document.querySelector("#outline-editor");
+    let templateCatalog = [{ id: "business", name: "Business", themes: ["modern", "classic"] }];
     const json = (url, body, method = "POST") => fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -486,6 +487,35 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         balanceStatusEl.textContent = error.message;
       }
     }
+    function renderTemplateOptions() {
+      const templateEl = document.querySelector("#template");
+      templateEl.innerHTML = templateCatalog.map((template) => (
+        '<option value="' + template.id + '">' + template.name + '</option>'
+      )).join("");
+      renderThemeOptions();
+    }
+    function renderThemeOptions() {
+      const selected = templateCatalog.find((template) => template.id === document.querySelector("#template").value) || templateCatalog[0];
+      const themeEl = document.querySelector("#theme");
+      themeEl.innerHTML = (selected.themes || ["modern"]).map((theme) => (
+        '<option value="' + theme + '">' + theme + '</option>'
+      )).join("");
+    }
+    async function loadTemplates() {
+      try {
+        const data = await fetch("/api/templates").then(async (res) => {
+          const payload = await res.json();
+          if (!res.ok) throw new Error(JSON.stringify(payload));
+          return payload;
+        });
+        templateCatalog = data.templates;
+        renderTemplateOptions();
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    }
+    document.querySelector("#template").addEventListener("change", renderThemeOptions);
+    loadTemplates();
     loadBalance();
     document.querySelector("#generate-outline").addEventListener("click", async () => {
       try {

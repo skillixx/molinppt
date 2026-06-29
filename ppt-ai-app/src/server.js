@@ -40,9 +40,7 @@ const storage = new LocalFileStorage({
   database,
 });
 const taskCenter = new MemoryTaskCenter();
-const templateManager = new TemplateManager({
-  templates: [{ id: "business", name: "Business", style: "clean", themes: ["modern", "classic"] }],
-});
+const templateManager = new TemplateManager();
 const aiProvider = config.ai.llmProvider === "http"
   ? new HttpAiProvider({ endpoint: config.ai.llmApiUrl, apiKey: config.ai.llmApiKey })
   : new MockAiProvider();

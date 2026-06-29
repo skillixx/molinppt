@@ -208,6 +208,16 @@ test("MockAiProvider and TemplateManager expose framework abstractions", async (
   assert.equal(templates.getTemplate("business").name, "Business");
 });
 
+test("TemplateManager provides a multi-template default catalog with themes", () => {
+  const templates = new TemplateManager();
+  const catalog = templates.listTemplates();
+
+  assert.equal(catalog.length >= 3, true);
+  assert.deepEqual(catalog.map((template) => template.id), ["business", "education", "pitch"]);
+  assert.equal(catalog.every((template) => template.themes.length >= 2), true);
+  assert.equal(templates.getTemplate("pitch").style, "storytelling");
+});
+
 test("HttpAiProvider posts prompt requests to an external provider endpoint", async () => {
   const calls = [];
   const provider = new HttpAiProvider({

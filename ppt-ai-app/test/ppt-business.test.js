@@ -243,6 +243,8 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /AI PPT 工作台/);
     assert.match(html, /id="topic"/);
     assert.match(html, /id="outline-editor"/);
+    assert.match(html, /loadTemplates/);
+    assert.match(html, /\/api\/templates/);
     assert.match(html, /id="generate-outline"/);
     assert.match(html, /id="save-outline"/);
     assert.match(html, /id="preview"/);

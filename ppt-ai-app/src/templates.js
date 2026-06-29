@@ -1,5 +1,26 @@
 import { AppError } from "./errors.js";
 
+export const DEFAULT_TEMPLATES = [
+  {
+    id: "business",
+    name: "Business",
+    style: "clean",
+    themes: ["modern", "classic", "executive"],
+  },
+  {
+    id: "education",
+    name: "Education",
+    style: "structured",
+    themes: ["lecture", "workshop", "minimal"],
+  },
+  {
+    id: "pitch",
+    name: "Pitch",
+    style: "storytelling",
+    themes: ["startup", "investor", "product"],
+  },
+];
+
 /**
  * Registry for PPT template metadata.
  */
@@ -8,7 +29,7 @@ export class TemplateManager {
    * Creates a template manager.
    * @param {{templates?: object[]}} input
    */
-  constructor({ templates = [] } = {}) {
+  constructor({ templates = DEFAULT_TEMPLATES } = {}) {
     this.templates = templates;
   }
 
