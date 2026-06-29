@@ -35,6 +35,7 @@ export function createApp(dependencies) {
         sessions.set(sessionId, {
           id: sessionId,
           identity,
+          entitlementId: resolveSessionEntitlementId(identity, dependencies.defaultEntitlementId),
           createdAt: new Date().toISOString(),
         });
         response.writeHead(302, {
@@ -49,12 +50,18 @@ export function createApp(dependencies) {
       const ownerUserId = Number(session.identity.user_id);
 
       if (request.method === "GET" && url.pathname === "/") {
-        sendHtml(response, renderWorkspace({ defaultEntitlementId: dependencies.defaultEntitlementId }));
+        sendHtml(response, renderWorkspace({ defaultEntitlementId: session.entitlementId }));
         return;
       }
 
       if (request.method === "GET" && url.pathname === "/api/me") {
-        sendJson(response, { user: { user_id: ownerUserId, role: "user" } });
+        sendJson(response, {
+          user: {
+            user_id: ownerUserId,
+            role: "user",
+            entitlement_id: session.entitlementId,
+          },
+        });
         return;
       }
 
@@ -132,7 +139,7 @@ export function createApp(dependencies) {
         const result = await dependencies.pptService.generateDeck({
           ownerUserId,
           outlineId: body.outline_id,
-          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
         });
         sendJson(response, result, 201);
         return;
@@ -166,7 +173,7 @@ export function createApp(dependencies) {
           deckId: parts[4],
           slideId: parts[6],
           instruction: body.instruction,
-          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
         });
         sendJson(response, result);
         return;
@@ -178,7 +185,7 @@ export function createApp(dependencies) {
         const result = await dependencies.pptService.retryTask({
           ownerUserId,
           taskId,
-          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
         });
         sendJson(response, result, 201);
         return;
@@ -202,6 +209,49 @@ export function createApp(dependencies) {
       sendJson(response, appError.toJSON(requestId), appError.status);
     }
   });
+}
+
+/**
+ * Resolves the current user's entitlement from Moling launch identity.
+ * @param {object} identity
+ * @param {number | undefined} configuredDefault
+ * @returns {number | undefined}
+ */
+function resolveSessionEntitlementId(identity, configuredDefault) {
+  return readPositiveId(identity.entitlement_id)
+    || readPositiveId(identity.default_entitlement_id)
+    || readPositiveId(identity.entitlement?.entitlement_id)
+    || readPositiveId(identity.entitlement?.id)
+    || readEntitlementList(identity.entitlements, identity.product_id)
+    || configuredDefault;
+}
+
+/**
+ * Reads the first active entitlement that belongs to the current product.
+ * @param {unknown} entitlements
+ * @param {unknown} productId
+ * @returns {number | undefined}
+ */
+function readEntitlementList(entitlements, productId) {
+  if (!Array.isArray(entitlements)) return undefined;
+  const product = readPositiveId(productId);
+  const matched = entitlements.find((item) => {
+    if (item.status && item.status !== "active") return false;
+    if (item.usable === false) return false;
+    const itemProduct = readPositiveId(item.product_id);
+    return !product || !itemProduct || itemProduct === product;
+  });
+  return matched ? readPositiveId(matched.entitlement_id) || readPositiveId(matched.id) : undefined;
+}
+
+/**
+ * Reads a positive integer ID without throwing on absent values.
+ * @param {unknown} value
+ * @returns {number | undefined}
+ */
+function readPositiveId(value) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 /**

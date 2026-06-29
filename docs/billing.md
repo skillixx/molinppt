@@ -25,6 +25,12 @@ Expensive or failure-prone actions use reserve first:
 4. Settle the hold when generation succeeds.
 5. Release the hold when generation fails.
 
+## Entitlement Selection
+
+Billing uses the current session entitlement resolved during Moling launch verification. The app prefers request `entitlement_id` for explicit operator/debug flows, then the active entitlement returned by Moling for the logged-in user, then `MOLING_DEFAULT_ENTITLEMENT_ID` or `PPT_DEFAULT_ENTITLEMENT_ID` as an environment fallback.
+
+Do not rely on one global entitlement ID for all production users. If Moling returns per-user entitlements, those IDs must be used so balance checks, package ownership checks, and deductions happen against the user's own credit package.
+
 ## Idempotency
 
 Every billing operation has a deterministic idempotency key based on task ID and operation type.

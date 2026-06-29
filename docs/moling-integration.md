@@ -30,13 +30,22 @@ Platform configuration must provide:
 
 ## Entitlement Discovery
 
-The application needs a reliable way to identify the current user's active PPT credit entitlement. Supported future options:
+The application identifies the current user's active PPT credit entitlement at launch time. Supported Moling launch verification fields:
 
-- Moling launch verification returns the active entitlement.
-- Moling provides an internal entitlement lookup by user and product.
-- The app uses a user-scoped token to query the user's entitlements.
+- `entitlement_id`
+- `default_entitlement_id`
+- `entitlement.entitlement_id`
+- `entitlement.id`
+- `entitlements[].entitlement_id`
+- `entitlements[].id`
 
-Until Moling provides entitlement discovery, configure `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`. Chargeable APIs use that value when the request does not include `entitlement_id`, and the workspace page pre-fills the same ID.
+When `entitlements[]` is returned, the app prefers an active, usable entitlement whose `product_id` matches the verified product. Chargeable APIs resolve entitlement IDs in this order:
+
+1. request `entitlement_id`
+2. launch identity entitlement
+3. `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
+
+The workspace page pre-fills the resolved session entitlement. This avoids using one fixed entitlement ID for every user while still allowing a configured fallback for environments where Moling has not yet added entitlement data to launch verification.
 
 ## Internal API Boundary
 
@@ -48,6 +57,7 @@ Until Moling provides entitlement discovery, configure `MOLING_DEFAULT_ENTITLEME
 
 - invalid tickets cannot create sessions
 - app/product mismatch is rejected
+- launch identity entitlement is preferred over configured fallback
 - insufficient credits are surfaced without AI provider calls
 - reserve, settle, and release are idempotent
 - platform errors map to stable application errors
