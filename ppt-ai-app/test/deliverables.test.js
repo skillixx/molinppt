@@ -50,6 +50,14 @@ test("local acceptance verifies exported file downloads", async () => {
   assert.match(script, /file_downloaded/);
 });
 
+test("real Moling acceptance verifies exported file downloads", async () => {
+  const script = await readFile(new URL("scripts/moling-acceptance.js", appRoot), "utf8");
+
+  assert.match(script, /\/api\/files\/\$\{file\.id\}/);
+  assert.match(script, /content-disposition/i);
+  assert.match(script, /file_downloaded/);
+});
+
 test("environment examples keep sensitive values empty", async () => {
   const rootEnv = await readFile(new URL(".env.example", repoRoot), "utf8");
   const appEnv = await readFile(new URL(".env.example", appRoot), "utf8");

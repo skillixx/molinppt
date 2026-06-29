@@ -46,4 +46,4 @@ ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
 npm run acceptance:moling
 ```
 
-The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, and call-log persistence. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.
+The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, real PPTX/PDF downloads, and call-log persistence. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.

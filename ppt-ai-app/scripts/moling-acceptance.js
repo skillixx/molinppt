@@ -55,10 +55,17 @@ const preview = await fetch(`${baseUrl}/api/ppt/decks/${deck.deck.id}/preview`, 
 if (!preview.ok || !(await preview.text()).includes("真实墨灵验收")) throw new Error("preview failed");
 const pptx = await post(`/api/ppt/decks/${deck.deck.id}/exports`, { format: "pptx" });
 const pdf = await post(`/api/ppt/decks/${deck.deck.id}/exports`, { format: "pdf" });
+const downloadedPptx = await downloadFile(pptx.file);
+const downloadedPdf = await downloadFile(pdf.file);
 const logs = await get("/api/logs");
 const finalBalance = await get(`/api/billing/balance?entitlement_id=${resolvedEntitlementId}`);
 
-if (!pptx.file?.id || !pdf.file?.id || logs.logs.length < 6) throw new Error("exports or logs failed");
+if (!pptx.file?.id || !pdf.file?.id || downloadedPptx.byteLength === 0 || downloadedPdf.byteLength === 0) {
+  throw new Error("exports or downloads failed");
+}
+if (!logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pptx.file.id)) {
+  throw new Error("download log failed");
+}
 
 console.log(JSON.stringify({
   status: "passed",
@@ -72,6 +79,8 @@ console.log(JSON.stringify({
   regenerated_slide_id: regenerated.slide.id,
   pptx_file_id: pptx.file.id,
   pdf_file_id: pdf.file.id,
+  pptx_download_bytes: downloadedPptx.byteLength,
+  pdf_download_bytes: downloadedPdf.byteLength,
   log_count: logs.logs.length,
 }, null, 2));
 
@@ -119,4 +128,18 @@ async function patch(path, body) {
   const data = await response.json();
   if (!response.ok) throw new Error(`${path} failed: ${JSON.stringify(data)}`);
   return data;
+}
+
+/**
+ * Downloads an exported file and verifies the filename header.
+ * @param {{id: string, fileName: string}} file
+ * @returns {Promise<ArrayBuffer>}
+ */
+async function downloadFile(file) {
+  const response = await fetch(`${baseUrl}/api/files/${file.id}`, { headers: { cookie } });
+  const disposition = response.headers.get("content-disposition") || "";
+  if (!response.ok || !disposition.includes(`filename="${file.fileName}"`)) {
+    throw new Error(`download failed: ${file.id}`);
+  }
+  return response.arrayBuffer();
 }
