@@ -86,6 +86,8 @@ Updates outline slide titles and bullets before deck generation.
 
 Generates a full deck from an outline. The backend checks balance, reserves credits, calls the AI provider, settles credits on success, and releases credits on failure.
 
+When AI generation fails after a task is created, the public error `details` includes `task_id` and `retryable` so the workspace can call the retry API without exposing internal provider or Moling details.
+
 ### `GET /api/ppt/decks/{deck_id}/preview`
 
 Returns an owner-checked HTML preview of generated slides.
@@ -117,10 +119,16 @@ Worker messages are not public HTTP APIs. Queue payloads must include `task_id`,
   "error": {
     "code": "INSUFFICIENT_CREDITS",
     "message": "积分不足，请购买积分包后重试。",
-    "request_id": "req_xxx"
+    "request_id": "req_xxx",
+    "details": {
+      "task_id": "optional_retryable_task_id",
+      "retryable": true
+    }
   }
 }
 ```
+
+`details` is only serialized for explicitly public fields such as retryable task references. Internal platform response data remains server-side.
 
 ## Versioning
 

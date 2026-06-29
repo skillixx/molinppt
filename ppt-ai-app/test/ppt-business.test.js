@@ -126,6 +126,46 @@ test("PptService marks failed generation retryable and retry succeeds", async ()
   assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "release", "balance", "reserve", "settle"]);
 });
 
+test("HTTP API returns retryable task ID when deck generation fails", async () => {
+  const context = await createBusinessContext({
+    aiProvider: new MockAiProvider({ failNextDeck: true }),
+  });
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Retryable failure",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outline = await outlineResponse.json();
+    const failedResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+    });
+    const failedBody = await failedResponse.json();
+
+    assert.equal(failedResponse.status, 502);
+    assert.equal(failedBody.error.code, "AI_PROVIDER_FAILED");
+    assert.match(failedBody.error.details.task_id, /^[0-9a-f-]+$/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("HTTP API runs acceptance flow from login to outline, deck, preview, exports, billing, and logs", async () => {
   const context = await createBusinessContext();
   const app = createApp({
@@ -202,9 +242,14 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.equal(page.status, 200);
     assert.match(html, /AI PPT 工作台/);
     assert.match(html, /id="topic"/);
+    assert.match(html, /id="outline-editor"/);
     assert.match(html, /id="generate-outline"/);
+    assert.match(html, /id="save-outline"/);
     assert.match(html, /id="preview"/);
     assert.match(html, /id="entitlement" value="62"/);
+    assert.match(html, /id="slide-id"/);
+    assert.match(html, /id="regenerate-slide"/);
+    assert.match(html, /id="retry-task"/);
     assert.match(html, /PPTX/);
     assert.match(html, /PDF/);
   } finally {

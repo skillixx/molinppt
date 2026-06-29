@@ -121,7 +121,12 @@ export class PptService {
       await this.taskCenter.updateTask(task.id, { status: "failed", progress: 100, error: error.message });
       await this.database.update("generation_tasks", generationTask.id, { status: "failed", progress: 100, retryable: true, errorMessage: error.message });
       await this.#log({ ownerUserId, action: "deck_generation_failed", resourceType: "task", resourceId: task.id, metadata: { error: error.message } });
-      throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });
+      throw new AppError({
+        code: "AI_PROVIDER_FAILED",
+        status: 502,
+        message: `AI_PROVIDER_FAILED: ${error.message}`,
+        publicDetails: { task_id: task.id, retryable: true },
+      });
     }
   }
 

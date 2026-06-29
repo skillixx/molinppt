@@ -19,6 +19,9 @@ Later implementation phases must prove:
 - Moling users can enter with SSO.
 - users can see the active entitlement balance after entering AI PPT.
 - users can generate a PPT from topic/template/source input.
+- users can edit outline JSON before generation.
+- users can regenerate one generated slide.
+- retryable failures return a task ID that the workspace can retry.
 - each user uses the entitlement returned by Moling launch verification before falling back to configured defaults.
 - credit reserve, settle, and release are correct and idempotent.
 - failed generation does not consume credits.

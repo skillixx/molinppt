@@ -425,11 +425,29 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       </div>
       <label for="document">上传文档内容</label>
       <textarea id="document" placeholder="可粘贴文档文本，生成大纲时会作为 source file 上传"></textarea>
+      <label for="outline-editor">大纲 JSON</label>
+      <textarea id="outline-editor" placeholder="生成大纲后可编辑 slides JSON"></textarea>
       <div class="actions">
         <button id="generate-outline">生成大纲</button>
+        <button id="save-outline" class="secondary">保存大纲</button>
         <button id="generate-deck" class="secondary">生成 PPT</button>
+        <button id="retry-task" class="secondary">重试失败任务</button>
         <button id="export-pptx" class="secondary">下载 PPTX</button>
         <button id="export-pdf" class="secondary">下载 PDF</button>
+      </div>
+      <h2>单页重生成</h2>
+      <div class="row">
+        <div>
+          <label for="slide-id">slide_id</label>
+          <input id="slide-id" placeholder="slide_1" />
+        </div>
+        <div>
+          <label for="slide-instruction">指令</label>
+          <input id="slide-instruction" placeholder="更正式、更简洁" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="regenerate-slide" class="secondary">重新生成单页</button>
       </div>
     </section>
     <section>
@@ -442,10 +460,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     </section>
   </main>
   <script>
-    const state = { outlineId: null, deckId: null };
+    const state = { outlineId: null, deckId: null, taskId: null };
     const statusEl = document.querySelector("#status");
     const balanceStatusEl = document.querySelector("#balance-status");
     const previewEl = document.querySelector("#preview");
+    const outlineEditorEl = document.querySelector("#outline-editor");
     const json = (url, body, method = "POST") => fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -488,6 +507,16 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           theme: document.querySelector("#theme").value
         });
         state.outlineId = data.outline.id;
+        outlineEditorEl.value = JSON.stringify(data.outline.slides, null, 2);
+        statusEl.textContent = JSON.stringify(data.outline, null, 2);
+      } catch (error) { statusEl.textContent = error.message; }
+    });
+    document.querySelector("#save-outline").addEventListener("click", async () => {
+      try {
+        const data = await json("/api/ppt/outlines/" + state.outlineId, {
+          slides: JSON.parse(outlineEditorEl.value)
+        }, "PATCH");
+        outlineEditorEl.value = JSON.stringify(data.outline.slides, null, 2);
         statusEl.textContent = JSON.stringify(data.outline, null, 2);
       } catch (error) { statusEl.textContent = error.message; }
     });
@@ -499,7 +528,41 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
         });
         state.deckId = data.deck.id;
+        state.taskId = data.task.id;
         statusEl.textContent = JSON.stringify(data.task, null, 2);
+        previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+        await loadBalance();
+      } catch (error) {
+        try {
+          const parsed = JSON.parse(error.message);
+          state.taskId = parsed.error?.details?.task_id || state.taskId;
+        } catch {}
+        statusEl.textContent = error.message;
+      }
+    });
+    document.querySelector("#retry-task").addEventListener("click", async () => {
+      try {
+        const entitlementValue = document.querySelector("#entitlement").value.trim();
+        const data = await json("/api/ppt/tasks/" + state.taskId + "/retry", {
+          ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
+        });
+        state.deckId = data.deck.id;
+        state.taskId = data.task.id;
+        statusEl.textContent = JSON.stringify(data.task, null, 2);
+        previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+        await loadBalance();
+      } catch (error) { statusEl.textContent = error.message; }
+    });
+    document.querySelector("#regenerate-slide").addEventListener("click", async () => {
+      try {
+        const entitlementValue = document.querySelector("#entitlement").value.trim();
+        const slideId = document.querySelector("#slide-id").value.trim();
+        const instruction = document.querySelector("#slide-instruction").value.trim();
+        const data = await json("/api/ppt/decks/" + state.deckId + "/slides/" + slideId + "/regenerate", {
+          instruction,
+          ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
+        });
+        statusEl.textContent = JSON.stringify(data.slide, null, 2);
         previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
         await loadBalance();
       } catch (error) { statusEl.textContent = error.message; }

@@ -48,6 +48,15 @@ Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, 
 - PPTX/PDF exporter
 - call log persistence
 
+## Workspace Capabilities
+
+- topic and document-to-outline generation
+- editable outline JSON before deck generation
+- deck generation with task status and balance refresh
+- single-slide regeneration
+- retry entry for failed generation tasks
+- PPTX/PDF export and owner-checked download
+
 ## API Routes
 
 - `GET /api/health`
