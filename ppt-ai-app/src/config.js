@@ -13,6 +13,7 @@ export function loadConfig(env = process.env) {
     productId: readNumber(env.PPT_PRODUCT_ID, 73),
     defaultEntitlementId: readOptionalNumber(env.PPT_DEFAULT_ENTITLEMENT_ID),
     port: readNumber(env.PORT, 5177),
+    databaseUrl: env.DATABASE_URL || "sqlite:./data/ppt-ai.db",
   };
 }
 

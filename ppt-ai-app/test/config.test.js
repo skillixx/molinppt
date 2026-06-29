@@ -20,7 +20,18 @@ test("loadConfig reads platform settings from env", () => {
     productId: 73,
     defaultEntitlementId: 62,
     port: 5177,
+    databaseUrl: "sqlite:./data/ppt-ai.db",
   });
+});
+
+test("loadConfig allows DATABASE_URL override", () => {
+  const config = loadConfig({
+    MOLING_API_BASE_URL: "http://platform.test",
+    INTERNAL_API_TOKEN: "secret-token",
+    DATABASE_URL: "sqlite::memory:",
+  });
+
+  assert.equal(config.databaseUrl, "sqlite::memory:");
 });
 
 test("loadConfig reports missing required settings", () => {

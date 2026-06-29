@@ -21,6 +21,8 @@ export PPT_APP_ID="15"
 export PPT_PRODUCT_ID="73"
 export PPT_DEFAULT_ENTITLEMENT_ID="62"
 export PORT="5177"
+export DATABASE_URL="sqlite:./data/ppt-ai.db"
+npm run migrate
 npm start
 ```
 
@@ -32,10 +34,24 @@ http://your-app-host:5177/enter?ticket=lt_xxx
 
 For current test data, entitlement `62` belongs to test user `479` and has `ppt_ai_credits`.
 
+## Database
+
+The development database uses Node's built-in SQLite driver and stores data at
+`./data/ppt-ai.db` by default. Run migrations before starting the app:
+
+```bash
+npm run migrate
+```
+
+For production PostgreSQL, set `DATABASE_URL` to a PostgreSQL connection string
+such as `postgresql://user:password@host:5432/ppt_ai`. PostgreSQL support lazy
+loads the optional `pg` package, so install it only in environments that use PG.
+
 ## Tests
 
 ```bash
 npm test
+node --test test/db.test.js
 ```
 
 ## Current platform gap

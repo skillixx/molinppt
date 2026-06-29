@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "migrate": "node scripts/migrate.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   }
 }
