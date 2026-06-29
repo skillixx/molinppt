@@ -281,13 +281,22 @@ function readPositiveId(value) {
 }
 
 /**
- * Resolves the entitlement ID from a request body or configured default.
+ * Resolves and validates the entitlement ID from a request body or configured default.
  * @param {number | string | null | undefined} requested
  * @param {number | undefined} configuredDefault
- * @returns {number | string | undefined}
+ * @returns {number}
  */
 function resolveEntitlementId(requested, configuredDefault) {
-  return requested === undefined || requested === null || requested === "" ? configuredDefault : requested;
+  const value = requested === undefined || requested === null || requested === "" ? configuredDefault : requested;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new AppError({
+      code: value === undefined ? "ENTITLEMENT_REQUIRED" : "ENTITLEMENT_INVALID",
+      status: 400,
+      message: "A positive entitlement_id is required",
+    });
+  }
+  return parsed;
 }
 
 /**

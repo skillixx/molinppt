@@ -31,6 +31,8 @@ Billing uses the current session entitlement resolved during Moling launch verif
 
 Do not rely on one global entitlement ID for all production users. If Moling returns per-user entitlements, those IDs must be used so balance checks, package ownership checks, and deductions happen against the user's own credit package.
 
+The API validates the final `entitlement_id` as a positive integer before balance lookup, reserve, settle, or release. Invalid package IDs fail closed with `ENTITLEMENT_INVALID` or `ENTITLEMENT_REQUIRED` and do not create billing events.
+
 ## Idempotency
 
 Every billing operation has a deterministic idempotency key based on task ID and operation type.

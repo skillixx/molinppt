@@ -30,7 +30,7 @@ Returns template metadata from the template manager.
 
 ### `GET /api/billing/balance`
 
-Returns the current session entitlement ID and Moling balance. It accepts optional `entitlement_id` for operator/debug checks; otherwise it uses the entitlement resolved from Moling launch identity and then the configured default fallback.
+Returns the current session entitlement ID and Moling balance. It accepts optional `entitlement_id` for operator/debug checks; otherwise it uses the entitlement resolved from Moling launch identity and then the configured default fallback. The resolved value must be a positive integer; invalid values return `ENTITLEMENT_INVALID`, and requests without any resolvable entitlement return `ENTITLEMENT_REQUIRED`.
 
 Response fields: `entitlement_id`, `balance`.
 
@@ -96,7 +96,7 @@ Updates outline slide titles and bullets before deck generation.
 
 ### `POST /api/ppt/decks`
 
-Generates a full deck from an outline. The backend checks balance, reserves credits, calls the AI provider, settles credits on success, and releases credits on failure.
+Generates a full deck from an outline. The backend checks balance, reserves credits, calls the AI provider, settles credits on success, and releases credits on failure. Optional `entitlement_id` must be a positive integer and is rejected before any billing call if invalid.
 
 When AI generation fails after a task is created, the public error `details` includes `task_id` and `retryable` so the workspace can call the retry API without exposing internal provider or Moling details.
 
