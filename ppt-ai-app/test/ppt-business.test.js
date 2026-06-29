@@ -1015,6 +1015,56 @@ test("HTTP API prefers the launch identity entitlement over the configured defau
   }
 });
 
+test("HTTP API resolves camelCase entitlement fields from launch identity", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({
+        user_id: 9,
+        app_id: 15,
+        productId: 73,
+        entitlements: [
+          { entitlementId: 91, productId: 73, status: "active", usable: true },
+        ],
+      }),
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const page = await fetch(`${baseUrl}/`, { headers: { cookie } });
+    const html = await page.text();
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "CamelCase entitlement",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+    });
+    const deckBody = await deckResponse.json();
+
+    assert.match(html, /id="entitlement" value="91"/);
+    assert.equal(deckResponse.status, 201);
+    assert.equal(deckBody.task.status, "succeeded");
+    assert.equal(context.billingCalls[0][1].entitlementId, 91);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("HTTP API exposes session entitlement balance for package checks", async () => {
   const context = await createBusinessContext();
   const app = createApp({

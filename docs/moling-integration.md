@@ -40,6 +40,11 @@ The application identifies the current user's active PPT credit entitlement at l
 - `entitlement.id`
 - `entitlements[].entitlement_id`
 - `entitlements[].id`
+- `entitlementId`（兼容）
+- `defaultEntitlementId`（兼容）
+- `entitlement.entitlementId`（兼容）
+- `entitlements[].entitlementId`（兼容）
+- `entitlements[].productId`（兼容）
 
 When `entitlements[]` is returned, the app prefers an active, usable entitlement whose `product_id` matches the verified product. Chargeable APIs resolve entitlement IDs in this order:
 

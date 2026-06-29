@@ -364,10 +364,14 @@ function buildSessionCookie({ name, value, maxAgeSeconds, secure }) {
  */
 function resolveSessionEntitlementId(identity, configuredDefault) {
   return readPositiveId(identity.entitlement_id)
+    || readPositiveId(identity.entitlementId)
     || readPositiveId(identity.default_entitlement_id)
+    || readPositiveId(identity.defaultEntitlementId)
     || readPositiveId(identity.entitlement?.entitlement_id)
+    || readPositiveId(identity.entitlement?.entitlementId)
     || readPositiveId(identity.entitlement?.id)
     || readEntitlementList(identity.entitlements, identity.product_id)
+    || readEntitlementList(identity.entitlements, identity.productId)
     || configuredDefault;
 }
 
@@ -383,10 +387,14 @@ function readEntitlementList(entitlements, productId) {
   const matched = entitlements.find((item) => {
     if (item.status && item.status !== "active") return false;
     if (item.usable === false) return false;
-    const itemProduct = readPositiveId(item.product_id);
+    const itemProduct = readPositiveId(item.product_id) || readPositiveId(item.productId);
     return !product || !itemProduct || itemProduct === product;
   });
-  return matched ? readPositiveId(matched.entitlement_id) || readPositiveId(matched.id) : undefined;
+  return matched
+    ? readPositiveId(matched.entitlement_id)
+      || readPositiveId(matched.entitlementId)
+      || readPositiveId(matched.id)
+    : undefined;
 }
 
 /**
