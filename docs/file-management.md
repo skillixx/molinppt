@@ -27,6 +27,7 @@ Metadata includes:
 
 - Users can access only files they own.
 - Download URLs are short-lived, signed by the backend, and expire after five minutes.
+- Signed URL responses and file downloads return `Cache-Control: no-store`.
 - Local direct downloads return `Content-Disposition` with a sanitized filename and write a `file_downloaded` call log.
 - Signed downloads can be fetched without a session cookie but validate the signed file ID, owner ID, and expiry before reading storage.
 - Direct file downloads are owner-checked at the HTTP route; cross-user downloads return `FORBIDDEN` and do not expose another user's file logs.

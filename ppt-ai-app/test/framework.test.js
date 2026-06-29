@@ -639,9 +639,11 @@ test("createApp issues short-lived owner download URLs", async () => {
     const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } }).then((response) => response.json());
 
     assert.equal(signed.status, 200);
+    assert.equal(signed.headers.get("cache-control"), "no-store");
     assert.match(signedBody.url, new RegExp(`^/api/files/${uploaded.file.id}\\?download_token=`));
     assert.equal(Date.parse(signedBody.expires_at) > Date.now(), true);
     assert.equal(downloaded.status, 200);
+    assert.equal(downloaded.headers.get("cache-control"), "no-store");
     assert.equal(await downloaded.text(), "signed download");
     assert.equal(tampered.status, 403);
     assert.equal(logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId === uploaded.file.id), true);

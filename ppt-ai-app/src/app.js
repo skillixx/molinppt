@@ -136,6 +136,7 @@ export function createApp(dependencies) {
           expiresAt,
           secret: dependencies.internalToken,
         });
+        response.setHeader("Cache-Control", "no-store");
         sendJson(response, {
           url: `/api/files/${fileId}?download_token=${encodeURIComponent(token)}`,
           expires_at: expiresAt,
@@ -288,6 +289,7 @@ async function sendFileDownload({ response, database, ownerUserId, downloaded })
   response.writeHead(200, {
     "Content-Type": downloaded.file.mimeType,
     "Content-Disposition": `attachment; filename="${headerSafeFileName(downloaded.file.fileName)}"`,
+    "Cache-Control": "no-store",
   });
   response.end(downloaded.content);
 }

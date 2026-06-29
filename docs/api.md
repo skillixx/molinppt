@@ -74,11 +74,11 @@ Creates an export task for `pptx` or `pdf`.
 
 Returns a short-lived authorized download URL for an owner-scoped file. The request requires the current user's application session. The response contains `url` and `expires_at`.
 
-The returned URL is signed by the backend, expires after five minutes, and can be fetched without a session cookie. Signed downloads still validate the file ID embedded in the token, enforce token expiry, return `Content-Disposition`, and record a `file_downloaded` call log.
+The returned URL is signed by the backend, expires after five minutes, and can be fetched without a session cookie. The signed URL response and the file download response both return `Cache-Control: no-store`. Signed downloads still validate the file ID embedded in the token, enforce token expiry, return `Content-Disposition`, and record a `file_downloaded` call log.
 
 The current local foundation also supports direct owner-checked `GET /api/files/{file_id}` downloads for compatibility.
 
-Direct downloads return the file MIME type, `Content-Disposition` with a sanitized filename, and record a `file_downloaded` call log for auditability.
+Direct downloads return the file MIME type, `Content-Disposition` with a sanitized filename, `Cache-Control: no-store`, and record a `file_downloaded` call log for auditability.
 
 ### `POST /api/files`
 
