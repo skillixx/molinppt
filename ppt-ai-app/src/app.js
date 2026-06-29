@@ -20,6 +20,7 @@ export function createApp(dependencies) {
 
   return createServer(async (request, response) => {
     const requestId = randomUUID();
+    response.setHeader("X-Request-Id", requestId);
     try {
       const url = new URL(request.url, "http://127.0.0.1");
 

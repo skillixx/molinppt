@@ -51,6 +51,8 @@ All settings are injected through environment variables:
 - AI provider credentials
 - log level and tracing configuration
 
+The reverse proxy should preserve the app's `X-Request-Id` response header so support tickets and Moling联调 reports can be matched to backend logs.
+
 For HTTP AI provider deployment, set:
 
 - `LLM_PROVIDER=http`

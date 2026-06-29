@@ -150,6 +150,8 @@ Worker messages are not public HTTP APIs. Queue payloads must include `task_id`,
 
 ## Error Shape
 
+Every HTTP response includes an `X-Request-Id` header. Error responses also repeat the same identifier as `error.request_id` so browser reports, backend logs, file downloads, and internal reconciliation calls can be correlated.
+
 ```json
 {
   "error": {

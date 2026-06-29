@@ -39,7 +39,7 @@ Track:
 
 ## Tracing
 
-Use request IDs across API, queue job, worker, billing call, and storage operation. A task should be traceable from user request to final file export.
+Use request IDs across API, queue job, worker, billing call, and storage operation. The API returns the request ID in `X-Request-Id` on every response, and error bodies repeat it as `error.request_id`. A task should be traceable from user request to final file export.
 
 ## Alerts
 

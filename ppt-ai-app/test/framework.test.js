@@ -336,6 +336,7 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
   try {
     const health = await fetch(`${baseUrl}/api/health`);
     assert.deepEqual(await health.json(), { status: "ok" });
+    assert.match(health.headers.get("x-request-id"), /^[0-9a-f-]{36}$/);
 
     const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
     const cookie = enter.headers.get("set-cookie").split(";")[0];
@@ -353,6 +354,9 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
       }),
     });
     assert.equal(upload.status, 201);
+    const uploaded = await upload.json();
+    const downloaded = await fetch(`${baseUrl}/api/files/${uploaded.file.id}`, { headers: { cookie } });
+    assert.match(downloaded.headers.get("x-request-id"), /^[0-9a-f-]{36}$/);
 
     const invalidUpload = await fetch(`${baseUrl}/api/files`, {
       method: "POST",
@@ -688,6 +692,7 @@ test("createApp protects the internal reconciliation endpoint", async () => {
       body: JSON.stringify({ limit: 10 }),
     });
     assert.equal(accepted.status, 200);
+    assert.match(accepted.headers.get("x-request-id"), /^[0-9a-f-]{36}$/);
     assert.deepEqual(await accepted.json(), { result: { checked: 1, settled: 1, failed: 0 } });
     assert.equal(reconciled, 1);
   } finally {
