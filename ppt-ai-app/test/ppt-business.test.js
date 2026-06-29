@@ -73,8 +73,47 @@ test("PptService completes topic to outline to editable deck to PPTX/PDF with bi
   assert.equal(regenerated.slide.title.includes("executive"), true);
   assert.equal(pptx.file.mimeType, "application/vnd.openxmlformats-officedocument.presentationml.presentation");
   assert.equal(pdf.file.mimeType, "application/pdf");
-  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle", "consume"]);
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle", "balance", "reserve", "settle"]);
   assert.equal((await context.database.find("call_logs")).length >= 5, true);
+});
+
+test("PptService releases slide regeneration credits when AI fails", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async () => {
+    throw new Error("slide provider failed");
+  };
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Regeneration failure",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deckResult.deck.id,
+      slideId: deckResult.deck.slides[0].id,
+      instruction: "fail after reserve",
+      entitlementId: 88,
+    }),
+    /AI_PROVIDER_FAILED/,
+  );
+
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), [
+    "balance",
+    "reserve",
+    "settle",
+    "balance",
+    "reserve",
+    "release",
+  ]);
 });
 
 test("PptService routes slide regeneration through PromptManager", async () => {

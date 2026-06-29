@@ -165,20 +165,36 @@ export class PptService {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     const slide = deck.slides.find((item) => item.id === slideId);
     if (!slide) throw new AppError({ code: "SLIDE_NOT_FOUND", status: 404, message: "Slide not found" });
-    const idempotencyKey = `${deckId}:${slideId}:ppt_slide_regenerate`;
-    await this.billingClient.consumeCredits({
+    const reserveKey = `${deckId}:${slideId}:ppt_slide_regenerate:reserve`;
+    const settleKey = `${deckId}:${slideId}:ppt_slide_regenerate:settle`;
+    const releaseKey = `${deckId}:${slideId}:ppt_slide_regenerate:release`;
+    await this.#ensureBalance({ ownerUserId, entitlementId, amount: REGENERATE_SLIDE_AMOUNT });
+    const reserve = await this.billingClient.reserveCredits({
       userId: ownerUserId,
       entitlementId,
       amount: REGENERATE_SLIDE_AMOUNT,
-      idempotencyKey,
+      idempotencyKey: reserveKey,
     });
-    await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "consume", amount: REGENERATE_SLIDE_AMOUNT, status: "consumed", idempotencyKey });
-    const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
-    const regenerated = await this.aiProvider.regenerateSlide(prompt);
-    const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
-    const updatedDeck = await this.database.update("decks", deck.id, { slides });
-    await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
-    return { deck: updatedDeck, slide: regenerated };
+    await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "reserve", amount: REGENERATE_SLIDE_AMOUNT, status: "reserved", holdId: reserve.hold_id, idempotencyKey: reserveKey });
+    try {
+      const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
+      const regenerated = await this.aiProvider.regenerateSlide(prompt);
+      const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
+      const updatedDeck = await this.database.update("decks", deck.id, { slides });
+      await this.billingClient.settleCredits({
+        holdId: reserve.hold_id,
+        actualAmount: REGENERATE_SLIDE_AMOUNT,
+        idempotencyKey: settleKey,
+      });
+      await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "settle", amount: REGENERATE_SLIDE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
+      await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
+      return { deck: updatedDeck, slide: regenerated };
+    } catch (error) {
+      await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      await this.#log({ ownerUserId, action: "slide_regeneration_failed", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message } });
+      throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });
+    }
   }
 
   /**

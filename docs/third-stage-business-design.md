@@ -25,6 +25,8 @@ The HTTP AI provider validates response shape before returning data to the workf
 
 Failed deck generation after reserve is marked retryable. The retry operation reuses the original outline and starts a new reserve -> settle/release cycle with a new task ID.
 
+Single-slide regeneration also uses reserve -> settle/release. If the AI provider fails while regenerating a slide, the hold is released and no credits are consumed for the failed edit.
+
 ## Export Model
 
 `PptExportService` is intentionally behind an interface. The current implementation generates a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies. A later renderer can produce richer theme-accurate PPTX/PDF output without changing API or service boundaries.

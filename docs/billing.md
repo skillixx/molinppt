@@ -9,7 +9,7 @@ Use Moling prepaid credits. Users purchase credit packages on Moling. The applic
 Initial production candidates:
 
 - full PPT generation: reserve, then settle or release
-- slide regeneration: consume or reserve depending on cost
+- slide regeneration: reserve, then settle or release
 - AI image generation: consume per image
 - export: initially free, can become chargeable later
 
@@ -40,6 +40,9 @@ Examples:
 - `{task_id}:ppt_generate:reserve`
 - `{task_id}:ppt_generate:settle`
 - `{task_id}:ppt_generate:release`
+- `{deck_id}:{slide_id}:ppt_slide_regenerate:reserve`
+- `{deck_id}:{slide_id}:ppt_slide_regenerate:settle`
+- `{deck_id}:{slide_id}:ppt_slide_regenerate:release`
 
 ## Reconciliation
 
@@ -70,5 +73,5 @@ All Moling IDs are coerced to JSON numbers at the adapter boundary, while credit
 
 - The workspace calls `GET /api/billing/balance` after login and after deck generation so users can see the active entitlement and remaining credits.
 - If credits are insufficient, generation is blocked before AI work starts.
-- Failed generation after reserve shows a refund or release status.
+- Failed PPT generation or slide regeneration after reserve shows a refund or release status.
 - Pending reconciliation is visible as a task state and monitored by operations.
