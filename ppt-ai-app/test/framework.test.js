@@ -377,6 +377,56 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
   }
 });
 
+test("createApp restores sessions from the persisted database after restart", async () => {
+  const databasePath = path.join(tempDir, "db.json");
+  const firstDatabase = new JsonFileDatabase({
+    filePath: databasePath,
+    collections: ["sessions"],
+  });
+  await firstDatabase.initialize();
+  const firstApp = createApp({
+    database: firstDatabase,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73, entitlement_id: 88 }),
+    },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => firstApp.listen(0, "127.0.0.1", resolve));
+  const firstBaseUrl = `http://127.0.0.1:${firstApp.address().port}`;
+  const enter = await fetch(`${firstBaseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+  const cookie = enter.headers.get("set-cookie").split(";")[0];
+  await new Promise((resolve, reject) => firstApp.close((error) => (error ? reject(error) : resolve())));
+
+  const secondDatabase = new JsonFileDatabase({
+    filePath: databasePath,
+    collections: ["sessions"],
+  });
+  await secondDatabase.initialize();
+  const secondApp = createApp({
+    database: secondDatabase,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73, entitlement_id: 88 }),
+    },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => secondApp.listen(0, "127.0.0.1", resolve));
+  const secondBaseUrl = `http://127.0.0.1:${secondApp.address().port}`;
+  try {
+    const me = await fetch(`${secondBaseUrl}/api/me`, { headers: { cookie } });
+    const body = await me.json();
+
+    assert.equal(me.status, 200);
+    assert.equal(body.user.user_id, 7);
+    assert.equal(body.user.entitlement_id, 88);
+  } finally {
+    await new Promise((resolve, reject) => secondApp.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp rejects malformed JSON request bodies as validation errors", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

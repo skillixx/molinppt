@@ -1081,7 +1081,7 @@ test("workspace page exposes package balance status", async () => {
 async function createBusinessContext(options = {}) {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
-    collections: ["files", "tasks", "outlines", "decks", "generation_tasks", "billing_events", "call_logs"],
+    collections: ["sessions", "files", "tasks", "outlines", "decks", "generation_tasks", "billing_events", "call_logs"],
   });
   await database.initialize();
   const storage = new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database });

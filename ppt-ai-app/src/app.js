@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { AppError, normalizeError } from "./errors.js";
 
 const MAX_JSON_BODY_BYTES = 1024 * 1024;
+const DEFAULT_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Creates the HTTP API application.
@@ -13,6 +14,7 @@ const MAX_JSON_BODY_BYTES = 1024 * 1024;
 export function createApp(dependencies) {
   const sessions = new Map();
   const sessionCookieName = dependencies.sessionCookieName || "ppt_ai_session";
+  const sessionTtlMs = dependencies.sessionTtlMs || DEFAULT_SESSION_TTL_MS;
 
   return createServer(async (request, response) => {
     const requestId = randomUUID();
@@ -42,21 +44,24 @@ export function createApp(dependencies) {
           expectedProductId: dependencies.expectedProductId,
         });
         const sessionId = randomUUID();
-        sessions.set(sessionId, {
+        const session = {
           id: sessionId,
           identity,
           entitlementId: resolveSessionEntitlementId(identity, dependencies.defaultEntitlementId),
           createdAt: new Date().toISOString(),
-        });
+          expiresAt: new Date(Date.now() + sessionTtlMs).toISOString(),
+        };
+        sessions.set(sessionId, session);
+        await dependencies.database.insert("sessions", session);
         response.writeHead(302, {
-          "Set-Cookie": `${sessionCookieName}=${sessionId}; HttpOnly; SameSite=Lax; Path=/`,
+          "Set-Cookie": `${sessionCookieName}=${sessionId}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${Math.floor(sessionTtlMs / 1000)}`,
           Location: "/",
         });
         response.end();
         return;
       }
 
-      const session = requireSession(request, sessions, sessionCookieName);
+      const session = await requireSession(request, sessions, sessionCookieName, dependencies.database);
       const ownerUserId = Number(session.identity.user_id);
 
       if (request.method === "GET" && url.pathname === "/") {
@@ -318,13 +323,30 @@ function escapeHtml(value) {
  * @param {import("node:http").IncomingMessage} request
  * @param {Map<string, object>} sessions
  * @param {string} cookieName
+ * @param {object} database
  * @returns {object}
  */
-function requireSession(request, sessions, cookieName) {
+async function requireSession(request, sessions, cookieName, database) {
   const sessionId = readCookie(request, cookieName);
-  const session = sessionId ? sessions.get(sessionId) : null;
+  const cachedSession = sessionId ? sessions.get(sessionId) : null;
+  if (cachedSession && isSessionActive(cachedSession)) return cachedSession;
+  const storedSession = sessionId
+    ? await database.findOne("sessions", (item) => item.id === sessionId)
+    : null;
+  const session = storedSession && isSessionActive(storedSession) ? storedSession : null;
   if (!session) throw new AppError({ code: "UNAUTHORIZED", status: 401, message: "Unauthorized" });
+  sessions.set(session.id, session);
   return session;
+}
+
+/**
+ * Checks whether a session is still usable.
+ * @param {object} session
+ * @returns {boolean}
+ */
+function isSessionActive(session) {
+  const expiresAt = Date.parse(session.expiresAt || "");
+  return Number.isFinite(expiresAt) && expiresAt > Date.now();
 }
 
 /**

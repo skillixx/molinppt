@@ -80,3 +80,9 @@ test("environment examples keep sensitive values empty", async () => {
     assert.match(content, /^TEST_PASSWORD=$/m);
   }
 });
+
+test("runtime database collections include persisted sessions", async () => {
+  const serverSource = await readFile(new URL("src/server.js", appRoot), "utf8");
+
+  assert.match(serverSource, /collections:\s*\[[^\]]*"sessions"/s);
+});

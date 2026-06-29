@@ -13,7 +13,9 @@
 2. Redirect includes a one-time launch ticket.
 3. Application backend verifies the ticket with Moling internal API.
 4. Backend validates app and product association.
-5. Backend creates its own application session.
+5. Backend creates its own application session, persists it in the `sessions` collection, and sets an HTTP-only cookie.
+
+Valid persisted sessions survive application process restarts. The backend restores the session from storage when the cookie is present and the stored `expiresAt` value is still in the future.
 
 The current implementation reads `MOLING_APP_ID` and `MOLING_PRODUCT_ID` from environment variables and rejects launch tickets whose `app_id` or `product_id` do not match. Deployment commands may also use the compatibility aliases `PPT_APP_ID`, `PPT_PRODUCT_ID`, and `PORT`.
 
@@ -56,6 +58,7 @@ The workspace page pre-fills the resolved session entitlement. This avoids using
 ## Acceptance for Integration
 
 - invalid tickets cannot create sessions
+- valid sessions survive application process restarts until expiry
 - app/product mismatch is rejected
 - launch identity entitlement is preferred over configured fallback
 - insufficient credits are surfaced without AI provider calls

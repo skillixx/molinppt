@@ -39,7 +39,7 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 - configuration management
 - structured logging
 - JSON-file database initialization
-- session authentication foundation
+- persisted session authentication foundation
 - Moling API wrapper
 - billing wrapper
 - owner permission checks

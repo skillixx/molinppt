@@ -16,6 +16,12 @@ Stores Moling identity references, not passwords.
 
 Fields: `id`, `moling_user_id`, `display_name`, `created_at`, `updated_at`.
 
+### sessions
+
+Stores application sessions created from verified Moling launch tickets. The local adapter persists these records so a process restart does not force a valid user to relaunch from Moling.
+
+Fields: `id`, `identity`, `entitlementId`, `createdAt`, `expiresAt`, `created_at`, `updated_at`.
+
 ### projects
 
 Groups user decks.
@@ -75,12 +81,15 @@ Fields: `id`, `actor_user_id`, `action`, `resource_type`, `resource_id`, `metada
 - Credit reservation and task creation are persisted before a worker starts generation.
 - Billing idempotency keys are unique.
 - Users can only access rows where ownership resolves to their Moling user identity.
+- Application sessions are restored from the database only while `expiresAt` is still in the future.
 - Failed generation after a successful reserve must produce a release event.
 - Successful generation after a reserve must produce a settle event.
 
 ## Indexes
 
 - `users.moling_user_id`
+- `sessions.id`
+- `sessions.expiresAt`
 - `projects.owner_user_id`
 - `decks.owner_user_id`
 - `slides.deck_id, sort_order`

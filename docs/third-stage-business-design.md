@@ -4,7 +4,7 @@
 
 The implemented acceptance flow is:
 
-1. Moling login creates an application session.
+1. Moling login creates a persisted application session.
 2. User submits a topic or uploaded document.
 3. AI Provider creates an editable outline.
 4. User edits the outline.
@@ -26,6 +26,10 @@ The HTTP AI provider validates response shape before returning data to the workf
 Failed deck generation after reserve is marked retryable. The retry operation reuses the original outline and starts a new reserve -> settle/release cycle with a new task ID.
 
 Single-slide regeneration also uses reserve -> settle/release. If the AI provider fails while regenerating a slide, the hold is released and no credits are consumed for the failed edit.
+
+## Session Model
+
+Moling launch verification creates an HTTP-only application session cookie and a matching record in the local `sessions` collection. Each session stores the verified Moling identity, resolved entitlement ID, creation time, and expiry time. Runtime memory caches sessions for speed, but authorization can restore a valid session from the database after a process restart.
 
 ## Export Model
 
