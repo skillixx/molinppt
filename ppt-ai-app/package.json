@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test",
-    "migrate": "node scripts/migrate.js"
+    "migrate": "node scripts/migrate.js",
+    "acceptance": "node scripts/acceptance.js"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=20"
   }
 }

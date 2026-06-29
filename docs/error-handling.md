@@ -1,0 +1,42 @@
+# Error Handling Design
+
+## Error Categories
+
+- authentication errors
+- authorization errors
+- validation errors
+- insufficient credits
+- platform integration errors
+- AI provider errors
+- file storage errors
+- export errors
+- unexpected system errors
+
+## User-Facing Rules
+
+- Explain recoverable failures clearly.
+- Do not expose internal stack traces or provider responses.
+- Show insufficient credits as a product action: buy credits or retry after purchase.
+- Show generation failure with refund or release status when credits were reserved.
+
+## Internal Error Shape
+
+Application errors should carry:
+
+- stable code
+- HTTP status
+- user-safe message
+- internal diagnostic message
+- retryability
+- request ID
+
+## Retry Rules
+
+- Retry transient provider, storage, and platform 5xx failures with bounded attempts.
+- Never change billing idempotency keys during retries.
+- Do not retry validation, authorization, or insufficient credit errors.
+- Reconciliation worker handles failed settle or release operations.
+
+## Fail-Closed Behavior
+
+If platform identity, billing configuration, or entitlement status cannot be verified, the application must block chargeable work.

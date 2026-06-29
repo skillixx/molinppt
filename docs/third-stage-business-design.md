@@ -1,0 +1,28 @@
+# Third-Stage Business Design
+
+## End-to-End Flow
+
+The implemented acceptance flow is:
+
+1. Moling login creates an application session.
+2. User submits a topic or uploaded document.
+3. AI Provider creates an editable outline.
+4. User edits the outline.
+5. Backend checks balance and reserves credits.
+6. AI Provider generates structured slides.
+7. Backend settles credits on success or releases on failure.
+8. User previews the deck online.
+9. User exports PPTX and PDF.
+10. Backend records billing events and call logs.
+
+## Retry Model
+
+Failed deck generation after reserve is marked retryable. The retry operation reuses the original outline and starts a new reserve -> settle/release cycle with a new task ID.
+
+## Export Model
+
+`PptExportService` is intentionally behind an interface. The current implementation generates a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies. A later renderer can produce richer theme-accurate PPTX/PDF output without changing API or service boundaries.
+
+## Local Acceptance
+
+Use `LOCAL_MOLING_MOCK=true` to run the full HTTP acceptance flow without external Moling credentials. Start the app, then run `npm run acceptance`. This verifies login, outline generation, outline edit, deck generation, preview, PPTX/PDF export, billing calls, and call logs through the same HTTP APIs used by the UI.

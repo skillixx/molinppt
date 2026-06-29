@@ -1,0 +1,121 @@
+# API Design
+
+## API Principles
+
+- All APIs are served by the application backend.
+- Browser clients never call Moling internal APIs directly.
+- All write APIs require a valid application session created from Moling launch.
+- Long-running generation APIs return task IDs and are completed asynchronously.
+- Billing errors are mapped to product-level messages without exposing internal secrets.
+
+## Public Application Routes
+
+The application implements foundation routes plus third-stage AI PPT business routes.
+
+### `GET /api/health`
+
+Returns `{ "status": "ok" }` for runtime health checks.
+
+### `GET /enter`
+
+Entry point from Moling platform. It accepts a one-time `ticket`, verifies it with Moling, creates an application session, and redirects to the workspace.
+
+### `GET /api/me`
+
+Returns current application user profile and platform identity summary.
+
+### `GET /api/templates`
+
+Returns template metadata from the template manager.
+
+### `GET /api/projects`
+
+Lists the current user's projects and recent decks.
+
+### `POST /api/projects`
+
+Creates a project shell with a `title`.
+
+### `POST /api/decks/generate`
+
+Creates an AI PPT generation task.
+
+Body fields: `project_id`, `topic`, `template_id`, `source_file_id`, `language`, `slide_count`, `tone`.
+
+Response fields: `task_id`, `status`.
+
+Second-stage foundation uses `POST /api/tasks` to create a generic queued task before full deck-generation routing is implemented.
+
+### `GET /api/tasks/{task_id}`
+
+Returns task status, progress, error, and result references.
+
+### `GET /api/decks/{deck_id}`
+
+Returns deck metadata and normalized slide content.
+
+### `PATCH /api/slides/{slide_id}`
+
+Updates slide content or layout after authorization.
+
+### `POST /api/decks/{deck_id}/export`
+
+Creates an export task for `pptx` or `pdf`.
+
+### `GET /api/files/{file_id}/download-url`
+
+Returns a short-lived authorized download URL.
+
+The current local foundation also supports direct owner-checked `GET /api/files/{file_id}` downloads for local development.
+
+### `POST /api/ppt/outlines`
+
+Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`.
+
+### `PATCH /api/ppt/outlines/{outline_id}`
+
+Updates outline slide titles and bullets before deck generation.
+
+### `POST /api/ppt/decks`
+
+Generates a full deck from an outline. The backend checks balance, reserves credits, calls the AI provider, settles credits on success, and releases credits on failure.
+
+### `GET /api/ppt/decks/{deck_id}/preview`
+
+Returns an owner-checked HTML preview of generated slides.
+
+### `POST /api/ppt/decks/{deck_id}/exports`
+
+Exports a generated deck to `pptx` or `pdf` and stores the generated file.
+
+### `POST /api/ppt/decks/{deck_id}/slides/{slide_id}/regenerate`
+
+Regenerates one slide using an instruction and consumes known-cost credits.
+
+### `POST /api/ppt/tasks/{task_id}/retry`
+
+Retries a failed generation task using the stored outline and a new billing operation.
+
+### `GET /api/logs`
+
+Returns owner-scoped call logs for generation, export, retry, and billing-adjacent actions.
+
+## Internal Worker Interfaces
+
+Worker messages are not public HTTP APIs. Queue payloads must include `task_id`, `task_type`, `owner_user_id`, and `idempotency_key`. Workers load full state from the database before executing to avoid trusting queue payloads as the source of truth.
+
+## Error Shape
+
+```json
+{
+  "error": {
+    "code": "INSUFFICIENT_CREDITS",
+    "message": "积分不足，请购买积分包后重试。",
+    "request_id": "req_xxx"
+  }
+}
+```
+
+## Versioning
+
+Use `/api/` for the first internal product release. Introduce `/api/v2/` only when response contracts become incompatible.

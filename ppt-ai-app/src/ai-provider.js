@@ -1,0 +1,131 @@
+/**
+ * Mock AI provider implementing the future provider interface.
+ */
+export class MockAiProvider {
+  /**
+   * Creates a mock AI provider.
+   * @param {{failNextDeck?: boolean}} input
+   */
+  constructor({ failNextDeck = false } = {}) {
+    this.failNextDeck = failNextDeck;
+  }
+
+  /**
+   * Generates an outline from topic and slide count.
+   * @param {{topic?: string, documentText?: string, slideCount?: number, theme?: string}} input
+   * @returns {Promise<object[]>}
+   */
+  async generateOutline({ topic, documentText, slideCount = 5 }) {
+    const sourceLines = String(documentText || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    return Array.from({ length: slideCount }, (_, index) => {
+      const title = sourceLines[index] || `${topic || "Document insight"} - slide ${index + 1}`;
+      return {
+        title,
+        bullets: [
+          `Key point ${index + 1}`,
+          `Supporting detail for ${title}`,
+        ],
+      };
+    });
+  }
+
+  /**
+   * Generates normalized slide JSON from an outline.
+   * @param {{outline: {slides: object[], theme?: string}}} input
+   * @returns {Promise<object[]>}
+   */
+  async generateSlides({ outline }) {
+    if (this.failNextDeck) {
+      this.failNextDeck = false;
+      throw new Error("AI_PROVIDER_FAILED");
+    }
+    return outline.slides.map((slide, index) => ({
+      id: `slide_${index + 1}`,
+      sortOrder: index + 1,
+      title: slide.title,
+      bullets: slide.bullets || [],
+      speakerNotes: `Talk through ${slide.title}`,
+      layout: index === 0 ? "title" : "content",
+      theme: outline.theme || "modern",
+    }));
+  }
+
+  /**
+   * Regenerates one slide from an instruction.
+   * @param {{slide: object, instruction: string}} input
+   * @returns {Promise<object>}
+   */
+  async regenerateSlide({ slide, instruction }) {
+    return {
+      ...slide,
+      title: `${slide.title} (${instruction})`,
+      bullets: [...(slide.bullets || []), instruction],
+    };
+  }
+}
+
+/**
+ * HTTP AI provider for production-compatible provider integration.
+ */
+export class HttpAiProvider {
+  /**
+   * Creates an HTTP AI provider.
+   * @param {{endpoint: string, apiKey?: string, fetcher?: typeof fetch}} input
+   */
+  constructor({ endpoint, apiKey = "", fetcher = fetch }) {
+    this.endpoint = endpoint;
+    this.apiKey = apiKey;
+    this.fetcher = fetcher;
+  }
+
+  /**
+   * Requests outline generation from the provider endpoint.
+   * @param {object} input
+   * @returns {Promise<object[]>}
+   */
+  async generateOutline(input) {
+    const response = await this.#post({ operation: "generate_outline", input });
+    return response.outline;
+  }
+
+  /**
+   * Requests slide generation from the provider endpoint.
+   * @param {object} input
+   * @returns {Promise<object[]>}
+   */
+  async generateSlides(input) {
+    const response = await this.#post({ operation: "generate_slides", input });
+    return response.slides;
+  }
+
+  /**
+   * Requests single-slide regeneration from the provider endpoint.
+   * @param {object} input
+   * @returns {Promise<object>}
+   */
+  async regenerateSlide(input) {
+    const response = await this.#post({ operation: "regenerate_slide", input });
+    return response.slide;
+  }
+
+  /**
+   * Sends a JSON request to the configured AI provider.
+   * @param {object} body
+   * @returns {Promise<object>}
+   */
+  async #post(body) {
+    const response = await this.fetcher(this.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) throw new Error(`AI provider failed with status ${response.status}`);
+    return response.json();
+  }
+}

@@ -185,12 +185,12 @@ X-Internal-Token: <INTERNAL_API_TOKEN>
 建议每个接入应用都使用下面这些环境变量：
 
 ```bash
-MOLING_API_BASE_URL="https://api.example.com"
-INTERNAL_API_TOKEN="<secure-token>"
-APP_ID="15"
-PRODUCT_ID="73"
-DEFAULT_ENTITLEMENT_ID="62" # 仅联调可用，生产不建议固定
-PORT="5177"
+MOLING_API_BASE_URL=
+INTERNAL_API_TOKEN=
+APP_ID=
+PRODUCT_ID=
+DEFAULT_ENTITLEMENT_ID= # 仅联调可用，生产不建议固定
+PORT=
 ```
 
 要求：
@@ -788,4 +788,3 @@ GET /api/internal/entitlements?user_id={user_id}&product_id={product_id}
   "message": "entitlement_id must be number"
 }
 ```
-

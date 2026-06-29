@@ -1,0 +1,19 @@
+services:
+  ppt-ai-app:
+    build:
+      context: ./ppt-ai-app
+    environment:
+      APP_ENV: development
+      APP_PORT: 5177
+      MOLING_API_BASE_URL: ${MOLING_API_BASE_URL}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      DATABASE_URL: json:/data/ppt-ai-db.json
+      STORAGE_DIR: /data/storage
+      LOG_LEVEL: info
+    ports:
+      - "5177:5177"
+    volumes:
+      - ppt_ai_data:/data
+
+volumes:
+  ppt_ai_data:

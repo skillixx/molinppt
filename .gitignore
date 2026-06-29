@@ -5,4 +5,5 @@ worktrees/
 ppt-ai-app/.env
 ppt-ai-app/.env.*
 ppt-ai-app/data/
+data/
 node_modules/

@@ -1,0 +1,445 @@
+import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
+
+import { AppError, normalizeError } from "./errors.js";
+
+/**
+ * Creates the HTTP API application.
+ * @param {object} dependencies
+ * @returns {import("node:http").Server}
+ */
+export function createApp(dependencies) {
+  const sessions = new Map();
+  const sessionCookieName = dependencies.sessionCookieName || "ppt_ai_session";
+
+  return createServer(async (request, response) => {
+    const requestId = randomUUID();
+    try {
+      const url = new URL(request.url, "http://127.0.0.1");
+
+      if (request.method === "GET" && url.pathname === "/api/health") {
+        sendJson(response, { status: "ok" });
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname === "/enter") {
+        const ticket = url.searchParams.get("ticket");
+        if (!ticket) throw new AppError({ code: "MISSING_TICKET", status: 400, message: "Missing launch ticket" });
+        const identity = await dependencies.molingClient.verifyLaunchTicket(ticket);
+        validateMolingIdentity({
+          identity,
+          expectedAppId: dependencies.expectedAppId,
+          expectedProductId: dependencies.expectedProductId,
+        });
+        const sessionId = randomUUID();
+        sessions.set(sessionId, {
+          id: sessionId,
+          identity,
+          createdAt: new Date().toISOString(),
+        });
+        response.writeHead(302, {
+          "Set-Cookie": `${sessionCookieName}=${sessionId}; HttpOnly; SameSite=Lax; Path=/`,
+          Location: "/",
+        });
+        response.end();
+        return;
+      }
+
+      const session = requireSession(request, sessions, sessionCookieName);
+      const ownerUserId = Number(session.identity.user_id);
+
+      if (request.method === "GET" && url.pathname === "/") {
+        sendHtml(response, renderWorkspace({ defaultEntitlementId: dependencies.defaultEntitlementId }));
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/me") {
+        sendJson(response, { user: { user_id: ownerUserId, role: "user" } });
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/templates") {
+        sendJson(response, { templates: dependencies.templateManager.listTemplates() });
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/files") {
+        const body = await readJson(request);
+        const file = await dependencies.storage.upload({
+          ownerUserId,
+          fileName: body.file_name,
+          mimeType: body.mime_type,
+          content: Buffer.from(body.content_base64, "base64"),
+        });
+        sendJson(response, { file }, 201);
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname.startsWith("/api/files/")) {
+        const fileId = url.pathname.split("/")[3];
+        const downloaded = await dependencies.storage.download({ fileId, ownerUserId });
+        response.writeHead(200, { "Content-Type": downloaded.file.mimeType });
+        response.end(downloaded.content);
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/tasks") {
+        const body = await readJson(request);
+        const task = await dependencies.taskCenter.createTask({
+          ownerUserId,
+          type: body.type,
+          input: body.input || {},
+        });
+        sendJson(response, { task }, 201);
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname.startsWith("/api/tasks/")) {
+        const taskId = url.pathname.split("/")[3];
+        const task = await dependencies.taskCenter.getTask(taskId, ownerUserId);
+        sendJson(response, { task });
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/ppt/outlines") {
+        const body = await readJson(request);
+        const outline = await dependencies.pptService.generateOutline({
+          ownerUserId,
+          topic: body.topic,
+          sourceFileId: body.source_file_id,
+          slideCount: body.slide_count,
+          templateId: body.template_id,
+          theme: body.theme,
+        });
+        sendJson(response, { outline }, 201);
+        return;
+      }
+
+      if (request.method === "PATCH" && url.pathname.startsWith("/api/ppt/outlines/")) {
+        const outlineId = url.pathname.split("/")[4];
+        const body = await readJson(request);
+        const outline = await dependencies.pptService.updateOutline({
+          ownerUserId,
+          outlineId,
+          slides: body.slides,
+        });
+        sendJson(response, { outline });
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/ppt/decks") {
+        const body = await readJson(request);
+        const result = await dependencies.pptService.generateDeck({
+          ownerUserId,
+          outlineId: body.outline_id,
+          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+        });
+        sendJson(response, result, 201);
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname.match(/^\/api\/ppt\/decks\/[^/]+\/preview$/)) {
+        const deckId = url.pathname.split("/")[4];
+        const html = await dependencies.pptService.previewDeck({ ownerUserId, deckId });
+        response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        response.end(html);
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname.match(/^\/api\/ppt\/decks\/[^/]+\/exports$/)) {
+        const deckId = url.pathname.split("/")[4];
+        const body = await readJson(request);
+        const result = await dependencies.pptService.exportDeck({
+          ownerUserId,
+          deckId,
+          format: body.format,
+        });
+        sendJson(response, result, 201);
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname.match(/^\/api\/ppt\/decks\/[^/]+\/slides\/[^/]+\/regenerate$/)) {
+        const parts = url.pathname.split("/");
+        const body = await readJson(request);
+        const result = await dependencies.pptService.regenerateSlide({
+          ownerUserId,
+          deckId: parts[4],
+          slideId: parts[6],
+          instruction: body.instruction,
+          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+        });
+        sendJson(response, result);
+        return;
+      }
+
+      if (request.method === "POST" && url.pathname.match(/^\/api\/ppt\/tasks\/[^/]+\/retry$/)) {
+        const taskId = url.pathname.split("/")[4];
+        const body = await readJson(request);
+        const result = await dependencies.pptService.retryTask({
+          ownerUserId,
+          taskId,
+          entitlementId: resolveEntitlementId(body.entitlement_id, dependencies.defaultEntitlementId),
+        });
+        sendJson(response, result, 201);
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/logs") {
+        const logs = await dependencies.pptService.listLogs({ ownerUserId });
+        sendJson(response, { logs });
+        return;
+      }
+
+      throw new AppError({ code: "NOT_FOUND", status: 404, message: "Not found" });
+    } catch (error) {
+      const appError = normalizeError(error);
+      dependencies.logger?.error?.("request_failed", {
+        request_id: requestId,
+        method: request.method,
+        url: request.url,
+        code: appError.code,
+      });
+      sendJson(response, appError.toJSON(requestId), appError.status);
+    }
+  });
+}
+
+/**
+ * Resolves the entitlement ID from a request body or configured default.
+ * @param {number | string | undefined} requested
+ * @param {number | undefined} configuredDefault
+ * @returns {number | string | undefined}
+ */
+function resolveEntitlementId(requested, configuredDefault) {
+  return requested === undefined || requested === "" ? configuredDefault : requested;
+}
+
+/**
+ * Escapes text for HTML attributes and content.
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeHtml(value) {
+  return value.replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+/**
+ * Requires a valid application session.
+ * @param {import("node:http").IncomingMessage} request
+ * @param {Map<string, object>} sessions
+ * @param {string} cookieName
+ * @returns {object}
+ */
+function requireSession(request, sessions, cookieName) {
+  const sessionId = readCookie(request, cookieName);
+  const session = sessionId ? sessions.get(sessionId) : null;
+  if (!session) throw new AppError({ code: "UNAUTHORIZED", status: 401, message: "Unauthorized" });
+  return session;
+}
+
+/**
+ * Reads one cookie value.
+ * @param {import("node:http").IncomingMessage} request
+ * @param {string} name
+ * @returns {string | null}
+ */
+function readCookie(request, name) {
+  const cookie = request.headers.cookie || "";
+  for (const item of cookie.split(";")) {
+    const [key, ...valueParts] = item.trim().split("=");
+    if (key === name) return valueParts.join("=");
+  }
+  return null;
+}
+
+/**
+ * Validates Moling launch identity against configured app and product IDs.
+ * @param {{identity: object, expectedAppId?: number, expectedProductId?: number}} input
+ * @returns {void}
+ */
+function validateMolingIdentity({ identity, expectedAppId, expectedProductId }) {
+  if (expectedAppId && Number(identity.app_id) !== Number(expectedAppId)) {
+    throw new AppError({ code: "APP_MISMATCH", status: 403, message: "APP_MISMATCH: launch ticket belongs to another app" });
+  }
+  if (expectedProductId && Number(identity.product_id) !== Number(expectedProductId)) {
+    throw new AppError({ code: "PRODUCT_MISMATCH", status: 403, message: "PRODUCT_MISMATCH: launch ticket belongs to another product" });
+  }
+}
+
+/**
+ * Reads a JSON request body.
+ * @param {import("node:http").IncomingMessage} request
+ * @returns {Promise<object>}
+ */
+async function readJson(request) {
+  const chunks = [];
+  for await (const chunk of request) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString("utf8");
+  return raw.trim() ? JSON.parse(raw) : {};
+}
+
+/**
+ * Sends a JSON response.
+ * @param {import("node:http").ServerResponse} response
+ * @param {object} payload
+ * @param {number} status
+ */
+function sendJson(response, payload, status = 200) {
+  response.writeHead(status, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(payload));
+}
+
+/**
+ * Sends an HTML response.
+ * @param {import("node:http").ServerResponse} response
+ * @param {string} html
+ * @param {number} status
+ */
+function sendHtml(response, html, status = 200) {
+  response.writeHead(status, { "Content-Type": "text/html; charset=utf-8" });
+  response.end(html);
+}
+
+/**
+ * Renders the AI PPT workspace.
+ * @returns {string}
+ */
+function renderWorkspace({ defaultEntitlementId } = {}) {
+  const entitlementValue = defaultEntitlementId ? String(defaultEntitlementId) : "";
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI PPT 工作台</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; background: #f6f7f9; color: #171717; }
+    header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: #fff; border-bottom: 1px solid #e5e7eb; }
+    main { display: grid; grid-template-columns: 360px 1fr; gap: 18px; padding: 18px; }
+    section { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; }
+    h1 { font-size: 20px; margin: 0; }
+    h2 { font-size: 15px; margin: 0 0 12px; }
+    label { display: block; font-size: 12px; font-weight: 700; margin: 12px 0 6px; }
+    input, textarea, select, button { font: inherit; box-sizing: border-box; }
+    input, textarea, select { width: 100%; border: 1px solid #cfd5df; border-radius: 6px; padding: 9px 10px; }
+    textarea { min-height: 92px; resize: vertical; }
+    button { border: 0; border-radius: 6px; padding: 9px 12px; background: #165dff; color: white; cursor: pointer; }
+    button.secondary { background: #475569; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .preview { min-height: 460px; background: #0f172a; color: #dbeafe; border-radius: 8px; padding: 16px; overflow: auto; }
+    pre { white-space: pre-wrap; word-break: break-word; }
+    @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI PPT 工作台</h1>
+    <span>主题生成 / 文档生成 / 预览 / 导出</span>
+  </header>
+  <main>
+    <section>
+      <h2>生成设置</h2>
+      <label for="topic">主题</label>
+      <textarea id="topic">季度经营复盘</textarea>
+      <div class="row">
+        <div>
+          <label for="slide-count">页数</label>
+          <input id="slide-count" type="number" min="1" max="20" value="6" />
+        </div>
+        <div>
+          <label for="entitlement">entitlement_id</label>
+          <input id="entitlement" value="${escapeHtml(entitlementValue)}" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="template">模板</label>
+          <select id="template"><option value="business">Business</option></select>
+        </div>
+        <div>
+          <label for="theme">主题风格</label>
+          <select id="theme"><option value="modern">Modern</option><option value="classic">Classic</option></select>
+        </div>
+      </div>
+      <label for="document">上传文档内容</label>
+      <textarea id="document" placeholder="可粘贴文档文本，生成大纲时会作为 source file 上传"></textarea>
+      <div class="actions">
+        <button id="generate-outline">生成大纲</button>
+        <button id="generate-deck" class="secondary">生成 PPT</button>
+        <button id="export-pptx" class="secondary">下载 PPTX</button>
+        <button id="export-pdf" class="secondary">下载 PDF</button>
+      </div>
+    </section>
+    <section>
+      <h2>在线预览</h2>
+      <div id="preview" class="preview">等待生成...</div>
+      <h2>任务状态 / 日志</h2>
+      <pre id="status">ready</pre>
+    </section>
+  </main>
+  <script>
+    const state = { outlineId: null, deckId: null };
+    const statusEl = document.querySelector("#status");
+    const previewEl = document.querySelector("#preview");
+    const json = (url, body, method = "POST") => fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(JSON.stringify(data));
+      return data;
+    });
+    document.querySelector("#generate-outline").addEventListener("click", async () => {
+      try {
+        let sourceFileId;
+        const documentText = document.querySelector("#document").value.trim();
+        if (documentText) {
+          const uploaded = await json("/api/files", {
+            file_name: "source.txt",
+            mime_type: "text/plain",
+            content_base64: btoa(unescape(encodeURIComponent(documentText)))
+          });
+          sourceFileId = uploaded.file.id;
+        }
+        const data = await json("/api/ppt/outlines", {
+          topic: document.querySelector("#topic").value,
+          source_file_id: sourceFileId,
+          slide_count: Number(document.querySelector("#slide-count").value),
+          template_id: document.querySelector("#template").value,
+          theme: document.querySelector("#theme").value
+        });
+        state.outlineId = data.outline.id;
+        statusEl.textContent = JSON.stringify(data.outline, null, 2);
+      } catch (error) { statusEl.textContent = error.message; }
+    });
+    document.querySelector("#generate-deck").addEventListener("click", async () => {
+      try {
+        const entitlementValue = document.querySelector("#entitlement").value.trim();
+        const data = await json("/api/ppt/decks", {
+          outline_id: state.outlineId,
+          ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
+        });
+        state.deckId = data.deck.id;
+        statusEl.textContent = JSON.stringify(data.task, null, 2);
+        previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+      } catch (error) { statusEl.textContent = error.message; }
+    });
+    async function exportDeck(format) {
+      try {
+        const data = await json("/api/ppt/decks/" + state.deckId + "/exports", { format });
+        statusEl.textContent = JSON.stringify(data.file, null, 2);
+        window.location.href = "/api/files/" + data.file.id;
+      } catch (error) { statusEl.textContent = error.message; }
+    }
+    document.querySelector("#export-pptx").addEventListener("click", () => exportDeck("pptx"));
+    document.querySelector("#export-pdf").addEventListener("click", () => exportDeck("pdf"));
+  </script>
+</body>
+</html>`;
+}

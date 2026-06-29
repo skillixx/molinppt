@@ -1,0 +1,308 @@
+import assert from "node:assert/strict";
+import { mkdtemp, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { afterEach, beforeEach, test } from "node:test";
+
+import { createApp } from "../src/app.js";
+import { MockAiProvider } from "../src/ai-provider.js";
+import { JsonFileDatabase } from "../src/database.js";
+import { LocalFileStorage } from "../src/files.js";
+import { PromptManager } from "../src/prompt-manager.js";
+import { PptExportService } from "../src/ppt-exporter.js";
+import { PptService } from "../src/ppt-service.js";
+import { MemoryTaskCenter } from "../src/tasks.js";
+import { TemplateManager } from "../src/templates.js";
+
+let tempDir;
+
+beforeEach(async () => {
+  tempDir = await mkdtemp(path.join(os.tmpdir(), "ppt-ai-business-"));
+});
+
+afterEach(async () => {
+  if (tempDir) await rm(tempDir, { recursive: true, force: true });
+});
+
+test("PptService completes topic to outline to editable deck to PPTX/PDF with billing and logs", async () => {
+  const context = await createBusinessContext();
+
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "AI sales enablement",
+    slideCount: 3,
+    templateId: "business",
+    theme: "modern",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "Market context", bullets: ["Demand is shifting"] },
+      { title: "AI workflow", bullets: ["Automate research"] },
+      { title: "Next steps", bullets: ["Pilot with sales"] },
+    ],
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: edited.id,
+    entitlementId: 88,
+  });
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    slideId: deckResult.deck.slides[1].id,
+    instruction: "Make this more executive friendly",
+    entitlementId: 88,
+  });
+  const pptx = await context.pptService.exportDeck({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    format: "pptx",
+  });
+  const pdf = await context.pptService.exportDeck({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    format: "pdf",
+  });
+
+  assert.equal(outline.status, "outline_ready");
+  assert.equal(deckResult.task.status, "succeeded");
+  assert.equal(deckResult.task.progress, 100);
+  assert.equal(deckResult.deck.slides.length, 3);
+  assert.equal(regenerated.slide.title.includes("executive"), true);
+  assert.equal(pptx.file.mimeType, "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+  assert.equal(pdf.file.mimeType, "application/pdf");
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle", "consume"]);
+  assert.equal((await context.database.find("call_logs")).length >= 5, true);
+});
+
+test("PptService generates outline from uploaded document content", async () => {
+  const context = await createBusinessContext();
+  const sourceFile = await context.storage.upload({
+    ownerUserId: 7,
+    fileName: "brief.txt",
+    mimeType: "text/plain",
+    content: Buffer.from("Customer retention plan\nExpansion revenue\nRenewal risk"),
+  });
+
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    sourceFileId: sourceFile.id,
+    slideCount: 2,
+    templateId: "business",
+    theme: "classic",
+  });
+
+  assert.equal(outline.input.sourceFileId, sourceFile.id);
+  assert.equal(outline.slides.length, 2);
+  assert.match(outline.slides[0].title, /Customer retention plan|Document insight/);
+});
+
+test("PptService marks failed generation retryable and retry succeeds", async () => {
+  const context = await createBusinessContext({
+    aiProvider: new MockAiProvider({ failNextDeck: true }),
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Risk review",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  await assert.rejects(
+    () => context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 }),
+    /AI_PROVIDER_FAILED/,
+  );
+  const failedTask = (await context.database.find("generation_tasks"))[0];
+  const retried = await context.pptService.retryTask({
+    ownerUserId: 7,
+    taskId: failedTask.id,
+    entitlementId: 88,
+  });
+
+  assert.equal(failedTask.status, "failed");
+  assert.equal(retried.task.status, "succeeded");
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "release", "balance", "reserve", "settle"]);
+});
+
+test("HTTP API runs acceptance flow from login to outline, deck, preview, exports, billing, and logs", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Board update",
+      slide_count: 2,
+      template_id: "business",
+      theme: "modern",
+    });
+    const outline = await outlineResponse.json();
+    const editedResponse = await fetch(`${baseUrl}/api/ppt/outlines/${outline.outline.id}`, {
+      method: "PATCH",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ slides: outline.outline.slides }),
+    });
+    assert.equal(editedResponse.status, 200);
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const pptx = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pptx" });
+    const pdf = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pdf" });
+    const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } });
+
+    assert.equal(deckBody.task.status, "succeeded");
+    assert.match(await preview.text(), /Board update/);
+    assert.equal((await pptx.json()).file.mimeType.includes("presentationml"), true);
+    assert.equal((await pdf.json()).file.mimeType, "application/pdf");
+    assert.equal((await logs.json()).logs.length >= 4, true);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("workspace page exposes the AI PPT generation controls after login", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const page = await fetch(`${baseUrl}/`, { headers: { cookie } });
+    const html = await page.text();
+
+    assert.equal(page.status, 200);
+    assert.match(html, /AI PPT 工作台/);
+    assert.match(html, /id="topic"/);
+    assert.match(html, /id="generate-outline"/);
+    assert.match(html, /id="preview"/);
+    assert.match(html, /id="entitlement" value="62"/);
+    assert.match(html, /PPTX/);
+    assert.match(html, /PDF/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API uses default entitlement ID when request omits entitlement_id", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Default entitlement",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+    });
+    const deckBody = await deckResponse.json();
+
+    assert.equal(deckResponse.status, 201);
+    assert.equal(deckBody.task.status, "succeeded");
+    assert.equal(context.billingCalls[0][1].entitlementId, 62);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+async function createBusinessContext(options = {}) {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["files", "tasks", "outlines", "decks", "generation_tasks", "billing_events", "call_logs"],
+  });
+  await database.initialize();
+  const storage = new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database });
+  const taskCenter = new MemoryTaskCenter();
+  const templateManager = new TemplateManager({
+    templates: [{ id: "business", name: "Business", style: "clean", themes: ["modern", "classic"] }],
+  });
+  const billingCalls = [];
+  const billingClient = {
+    getBalance: async (input) => {
+      billingCalls.push(["balance", input]);
+      return { usable: true, remaining: "100" };
+    },
+    reserveCredits: async (input) => {
+      billingCalls.push(["reserve", input]);
+      return { hold_id: 501, reserved: input.amount };
+    },
+    settleCredits: async (input) => {
+      billingCalls.push(["settle", input]);
+      return { status: "settled", settled_amount: input.actualAmount };
+    },
+    releaseCredits: async (input) => {
+      billingCalls.push(["release", input]);
+      return { status: "released", hold_id: input.holdId };
+    },
+    consumeCredits: async (input) => {
+      billingCalls.push(["consume", input]);
+      return { status: "consumed", amount: input.amount };
+    },
+  };
+  const aiProvider = options.aiProvider || new MockAiProvider();
+  const pptService = new PptService({
+    database,
+    storage,
+    taskCenter,
+    templateManager,
+    aiProvider,
+    promptManager: new PromptManager(),
+    exporter: new PptExportService(),
+    billingClient,
+  });
+
+  return { database, storage, taskCenter, templateManager, aiProvider, pptService, billingCalls };
+}
+
+async function postJson(url, cookie, body) {
+  return fetch(url, {
+    method: "POST",
+    headers: { cookie, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}

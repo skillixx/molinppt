@@ -3,40 +3,67 @@ import { test } from "node:test";
 
 import { loadConfig } from "../src/config.js";
 
-test("loadConfig reads platform settings from env", () => {
+test("loadConfig reads every framework setting from environment variables", () => {
   const config = loadConfig({
-    MOLING_API_BASE_URL: "http://8.130.9.163:8080",
-    INTERNAL_API_TOKEN: "secret-token",
+    APP_ENV: "test",
+    APP_PORT: "5180",
+    APP_BASE_URL: "http://app.test",
+    MOLING_API_BASE_URL: "http://moling.test",
+    INTERNAL_API_TOKEN: "token",
+    LOCAL_MOLING_MOCK: "true",
+    LOCAL_MOLING_USER_ID: "7",
+    LOCAL_MOLING_ENTITLEMENT_ID: "88",
+    TEST_ACCOUNT: "tester",
+    TEST_PASSWORD: "password",
+    DATABASE_URL: "sqlite:./tmp/test.db",
+    STORAGE_DIR: "./tmp/storage",
+    LOG_LEVEL: "debug",
+    LLM_PROVIDER: "mock",
+    LLM_API_KEY: "llm-key",
+    IMAGE_PROVIDER: "mock-image",
+    IMAGE_API_KEY: "image-key",
+    SESSION_COOKIE_NAME: "sid",
+  });
+
+  assert.equal(config.app.port, 5180);
+  assert.equal(config.moling.baseUrl, "http://moling.test");
+  assert.equal(config.moling.localMock, true);
+  assert.equal(config.moling.localUserId, 7);
+  assert.equal(config.moling.localEntitlementId, 88);
+  assert.equal(config.auth.sessionCookieName, "sid");
+  assert.equal(config.storage.directory, "./tmp/storage");
+  assert.equal(config.ai.llmProvider, "mock");
+});
+
+test("loadConfig uses port 5177 when APP_PORT is omitted", () => {
+  const config = loadConfig({
+    MOLING_API_BASE_URL: "http://moling.test",
+    INTERNAL_API_TOKEN: "token",
+  });
+
+  assert.equal(config.app.port, 5177);
+});
+
+test("loadConfig accepts Moling launch aliases used by deployment commands", () => {
+  const config = loadConfig({
+    PORT: "5178",
     PPT_APP_ID: "15",
     PPT_PRODUCT_ID: "73",
     PPT_DEFAULT_ENTITLEMENT_ID: "62",
-    PORT: "5177",
+    MOLING_API_BASE_URL: "http://moling.test",
+    INTERNAL_API_TOKEN: "token",
   });
 
-  assert.deepEqual(config, {
-    platformBaseUrl: "http://8.130.9.163:8080",
-    internalToken: "secret-token",
-    appId: 15,
-    productId: 73,
-    defaultEntitlementId: 62,
-    port: 5177,
-    databaseUrl: "sqlite:./data/ppt-ai.db",
-  });
+  assert.equal(config.app.port, 5178);
+  assert.equal(config.app.molingAppId, 15);
+  assert.equal(config.app.molingProductId, 73);
+  assert.equal(config.moling.defaultEntitlementId, 62);
+  assert.equal(config.moling.localEntitlementId, 62);
 });
 
-test("loadConfig allows DATABASE_URL override", () => {
-  const config = loadConfig({
-    MOLING_API_BASE_URL: "http://platform.test",
-    INTERNAL_API_TOKEN: "secret-token",
-    DATABASE_URL: "sqlite::memory:",
-  });
-
-  assert.equal(config.databaseUrl, "sqlite::memory:");
-});
-
-test("loadConfig reports missing required settings", () => {
+test("loadConfig rejects missing required secrets", () => {
   assert.throws(
-    () => loadConfig({}),
-    /MOLING_API_BASE_URL, INTERNAL_API_TOKEN/,
+    () => loadConfig({ MOLING_API_BASE_URL: "http://moling.test" }),
+    /INTERNAL_API_TOKEN/,
   );
 });

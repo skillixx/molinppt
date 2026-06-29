@@ -1,67 +1,68 @@
-# PPT AI App Integration Shell
+# PPT AI App
 
-This is the first integration slice for the Moling PPT AI application.
+This directory contains the AI PPT business application for the Moling AI PPT tool.
 
-It verifies:
-
-- `/enter?ticket=...` SSO launch ticket exchange
-- app/product identity checks
-- entitlement balance lookup
-- mock PPT generation with `reserve -> settle`
-- mock failure with `reserve -> release`
-
-## Run locally
-
-Set environment variables without committing secrets:
-
-```bash
-export MOLING_API_BASE_URL="http://8.130.9.163:8080"
-export INTERNAL_API_TOKEN="<secure token>"
-export PPT_APP_ID="15"
-export PPT_PRODUCT_ID="73"
-export PPT_DEFAULT_ENTITLEMENT_ID="62"
-export PORT="5177"
-export DATABASE_URL="sqlite:./data/ppt-ai.db"
-npm run migrate
-npm start
-```
-
-Open the app through Moling platform launch:
-
-```text
-http://your-app-host:5177/enter?ticket=lt_xxx
-```
-
-For current test data, entitlement `62` belongs to test user `479` and has `ppt_ai_credits`.
-
-## Database
-
-The development database uses Node's built-in SQLite driver and stores data at
-`./data/ppt-ai.db` by default. Run migrations before starting the app:
-
-```bash
-npm run migrate
-```
-
-For production PostgreSQL, set `DATABASE_URL` to a PostgreSQL connection string
-such as `postgresql://user:password@host:5432/ppt_ai`. PostgreSQL support lazy
-loads the optional `pg` package, so install it only in environments that use PG.
-
-## Tests
+## Commands
 
 ```bash
 npm test
-node --test test/db.test.js
+npm run migrate
+npm start
+npm run acceptance
 ```
 
-## Current platform gap
+## Environment
 
-The current Moling API exposes `GET /api/internal/entitlement-balance` only when
-the app already knows `entitlement_id`. The SSO `verify` response provides
-`user_id/app_id/product_id`, but not entitlement IDs.
+Copy `.env.example` locally and provide real values through environment variables or a secret manager. Do not commit real secrets.
 
-For production, add one of these platform-side options:
+Required for runtime:
 
-- return active `ppt_ai_credits` entitlement in `app-launch/verify`
-- add an internal endpoint to list entitlements by `user_id + product_id`
-- pass an app-scoped user token that can call `/api/my/entitlements`
+- `MOLING_API_BASE_URL`
+- `INTERNAL_API_TOKEN`
+
+Moling launch and billing configuration:
+
+- `MOLING_APP_ID` or compatibility alias `PPT_APP_ID`
+- `MOLING_PRODUCT_ID` or compatibility alias `PPT_PRODUCT_ID`
+- `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
+- `APP_PORT` or compatibility alias `PORT`
+
+Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
+
+## Foundation Modules
+
+- configuration management
+- structured logging
+- JSON-file database initialization
+- session authentication foundation
+- Moling API wrapper
+- billing wrapper
+- owner permission checks
+- local file upload/download
+- in-memory task center
+- AI provider abstraction
+- template manager
+- HTTP API foundation
+- prompt manager
+- PPT generation service
+- PPTX/PDF exporter
+- call log persistence
+
+## API Routes
+
+- `GET /api/health`
+- `GET /enter?ticket=...`
+- `GET /api/me`
+- `GET /api/templates`
+- `POST /api/files`
+- `GET /api/files/{file_id}`
+- `POST /api/tasks`
+- `GET /api/tasks/{task_id}`
+- `POST /api/ppt/outlines`
+- `PATCH /api/ppt/outlines/{outline_id}`
+- `POST /api/ppt/decks`
+- `GET /api/ppt/decks/{deck_id}/preview`
+- `POST /api/ppt/decks/{deck_id}/exports`
+- `POST /api/ppt/decks/{deck_id}/slides/{slide_id}/regenerate`
+- `POST /api/ppt/tasks/{task_id}/retry`
+- `GET /api/logs`
