@@ -19,6 +19,7 @@
 - Show insufficient credits as a product action: buy credits or retry after purchase.
 - Show generation failure with refund or release status when credits were reserved.
 - Return `REQUEST_JSON_INVALID` with HTTP 400 for malformed JSON request bodies.
+- Return `REQUEST_BODY_TOO_LARGE` with HTTP 413 for JSON request bodies over 1 MiB.
 
 ## Internal Error Shape
 

@@ -415,6 +415,45 @@ test("createApp rejects malformed JSON request bodies as validation errors", asy
   }
 });
 
+test("createApp rejects oversized JSON request bodies", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "files", "tasks"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager({ templates: [{ id: "business", name: "Business" }] }),
+    aiProvider: new MockAiProvider(),
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const oversized = JSON.stringify({ type: "ppt_generate", input: { topic: "x".repeat(1024 * 1024 + 1) } });
+    const response = await fetch(`${baseUrl}/api/tasks`, {
+      method: "POST",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: oversized,
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 413);
+    assert.equal(body.error.code, "REQUEST_BODY_TOO_LARGE");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp protects the internal reconciliation endpoint", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

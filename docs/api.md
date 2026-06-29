@@ -8,6 +8,7 @@
 - Long-running generation APIs return task IDs and are completed asynchronously.
 - Billing errors are mapped to product-level messages without exposing internal secrets.
 - Malformed JSON request bodies return `REQUEST_JSON_INVALID` with HTTP 400.
+- JSON request bodies over 1 MiB return `REQUEST_BODY_TOO_LARGE` with HTTP 413.
 
 ## Public Application Routes
 

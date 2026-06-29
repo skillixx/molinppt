@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 
 import { AppError, normalizeError } from "./errors.js";
 
+const MAX_JSON_BODY_BYTES = 1024 * 1024;
+
 /**
  * Creates the HTTP API application.
  * @param {object} dependencies
@@ -400,7 +402,18 @@ function validateMolingIdentity({ identity, expectedAppId, expectedProductId }) 
  */
 async function readJson(request) {
   const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
+  let sizeBytes = 0;
+  for await (const chunk of request) {
+    sizeBytes += chunk.length;
+    if (sizeBytes > MAX_JSON_BODY_BYTES) {
+      throw new AppError({
+        code: "REQUEST_BODY_TOO_LARGE",
+        status: 413,
+        message: "Request body is too large",
+      });
+    }
+    chunks.push(chunk);
+  }
   const raw = Buffer.concat(chunks).toString("utf8");
   if (!raw.trim()) return {};
   try {
