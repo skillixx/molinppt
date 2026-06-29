@@ -7,6 +7,7 @@
 - All write APIs require a valid application session created from Moling launch.
 - Long-running generation APIs return task IDs and are completed asynchronously.
 - Billing errors are mapped to product-level messages without exposing internal secrets.
+- Malformed JSON request bodies return `REQUEST_JSON_INVALID` with HTTP 400.
 
 ## Public Application Routes
 

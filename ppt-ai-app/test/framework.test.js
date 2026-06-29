@@ -377,6 +377,44 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
   }
 });
 
+test("createApp rejects malformed JSON request bodies as validation errors", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "files", "tasks"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager({ templates: [{ id: "business", name: "Business" }] }),
+    aiProvider: new MockAiProvider(),
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const response = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: "{\"file_name\":",
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error.code, "REQUEST_JSON_INVALID");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp protects the internal reconciliation endpoint", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

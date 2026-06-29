@@ -402,7 +402,17 @@ async function readJson(request) {
   const chunks = [];
   for await (const chunk of request) chunks.push(chunk);
   const raw = Buffer.concat(chunks).toString("utf8");
-  return raw.trim() ? JSON.parse(raw) : {};
+  if (!raw.trim()) return {};
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    throw new AppError({
+      code: "REQUEST_JSON_INVALID",
+      status: 400,
+      message: "Request body must be valid JSON",
+      details: error,
+    });
+  }
 }
 
 /**
