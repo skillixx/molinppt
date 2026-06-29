@@ -68,6 +68,7 @@ All Moling IDs are coerced to JSON numbers at the adapter boundary, while credit
 
 ## User Experience
 
+- The workspace calls `GET /api/billing/balance` after login and after deck generation so users can see the active entitlement and remaining credits.
 - If credits are insufficient, generation is blocked before AI work starts.
 - Failed generation after reserve shows a refund or release status.
 - Pending reconciliation is visible as a task state and monitored by operations.

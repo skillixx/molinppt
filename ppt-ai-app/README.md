@@ -54,6 +54,7 @@ Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, 
 - `GET /enter?ticket=...`
 - `GET /api/me`
 - `GET /api/templates`
+- `GET /api/billing/balance`
 - `POST /api/files`
 - `GET /api/files/{file_id}`
 - `POST /api/tasks`

@@ -17,6 +17,7 @@ The architecture phase is accepted when:
 Later implementation phases must prove:
 
 - Moling users can enter with SSO.
+- users can see the active entitlement balance after entering AI PPT.
 - users can generate a PPT from topic/template/source input.
 - each user uses the entitlement returned by Moling launch verification before falling back to configured defaults.
 - credit reserve, settle, and release are correct and idempotent.

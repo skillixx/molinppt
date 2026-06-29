@@ -70,6 +70,13 @@ export function createApp(dependencies) {
         return;
       }
 
+      if (request.method === "GET" && url.pathname === "/api/billing/balance") {
+        const entitlementId = resolveEntitlementId(url.searchParams.get("entitlement_id"), session.entitlementId);
+        const balance = await dependencies.billingClient.getBalance({ userId: ownerUserId, entitlementId });
+        sendJson(response, { entitlement_id: Number(entitlementId), balance });
+        return;
+      }
+
       if (request.method === "POST" && url.pathname === "/api/files") {
         const body = await readJson(request);
         const file = await dependencies.storage.upload({
@@ -256,12 +263,12 @@ function readPositiveId(value) {
 
 /**
  * Resolves the entitlement ID from a request body or configured default.
- * @param {number | string | undefined} requested
+ * @param {number | string | null | undefined} requested
  * @param {number | undefined} configuredDefault
  * @returns {number | string | undefined}
  */
 function resolveEntitlementId(requested, configuredDefault) {
-  return requested === undefined || requested === "" ? configuredDefault : requested;
+  return requested === undefined || requested === null || requested === "" ? configuredDefault : requested;
 }
 
 /**
@@ -428,6 +435,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     <section>
       <h2>在线预览</h2>
       <div id="preview" class="preview">等待生成...</div>
+      <h2>套餐余额</h2>
+      <pre id="balance-status">checking</pre>
       <h2>任务状态 / 日志</h2>
       <pre id="status">ready</pre>
     </section>
@@ -435,6 +444,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
   <script>
     const state = { outlineId: null, deckId: null };
     const statusEl = document.querySelector("#status");
+    const balanceStatusEl = document.querySelector("#balance-status");
     const previewEl = document.querySelector("#preview");
     const json = (url, body, method = "POST") => fetch(url, {
       method,
@@ -445,6 +455,19 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (!res.ok) throw new Error(JSON.stringify(data));
       return data;
     });
+    async function loadBalance() {
+      try {
+        const data = await fetch("/api/billing/balance").then(async (res) => {
+          const payload = await res.json();
+          if (!res.ok) throw new Error(JSON.stringify(payload));
+          return payload;
+        });
+        balanceStatusEl.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        balanceStatusEl.textContent = error.message;
+      }
+    }
+    loadBalance();
     document.querySelector("#generate-outline").addEventListener("click", async () => {
       try {
         let sourceFileId;
@@ -478,6 +501,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         state.deckId = data.deck.id;
         statusEl.textContent = JSON.stringify(data.task, null, 2);
         previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+        await loadBalance();
       } catch (error) { statusEl.textContent = error.message; }
     });
     async function exportDeck(format) {

@@ -300,6 +300,69 @@ test("HTTP API prefers the launch identity entitlement over the configured defau
   }
 });
 
+test("HTTP API exposes session entitlement balance for package checks", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const response = await fetch(`${baseUrl}/api/billing/balance`, { headers: { cookie } });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.entitlement_id, 62);
+    assert.equal(body.balance.remaining, "100");
+    assert.deepEqual(context.billingCalls[0], ["balance", { userId: 7, entitlementId: 62 }]);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("workspace page exposes package balance status", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const page = await fetch(`${baseUrl}/`, { headers: { cookie } });
+    const html = await page.text();
+
+    assert.equal(page.status, 200);
+    assert.match(html, /id="balance-status"/);
+    assert.match(html, /\/api\/billing\/balance/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 async function createBusinessContext(options = {}) {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
@@ -346,7 +409,7 @@ async function createBusinessContext(options = {}) {
     billingClient,
   });
 
-  return { database, storage, taskCenter, templateManager, aiProvider, pptService, billingCalls };
+  return { database, storage, taskCenter, templateManager, aiProvider, pptService, billingClient, billingCalls };
 }
 
 async function postJson(url, cookie, body) {

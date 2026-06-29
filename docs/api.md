@@ -28,6 +28,12 @@ Returns current application user profile and platform identity summary.
 
 Returns template metadata from the template manager.
 
+### `GET /api/billing/balance`
+
+Returns the current session entitlement ID and Moling balance. It accepts optional `entitlement_id` for operator/debug checks; otherwise it uses the entitlement resolved from Moling launch identity and then the configured default fallback.
+
+Response fields: `entitlement_id`, `balance`.
+
 ### `GET /api/projects`
 
 Lists the current user's projects and recent decks.
