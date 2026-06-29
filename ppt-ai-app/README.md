@@ -7,6 +7,7 @@ This directory contains the AI PPT business application for the Moling AI PPT to
 ```bash
 npm test
 npm run migrate
+# npm start reads .env automatically
 npm start
 npm run acceptance
 npm run acceptance:moling
@@ -16,22 +17,40 @@ npm run acceptance:moling
 
 Copy `.env.example` locally and provide real values through environment variables or a secret manager. Do not commit real secrets.
 
-Required for runtime:
+### Required for runtime
 
-- `MOLING_API_BASE_URL`
-- `INTERNAL_API_TOKEN`
+- `MOLING_API_BASE_URL`: Moling backend base URL from your platform endpoint.
+- `INTERNAL_API_TOKEN`: Internal API token from platform config (used for `/api/internal/*`).
 
-Moling launch and billing configuration:
+### Moling app/product binding (recommended)
 
-- `MOLING_APP_ID` or compatibility alias `PPT_APP_ID`
-- `MOLING_PRODUCT_ID` or compatibility alias `PPT_PRODUCT_ID`
-- `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
-- `APP_PORT` or compatibility alias `PORT`
-- `SESSION_TTL_SECONDS` optionally controls application session lifetime and defaults to 604800 seconds.
-- `SESSION_COOKIE_SECURE` optionally controls the cookie `Secure` attribute; it defaults to true when `APP_ENV=production`.
-- `LLM_TIMEOUT_MS` optionally controls HTTP AI provider request timeout and defaults to 30000 ms.
-- `LLM_MAX_RETRIES` optionally controls HTTP AI provider transient-failure retries and defaults to 0.
-- `LLM_MODEL` is the model name sent to the provider (for example `deepseek-v4-flash`).
+- `MOLING_APP_ID` (or `PPT_APP_ID`): App id from Moling application settings.
+- `MOLING_PRODUCT_ID` (or `PPT_PRODUCT_ID`): Product id used for package checks.
+- `MOLING_DEFAULT_ENTITLEMENT_ID` (or `PPT_DEFAULT_ENTITLEMENT_ID`): Fallback entitlement id. Keep empty if entitlement must come from launch identity.
+- `APP_PORT` (or `PORT`): Listening port, defaults to `5177`.
+
+### Session & auth
+
+- `SESSION_TTL_SECONDS`: Session expire period in seconds, default `604800`.
+- `SESSION_COOKIE_SECURE`: Set true in HTTPS/prod environment.
+
+### AI provider
+
+- `LLM_PROVIDER`: `http` for real model, `mock` for deterministic tests.
+- `LLM_API_URL`: HTTP endpoint for AI calls.
+- `LLM_API_KEY`: Provider API key.
+- `LLM_MODEL`: Model string sent to provider (for DeepSeek, `deepseek-v4-flash`).
+- `LLM_TIMEOUT_MS`: Request timeout in ms (default `30000`).
+- `LLM_MAX_RETRIES`: Retry count for transient provider failures (default `0`).
+
+### Local mock / offline smoke test
+
+- `LOCAL_MOLING_MOCK`: `true` enables local mock platform mode.
+- `LOCAL_MOLING_USER_ID`: Mock user id.
+- `LOCAL_MOLING_ENTITLEMENT_ID`: Mock entitlement id.
+- `LOCAL_MOLING_INITIAL_CREDITS`: Initial local credits (string, default `100`).
+
+### DeepSeek OpenAI-style example
 
 Deepseek/OpenAI-style providers should set:
 
@@ -39,6 +58,8 @@ Deepseek/OpenAI-style providers should set:
 - `LLM_API_URL=https://api.deepseek.com/chat/completions`
 - `LLM_API_KEY=<your token>`
 - `LLM_MODEL=deepseek-v4-flash`
+
+Use this exact endpoint form with `/chat/completions`; `https://api.deepseek.com` alone will use the legacy adapter path and cannot work for DeepSeek.
 
 For legacy self-hosted adapters, keep `LLM_API_URL` in legacy format and return the legacy payload fields directly.
 

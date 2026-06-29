@@ -33,6 +33,29 @@ Current runtime in this branch is single-process: API, workspace, generation orc
 - A data volume mounted to `/data` for `json:/data/ppt-ai-db.json` and stored uploads
 - Optional reverse proxy (nginx/Traefik) and TLS termination
 - Reachable Moling and AI provider endpoints
+
+## Environment Variable Reference (Detailed)
+
+| Variable | Required | Source | Where to get it | What it does |
+|---|---|---|---|---|
+| `MOLING_API_BASE_URL` | Yes | Moling platform config | Moling API Gateway / base host | The backend URL used to verify launch tickets and call entitlement APIs. |
+| `INTERNAL_API_TOKEN` | Yes | Moling platform config | Internal service token on platform administration page | Signed secret for `/api/internal/*` calls. |
+| `MOLING_APP_ID` | Optional (recommended) | Moling app management | App ID returned by `app create`/应用配置 | Verifies launched tickets are for this app. |
+| `MOLING_PRODUCT_ID` | Optional (recommended) | Moling product management | Product ID from the PPT product entry | Verifies launch/product context and resolves default entitlement fallback. |
+| `MOLING_DEFAULT_ENTITLEMENT_ID` | Optional | Moling entitlement/package config | A default entitlement suitable for smoke testing or controlled environments | Fallback entitlement when launch identity does not provide one. Leave empty if per-user entitlement must be mandatory. |
+| `LOCAL_MOLING_MOCK` | Optional | Deployment mode | Set `true` for local integration tests | Enables local billing/session mock mode, bypassing external Moling API. |
+| `LOCAL_MOLING_USER_ID` | Mock required | Local test setup | Any positive integer user id | Local mock session owner. |
+| `LOCAL_MOLING_ENTITLEMENT_ID` | Mock required | Local test setup | Test entitlement id (e.g. `88`) | Local mock entitlement fallback and initial session selection. |
+| `LOCAL_MOLING_INITIAL_CREDITS` | Optional | Local test setup | Number string such as `100` | Initial local mock remaining credits. |
+| `LLM_PROVIDER` | Optional | Deployment variable | `mock` or `http` | Selects AI provider adapter. |
+| `LLM_API_URL` | Required when `LLM_PROVIDER=http` | AI vendor dashboard | DeepSeek API URL (`https://api.deepseek.com/chat/completions`) | Request target for provider calls. |
+| `LLM_API_KEY` | Usually required when `LLM_PROVIDER=http` | AI vendor dashboard | Generated API key | Bearer token for AI vendor authentication. |
+| `LLM_MODEL` | Required for chat-completion providers | AI vendor model catalog | `deepseek-v4-flash` | Passed into request body as model name. |
+| `LLM_TIMEOUT_MS` | Optional | Deployment variable | Default `30000` | Limits each provider request wall-clock time. |
+| `LLM_MAX_RETRIES` | Optional | Deployment variable | Retry count for transient errors | Retries only timeout/5xx/fetch failures. |
+| `APP_PORT` | Optional | Process environment | `5177` default | HTTP listening port. |
+| `SESSION_COOKIE_SECURE` | Optional | Security policy | `true` in production, `false` in local HTTP tests | Sets cookie `Secure` flag. |
+
 ## Configuration
 
 All settings are injected through environment variables:
@@ -72,6 +95,14 @@ npm run acceptance:moling
 ```
 
 The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, file download, call-log checks, and final balance deduction checks against the configured Moling APIs.
+
+## DeepSeek/Chat Completion Note
+
+DeepSeek requires the endpoint to be set to the chat-completion path:
+
+- `LLM_API_URL=https://api.deepseek.com/chat/completions`
+
+The plain base URL (`https://api.deepseek.com`) is not enough because this app will switch to legacy contract mode unless `/chat/completions` is present.
 
 ## Production Deployment Steps
 
