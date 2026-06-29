@@ -296,6 +296,42 @@ test("HttpAiProvider rejects malformed provider responses", async () => {
   );
 });
 
+test("HttpAiProvider retries transient provider failures", async () => {
+  let attempts = 0;
+  const provider = new HttpAiProvider({
+    endpoint: "http://ai.test/generate",
+    maxRetries: 1,
+    fetcher: async () => {
+      attempts += 1;
+      return attempts === 1
+        ? Response.json({ error: "temporary" }, { status: 503 })
+        : Response.json({ outline: [{ title: "Recovered", bullets: [] }] });
+    },
+  });
+
+  const outline = await provider.generateOutline({ topic: "Retry", slideCount: 1 });
+
+  assert.equal(attempts, 2);
+  assert.equal(outline[0].title, "Recovered");
+});
+
+test("HttpAiProvider passes timeout abort signals to fetch", async () => {
+  const signals = [];
+  const provider = new HttpAiProvider({
+    endpoint: "http://ai.test/generate",
+    timeoutMs: 1000,
+    fetcher: async (url, init) => {
+      signals.push(init.signal);
+      return Response.json({ outline: [{ title: "Timed", bullets: [] }] });
+    },
+  });
+
+  await provider.generateOutline({ topic: "Timeout", slideCount: 1 });
+
+  assert.equal(signals.length, 1);
+  assert.equal(signals[0] instanceof AbortSignal, true);
+});
+
 test("requirePermission blocks cross-user resource access", () => {
   assert.doesNotThrow(() => requirePermission({
     actor: { userId: 7, role: "user" },

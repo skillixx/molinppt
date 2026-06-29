@@ -58,6 +58,8 @@ For HTTP AI provider deployment, set:
 - `LLM_PROVIDER=http`
 - `LLM_API_URL`
 - `LLM_API_KEY`
+- `LLM_TIMEOUT_MS` to bound each provider request, default `30000`
+- `LLM_MAX_RETRIES` for transient 5xx/network failures, default `0`
 
 For local pre-production smoke tests without external Moling credentials, set `LOCAL_MOLING_MOCK=true` plus local user and entitlement IDs, then run `npm run acceptance`.
 

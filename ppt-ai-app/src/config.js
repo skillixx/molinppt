@@ -56,6 +56,8 @@ export function loadConfig(env = process.env) {
       llmProvider: env.LLM_PROVIDER || "mock",
       llmApiUrl: env.LLM_API_URL || "",
       llmApiKey: env.LLM_API_KEY || "",
+      llmTimeoutMs: readPositiveInteger(env.LLM_TIMEOUT_MS, 30000, "LLM_TIMEOUT_MS"),
+      llmMaxRetries: readNonNegativeInteger(env.LLM_MAX_RETRIES, 0, "LLM_MAX_RETRIES"),
       imageProvider: env.IMAGE_PROVIDER || "mock",
       imageApiKey: env.IMAGE_API_KEY || "",
     },
@@ -100,6 +102,21 @@ function readPositiveInteger(value, fallback, name) {
 function readOptionalPositiveInteger(value, name) {
   if (value === undefined || value === "") return undefined;
   return readPositiveInteger(value, undefined, name);
+}
+
+/**
+ * Reads a zero-or-positive integer env value.
+ * @param {string | undefined} value
+ * @param {number} fallback
+ * @param {string} name
+ * @returns {number}
+ */
+function readNonNegativeInteger(value, fallback, name) {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${name} must be a non-negative integer`);
+  }
+  return parsed;
 }
 
 /**

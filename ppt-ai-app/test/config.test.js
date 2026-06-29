@@ -19,7 +19,10 @@ test("loadConfig reads every framework setting from environment variables", () =
     STORAGE_DIR: "./tmp/storage",
     LOG_LEVEL: "debug",
     LLM_PROVIDER: "mock",
+    LLM_API_URL: "http://ai.test/generate",
     LLM_API_KEY: "llm-key",
+    LLM_TIMEOUT_MS: "1500",
+    LLM_MAX_RETRIES: "2",
     IMAGE_PROVIDER: "mock-image",
     IMAGE_API_KEY: "image-key",
     SESSION_COOKIE_NAME: "sid",
@@ -37,6 +40,9 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.auth.sessionCookieSecure, false);
   assert.equal(config.storage.directory, "./tmp/storage");
   assert.equal(config.ai.llmProvider, "mock");
+  assert.equal(config.ai.llmApiUrl, "http://ai.test/generate");
+  assert.equal(config.ai.llmTimeoutMs, 1500);
+  assert.equal(config.ai.llmMaxRetries, 2);
 });
 
 test("loadConfig secures session cookies by default in production", () => {
@@ -91,5 +97,16 @@ test("loadConfig rejects invalid session TTL values", () => {
       SESSION_TTL_SECONDS: "0",
     }),
     /SESSION_TTL_SECONDS/,
+  );
+});
+
+test("loadConfig rejects invalid AI provider retry settings", () => {
+  assert.throws(
+    () => loadConfig({
+      MOLING_API_BASE_URL: "http://moling.test",
+      INTERNAL_API_TOKEN: "token",
+      LLM_MAX_RETRIES: "-1",
+    }),
+    /LLM_MAX_RETRIES/,
   );
 });

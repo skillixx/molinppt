@@ -42,7 +42,12 @@ const storage = new LocalFileStorage({
 const taskCenter = new MemoryTaskCenter();
 const templateManager = new TemplateManager();
 const aiProvider = config.ai.llmProvider === "http"
-  ? new HttpAiProvider({ endpoint: config.ai.llmApiUrl, apiKey: config.ai.llmApiKey })
+  ? new HttpAiProvider({
+    endpoint: config.ai.llmApiUrl,
+    apiKey: config.ai.llmApiKey,
+    timeoutMs: config.ai.llmTimeoutMs,
+    maxRetries: config.ai.llmMaxRetries,
+  })
   : new MockAiProvider();
 const pptService = new PptService({
   database,

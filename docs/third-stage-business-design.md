@@ -19,7 +19,7 @@ The implemented acceptance flow is:
 
 `PromptManager` builds structured prompt payloads for outline generation, deck generation, and single-slide regeneration. `PptService` never sends ad hoc slide regeneration payloads directly to the provider; every AI action goes through the prompt boundary first.
 
-The HTTP AI provider validates response shape before returning data to the workflow. Missing `outline`, `slides`, or `slide` fields raise `AI_PROVIDER_INVALID_RESPONSE`.
+The HTTP AI provider validates response shape before returning data to the workflow. Missing `outline`, `slides`, or `slide` fields raise `AI_PROVIDER_INVALID_RESPONSE`. Provider calls are bounded by `LLM_TIMEOUT_MS`; transient 5xx or network failures can retry up to `LLM_MAX_RETRIES`, while malformed provider payloads fail fast.
 
 ## Retry Model
 

@@ -73,12 +73,14 @@ export class MockAiProvider {
 export class HttpAiProvider {
   /**
    * Creates an HTTP AI provider.
-   * @param {{endpoint: string, apiKey?: string, fetcher?: typeof fetch}} input
+   * @param {{endpoint: string, apiKey?: string, fetcher?: typeof fetch, timeoutMs?: number, maxRetries?: number}} input
    */
-  constructor({ endpoint, apiKey = "", fetcher = fetch }) {
+  constructor({ endpoint, apiKey = "", fetcher = fetch, timeoutMs = 30000, maxRetries = 0 }) {
     this.endpoint = endpoint;
     this.apiKey = apiKey;
     this.fetcher = fetcher;
+    this.timeoutMs = timeoutMs;
+    this.maxRetries = maxRetries;
   }
 
   /**
@@ -117,16 +119,31 @@ export class HttpAiProvider {
    * @returns {Promise<object>}
    */
   async #post(body) {
-    const response = await this.fetcher(this.endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
-      },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok) throw new Error(`AI provider failed with status ${response.status}`);
-    return response.json();
+    for (let attempt = 0; attempt <= this.maxRetries; attempt += 1) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+      try {
+        const response = await this.fetcher(this.endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          if (response.status >= 500 && attempt < this.maxRetries) continue;
+          throw new Error(`AI provider failed with status ${response.status}`);
+        }
+        return response.json();
+      } catch (error) {
+        if (attempt >= this.maxRetries || error.name === "AbortError") throw error;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    throw new Error("AI provider request failed");
   }
 }
 

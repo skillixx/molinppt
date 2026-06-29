@@ -29,6 +29,8 @@ Moling launch and billing configuration:
 - `APP_PORT` or compatibility alias `PORT`
 - `SESSION_TTL_SECONDS` optionally controls application session lifetime and defaults to 604800 seconds.
 - `SESSION_COOKIE_SECURE` optionally controls the cookie `Secure` attribute; it defaults to true when `APP_ENV=production`.
+- `LLM_TIMEOUT_MS` optionally controls HTTP AI provider request timeout and defaults to 30000 ms.
+- `LLM_MAX_RETRIES` optionally controls HTTP AI provider transient-failure retries and defaults to 0.
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
 

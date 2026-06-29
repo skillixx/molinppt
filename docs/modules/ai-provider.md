@@ -10,6 +10,8 @@ Current implementation:
 - mock slide JSON generation
 - single-slide regeneration
 - HTTP provider adapter selected with `LLM_PROVIDER=http`
+- HTTP provider timeout controlled by `LLM_TIMEOUT_MS`, default 30000 ms
+- transient HTTP 5xx or network failures retried up to `LLM_MAX_RETRIES`, default 0
 - provider response validation for `outline`, `slides`, and `slide`
 - prompt payload builders for outline, deck, and single-slide regeneration
 
@@ -27,3 +29,5 @@ The HTTP provider receives JSON with `operation` and `input` fields. It must ret
 - `regenerate_slide`: `{ "slide": { ... } }`
 
 Malformed responses fail with `AI_PROVIDER_INVALID_RESPONSE` so bad provider payloads do not silently create invalid decks.
+
+The app sends an abort signal to the HTTP provider request. Provider 5xx responses and network failures are retried within the configured retry budget; validation failures and non-5xx provider errors are not retried.
