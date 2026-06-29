@@ -66,7 +66,7 @@ ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
 npm run acceptance:moling
 ```
 
-The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, file download, and call-log checks against the configured Moling APIs.
+The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, file download, call-log checks, and final balance deduction checks against the configured Moling APIs.
 
 ## Release Strategy
 

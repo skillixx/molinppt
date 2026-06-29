@@ -21,6 +21,7 @@ if (templates.templates.length < 3 || !templates.templates.every((template) => t
 const initialBalance = await get(entitlementId ? `/api/billing/balance?entitlement_id=${entitlementId}` : "/api/billing/balance");
 const resolvedEntitlementId = entitlementId || Number(initialBalance.entitlement_id);
 if (!resolvedEntitlementId) throw new Error("entitlement resolution failed");
+const expectedDebit = 8;
 
 const template = templates.templates[0];
 const outline = await post("/api/ppt/outlines", {
@@ -66,6 +67,7 @@ if (!pptx.file?.id || !pdf.file?.id || downloadedPptx.byteLength === 0 || downlo
 if (!logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pptx.file.id)) {
   throw new Error("download log failed");
 }
+assertBalanceDeducted({ initialBalance, finalBalance, expectedDebit });
 
 console.log(JSON.stringify({
   status: "passed",
@@ -73,6 +75,7 @@ console.log(JSON.stringify({
   entitlement_id: resolvedEntitlementId,
   initial_remaining: initialBalance.balance?.remaining,
   final_remaining: finalBalance.balance?.remaining,
+  expected_debit: expectedDebit,
   outline_id: outline.outline.id,
   deck_id: deck.deck.id,
   task_id: task.task.id,
@@ -142,4 +145,17 @@ async function downloadFile(file) {
     throw new Error(`download failed: ${file.id}`);
   }
   return response.arrayBuffer();
+}
+
+/**
+ * Verifies that paid acceptance operations consumed the expected credits.
+ * @param {{initialBalance: object, finalBalance: object, expectedDebit: number}} input
+ * @returns {void}
+ */
+function assertBalanceDeducted({ initialBalance, finalBalance, expectedDebit }) {
+  const initial = Number(initialBalance.balance?.remaining);
+  const final = Number(finalBalance.balance?.remaining);
+  if (!Number.isFinite(initial) || !Number.isFinite(final) || initial - final !== expectedDebit) {
+    throw new Error(`credit deduction failed: expected ${expectedDebit}, got ${initial - final}`);
+  }
 }

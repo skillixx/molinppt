@@ -58,6 +58,17 @@ test("real Moling acceptance verifies exported file downloads", async () => {
   assert.match(script, /file_downloaded/);
 });
 
+test("acceptance scripts verify credit deduction after paid operations", async () => {
+  const localScript = await readFile(new URL("scripts/acceptance.js", appRoot), "utf8");
+  const molingScript = await readFile(new URL("scripts/moling-acceptance.js", appRoot), "utf8");
+
+  for (const script of [localScript, molingScript]) {
+    assert.match(script, /expectedDebit/);
+    assert.match(script, /assertBalanceDeducted/);
+    assert.match(script, /credit deduction failed/);
+  }
+});
+
 test("environment examples keep sensitive values empty", async () => {
   const rootEnv = await readFile(new URL(".env.example", repoRoot), "utf8");
   const appEnv = await readFile(new URL(".env.example", appRoot), "utf8");

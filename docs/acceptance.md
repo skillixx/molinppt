@@ -31,7 +31,7 @@ Later implementation phases must prove:
 
 ## Third-Stage Acceptance Commands
 
-Local deterministic acceptance uses the in-process Moling mock and verifies the full export-download-log path:
+Local deterministic acceptance uses the in-process Moling mock and verifies the full export-download-log path plus credit deduction:
 
 ```bash
 npm run acceptance
@@ -46,4 +46,4 @@ ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
 npm run acceptance:moling
 ```
 
-The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, real PPTX/PDF downloads, and call-log persistence. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.
+The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, real PPTX/PDF downloads, call-log persistence, and the expected balance decrease after paid operations. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.
