@@ -5,6 +5,17 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "./errors.js";
 import { requirePermission } from "./permissions.js";
 
+export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+
+const SUPPORTED_MIME_TYPES = new Set([
+  "text/plain",
+  "text/markdown",
+  "application/json",
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
 /**
  * Local file storage adapter for uploads and downloads.
  */
@@ -24,6 +35,7 @@ export class LocalFileStorage {
    * @returns {Promise<object>}
    */
   async upload({ ownerUserId, fileName, mimeType, content }) {
+    validateUploadPayload({ fileName, mimeType, content });
     await mkdir(this.storageDir, { recursive: true });
     const id = randomUUID();
     const storageKey = `${ownerUserId}/${id}-${sanitizeFileName(fileName)}`;
@@ -58,6 +70,39 @@ export class LocalFileStorage {
       file,
       content: await readFile(path.join(this.storageDir, file.storageKey)),
     };
+  }
+}
+
+/**
+ * Validates a file payload before persisting it.
+ * @param {{fileName: string, mimeType: string, content: Buffer}} input
+ * @returns {void}
+ */
+function validateUploadPayload({ fileName, mimeType, content }) {
+  if (!fileName || typeof fileName !== "string") {
+    throw new AppError({ code: "FILE_NAME_REQUIRED", status: 400, message: "File name is required" });
+  }
+  if (!Buffer.isBuffer(content)) {
+    throw new AppError({ code: "FILE_CONTENT_INVALID", status: 400, message: "File content is invalid" });
+  }
+  if (content.length === 0) {
+    throw new AppError({ code: "FILE_EMPTY", status: 400, message: "File is empty" });
+  }
+  if (content.length > MAX_UPLOAD_BYTES) {
+    throw new AppError({
+      code: "FILE_TOO_LARGE",
+      status: 413,
+      message: "File is too large",
+      publicDetails: { max_bytes: MAX_UPLOAD_BYTES },
+    });
+  }
+  if (!SUPPORTED_MIME_TYPES.has(mimeType)) {
+    throw new AppError({
+      code: "UNSUPPORTED_FILE_TYPE",
+      status: 400,
+      message: "Unsupported file type",
+      publicDetails: { supported_mime_types: [...SUPPORTED_MIME_TYPES] },
+    });
   }
 }
 

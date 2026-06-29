@@ -40,6 +40,8 @@ Metadata includes:
 ## Security
 
 - Validate MIME type and size before accepting uploads.
+- The local app accepts non-empty files up to 2 MiB.
+- Supported MIME types are `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, and `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
 - Scan or reject unsupported file types.
 - Never expose raw storage credentials to the browser.
 - Use unpredictable storage keys and avoid user-controlled paths.

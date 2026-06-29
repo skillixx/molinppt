@@ -74,6 +74,16 @@ Returns a short-lived authorized download URL.
 
 The current local foundation also supports direct owner-checked `GET /api/files/{file_id}` downloads for local development.
 
+### `POST /api/files`
+
+Uploads an owner-scoped file.
+
+Request fields: `file_name`, `mime_type`, `content_base64`.
+
+The API accepts canonical base64 only. Empty content is rejected with `FILE_EMPTY`, invalid base64 with `FILE_CONTENT_INVALID`, unsupported MIME types with `UNSUPPORTED_FILE_TYPE`, and files over 2 MiB with `FILE_TOO_LARGE`.
+
+Supported MIME types are `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, and `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
+
 ### `POST /api/ppt/outlines`
 
 Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`. `slide_count` must be an integer from 1 to 20, and `theme` must be one of the selected template's `themes`.

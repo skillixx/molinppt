@@ -83,7 +83,7 @@ export function createApp(dependencies) {
           ownerUserId,
           fileName: body.file_name,
           mimeType: body.mime_type,
-          content: Buffer.from(body.content_base64, "base64"),
+          content: decodeBase64Content(body.content_base64),
         });
         sendJson(response, { file }, 201);
         return;
@@ -343,6 +343,22 @@ async function readJson(request) {
   for await (const chunk of request) chunks.push(chunk);
   const raw = Buffer.concat(chunks).toString("utf8");
   return raw.trim() ? JSON.parse(raw) : {};
+}
+
+/**
+ * Decodes a canonical base64 request payload.
+ * @param {unknown} value
+ * @returns {Buffer}
+ */
+function decodeBase64Content(value) {
+  if (typeof value !== "string") {
+    throw new AppError({ code: "FILE_CONTENT_INVALID", status: 400, message: "File content is invalid" });
+  }
+  const normalized = value.trim();
+  if (!normalized || normalized.length % 4 !== 0 || !/^[A-Za-z0-9+/]*={0,2}$/.test(normalized)) {
+    throw new AppError({ code: "FILE_CONTENT_INVALID", status: 400, message: "File content is invalid" });
+  }
+  return Buffer.from(normalized, "base64");
 }
 
 /**

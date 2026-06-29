@@ -181,6 +181,46 @@ test("LocalFileStorage uploads and downloads owner-scoped files", async () => {
   );
 });
 
+test("LocalFileStorage rejects unsafe upload payloads", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["files"],
+  });
+  await database.initialize();
+  const storage = new LocalFileStorage({
+    storageDir: path.join(tempDir, "storage"),
+    database,
+  });
+
+  await assert.rejects(
+    () => storage.upload({
+      ownerUserId: 7,
+      fileName: "empty.txt",
+      mimeType: "text/plain",
+      content: Buffer.alloc(0),
+    }),
+    { code: "FILE_EMPTY" },
+  );
+  await assert.rejects(
+    () => storage.upload({
+      ownerUserId: 7,
+      fileName: "tool.exe",
+      mimeType: "application/x-msdownload",
+      content: Buffer.from("bad"),
+    }),
+    { code: "UNSUPPORTED_FILE_TYPE" },
+  );
+  await assert.rejects(
+    () => storage.upload({
+      ownerUserId: 7,
+      fileName: "large.txt",
+      mimeType: "text/plain",
+      content: Buffer.alloc(2 * 1024 * 1024 + 1),
+    }),
+    { code: "FILE_TOO_LARGE" },
+  );
+});
+
 test("MemoryTaskCenter creates tasks and advances status", async () => {
   const taskCenter = new MemoryTaskCenter();
 
@@ -313,6 +353,18 @@ test("createApp exposes health, session, task, template, file, and error APIs", 
       }),
     });
     assert.equal(upload.status, 201);
+
+    const invalidUpload = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "brief.txt",
+        mime_type: "text/plain",
+        content_base64: "not base64",
+      }),
+    });
+    assert.equal(invalidUpload.status, 400);
+    assert.equal((await invalidUpload.json()).error.code, "FILE_CONTENT_INVALID");
 
     const task = await fetch(`${baseUrl}/api/tasks`, {
       method: "POST",
