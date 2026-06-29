@@ -35,6 +35,7 @@ Track:
 - reserve, settle, release, and reconciliation counts
 - AI provider latency, failures, and cost estimates
 - export duration and failure rate
+- file download count through `file_downloaded` call logs
 
 ## Tracing
 

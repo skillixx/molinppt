@@ -74,6 +74,8 @@ Returns a short-lived authorized download URL.
 
 The current local foundation also supports direct owner-checked `GET /api/files/{file_id}` downloads for local development.
 
+Direct downloads return the file MIME type, `Content-Disposition` with a sanitized filename, and record a `file_downloaded` call log for auditability.
+
 ### `POST /api/files`
 
 Uploads an owner-scoped file.

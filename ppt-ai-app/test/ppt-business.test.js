@@ -484,7 +484,11 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
     const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
     const pptx = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pptx" });
     const pdf = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pdf" });
+    const pptxBody = await pptx.json();
+    const pdfBody = await pdf.json();
+    const downloadedPptx = await fetch(`${baseUrl}/api/files/${pptxBody.file.id}`, { headers: { cookie } });
     const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } });
+    const logsBody = await logs.json();
 
     assert.equal(deckBody.task.status, "succeeded");
     assert.equal(taskResponse.status, 200);
@@ -492,9 +496,12 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
     assert.equal(taskBody.task.progress, 100);
     assert.equal(taskBody.task.deckId, deckBody.deck.id);
     assert.match(await preview.text(), /Board update/);
-    assert.equal((await pptx.json()).file.mimeType.includes("presentationml"), true);
-    assert.equal((await pdf.json()).file.mimeType, "application/pdf");
-    assert.equal((await logs.json()).logs.length >= 4, true);
+    assert.equal(pptxBody.file.mimeType.includes("presentationml"), true);
+    assert.equal(pdfBody.file.mimeType, "application/pdf");
+    assert.equal(downloadedPptx.status, 200);
+    assert.match(downloadedPptx.headers.get("content-disposition"), /filename="Board_update\.pptx"/);
+    assert.equal((await downloadedPptx.arrayBuffer()).byteLength > 0, true);
+    assert.equal(logsBody.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pptxBody.file.id), true);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }

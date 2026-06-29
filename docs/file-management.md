@@ -27,6 +27,7 @@ Metadata includes:
 
 - Users can access only files they own.
 - Download URLs are short-lived.
+- Local direct downloads return `Content-Disposition` with a sanitized filename and write a `file_downloaded` call log.
 - Uploads use constrained pre-signed URLs when direct upload is introduced.
 - Internal worker files are not user-downloadable unless promoted to generated assets or exports.
 

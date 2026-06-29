@@ -100,7 +100,11 @@ export function createApp(dependencies) {
       if (request.method === "GET" && url.pathname.startsWith("/api/files/")) {
         const fileId = url.pathname.split("/")[3];
         const downloaded = await dependencies.storage.download({ fileId, ownerUserId });
-        response.writeHead(200, { "Content-Type": downloaded.file.mimeType });
+        await recordFileDownload({ database: dependencies.database, ownerUserId, file: downloaded.file });
+        response.writeHead(200, {
+          "Content-Type": downloaded.file.mimeType,
+          "Content-Disposition": `attachment; filename="${headerSafeFileName(downloaded.file.fileName)}"`,
+        });
         response.end(downloaded.content);
         return;
       }
@@ -325,6 +329,30 @@ function requireInternalToken(request, expectedToken) {
   if (request.headers["x-internal-token"] !== expectedToken) {
     throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
   }
+}
+
+/**
+ * Records an owner-scoped file download call log.
+ * @param {{database: object, ownerUserId: number, file: object}} input
+ * @returns {Promise<void>}
+ */
+async function recordFileDownload({ database, ownerUserId, file }) {
+  await database.insert("call_logs", {
+    ownerUserId,
+    action: "file_downloaded",
+    resourceType: "file",
+    resourceId: file.id,
+    metadata: { fileName: file.fileName, mimeType: file.mimeType, sizeBytes: file.sizeBytes },
+  });
+}
+
+/**
+ * Produces a safe ASCII filename for Content-Disposition.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function headerSafeFileName(value) {
+  return String(value || "download").replaceAll(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 /**
