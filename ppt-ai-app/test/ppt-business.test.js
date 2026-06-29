@@ -1097,6 +1097,61 @@ test("HTTP API exposes session entitlement balance for package checks", async ()
   }
 });
 
+test("HTTP API keeps separate users in different sessions with separate entitlement and user id", async () => {
+  const context = await createBusinessContext();
+  const identities = {
+    ok1: { user_id: 7, app_id: 15, product_id: 73, entitlements: [{ entitlement_id: 88, product_id: 73, status: "active", usable: true }] },
+    ok2: { user_id: 9, app_id: 15, product_id: 73, entitlements: [{ entitlement_id: 91, product_id: 73, status: "active", usable: true }] },
+  };
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async (ticket) => identities[ticket],
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter1 = await fetch(`${baseUrl}/enter?ticket=ok1`, { redirect: "manual" });
+    const cookie1 = enter1.headers.get("set-cookie").split(";")[0];
+    const enter2 = await fetch(`${baseUrl}/enter?ticket=ok2`, { redirect: "manual" });
+    const cookie2 = enter2.headers.get("set-cookie").split(";")[0];
+
+    const balance1 = await fetch(`${baseUrl}/api/billing/balance`, { headers: { cookie: cookie1 } });
+    const balance1Body = await balance1.json();
+    const balance2 = await fetch(`${baseUrl}/api/billing/balance`, { headers: { cookie: cookie2 } });
+    const balance2Body = await balance2.json();
+
+    const outline1Response = await postJson(`${baseUrl}/api/ppt/outlines`, cookie1, { topic: "User7", slide_count: 2, template_id: "business" });
+    const outline1 = await outline1Response.json();
+    await postJson(`${baseUrl}/api/ppt/decks`, cookie1, { outline_id: outline1.outline.id });
+
+    const outline2Response = await postJson(`${baseUrl}/api/ppt/outlines`, cookie2, { topic: "User9", slide_count: 2, template_id: "business" });
+    const outline2 = await outline2Response.json();
+    await postJson(`${baseUrl}/api/ppt/decks`, cookie2, { outline_id: outline2.outline.id });
+
+    assert.equal(balance1.status, 200);
+    assert.equal(balance1Body.entitlement_id, 88);
+    assert.equal(balance2.status, 200);
+    assert.equal(balance2Body.entitlement_id, 91);
+    assert.equal(context.billingCalls.some((call) => call[0] === "balance" && call[1].userId === 7 && call[1].entitlementId === 88), true);
+    assert.equal(context.billingCalls.some((call) => call[0] === "balance" && call[1].userId === 9 && call[1].entitlementId === 91), true);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve" && call[1].userId === 7 && call[1].entitlementId === 88), true);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve" && call[1].userId === 9 && call[1].entitlementId === 91), true);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("workspace page exposes package balance status", async () => {
   const context = await createBusinessContext();
   const app = createApp({
