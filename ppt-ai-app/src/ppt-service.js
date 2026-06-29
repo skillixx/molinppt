@@ -387,8 +387,16 @@ export class PptService {
    */
   async #ensureBalance({ ownerUserId, entitlementId, amount }) {
     const balance = await this.billingClient.getBalance({ userId: ownerUserId, entitlementId });
-    if (balance.usable === false || Number(balance.remaining) < Number(amount)) {
-      throw new AppError({ code: "INSUFFICIENT_CREDITS", status: 402, message: "Insufficient credits" });
+    const remaining = Number(balance?.remaining);
+    const usable = isEntitlementUsable(balance);
+    if (!usable || !Number.isFinite(remaining) || remaining < Number(amount)) {
+      const isBlockedByStatus = !usable;
+      throw new AppError({
+        code: isBlockedByStatus ? "ENTITLEMENT_NOT_USABLE" : "INSUFFICIENT_CREDITS",
+        status: isBlockedByStatus ? 403 : 402,
+        message: isBlockedByStatus ? "Entitlement is not usable" : "Insufficient credits",
+        publicDetails: { entitlement_id: entitlementId, balance },
+      });
     }
   }
 
@@ -470,6 +478,19 @@ function validateTemplateTheme({ template, theme }) {
       message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
     });
   }
+}
+
+/**
+ * Returns whether an entitlement is currently usable for charging.
+ * @param {object} balance
+ * @returns {boolean}
+ */
+function isEntitlementUsable(balance) {
+  if (typeof balance?.usable === "boolean") return balance.usable;
+  if (typeof balance?.usable === "number") return balance.usable === 1;
+  if (typeof balance?.usable === "string") return balance.usable === "true" || balance.usable === "1";
+  if (balance?.status !== undefined) return String(balance.status) === "active";
+  return true;
 }
 
 /**

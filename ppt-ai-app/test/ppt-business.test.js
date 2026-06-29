@@ -158,6 +158,32 @@ test("PptService records slide release reconciliation when regeneration release 
   assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle", "balance", "reserve", "release"]);
 });
 
+test("PptService blocks generation when entitlement is not usable", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      getBalance: async (input) => {
+        context.billingCalls.push(["balance", input]);
+        return { usable: false, status: "expired", remaining: "100" };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Blocked by entitlement status",
+    slideCount: 2,
+    templateId: "business",
+  });
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    { code: "ENTITLEMENT_NOT_USABLE" },
+  );
+  assert.deepEqual(context.billingCalls, [["balance", { userId: 7, entitlementId: 88 }]]);
+});
+
 test("PptService reconciles pending slide release events", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.regenerateSlide = async () => {
@@ -1019,6 +1045,59 @@ test("HTTP API rejects invalid entitlement IDs before billing", async () => {
     assert.equal(deckResponse.status, 400);
     assert.equal(body.error.code, "ENTITLEMENT_INVALID");
     assert.deepEqual(context.billingCalls, []);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API blocks generation when launch entitlement is not usable", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      getBalance: async (input) => {
+        context.billingCalls.push(["balance", input]);
+        return { usable: "0", status: "paused", remaining: "100" };
+      },
+    },
+  });
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({
+        user_id: 7,
+        app_id: 15,
+        product_id: 73,
+        entitlements: [{ entitlement_id: 88, product_id: 73, status: "active", usable: true }],
+      }),
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Entitlement not usable",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+    });
+    const body = await deckResponse.json();
+
+    assert.equal(deckResponse.status, 403);
+    assert.equal(body.error.code, "ENTITLEMENT_NOT_USABLE");
+    assert.deepEqual(context.billingCalls[0], ["balance", { userId: 7, entitlementId: 88 }]);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve"), false);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }

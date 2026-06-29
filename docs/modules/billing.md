@@ -11,6 +11,7 @@ Current implementation:
 - balance lookup
 - consume operation
 - numeric ID coercion for Moling JSON payloads
+- entitlement usability checks (`usable` / `status`) before reserve
 
 Third-stage usage:
 

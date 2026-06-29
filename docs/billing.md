@@ -33,6 +33,8 @@ Do not rely on one global entitlement ID for all production users. If Moling ret
 
 The API validates the final `entitlement_id` as a positive integer before balance lookup, reserve, settle, or release. Invalid package IDs fail closed with `ENTITLEMENT_INVALID` or `ENTITLEMENT_REQUIRED` and do not create billing events.
 
+Before reserve, the app also verifies entitlement usability from the balance response. If the entitlement is not usable (`usable === false`, `usable === 0/\"0\"`, or `status !== active`), generation is blocked with `ENTITLEMENT_NOT_USABLE` and no reserve is attempted.
+
 ## Idempotency
 
 Every billing operation has a deterministic idempotency key based on task ID and operation type.
