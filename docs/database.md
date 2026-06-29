@@ -8,73 +8,130 @@ The second-stage framework uses a dependency-light JSON-file database adapter fo
 
 ## Core Entities
 
-The local framework initializes these collections: `users`, `sessions`, `files`, `tasks`, `billing_events`, `templates`, `audit_logs`, `outlines`, `decks`, `generation_tasks`, and `call_logs`.
+The runtime app (`ppt-ai-app/src/server.js`) initializes these collections by default:
+
+- `sessions`
+- `files`
+- `tasks`（内存任务中心兼容入口，当前不持久化任务数据）
+- `users`
+- `billing_events`
+- `outlines`
+- `decks`
+- `generation_tasks`
+- `call_logs`
+
+The server does not initialize `projects`、`templates`、`slides`、`audit_logs` in the current branch.
 
 ### users
 
 Stores Moling identity references, not passwords.
 
-Fields: `id`, `moling_user_id`, `display_name`, `created_at`, `updated_at`.
+Current fields are not yet persisted by the workflow (reserved for future extension):
+
+- `id`, `created_at`, `updated_at`
 
 ### sessions
 
 Stores application sessions created from verified Moling launch tickets. The local adapter persists these records so a process restart does not force a valid user to relaunch from Moling.
 
-Fields: `id`, `identity`, `entitlementId`, `createdAt`, `expiresAt`, `created_at`, `updated_at`.
-
-### projects
-
-Groups user decks.
-
-Fields: `id`, `owner_user_id`, `title`, `status`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `identity`（包含 `user_id`, `app_id`, `product_id` 等）
+- `entitlementId`
+- `createdAt`, `expiresAt`（会话语义字段）
+- `created_at`, `updated_at`（JSON 适配器自动补全）
 
 ### decks
 
-Represents one generated or uploaded presentation.
+Represents one generated presentation.
 
-Fields: `id`, `project_id`, `owner_user_id`, `title`, `source_type`, `template_id`, `status`, `created_at`, `updated_at`.
-
-### slides
-
-Stores normalized slide content for editing and regeneration.
-
-Fields: `id`, `deck_id`, `sort_order`, `title`, `content_json`, `layout_json`, `speaker_notes`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `outlineId`
+- `title`
+- `templateId`
+- `theme`
+- `status`（`billing_pending`/`ready`）
+- `slides`
+- `created_at`, `updated_at`
 
 ### generation_tasks
 
 Tracks asynchronous AI jobs and billing state.
 
-Fields: `id`, `owner_user_id`, `deck_id`, `task_type`, `status`, `input_json`, `result_json`, `error_code`, `error_message`, `billing_hold_id`, `idempotency_key`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `outlineId`
+- `entitlementId`
+- `status`（`running`/`succeeded`/`failed`/`reconcile_pending`/`release_pending`）
+- `progress`（0-100）
+- `retryable`
+- `deckId`
+- `errorCode`
+- `errorMessage`
+- `originalErrorMessage`
+- `created_at`, `updated_at`
 
 ### outlines
 
 Stores editable AI-generated outlines before full deck generation.
 
-Fields: `id`, `owner_user_id`, `topic`, `template_id`, `theme`, `status`, `input`, `slides`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `topic`
+- `templateId`
+- `theme`
+- `status`（`outline_ready`/`outline_edited`）
+- `input`（包含 `topic`、`sourceFileId`、`slideCount` 等）
+- `slides`
+- `created_at`, `updated_at`
 
 ### billing_events
 
 Stores application-side billing attempts for reconciliation.
 
-Fields: `id`, `owner_user_id`, `moling_entitlement_id`, `task_id`, `event_type`, `amount`, `status`, `hold_id`, `idempotency_key`, `platform_response_json`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `taskId`
+- `eventType`（`reserve`/`settle`/`release`）
+- `amount`
+- `status`（`reserved`/`settled`/`released`/`settle_pending`/`release_pending`/`reconcile_failed`）
+- `holdId`
+- `idempotencyKey`
+- `platformResponse`
+- `errorMessage`
+- `created_at`, `updated_at`
 
 ### files
 
 Stores metadata for uploads and generated exports.
 
-Fields: `id`, `owner_user_id`, `deck_id`, `storage_key`, `file_type`, `mime_type`, `size_bytes`, `checksum`, `visibility`, `status`, `created_at`, `updated_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `fileName`
+- `mimeType`
+- `storageKey`
+- `sizeBytes`
+- `status`（`available`）
+- `created_at`, `updated_at`
 
 ### call_logs
 
 Stores user-scoped application actions for audit and troubleshooting.
 
-Fields: `id`, `owner_user_id`, `action`, `resource_type`, `resource_id`, `metadata`, `created_at`.
-
-### audit_logs
-
-Records security and important business events.
-
-Fields: `id`, `actor_user_id`, `action`, `resource_type`, `resource_id`, `metadata_json`, `created_at`.
+Fields:
+- `id`
+- `ownerUserId`
+- `action`
+- `resourceType`
+- `resourceId`
+- `metadata`
+- `created_at`, `updated_at`
 
 ## Consistency Rules
 
@@ -87,13 +144,11 @@ Fields: `id`, `actor_user_id`, `action`, `resource_type`, `resource_id`, `metada
 
 ## Indexes
 
-- `users.moling_user_id`
 - `sessions.id`
 - `sessions.expiresAt`
-- `projects.owner_user_id`
-- `decks.owner_user_id`
-- `slides.deck_id, sort_order`
-- `generation_tasks.owner_user_id, status`
-- `generation_tasks.idempotency_key`
-- `billing_events.idempotency_key`
-- `files.owner_user_id, deck_id`
+- `decks.ownerUserId`
+- `decks.outlineId`
+- `generation_tasks.ownerUserId, status`
+- `billing_events.idempotencyKey`
+- `files.ownerUserId`
+- `outlines.ownerUserId`

@@ -49,3 +49,18 @@ npm run acceptance:moling
 ```
 
 The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, real PPTX/PDF downloads, call-log persistence, and the expected balance decrease after paid operations. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.
+
+## 手动验收清单（本地）
+
+推荐在本地环境（`npm start`）执行一次完整流程：
+
+- 打开主页并通过 `ticket=local_ticket` 进入（或平台真实票据）。
+- 在页面点击“生成大纲”，确认返回大纲 ID。
+- 编辑大纲后点击“生成演示文稿”，确认按钮状态切换到“任务中”，并持续显示：
+  - `running` 过程中的状态/进度
+  - `succeeded` 后显示 `deckId`
+  - 失败返回 `retryable` 标识
+- 生成成功后：调用预览接口确认可见内容。
+- 点击导出 PPTX/PDF，确认返回 `file.id`，并能在 `/api/files/{fileId}` 下载成功。
+- 再执行一次同一用户登出/重登场景验证：`session` 恢复后可继续查看同一轮任务状态。
+- 切换到另一用户 `user_id`，重复上述流程，确认无法查看或下载对方文件、调用日志与余额独立。
