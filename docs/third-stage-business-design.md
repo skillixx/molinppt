@@ -33,4 +33,4 @@ Single-slide regeneration also uses reserve -> settle/release. If the AI provide
 
 ## Local Acceptance
 
-Use `LOCAL_MOLING_MOCK=true` to run the full HTTP acceptance flow without external Moling credentials. Start the app, then run `npm run acceptance`. This verifies login, outline generation, outline edit, deck generation, preview, PPTX/PDF export, billing calls, and call logs through the same HTTP APIs used by the UI.
+Use `LOCAL_MOLING_MOCK=true` to run the full HTTP acceptance flow without external Moling credentials. Start the app, then run `npm run acceptance`. This verifies login, outline generation, outline edit, deck generation, preview, PPTX/PDF export, real file download, billing calls, and call logs through the same HTTP APIs used by the UI.

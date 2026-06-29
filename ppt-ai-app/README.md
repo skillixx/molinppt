@@ -30,6 +30,8 @@ Moling launch and billing configuration:
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
 
+Local acceptance exports PPTX/PDF, downloads both files through `GET /api/files/{file_id}`, checks filename headers, and verifies download call logs.
+
 Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform entry flow and can optionally pass `ACCEPTANCE_ENTITLEMENT_ID`.
 
 ## Foundation Modules

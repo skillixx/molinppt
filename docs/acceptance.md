@@ -25,13 +25,13 @@ Later implementation phases must prove:
 - each user uses the entitlement returned by Moling launch verification before falling back to configured defaults.
 - credit reserve, settle, and release are correct and idempotent.
 - failed generation does not consume credits.
-- exported PPTX/PDF files are downloadable by the owner only.
+- exported PPTX/PDF files are downloaded by the owner, return filename headers, and create `file_downloaded` logs.
 - logs, metrics, and reconciliation alerts are available.
 - access control prevents cross-user data access.
 
 ## Third-Stage Acceptance Commands
 
-Local deterministic acceptance uses the in-process Moling mock:
+Local deterministic acceptance uses the in-process Moling mock and verifies the full export-download-log path:
 
 ```bash
 npm run acceptance
