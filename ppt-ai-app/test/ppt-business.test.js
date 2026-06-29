@@ -759,6 +759,65 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
   }
 });
 
+test("HTTP API supports document upload based outline and deck generation", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const upload = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "source.txt",
+        mime_type: "text/plain",
+        content_base64: Buffer.from("Source document\nUsed for outline generation").toString("base64"),
+      }),
+    });
+    const uploadBody = await upload.json();
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      source_file_id: uploadBody.file.id,
+      slide_count: 3,
+      template_id: "business",
+      theme: "modern",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+
+    assert.equal(upload.status, 201);
+    assert.equal(outlineResponse.status, 201);
+    assert.equal(outline.outline.slides[0].title, "Source document");
+    assert.equal(outline.outline.slides.length, 3);
+    assert.equal(deckResponse.status, 201);
+    assert.equal(deckBody.task.status, "succeeded");
+    const previewBody = await preview.text();
+    assert.equal(preview.status, 200);
+    assert.match(previewBody, /Source document/);
+    assert.match(preview.headers.get("content-type"), /text\/html/);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve" && call[1].entitlementId === 88 && call[1].userId === 7), true);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("HTTP API rejects invalid outline edits before deck generation", async () => {
   const context = await createBusinessContext();
   const app = createApp({

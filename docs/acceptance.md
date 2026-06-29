@@ -19,6 +19,7 @@ Later implementation phases must prove:
 - Moling users can enter with SSO.
 - users can see the active entitlement balance after entering AI PPT.
 - users can generate a PPT from topic/template/source input.
+- users can generate a PPT from uploaded source documents (`/api/files` + `source_file_id`).
 - users can edit outline JSON before generation.
 - users can regenerate one generated slide.
 - retryable failures return a task ID that the workspace can retry.
