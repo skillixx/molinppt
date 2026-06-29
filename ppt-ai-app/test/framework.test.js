@@ -562,6 +562,60 @@ test("createApp blocks cross-user file downloads and log visibility", async () =
   }
 });
 
+test("createApp issues short-lived owner download URLs", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "files", "tasks", "call_logs"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    internalToken: "download-secret",
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager({ templates: [{ id: "business", name: "Business" }] }),
+    aiProvider: new MockAiProvider(),
+    pptService: { listLogs: async ({ ownerUserId }) => database.find("call_logs", (log) => Number(log.ownerUserId) === Number(ownerUserId)) },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const upload = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "signed.txt",
+        mime_type: "text/plain",
+        content_base64: Buffer.from("signed download").toString("base64"),
+      }),
+    });
+    const uploaded = await upload.json();
+    const signed = await fetch(`${baseUrl}/api/files/${uploaded.file.id}/download-url`, { headers: { cookie } });
+    const signedBody = await signed.json();
+    const downloaded = await fetch(`${baseUrl}${signedBody.url}`);
+    const tampered = await fetch(`${baseUrl}${signedBody.url.replace("download_token=", "download_token=x")}`);
+    const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } }).then((response) => response.json());
+
+    assert.equal(signed.status, 200);
+    assert.match(signedBody.url, new RegExp(`^/api/files/${uploaded.file.id}\\?download_token=`));
+    assert.equal(Date.parse(signedBody.expires_at) > Date.now(), true);
+    assert.equal(downloaded.status, 200);
+    assert.equal(await downloaded.text(), "signed download");
+    assert.equal(tampered.status, 403);
+    assert.equal(logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId === uploaded.file.id), true);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp protects the internal reconciliation endpoint", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

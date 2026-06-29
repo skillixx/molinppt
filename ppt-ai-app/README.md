@@ -73,6 +73,7 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 - `GET /api/billing/balance`
 - `POST /api/files`
 - `GET /api/files/{file_id}`
+- `GET /api/files/{file_id}/download-url`
 - `POST /api/tasks`
 - `GET /api/tasks/{task_id}`
 - `POST /api/ppt/outlines`
@@ -88,7 +89,7 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 
 `POST /api/files` accepts canonical base64 content only. Files must be non-empty, no larger than 2 MiB, and use one of these MIME types: `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, or `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
 
-`GET /api/files/{file_id}` is owner-checked, returns `Content-Disposition` with a sanitized filename, and records a `file_downloaded` call log.
+`GET /api/files/{file_id}/download-url` returns a five-minute signed URL for owner-scoped downloads. `GET /api/files/{file_id}` remains owner-checked for direct compatibility. Both signed and direct downloads return `Content-Disposition` with a sanitized filename and record a `file_downloaded` call log.
 
 `POST /api/ppt/decks/{deck_id}/exports` accepts only `pptx` and `pdf` formats.
 

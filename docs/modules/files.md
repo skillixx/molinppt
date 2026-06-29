@@ -8,6 +8,8 @@ Current implementation:
 - local storage directory from environment configuration
 - file metadata persisted through the database adapter
 - owner checks before download
+- owner-scoped `GET /api/files/{file_id}/download-url` issues five-minute signed download URLs
+- signed and direct downloads return `Content-Disposition` and record `file_downloaded` call logs
 - upload validation rejects empty files, files over 2 MiB, unsupported MIME types, and invalid API payloads
 
 Allowed MIME types:

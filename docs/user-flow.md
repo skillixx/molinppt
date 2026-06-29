@@ -29,7 +29,8 @@
 2. App validates ownership and deck status.
 3. App creates an export task.
 4. Worker generates export file and stores it.
-5. User downloads through a short-lived authorized URL.
+5. App issues a five-minute signed download URL for the owner.
+6. User downloads through the signed URL and the app records a `file_downloaded` log.
 
 ## Failure Flow
 

@@ -45,7 +45,7 @@ test("production Moling acceptance command is documented and ticket-gated", asyn
 test("local acceptance verifies exported file downloads", async () => {
   const script = await readFile(new URL("scripts/acceptance.js", appRoot), "utf8");
 
-  assert.match(script, /\/api\/files\/\$\{file\.id\}/);
+  assert.match(script, /\/api\/files\/\$\{file\.id\}\/download-url/);
   assert.match(script, /content-disposition/i);
   assert.match(script, /file_downloaded/);
 });
@@ -53,7 +53,7 @@ test("local acceptance verifies exported file downloads", async () => {
 test("real Moling acceptance verifies exported file downloads", async () => {
   const script = await readFile(new URL("scripts/moling-acceptance.js", appRoot), "utf8");
 
-  assert.match(script, /\/api\/files\/\$\{file\.id\}/);
+  assert.match(script, /\/api\/files\/\$\{file\.id\}\/download-url/);
   assert.match(script, /content-disposition/i);
   assert.match(script, /file_downloaded/);
 });

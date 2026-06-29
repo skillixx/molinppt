@@ -125,7 +125,8 @@ async function patch(path, body) {
  * @returns {Promise<ArrayBuffer>}
  */
 async function downloadFile(file) {
-  const response = await fetch(`${baseUrl}/api/files/${file.id}`, { headers: { cookie } });
+  const signed = await get(`/api/files/${file.id}/download-url`);
+  const response = await fetch(`${baseUrl}${signed.url}`);
   const disposition = response.headers.get("content-disposition") || "";
   if (!response.ok || !disposition.includes(`filename="${file.fileName}"`)) {
     throw new Error(`download failed: ${file.id}`);

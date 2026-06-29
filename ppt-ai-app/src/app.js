@@ -1,10 +1,11 @@
 import { createServer } from "node:http";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
 import { AppError, normalizeError } from "./errors.js";
 
 const MAX_JSON_BODY_BYTES = 1024 * 1024;
 const DEFAULT_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const DOWNLOAD_URL_TTL_MS = 5 * 60 * 1000;
 
 /**
  * Creates the HTTP API application.
@@ -61,6 +62,20 @@ export function createApp(dependencies) {
         return;
       }
 
+      if (request.method === "GET" && url.pathname.match(/^\/api\/files\/[^/]+$/) && url.searchParams.has("download_token")) {
+        const token = verifyDownloadToken({
+          token: url.searchParams.get("download_token"),
+          secret: dependencies.internalToken,
+        });
+        const fileId = url.pathname.split("/")[3];
+        if (token.fileId !== fileId) {
+          throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
+        }
+        const downloaded = await dependencies.storage.download({ fileId, ownerUserId: token.ownerUserId });
+        await sendFileDownload({ response, database: dependencies.database, ownerUserId: token.ownerUserId, downloaded });
+        return;
+      }
+
       const session = await requireSession(request, sessions, sessionCookieName, dependencies.database);
       const ownerUserId = Number(session.identity.user_id);
 
@@ -104,15 +119,27 @@ export function createApp(dependencies) {
         return;
       }
 
-      if (request.method === "GET" && url.pathname.startsWith("/api/files/")) {
+      if (request.method === "GET" && url.pathname.match(/^\/api\/files\/[^/]+\/download-url$/)) {
+        const fileId = url.pathname.split("/")[3];
+        await dependencies.storage.download({ fileId, ownerUserId });
+        const expiresAt = new Date(Date.now() + DOWNLOAD_URL_TTL_MS).toISOString();
+        const token = signDownloadToken({
+          fileId,
+          ownerUserId,
+          expiresAt,
+          secret: dependencies.internalToken,
+        });
+        sendJson(response, {
+          url: `/api/files/${fileId}?download_token=${encodeURIComponent(token)}`,
+          expires_at: expiresAt,
+        });
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname.match(/^\/api\/files\/[^/]+$/)) {
         const fileId = url.pathname.split("/")[3];
         const downloaded = await dependencies.storage.download({ fileId, ownerUserId });
-        await recordFileDownload({ database: dependencies.database, ownerUserId, file: downloaded.file });
-        response.writeHead(200, {
-          "Content-Type": downloaded.file.mimeType,
-          "Content-Disposition": `attachment; filename="${headerSafeFileName(downloaded.file.fileName)}"`,
-        });
-        response.end(downloaded.content);
+        await sendFileDownload({ response, database: dependencies.database, ownerUserId, downloaded });
         return;
       }
 
@@ -242,6 +269,66 @@ export function createApp(dependencies) {
       sendJson(response, appError.toJSON(requestId), appError.status);
     }
   });
+}
+
+/**
+ * Sends a downloaded file and records the user-visible audit log.
+ * @param {{response: import("node:http").ServerResponse, database: object, ownerUserId: number, downloaded: {file: object, content: Buffer}}} input
+ * @returns {Promise<void>}
+ */
+async function sendFileDownload({ response, database, ownerUserId, downloaded }) {
+  await recordFileDownload({ database, ownerUserId, file: downloaded.file });
+  response.writeHead(200, {
+    "Content-Type": downloaded.file.mimeType,
+    "Content-Disposition": `attachment; filename="${headerSafeFileName(downloaded.file.fileName)}"`,
+  });
+  response.end(downloaded.content);
+}
+
+/**
+ * Signs a short-lived file download token.
+ * @param {{fileId: string, ownerUserId: number, expiresAt: string, secret: string | undefined}} input
+ * @returns {string}
+ */
+function signDownloadToken({ fileId, ownerUserId, expiresAt, secret }) {
+  if (!secret) throw new AppError({ code: "DOWNLOAD_TOKEN_SECRET_REQUIRED", status: 500, message: "Download token secret is not configured" });
+  const payload = Buffer.from(JSON.stringify({ fileId, ownerUserId, exp: Date.parse(expiresAt) }), "utf8").toString("base64url");
+  const signature = createHmac("sha256", secret).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+
+/**
+ * Verifies a short-lived file download token.
+ * @param {{token: string | null, secret: string | undefined}} input
+ * @returns {{fileId: string, ownerUserId: number}}
+ */
+function verifyDownloadToken({ token, secret }) {
+  if (!secret) throw new AppError({ code: "DOWNLOAD_TOKEN_SECRET_REQUIRED", status: 500, message: "Download token secret is not configured" });
+  const [payload, signature] = String(token || "").split(".");
+  if (!payload || !signature || !isValidSignature({ payload, signature, secret })) {
+    throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+  } catch {
+    throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
+  }
+  if (!parsed.fileId || !Number.isInteger(Number(parsed.ownerUserId)) || Number(parsed.exp) <= Date.now()) {
+    throw new AppError({ code: "FORBIDDEN", status: 403, message: "Forbidden" });
+  }
+  return { fileId: parsed.fileId, ownerUserId: Number(parsed.ownerUserId) };
+}
+
+/**
+ * Compares HMAC signatures without leaking timing details.
+ * @param {{payload: string, signature: string, secret: string}} input
+ * @returns {boolean}
+ */
+function isValidSignature({ payload, signature, secret }) {
+  const expected = Buffer.from(createHmac("sha256", secret).update(payload).digest("base64url"));
+  const received = Buffer.from(signature);
+  return expected.length === received.length && timingSafeEqual(expected, received);
 }
 
 /**
