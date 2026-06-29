@@ -37,7 +37,7 @@ export function createApp(dependencies) {
         return;
       }
 
-      if (request.method === "GET" && url.pathname === "/enter") {
+      if (request.method === "GET" && isLaunchRequest(url)) {
         const ticket = url.searchParams.get("ticket");
         if (!ticket) throw new AppError({ code: "MISSING_TICKET", status: 400, message: "Missing launch ticket" });
         const identity = await dependencies.molingClient.verifyLaunchTicket(ticket);
@@ -50,7 +50,13 @@ export function createApp(dependencies) {
         const session = {
           id: sessionId,
           identity,
-          entitlementId: resolveSessionEntitlementId(identity, dependencies.defaultEntitlementId),
+          entitlementId: await resolveSessionEntitlementId({
+            identity,
+            configuredDefault: dependencies.defaultEntitlementId,
+            userEntitlementMap: dependencies.userEntitlementMap,
+            molingClient: dependencies.molingClient,
+            logger: dependencies.logger,
+          }),
           createdAt: new Date().toISOString(),
           expiresAt: new Date(Date.now() + sessionTtlMs).toISOString(),
         };
@@ -85,9 +91,10 @@ export function createApp(dependencies) {
 
       const session = await requireSession(request, sessions, sessionCookieName, dependencies.database);
       const ownerUserId = Number(session.identity.user_id);
+      const sessionEntitlementId = session.entitlementId || dependencies.defaultEntitlementId;
 
       if (request.method === "GET" && url.pathname === "/") {
-        sendHtml(response, renderWorkspace({ defaultEntitlementId: session.entitlementId }));
+        sendHtml(response, renderWorkspace({ defaultEntitlementId: sessionEntitlementId }));
         return;
       }
 
@@ -96,7 +103,7 @@ export function createApp(dependencies) {
           user: {
             user_id: ownerUserId,
             role: "user",
-            entitlement_id: session.entitlementId,
+            entitlement_id: sessionEntitlementId,
           },
         });
         return;
@@ -108,7 +115,7 @@ export function createApp(dependencies) {
       }
 
       if (request.method === "GET" && url.pathname === "/api/billing/balance") {
-        const entitlementId = resolveEntitlementId(url.searchParams.get("entitlement_id"), session.entitlementId);
+        const entitlementId = resolveEntitlementId(url.searchParams.get("entitlement_id"), sessionEntitlementId);
         const balance = await dependencies.billingClient.getBalance({ userId: ownerUserId, entitlementId });
         sendJson(response, { entitlement_id: Number(entitlementId), balance });
         return;
@@ -200,7 +207,7 @@ export function createApp(dependencies) {
         const result = await dependencies.pptService.generateDeck({
           ownerUserId,
           outlineId: body.outline_id,
-          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, sessionEntitlementId),
         });
         sendJson(response, result, 201);
         return;
@@ -234,7 +241,7 @@ export function createApp(dependencies) {
           deckId: parts[4],
           slideId: parts[6],
           instruction: body.instruction,
-          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, sessionEntitlementId),
         });
         sendJson(response, result);
         return;
@@ -253,7 +260,7 @@ export function createApp(dependencies) {
         const result = await dependencies.pptService.retryTask({
           ownerUserId,
           taskId,
-          entitlementId: resolveEntitlementId(body.entitlement_id, session.entitlementId),
+          entitlementId: resolveEntitlementId(body.entitlement_id, sessionEntitlementId),
         });
         sendJson(response, result, 201);
         return;
@@ -271,12 +278,25 @@ export function createApp(dependencies) {
       dependencies.logger?.error?.("request_failed", {
         request_id: requestId,
         method: request.method,
-        url: request.url,
+        url: redactRequestUrl(request.url),
         code: appError.code,
       });
       sendJson(response, appError.toJSON(requestId), appError.status);
     }
   });
+}
+
+/**
+ * Redacts sensitive query parameters before structured request logging.
+ * @param {string | undefined} requestUrl
+ * @returns {string}
+ */
+function redactRequestUrl(requestUrl) {
+  const parsed = new URL(requestUrl || "/", "http://127.0.0.1");
+  for (const name of ["ticket", "download_token"]) {
+    if (parsed.searchParams.has(name)) parsed.searchParams.set(name, "REDACTED");
+  }
+  return `${parsed.pathname}${parsed.search}`;
 }
 
 /**
@@ -341,6 +361,17 @@ function isValidSignature({ payload, signature, secret }) {
 }
 
 /**
+ * Returns true when the request is a Moling SSO launch callback.
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isLaunchRequest(url) {
+  return url.pathname === "/enter"
+    || url.pathname === "/auth/launch"
+    || (url.pathname === "/" && url.searchParams.has("ticket"));
+}
+
+/**
  * Builds the application session cookie header.
  * @param {{name: string, value: string, maxAgeSeconds: number, secure: boolean}} input
  * @returns {string}
@@ -358,12 +389,11 @@ function buildSessionCookie({ name, value, maxAgeSeconds, secure }) {
 
 /**
  * Resolves the current user's entitlement from Moling launch identity.
- * @param {object} identity
- * @param {number | undefined} configuredDefault
- * @returns {number | undefined}
+ * @param {{identity: object, configuredDefault?: number, userEntitlementMap?: Map<number, number>, molingClient?: object, logger?: object}} input
+ * @returns {Promise<number | undefined>}
  */
-function resolveSessionEntitlementId(identity, configuredDefault) {
-  return readPositiveId(identity.entitlement_id)
+async function resolveSessionEntitlementId({ identity, configuredDefault, userEntitlementMap, molingClient, logger }) {
+  const launchEntitlementId = readPositiveId(identity.entitlement_id)
     || readPositiveId(identity.entitlementId)
     || readPositiveId(identity.default_entitlement_id)
     || readPositiveId(identity.defaultEntitlementId)
@@ -371,8 +401,29 @@ function resolveSessionEntitlementId(identity, configuredDefault) {
     || readPositiveId(identity.entitlement?.entitlementId)
     || readPositiveId(identity.entitlement?.id)
     || readEntitlementList(identity.entitlements, identity.product_id)
-    || readEntitlementList(identity.entitlements, identity.productId)
-    || configuredDefault;
+    || readEntitlementList(identity.entitlements, identity.productId);
+  if (launchEntitlementId) return launchEntitlementId;
+
+  const userId = readPositiveId(identity.user_id) || readPositiveId(identity.userId);
+  const productId = readPositiveId(identity.product_id) || readPositiveId(identity.productId);
+  if (userId && productId && typeof molingClient?.listUserEntitlements === "function") {
+    try {
+      const result = await molingClient.listUserEntitlements({ userId, productId });
+      const resolved = readEntitlementList(result?.entitlements, productId);
+      if (resolved) return resolved;
+    } catch (error) {
+      logger?.warn?.("entitlement_lookup_failed", {
+        user_id: userId,
+        product_id: productId,
+        error: error.message,
+      });
+    }
+  }
+
+  const mapped = readPositiveId(userEntitlementMap?.get?.(userId));
+  if (mapped) return mapped;
+
+  return configuredDefault;
 }
 
 /**
@@ -634,6 +685,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     textarea { min-height: 92px; resize: vertical; }
     button { border: 0; border-radius: 6px; padding: 9px 12px; background: #165dff; color: white; cursor: pointer; }
     button.secondary { background: #475569; }
+    .hint { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: #6b7280; }
+    .hint.warning { color: #b45309; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .preview { min-height: 460px; background: #0f172a; color: #dbeafe; border-radius: 8px; padding: 16px; overflow: auto; }
@@ -659,6 +712,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         <div>
           <label for="entitlement">entitlement_id</label>
           <input id="entitlement" value="${escapeHtml(entitlementValue)}" />
+          ${entitlementValue ? "" : '<p class="hint warning">未识别到权益 ID。请确认魔灵入口 verify 返回 entitlement_id，或手动填写用户购买套餐后的 entitlement_id。</p>'}
         </div>
       </div>
       <div class="row">
@@ -686,8 +740,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <h2>单页重生成</h2>
       <div class="row">
         <div>
-          <label for="slide-id">slide_id</label>
-          <input id="slide-id" placeholder="slide_1" />
+          <label for="slide-id">页码或 slide_id</label>
+          <input id="slide-id" placeholder="1 或 slide_1" />
         </div>
         <div>
           <label for="slide-instruction">指令</label>
@@ -721,14 +775,32 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       body: JSON.stringify(body)
     }).then(async (res) => {
       const data = await res.json();
-      if (!res.ok) throw new Error(JSON.stringify(data));
+      if (!res.ok) throw new Error(formatApiError(data));
       return data;
     });
+    function formatApiError(payload) {
+      const error = payload?.error || {};
+      if (error.code === "ENTITLEMENT_REQUIRED") {
+        return "ENTITLEMENT_REQUIRED: 未识别到权益 ID。请从魔灵平台重新进入应用，或填写该用户购买积分套餐后生成的 entitlement_id。";
+      }
+      if (error.code === "40003") {
+        return "40003: 票据无效、已过期或已被使用。请从魔灵平台重新点击进入应用，不要刷新旧链接。";
+      }
+      if (error.code === "INSUFFICIENT_CREDITS") {
+        const details = error.details || {};
+        const remaining = details.balance?.remaining ?? "未知";
+        const required = details.required_amount ?? "未知";
+        return "INSUFFICIENT_CREDITS: 积分不足。当前权益 " + details.entitlement_id + " 剩余 " + remaining + "，本次需要 " + required + "。请购买或补充积分后重试。";
+      }
+      return error.code
+        ? error.code + ": " + (error.message || "请求失败")
+        : JSON.stringify(payload);
+    }
     async function loadBalance() {
       try {
         const data = await fetch("/api/billing/balance").then(async (res) => {
           const payload = await res.json();
-          if (!res.ok) throw new Error(JSON.stringify(payload));
+          if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
         balanceStatusEl.textContent = JSON.stringify(data, null, 2);
@@ -754,7 +826,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       try {
         const data = await fetch("/api/templates").then(async (res) => {
           const payload = await res.json();
-          if (!res.ok) throw new Error(JSON.stringify(payload));
+          if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
         templateCatalog = data.templates;
@@ -777,12 +849,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       try {
         const response = await fetch("/api/ppt/tasks/" + taskId);
         const payload = await response.json();
-        if (!response.ok) throw new Error(JSON.stringify(payload));
+        if (!response.ok) throw new Error(formatApiError(payload));
 
         const task = payload.task;
-        statusEl.textContent = "任务状态: " + task.status + "\n"
-          + "进度: " + task.progress + "%\n"
-          + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\n"
+        statusEl.textContent = "任务状态: " + task.status + "\\n"
+          + "进度: " + task.progress + "%\\n"
+          + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\\n"
           + "失败信息: " + (task.error || "");
 
         if (task.status === "running" || task.status === "pending") {
@@ -809,9 +881,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       statusEl.textContent = JSON.stringify(task, null, 2);
     }
 
+    loadBalance();
     document.querySelector("#template").addEventListener("change", renderThemeOptions);
     loadTemplates();
-    loadBalance();
     document.querySelector("#generate-outline").addEventListener("click", async () => {
       try {
         let sourceFileId;

@@ -13,6 +13,7 @@ test("loadConfig reads every framework setting from environment variables", () =
     LOCAL_MOLING_MOCK: "true",
     LOCAL_MOLING_USER_ID: "7",
     LOCAL_MOLING_ENTITLEMENT_ID: "88",
+    MOLING_USER_ENTITLEMENT_MAP: "7:88,9:91",
     TEST_ACCOUNT: "tester",
     TEST_PASSWORD: "password",
     DATABASE_URL: "sqlite:./tmp/test.db",
@@ -36,6 +37,7 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.moling.localMock, true);
   assert.equal(config.moling.localUserId, 7);
   assert.equal(config.moling.localEntitlementId, 88);
+  assert.deepEqual(config.moling.userEntitlementMap, new Map([[7, 88], [9, 91]]));
   assert.equal(config.auth.sessionCookieName, "sid");
   assert.equal(config.auth.sessionTtlMs, 3600000);
   assert.equal(config.auth.sessionCookieSecure, false);
@@ -84,6 +86,20 @@ test("loadConfig accepts Moling launch aliases used by deployment commands", () 
   assert.equal(config.moling.localEntitlementId, 62);
 });
 
+test("loadConfig treats empty numeric env values as defaults", () => {
+  const config = loadConfig({
+    MOLING_API_BASE_URL: "http://moling.test",
+    INTERNAL_API_TOKEN: "token",
+    SESSION_TTL_SECONDS: "",
+    LLM_TIMEOUT_MS: "",
+    LLM_MAX_RETRIES: "",
+  });
+
+  assert.equal(config.auth.sessionTtlMs, 7 * 24 * 60 * 60 * 1000);
+  assert.equal(config.ai.llmTimeoutMs, 30000);
+  assert.equal(config.ai.llmMaxRetries, 0);
+});
+
 test("loadConfig rejects missing required secrets", () => {
   assert.throws(
     () => loadConfig({ MOLING_API_BASE_URL: "http://moling.test" }),
@@ -110,6 +126,17 @@ test("loadConfig rejects invalid AI provider retry settings", () => {
       LLM_MAX_RETRIES: "-1",
     }),
     /LLM_MAX_RETRIES/,
+  );
+});
+
+test("loadConfig rejects invalid user entitlement mappings", () => {
+  assert.throws(
+    () => loadConfig({
+      MOLING_API_BASE_URL: "http://moling.test",
+      INTERNAL_API_TOKEN: "token",
+      MOLING_USER_ENTITLEMENT_MAP: "7:88,bad",
+    }),
+    /MOLING_USER_ENTITLEMENT_MAP/,
   );
 });
 

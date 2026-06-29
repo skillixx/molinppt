@@ -7,6 +7,7 @@
     "start": "node --env-file=.env src/server.js",
     "test": "node --test",
     "migrate": "node scripts/migrate.js",
+    "validate:moling-config": "node --env-file=.env scripts/validate-moling-config.js",
     "acceptance": "node scripts/acceptance.js",
     "acceptance:moling": "node scripts/moling-acceptance.js"
   },

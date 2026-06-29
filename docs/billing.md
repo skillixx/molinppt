@@ -27,9 +27,9 @@ Expensive or failure-prone actions use reserve first:
 
 ## Entitlement Selection
 
-Billing uses the current session entitlement resolved during Moling launch verification. The app prefers request `entitlement_id` for explicit operator/debug flows, then the active entitlement returned by Moling for the logged-in user, then `MOLING_DEFAULT_ENTITLEMENT_ID` or `PPT_DEFAULT_ENTITLEMENT_ID` as an environment fallback.
+Billing uses the current session entitlement resolved during Moling launch verification. The app prefers request `entitlement_id` for explicit operator/debug flows, then the active entitlement returned by Moling for the logged-in user, then Moling internal `user-entitlements` lookup, then `MOLING_USER_ENTITLEMENT_MAP`, and finally `MOLING_DEFAULT_ENTITLEMENT_ID` or `PPT_DEFAULT_ENTITLEMENT_ID` as a last-resort environment fallback.
 
-Do not rely on one global entitlement ID for all production users. If Moling returns per-user entitlements, those IDs must be used so balance checks, package ownership checks, and deductions happen against the user's own credit package.
+Do not rely on one global entitlement ID for all production users. If Moling returns per-user entitlements, those IDs must be used so balance checks, package ownership checks, and deductions happen against the user's own credit package. `MOLING_USER_ENTITLEMENT_MAP` is a temporary bridge for known users while the Moling internal lookup endpoint is unavailable.
 
 The API validates the final `entitlement_id` as a positive integer before balance lookup, reserve, settle, or release. Invalid package IDs fail closed with `ENTITLEMENT_INVALID` or `ENTITLEMENT_REQUIRED` and do not create billing events.
 

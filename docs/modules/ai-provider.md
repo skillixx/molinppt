@@ -35,6 +35,13 @@ For both modes, the parsed payload must finally contain:
 - `generate_slides`: `{ "slides": [...] }`
 - `regenerate_slide`: `{ "slide": { ... } }`
 
+DeepSeek / chat-completions mode uses the same operation payloads, but the adapter is tolerant to common model behaviors:
+
+- If the model returns an array for `generate_outline`, the adapter treats it as `{ "outline": [...] }`.
+- If the model returns an array for `generate_slides`, the adapter treats it as `{ "slides": [...] }`.
+- If the model returns a slide object directly for `regenerate_slide`, the adapter treats it as `{ "slide": { ... } }`.
+- If the model returns JSON in `reasoning_content` while `content` is empty, the adapter will parse `reasoning_content` first.
+
 Malformed responses fail with `AI_PROVIDER_INVALID_RESPONSE` so bad provider payloads do not silently create invalid decks.
 
 The app sends an abort signal to the HTTP provider request. Provider 5xx responses and network failures are retried within the configured retry budget; validation failures and non-5xx provider errors are not retried.

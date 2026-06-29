@@ -10,10 +10,12 @@
 ## Application Launch
 
 1. Moling product entry redirects to the application access URL.
-2. Redirect includes a one-time launch ticket.
+2. Redirect includes a one-time launch ticket by appending `?ticket=...` to `access_url`.
 3. Application backend verifies the ticket with Moling internal API.
 4. Backend validates app and product association.
 5. Backend creates its own application session, persists it in the `sessions` collection, and sets an HTTP-only cookie.
+
+The app accepts launch tickets on `/?ticket=...`, `/enter?ticket=...`, and `/auth/launch?ticket=...`. Configure Moling `access_url` as the public app root unless a path-specific entry is required.
 
 Valid persisted sessions survive application process restarts. The backend restores the session from storage when the cookie is present and the stored `expiresAt` value is still in the future.
 
@@ -50,9 +52,11 @@ When `entitlements[]` is returned, the app prefers an active, usable entitlement
 
 1. request `entitlement_id`
 2. launch identity entitlement
-3. `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
+3. Moling internal `GET /api/internal/user-entitlements?user_id={user_id}&product_id={product_id}`
+4. temporary `MOLING_USER_ENTITLEMENT_MAP` entry for the current `user_id`
+5. `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
 
-The workspace page pre-fills the resolved session entitlement. This avoids using one fixed entitlement ID for every user while still allowing a configured fallback for environments where Moling has not yet added entitlement data to launch verification.
+The workspace page pre-fills the resolved session entitlement. This avoids using one fixed entitlement ID for every user while still allowing a per-user manual fallback for environments where Moling has not yet deployed entitlement discovery. A single `MOLING_DEFAULT_ENTITLEMENT_ID` is only appropriate for controlled single-user smoke tests.
 
 ## Internal API Boundary
 

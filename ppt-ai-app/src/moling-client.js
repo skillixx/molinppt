@@ -24,6 +24,19 @@ export class MolingClient {
   }
 
   /**
+   * Lists usable entitlements for a user and product.
+   * @param {{userId: number, productId: number}} input
+   * @returns {Promise<{entitlements: object[]}>}
+   */
+  listUserEntitlements({ userId, productId }) {
+    const query = new URLSearchParams({
+      user_id: String(userId),
+      product_id: String(productId),
+    });
+    return this.getInternal(`/api/internal/user-entitlements?${query}`);
+  }
+
+  /**
    * Sends an internal POST request to Moling.
    * @param {string} pathName
    * @param {object} body
@@ -60,7 +73,15 @@ export class MolingClient {
         ...(init.headers || {}),
       },
     });
-    const envelope = await response.json();
+    const responseText = await response.text();
+    const envelope = parseJsonEnvelope(responseText);
+    if (!envelope) {
+      throw new AppError({
+        code: String(response.status),
+        status: response.status,
+        message: responseText || response.statusText || "Moling request failed",
+      });
+    }
     if (!response.ok || envelope.code !== 0) {
       throw new AppError({
         code: String(envelope.code || response.status),
@@ -70,6 +91,19 @@ export class MolingClient {
       });
     }
     return envelope.data;
+  }
+}
+
+/**
+ * Parses a Moling JSON envelope without leaking raw SyntaxError to callers.
+ * @param {string} text
+ * @returns {object | undefined}
+ */
+function parseJsonEnvelope(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
   }
 }
 
@@ -101,6 +135,18 @@ export class LocalMolingClient {
   async verifyLaunchTicket(ticket) {
     if (!ticket) throw new AppError({ code: "40003", status: 403, message: "Invalid local launch ticket" });
     return { user_id: this.userId, app_id: this.appId, product_id: this.productId };
+  }
+
+  /**
+   * Lists local entitlements for the verified user and product.
+   * @param {{userId: number, productId: number}} input
+   * @returns {Promise<{entitlements: object[]}>}
+   */
+  async listUserEntitlements({ userId, productId }) {
+    if (Number(userId) !== this.userId || Number(productId) !== this.productId) {
+      return { entitlements: [] };
+    }
+    return { entitlements: [this.#balance()] };
   }
 
   /**

@@ -33,6 +33,7 @@ export function loadConfig(env = process.env) {
         firstDefined(env.MOLING_DEFAULT_ENTITLEMENT_ID, env.PPT_DEFAULT_ENTITLEMENT_ID),
         "MOLING_DEFAULT_ENTITLEMENT_ID",
       ),
+      userEntitlementMap: readUserEntitlementMap(env.MOLING_USER_ENTITLEMENT_MAP),
       localEntitlementId: readOptionalPositiveInteger(
         firstDefined(env.LOCAL_MOLING_ENTITLEMENT_ID, env.MOLING_DEFAULT_ENTITLEMENT_ID, env.PPT_DEFAULT_ENTITLEMENT_ID),
         "LOCAL_MOLING_ENTITLEMENT_ID",
@@ -91,7 +92,8 @@ function firstDefined(...values) {
  * @returns {number}
  */
 function readPositiveInteger(value, fallback, name) {
-  const parsed = Number(value ?? fallback);
+  const normalized = value === "" || value === undefined ? undefined : value;
+  const parsed = Number(normalized ?? fallback);
   if (!Number.isInteger(parsed) || parsed <= 0) {
     throw new Error(`${name} must be a positive integer`);
   }
@@ -110,6 +112,26 @@ function readOptionalPositiveInteger(value, name) {
 }
 
 /**
+ * Reads comma-separated user to entitlement mappings in the form "user_id:entitlement_id".
+ * @param {string | undefined} value
+ * @returns {Map<number, number>}
+ */
+function readUserEntitlementMap(value) {
+  const map = new Map();
+  if (value === undefined || value.trim() === "") return map;
+  for (const pair of value.split(",")) {
+    const [rawUserId, rawEntitlementId, extra] = pair.split(":");
+    const userId = readOptionalPositiveInteger(rawUserId?.trim(), "MOLING_USER_ENTITLEMENT_MAP");
+    const entitlementId = readOptionalPositiveInteger(rawEntitlementId?.trim(), "MOLING_USER_ENTITLEMENT_MAP");
+    if (extra !== undefined || !userId || !entitlementId) {
+      throw new Error("MOLING_USER_ENTITLEMENT_MAP must use user_id:entitlement_id pairs");
+    }
+    map.set(userId, entitlementId);
+  }
+  return map;
+}
+
+/**
  * Reads a zero-or-positive integer env value.
  * @param {string | undefined} value
  * @param {number} fallback
@@ -117,7 +139,8 @@ function readOptionalPositiveInteger(value, name) {
  * @returns {number}
  */
 function readNonNegativeInteger(value, fallback, name) {
-  const parsed = Number(value ?? fallback);
+  const normalized = value === "" || value === undefined ? undefined : value;
+  const parsed = Number(normalized ?? fallback);
   if (!Number.isInteger(parsed) || parsed < 0) {
     throw new Error(`${name} must be a non-negative integer`);
   }

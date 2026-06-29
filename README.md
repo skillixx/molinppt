@@ -35,6 +35,7 @@ Implemented:
 
 Core design and implementation documents live in `docs/`:
 
+- `development-summary.md`
 - `requirements.md`
 - `project-overview.md`
 - `architecture.md`
@@ -88,6 +89,7 @@ For local end-to-end acceptance without real Moling credentials, set:
 ```bash
 cd ppt-ai-app
 npm test
+npm run validate:moling-config
 npm run migrate
 npm start
 npm run acceptance

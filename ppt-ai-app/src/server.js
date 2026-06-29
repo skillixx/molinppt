@@ -64,6 +64,7 @@ const pptService = new PptService({
 const app = createApp({
   database,
   defaultEntitlementId: config.moling.defaultEntitlementId || config.moling.localEntitlementId,
+  userEntitlementMap: config.moling.userEntitlementMap,
   expectedAppId: config.app.molingAppId,
   expectedProductId: config.app.molingProductId,
   logger,

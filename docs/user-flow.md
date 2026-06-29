@@ -3,7 +3,7 @@
 ## Entry Flow
 
 1. User opens the AI PPT product from Moling.
-2. Moling redirects to the app entry URL with a one-time launch ticket.
+2. Moling redirects to the app entry URL with a one-time launch ticket appended to `access_url`.
 3. The backend verifies the ticket with Moling.
 4. The backend creates an application session and loads the user's workspace.
 

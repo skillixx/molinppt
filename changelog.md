@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added DeepSeek/OpenAI-compatible chat-completions provider support with operation-specific JSON output contracts.
+- Added Moling launch compatibility for `/?ticket=...`, `/enter?ticket=...`, and `/auth/launch?ticket=...`.
+- Added user entitlement lookup and temporary `MOLING_USER_ENTITLEMENT_MAP` fallback before default entitlement fallback.
+- Added `npm run validate:moling-config` for validating manually mapped Moling user entitlements.
+- Improved PPTX export structure with slide layout, slide master, theme, and relationship parts.
+- Improved slide regeneration to accept display page numbers and preserve stable slide identity.
+- Improved user-facing billing, entitlement, and launch-ticket error messages.
+- Documented current development summary, deployment settings, Moling acceptance behavior, and production caveats.
 - Added third-stage AI PPT business workflow.
 - Added topic and uploaded-document outline generation.
 - Added editable outline persistence and deck generation.

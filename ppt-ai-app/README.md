@@ -9,6 +9,7 @@ npm test
 npm run migrate
 # npm start reads .env automatically
 npm start
+npm run validate:moling-config
 npm run acceptance
 npm run acceptance:moling
 ```
@@ -26,7 +27,8 @@ Copy `.env.example` locally and provide real values through environment variable
 
 - `MOLING_APP_ID` (or `PPT_APP_ID`): App id from Moling application settings.
 - `MOLING_PRODUCT_ID` (or `PPT_PRODUCT_ID`): Product id used for package checks.
-- `MOLING_DEFAULT_ENTITLEMENT_ID` (or `PPT_DEFAULT_ENTITLEMENT_ID`): Fallback entitlement id. Keep empty if entitlement must come from launch identity.
+- `MOLING_USER_ENTITLEMENT_MAP`: Temporary fallback map when Moling has not deployed user entitlement lookup yet, e.g. `696:64,479:62`.
+- `MOLING_DEFAULT_ENTITLEMENT_ID` (or `PPT_DEFAULT_ENTITLEMENT_ID`): Last-resort fallback entitlement id. Keep empty for multi-user production unless this is a controlled single-user smoke test.
 - `APP_PORT` (or `PORT`): Listening port, defaults to `5177`.
 
 ### Session & auth
@@ -67,6 +69,8 @@ Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, 
 
 Local acceptance exports PPTX/PDF, downloads both files through `GET /api/files/{file_id}/download-url`, checks filename headers, and verifies download call logs.
 
+After adding or changing `MOLING_USER_ENTITLEMENT_MAP`, run `npm run validate:moling-config`. It checks every mapped `user_id:entitlement_id` through Moling's internal balance API and fails if an entitlement does not belong to that user.
+
 Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform entry flow and can optionally pass `ACCEPTANCE_ENTITLEMENT_ID`.
 
 ## Foundation Modules
@@ -101,7 +105,9 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 ## API Routes
 
 - `GET /api/health`
+- `GET /?ticket=...`
 - `GET /enter?ticket=...`
+- `GET /auth/launch?ticket=...`
 - `GET /api/me`
 - `GET /api/templates`
 - `GET /api/billing/balance`

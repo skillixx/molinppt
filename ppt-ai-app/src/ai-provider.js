@@ -92,7 +92,11 @@ export class HttpAiProvider {
    */
   async generateOutline(input) {
     const response = await this.#post({ operation: "generate_outline", input });
-    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    const payload = normalizeProviderResponse({
+      response,
+      operation: "generate_outline",
+      useChatCompletionsPayload: this.useChatCompletionsPayload,
+    });
     return requireArray(payload.outline, "outline");
   }
 
@@ -103,7 +107,11 @@ export class HttpAiProvider {
    */
   async generateSlides(input) {
     const response = await this.#post({ operation: "generate_slides", input });
-    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    const payload = normalizeProviderResponse({
+      response,
+      operation: "generate_slides",
+      useChatCompletionsPayload: this.useChatCompletionsPayload,
+    });
     return requireArray(payload.slides, "slides");
   }
 
@@ -114,7 +122,11 @@ export class HttpAiProvider {
    */
   async regenerateSlide(input) {
     const response = await this.#post({ operation: "regenerate_slide", input });
-    const payload = normalizeProviderResponse(response, this.useChatCompletionsPayload);
+    const payload = normalizeProviderResponse({
+      response,
+      operation: "regenerate_slide",
+      useChatCompletionsPayload: this.useChatCompletionsPayload,
+    });
     return requireObject(payload.slide, "slide");
   }
 
@@ -166,9 +178,10 @@ function buildRequestPayload(body, model, useChatCompletionsPayload) {
   if (!useChatCompletionsPayload) {
     return model ? { ...body, model } : body;
   }
+  const operationInstruction = buildOperationInstruction(body.operation);
   const request = {
     messages: [
-      { role: "system", content: OPENAI_SYSTEM_PROMPT },
+      { role: "system", content: `${OPENAI_SYSTEM_PROMPT}\n${operationInstruction}` },
       { role: "user", content: JSON.stringify(body) },
     ],
   };
@@ -181,20 +194,21 @@ function buildRequestPayload(body, model, useChatCompletionsPayload) {
  * @param {boolean} useChatCompletionsPayload
  * @returns {{outline?: unknown, slides?: unknown, slide?: unknown}}
  */
-function normalizeProviderResponse(response, useChatCompletionsPayload) {
+function normalizeProviderResponse({ response, operation, useChatCompletionsPayload }) {
   if (!useChatCompletionsPayload) return response;
   if (!response || typeof response !== "object") {
     throw new Error("AI_PROVIDER_INVALID_RESPONSE: response must be an object");
   }
-  const message = response.choices?.[0]?.message?.content;
-  if (typeof message !== "string") {
+  const message = response.choices?.[0]?.message;
+  const parsed = parseProviderMessage(message);
+  if (parsed === undefined) {
     throw new Error("AI_PROVIDER_INVALID_RESPONSE: chat provider content missing or invalid");
   }
-  const parsed = parseJSON(message);
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+  const normalized = coerceOperationPayload(parsed, operation);
+  if (!normalized || typeof normalized !== "object" || Array.isArray(normalized)) {
     throw new Error("AI_PROVIDER_INVALID_RESPONSE: chat provider content must be an object");
   }
-  return parsed;
+  return normalized;
 }
 
 /**
@@ -230,6 +244,101 @@ function parseJSON(text) {
       throw new Error("AI_PROVIDER_INVALID_RESPONSE: response content is not valid JSON");
     }
   }
+}
+
+/**
+ * Parses provider response message text with DeepSeek/ChatGPT-style fields.
+ * Prefers `content`, then `reasoning_content`.
+ * @param {unknown} message
+ * @returns {unknown | undefined}
+ */
+function parseProviderMessage(message) {
+  if (!message || typeof message !== "object") return undefined;
+  const candidates = [message.content, message.reasoning_content, message.reasoning]
+    .filter((candidate) => typeof candidate === "string" && candidate.trim());
+  if (!candidates.length) return undefined;
+
+  for (const candidate of candidates) {
+    try {
+      return parseJSON(candidate.trim());
+    } catch {
+      // try extracting JSON from verbose text if strict parse fails
+    }
+    const bracketStart = candidate.indexOf("[");
+    const braceStart = candidate.indexOf("{");
+    const candidatesJson = [];
+    if (bracketStart !== -1) candidatesJson.push(candidate.slice(bracketStart));
+    if (braceStart !== -1) candidatesJson.push(candidate.slice(braceStart));
+    for (const candidateText of candidatesJson) {
+      try {
+        return parseJSON(candidateText);
+      } catch {
+        continue;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Applies operation-specific normalization to make chat model outputs more tolerant.
+ * @param {Record<string, unknown>} parsed
+ * @param {string} operation
+ * @returns {{outline?: unknown, slides?: unknown, slide?: unknown}}
+ */
+function coerceOperationPayload(parsed, operation) {
+  if (operation === "generate_outline") {
+    if (Array.isArray(parsed)) {
+      return { outline: parsed };
+    }
+    return parsed;
+  }
+  if (operation === "generate_slides") {
+    if (Array.isArray(parsed)) {
+      return { slides: parsed };
+    }
+    return parsed;
+  }
+  if (operation === "regenerate_slide") {
+    if (parsed && !parsed.slide && parsed.id && parsed.title) {
+      return { slide: parsed };
+    }
+    return parsed;
+  }
+  return parsed;
+}
+
+/**
+ * Returns strict system instructions for chat-completions payloads.
+ * @param {string} operation
+ * @returns {string}
+ */
+function buildOperationInstruction(operation) {
+  if (operation === "generate_outline") {
+    return (
+      "Output format contract:\n"
+      + "{ \"outline\": [\n"
+      + "  { \"title\": string, \"bullets\": [string, ...] },\n"
+      + "  ...\n"
+      + "] }\n"
+      + "Return ONLY JSON."
+    );
+  }
+  if (operation === "generate_slides") {
+    return (
+      "Output format contract:\n"
+      + "{ \"slides\": [\n"
+      + "  { \"id\": string, \"sortOrder\": number, \"title\": string, \"bullets\": [string, ...], \"speakerNotes\": string, \"layout\": string, \"theme\": string },\n"
+      + "  ...\n"
+      + "] }\n"
+      + "Return ONLY JSON."
+    );
+  }
+  return (
+    "Output format contract:\n"
+    + "{ \"slide\": { \"id\": string, \"sortOrder\": number, \"title\": string, \"bullets\": [string, ...], \"speakerNotes\": string, \"layout\": string, \"theme\": string } }\n"
+    + "Return ONLY JSON."
+  );
 }
 
 /**

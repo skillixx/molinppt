@@ -24,6 +24,8 @@ test("second-stage deployment and documentation deliverables exist", async () =>
     new URL("src/prompt-manager.js", appRoot),
     new URL("src/ppt-exporter.js", appRoot),
     new URL("src/ppt-service.js", appRoot),
+    new URL("src/moling-config-validator.js", appRoot),
+    new URL("scripts/validate-moling-config.js", appRoot),
     new URL("scripts/moling-acceptance.js", appRoot),
   ];
 
@@ -40,6 +42,23 @@ test("production Moling acceptance command is documented and ticket-gated", asyn
   assert.match(script, /ACCEPTANCE_LAUNCH_TICKET/);
   assert.match(script, /\/api\/billing\/balance/);
   assert.match(script, /\/api\/ppt\/decks/);
+});
+
+test("Moling config validation command is available for mapped entitlement checks", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("package.json", appRoot), "utf8"));
+  const script = await readFile(new URL("scripts/validate-moling-config.js", appRoot), "utf8");
+
+  assert.equal(packageJson.scripts["validate:moling-config"], "node --env-file=.env scripts/validate-moling-config.js");
+  assert.match(script, /validateUserEntitlementMap/);
+  assert.doesNotMatch(script, /INTERNAL_API_TOKEN/);
+});
+
+test("production compose loads app env file without interpolating secrets", async () => {
+  const compose = await readFile(new URL("docker-compose.prod.yml", repoRoot), "utf8");
+
+  assert.match(compose, /env_file:\s*\n\s*-\s*\.\/ppt-ai-app\/\.env/);
+  assert.doesNotMatch(compose, /\$\{(?:MOLING_|INTERNAL_API_TOKEN|LLM_)/);
+  assert.doesNotMatch(compose, /SESSION_COOKIE_SECURE:\s*true/);
 });
 
 test("local acceptance verifies exported file downloads", async () => {

@@ -1,4 +1,5 @@
 const baseUrl = process.env.ACCEPTANCE_BASE_URL || "http://127.0.0.1:5177";
+const launchPath = process.env.ACCEPTANCE_LAUNCH_PATH || "/";
 const entitlementId = Number(
   process.env.ACCEPTANCE_ENTITLEMENT_ID
     || process.env.LOCAL_MOLING_ENTITLEMENT_ID
@@ -7,7 +8,7 @@ const entitlementId = Number(
     || 88,
 );
 
-const launch = await fetch(`${baseUrl}/enter?ticket=local_acceptance`, { redirect: "manual" });
+const launch = await fetch(buildLaunchUrl("local_acceptance"), { redirect: "manual" });
 if (launch.status !== 302) throw new Error(`launch failed: ${launch.status}`);
 const cookie = launch.headers.get("set-cookie").split(";")[0];
 const templates = await get("/api/templates");
@@ -56,6 +57,17 @@ if (!logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId 
   throw new Error("download log failed");
 }
 assertBalanceDeducted({ initialBalance, finalBalance, expectedDebit });
+
+/**
+ * Builds the SSO launch URL in the same shape as Moling's access_url ticket append.
+ * @param {string} ticket
+ * @returns {string}
+ */
+function buildLaunchUrl(ticket) {
+  const url = new URL(launchPath, baseUrl);
+  url.searchParams.set("ticket", ticket);
+  return url.toString();
+}
 
 console.log(JSON.stringify({
   status: "passed",

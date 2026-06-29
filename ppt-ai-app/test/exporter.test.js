@@ -24,6 +24,24 @@ test("PptExportService creates a PPTX zip package with presentation parts", () =
   assert.match(text, /Revenue grew/);
 });
 
+test("PptExportService creates PPTX relationship, layout, master, and theme parts required by Office apps", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({ deck, format: "pptx" });
+  const text = result.content.toString("latin1");
+
+  assert.match(text, /ppt\/slides\/_rels\/slide1\.xml\.rels/);
+  assert.match(text, /ppt\/slideLayouts\/slideLayout1\.xml/);
+  assert.match(text, /ppt\/slideLayouts\/_rels\/slideLayout1\.xml\.rels/);
+  assert.match(text, /ppt\/slideMasters\/slideMaster1\.xml/);
+  assert.match(text, /ppt\/slideMasters\/_rels\/slideMaster1\.xml\.rels/);
+  assert.match(text, /ppt\/theme\/theme1\.xml/);
+  assert.match(text, /application\/vnd\.openxmlformats-officedocument\.presentationml\.slideLayout\+xml/);
+  assert.match(text, /application\/vnd\.openxmlformats-officedocument\.presentationml\.slideMaster\+xml/);
+  assert.match(text, /application\/vnd\.openxmlformats-officedocument\.theme\+xml/);
+  assert.match(text, /<p:sldMasterIdLst>/);
+  assert.match(text, /<p:nvSpPr>/);
+});
+
 test("PptExportService creates a minimal PDF document with xref and trailer", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({ deck, format: "pdf" });

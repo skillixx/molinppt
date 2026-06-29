@@ -42,7 +42,9 @@ Current runtime in this branch is single-process: API, workspace, generation orc
 | `INTERNAL_API_TOKEN` | Yes | Moling platform config | Internal service token on platform administration page | Signed secret for `/api/internal/*` calls. |
 | `MOLING_APP_ID` | Optional (recommended) | Moling app management | App ID returned by `app create`/应用配置 | Verifies launched tickets are for this app. |
 | `MOLING_PRODUCT_ID` | Optional (recommended) | Moling product management | Product ID from the PPT product entry | Verifies launch/product context and resolves default entitlement fallback. |
-| `MOLING_DEFAULT_ENTITLEMENT_ID` | Optional | Moling entitlement/package config | A default entitlement suitable for smoke testing or controlled environments | Fallback entitlement when launch identity does not provide one. Leave empty if per-user entitlement must be mandatory. |
+| `MOLING_USER_ENTITLEMENT_MAP` | Optional | Temporary deployment override | Manual mapping from Moling user IDs to their purchased entitlement IDs, for example `696:64,479:62` | Fallback used only when launch verification and `GET /api/internal/user-entitlements` do not return an entitlement. Prefer deploying the Moling internal lookup endpoint for production. |
+| `MOLING_DEFAULT_ENTITLEMENT_ID` | Optional | Moling entitlement/package config | A default entitlement suitable for smoke testing or controlled single-user environments | Last-resort fallback when launch identity, user entitlement lookup, and `MOLING_USER_ENTITLEMENT_MAP` do not provide one. Leave empty for multi-user production unless intentional. |
+| `SESSION_TTL_SECONDS` | Optional | Runtime policy | Any positive integer seconds, blank means default `604800` | Session expiry for `/` login cookies (defaults to 7 days in seconds). |
 | `LOCAL_MOLING_MOCK` | Optional | Deployment mode | Set `true` for local integration tests | Enables local billing/session mock mode, bypassing external Moling API. |
 | `LOCAL_MOLING_USER_ID` | Mock required | Local test setup | Any positive integer user id | Local mock session owner. |
 | `LOCAL_MOLING_ENTITLEMENT_ID` | Mock required | Local test setup | Test entitlement id (e.g. `88`) | Local mock entitlement fallback and initial session selection. |
@@ -54,7 +56,7 @@ Current runtime in this branch is single-process: API, workspace, generation orc
 | `LLM_TIMEOUT_MS` | Optional | Deployment variable | Default `30000` | Limits each provider request wall-clock time. |
 | `LLM_MAX_RETRIES` | Optional | Deployment variable | Retry count for transient errors | Retries only timeout/5xx/fetch failures. |
 | `APP_PORT` | Optional | Process environment | `5177` default | HTTP listening port. |
-| `SESSION_COOKIE_SECURE` | Optional | Security policy | `true` in production, `false` in local HTTP tests | Sets cookie `Secure` flag. |
+| `SESSION_COOKIE_SECURE` | Optional | Security policy | `true` behind HTTPS, `false` for direct HTTP access | Sets cookie `Secure` flag. Browsers will not store `Secure` session cookies over `http://`, so direct `:5177` deployments must set this to `false`. |
 
 ## Configuration
 
@@ -94,6 +96,8 @@ ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
 npm run acceptance:moling
 ```
 
+The acceptance script launches with `/?ticket=...` by default to match Moling's `access_url` ticket append behavior. Set `ACCEPTANCE_LAUNCH_PATH=/enter` only when the platform application access URL intentionally includes `/enter`.
+
 The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, file download, call-log checks, and final balance deduction checks against the configured Moling APIs.
 
 ## DeepSeek/Chat Completion Note
@@ -109,22 +113,22 @@ The plain base URL (`https://api.deepseek.com`) is not enough because this app w
 1. Configure production environment variables (example list):
 
    - `MOLING_API_BASE_URL`, `INTERNAL_API_TOKEN`
-   - `MOLING_APP_ID`, `MOLING_PRODUCT_ID`, `MOLING_DEFAULT_ENTITLEMENT_ID`
+   - `MOLING_APP_ID`, `MOLING_PRODUCT_ID`
+   - `MOLING_USER_ENTITLEMENT_MAP` only if the Moling internal user entitlement lookup endpoint is not deployed yet
+   - `MOLING_DEFAULT_ENTITLEMENT_ID` only for controlled single-user smoke tests
    - `LLM_PROVIDER=mock` (local) or `LLM_PROVIDER=http` + `LLM_API_URL` and `LLM_API_KEY`
    - `APP_ENV=production`
-   - `SESSION_COOKIE_SECURE=true`
+   - `SESSION_COOKIE_SECURE=true` behind HTTPS; `SESSION_COOKIE_SECURE=false` when Moling opens the app over direct HTTP during testing
    - `LOCAL_MOLING_MOCK=false`
 
-2. Start the service:
+2. Start the service.
+
+   `docker-compose.prod.yml` loads `ppt-ai-app/.env` by default, so production
+   restarts do not require repeating every Moling and AI variable on the command
+   line.
 
    ```bash
-   APP_ENV=production APP_PORT=5177 \
-   MOLING_API_BASE_URL=... \
-   INTERNAL_API_TOKEN=... \
-   MOLING_APP_ID=... \
-   MOLING_PRODUCT_ID=... \
-   MOLING_DEFAULT_ENTITLEMENT_ID=... \
-   docker-compose -f docker-compose.yml up -d --build
+   docker compose -f docker-compose.prod.yml up -d --build
    ```
 
 3. Run readiness and sanity checks:
@@ -133,7 +137,16 @@ The plain base URL (`https://api.deepseek.com`) is not enough because this app w
    curl -fs http://127.0.0.1:5177/api/health
    ```
 
-4. Run post-deploy acceptance:
+4. If `MOLING_USER_ENTITLEMENT_MAP` is configured, validate every mapped user and entitlement before accepting traffic:
+
+   ```bash
+   cd ppt-ai-app
+   npm run validate:moling-config
+   ```
+
+   The command calls Moling `entitlement-balance` for each `user_id:entitlement_id` pair and fails if the entitlement does not belong to that user or cannot be read.
+
+5. Run post-deploy acceptance:
 
    ```bash
    cd ppt-ai-app

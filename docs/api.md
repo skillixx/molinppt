@@ -18,9 +18,9 @@ The application implements foundation routes plus third-stage AI PPT business ro
 
 Returns `{ "status": "ok" }` for runtime health checks.
 
-### `GET /enter`
+### `GET /?ticket=...`, `GET /enter?ticket=...`, `GET /auth/launch?ticket=...`
 
-Entry point from Moling platform. It accepts a one-time `ticket`, verifies it with Moling, creates an application session, and redirects to the workspace.
+Entry points from Moling platform. Moling normally appends the one-time `ticket` to the configured `access_url`; the root path form supports an `access_url` such as `https://ppt.example.com`. The `/enter` and `/auth/launch` forms are compatibility aliases. All forms verify the ticket with Moling, create an application session, and redirect to the workspace.
 
 ### `GET /api/me`
 

@@ -202,6 +202,38 @@ test("PptService blocks generation when entitlement is not usable", async () => 
   assert.deepEqual(context.billingCalls, [["balance", { userId: 7, entitlementId: 88 }]]);
 });
 
+test("PptService reports required credits when balance is insufficient", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      getBalance: async (input) => {
+        context.billingCalls.push(["balance", input]);
+        return { usable: true, remaining: "3.9" };
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Insufficient credits detail",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 62,
+    }),
+    (error) => {
+      assert.equal(error.code, "INSUFFICIENT_CREDITS");
+      assert.equal(error.publicDetails.entitlement_id, 62);
+      assert.equal(error.publicDetails.required_amount, "6");
+      assert.equal(error.publicDetails.balance.remaining, "3.9");
+      return true;
+    },
+  );
+});
+
 test("PptService reconciles pending slide release events", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.regenerateSlide = async () => {
@@ -610,6 +642,64 @@ test("PptService routes slide regeneration through PromptManager", async () => {
   assert.equal(regenerated.slide.title, "Prompted regeneration");
 });
 
+test("PptService regenerates a slide when the UI sends a one-based slide number", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Numbered slide regeneration",
+    slideCount: 3,
+    templateId: "business",
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    slideId: "2",
+    instruction: "Tighten this page",
+    entitlementId: 88,
+  });
+
+  assert.equal(regenerated.slide.id, "slide_2");
+  assert.equal(regenerated.slide.title.includes("Tighten this page"), true);
+});
+
+test("PptService preserves slide identity when regenerated slide omits ids", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async ({ slide, instruction }) => ({
+    title: `${slide.title} regenerated`,
+    bullets: [instruction],
+  });
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Identity preservation",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    slideId: deckResult.deck.slides[0].id,
+    instruction: "Keep identity",
+    entitlementId: 88,
+  });
+
+  assert.equal(regenerated.slide.id, "slide_1");
+  assert.equal(regenerated.slide.sortOrder, 1);
+  assert.equal(regenerated.deck.slides[0].id, "slide_1");
+});
+
 test("PptService generates outline from uploaded document content", async () => {
   const context = await createBusinessContext();
   const sourceFile = await context.storage.upload({
@@ -986,6 +1076,9 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /id="retry-task"/);
     assert.match(html, /PPTX/);
     assert.match(html, /PDF/);
+    const script = html.match(/<script>([\s\S]*)<\/script>/)?.[1];
+    assert.ok(script);
+    assert.doesNotThrow(() => new Function(script));
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
@@ -1166,6 +1259,87 @@ test("HTTP API prefers the launch identity entitlement over the configured defau
     assert.equal(deckResponse.status, 201);
     assert.equal(deckBody.task.status, "succeeded");
     assert.equal(context.billingCalls[0][1].entitlementId, 91);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API resolves entitlement through Moling user entitlement lookup", async () => {
+  const context = await createBusinessContext();
+  const lookupCalls = [];
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+      listUserEntitlements: async ({ userId, productId }) => {
+        lookupCalls.push({ userId, productId });
+        return {
+          entitlements: [
+            { entitlement_id: 90, product_id: 73, status: "expired", usable: false },
+            { entitlement_id: 88, product_id: 73, status: "active", usable: true },
+          ],
+        };
+      },
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const me = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    const body = await me.json();
+
+    assert.equal(enter.status, 302);
+    assert.deepEqual(lookupCalls, [{ userId: 7, productId: 73 }]);
+    assert.equal(body.user.entitlement_id, 88);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API uses configured user entitlement map when Moling lookup is unavailable", async () => {
+  const context = await createBusinessContext();
+  const warnings = [];
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    userEntitlementMap: new Map([[7, 88]]),
+    logger: { info() {}, error() {}, warn(event, details) { warnings.push({ event, details }); }, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+      listUserEntitlements: async () => {
+        throw new Error("not deployed");
+      },
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const me = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    const body = await me.json();
+
+    assert.equal(enter.status, 302);
+    assert.equal(body.user.entitlement_id, 88);
+    assert.equal(warnings[0].event, "entitlement_lookup_failed");
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
@@ -1437,6 +1611,82 @@ test("workspace page exposes package balance status", async () => {
     assert.equal(page.status, 200);
     assert.match(html, /id="balance-status"/);
     assert.match(html, /\/api\/billing\/balance/);
+    assert.ok(
+      html.indexOf("\n    loadBalance();") < html.indexOf("addEventListener"),
+      "balance should start loading before optional control event binding",
+    );
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("workspace page explains missing entitlement resolution", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const page = await fetch(`${baseUrl}/`, { headers: { cookie } });
+    const html = await page.text();
+
+    assert.equal(page.status, 200);
+    assert.match(html, /未识别到权益 ID/);
+    assert.match(html, /formatApiError/);
+    assert.match(html, /ENTITLEMENT_REQUIRED/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API falls back to configured entitlement for restored sessions without entitlement", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const storedSession = await context.database.insert("sessions", {
+      id: "legacy-session",
+      identity: { user_id: 7, app_id: 15, product_id: 73 },
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    });
+    const cookie = `sid=${storedSession.id}`;
+
+    const page = await fetch(`${baseUrl}/`, { headers: { cookie } });
+    const html = await page.text();
+    const balance = await fetch(`${baseUrl}/api/billing/balance`, { headers: { cookie } });
+    const balanceBody = await balance.json();
+
+    assert.equal(page.status, 200);
+    assert.match(html, /id="entitlement" value="62"/);
+    assert.equal(balance.status, 200);
+    assert.equal(balanceBody.entitlement_id, 62);
+    assert.equal(context.billingCalls[0][1].entitlementId, 62);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }

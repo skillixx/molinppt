@@ -55,6 +55,28 @@ test("MolingClient wraps internal requests with token and envelope parsing", asy
   assert.equal(calls[0].init.headers["X-Internal-Token"], "secret");
 });
 
+test("MolingClient maps non-JSON Moling errors to AppError", async () => {
+  const client = new MolingClient({
+    baseUrl: "http://moling.test",
+    internalToken: "secret",
+    fetcher: async () => new Response("404 page not found", {
+      status: 404,
+      headers: { "Content-Type": "text/plain" },
+    }),
+  });
+
+  await assert.rejects(
+    () => client.listUserEntitlements({ userId: 7, productId: 73 }),
+    (error) => {
+      assert.equal(error instanceof AppError, true);
+      assert.equal(error.code, "404");
+      assert.equal(error.status, 404);
+      assert.match(error.message, /404 page not found/);
+      return true;
+    },
+  );
+});
+
 test("LocalMolingClient supports launch, balance, reserve, settle, release, and consume for local acceptance", async () => {
   const client = new LocalMolingClient({
     userId: 7,
@@ -338,6 +360,43 @@ test("HttpAiProvider supports OpenAI-compatible chat-completion responses", asyn
   assert.equal(slide.title, "Chat regenerated");
 });
 
+test("HttpAiProvider tolerates chat-completion outline as plain array output", async () => {
+  const provider = new HttpAiProvider({
+    endpoint: "https://api.deepseek.com/chat/completions",
+    model: "deepseek-v4-flash",
+    fetcher: async () => Response.json({
+      choices: [{
+        message: {
+          content: JSON.stringify([{ title: "Array outline", bullets: ["A"] }]),
+        },
+      }],
+    }),
+  });
+
+  const outline = await provider.generateOutline({ topic: "Provider", slideCount: 1 });
+  assert.equal(Array.isArray(outline), true);
+  assert.equal(outline[0].title, "Array outline");
+});
+
+test("HttpAiProvider tolerates chat-completion responses with reasoning_content JSON", async () => {
+  const provider = new HttpAiProvider({
+    endpoint: "https://api.deepseek.com/chat/completions",
+    model: "deepseek-v4-flash",
+    fetcher: async () => Response.json({
+      choices: [{
+        message: {
+          content: "",
+          reasoning_content: "[{\"title\": \"Reasoning outline\", \"bullets\": [\"A\"]}]",
+        },
+      }],
+    }),
+  });
+
+  const outline = await provider.generateOutline({ topic: "Provider", slideCount: 1 });
+  assert.equal(Array.isArray(outline), true);
+  assert.equal(outline[0].title, "Reasoning outline");
+});
+
 test("HttpAiProvider rejects malformed OpenAI-compatible provider responses", async () => {
   const provider = new HttpAiProvider({
     endpoint: "https://api.deepseek.com/chat/completions",
@@ -532,6 +591,92 @@ test("createApp restores sessions from the persisted database after restart", as
     assert.equal(body.user.entitlement_id, 88);
   } finally {
     await new Promise((resolve, reject) => secondApp.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("createApp accepts Moling launch tickets appended to the access URL root", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    defaultEntitlementId: 62,
+    expectedAppId: 15,
+    expectedProductId: 73,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async (ticket) => {
+        assert.equal(ticket, "ticket_1");
+        return { user_id: 7, app_id: 15, product_id: 73 };
+      },
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager(),
+    aiProvider: new MockAiProvider(),
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const launch = await fetch(`${baseUrl}/?ticket=ticket_1`, { redirect: "manual" });
+    assert.equal(launch.status, 302);
+    assert.equal(launch.headers.get("location"), "/");
+    const cookie = launch.headers.get("set-cookie")?.split(";")[0];
+    assert.match(cookie, /^sid=/);
+
+    const me = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    assert.equal(me.status, 200);
+    assert.deepEqual(await me.json(), {
+      user: { user_id: 7, role: "user", entitlement_id: 62 },
+    });
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("createApp redacts launch tickets from request failure logs", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions"],
+  });
+  await database.initialize();
+  const logEntries = [];
+  const app = createApp({
+    database,
+    logger: {
+      info() {},
+      warn() {},
+      debug() {},
+      error(event, fields) {
+        logEntries.push({ event, fields });
+      },
+    },
+    molingClient: {
+      verifyLaunchTicket: async () => {
+        throw new AppError({ code: "40003", status: 403, message: "Invalid ticket" });
+      },
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager(),
+    aiProvider: new MockAiProvider(),
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const response = await fetch(`${baseUrl}/?ticket=secret_launch_ticket&foo=bar`);
+    assert.equal(response.status, 403);
+    assert.equal(logEntries[0].event, "request_failed");
+    assert.equal(logEntries[0].fields.url, "/?ticket=REDACTED&foo=bar");
+    assert.doesNotMatch(JSON.stringify(logEntries), /secret_launch_ticket/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
 });
 

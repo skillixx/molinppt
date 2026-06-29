@@ -2,27 +2,16 @@ services:
   ppt-ai-app:
     build:
       context: ./ppt-ai-app
+    env_file:
+      - ./ppt-ai-app/.env
     environment:
       APP_ENV: production
       APP_PORT: 5177
-      MOLING_API_BASE_URL: ${MOLING_API_BASE_URL}
-      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-      MOLING_APP_ID: ${MOLING_APP_ID}
-      MOLING_PRODUCT_ID: ${MOLING_PRODUCT_ID}
-      MOLING_DEFAULT_ENTITLEMENT_ID: ${MOLING_DEFAULT_ENTITLEMENT_ID}
-      SESSION_COOKIE_SECURE: true
-      DATABASE_URL: ${DATABASE_URL:-json:/data/ppt-ai-db.json}
+      DATABASE_URL: json:/data/ppt-ai-db.json
       STORAGE_DIR: /data/storage
-      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
-      LLM_API_URL: ${LLM_API_URL:-}
-      LLM_API_KEY: ${LLM_API_KEY:-}
-      LLM_MODEL: ${LLM_MODEL:-}
-      LLM_TIMEOUT_MS: ${LLM_TIMEOUT_MS:-30000}
-      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-0}
-      APP_BASE_URL: ${APP_BASE_URL:-}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_LEVEL: info
     ports:
-      - "${APP_PORT:-5177}:5177"
+      - "5177:5177"
     volumes:
       - ppt_ai_prod_data:/data
     restart: always

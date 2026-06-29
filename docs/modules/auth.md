@@ -7,6 +7,7 @@ Current implementation:
 - `src/app.js`
 - session cookie name from environment configuration
 - session records are persisted in the `sessions` collection and cached in memory per process
+- launch tickets are accepted at `/?ticket=...`, `/enter?ticket=...`, and `/auth/launch?ticket=...`
 - service restarts can restore a valid cookie by loading the session from the database
 - sessions include `createdAt` and `expiresAt`; expired sessions are rejected
 - `SESSION_TTL_SECONDS` controls the persisted session lifetime and defaults to 604800 seconds

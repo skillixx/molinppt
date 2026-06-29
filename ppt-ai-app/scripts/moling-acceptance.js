@@ -1,4 +1,5 @@
 const baseUrl = process.env.ACCEPTANCE_BASE_URL || "http://127.0.0.1:5177";
+const launchPath = process.env.ACCEPTANCE_LAUNCH_PATH || "/";
 const launchTicket = process.env.ACCEPTANCE_LAUNCH_TICKET;
 const entitlementId = process.env.ACCEPTANCE_ENTITLEMENT_ID ? Number(process.env.ACCEPTANCE_ENTITLEMENT_ID) : undefined;
 
@@ -6,7 +7,7 @@ if (!launchTicket) {
   throw new Error("ACCEPTANCE_LAUNCH_TICKET is required for real Moling acceptance");
 }
 
-const launch = await fetch(`${baseUrl}/enter?ticket=${encodeURIComponent(launchTicket)}`, { redirect: "manual" });
+const launch = await fetch(buildLaunchUrl(launchTicket), { redirect: "manual" });
 if (launch.status !== 302) throw new Error(`launch failed: ${launch.status}`);
 const cookie = launch.headers.get("set-cookie")?.split(";")[0];
 if (!cookie) throw new Error("launch did not return a session cookie");
@@ -68,6 +69,17 @@ if (!logs.logs.some((log) => log.action === "file_downloaded" && log.resourceId 
   throw new Error("download log failed");
 }
 assertBalanceDeducted({ initialBalance, finalBalance, expectedDebit });
+
+/**
+ * Builds the SSO launch URL in the same shape as Moling's access_url ticket append.
+ * @param {string} ticket
+ * @returns {string}
+ */
+function buildLaunchUrl(ticket) {
+  const url = new URL(launchPath, baseUrl);
+  url.searchParams.set("ticket", ticket);
+  return url.toString();
+}
 
 console.log(JSON.stringify({
   status: "passed",

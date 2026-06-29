@@ -282,11 +282,12 @@ export class PptService {
   async regenerateSlide({ ownerUserId, deckId, slideId, instruction, entitlementId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
-    const slide = deck.slides.find((item) => item.id === slideId);
+    const slide = resolveSlide(deck.slides, slideId);
     if (!slide) throw new AppError({ code: "SLIDE_NOT_FOUND", status: 404, message: "Slide not found" });
-    const reserveKey = `${deckId}:${slideId}:ppt_slide_regenerate:reserve`;
-    const settleKey = `${deckId}:${slideId}:ppt_slide_regenerate:settle`;
-    const releaseKey = `${deckId}:${slideId}:ppt_slide_regenerate:release`;
+    const resolvedSlideId = slide.id || String(slide.sortOrder || slideId);
+    const reserveKey = `${deckId}:${resolvedSlideId}:ppt_slide_regenerate:reserve`;
+    const settleKey = `${deckId}:${resolvedSlideId}:ppt_slide_regenerate:settle`;
+    const releaseKey = `${deckId}:${resolvedSlideId}:ppt_slide_regenerate:release`;
     await this.#ensureBalance({ ownerUserId, entitlementId, amount: REGENERATE_SLIDE_AMOUNT });
     const reserve = await this.billingClient.reserveCredits({
       userId: ownerUserId,
@@ -298,7 +299,7 @@ export class PptService {
     let regenerated;
     try {
       const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
-      regenerated = await this.aiProvider.regenerateSlide(prompt);
+      regenerated = normalizeRegeneratedSlide({ original: slide, regenerated: await this.aiProvider.regenerateSlide(prompt) });
     } catch (error) {
       try {
         await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
@@ -316,7 +317,7 @@ export class PptService {
       await this.#log({ ownerUserId, action: "slide_regeneration_failed", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message } });
       throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });
     }
-    const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
+    const slides = deck.slides.map((item) => (item === slide ? regenerated : item));
     try {
       await this.billingClient.settleCredits({
         holdId: reserve.hold_id,
@@ -404,7 +405,7 @@ export class PptService {
         code: isBlockedByStatus ? "ENTITLEMENT_NOT_USABLE" : "INSUFFICIENT_CREDITS",
         status: isBlockedByStatus ? 403 : 402,
         message: isBlockedByStatus ? "Entitlement is not usable" : "Insufficient credits",
-        publicDetails: { entitlement_id: entitlementId, balance },
+        publicDetails: { entitlement_id: entitlementId, required_amount: amount, balance },
       });
     }
   }
@@ -521,6 +522,36 @@ function validateOutlineSlides(slides) {
       throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: "Each outline slide must include a title and string bullets" });
     }
   }
+}
+
+/**
+ * Resolves a slide by stable ID, sort order, or one-based display index.
+ * @param {object[]} slides
+ * @param {unknown} requestedSlideId
+ * @returns {object | undefined}
+ */
+function resolveSlide(slides, requestedSlideId) {
+  const normalized = String(requestedSlideId ?? "").trim();
+  if (!normalized) return undefined;
+  const exact = slides.find((slide) => String(slide.id) === normalized);
+  if (exact) return exact;
+  const numeric = Number(normalized);
+  if (!Number.isInteger(numeric) || numeric < 1) return undefined;
+  return slides.find((slide) => Number(slide.sortOrder) === numeric) || slides[numeric - 1];
+}
+
+/**
+ * Keeps persisted slide identity stable after AI regeneration.
+ * @param {{original: object, regenerated: object}} input
+ * @returns {object}
+ */
+function normalizeRegeneratedSlide({ original, regenerated }) {
+  return {
+    ...original,
+    ...(regenerated && typeof regenerated === "object" ? regenerated : {}),
+    id: original.id,
+    sortOrder: original.sortOrder,
+  };
 }
 
 /**
