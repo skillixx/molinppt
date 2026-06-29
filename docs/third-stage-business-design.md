@@ -31,6 +31,10 @@ Single-slide regeneration also uses reserve -> settle/release. If the AI provide
 
 Moling launch verification creates an HTTP-only application session cookie and a matching record in the local `sessions` collection. Each session stores the verified Moling identity, resolved entitlement ID, creation time, and expiry time. Runtime memory caches sessions for speed, but authorization can restore a valid session from the database after a process restart.
 
+## Document-Driven Outline and Multi-User Isolation
+
+When `source_file_id` is provided, outline generation reads file content in the caller's ownership context and passes that document text into prompt construction. The resulting outline is still persisted under the current session user, so later deck generation uses the same identity/entitlement pair as `session.entitlementId` and cannot cross user boundaries.
+
 ## Export Model
 
 `PptExportService` is intentionally behind an interface. The current implementation accepts only `pptx` and `pdf`, generates a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies, and rejects unknown formats with `EXPORT_FORMAT_UNSUPPORTED`. A later renderer can produce richer theme-accurate PPTX/PDF output without changing API or service boundaries.

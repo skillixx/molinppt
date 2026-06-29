@@ -1211,6 +1211,109 @@ test("HTTP API keeps separate users in different sessions with separate entitlem
   }
 });
 
+test("HTTP API keeps uploaded-document outlines isolated by user for billing", async () => {
+  const context = await createBusinessContext();
+  const identities = {
+    user7: {
+      user_id: 7,
+      app_id: 15,
+      product_id: 73,
+      entitlements: [{ entitlement_id: 88, product_id: 73, status: "active", usable: true }],
+    },
+    user9: {
+      user_id: 9,
+      app_id: 15,
+      product_id: 73,
+      entitlements: [{ entitlement_id: 91, product_id: 73, status: "active", usable: true }],
+    },
+  };
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async (ticket) => identities[ticket],
+    },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter7 = await fetch(`${baseUrl}/enter?ticket=user7`, { redirect: "manual" });
+    const cookie7 = enter7.headers.get("set-cookie").split(";")[0];
+    const enter9 = await fetch(`${baseUrl}/enter?ticket=user9`, { redirect: "manual" });
+    const cookie9 = enter9.headers.get("set-cookie").split(";")[0];
+
+    const upload7 = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie: cookie7, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "user7.txt",
+        mime_type: "text/plain",
+        content_base64: Buffer.from("User7 source for outline").toString("base64"),
+      }),
+    });
+    const file7 = await upload7.json();
+    const upload9 = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie: cookie9, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "user9.txt",
+        mime_type: "text/plain",
+        content_base64: Buffer.from("User9 source for outline").toString("base64"),
+      }),
+    });
+    const file9 = await upload9.json();
+    const outline7Response = await postJson(`${baseUrl}/api/ppt/outlines`, cookie7, {
+      source_file_id: file7.file.id,
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outline9Response = await postJson(`${baseUrl}/api/ppt/outlines`, cookie9, {
+      source_file_id: file9.file.id,
+      slide_count: 2,
+      template_id: "business",
+    });
+    assert.equal(outline7Response.status, 201);
+    assert.equal(outline9Response.status, 201);
+    const outline7 = await outline7Response.json();
+    const outline9 = await outline9Response.json();
+    const deck7Response = await postJson(`${baseUrl}/api/ppt/decks`, cookie7, {
+      outline_id: outline7.outline.id,
+    });
+    const deck9Response = await postJson(`${baseUrl}/api/ppt/decks`, cookie9, {
+      outline_id: outline9.outline.id,
+    });
+    assert.equal(deck7Response.status, 201);
+    assert.equal(deck9Response.status, 201);
+    const deck7 = await deck7Response.json();
+    const deck9 = await deck9Response.json();
+    const task7 = await fetch(`${baseUrl}/api/ppt/tasks/${deck7.task.id}`, { headers: { cookie: cookie7 } }).then((response) => response.json());
+    const task9 = await fetch(`${baseUrl}/api/ppt/tasks/${deck9.task.id}`, { headers: { cookie: cookie9 } }).then((response) => response.json());
+
+    assert.equal(upload7.status, 201);
+    assert.equal(upload9.status, 201);
+    assert.equal(outline7.outline.slides[0].title, "User7 source for outline");
+    assert.equal(outline9.outline.slides[0].title, "User9 source for outline");
+    assert.equal(deck7.task.status, "succeeded");
+    assert.equal(deck9.task.status, "succeeded");
+    assert.equal(task7.task.status, "succeeded");
+    assert.equal(task9.task.status, "succeeded");
+    assert.equal(task7.task.deckId, deck7.deck.id);
+    assert.equal(task9.task.deckId, deck9.deck.id);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve" && call[1].userId === 7 && call[1].entitlementId === 88), true);
+    assert.equal(context.billingCalls.some((call) => call[0] === "reserve" && call[1].userId === 9 && call[1].entitlementId === 91), true);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("workspace page exposes package balance status", async () => {
   const context = await createBusinessContext();
   const app = createApp({
