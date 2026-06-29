@@ -35,7 +35,16 @@ export class PptService {
     const template = this.templateManager.getTemplate(templateId);
     validateTemplateTheme({ template, theme });
     const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme });
-    const slides = await this.aiProvider.generateOutline(prompt);
+    let slides;
+    try {
+      slides = await this.aiProvider.generateOutline(prompt);
+    } catch (error) {
+      throw new AppError({
+        code: "AI_PROVIDER_FAILED",
+        status: 502,
+        message: `AI_PROVIDER_FAILED: ${error.message}`,
+      });
+    }
     const outline = await this.database.insert("outlines", {
       ownerUserId,
       topic: topic || documentText.split(/\r?\n/).find(Boolean) || "Document generated presentation",

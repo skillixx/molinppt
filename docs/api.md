@@ -47,6 +47,7 @@ Reads generic task metadata (`status`, `progress`, `result`) and is used as a co
 ### `POST /api/ppt/outlines`
 
 Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`. `slide_count` must be an integer from 1 to 20, and `theme` must be one of the selected template's `themes`.
+If the AI provider is unavailable or returns malformed responses, this API returns `AI_PROVIDER_FAILED` (HTTP 502).
 
 ### `GET /api/files/{file_id}/download-url`
 

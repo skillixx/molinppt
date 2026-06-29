@@ -77,6 +77,24 @@ test("PptService completes topic to outline to editable deck to PPTX/PDF with bi
   assert.equal((await context.database.find("call_logs")).length >= 5, true);
 });
 
+test("PptService returns provider failure for outline generation as AI_PROVIDER_FAILED", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateOutline = async () => {
+    throw new Error("provider unavailable");
+  };
+  const context = await createBusinessContext({ aiProvider });
+
+  await assert.rejects(
+    () => context.pptService.generateOutline({
+      ownerUserId: 7,
+      topic: "outline fail",
+      slideCount: 2,
+      templateId: "business",
+    }),
+    { code: "AI_PROVIDER_FAILED" },
+  );
+});
+
 test("PptService releases slide regeneration credits when AI fails", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.regenerateSlide = async () => {

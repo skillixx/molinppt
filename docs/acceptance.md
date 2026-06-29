@@ -64,3 +64,45 @@ The real command is the acceptance evidence for platform login, entitlement reso
 - 点击导出 PPTX/PDF，确认返回 `file.id`，并能在 `/api/files/{fileId}` 下载成功。
 - 再执行一次同一用户登出/重登场景验证：`session` 恢复后可继续查看同一轮任务状态。
 - 切换到另一用户 `user_id`，重复上述流程，确认无法查看或下载对方文件、调用日志与余额独立。
+
+## 自动化验收（命令）
+
+```bash
+cd ppt-ai-app
+APP_ENV=test \
+APP_PORT=5178 \
+LOCAL_MOLING_MOCK=true \
+LOCAL_MOLING_USER_ID=10 \
+LOCAL_MOLING_ENTITLEMENT_ID=88 \
+LOCAL_MOLING_INITIAL_CREDITS=100 \
+LLM_PROVIDER=mock \
+npm run acceptance
+```
+
+预期输出必须包含：
+
+- `status: "passed"`
+- 余额 `initial_remaining` 与 `final_remaining` 差值为 `8`
+- `pptx_file_id` 与 `pdf_file_id` 可下载，且 `downloaded` 字节数大于 0
+- `log_count` > 0
+
+真实联调验收（可用于上生产前红线）：
+
+```bash
+cd ppt-ai-app
+ACCEPTANCE_BASE_URL=http://127.0.0.1:5177 \
+ACCEPTANCE_LAUNCH_TICKET=<real_launch_ticket> \
+ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
+npm run acceptance:moling
+```
+
+该命令必须覆盖：
+
+- SSO 登录入口和身份解析
+- 模板加载与主题列表
+- 大纲生成、编辑、整稿生成
+- 预览与 PPTX/PDF 导出
+- 重新生成单页
+- 任务状态与 `retry` 可用性（若失败）
+- 最终余额扣减（用户权益剩余）
+- `file_downloaded` 日志落库
