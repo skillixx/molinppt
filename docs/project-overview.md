@@ -8,38 +8,30 @@ Build a production-ready AI PPT tool as a Moling platform application. Users ent
 
 The product experience references Presenton for interaction patterns such as topic input, outline confirmation, slide generation, editing, and export. Presenton source code is not used as the implementation base.
 
-Core user capabilities for later phases:
+Current delivery status (third-stage scope):
 
 - create a PPT from a topic, prompt, document, or selected template
 - review and edit outline before generation
-- generate slide content, layouts, and optional images
+- generate slide content and slide layouts
 - preview generated PPT in the browser
 - export PPTX and PDF files
 - view credit balance and generation history
+- perform failed-task retry and billing reconciliation checks
 
-## First-Stage Scope
-
-This stage is limited to architecture design and project initialization. It must not include business logic, platform API calls, billing code, AI generation code, or real user flows.
+## Delivered Business Scope
 
 Deliverables:
 
-- initialized application workspace
-- environment variable example
-- project README
-- architecture, database, API, workflow, billing, deployment, directory, and module design documents
+- local API and in-process business implementation
+- Moling launch/session integration and entitlement enforcement
+- outline generation, editable draft flow, deck generation, slide regeneration, preview, and export
+- billing reserve/settle/release, retry paths, and call logs
+- file upload/download path with signed URL fallback
+- production-oriented Docker container image and compose entry
+- local acceptance + API contract tests
 
-## Non-Goals
+## Delivery Notes
 
-- no working PPT generation
-- no SSO implementation
-- no billing implementation
-- no database migration execution
-- no Presenton code refactor
-- no production deployment
-
-## Success Criteria
-
-- all required design topics are documented
-- all configuration is expressed as environment variables
-- no real token, account, password, or platform host is committed
-- application workspace remains a skeleton without business logic
+- The data layer currently uses a JSON file adapter for local and deterministic environments.
+- Production hardening target items include PostgreSQL migration and separate worker topology; these are tracked in `docs/development-plan.md` and related module notes.
+- API surface, workspace flow, and billing behaviors are covered by local tests and documented in `docs/api.md` and `docs/acceptance.md`.

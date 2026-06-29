@@ -13,30 +13,27 @@ Each environment uses environment variables and secret management. No `.env` fil
 ```mermaid
 flowchart LR
   CDN[CDN or Reverse Proxy] --> Web[Web/API Service]
-  Web --> DB[(PostgreSQL)]
-  Web --> Redis[(Redis or Queue Backend)]
-  Worker[Worker Service] --> Redis
-  Worker --> DB
-  Worker --> Storage[Object Storage]
+  Web --> DB[(Persistent Storage)]
   Web --> Moling[Moling Platform APIs]
-  Worker --> AI[AI Providers]
+  Web --> AI[AI Providers]
 ```
+
+Current runtime in this branch is single-process: API, workspace, generation orchestration, and billing checks run together, with local JSON persistence.
 
 ## Current Docker Assets
 
 - `ppt-ai-app/Dockerfile` builds the foundation API container.
-- `docker-compose.yml` runs the app with environment-variable injection and a persistent local data volume.
+- `docker-compose.yml` runs the app with environment-variable injection and a persistent `./data` volume.
+- `docker-compose.prod.yml` provides a production-oriented example with fixed restart and healthcheck strategy.
 - `.github/workflows/ci.yml` runs `npm test` for pushes and pull requests.
 
-## Required Services
+## Required Services (Current Phase)
 
-- Web/API container
-- Worker container
-- PostgreSQL
-- Redis or equivalent queue backend
-- Object storage
-- Logs and metrics collector
-
+- One app container built from `ppt-ai-app/Dockerfile`
+- A data volume mounted to `/data` for `json:/data/ppt-ai-db.json` and stored uploads
+- Optional reverse proxy (nginx/Traefik) and TLS termination
+- Reachable Moling and AI provider endpoints
+-
 ## Configuration
 
 All settings are injected through environment variables:
@@ -44,14 +41,12 @@ All settings are injected through environment variables:
 - Moling base URL and internal token
 - application URL and port
 - session cookie lifetime through `SESSION_TTL_SECONDS` in seconds; default is 604800
-- session cookie `Secure` behavior through `SESSION_COOKIE_SECURE`; default is true in production
-- database URL
-- queue URL
-- object storage credentials
+- session cookie `Secure` behavior through `SESSION_COOKIE_SECURE`; defaults to production-safe values when `APP_ENV=production`
+- database URL / storage path
 - AI provider credentials
-- log level and tracing configuration
+- logging level and tracing configuration
 
-The reverse proxy should preserve the app's `X-Request-Id` response header so support tickets and Moling联调 reports can be matched to backend logs.
+The reverse proxy should preserve the app's `X-Request-Id` response header so support tickets and Moling 联调 reports can be matched to backend logs.
 
 For HTTP AI provider deployment, set:
 
@@ -74,13 +69,49 @@ npm run acceptance:moling
 
 The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, file download, call-log checks, and final balance deduction checks against the configured Moling APIs.
 
+## Production Deployment Steps
+
+1. Configure production environment variables (example list):
+
+   - `MOLING_API_BASE_URL`, `INTERNAL_API_TOKEN`
+   - `MOLING_APP_ID`, `MOLING_PRODUCT_ID`, `MOLING_DEFAULT_ENTITLEMENT_ID`
+   - `LLM_PROVIDER=mock` (local) or `LLM_PROVIDER=http` + `LLM_API_URL` and `LLM_API_KEY`
+   - `APP_ENV=production`
+   - `SESSION_COOKIE_SECURE=true`
+   - `LOCAL_MOLING_MOCK=false`
+
+2. Start the service:
+
+   ```bash
+   APP_ENV=production APP_PORT=5177 \
+   MOLING_API_BASE_URL=... \
+   INTERNAL_API_TOKEN=... \
+   MOLING_APP_ID=... \
+   MOLING_PRODUCT_ID=... \
+   MOLING_DEFAULT_ENTITLEMENT_ID=... \
+   docker-compose -f docker-compose.yml up -d --build
+   ```
+
+3. Run readiness and sanity checks:
+
+   ```bash
+   curl -fs http://127.0.0.1:5177/api/health
+   ```
+
+4. Run post-deploy acceptance:
+
+   ```bash
+   cd ppt-ai-app
+   npm run acceptance
+   ```
+
+   In staging or production-linked environments, run `npm run acceptance:moling` with a valid launch ticket.
+
 ## Release Strategy
 
 - Build immutable container images.
-- Run database migrations before new application rollout.
-- Deploy API and workers separately.
-- Use health checks for API readiness and worker liveness.
-- Roll back by restoring the previous image and pausing workers if billing reconciliation risk is detected.
+- Use health checks for rollout/rollback decisions.
+- Keep rollback tags ready for one-click recovery if billing reconciliation risk is detected.
 
 ## Security Requirements
 

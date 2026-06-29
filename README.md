@@ -90,10 +90,16 @@ npm test
 npm run migrate
 npm start
 npm run acceptance
+npm run acceptance:moling
 ```
 
 ## Docker
 
 ```bash
 docker compose up --build
+
+# Production deploy (recommended)
+docker compose -f docker-compose.prod.yml up -d --build
 ```
+
+Production compose uses `APP_ENV=production`, `SESSION_COOKIE_SECURE=true`, and a persistent `/data` volume.
