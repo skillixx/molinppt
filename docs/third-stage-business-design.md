@@ -25,6 +25,8 @@ The HTTP AI provider validates response shape before returning data to the workf
 
 Failed deck generation after reserve is marked retryable. The retry operation reuses the original outline and starts a new reserve -> settle/release cycle with a new task ID.
 
+The workspace currently performs lightweight task polling after `/api/ppt/decks` and `/api/ppt/tasks/{task_id}/retry` responses. Users can therefore see `running`/`succeeded` progress updates and can act on `retryable` state when generation fails.
+
 Single-slide regeneration also uses reserve -> settle/release. If the AI provider fails while regenerating a slide, the hold is released and no credits are consumed for the failed edit.
 
 ## Session Model

@@ -709,6 +709,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
   </main>
   <script>
     const state = { outlineId: null, deckId: null, taskId: null };
+    let taskPollTimeout;
     const statusEl = document.querySelector("#status");
     const balanceStatusEl = document.querySelector("#balance-status");
     const previewEl = document.querySelector("#preview");
@@ -762,6 +763,52 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = error.message;
       }
     }
+
+    function stopTaskPoll() {
+      if (taskPollTimeout) {
+        clearTimeout(taskPollTimeout);
+        taskPollTimeout = null;
+      }
+    }
+
+    async function pollTaskProgress(taskId) {
+      stopTaskPoll();
+      if (!taskId) return;
+      try {
+        const response = await fetch("/api/ppt/tasks/" + taskId);
+        const payload = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(payload));
+
+        const task = payload.task;
+        statusEl.textContent = "任务状态: " + task.status + "\n"
+          + "进度: " + task.progress + "%\n"
+          + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\n"
+          + "失败信息: " + (task.error || "");
+
+        if (task.status === "running" || task.status === "pending") {
+          taskPollTimeout = setTimeout(() => {
+            pollTaskProgress(taskId);
+          }, 300);
+          return;
+        }
+
+        if (task.status === "succeeded") {
+          state.deckId = task.deckId || state.deckId;
+          if (state.deckId) {
+            previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+            await loadBalance();
+          }
+          return;
+        }
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    }
+
+    function showTaskStatus(task) {
+      statusEl.textContent = JSON.stringify(task, null, 2);
+    }
+
     document.querySelector("#template").addEventListener("change", renderThemeOptions);
     loadTemplates();
     loadBalance();
@@ -807,8 +854,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         });
         state.deckId = data.deck.id;
         state.taskId = data.task.id;
-        statusEl.textContent = JSON.stringify(data.task, null, 2);
-        previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+        showTaskStatus(data.task);
+        pollTaskProgress(state.taskId);
+        if (data.task.status === "succeeded" && state.deckId) {
+          previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+          await loadBalance();
+        }
         await loadBalance();
       } catch (error) {
         try {
@@ -826,8 +877,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         });
         state.deckId = data.deck.id;
         state.taskId = data.task.id;
-        statusEl.textContent = JSON.stringify(data.task, null, 2);
-        previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+        showTaskStatus(data.task);
+        pollTaskProgress(state.taskId);
+        if (data.task.status === "succeeded" && state.deckId) {
+          previewEl.innerHTML = await fetch("/api/ppt/decks/" + state.deckId + "/preview").then((res) => res.text());
+          await loadBalance();
+        }
         await loadBalance();
       } catch (error) { statusEl.textContent = error.message; }
     });

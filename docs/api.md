@@ -36,39 +36,17 @@ Returns the current session entitlement ID and Moling balance. It accepts option
 
 Response fields: `entitlement_id`, `balance`.
 
-### `GET /api/projects`
+### `POST /api/tasks`
 
-Lists the current user's projects and recent decks.
-
-### `POST /api/projects`
-
-Creates a project shell with a `title`.
-
-### `POST /api/decks/generate`
-
-Creates an AI PPT generation task.
-
-Body fields: `project_id`, `topic`, `template_id`, `source_file_id`, `language`, `slide_count`, `tone`.
-
-Response fields: `task_id`, `status`.
-
-Second-stage foundation uses `POST /api/tasks` to create a generic queued task before full deck-generation routing is implemented.
+Creates a generic in-memory application task record.
 
 ### `GET /api/tasks/{task_id}`
 
-Returns task status, progress, error, and result references.
+Reads generic task metadata (`status`, `progress`, `result`) and is used as a compatibility facade in tests.
 
-### `GET /api/decks/{deck_id}`
+### `POST /api/ppt/outlines`
 
-Returns deck metadata and normalized slide content.
-
-### `PATCH /api/slides/{slide_id}`
-
-Updates slide content or layout after authorization.
-
-### `POST /api/decks/{deck_id}/export`
-
-Creates an export task for `pptx` or `pdf`.
+Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`. `slide_count` must be an integer from 1 to 20, and `theme` must be one of the selected template's `themes`.
 
 ### `GET /api/files/{file_id}/download-url`
 
@@ -89,10 +67,6 @@ Request fields: `file_name`, `mime_type`, `content_base64`.
 The API accepts canonical base64 only. Empty content is rejected with `FILE_EMPTY`, invalid base64 with `FILE_CONTENT_INVALID`, unsupported MIME types with `UNSUPPORTED_FILE_TYPE`, and files over 2 MiB with `FILE_TOO_LARGE`.
 
 Supported MIME types are `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, and `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
-
-### `POST /api/ppt/outlines`
-
-Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`. `slide_count` must be an integer from 1 to 20, and `theme` must be one of the selected template's `themes`.
 
 ### `PATCH /api/ppt/outlines/{outline_id}`
 
