@@ -77,6 +77,58 @@ test("PptService completes topic to outline to editable deck to PPTX/PDF with bi
   assert.equal((await context.database.find("call_logs")).length >= 5, true);
 });
 
+test("PptService routes slide regeneration through PromptManager", async () => {
+  const promptCalls = [];
+  const aiCalls = [];
+  const promptManager = {
+    buildOutlinePrompt: (input) => input,
+    buildDeckPrompt: (input) => input,
+    buildRegenerateSlidePrompt: (input) => {
+      promptCalls.push(input);
+      return { kind: "regenerate_slide", ...input };
+    },
+  };
+  const aiProvider = {
+    generateOutline: async ({ slideCount }) => Array.from({ length: slideCount }, (_, index) => ({
+      title: `Slide ${index + 1}`,
+      bullets: ["A"],
+    })),
+    generateSlides: async ({ outline }) => outline.slides.map((slide, index) => ({
+      id: `slide_${index + 1}`,
+      title: slide.title,
+      bullets: slide.bullets,
+    })),
+    regenerateSlide: async (prompt) => {
+      aiCalls.push(prompt);
+      return { ...prompt.slide, title: "Prompted regeneration" };
+    },
+  };
+  const context = await createBusinessContext({ promptManager, aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Prompt route",
+    slideCount: 1,
+    templateId: "business",
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deckResult.deck.id,
+    slideId: "slide_1",
+    instruction: "Use the prompt manager",
+    entitlementId: 88,
+  });
+
+  assert.equal(promptCalls[0].instruction, "Use the prompt manager");
+  assert.equal(aiCalls[0].kind, "regenerate_slide");
+  assert.equal(regenerated.slide.title, "Prompted regeneration");
+});
+
 test("PptService generates outline from uploaded document content", async () => {
   const context = await createBusinessContext();
   const sourceFile = await context.storage.upload({
@@ -462,7 +514,7 @@ async function createBusinessContext(options = {}) {
     taskCenter,
     templateManager,
     aiProvider,
-    promptManager: new PromptManager(),
+    promptManager: options.promptManager || new PromptManager(),
     exporter: new PptExportService(),
     billingClient,
   });

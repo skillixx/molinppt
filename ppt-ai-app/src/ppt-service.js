@@ -169,7 +169,8 @@ export class PptService {
       idempotencyKey,
     });
     await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "consume", amount: REGENERATE_SLIDE_AMOUNT, status: "consumed", idempotencyKey });
-    const regenerated = await this.aiProvider.regenerateSlide({ slide, instruction });
+    const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
+    const regenerated = await this.aiProvider.regenerateSlide(prompt);
     const slides = deck.slides.map((item) => (item.id === slideId ? regenerated : item));
     const updatedDeck = await this.database.update("decks", deck.id, { slides });
     await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });

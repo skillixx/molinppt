@@ -15,6 +15,12 @@ The implemented acceptance flow is:
 9. User exports PPTX and PDF.
 10. Backend records billing events and call logs.
 
+## Prompt and Provider Model
+
+`PromptManager` builds structured prompt payloads for outline generation, deck generation, and single-slide regeneration. `PptService` never sends ad hoc slide regeneration payloads directly to the provider; every AI action goes through the prompt boundary first.
+
+The HTTP AI provider validates response shape before returning data to the workflow. Missing `outline`, `slides`, or `slide` fields raise `AI_PROVIDER_INVALID_RESPONSE`.
+
 ## Retry Model
 
 Failed deck generation after reserve is marked retryable. The retry operation reuses the original outline and starts a new reserve -> settle/release cycle with a new task ID.

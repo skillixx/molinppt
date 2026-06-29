@@ -5,13 +5,25 @@ The AI provider foundation defines the provider boundary without coupling the ap
 Current implementation:
 
 - `src/ai-provider.js`
+- `src/prompt-manager.js`
 - mock outline generation
 - mock slide JSON generation
 - single-slide regeneration
 - HTTP provider adapter selected with `LLM_PROVIDER=http`
+- provider response validation for `outline`, `slides`, and `slide`
+- prompt payload builders for outline, deck, and single-slide regeneration
 
 Future work:
 
 - image provider adapters
-- prompt templates
 - cost and rate-limit controls
+
+## HTTP Provider Contract
+
+The HTTP provider receives JSON with `operation` and `input` fields. It must return:
+
+- `generate_outline`: `{ "outline": [...] }`
+- `generate_slides`: `{ "slides": [...] }`
+- `regenerate_slide`: `{ "slide": { ... } }`
+
+Malformed responses fail with `AI_PROVIDER_INVALID_RESPONSE` so bad provider payloads do not silently create invalid decks.

@@ -244,6 +244,18 @@ test("HttpAiProvider posts prompt requests to an external provider endpoint", as
   assert.equal(slide.title, "Regenerated");
 });
 
+test("HttpAiProvider rejects malformed provider responses", async () => {
+  const provider = new HttpAiProvider({
+    endpoint: "http://ai.test/generate",
+    fetcher: async () => Response.json({ ok: true }),
+  });
+
+  await assert.rejects(
+    () => provider.generateSlides({ outline: { slides: [] } }),
+    /AI_PROVIDER_INVALID_RESPONSE/,
+  );
+});
+
 test("requirePermission blocks cross-user resource access", () => {
   assert.doesNotThrow(() => requirePermission({
     actor: { userId: 7, role: "user" },

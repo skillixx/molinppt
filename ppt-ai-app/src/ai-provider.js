@@ -88,7 +88,7 @@ export class HttpAiProvider {
    */
   async generateOutline(input) {
     const response = await this.#post({ operation: "generate_outline", input });
-    return response.outline;
+    return requireArray(response.outline, "outline");
   }
 
   /**
@@ -98,7 +98,7 @@ export class HttpAiProvider {
    */
   async generateSlides(input) {
     const response = await this.#post({ operation: "generate_slides", input });
-    return response.slides;
+    return requireArray(response.slides, "slides");
   }
 
   /**
@@ -108,7 +108,7 @@ export class HttpAiProvider {
    */
   async regenerateSlide(input) {
     const response = await this.#post({ operation: "regenerate_slide", input });
-    return response.slide;
+    return requireObject(response.slide, "slide");
   }
 
   /**
@@ -128,4 +128,28 @@ export class HttpAiProvider {
     if (!response.ok) throw new Error(`AI provider failed with status ${response.status}`);
     return response.json();
   }
+}
+
+/**
+ * Validates an AI provider array response field.
+ * @param {unknown} value
+ * @param {string} field
+ * @returns {object[]}
+ */
+function requireArray(value, field) {
+  if (!Array.isArray(value)) throw new Error(`AI_PROVIDER_INVALID_RESPONSE: ${field} must be an array`);
+  return value;
+}
+
+/**
+ * Validates an AI provider object response field.
+ * @param {unknown} value
+ * @param {string} field
+ * @returns {object}
+ */
+function requireObject(value, field) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`AI_PROVIDER_INVALID_RESPONSE: ${field} must be an object`);
+  }
+  return value;
 }
