@@ -20,5 +20,5 @@ Design notes:
 
 - Outline generation is separated from deck generation so users can edit before chargeable work.
 - Full deck generation uses reserve -> settle/release because it is expensive and failure-prone.
-- Single-slide regeneration uses consume because the current operation has known cost.
-- The current exporter produces a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies. A richer production renderer can replace `PptExportService` behind the same interface.
+- Single-slide regeneration uses reserve -> settle/release so failed AI edits release the hold and do not consume credits.
+- The current exporter accepts only `pptx` and `pdf`, produces a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies, and rejects unknown formats with `EXPORT_FORMAT_UNSUPPORTED`. A richer production renderer can replace `PptExportService` behind the same interface.

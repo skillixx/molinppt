@@ -29,7 +29,7 @@ Single-slide regeneration also uses reserve -> settle/release. If the AI provide
 
 ## Export Model
 
-`PptExportService` is intentionally behind an interface. The current implementation generates a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies. A later renderer can produce richer theme-accurate PPTX/PDF output without changing API or service boundaries.
+`PptExportService` is intentionally behind an interface. The current implementation accepts only `pptx` and `pdf`, generates a minimal Office Open XML PPTX ZIP package and a minimal PDF with xref/trailer without external dependencies, and rejects unknown formats with `EXPORT_FORMAT_UNSUPPORTED`. A later renderer can produce richer theme-accurate PPTX/PDF output without changing API or service boundaries.
 
 ## Local Acceptance
 

@@ -36,3 +36,12 @@ test("PptExportService creates a minimal PDF document with xref and trailer", ()
   assert.match(text, /%%EOF$/);
   assert.match(text, /Overview/);
 });
+
+test("PptExportService rejects unsupported export formats", () => {
+  const exporter = new PptExportService();
+
+  assert.throws(
+    () => exporter.exportDeck({ deck, format: "docx" }),
+    { code: "EXPORT_FORMAT_UNSUPPORTED" },
+  );
+});

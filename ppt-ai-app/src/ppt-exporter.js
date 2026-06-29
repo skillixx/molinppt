@@ -1,3 +1,5 @@
+import { AppError } from "./errors.js";
+
 /**
  * Exports generated decks into downloadable document buffers.
  */
@@ -8,6 +10,14 @@ export class PptExportService {
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
   exportDeck({ deck, format }) {
+    if (format !== "pptx" && format !== "pdf") {
+      throw new AppError({
+        code: "EXPORT_FORMAT_UNSUPPORTED",
+        status: 400,
+        message: "Unsupported export format",
+        publicDetails: { supported_formats: ["pptx", "pdf"] },
+      });
+    }
     if (format === "pdf") return this.#exportPdf(deck);
     return this.#exportPptx(deck);
   }

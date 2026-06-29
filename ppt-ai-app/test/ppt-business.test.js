@@ -116,6 +116,30 @@ test("PptService releases slide regeneration credits when AI fails", async () =>
   ]);
 });
 
+test("PptService rejects unsupported deck export formats", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Export validation",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const deckResult = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  await assert.rejects(
+    () => context.pptService.exportDeck({
+      ownerUserId: 7,
+      deckId: deckResult.deck.id,
+      format: "docx",
+    }),
+    { code: "EXPORT_FORMAT_UNSUPPORTED" },
+  );
+});
+
 test("PptService marks successful generation for reconciliation when settle fails", async () => {
   const context = await createBusinessContext({
     billingOverrides: {

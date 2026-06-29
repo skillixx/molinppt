@@ -85,4 +85,6 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 
 `POST /api/files` accepts canonical base64 content only. Files must be non-empty, no larger than 2 MiB, and use one of these MIME types: `text/plain`, `text/markdown`, `application/json`, `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, or `application/vnd.openxmlformats-officedocument.presentationml.presentation`.
 
+`POST /api/ppt/decks/{deck_id}/exports` accepts only `pptx` and `pdf` formats.
+
 `POST /internal/reconcile` is for operations only. It requires `X-Internal-Token: <INTERNAL_API_TOKEN>` and retries pending Moling settlement events.

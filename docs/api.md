@@ -108,6 +108,8 @@ Returns an owner-checked HTML preview of generated slides. Decks in `billing_pen
 
 Exports a generated deck to `pptx` or `pdf` and stores the generated file. Decks in `billing_pending` state are blocked.
 
+Request field `format` must be `pptx` or `pdf`; other values return `EXPORT_FORMAT_UNSUPPORTED`.
+
 ### `POST /api/ppt/decks/{deck_id}/slides/{slide_id}/regenerate`
 
 Regenerates one slide using an instruction and consumes known-cost credits. Decks in `billing_pending` state are blocked.
