@@ -18,6 +18,7 @@ Moling product access controls decide whether a user can enter, buy, or use the 
 
 - Every request requires a valid application session except health checks and Moling entry route.
 - Users can read and mutate only their own projects, decks, slides, files, and tasks.
+- HTTP file download and log routes remain owner-scoped; one user's files and `file_downloaded` audit entries are not visible to another user.
 - Operators can view operational metadata but not raw secrets.
 - Admin actions require explicit audit logging.
 

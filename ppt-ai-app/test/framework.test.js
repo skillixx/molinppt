@@ -454,6 +454,64 @@ test("createApp rejects oversized JSON request bodies", async () => {
   }
 });
 
+test("createApp blocks cross-user file downloads and log visibility", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "files", "tasks", "call_logs"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async (ticket) => ({
+        user_id: ticket === "user_8" ? 8 : 7,
+        app_id: 15,
+        product_id: 73,
+      }),
+    },
+    storage: new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database }),
+    taskCenter: new MemoryTaskCenter(),
+    templateManager: new TemplateManager({ templates: [{ id: "business", name: "Business" }] }),
+    aiProvider: new MockAiProvider(),
+    pptService: { listLogs: async ({ ownerUserId }) => database.find("call_logs", (log) => Number(log.ownerUserId) === Number(ownerUserId)) },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enterUser7 = await fetch(`${baseUrl}/enter?ticket=user_7`, { redirect: "manual" });
+    const cookie7 = enterUser7.headers.get("set-cookie").split(";")[0];
+    const enterUser8 = await fetch(`${baseUrl}/enter?ticket=user_8`, { redirect: "manual" });
+    const cookie8 = enterUser8.headers.get("set-cookie").split(";")[0];
+
+    const upload = await fetch(`${baseUrl}/api/files`, {
+      method: "POST",
+      headers: { cookie: cookie7, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        file_name: "owner.txt",
+        mime_type: "text/plain",
+        content_base64: Buffer.from("owner only").toString("base64"),
+      }),
+    });
+    const uploaded = await upload.json();
+    const forbidden = await fetch(`${baseUrl}/api/files/${uploaded.file.id}`, { headers: { cookie: cookie8 } });
+    const forbiddenBody = await forbidden.json();
+    const ownerDownload = await fetch(`${baseUrl}/api/files/${uploaded.file.id}`, { headers: { cookie: cookie7 } });
+    const ownerLogs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie: cookie7 } }).then((response) => response.json());
+    const otherLogs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie: cookie8 } }).then((response) => response.json());
+
+    assert.equal(forbidden.status, 403);
+    assert.equal(forbiddenBody.error.code, "FORBIDDEN");
+    assert.equal(ownerDownload.status, 200);
+    assert.equal(ownerLogs.logs.some((log) => log.action === "file_downloaded" && log.resourceId === uploaded.file.id), true);
+    assert.equal(otherLogs.logs.some((log) => log.resourceId === uploaded.file.id), false);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp protects the internal reconciliation endpoint", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
