@@ -151,6 +151,41 @@ test("PptService generates outline from uploaded document content", async () => 
   assert.match(outline.slides[0].title, /Customer retention plan|Document insight/);
 });
 
+test("PptService enforces slide count and template theme rules", async () => {
+  const context = await createBusinessContext();
+
+  await assert.rejects(
+    () => context.pptService.generateOutline({
+      ownerUserId: 7,
+      topic: "Too short",
+      slideCount: 0,
+      templateId: "business",
+      theme: "modern",
+    }),
+    /SLIDE_COUNT_INVALID/,
+  );
+  await assert.rejects(
+    () => context.pptService.generateOutline({
+      ownerUserId: 7,
+      topic: "Too long",
+      slideCount: 21,
+      templateId: "business",
+      theme: "modern",
+    }),
+    /SLIDE_COUNT_INVALID/,
+  );
+  await assert.rejects(
+    () => context.pptService.generateOutline({
+      ownerUserId: 7,
+      topic: "Wrong theme",
+      slideCount: 3,
+      templateId: "business",
+      theme: "startup",
+    }),
+    /THEME_NOT_SUPPORTED/,
+  );
+});
+
 test("PptService marks failed generation retryable and retry succeeds", async () => {
   const context = await createBusinessContext({
     aiProvider: new MockAiProvider({ failNextDeck: true }),

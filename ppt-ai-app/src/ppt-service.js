@@ -2,6 +2,8 @@ import { AppError } from "./errors.js";
 
 const GENERATE_AMOUNT = "6";
 const REGENERATE_SLIDE_AMOUNT = "2";
+const MIN_SLIDE_COUNT = 1;
+const MAX_SLIDE_COUNT = 20;
 
 /**
  * Orchestrates AI PPT outlines, decks, exports, billing, and call logs.
@@ -28,9 +30,11 @@ export class PptService {
    * @returns {Promise<object>}
    */
   async generateOutline({ ownerUserId, topic, sourceFileId, slideCount = 8, templateId, theme = "modern" }) {
+    const normalizedSlideCount = normalizeSlideCount(slideCount);
     const documentText = sourceFileId ? await this.#readDocumentText({ sourceFileId, ownerUserId }) : "";
     const template = this.templateManager.getTemplate(templateId);
-    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount, theme });
+    validateTemplateTheme({ template, theme });
+    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme });
     const slides = await this.aiProvider.generateOutline(prompt);
     const outline = await this.database.insert("outlines", {
       ownerUserId,
@@ -38,7 +42,7 @@ export class PptService {
       templateId: template.id,
       theme,
       status: "outline_ready",
-      input: { topic, sourceFileId, slideCount, templateId, theme },
+      input: { topic, sourceFileId, slideCount: normalizedSlideCount, templateId, theme },
       slides,
     });
     await this.#log({ ownerUserId, action: "outline_generated", resourceType: "outline", resourceId: outline.id });
@@ -281,4 +285,37 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+/**
+ * Normalizes and validates requested slide count.
+ * @param {unknown} value
+ * @returns {number}
+ */
+function normalizeSlideCount(value) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < MIN_SLIDE_COUNT || parsed > MAX_SLIDE_COUNT) {
+    throw new AppError({
+      code: "SLIDE_COUNT_INVALID",
+      status: 400,
+      message: `SLIDE_COUNT_INVALID: slideCount must be an integer between ${MIN_SLIDE_COUNT} and ${MAX_SLIDE_COUNT}`,
+    });
+  }
+  return parsed;
+}
+
+/**
+ * Validates that the selected theme is supported by the template.
+ * @param {{template: object, theme: string}} input
+ * @returns {void}
+ */
+function validateTemplateTheme({ template, theme }) {
+  const themes = Array.isArray(template.themes) ? template.themes : [];
+  if (themes.length && !themes.includes(theme)) {
+    throw new AppError({
+      code: "THEME_NOT_SUPPORTED",
+      status: 400,
+      message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
+    });
+  }
 }

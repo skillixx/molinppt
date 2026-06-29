@@ -76,7 +76,7 @@ The current local foundation also supports direct owner-checked `GET /api/files/
 
 ### `POST /api/ppt/outlines`
 
-Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`.
+Generates an editable AI outline from `topic` or `source_file_id`. Supports `slide_count`, `template_id`, and `theme`. `slide_count` must be an integer from 1 to 20, and `theme` must be one of the selected template's `themes`.
 
 ### `PATCH /api/ppt/outlines/{outline_id}`
 

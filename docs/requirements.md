@@ -17,6 +17,7 @@
 
 - Enter the app from Moling without separate registration.
 - Generate PPT from topic, source document, or template.
+- Limit requested slide counts to 1-20 and reject unsupported template themes.
 - Confirm or edit outline before expensive generation when the UX requires it.
 - Track asynchronous generation progress.
 - Preview, edit, regenerate, and export decks.
