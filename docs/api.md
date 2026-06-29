@@ -104,6 +104,10 @@ Regenerates one slide using an instruction and consumes known-cost credits.
 
 Retries a failed generation task using the stored outline and a new billing operation.
 
+### `GET /api/ppt/tasks/{task_id}`
+
+Returns the persisted PPT generation task record, including `status`, `progress`, `retryable`, `deckId`, and error fields when present. This route is owner-scoped and remains available after the in-memory task center is reset because it reads from `generation_tasks`.
+
 ### `GET /api/logs`
 
 Returns owner-scoped call logs for generation, export, retry, and billing-adjacent actions.

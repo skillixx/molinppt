@@ -33,6 +33,8 @@ const deck = await post("/api/ppt/decks", {
   outline_id: outline.outline.id,
   entitlement_id: entitlementId,
 });
+const task = await get(`/api/ppt/tasks/${deck.task.id}`);
+if (task.task.status !== "succeeded" || task.task.progress !== 100) throw new Error("task status failed");
 const regenerated = await post(`/api/ppt/decks/${deck.deck.id}/slides/${deck.deck.slides[0].id}/regenerate`, {
   instruction: "改写为验收版",
   entitlement_id: entitlementId,
@@ -49,6 +51,7 @@ console.log(JSON.stringify({
   status: "passed",
   outline_id: outline.outline.id,
   deck_id: deck.deck.id,
+  task_id: task.task.id,
   regenerated_slide_id: regenerated.slide.id,
   pptx_file_id: pptx.file.id,
   pdf_file_id: pdf.file.id,

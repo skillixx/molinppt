@@ -144,6 +144,15 @@ export class PptService {
   }
 
   /**
+   * Returns a persisted generation task for status and progress checks.
+   * @param {{ownerUserId: number, taskId: string}} input
+   * @returns {Promise<object>}
+   */
+  async getGenerationTask({ ownerUserId, taskId }) {
+    return this.#getOwned("generation_tasks", taskId, ownerUserId, "TASK_NOT_FOUND");
+  }
+
+  /**
    * Regenerates one slide and consumes known-cost credits.
    * @param {{ownerUserId: number, deckId: string, slideId: string, instruction: string, entitlementId: number}} input
    * @returns {Promise<{deck: object, slide: object}>}

@@ -186,6 +186,13 @@ export function createApp(dependencies) {
         return;
       }
 
+      if (request.method === "GET" && url.pathname.match(/^\/api\/ppt\/tasks\/[^/]+$/)) {
+        const taskId = url.pathname.split("/")[4];
+        const task = await dependencies.pptService.getGenerationTask({ ownerUserId, taskId });
+        sendJson(response, { task });
+        return;
+      }
+
       if (request.method === "POST" && url.pathname.match(/^\/api\/ppt\/tasks\/[^/]+\/retry$/)) {
         const taskId = url.pathname.split("/")[4];
         const body = await readJson(request);

@@ -8,10 +8,11 @@ Current implementation:
 - in-memory task center
 - queued and updated task status
 - owner-checked task reads
+- persisted PPT generation task reads through `GET /api/ppt/tasks/{task_id}`
 
 Future work:
 
 - queue backend
 - worker processes
 - retry and dead-letter handling
-- persistent progress events
+- detailed progress event streams

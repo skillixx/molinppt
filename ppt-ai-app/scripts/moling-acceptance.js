@@ -42,6 +42,8 @@ const deck = await post("/api/ppt/decks", {
   entitlement_id: resolvedEntitlementId,
 });
 if (deck.task.status !== "succeeded") throw new Error("deck generation did not succeed");
+const task = await get(`/api/ppt/tasks/${deck.task.id}`);
+if (task.task.status !== "succeeded" || task.task.progress !== 100) throw new Error("task status failed");
 
 const regenerated = await post(`/api/ppt/decks/${deck.deck.id}/slides/${deck.deck.slides[0].id}/regenerate`, {
   instruction: "改写为真实验收版",
@@ -66,6 +68,7 @@ console.log(JSON.stringify({
   final_remaining: finalBalance.balance?.remaining,
   outline_id: outline.outline.id,
   deck_id: deck.deck.id,
+  task_id: task.task.id,
   regenerated_slide_id: regenerated.slide.id,
   pptx_file_id: pptx.file.id,
   pdf_file_id: pdf.file.id,

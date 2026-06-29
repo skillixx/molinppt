@@ -161,6 +161,11 @@ test("HTTP API returns retryable task ID when deck generation fails", async () =
     assert.equal(failedResponse.status, 502);
     assert.equal(failedBody.error.code, "AI_PROVIDER_FAILED");
     assert.match(failedBody.error.details.task_id, /^[0-9a-f-]+$/);
+    const taskResponse = await fetch(`${baseUrl}/api/ppt/tasks/${failedBody.error.details.task_id}`, { headers: { cookie } });
+    const taskBody = await taskResponse.json();
+    assert.equal(taskResponse.status, 200);
+    assert.equal(taskBody.task.status, "failed");
+    assert.equal(taskBody.task.retryable, true);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
@@ -202,12 +207,18 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
       entitlement_id: 88,
     });
     const deckBody = await deckResponse.json();
+    const taskResponse = await fetch(`${baseUrl}/api/ppt/tasks/${deckBody.task.id}`, { headers: { cookie } });
+    const taskBody = await taskResponse.json();
     const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
     const pptx = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pptx" });
     const pdf = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pdf" });
     const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } });
 
     assert.equal(deckBody.task.status, "succeeded");
+    assert.equal(taskResponse.status, 200);
+    assert.equal(taskBody.task.status, "succeeded");
+    assert.equal(taskBody.task.progress, 100);
+    assert.equal(taskBody.task.deckId, deckBody.deck.id);
     assert.match(await preview.text(), /Board update/);
     assert.equal((await pptx.json()).file.mimeType.includes("presentationml"), true);
     assert.equal((await pdf.json()).file.mimeType, "application/pdf");

@@ -78,5 +78,6 @@ Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform ent
 - `GET /api/ppt/decks/{deck_id}/preview`
 - `POST /api/ppt/decks/{deck_id}/exports`
 - `POST /api/ppt/decks/{deck_id}/slides/{slide_id}/regenerate`
+- `GET /api/ppt/tasks/{task_id}`
 - `POST /api/ppt/tasks/{task_id}/retry`
 - `GET /api/logs`
