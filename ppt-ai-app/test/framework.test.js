@@ -427,6 +427,36 @@ test("createApp restores sessions from the persisted database after restart", as
   }
 });
 
+test("createApp can mark session cookies as secure", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    sessionCookieName: "sid",
+    sessionCookieSecure: true,
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie");
+
+    assert.match(cookie, /HttpOnly/);
+    assert.match(cookie, /SameSite=Lax/);
+    assert.match(cookie, /Secure/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("createApp rejects malformed JSON request bodies as validation errors", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

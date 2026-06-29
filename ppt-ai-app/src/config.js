@@ -62,6 +62,7 @@ export function loadConfig(env = process.env) {
     auth: {
       sessionCookieName: env.SESSION_COOKIE_NAME || "ppt_ai_session",
       sessionTtlMs: readPositiveInteger(env.SESSION_TTL_SECONDS, 7 * 24 * 60 * 60, "SESSION_TTL_SECONDS") * 1000,
+      sessionCookieSecure: readBoolean(env.SESSION_COOKIE_SECURE, (env.APP_ENV || "development") === "production"),
     },
   };
 }
@@ -99,4 +100,15 @@ function readPositiveInteger(value, fallback, name) {
 function readOptionalPositiveInteger(value, name) {
   if (value === undefined || value === "") return undefined;
   return readPositiveInteger(value, undefined, name);
+}
+
+/**
+ * Reads a boolean env value with an explicit fallback.
+ * @param {string | undefined} value
+ * @param {boolean} fallback
+ * @returns {boolean}
+ */
+function readBoolean(value, fallback) {
+  if (value === undefined || value === "") return fallback;
+  return value === "true";
 }

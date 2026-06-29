@@ -24,6 +24,7 @@ test("loadConfig reads every framework setting from environment variables", () =
     IMAGE_API_KEY: "image-key",
     SESSION_COOKIE_NAME: "sid",
     SESSION_TTL_SECONDS: "3600",
+    SESSION_COOKIE_SECURE: "false",
   });
 
   assert.equal(config.app.port, 5180);
@@ -33,8 +34,19 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.moling.localEntitlementId, 88);
   assert.equal(config.auth.sessionCookieName, "sid");
   assert.equal(config.auth.sessionTtlMs, 3600000);
+  assert.equal(config.auth.sessionCookieSecure, false);
   assert.equal(config.storage.directory, "./tmp/storage");
   assert.equal(config.ai.llmProvider, "mock");
+});
+
+test("loadConfig secures session cookies by default in production", () => {
+  const config = loadConfig({
+    APP_ENV: "production",
+    MOLING_API_BASE_URL: "http://moling.test",
+    INTERNAL_API_TOKEN: "token",
+  });
+
+  assert.equal(config.auth.sessionCookieSecure, true);
 });
 
 test("loadConfig uses port 5177 when APP_PORT is omitted", () => {

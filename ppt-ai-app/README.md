@@ -28,10 +28,11 @@ Moling launch and billing configuration:
 - `MOLING_DEFAULT_ENTITLEMENT_ID` or compatibility alias `PPT_DEFAULT_ENTITLEMENT_ID`
 - `APP_PORT` or compatibility alias `PORT`
 - `SESSION_TTL_SECONDS` optionally controls application session lifetime and defaults to 604800 seconds.
+- `SESSION_COOKIE_SECURE` optionally controls the cookie `Secure` attribute; it defaults to true when `APP_ENV=production`.
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
 
-Local acceptance exports PPTX/PDF, downloads both files through `GET /api/files/{file_id}`, checks filename headers, and verifies download call logs.
+Local acceptance exports PPTX/PDF, downloads both files through `GET /api/files/{file_id}/download-url`, checks filename headers, and verifies download call logs.
 
 Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform entry flow and can optionally pass `ACCEPTANCE_ENTITLEMENT_ID`.
 

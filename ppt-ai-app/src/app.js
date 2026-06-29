@@ -16,6 +16,7 @@ export function createApp(dependencies) {
   const sessions = new Map();
   const sessionCookieName = dependencies.sessionCookieName || "ppt_ai_session";
   const sessionTtlMs = dependencies.sessionTtlMs || DEFAULT_SESSION_TTL_MS;
+  const sessionCookieSecure = dependencies.sessionCookieSecure === true;
 
   return createServer(async (request, response) => {
     const requestId = randomUUID();
@@ -55,7 +56,12 @@ export function createApp(dependencies) {
         sessions.set(sessionId, session);
         await dependencies.database.insert("sessions", session);
         response.writeHead(302, {
-          "Set-Cookie": `${sessionCookieName}=${sessionId}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${Math.floor(sessionTtlMs / 1000)}`,
+          "Set-Cookie": buildSessionCookie({
+            name: sessionCookieName,
+            value: sessionId,
+            maxAgeSeconds: Math.floor(sessionTtlMs / 1000),
+            secure: sessionCookieSecure,
+          }),
           Location: "/",
         });
         response.end();
@@ -329,6 +335,22 @@ function isValidSignature({ payload, signature, secret }) {
   const expected = Buffer.from(createHmac("sha256", secret).update(payload).digest("base64url"));
   const received = Buffer.from(signature);
   return expected.length === received.length && timingSafeEqual(expected, received);
+}
+
+/**
+ * Builds the application session cookie header.
+ * @param {{name: string, value: string, maxAgeSeconds: number, secure: boolean}} input
+ * @returns {string}
+ */
+function buildSessionCookie({ name, value, maxAgeSeconds, secure }) {
+  return [
+    `${name}=${value}`,
+    "HttpOnly",
+    "SameSite=Lax",
+    "Path=/",
+    `Max-Age=${maxAgeSeconds}`,
+    secure ? "Secure" : "",
+  ].filter(Boolean).join("; ");
 }
 
 /**

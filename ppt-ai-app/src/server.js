@@ -71,6 +71,7 @@ const app = createApp({
   internalToken: config.moling.internalToken,
   sessionCookieName: config.auth.sessionCookieName,
   sessionTtlMs: config.auth.sessionTtlMs,
+  sessionCookieSecure: config.auth.sessionCookieSecure,
 });
 
 app.listen(config.app.port, "0.0.0.0", () => {
