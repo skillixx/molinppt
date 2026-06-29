@@ -98,17 +98,19 @@ Generates a full deck from an outline. The backend checks balance, reserves cred
 
 When AI generation fails after a task is created, the public error `details` includes `task_id` and `retryable` so the workspace can call the retry API without exposing internal provider or Moling details.
 
+If AI generation succeeds but billing settlement is pending, the deck is stored with `billing_pending` status and user-facing deck operations return `DECK_BILLING_PENDING` until reconciliation marks it `ready`.
+
 ### `GET /api/ppt/decks/{deck_id}/preview`
 
-Returns an owner-checked HTML preview of generated slides.
+Returns an owner-checked HTML preview of generated slides. Decks in `billing_pending` state are blocked.
 
 ### `POST /api/ppt/decks/{deck_id}/exports`
 
-Exports a generated deck to `pptx` or `pdf` and stores the generated file.
+Exports a generated deck to `pptx` or `pdf` and stores the generated file. Decks in `billing_pending` state are blocked.
 
 ### `POST /api/ppt/decks/{deck_id}/slides/{slide_id}/regenerate`
 
-Regenerates one slide using an instruction and consumes known-cost credits.
+Regenerates one slide using an instruction and consumes known-cost credits. Decks in `billing_pending` state are blocked.
 
 ### `POST /api/ppt/tasks/{task_id}/retry`
 

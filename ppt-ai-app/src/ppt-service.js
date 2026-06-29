@@ -229,6 +229,7 @@ export class PptService {
    */
   async regenerateSlide({ ownerUserId, deckId, slideId, instruction, entitlementId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
+    assertDeckReady(deck);
     const slide = deck.slides.find((item) => item.id === slideId);
     if (!slide) throw new AppError({ code: "SLIDE_NOT_FOUND", status: 404, message: "Slide not found" });
     const reserveKey = `${deckId}:${slideId}:ppt_slide_regenerate:reserve`;
@@ -270,6 +271,7 @@ export class PptService {
    */
   async previewDeck({ ownerUserId, deckId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
+    assertDeckReady(deck);
     return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title></head><body>${deck.slides.map((slide) => `<section><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></section>`).join("")}</body></html>`;
   }
 
@@ -280,6 +282,7 @@ export class PptService {
    */
   async exportDeck({ ownerUserId, deckId, format }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
+    assertDeckReady(deck);
     const exportPayload = this.exporter.exportDeck({ deck, format });
     const file = await this.storage.upload({
       ownerUserId,
@@ -398,6 +401,22 @@ function validateTemplateTheme({ template, theme }) {
       code: "THEME_NOT_SUPPORTED",
       status: 400,
       message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
+    });
+  }
+}
+
+/**
+ * Blocks user-facing deck operations until billing has settled.
+ * @param {object} deck
+ * @returns {void}
+ */
+function assertDeckReady(deck) {
+  if (deck.status !== "ready") {
+    throw new AppError({
+      code: "DECK_BILLING_PENDING",
+      status: 409,
+      message: "Deck billing settlement is pending",
+      publicDetails: { deck_id: deck.id, status: deck.status },
     });
   }
 }

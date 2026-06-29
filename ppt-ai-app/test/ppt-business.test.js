@@ -154,6 +154,51 @@ test("PptService marks successful generation for reconciliation when settle fail
   assert.deepEqual(events.map((event) => event.status), ["reserved", "settle_pending"]);
 });
 
+test("PptService blocks deck usage while billing settlement is pending", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        throw new Error("settle unavailable");
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Locked deck",
+    slideCount: 2,
+    templateId: "business",
+  });
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    { code: "BILLING_RECONCILIATION_PENDING" },
+  );
+  const [deck] = await context.database.find("decks");
+
+  await assert.rejects(
+    () => context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id }),
+    { code: "DECK_BILLING_PENDING" },
+  );
+  await assert.rejects(
+    () => context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pptx" }),
+    { code: "DECK_BILLING_PENDING" },
+  );
+  await assert.rejects(
+    () => context.pptService.regenerateSlide({
+      ownerUserId: 7,
+      deckId: deck.id,
+      slideId: deck.slides[0].id,
+      instruction: "change",
+      entitlementId: 88,
+    }),
+    { code: "DECK_BILLING_PENDING" },
+  );
+});
+
 test("PptService reconciles pending settle events", async () => {
   const context = await createBusinessContext({
     billingOverrides: {

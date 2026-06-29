@@ -36,4 +36,4 @@
 - If login fails, user returns to Moling.
 - If credits are insufficient, user is prompted to buy credits.
 - If generation fails after reserve, credits are released.
-- If billing reconciliation is pending, generated output remains in a controlled state until resolved.
+- If billing reconciliation is pending, generated output remains locked: preview, export, and slide regeneration are blocked until settlement succeeds.
