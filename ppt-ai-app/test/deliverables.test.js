@@ -24,11 +24,22 @@ test("second-stage deployment and documentation deliverables exist", async () =>
     new URL("src/prompt-manager.js", appRoot),
     new URL("src/ppt-exporter.js", appRoot),
     new URL("src/ppt-service.js", appRoot),
+    new URL("scripts/moling-acceptance.js", appRoot),
   ];
 
   for (const filePath of requiredFiles) {
     await access(filePath);
   }
+});
+
+test("production Moling acceptance command is documented and ticket-gated", async () => {
+  const packageJson = JSON.parse(await readFile(new URL("package.json", appRoot), "utf8"));
+  const script = await readFile(new URL("scripts/moling-acceptance.js", appRoot), "utf8");
+
+  assert.equal(packageJson.scripts["acceptance:moling"], "node scripts/moling-acceptance.js");
+  assert.match(script, /ACCEPTANCE_LAUNCH_TICKET/);
+  assert.match(script, /\/api\/billing\/balance/);
+  assert.match(script, /\/api\/ppt\/decks/);
 });
 
 test("environment examples keep sensitive values empty", async () => {

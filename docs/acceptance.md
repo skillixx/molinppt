@@ -28,3 +28,22 @@ Later implementation phases must prove:
 - exported PPTX/PDF files are downloadable by the owner only.
 - logs, metrics, and reconciliation alerts are available.
 - access control prevents cross-user data access.
+
+## Third-Stage Acceptance Commands
+
+Local deterministic acceptance uses the in-process Moling mock:
+
+```bash
+npm run acceptance
+```
+
+Real Moling acceptance requires a one-time launch ticket from the platform:
+
+```bash
+ACCEPTANCE_BASE_URL=http://127.0.0.1:5177 \
+ACCEPTANCE_LAUNCH_TICKET=<real_launch_ticket> \
+ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
+npm run acceptance:moling
+```
+
+The real command is the acceptance evidence for platform login, entitlement resolution, balance lookup, reserve/settle billing, slide regeneration consumption, generated file ownership, and call-log persistence. Local mock success is necessary for regression coverage but is not sufficient to claim full Moling联调完成.

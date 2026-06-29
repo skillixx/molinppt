@@ -9,6 +9,7 @@ npm test
 npm run migrate
 npm start
 npm run acceptance
+npm run acceptance:moling
 ```
 
 ## Environment
@@ -28,6 +29,8 @@ Moling launch and billing configuration:
 - `APP_PORT` or compatibility alias `PORT`
 
 Local acceptance can run with `LOCAL_MOLING_MOCK=true`, `LOCAL_MOLING_USER_ID`, and `LOCAL_MOLING_ENTITLEMENT_ID`.
+
+Real Moling acceptance requires `ACCEPTANCE_LAUNCH_TICKET` from the platform entry flow and can optionally pass `ACCEPTANCE_ENTITLEMENT_ID`.
 
 ## Foundation Modules
 

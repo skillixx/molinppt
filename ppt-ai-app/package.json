@@ -7,7 +7,8 @@
     "start": "node src/server.js",
     "test": "node --test",
     "migrate": "node scripts/migrate.js",
-    "acceptance": "node scripts/acceptance.js"
+    "acceptance": "node scripts/acceptance.js",
+    "acceptance:moling": "node scripts/moling-acceptance.js"
   },
   "engines": {
     "node": ">=20"

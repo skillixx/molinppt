@@ -57,6 +57,17 @@ For HTTP AI provider deployment, set:
 
 For local pre-production smoke tests without external Moling credentials, set `LOCAL_MOLING_MOCK=true` plus local user and entitlement IDs, then run `npm run acceptance`.
 
+For real Moling platform acceptance, start the app with production-like Moling variables and pass a one-time launch ticket from the Moling entry flow:
+
+```bash
+ACCEPTANCE_BASE_URL=http://127.0.0.1:5177 \
+ACCEPTANCE_LAUNCH_TICKET=<real_launch_ticket> \
+ACCEPTANCE_ENTITLEMENT_ID=<optional_entitlement_id> \
+npm run acceptance:moling
+```
+
+The real acceptance script exercises SSO launch, template catalog, balance lookup, outline generation, outline editing, deck generation, single-slide regeneration, preview, PPTX/PDF export, and call-log checks against the configured Moling APIs.
+
 ## Release Strategy
 
 - Build immutable container images.

@@ -1,5 +1,8 @@
 import { AppError } from "./errors.js";
 
+/**
+ * Built-in template catalog used when no external catalog is configured.
+ */
 export const DEFAULT_TEMPLATES = [
   {
     id: "business",
