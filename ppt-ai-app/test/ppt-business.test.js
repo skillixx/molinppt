@@ -984,7 +984,7 @@ test("PptService assigns dome layout roles from outline structure when provider 
     { title: "三步骤流程", bullets: ["调研", "规划", "落地"] },
     { title: "四步骤流程", bullets: ["目标拆解", "资源配置", "执行跟踪", "复盘优化"] },
     { title: "数据指标", bullets: ["收入增长", "留存提升", "交付提速"] },
-    { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"] },
+    { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], sectionLabel: "PART 02" },
     { title: "问题复盘", bullets: ["风险信号", "原因分析", "改进措施"] },
     { title: "下一步计划", bullets: ["季度路线", "关键动作", "负责人复盘"] },
     { title: "汇报结束", bullets: ["感谢观看"] },
@@ -1029,6 +1029,7 @@ test("PptService assigns dome layout roles from outline structure when provider 
     "next-plan",
     "closing",
   ]);
+  assert.equal(result.deck.slides[7].sectionLabel, "PART 02");
 });
 
 test("PromptManager includes dome placeholder instructions for red-gold deck generation", () => {

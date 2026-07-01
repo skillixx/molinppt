@@ -1130,6 +1130,9 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
     if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
       throwSlideSchemaError(`slide ${index + 1} must be an object`);
     }
+    const outlineSlide = outlineSlides[index] || {};
+    const mergedSlide = { ...outlineSlide, ...slide };
+    const structuredMetadata = preserveStructuredSlideMetadata({ outlineSlide, generatedSlide: slide });
     const title = typeof slide.title === "string" ? slide.title.trim() : "";
     if (!title) {
       throwSlideSchemaError(`slide ${index + 1} title must be a non-empty string`);
@@ -1139,12 +1142,13 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
     }
     return {
       ...slide,
+      ...structuredMetadata,
       id: normalizeSlideId(slide.id, index),
       sortOrder: normalizeSortOrder(slide.sortOrder, index),
       title,
       bullets: slide.bullets,
       speakerNotes: typeof slide.speakerNotes === "string" ? slide.speakerNotes : "",
-      layout: normalizeSlideLayout({ layout: slide.layout, template, index, total: outlineSlides.length, slide }),
+      layout: normalizeSlideLayout({ layout: slide.layout || outlineSlide.layout, template, index, total: outlineSlides.length, slide: mergedSlide }),
       theme: normalizeSlideText(slide.theme, outline.theme || "modern"),
     };
   });
@@ -1160,6 +1164,7 @@ function buildFallbackSlides({ outline, template }) {
   return outlineSlides.map((slide, index) => {
     const title = normalizeSlideText(slide?.title, `Slide ${index + 1}`);
     return {
+      ...preserveStructuredSlideMetadata({ outlineSlide: slide, generatedSlide: {} }),
       id: `slide_${index + 1}`,
       sortOrder: index + 1,
       title,
@@ -1170,6 +1175,27 @@ function buildFallbackSlides({ outline, template }) {
       fallback: true,
     };
   });
+}
+
+/**
+ * 保留 outline 中会驱动模板占位符的结构化字段。
+ * 只复制明确用于 dome 章节标签的字段，避免把 outline 的内部状态无意写入最终 deck。
+ * @param {{outlineSlide: object, generatedSlide: object}} input
+ * @returns {object}
+ */
+function preserveStructuredSlideMetadata({ outlineSlide, generatedSlide }) {
+  const metadata = {};
+  if (typeof generatedSlide?.sectionLabel === "string" && generatedSlide.sectionLabel.trim()) {
+    metadata.sectionLabel = generatedSlide.sectionLabel.trim();
+  } else if (typeof outlineSlide?.sectionLabel === "string" && outlineSlide.sectionLabel.trim()) {
+    metadata.sectionLabel = outlineSlide.sectionLabel.trim();
+  }
+  if (typeof generatedSlide?.section === "string" && generatedSlide.section.trim()) {
+    metadata.section = generatedSlide.section.trim();
+  } else if (typeof outlineSlide?.section === "string" && outlineSlide.section.trim()) {
+    metadata.section = outlineSlide.section.trim();
+  }
+  return metadata;
 }
 
 /**
