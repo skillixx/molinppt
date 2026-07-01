@@ -1788,12 +1788,22 @@ test("HTTP API generates a new deck from an existing outline with the currently 
 test("HTTP API lists template categories and merges official active templates with owner templates", async () => {
   const context = await createBusinessContext();
   await context.database.insert("template_categories", { id: "custom", name: "Custom", sortOrder: 20 });
+  const officialThumbnail = await context.storage.upload({
+    ownerUserId: 0,
+    fileName: "official-custom-thumbnail.png",
+    mimeType: "image/png",
+    content: Buffer.from("official-thumbnail"),
+    fileRole: "official_template_thumbnail",
+    visibility: "official",
+    templateSlug: "official-custom",
+  });
   await context.database.insert("templates", {
     id: "official-custom",
     name: "Official Custom",
     categoryId: "custom",
     scope: "official",
     status: "active",
+    thumbnailFileId: officialThumbnail.id,
     themes: [{ id: "clean", name: "Clean" }],
   });
   await context.database.insert("templates", {
@@ -1847,7 +1857,13 @@ test("HTTP API lists template categories and merges official active templates wi
     assert.equal(templatesResponse.status, 200);
     assert.deepEqual(templates.templates.map((template) => template.id), ["official-custom", "my-custom"]);
     assert.equal(templates.templates[0].category.id, "custom");
+    assert.equal(templates.templates[0].thumbnailUrl, "/api/templates/official-custom/thumbnail");
     assert.equal(templates.templates[1].scope, "user");
+
+    const thumbnailResponse = await fetch(`${baseUrl}${templates.templates[0].thumbnailUrl}`, { headers: { cookie } });
+    assert.equal(thumbnailResponse.status, 200);
+    assert.equal(thumbnailResponse.headers.get("content-type"), "image/png");
+    assert.equal(await thumbnailResponse.text(), "official-thumbnail");
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }

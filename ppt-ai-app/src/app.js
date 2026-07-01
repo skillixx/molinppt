@@ -137,17 +137,30 @@ export function createApp(dependencies) {
       }
 
       if (request.method === "GET" && url.pathname === "/api/templates") {
+        const templates = dependencies.templateManager.listTemplates({
+          ownerUserId,
+          categoryId: url.searchParams.get("category_id") || undefined,
+        });
         sendJson(response, {
-          templates: dependencies.templateManager.listTemplates({
-            ownerUserId,
-            categoryId: url.searchParams.get("category_id") || undefined,
-          }),
+          templates: templates.map(withTemplateThumbnailUrl),
         });
         return;
       }
 
       if (request.method === "GET" && url.pathname === "/api/template-categories") {
         sendJson(response, { categories: dependencies.templateManager.listCategories() });
+        return;
+      }
+
+      if (request.method === "GET" && url.pathname.match(/^\/api\/templates\/[^/]+\/thumbnail$/)) {
+        const templateId = decodeURIComponent(url.pathname.split("/")[3]);
+        const downloaded = await downloadTemplateThumbnail({
+          templateManager: dependencies.templateManager,
+          storage: dependencies.storage,
+          ownerUserId,
+          templateId,
+        });
+        sendInlineFile(response, downloaded);
         return;
       }
 
@@ -484,6 +497,47 @@ async function sendFileDownload({ response, database, ownerUserId, downloaded })
     "Cache-Control": "no-store",
   });
   response.end(downloaded.content);
+}
+
+/**
+ * Sends an inline image/file response for UI assets such as template thumbnails.
+ * @param {import("node:http").ServerResponse} response
+ * @param {{file: object, content: Buffer}} downloaded
+ * @returns {void}
+ */
+function sendInlineFile(response, downloaded) {
+  response.writeHead(200, {
+    "Content-Type": downloaded.file.mimeType,
+    "Content-Disposition": `inline; filename="${headerSafeFileName(downloaded.file.fileName)}"`,
+    "Cache-Control": "private, max-age=300",
+  });
+  response.end(downloaded.content);
+}
+
+/**
+ * Adds the authenticated thumbnail endpoint to template API records.
+ * @param {object} template
+ * @returns {object}
+ */
+function withTemplateThumbnailUrl(template) {
+  if (!template.thumbnailFileId) return template;
+  return {
+    ...template,
+    thumbnailUrl: `/api/templates/${encodeURIComponent(template.id)}/thumbnail`,
+  };
+}
+
+/**
+ * Downloads a template thumbnail after confirming the current user can see that template.
+ * 官方模板文件归属系统用户 0，个人模板仍按当前用户校验，避免用户越权读取他人模板缩略图。
+ * @param {{templateManager: object, storage: object, ownerUserId: number, templateId: string}} input
+ * @returns {Promise<{file: object, content: Buffer}>}
+ */
+async function downloadTemplateThumbnail({ templateManager, storage, ownerUserId, templateId }) {
+  const template = templateManager.getTemplate(templateId, { ownerUserId });
+  if (!template.thumbnailFileId) throw new AppError({ code: "TEMPLATE_THUMBNAIL_NOT_FOUND", status: 404, message: "Template thumbnail not found" });
+  const fileOwnerUserId = template.scope === "official" ? 0 : ownerUserId;
+  return storage.download({ fileId: template.thumbnailFileId, ownerUserId: fileOwnerUserId });
 }
 
 /**
@@ -1002,6 +1056,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 7px; border: 1px solid rgba(23,32,51,.10);
       background: var(--thumb-bg); color: var(--thumb-body);
     }
+    .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
+    .template-thumb[data-has-thumbnail="true"]::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(15,23,42,.10)); }
+    .template-thumb[data-has-thumbnail="true"]::after,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-band,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-content,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-accent { display: none; }
     .template-thumb::before { content: ""; position: absolute; inset: 0; background:
       linear-gradient(135deg, rgba(255,255,255,.70), rgba(255,255,255,.18)),
       repeating-linear-gradient(90deg, rgba(15,23,42,.035) 0 1px, transparent 1px 24px),
@@ -1563,11 +1623,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const displayTheme = (template.id === selectedId && selectedTheme) || themes[0] || { id: "modern", name: "Modern" };
       const categoryName = template.category?.name || template.category || "未分类";
       const hasDomeAsset = visual.layout === "red-gold";
-      const style = "--thumb-primary:#" + visual.primary + ";--thumb-accent:#" + visual.accent + ";--thumb-bg:#" + visual.background + ";--thumb-surface:#" + visual.surface + ";--thumb-title:#" + visual.title + ";--thumb-body:#" + visual.body + ";";
+      const thumbnailUrl = template.thumbnailUrl ? "url('" + cssUrl(template.thumbnailUrl) + "')" : "";
+      const style = "--thumb-primary:#" + visual.primary + ";--thumb-accent:#" + visual.accent + ";--thumb-bg:#" + visual.background + ";--thumb-surface:#" + visual.surface + ";--thumb-title:#" + visual.title + ";--thumb-body:#" + visual.body + ";" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
       return ''
         + '<button type="button" class="template-card" data-template-card="' + escapeHtml(template.id) + '" aria-selected="' + (template.id === selectedId ? 'true' : 'false') + '">'
         + '<span class="template-card-head"><span class="template-card-title">' + escapeHtml(template.name) + '</span><span class="template-card-scope">' + (template.scope === "user" ? '个人' : '官方') + '</span></span>'
-        + '<span class="template-thumb" data-layout="' + escapeHtml(visual.layout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" style="' + style + '">'
+        + '<span class="template-thumb" data-layout="' + escapeHtml(visual.layout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
         + '<span class="template-thumb-band"></span><span class="template-thumb-content"><span class="template-thumb-title"></span><span class="template-thumb-line"></span><span class="template-thumb-line"></span></span><span class="template-thumb-accent"></span>'
         + '</span>'
         + '<span class="template-card-meta"><span>' + escapeHtml(categoryName) + '</span><span>' + escapeHtml(displayTheme.name || displayTheme.id || displayTheme) + '</span></span>'
@@ -1593,6 +1654,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     function normalizeHexColor(value, fallback) {
       const normalized = String(value || "").replace(/^#/, "").trim().toUpperCase();
       return /^[0-9A-F]{6}$/.test(normalized) ? normalized : fallback;
+    }
+    function cssUrl(value) {
+      return String(value || "").replaceAll("\\\\", "\\\\\\\\").replaceAll("'", "\\\\'");
     }
     async function loadTemplateCategories() {
       try {
