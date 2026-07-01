@@ -772,6 +772,54 @@ test("PptService preserves slide identity when regenerated slide omits ids", asy
   assert.equal(regenerated.deck.slides[0].id, "slide_1");
 });
 
+test("PptService preserves dome layout metadata during slide regeneration", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async ({ instruction }) => ({
+    title: "成果展示 regenerated",
+    bullets: [instruction, "客户反馈", "团队荣誉"],
+    layout: "unknown-layout",
+    sectionLabel: "",
+  });
+  const context = await createBusinessContext({ aiProvider });
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "outline-dome-regenerate",
+    title: "Dome regenerate",
+    templateId: "business",
+    templateName: "Executive Business",
+    templateVisual: {
+      primary: "B80F1A",
+      accent: "F6D48A",
+      background: "8F0613",
+      surface: "FFF8E6",
+      title: "7A0611",
+      body: "3C1F1F",
+      layout: "red-gold",
+    },
+    theme: "modern",
+    status: "ready",
+    slides: [{
+      id: "slide_1",
+      sortOrder: 1,
+      title: "成果展示",
+      bullets: ["项目成果", "客户反馈", "团队荣誉"],
+      layout: "showcase",
+      sectionLabel: "PART 02",
+    }],
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deck.id,
+    slideId: "slide_1",
+    instruction: "强化成果表达",
+    entitlementId: 88,
+  });
+
+  assert.equal(regenerated.slide.layout, "showcase");
+  assert.equal(regenerated.slide.sectionLabel, "PART 02");
+});
+
 test("PptService generates outline from uploaded document content", async () => {
   const context = await createBusinessContext();
   const sourceFile = await context.storage.upload({

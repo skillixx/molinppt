@@ -1332,13 +1332,18 @@ function resolveSlide(slides, requestedSlideId) {
 
 /**
  * Keeps persisted slide identity stable after AI regeneration.
+ * 单页重生成只替换内容，不允许模型返回值破坏 dome 模板的版式角色和章节占位字段。
  * @param {{original: object, regenerated: object}} input
  * @returns {object}
  */
 function normalizeRegeneratedSlide({ original, regenerated }) {
+  const structuredMetadata = preserveStructuredSlideMetadata({ outlineSlide: original, generatedSlide: {} });
+  const stableLayout = typeof original?.layout === "string" && original.layout.trim() ? { layout: original.layout } : {};
   return {
     ...original,
     ...(regenerated && typeof regenerated === "object" ? regenerated : {}),
+    ...structuredMetadata,
+    ...stableLayout,
     id: original.id,
     sortOrder: original.sortOrder,
   };
