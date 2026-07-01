@@ -892,6 +892,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-agenda-number{font-size:20px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-agenda-text{font-size:20px;line-height:1.2;overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:#ffe8b0;font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(60,0,0,.24);}
+    body[data-layout="red-gold"] .dome-section-divider-line{left:37.5%;right:37.5%;top:53.5%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(60,0,0,.20);}
     body[data-layout="red-gold"] .dome-section-label{left:12%;top:13%;color:var(--template-accent);font-size:12px;font-weight:800;letter-spacing:0;}
     body[data-layout="red-gold"] .dome-step-connector{left:14%;right:14%;bottom:36%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(82,5,12,.14);z-index:2;}
     body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
@@ -998,7 +999,8 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
   if (role === "section-divider") {
-    return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide, index))}</div>`;
+    // 章节分隔页同步 PPTX 里的 Dome Section Divider Line，让预览也保留章节编号下方的金色分割线层级。
+    return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide, index))}</div><div class="dome-role-decor dome-section-divider-line"></div>`;
   }
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
