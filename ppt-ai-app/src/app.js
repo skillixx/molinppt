@@ -1,9 +1,12 @@
 import { createServer } from "node:http";
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { readFileSync } from "node:fs";
 
 import { AppError, normalizeError } from "./errors.js";
 import { MetricsRegistry } from "./metrics.js";
 
+// 工作台模板卡片直接复用 dome.pptx 提取出的封面图，让用户选模板时看到真实帆船红金视觉。
+const DOME_TEMPLATE_THUMBNAIL = readFileSync(new URL("../../templates/official/dome/assets/dome-cover.jpg", import.meta.url)).toString("base64");
 const MAX_JSON_BODY_BYTES = 1024 * 1024;
 const MAX_TEMPLATE_UPLOAD_JSON_BODY_BYTES = 30 * 1024 * 1024;
 const DEFAULT_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -900,6 +903,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       --warning: #b45309;
       --success: #15803d;
       --shadow: 0 18px 46px rgba(23, 32, 51, .08);
+      --dome-template-thumb:url("data:image/jpeg;base64,${DOME_TEMPLATE_THUMBNAIL}");
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
@@ -1022,12 +1026,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="venture"] .template-thumb-content { left: 13%; right: 14%; top: 29%; }
     .template-thumb[data-layout="venture"] .template-thumb-accent { display: none; }
     .template-thumb[data-layout="red-gold"] { background: var(--thumb-primary); }
+    .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"] { background-image: var(--dome-template-thumb), linear-gradient(135deg, var(--thumb-primary), #7d0610); background-size: cover; background-position: center; }
     .template-thumb[data-layout="red-gold"]::before {
       background:
         repeating-linear-gradient(115deg, rgba(255,232,176,.10) 0 1px, transparent 1px 24px),
         linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 96%, #000000 4%), color-mix(in srgb, var(--thumb-primary) 78%, #f97316 22%));
     }
+    .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"]::before { background: linear-gradient(90deg, rgba(111,4,13,.14), rgba(111,4,13,.02) 48%, rgba(255,232,176,.10)); }
     .template-thumb[data-layout="red-gold"]::after { inset: 18% 12% 25% 12%; background: rgba(255,248,230,.94); border-color: rgba(246,212,138,.50); box-shadow: 0 18px 30px rgba(82,5,12,.22); }
+    .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"]::after { display:none; }
     .template-thumb[data-layout="red-gold"] .template-thumb-band { inset: auto 0 0 0; width: auto; height: 28%; background: linear-gradient(135deg, rgba(255,248,204,.94), color-mix(in srgb, var(--thumb-accent) 82%, #ffffff 18%) 36%, rgba(184,15,26,.25) 37%, color-mix(in srgb, var(--thumb-primary) 80%, #3f0308 20%)); clip-path: polygon(0 64%, 15% 48%, 29% 58%, 45% 34%, 61% 53%, 76% 31%, 100% 44%, 100% 100%, 0 100%); }
     .template-thumb[data-layout="red-gold"] .template-thumb-content { left: 19%; right: 24%; top: 34%; }
     .template-thumb[data-layout="red-gold"] .template-thumb-title { background: var(--thumb-title); }
@@ -1555,11 +1562,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const selectedTheme = themes.find((theme) => (theme.id || theme) === selectedThemeId);
       const displayTheme = (template.id === selectedId && selectedTheme) || themes[0] || { id: "modern", name: "Modern" };
       const categoryName = template.category?.name || template.category || "未分类";
+      const hasDomeAsset = visual.layout === "red-gold";
       const style = "--thumb-primary:#" + visual.primary + ";--thumb-accent:#" + visual.accent + ";--thumb-bg:#" + visual.background + ";--thumb-surface:#" + visual.surface + ";--thumb-title:#" + visual.title + ";--thumb-body:#" + visual.body + ";";
       return ''
         + '<button type="button" class="template-card" data-template-card="' + escapeHtml(template.id) + '" aria-selected="' + (template.id === selectedId ? 'true' : 'false') + '">'
         + '<span class="template-card-head"><span class="template-card-title">' + escapeHtml(template.name) + '</span><span class="template-card-scope">' + (template.scope === "user" ? '个人' : '官方') + '</span></span>'
-        + '<span class="template-thumb" data-layout="' + escapeHtml(visual.layout) + '" style="' + style + '">'
+        + '<span class="template-thumb" data-layout="' + escapeHtml(visual.layout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" style="' + style + '">'
         + '<span class="template-thumb-band"></span><span class="template-thumb-content"><span class="template-thumb-title"></span><span class="template-thumb-line"></span><span class="template-thumb-line"></span></span><span class="template-thumb-accent"></span>'
         + '</span>'
         + '<span class="template-card-meta"><span>' + escapeHtml(categoryName) + '</span><span>' + escapeHtml(displayTheme.name || displayTheme.id || displayTheme) + '</span></span>'

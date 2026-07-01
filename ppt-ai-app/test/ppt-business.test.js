@@ -2129,6 +2129,8 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /模板内容样式预览/);
     assert.match(html, /class="template-card"/);
     assert.match(html, /class="template-thumb"/);
+    assert.match(html, /--dome-template-thumb:url\("data:image\/jpeg;base64,/);
+    assert.match(html, /data-has-dome-asset="true"/);
     assert.match(html, /data-template-card/);
     assert.match(html, /renderTemplateGallery/);
     assert.match(html, /selectTemplateCard/);
