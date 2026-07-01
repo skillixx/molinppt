@@ -1106,6 +1106,8 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
     "closing",
   ]);
   assert.match(prompt.templateInstructions?.contentContract || "", /把 bullets 填入对应占位符/);
+  assert.match(prompt.templateInstructions?.roleHints?.cover || "", /必须使用副标题占位/);
+  assert.match(prompt.templateInstructions?.roleHints?.["section-divider"] || "", /必须是 PART 编号/);
   assert.match(prompt.templateInstructions?.contentContract || "", /指标名: 指标值/);
   assert.match(prompt.templateInstructions?.contentContract || "", /阶段: 动作/);
   assert.match(prompt.templateInstructions?.contentContract || "", /风险、原因、措施/);
@@ -1117,6 +1119,7 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
   assert.match(prompt.templateInstructions?.roleHints?.metrics || "", /指标名: 指标值/);
   assert.match(prompt.templateInstructions?.roleHints?.retrospective || "", /风险、原因、措施/);
   assert.match(prompt.templateInstructions?.roleHints?.["next-plan"] || "", /阶段: 动作/);
+  assert.match(prompt.templateInstructions?.roleHints?.closing || "", /必须使用结束页副标题占位/);
   assert.match(prompt.templateInstructions?.contentContract || "", /不要生成普通项目符号列表/);
 });
 

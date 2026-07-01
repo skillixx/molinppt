@@ -78,9 +78,9 @@ function buildTemplateInstructions(template) {
     layoutRoles: DOME_LAYOUT_ROLES,
     contentContract: "按 outline 页序或标题选择 layout；把 bullets 填入对应占位符；目录固定 4 项，流程/成果/复盘/计划按模板卡片槽位填充；指标页 bullets 必须使用“指标名: 指标值”格式；问题复盘页 bullets 必须按风险、原因、措施顺序输出；下一步计划页 bullets 必须使用“阶段: 动作”格式；封面和结束页使用副标题占位；不要生成普通项目符号列表。",
     roleHints: {
-      cover: "封面页：title 是主标题，bullets[0] 是封面副标题。",
+      cover: "封面页：title 是主标题，bullets[0] 必须使用副标题占位。",
       agenda: "目录页：必须 4 项 bullets 填入 4 个目录卡片，保持卡片式目录完整。",
-      "section-divider": "章节分隔页：bullets[0] 是 PART 编号。",
+      "section-divider": "章节分隔页：bullets[0] 必须是 PART 编号，例如“PART 01”。",
       "image-report": "工作汇报图文页：必须 3 条 bullets 填入图文汇报卡片，保持三张图文卡片完整。",
       "three-steps": "三步骤流程页：必须 3 条 bullets 填入流程卡片，保持三个步骤槽位完整。",
       "four-steps": "四步骤流程页：必须 4 条 bullets 填入流程卡片，保持四个步骤槽位完整。",
@@ -88,7 +88,7 @@ function buildTemplateInstructions(template) {
       showcase: "成果展示页：必须 3 条 bullets 填入成果卡片，保持三张成果卡片完整。",
       retrospective: "问题复盘页：3 条 bullets 必须按风险、原因、措施顺序填入复盘卡片，第一条同时作为风险高亮。",
       "next-plan": "下一步计划页：4 条 bullets 填入计划时间线卡片；每条必须写成“阶段: 动作”，例如“Q1: Launch pilot”。",
-      closing: "结束页：bullets[0] 是结束页副标题。",
+      closing: "结束页：bullets[0] 必须使用结束页副标题占位。",
     },
   };
 }
