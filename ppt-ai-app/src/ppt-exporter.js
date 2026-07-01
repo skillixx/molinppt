@@ -431,6 +431,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
     const count = role === "three-steps" ? 3 : 4;
     const bulletItems = normalizeDomeBulletItems(slide, count);
+    const sectionLabel = textShapeXml({ id: 80, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
     const steps = Array.from({ length: count }, (_, stepIndex) => {
       const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
       const y = 2895600;
@@ -448,12 +449,14 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       ? pictureXml({ id: 71, name: "Dome Next Plan Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
     return role === "next-plan"
-      ? nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
-      : fourStepsImage + steps;
+      ? sectionLabel + nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
+      : sectionLabel + fourStepsImage + steps;
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeBulletItems(slide, 3);
-    return pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
+    // 指标页也保留右上章节标签，使所有内容页都有 dome.pptx 风格的章节定位。
+    return textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
+      + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       + Array.from({ length: 3 }, (_, metricIndex) => {
       const x = 1219200 + metricIndex * 2286000;
       return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" })

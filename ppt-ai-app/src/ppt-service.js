@@ -982,11 +982,11 @@ function renderDomePreviewDecoration(role, slide, index) {
     const count = role === "three-steps" ? 3 : 4;
     const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
     const visual = role === "four-steps" ? `<div class="dome-role-visual"></div>` : "";
-    return `${visual}<div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
   }
   if (role === "metrics") {
     const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-metric-card", index, bullets[index])).join("");
-    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase") {
     // 成果展示页使用三张固定卡片承载要点，预览结构和 PPTX 导出保持一致。
@@ -1005,7 +1005,7 @@ function renderDomePreviewDecoration(role, slide, index) {
   }
   if (role === "next-plan") {
     const cards = Array.from({ length: 4 }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
-    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
   }
   if (role === "closing") {
     // 结束页把用户输入作为模板副标题输出，避免破坏 THANKS 结束版式。
