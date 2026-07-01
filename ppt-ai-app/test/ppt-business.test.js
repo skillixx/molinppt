@@ -1107,7 +1107,9 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
   ]);
   assert.match(prompt.templateInstructions?.contentContract || "", /把 bullets 填入对应占位符/);
   assert.match(prompt.templateInstructions?.contentContract || "", /指标名: 指标值/);
+  assert.match(prompt.templateInstructions?.contentContract || "", /阶段: 动作/);
   assert.match(prompt.templateInstructions?.roleHints?.metrics || "", /指标名: 指标值/);
+  assert.match(prompt.templateInstructions?.roleHints?.["next-plan"] || "", /阶段: 动作/);
   assert.match(prompt.templateInstructions?.contentContract || "", /不要生成普通项目符号列表/);
 });
 
