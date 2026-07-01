@@ -893,6 +893,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-agenda-text{font-size:20px;line-height:1.2;overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:#ffe8b0;font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .dome-section-label{left:12%;top:13%;color:var(--template-accent);font-size:12px;font-weight:800;letter-spacing:0;}
+    body[data-layout="red-gold"] .dome-step-connector{left:14%;right:14%;bottom:36%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(82,5,12,.14);z-index:2;}
     body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
@@ -996,7 +997,7 @@ function renderDomePreviewDecoration(role, slide, index) {
     const count = role === "three-steps" ? 3 : 4;
     const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
     const visual = role === "four-steps" ? `<div class="dome-role-visual"></div>` : "";
-    return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-connector"></div><div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
   }
   if (role === "metrics") {
     const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-metric-card", index, bullets[index])).join("");

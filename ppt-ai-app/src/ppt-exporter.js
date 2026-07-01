@@ -441,6 +441,10 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
         + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title })
         + textShapeXml({ id: 50 + stepIndex, name: textName, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
+    // 三/四步骤流程页增加横向连接线，让独立卡片形成清晰的流程关系。
+    const stepConnector = role === "next-plan"
+      ? ""
+      : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: visual.accent });
     // 四步骤流程页复用 dome.pptx 的第 4 张商务图，避免提取出的业务视觉资产闲置。
     const fourStepsImage = role === "four-steps"
       ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
@@ -451,7 +455,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       : "";
     return role === "next-plan"
       ? sectionLabel + nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
-      : sectionLabel + fourStepsImage + steps;
+      : sectionLabel + fourStepsImage + stepConnector + steps;
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeBulletItems(slide, 3);
