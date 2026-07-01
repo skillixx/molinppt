@@ -1,0 +1,26 @@
+{
+  "themes": [
+    { "id": "city", "name": "City" },
+    { "id": "urban", "name": "Urban" }
+  ],
+  "visual": {
+    "primary": "1F3A5F",
+    "accent": "E0A33A",
+    "background": "EEF3F7",
+    "surface": "FFFFFF",
+    "title": "17263B",
+    "body": "3F4B5B",
+    "layout": "executive"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": ["executive-cover", "executive-content", "title", "content"]
+  },
+  "source": {
+    "repository": "https://github.com/burkeholland/powerpoints",
+    "commit": "6605ca2e496a778b41e75902642b33849baa7597",
+    "license": "MIT",
+    "file": "city-template.pptx"
+  }
+}

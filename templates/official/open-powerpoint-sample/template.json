@@ -1,0 +1,26 @@
+{
+  "themes": [
+    { "id": "journey", "name": "Journey" },
+    { "id": "sample", "name": "Sample" }
+  ],
+  "visual": {
+    "primary": "224A5E",
+    "accent": "D97941",
+    "background": "F4F0EA",
+    "surface": "FFFFFF",
+    "title": "182C36",
+    "body": "42515A",
+    "layout": "academy"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": ["academy-cover", "academy-content", "lesson-title", "lesson-content", "title", "content"]
+  },
+  "source": {
+    "repository": "https://github.com/Suparnapaul393/PowerPoint-Sample",
+    "commit": "edbd906f5d670703e5b82814e5ae2e60689b9612",
+    "license": "Apache-2.0",
+    "file": "Journey.pptx"
+  }
+}

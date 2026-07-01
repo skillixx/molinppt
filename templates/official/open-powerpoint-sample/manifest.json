@@ -1,0 +1,13 @@
+{
+  "slug": "open-powerpoint-sample",
+  "name": "Open PowerPoint Sample",
+  "description": "Apache-2.0 licensed PowerPoint sample imported from Suparnapaul393/PowerPoint-Sample for official template compatibility testing.",
+  "category_slug": "open-source-samples",
+  "category_name": "Open Source Samples",
+  "category_sort_order": 95,
+  "status": "active",
+  "tags": ["open-source", "apache-2.0", "sample"],
+  "source_file": "source.pptx",
+  "thumbnail_file": "thumbnail.png",
+  "template_file": "template.json"
+}

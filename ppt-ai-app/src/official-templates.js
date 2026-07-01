@@ -141,10 +141,13 @@ export async function syncOfficialTemplates({ rootDir, database, storage }) {
 async function findTemplateSlugs(rootDir) {
   if (!(await exists(rootDir))) return [];
   const entries = await readdir(rootDir, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
+  const slugs = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    // templates/official 下允许放共享素材目录；只有包含 manifest.json 的目录才参与官方模板同步。
+    if (await exists(path.join(rootDir, entry.name, MANIFEST_FILE))) slugs.push(entry.name);
+  }
+  return slugs.sort();
 }
 
 async function uploadOfficialFile({ storage, dir, slug, fileName, mimeType, fileRole }) {

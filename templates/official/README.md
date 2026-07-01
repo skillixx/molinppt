@@ -35,6 +35,7 @@ templates/official/
 规则：
 
 - `manifest.slug` 必须和目录名 `{slug}` 一致。
+- 只有包含 `manifest.json` 的一级子目录会被当作模板同步，纯素材目录会被跳过。
 - `status` 只能是 `active` 或 `disabled`。
 - `source_file` 只能引用当前目录下的 `.pptx` 文件。
 - `thumbnail_file` 只能引用当前目录下的 `.png` 文件。

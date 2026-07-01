@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 import { JsonFileDatabase } from "../src/database.js";
 import { LocalFileStorage } from "../src/files.js";
@@ -10,6 +11,7 @@ import { syncOfficialTemplateCategories, syncOfficialTemplates } from "../src/of
 import { TemplateManager } from "../src/templates.js";
 
 let tempDir;
+const repoOfficialTemplatesRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../templates/official");
 
 beforeEach(async () => {
   tempDir = await mkdtemp(path.join(os.tmpdir(), "ppt-official-templates-"));
@@ -172,6 +174,24 @@ test("syncOfficialTemplates rejects invalid manifests before writing database re
     { code: "OFFICIAL_TEMPLATE_MANIFEST_INVALID" },
   );
   assert.deepEqual(await context.database.find("templates"), []);
+});
+
+test("repository official templates include usable open-source samples", async () => {
+  const context = await createSyncContext();
+
+  const result = await syncOfficialTemplates({
+    rootDir: repoOfficialTemplatesRoot,
+    database: context.database,
+    storage: context.storage,
+  });
+  const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7, categoryId: "open-source-samples" });
+
+  assert.equal(result.active >= 2, true);
+  assert.deepEqual(visible.map((template) => template.id).sort(), ["open-city-template", "open-powerpoint-sample"]);
+  assert.equal(visible.every((template) => template.scope === "official"), true);
+  assert.equal(visible.every((template) => template.status === "active"), true);
+  assert.equal(visible.every((template) => template.sourceFileId), true);
+  assert.equal(visible.every((template) => template.thumbnailFileId), true);
 });
 
 async function createSyncContext() {
