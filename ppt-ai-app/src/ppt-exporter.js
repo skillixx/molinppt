@@ -250,7 +250,7 @@ function slideFiles(deck, visual) {
     const bodySize = layout.bodySize || 2200;
     const fontFace = visual.layout === "red-gold" ? DOME_TEXT_FONT : "";
     const bullets = (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}">${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("");
-    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: visual.layout === "red-gold" ? "dome-gold-gradient" : "" })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
     files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
@@ -737,12 +737,13 @@ function pictureXml({ id, name, relId, x, y, cx, cy }) {
 /**
  * 创建绝对定位文本框。
  * dome 相关文本框默认写入 Source Han Sans 字体声明，贴近原模板字形。
+ * 主标题可传入 dome-gold-gradient，复用 dome.pptx 的金色渐变文字。
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, text?: string, body?: string, size: number, bold: boolean, color?: string}} input
  * @returns {string}
  */
-function textShapeXml({ id, name, x, y, cx, cy, text, body, size, bold, color = "1F2937", fontFace = "" }) {
+function textShapeXml({ id, name, x, y, cx, cy, text, body, size, bold, color = "1F2937", fontFace = "", fillStyle = "" }) {
   const resolvedFontFace = fontFace || (String(name).startsWith("Dome") ? DOME_TEXT_FONT : "");
-  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr><p:txBody><a:bodyPr wrap="square" rtlCol="0"/><a:lstStyle/>${body || paragraphXml(text, size, bold, color, resolvedFontFace)}</p:txBody></p:sp>`;
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr><p:txBody><a:bodyPr wrap="square" rtlCol="0"/><a:lstStyle/>${body || paragraphXml(text, size, bold, color, resolvedFontFace, fillStyle)}</p:txBody></p:sp>`;
 }
 
 /**
@@ -753,8 +754,8 @@ function textShapeXml({ id, name, x, y, cx, cy, text, body, size, bold, color = 
  * @param {string} [color]
  * @returns {string}
  */
-function paragraphXml(value, size = 2200, bold = false, color = "1F2937", fontFace = "") {
-  return `<a:p><a:r><a:rPr lang="zh-CN" sz="${size}"${bold ? ' b="1"' : ""}>${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:rPr><a:t>${escapeXml(value)}</a:t></a:r></a:p>`;
+function paragraphXml(value, size = 2200, bold = false, color = "1F2937", fontFace = "", fillStyle = "") {
+  return `<a:p><a:r><a:rPr lang="zh-CN" sz="${size}"${bold ? ' b="1"' : ""}>${fontFaceXml(fontFace)}${textFillXml(color, fillStyle)}</a:rPr><a:t>${escapeXml(value)}</a:t></a:r></a:p>`;
 }
 
 /**
@@ -766,6 +767,20 @@ function fontFaceXml(fontFace) {
   if (!fontFace) return "";
   const escaped = escapeXml(fontFace);
   return `<a:latin typeface="${escaped}"/><a:ea typeface="${escaped}"/>`;
+}
+
+/**
+ * 生成文本 run 的填充效果。
+ * dome-gold-gradient 对齐 dome.pptx 中封面金色渐变字：FFF8CC -> FCD696，方向为 5400000。
+ * @param {string} color
+ * @param {string} fillStyle
+ * @returns {string}
+ */
+function textFillXml(color, fillStyle = "") {
+  if (fillStyle === "dome-gold-gradient") {
+    return `<a:gradFill><a:gsLst><a:gs pos="0"><a:srgbClr val="FFF8CC"/></a:gs><a:gs pos="100000"><a:srgbClr val="FCD696"/></a:gs></a:gsLst><a:lin ang="5400000" scaled="1"/></a:gradFill>`;
+  }
+  return `<a:solidFill><a:srgbClr val="${color}"/></a:solidFill>`;
 }
 
 /**
