@@ -1144,7 +1144,7 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
       title,
       bullets: slide.bullets,
       speakerNotes: typeof slide.speakerNotes === "string" ? slide.speakerNotes : "",
-      layout: normalizeSlideLayout({ layout: slide.layout, template, index }),
+      layout: normalizeSlideLayout({ layout: slide.layout, template, index, total: outlineSlides.length, slide }),
       theme: normalizeSlideText(slide.theme, outline.theme || "modern"),
     };
   });
@@ -1165,7 +1165,7 @@ function buildFallbackSlides({ outline, template }) {
       title,
       bullets: normalizeBulletList(slide?.bullets),
       speakerNotes: `Generated from confirmed outline: ${title}`,
-      layout: normalizeSlideLayout({ layout: "", template, index }),
+      layout: normalizeSlideLayout({ layout: "", template, index, total: outlineSlides.length, slide }),
       theme: outline.theme || "modern",
       fallback: true,
     };
@@ -1229,17 +1229,54 @@ function normalizeSlideText(value, fallback) {
 
 /**
  * Normalizes a slide layout against the selected template schema.
- * @param {{layout: unknown, template: object, index: number}} input
+ * dome 模板在 AI 未返回可用 layout 时，会根据 outline 结构自动推断页面角色，避免整份 deck 退化为同一种图文页。
+ * @param {{layout: unknown, template: object, index: number, total?: number, slide?: object}} input
  * @returns {string}
  */
-function normalizeSlideLayout({ layout, template, index }) {
+function normalizeSlideLayout({ layout, template, index, total = 0, slide = {} }) {
   const schema = template?.layoutSchema || {};
   const fallback = index === 0
     ? schema.defaultCoverLayout || "title"
     : schema.defaultContentLayout || "content";
-  const normalized = normalizeSlideText(layout, fallback);
+  const rawLayout = typeof layout === "string" ? layout.trim() : "";
+  if (!rawLayout && isDomeTemplate(template)) return inferDomeLayoutRole({ slide, index, total });
+  const normalized = rawLayout || fallback;
   const allowedLayouts = Array.isArray(schema.allowedLayouts) ? schema.allowedLayouts : [];
-  return allowedLayouts.length === 0 || allowedLayouts.includes(normalized) ? normalized : fallback;
+  if (allowedLayouts.length === 0 || allowedLayouts.includes(normalized)) return normalized;
+  if (isDomeTemplate(template)) return inferDomeLayoutRole({ slide, index, total });
+  return fallback;
+}
+
+/**
+ * 判断模板是否使用 dome.pptx 的 red-gold 版式体系。
+ * @param {object} template
+ * @returns {boolean}
+ */
+function isDomeTemplate(template) {
+  return template?.visual?.layout === "red-gold";
+}
+
+/**
+ * 根据已确认 outline 的页面结构推断 dome 版式角色。
+ * 这里和预览/导出的角色语义保持一致，让用户无需手写 layout 也能进入对应占位符。
+ * @param {{slide: object, index: number, total: number}} input
+ * @returns {string}
+ */
+function inferDomeLayoutRole({ slide, index, total }) {
+  const title = String(slide?.title || "");
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  if (index === 0) return "cover";
+  if (index === total - 1 && /结束|谢谢|感谢|thanks/i.test(title)) return "closing";
+  if (/目录|contents?/i.test(title)) return "agenda";
+  if (/part|章节|工作汇报|成果展示|问题不足|下步计划/i.test(title) && bullets.length <= 1) return "section-divider";
+  if (/指标|数据|kpi|metric/i.test(title)) return "metrics";
+  if (/成果|展示|亮点/i.test(title)) return "showcase";
+  if (/问题|复盘|不足|风险/i.test(title)) return "retrospective";
+  if (/计划|下一步|下步/i.test(title)) return "next-plan";
+  if (/概况|汇报|图文|进展/i.test(title)) return "image-report";
+  if (bullets.length >= 4) return "four-steps";
+  if (bullets.length === 3) return "three-steps";
+  return "image-report";
 }
 
 /**
