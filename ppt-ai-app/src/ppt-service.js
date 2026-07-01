@@ -824,7 +824,7 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     // dome 模板化页面的内容已经落入专用视觉层，不输出空 ul，避免预览层级和间距被普通列表干扰。
     const bodyList = renderBodyList ? `<ul>${bullets}</ul>` : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
@@ -889,6 +889,9 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;right:11%;top:30%;width:7.8%;height:34%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(82,5,12,.18);}
     body[data-layout="red-gold"] .dome-role-visual{position:absolute;z-index:2;right:10.5%;top:27%;width:24%;height:35%;border-radius:10px;background:var(--dome-business-1) center/cover no-repeat;box-shadow:0 18px 30px rgba(82,5,12,.22);overflow:hidden;}
     body[data-layout="red-gold"] .dome-role-decor{position:absolute;z-index:3;pointer-events:none;}
+    body[data-layout="red-gold"] .dome-wave-arc{z-index:2;border-radius:50%;border-top-style:solid;border-left:0;border-right:0;border-bottom:0;background:transparent;}
+    body[data-layout="red-gold"] .dome-wave-arc.dome-wave-gold{left:-7%;bottom:7.8%;width:54%;height:25%;border-top-width:8px;border-top-color:rgba(255,232,176,.92);}
+    body[data-layout="red-gold"] .dome-wave-arc.dome-wave-light{left:28%;bottom:10.5%;width:61%;height:27%;border-top-width:7px;border-top-color:rgba(246,212,138,.88);}
     body[data-layout="red-gold"] .dome-footer-decoration{left:7%;bottom:7.2%;color:rgba(255,232,176,.86);font-size:12px;font-weight:700;letter-spacing:0;text-shadow:0 8px 18px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .dome-agenda-grid{left:13%;right:13%;top:33%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
     body[data-layout="red-gold"] .dome-agenda-card{min-height:74px;border-radius:12px;background:rgba(246,212,138,.92);box-shadow:0 14px 22px rgba(82,5,12,.20);color:var(--template-title);font-weight:800;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;padding:0 22px;min-width:0;}
@@ -956,6 +959,17 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 function renderDomePreviewFooter(visual) {
   if (visual.layout !== "red-gold") return "";
   return `<div class="dome-role-decor dome-footer-decoration">商务办公系列 PPT 模板</div>`;
+}
+
+/**
+ * 渲染 dome 预览底部圆弧波浪。
+ * 这两层 HTML 装饰对应 PPTX 导出的 Dome Gold/Light Wave Arc，保证预览和导出看到同一套底部波浪层级。
+ * @param {object} visual
+ * @returns {string}
+ */
+function renderDomePreviewWaves(visual) {
+  if (visual.layout !== "red-gold") return "";
+  return `<div class="dome-role-decor dome-wave-arc dome-wave-gold"></div><div class="dome-role-decor dome-wave-arc dome-wave-light"></div>`;
 }
 
 /**
