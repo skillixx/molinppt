@@ -420,9 +420,13 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
         + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title })
         + textShapeXml({ id: 50 + stepIndex, name: textName, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
+    // 四步骤流程页复用 dome.pptx 的第 4 张商务图，避免提取出的业务视觉资产闲置。
+    const fourStepsImage = role === "four-steps"
+      ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
+      : "";
     return role === "next-plan"
       ? steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
-      : steps;
+      : fourStepsImage + steps;
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeBulletItems(slide, 3);
@@ -490,6 +494,7 @@ function normalizeDomeBulletItems(slide, count) {
 function domeRoleBusinessMedia(role) {
   const mapping = {
     "image-report": "dome-business-1.jpeg",
+    "four-steps": "dome-business-4.jpeg",
     metrics: "dome-business-5.jpeg",
     showcase: "dome-business-2.jpeg",
     retrospective: "dome-business-3.jpeg",
