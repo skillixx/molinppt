@@ -1109,6 +1109,7 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
   assert.match(prompt.templateInstructions?.contentContract || "", /指标名: 指标值/);
   assert.match(prompt.templateInstructions?.contentContract || "", /阶段: 动作/);
   assert.match(prompt.templateInstructions?.contentContract || "", /风险、原因、措施/);
+  assert.match(prompt.templateInstructions?.roleHints?.agenda || "", /必须 4 项/);
   assert.match(prompt.templateInstructions?.roleHints?.["image-report"] || "", /必须 3 条/);
   assert.match(prompt.templateInstructions?.roleHints?.["three-steps"] || "", /必须 3 条/);
   assert.match(prompt.templateInstructions?.roleHints?.["four-steps"] || "", /必须 4 条/);

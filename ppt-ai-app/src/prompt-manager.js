@@ -79,7 +79,7 @@ function buildTemplateInstructions(template) {
     contentContract: "按 outline 页序或标题选择 layout；把 bullets 填入对应占位符；目录固定 4 项，流程/成果/复盘/计划按模板卡片槽位填充；指标页 bullets 必须使用“指标名: 指标值”格式；问题复盘页 bullets 必须按风险、原因、措施顺序输出；下一步计划页 bullets 必须使用“阶段: 动作”格式；封面和结束页使用副标题占位；不要生成普通项目符号列表。",
     roleHints: {
       cover: "封面页：title 是主标题，bullets[0] 是封面副标题。",
-      agenda: "目录页：bullets 填入 4 个目录卡片。",
+      agenda: "目录页：必须 4 项 bullets 填入 4 个目录卡片，保持卡片式目录完整。",
       "section-divider": "章节分隔页：bullets[0] 是 PART 编号。",
       "image-report": "工作汇报图文页：必须 3 条 bullets 填入图文汇报卡片，保持三张图文卡片完整。",
       "three-steps": "三步骤流程页：必须 3 条 bullets 填入流程卡片，保持三个步骤槽位完整。",
