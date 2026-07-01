@@ -179,6 +179,27 @@ test("PptExportService respects an explicit dome cover layout on any slide", () 
   assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Cover Sailboat Background"/);
 });
 
+test("PptExportService uses the sailboat background for dome closing slides", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "结束页背景",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "工作汇报图文页", bullets: ["Progress"], layout: "image-report" },
+        { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+
+  assert.match(text, /ppt\/slides\/_rels\/slide2\.xml\.rels[\s\S]*Target="\.\.\/media\/dome-cover\.jpg"/);
+  assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Cover Sailboat Background"/);
+  assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Closing Mark"/);
+});
+
 test("PptExportService infers image-report role from work summary titles", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

@@ -1620,6 +1620,9 @@ test("PptService preview renders dome role classes and business image assets", a
   const explicitCoverSlide = previewSlides.find(([, , , title]) => title === "追加封面");
   assert.equal(explicitCoverSlide?.[2], "cover");
   assert.match(explicitCoverSlide?.[1] || "", /\bslide-cover\b/);
+  const closingSlide = previewSlides.find(([, , , title]) => title === "汇报结束");
+  assert.equal(closingSlide?.[2], "closing");
+  assert.match(closingSlide?.[1] || "", /\bslide-cover\b/);
 });
 
 test("PptService preview infers image-report role from work summary titles", async () => {

@@ -303,7 +303,7 @@ function scaleTemplateGeometryXml(xml, visual) {
 function templateDecorationsXml(visual, index, layout, role, slide) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
   if (visual.layout === "red-gold") {
-    const isCover = role === "cover";
+    const isCover = ["cover", "closing"].includes(role);
     const background = pictureXml({
       id: 3,
       name: isCover ? "Dome Cover Sailboat Background" : "Dome Red Gold Background",
@@ -712,8 +712,9 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
  * @returns {string}
  */
 function slideRelsXml(visual, role = "content") {
+  const usesDomeCoverBackground = ["cover", "closing"].includes(role);
   const imageRel = visual.layout === "red-gold"
-    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${role === "cover" ? "dome-cover" : "dome-content"}.jpg"/>`
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${usesDomeCoverBackground ? "dome-cover" : "dome-content"}.jpg"/>`
     : "";
   const businessImage = visual.layout === "red-gold" ? domeRoleBusinessMedia(role) : "";
   const businessImageRel = businessImage

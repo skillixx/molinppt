@@ -815,8 +815,8 @@ function escapeHtml(value) {
 function renderDeckPreview({ deck, visual }) {
   const slides = deck.slides.map((slide, index) => {
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
-    // dome 模板允许任意页显式声明封面版式，预览 class 必须跟随角色才能套用封面背景。
-    const slideKind = visual.layout === "red-gold" && domeRole === "cover" ? "cover" : index === 0 ? "cover" : "content";
+    // dome 模板允许任意页显式声明封面/结束版式，预览 class 必须跟随角色才能套用帆船背景。
+    const slideKind = visual.layout === "red-gold" && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "content";
     const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
