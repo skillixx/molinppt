@@ -1,9 +1,14 @@
 import { AppError } from "./errors.js";
+import { resolveTemplateVisual } from "./templates.js";
 
 const GENERATE_AMOUNT = "6";
 const REGENERATE_SLIDE_AMOUNT = "2";
 const MIN_SLIDE_COUNT = 1;
 const MAX_SLIDE_COUNT = 20;
+const SLIDE_GENERATION_MAX_ATTEMPTS = 2;
+const MAX_ACTIVE_PPT_ASSETS = 100;
+const MAX_PROMPT_CHARS = 5000;
+const RUNNING_GENERATION_STATUSES = new Set(["running", "reconcile_pending", "release_pending"]);
 
 /**
  * Orchestrates AI PPT outlines, decks, exports, billing, and call logs.
@@ -11,9 +16,9 @@ const MAX_SLIDE_COUNT = 20;
 export class PptService {
   /**
    * Creates a PPT workflow service.
-   * @param {{database: object, storage: object, taskCenter: object, templateManager: object, aiProvider: object, promptManager: object, exporter: object, billingClient: object}} input
+   * @param {{database: object, storage: object, taskCenter: object, templateManager: object, aiProvider: object, promptManager: object, exporter: object, billingClient: object, metrics?: object, generationLocks?: Set<string>}} input
    */
-  constructor({ database, storage, taskCenter, templateManager, aiProvider, promptManager, exporter, billingClient }) {
+  constructor({ database, storage, taskCenter, templateManager, aiProvider, promptManager, exporter, billingClient, metrics, generationLocks }) {
     this.database = database;
     this.storage = storage;
     this.taskCenter = taskCenter;
@@ -22,6 +27,8 @@ export class PptService {
     this.promptManager = promptManager;
     this.exporter = exporter;
     this.billingClient = billingClient;
+    this.metrics = metrics;
+    this.generationLocks = generationLocks || new Set();
   }
 
   /**
@@ -32,11 +39,13 @@ export class PptService {
   async generateOutline({ ownerUserId, topic, sourceFileId, slideCount = 8, templateId, theme = "modern" }) {
     const normalizedSlideCount = normalizeSlideCount(slideCount);
     const documentText = sourceFileId ? await this.#readDocumentText({ sourceFileId, ownerUserId }) : "";
-    const template = this.templateManager.getTemplate(templateId);
+    const template = this.templateManager.getTemplate(templateId, { ownerUserId });
     validateTemplateTheme({ template, theme });
     const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme });
+    this.#assertPromptWithinLimit({ operation: "outline", prompt });
     let slides;
     try {
+      this.#recordAiCall({ operation: "outline", prompt });
       slides = await this.aiProvider.generateOutline(prompt);
     } catch (error) {
       throw new AppError({
@@ -76,15 +85,29 @@ export class PptService {
 
   /**
    * Generates a deck from an outline with reserve and settle billing.
-   * @param {{ownerUserId: number, outlineId: string, entitlementId: number}} input
+   * @param {{ownerUserId: number, outlineId: string, entitlementId: number, templateId?: string, theme?: string}} input
    * @returns {Promise<{deck: object, task: object}>}
    */
-  async generateDeck({ ownerUserId, outlineId, entitlementId }) {
+  async generateDeck({ ownerUserId, outlineId, entitlementId, templateId, theme }) {
     const outline = await this.#getOwned("outlines", outlineId, ownerUserId, "OUTLINE_NOT_FOUND");
+    const selectedTemplateId = templateId || outline.templateId;
+    const selectedTheme = theme || outline.theme || "modern";
+    const template = this.templateManager.getTemplate(selectedTemplateId, { ownerUserId });
+    validateTemplateTheme({ template, theme: selectedTheme });
+    await this.#ensureAssetQuota({ ownerUserId });
+    const generationLock = await this.#acquireGenerationLock({ ownerUserId, outlineId });
+    try {
+    const deckOutline = {
+      ...outline,
+      templateId: selectedTemplateId,
+      theme: selectedTheme,
+      sourceTemplateId: outline.templateId,
+      sourceTheme: outline.theme,
+    };
     const task = await this.taskCenter.createTask({
       ownerUserId,
       type: "ppt_generate",
-      input: { outlineId, entitlementId },
+      input: { outlineId, entitlementId, templateId: selectedTemplateId, theme: selectedTheme },
     });
     const generationTask = await this.database.insert("generation_tasks", {
       id: task.id,
@@ -99,24 +122,26 @@ export class PptService {
     const settleKey = `${task.id}:ppt_generate:settle`;
     const releaseKey = `${task.id}:ppt_generate:release`;
     await this.#ensureBalance({ ownerUserId, entitlementId, amount: GENERATE_AMOUNT });
-    const reserve = await this.billingClient.reserveCredits({
-      userId: ownerUserId,
+    const reserve = await this.#reserveGenerationCredits({
+      ownerUserId,
       entitlementId,
-      amount: GENERATE_AMOUNT,
       idempotencyKey: reserveKey,
     });
     await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "reserve", amount: GENERATE_AMOUNT, status: "reserved", holdId: reserve.hold_id, idempotencyKey: reserveKey });
     let deck;
     try {
-      const template = this.templateManager.getTemplate(outline.templateId);
-      const prompt = this.promptManager.buildDeckPrompt({ outline, template });
-      const slides = await this.aiProvider.generateSlides(prompt);
+      const prompt = this.promptManager.buildDeckPrompt({ outline: deckOutline, template });
+      this.#assertPromptWithinLimit({ operation: "deck", prompt });
+      const slides = await this.#generateValidSlides({ prompt, outline: deckOutline, template });
       deck = await this.database.insert("decks", {
         ownerUserId,
         outlineId,
         title: outline.topic,
-        templateId: outline.templateId,
-        theme: outline.theme,
+        templateId: selectedTemplateId,
+        templateName: template.name,
+        templateVisual: template.visual,
+        templateLayoutSchema: template.layoutSchema,
+        theme: selectedTheme,
         status: "billing_pending",
         slides,
       });
@@ -163,6 +188,7 @@ export class PptService {
       const readyDeck = await this.database.update("decks", deck.id, { status: "ready" });
       const completedTask = await this.taskCenter.updateTask(task.id, { status: "succeeded", progress: 100, result: { deckId: deck.id } });
       await this.database.update("generation_tasks", generationTask.id, { status: "succeeded", progress: 100, deckId: deck.id });
+      await this.#createAssetForDeck({ deck: readyDeck, outline });
       await this.#log({ ownerUserId, action: "deck_generated", resourceType: "deck", resourceId: deck.id });
       return { deck: readyDeck, task: completedTask };
     } catch (error) {
@@ -183,6 +209,9 @@ export class PptService {
         message: "Billing reconciliation pending",
         publicDetails: { task_id: task.id, deck_id: deck.id, retryable: false },
       });
+    }
+    } finally {
+      await generationLock.release();
     }
   }
 
@@ -206,6 +235,45 @@ export class PptService {
    */
   async getGenerationTask({ ownerUserId, taskId }) {
     return this.#getOwned("generation_tasks", taskId, ownerUserId, "TASK_NOT_FOUND");
+  }
+
+  /**
+   * Lists active PPT assets owned by a user.
+   * @param {{ownerUserId: number}} input
+   * @returns {Promise<object[]>}
+   */
+  async listAssets({ ownerUserId }) {
+    const assets = await this.database.find("ppt_assets", (asset) => (
+      Number(asset.ownerUserId) === Number(ownerUserId) && asset.status === "active"
+    ));
+    return assets.sort((left, right) => String(right.created_at || "").localeCompare(String(left.created_at || "")));
+  }
+
+  /**
+   * Returns an owner-scoped PPT asset with its deck.
+   * @param {{ownerUserId: number, assetId: string}} input
+   * @returns {Promise<{asset: object, deck: object}>}
+   */
+  async getAsset({ ownerUserId, assetId }) {
+    const asset = await this.#getOwnedActiveAsset({ ownerUserId, assetId });
+    const deck = await this.#getOwned("decks", asset.deckId, ownerUserId, "DECK_NOT_FOUND");
+    return { asset, deck };
+  }
+
+  /**
+   * Soft deletes an owner-scoped PPT asset.
+   * @param {{ownerUserId: number, assetId: string}} input
+   * @returns {Promise<object>}
+   */
+  async deleteAsset({ ownerUserId, assetId }) {
+    const asset = await this.#getOwnedActiveAsset({ ownerUserId, assetId });
+    const deleted = await this.database.update("ppt_assets", asset.id, {
+      status: "deleted",
+      deleted_at: new Date().toISOString(),
+    });
+    await this.#deleteAssetFiles({ ownerUserId, assetId: asset.id });
+    await this.#log({ ownerUserId, action: "ppt_asset_deleted", resourceType: "ppt_asset", resourceId: asset.id });
+    return deleted;
   }
 
   /**
@@ -243,7 +311,10 @@ export class PptService {
               errorCode: null,
               errorMessage: null,
             });
-            if (task.deckId) await this.database.update("decks", task.deckId, { status: "ready" });
+            if (task.deckId) {
+              await this.database.update("decks", task.deckId, { status: "ready" });
+              await this.#createAssetForReadyDeck({ ownerUserId: task.ownerUserId, deckId: task.deckId });
+            }
           } else {
             await this.database.update("generation_tasks", task.id, {
               status: "failed",
@@ -299,6 +370,8 @@ export class PptService {
     let regenerated;
     try {
       const prompt = this.promptManager.buildRegenerateSlidePrompt({ slide, instruction });
+      this.#assertPromptWithinLimit({ operation: "slide_regenerate", prompt });
+      this.#recordAiCall({ operation: "slide_regenerate", prompt });
       regenerated = normalizeRegeneratedSlide({ original: slide, regenerated: await this.aiProvider.regenerateSlide(prompt) });
     } catch (error) {
       try {
@@ -349,7 +422,11 @@ export class PptService {
   async previewDeck({ ownerUserId, deckId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
-    return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title></head><body>${deck.slides.map((slide) => `<section><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></section>`).join("")}</body></html>`;
+    const visual = resolveTemplateVisual({
+      templateId: deck.templateId,
+      template: { id: deck.templateId, name: deck.templateName, visual: deck.templateVisual },
+    });
+    return renderDeckPreview({ deck, visual });
   }
 
   /**
@@ -360,12 +437,17 @@ export class PptService {
   async exportDeck({ ownerUserId, deckId, format }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
+    const asset = await this.#getActiveAssetForDeck({ ownerUserId, deckId });
     const exportPayload = this.exporter.exportDeck({ deck, format });
     const file = await this.storage.upload({
       ownerUserId,
       fileName: exportPayload.fileName,
       mimeType: exportPayload.mimeType,
       content: exportPayload.content,
+      fileRole: format === "pptx" ? "generated_pptx" : "generated_pdf",
+      visibility: "private",
+      assetId: asset.id,
+      deckId,
     });
     await this.#log({ ownerUserId, action: `deck_exported_${format}`, resourceType: "file", resourceId: file.id });
     return { file };
@@ -411,6 +493,175 @@ export class PptService {
   }
 
   /**
+   * Reserves generation credits and maps platform credit errors into product errors.
+   * @param {{ownerUserId: number, entitlementId: number, idempotencyKey: string}} input
+   * @returns {Promise<object>}
+   */
+  async #reserveGenerationCredits({ ownerUserId, entitlementId, idempotencyKey }) {
+    try {
+      return await this.billingClient.reserveCredits({
+        userId: ownerUserId,
+        entitlementId,
+        amount: GENERATE_AMOUNT,
+        idempotencyKey,
+      });
+    } catch (error) {
+      if (String(error?.code) === "60005") {
+        throw new AppError({
+          code: "INSUFFICIENT_CREDITS",
+          status: 402,
+          message: "Insufficient credits",
+          publicDetails: { entitlement_id: entitlementId, required_amount: GENERATE_AMOUNT },
+        });
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Generates schema-valid slide JSON, retrying provider shape errors once and falling back to outline content.
+   * @param {{prompt: object, outline: object, template: object}} input
+   * @returns {Promise<object[]>}
+   */
+  async #generateValidSlides({ prompt, outline, template }) {
+    let lastError;
+    for (let attempt = 1; attempt <= SLIDE_GENERATION_MAX_ATTEMPTS; attempt += 1) {
+      try {
+        this.#recordAiCall({ operation: attempt === 1 ? "deck" : "deck_retry", prompt });
+        const slides = await this.aiProvider.generateSlides(
+          attempt === 1
+            ? prompt
+            : {
+              ...prompt,
+              validation: {
+                retry: true,
+                reason: lastError.message,
+              },
+            },
+        );
+        return normalizeGeneratedSlides({ slides, outline, template });
+      } catch (error) {
+        if (!isSlideSchemaError(error)) throw error;
+        lastError = error;
+      }
+    }
+    return buildFallbackSlides({ outline, template });
+  }
+
+  /**
+   * Ensures the owner has capacity for one more active PPT asset before paid generation.
+   * @param {{ownerUserId: number}} input
+   * @returns {Promise<void>}
+   */
+  async #ensureAssetQuota({ ownerUserId }) {
+    const activeCount = (await this.database.find("ppt_assets", (asset) => (
+      Number(asset.ownerUserId) === Number(ownerUserId) && asset.status === "active"
+    ))).length;
+    if (activeCount >= MAX_ACTIVE_PPT_ASSETS) {
+      throw new AppError({
+        code: "PPT_ASSET_LIMIT_REACHED",
+        status: 409,
+        message: "PPT asset limit reached",
+        publicDetails: { limit: MAX_ACTIVE_PPT_ASSETS, active_count: activeCount },
+      });
+    }
+  }
+
+  /**
+   * Creates an active PPT asset for a newly ready deck.
+   * @param {{deck: object, outline?: object}} input
+   * @returns {Promise<object>}
+   */
+  async #createAssetForDeck({ deck, outline }) {
+    const existing = await this.database.findOne("ppt_assets", (asset) => asset.deckId === deck.id && asset.status === "active");
+    if (existing) return existing;
+    return this.database.insert("ppt_assets", {
+      ownerUserId: deck.ownerUserId,
+      deckId: deck.id,
+      outlineId: deck.outlineId,
+      title: deck.title,
+      status: "active",
+      slideCount: Array.isArray(deck.slides) ? deck.slides.length : 0,
+      templateId: deck.templateId,
+      templateName: deck.templateName,
+      theme: deck.theme,
+      topic: outline?.topic || deck.title,
+      sourceType: outline?.input?.sourceFileId ? "document" : "topic",
+    });
+  }
+
+  /**
+   * Creates an asset after billing reconciliation makes a deck ready.
+   * @param {{ownerUserId: number, deckId: string}} input
+   * @returns {Promise<object | null>}
+   */
+  async #createAssetForReadyDeck({ ownerUserId, deckId }) {
+    const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
+    if (deck.status !== "ready") return null;
+    const outline = await this.database.findOne("outlines", (item) => item.id === deck.outlineId && Number(item.ownerUserId) === Number(ownerUserId));
+    return this.#createAssetForDeck({ deck, outline });
+  }
+
+  /**
+   * Returns an active owner-scoped PPT asset.
+   * @param {{ownerUserId: number, assetId: string}} input
+   * @returns {Promise<object>}
+   */
+  async #getOwnedActiveAsset({ ownerUserId, assetId }) {
+    const asset = await this.database.findOne("ppt_assets", (item) => (
+      item.id === assetId && Number(item.ownerUserId) === Number(ownerUserId) && item.status === "active"
+    ));
+    if (!asset) throw new AppError({ code: "ASSET_NOT_FOUND", status: 404, message: "Asset not found" });
+    return asset;
+  }
+
+  /**
+   * Returns an active asset for a ready deck before export.
+   * @param {{ownerUserId: number, deckId: string}} input
+   * @returns {Promise<object>}
+   */
+  async #getActiveAssetForDeck({ ownerUserId, deckId }) {
+    const asset = await this.database.findOne("ppt_assets", (item) => (
+      item.deckId === deckId && Number(item.ownerUserId) === Number(ownerUserId) && item.status === "active"
+    ));
+    if (!asset) throw new AppError({ code: "ASSET_NOT_FOUND", status: 404, message: "Asset not found" });
+    return asset;
+  }
+
+  /**
+   * Marks all generated files for a deleted asset inaccessible.
+   * @param {{ownerUserId: number, assetId: string}} input
+   * @returns {Promise<void>}
+   */
+  async #deleteAssetFiles({ ownerUserId, assetId }) {
+    let objects;
+    try {
+      objects = await this.database.find("storage_objects", (item) => (
+        item.assetId === assetId && Number(item.ownerUserId) === Number(ownerUserId) && item.status === "available"
+      ));
+    } catch (error) {
+      if (error?.code === "DATABASE_NOT_INITIALIZED") return;
+      throw error;
+    }
+    for (const object of objects) {
+      await this.database.update("storage_objects", object.id, {
+        status: "deleted",
+        deleted_at: new Date().toISOString(),
+      });
+      if (object.fileId) {
+        try {
+          await this.database.update("files", object.fileId, {
+            status: "deleted",
+            deleted_at: new Date().toISOString(),
+          });
+        } catch (error) {
+          if (error?.code !== "NOT_FOUND") throw error;
+        }
+      }
+    }
+  }
+
+  /**
    * Returns an owner-scoped record.
    * @param {string} collection
    * @param {string} id
@@ -441,6 +692,91 @@ export class PptService {
   async #log(input) {
     return this.database.insert("call_logs", input);
   }
+
+  /**
+   * Blocks duplicate generation for one user's outline before quota and credits can be consumed twice.
+   * @param {{ownerUserId: number, outlineId: string}} input
+   * @returns {Promise<{release: () => void}>}
+   */
+  async #acquireGenerationLock({ ownerUserId, outlineId }) {
+    const lockKey = `${ownerUserId}:${outlineId}`;
+    if (this.generationLocks.has(lockKey)) {
+      throw new AppError({
+        code: "GENERATION_ALREADY_RUNNING",
+        status: 409,
+        message: "Generation is already running for this outline",
+      });
+    }
+    this.generationLocks.add(lockKey);
+    let databaseLock;
+    try {
+      if (typeof this.database.acquireLock === "function") {
+        databaseLock = await this.database.acquireLock(`ppt-generation:${lockKey}`);
+        if (!databaseLock) {
+          this.generationLocks.delete(lockKey);
+          throw new AppError({
+            code: "GENERATION_ALREADY_RUNNING",
+            status: 409,
+            message: "Generation is already running for this outline",
+          });
+        }
+      }
+      const activeTask = await this.database.findOne("generation_tasks", (task) => (
+        Number(task.ownerUserId) === Number(ownerUserId)
+          && task.outlineId === outlineId
+          && RUNNING_GENERATION_STATUSES.has(task.status)
+      ));
+      if (activeTask) {
+        this.generationLocks.delete(lockKey);
+        await databaseLock?.release?.();
+        throw new AppError({
+          code: "GENERATION_ALREADY_RUNNING",
+          status: 409,
+          message: "Generation is already running for this outline",
+          publicDetails: { task_id: activeTask.id },
+        });
+      }
+    } catch (error) {
+      if (error?.code !== "GENERATION_ALREADY_RUNNING") this.generationLocks.delete(lockKey);
+      if (error?.code !== "GENERATION_ALREADY_RUNNING") await databaseLock?.release?.();
+      throw error;
+    }
+    return {
+      release: async () => {
+        this.generationLocks.delete(lockKey);
+        await databaseLock?.release?.();
+      },
+    };
+  }
+
+  /**
+   * Rejects prompts that would exceed the configured cost guard.
+   * @param {{operation: string, prompt: object}} input
+   * @returns {void}
+   */
+  #assertPromptWithinLimit({ operation, prompt }) {
+    const promptChars = JSON.stringify(prompt).length;
+    this.metrics?.observe?.("llm_prompt_chars", { operation }, promptChars);
+    if (promptChars > MAX_PROMPT_CHARS) {
+      this.metrics?.increment?.("alerts_total", { type: "prompt_too_long", operation });
+      throw new AppError({
+        code: "PROMPT_TOO_LONG",
+        status: 400,
+        message: "Prompt is too long",
+        publicDetails: { max_chars: MAX_PROMPT_CHARS, prompt_chars: promptChars },
+      });
+    }
+  }
+
+  /**
+   * Records an outbound model call for cost and volume monitoring.
+   * @param {{operation: string, prompt: object}} input
+   * @returns {void}
+   */
+  #recordAiCall({ operation, prompt }) {
+    this.metrics?.increment?.("llm_calls_total", { operation });
+    this.metrics?.increment?.("llm_prompt_chars_total", { operation }, JSON.stringify(prompt).length);
+  }
 }
 
 /**
@@ -455,6 +791,75 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+/**
+ * Renders an HTML deck preview using the selected template visuals.
+ * @param {{deck: object, visual: object}} input
+ * @returns {string}
+ */
+function renderDeckPreview({ deck, visual }) {
+  const slides = deck.slides.map((slide, index) => (
+    `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}"><div class="accent"></div><div class="motif"></div><div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`
+  )).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title><style>
+    :root{--template-primary:#${visual.primary};--template-accent:#${visual.accent};--template-bg:#${visual.background};--template-surface:#${visual.surface};--template-title:#${visual.title};--template-body:#${visual.body};}
+    *{box-sizing:border-box} html{background:var(--template-bg);} body{margin:0;padding:28px;background:linear-gradient(135deg,var(--template-bg),#ffffff 58%,var(--template-bg));color:var(--template-body);font-family:Arial,"Microsoft YaHei",sans-serif;}
+    main{display:grid;gap:34px;width:min(100%,1120px);margin:0 auto;}
+    .preview-page{display:grid;gap:10px;}
+    .slide{position:relative;width:100%;aspect-ratio:16/9;min-height:0;overflow:hidden;background:var(--template-surface);border:1px solid rgba(15,23,42,.08);box-shadow:0 18px 50px rgba(15,23,42,.12);padding:6.5% 7.4%;}
+    .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(15,23,42,.028) 0 1px,transparent 1px 34px),linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.12));pointer-events:none;}
+    .slide-content{position:relative;z-index:2;display:grid;align-content:start;width:100%;height:100%;min-width:0;}
+    .slide-content>*{position:relative;z-index:2;}
+    .motif{display:none;position:absolute;z-index:1;pointer-events:none;}
+    .accent{position:absolute;background:var(--template-primary);left:0;top:0;right:0;height:3.2%;}
+    h2{position:relative;margin:0 0 3.8%;color:var(--template-title);font-size:42px;line-height:1.14;letter-spacing:0;overflow-wrap:anywhere;}
+    ul{position:relative;margin:0;padding-left:1.25em;font-size:22px;line-height:1.55;max-width:82%;overflow-wrap:anywhere;}
+    li::marker{color:var(--template-accent);}
+    .page-number{position:absolute;right:3.2%;bottom:3.2%;color:rgba(15,23,42,.48);font-size:12px;font-weight:700;}
+    body[data-layout="left-rail"] .accent{right:auto;bottom:0;width:2.6%;height:auto;}
+    body[data-layout="left-rail"] .slide{padding-left:9.2%;}
+    body[data-layout="hero"] .slide-cover{padding-top:10.8%;background:linear-gradient(135deg,var(--template-bg),var(--template-surface));}
+    body[data-layout="hero"] .slide-cover h2{font-size:54px;max-width:82%;}
+    body[data-layout="hero"] .slide-cover .accent{height:4.2%;background:var(--template-accent);}
+    body[data-layout="executive"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 68%);padding:8.2% 10%;border:0;}
+    body[data-layout="executive"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(15,23,42,.026) 0 1px,transparent 1px 38px);}
+    body[data-layout="executive"] .slide::after{content:"";position:absolute;inset:12% 6% 10%;background:var(--template-surface);box-shadow:0 18px 46px rgba(15,42,67,.12);}
+    body[data-layout="executive"] .accent{height:9.8%;background:var(--template-primary);box-shadow:inset 0 -3px 0 var(--template-accent);}
+    body[data-layout="executive"] .motif{display:block;right:10%;top:25%;width:8.8%;height:42%;border-radius:8px;background:var(--template-accent);opacity:.82;}
+    body[data-layout="executive"] h2{max-width:74%;font-size:44px;}
+    body[data-layout="academy"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 72%);padding:8% 10%;border:0;}
+    body[data-layout="academy"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(15,23,42,.022) 0 1px,transparent 1px 32px);}
+    body[data-layout="academy"] .slide::after{content:"";position:absolute;inset:14% 7.5% 12%;background:var(--template-surface);box-shadow:0 16px 40px rgba(11,93,102,.10);}
+    body[data-layout="academy"] .accent{height:7.6%;background:var(--template-primary);box-shadow:inset 0 -3px 0 var(--template-accent);}
+    body[data-layout="academy"] .motif{display:block;right:9.5%;top:26%;width:7.2%;height:40%;border-radius:8px;background:var(--template-accent);opacity:.78;}
+    body[data-layout="academy"] h2{max-width:78%;font-size:42px;}
+    body[data-layout="venture"] .slide{background:linear-gradient(135deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 78%,var(--template-bg) 22%));padding:8.5% 10%;border:0;}
+    body[data-layout="venture"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,color-mix(in srgb,var(--template-accent) 24%,transparent),transparent 32%),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 36px);}
+    body[data-layout="venture"] .slide::after{content:"";position:absolute;inset:9% 6% 11%;background:var(--template-surface);box-shadow:0 22px 54px rgba(17,24,39,.20);}
+    body[data-layout="venture"] .accent{top:auto;left:9%;right:9%;bottom:14%;height:2.2%;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="venture"] h2{max-width:82%;font-size:46px;}
+    body[data-layout="red-gold"] .slide{background:linear-gradient(135deg,var(--template-primary),#d91d24 58%,#7d0610);border:0;padding:10.5% 12% 9%;box-shadow:0 22px 58px rgba(104,5,13,.24);}
+    body[data-layout="red-gold"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 44%),repeating-linear-gradient(115deg,rgba(255,232,176,.08) 0 1px,transparent 1px 42px);}
+    body[data-layout="red-gold"] .slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:25%;background:linear-gradient(135deg,rgba(255,248,204,.92),rgba(246,212,138,.78) 34%,rgba(184,15,26,.28) 35%,rgba(126,6,16,.68));clip-path:polygon(0 66%,14% 48%,28% 58%,44% 34%,60% 52%,76% 30%,100% 44%,100% 100%,0 100%);}
+    body[data-layout="red-gold"] .accent{left:0;right:0;top:auto;bottom:23.2%;height:2px;background:var(--template-accent);}
+    body[data-layout="red-gold"] .slide-content{align-content:center;justify-items:center;text-align:center;color:#ffe8b0;}
+    body[data-layout="red-gold"] .slide-cover h2{max-width:78%;margin-bottom:2.8%;font-size:58px;color:#fff2b8;text-shadow:0 3px 0 rgba(90,4,10,.32),0 12px 24px rgba(60,0,0,.24);}
+    body[data-layout="red-gold"] .slide-cover ul{max-width:60%;padding:0;list-style:none;color:#ffe8b0;text-align:center;}
+    body[data-layout="red-gold"] .slide-content::before{content:"商务办公系列 PPT 模板";position:absolute;left:-4%;bottom:-30%;color:rgba(255,232,176,.82);font-size:12px;letter-spacing:0;}
+    body[data-layout="red-gold"] .slide-content::after{content:"";position:absolute;z-index:0;inset:18% 13% 12%;border:1px solid rgba(255,232,176,.18);border-radius:18px;}
+    body[data-layout="red-gold"] .slide-content>*{z-index:2;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover){padding:12% 12% 10%;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover)::before{background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 42%),repeating-linear-gradient(115deg,rgba(255,232,176,.07) 0 1px,transparent 1px 42px);}
+    body[data-layout="red-gold"] .slide:not(.slide-cover)::after{inset:12% 7.5% 16%;height:auto;border-radius:20px;background:rgba(255,248,230,.96);box-shadow:0 22px 42px rgba(82,5,12,.23);}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content{align-content:start;justify-items:start;text-align:left;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::before{content:"BUSINESS REPORT";left:0;top:-12%;bottom:auto;color:var(--template-accent);font-size:12px;font-weight:800;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::after{display:none;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) h2{max-width:66%;font-size:42px;color:var(--template-title);text-shadow:none;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) ul{max-width:64%;font-size:21px;color:var(--template-body);}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;right:11%;top:30%;width:7.8%;height:34%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(82,5,12,.18);}
+    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
+  </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
 
 /**
@@ -481,7 +886,8 @@ function normalizeSlideCount(value) {
  */
 function validateTemplateTheme({ template, theme }) {
   const themes = Array.isArray(template.themes) ? template.themes : [];
-  if (themes.length && !themes.includes(theme)) {
+  const themeIds = themes.map((item) => (item && typeof item === "object" ? item.id : item));
+  if (themeIds.length && !themeIds.includes(theme)) {
     throw new AppError({
       code: "THEME_NOT_SUPPORTED",
       status: 400,
@@ -522,6 +928,144 @@ function validateOutlineSlides(slides) {
       throw new AppError({ code: "OUTLINE_INVALID", status: 400, message: "Each outline slide must include a title and string bullets" });
     }
   }
+}
+
+/**
+ * Normalizes provider slide JSON after validating the required schema surface.
+ * @param {{slides: unknown, outline: object, template: object}} input
+ * @returns {object[]}
+ */
+function normalizeGeneratedSlides({ slides, outline, template }) {
+  const outlineSlides = Array.isArray(outline?.slides) ? outline.slides : [];
+  if (!Array.isArray(slides)) {
+    throwSlideSchemaError("slides must be an array");
+  }
+  if (slides.length !== outlineSlides.length) {
+    throwSlideSchemaError(`slides length must match outline length ${outlineSlides.length}`);
+  }
+  return slides.map((slide, index) => {
+    if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
+      throwSlideSchemaError(`slide ${index + 1} must be an object`);
+    }
+    const title = typeof slide.title === "string" ? slide.title.trim() : "";
+    if (!title) {
+      throwSlideSchemaError(`slide ${index + 1} title must be a non-empty string`);
+    }
+    if (!Array.isArray(slide.bullets) || !slide.bullets.every((bullet) => typeof bullet === "string")) {
+      throwSlideSchemaError(`slide ${index + 1} bullets must be an array of strings`);
+    }
+    return {
+      ...slide,
+      id: normalizeSlideId(slide.id, index),
+      sortOrder: normalizeSortOrder(slide.sortOrder, index),
+      title,
+      bullets: slide.bullets,
+      speakerNotes: typeof slide.speakerNotes === "string" ? slide.speakerNotes : "",
+      layout: normalizeSlideLayout({ layout: slide.layout, template, index }),
+      theme: normalizeSlideText(slide.theme, outline.theme || "modern"),
+    };
+  });
+}
+
+/**
+ * Builds safe deck content from the confirmed outline when AI slide JSON remains invalid.
+ * @param {{outline: object, template: object}} input
+ * @returns {object[]}
+ */
+function buildFallbackSlides({ outline, template }) {
+  const outlineSlides = Array.isArray(outline?.slides) ? outline.slides : [];
+  return outlineSlides.map((slide, index) => {
+    const title = normalizeSlideText(slide?.title, `Slide ${index + 1}`);
+    return {
+      id: `slide_${index + 1}`,
+      sortOrder: index + 1,
+      title,
+      bullets: normalizeBulletList(slide?.bullets),
+      speakerNotes: `Generated from confirmed outline: ${title}`,
+      layout: normalizeSlideLayout({ layout: "", template, index }),
+      theme: outline.theme || "modern",
+      fallback: true,
+    };
+  });
+}
+
+/**
+ * Throws a typed slide schema error for retry and fallback handling.
+ * @param {string} message
+ * @returns {never}
+ */
+function throwSlideSchemaError(message) {
+  throw new AppError({
+    code: "SLIDE_SCHEMA_INVALID",
+    status: 502,
+    message: `SLIDE_SCHEMA_INVALID: ${message}`,
+  });
+}
+
+/**
+ * Returns whether an error was produced by slide schema validation.
+ * @param {unknown} error
+ * @returns {boolean}
+ */
+function isSlideSchemaError(error) {
+  return error?.code === "SLIDE_SCHEMA_INVALID";
+}
+
+/**
+ * Normalizes a generated slide ID.
+ * @param {unknown} value
+ * @param {number} index
+ * @returns {string}
+ */
+function normalizeSlideId(value, index) {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return normalized || `slide_${index + 1}`;
+}
+
+/**
+ * Normalizes a generated slide sort order.
+ * @param {unknown} value
+ * @param {number} index
+ * @returns {number}
+ */
+function normalizeSortOrder(value, index) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : index + 1;
+}
+
+/**
+ * Normalizes required string fields with a fallback.
+ * @param {unknown} value
+ * @param {string} fallback
+ * @returns {string}
+ */
+function normalizeSlideText(value, fallback) {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return normalized || fallback;
+}
+
+/**
+ * Normalizes a slide layout against the selected template schema.
+ * @param {{layout: unknown, template: object, index: number}} input
+ * @returns {string}
+ */
+function normalizeSlideLayout({ layout, template, index }) {
+  const schema = template?.layoutSchema || {};
+  const fallback = index === 0
+    ? schema.defaultCoverLayout || "title"
+    : schema.defaultContentLayout || "content";
+  const normalized = normalizeSlideText(layout, fallback);
+  const allowedLayouts = Array.isArray(schema.allowedLayouts) ? schema.allowedLayouts : [];
+  return allowedLayouts.length === 0 || allowedLayouts.includes(normalized) ? normalized : fallback;
+}
+
+/**
+ * Normalizes outline bullets for fallback slide content.
+ * @param {unknown} bullets
+ * @returns {string[]}
+ */
+function normalizeBulletList(bullets) {
+  return Array.isArray(bullets) ? bullets.filter((bullet) => typeof bullet === "string") : [];
 }
 
 /**

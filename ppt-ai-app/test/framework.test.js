@@ -7,7 +7,7 @@ import { afterEach, beforeEach, test } from "node:test";
 import { createApp } from "../src/app.js";
 import { AppError } from "../src/errors.js";
 import { JsonFileDatabase } from "../src/database.js";
-import { LocalFileStorage } from "../src/files.js";
+import { LocalFileStorage, MAX_UPLOAD_BYTES } from "../src/files.js";
 import { MemoryTaskCenter } from "../src/tasks.js";
 import { TemplateManager } from "../src/templates.js";
 import { HttpAiProvider, MockAiProvider } from "../src/ai-provider.js";
@@ -110,6 +110,68 @@ test("LocalMolingClient supports launch, balance, reserve, settle, release, and 
   assert.equal(balance.usable, true);
   assert.equal(settled.status, "settled");
   assert.equal(consumed.remaining, "12");
+});
+
+test("LocalMolingClient rejects invalid local launch tickets", async () => {
+  const client = new LocalMolingClient({
+    userId: 7,
+    appId: 15,
+    productId: 73,
+    entitlementId: 88,
+  });
+
+  await assert.rejects(
+    () => client.verifyLaunchTicket("invalid_ticket"),
+    (error) => {
+      assert.equal(error instanceof AppError, true);
+      assert.equal(error.code, "40003");
+      assert.equal(error.status, 403);
+      return true;
+    },
+  );
+});
+
+test("LocalMolingClient reuses idempotent billing responses without double charging", async () => {
+  const client = new LocalMolingClient({
+    userId: 7,
+    appId: 15,
+    productId: 73,
+    entitlementId: 88,
+    initialCredits: "20",
+  });
+
+  const firstReserve = await client.postInternal("/api/internal/entitlement-reserve", {
+    user_id: 7,
+    entitlement_id: 88,
+    amount: "6",
+    idempotency_key: "same-task:reserve",
+  });
+  const secondReserve = await client.postInternal("/api/internal/entitlement-reserve", {
+    user_id: 7,
+    entitlement_id: 88,
+    amount: "6",
+    idempotency_key: "same-task:reserve",
+  });
+  const afterReserve = await client.getInternal("/api/internal/entitlement-balance?user_id=7&entitlement_id=88");
+  const firstSettle = await client.postInternal("/api/internal/entitlement-settle", {
+    hold_id: firstReserve.hold_id,
+    actual_amount: "6",
+    idempotency_key: "same-task:settle",
+  });
+  const secondSettle = await client.postInternal("/api/internal/entitlement-settle", {
+    hold_id: firstReserve.hold_id,
+    actual_amount: "6",
+    idempotency_key: "same-task:settle",
+  });
+  const afterSettle = await client.getInternal("/api/internal/entitlement-balance?user_id=7&entitlement_id=88");
+
+  assert.deepEqual(secondReserve, firstReserve);
+  assert.deepEqual(secondSettle, firstSettle);
+  assert.equal(afterReserve.quota_reserved, "6");
+  assert.equal(afterReserve.remaining, "14");
+  assert.equal(afterSettle.quota_reserved, "0");
+  assert.equal(afterSettle.quota_used, "6");
+  assert.equal(afterSettle.remaining, "14");
 });
 
 test("BillingClient delegates reserve and settle to MolingClient with stable payloads", async () => {
@@ -237,7 +299,7 @@ test("LocalFileStorage rejects unsafe upload payloads", async () => {
       ownerUserId: 7,
       fileName: "large.txt",
       mimeType: "text/plain",
-      content: Buffer.alloc(2 * 1024 * 1024 + 1),
+      content: Buffer.alloc(MAX_UPLOAD_BYTES + 1),
     }),
     { code: "FILE_TOO_LARGE" },
   );
@@ -274,10 +336,70 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   const templates = new TemplateManager();
   const catalog = templates.listTemplates();
 
-  assert.equal(catalog.length >= 3, true);
-  assert.deepEqual(catalog.map((template) => template.id), ["business", "education", "pitch"]);
+  assert.equal(catalog.length >= 10, true);
+  assert.deepEqual(catalog.slice(0, 3).map((template) => template.id), ["business", "strategy-consulting", "financial-review"]);
+  assert.equal(catalog.some((template) => template.id === "sales-proposal"), true);
+  assert.equal(catalog.some((template) => template.id === "product-roadmap"), true);
+  assert.equal(catalog.some((template) => template.id === "marketing-campaign"), true);
+  assert.equal(catalog.some((template) => template.id === "data-insight"), true);
   assert.equal(catalog.every((template) => template.themes.length >= 2), true);
-  assert.equal(templates.getTemplate("pitch").style, "storytelling");
+  assert.equal(catalog.every((template) => template.category?.id), true);
+  assert.equal(catalog.every((template) => template.layoutSchema?.defaultContentLayout), true);
+  assert.equal(templates.getTemplate("pitch").style, "venture-story");
+});
+
+test("TemplateManager lists official active templates and the owner user templates by category", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["templates", "template_categories"],
+  });
+  await database.initialize();
+  await database.insert("template_categories", { id: "sales", name: "Sales", sortOrder: 10 });
+  await database.insert("templates", {
+    id: "official-sales",
+    name: "Official Sales",
+    categoryId: "sales",
+    scope: "official",
+    status: "active",
+    themes: [{ id: "modern", name: "Modern" }],
+    visual: { primary: "111111", accent: "222222", background: "FFFFFF", surface: "FFFFFF", title: "111111", body: "333333", layout: "top-band" },
+    layoutSchema: { defaultCoverLayout: "title", defaultContentLayout: "content", allowedLayouts: ["title", "content"] },
+  });
+  await database.insert("templates", {
+    id: "disabled-sales",
+    name: "Disabled Sales",
+    categoryId: "sales",
+    scope: "official",
+    status: "disabled",
+  });
+  await database.insert("templates", {
+    id: "user-sales",
+    name: "User Sales",
+    categoryId: "sales",
+    scope: "user",
+    status: "active",
+    ownerUserId: 7,
+    themes: [{ id: "custom", name: "Custom" }],
+  });
+  await database.insert("templates", {
+    id: "other-user-sales",
+    name: "Other User Sales",
+    categoryId: "sales",
+    scope: "user",
+    status: "active",
+    ownerUserId: 9,
+  });
+  const templates = new TemplateManager({ database });
+
+  const catalog = await templates.listTemplates({ ownerUserId: 7, categoryId: "sales" });
+
+  assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "official-sales", "user-sales"]);
+  assert.equal(catalog[0].category.id, "sales");
+  assert.equal((await templates.getTemplate("user-sales", { ownerUserId: 7 })).scope, "user");
+  assert.throws(
+    () => templates.getTemplate("other-user-sales", { ownerUserId: 7 }),
+    { code: "TEMPLATE_NOT_FOUND" },
+  );
 });
 
 test("HttpAiProvider posts prompt requests to an external provider endpoint", async () => {
@@ -591,6 +713,85 @@ test("createApp restores sessions from the persisted database after restart", as
     assert.equal(body.user.entitlement_id, 88);
   } finally {
     await new Promise((resolve, reject) => secondApp.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("createApp rejects missing launch tickets and expired sessions", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions"],
+  });
+  await database.initialize();
+  const expiredSession = await database.insert("sessions", {
+    id: "expired-session",
+    identity: { user_id: 7, app_id: 15, product_id: 73 },
+    entitlementId: 88,
+    createdAt: new Date(Date.now() - 120_000).toISOString(),
+    expiresAt: new Date(Date.now() - 60_000).toISOString(),
+  });
+  const app = createApp({
+    database,
+    defaultEntitlementId: 88,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }),
+    },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const missingTicket = await fetch(`${baseUrl}/enter`);
+    const missingTicketBody = await missingTicket.json();
+    const expired = await fetch(`${baseUrl}/api/me`, { headers: { cookie: `sid=${expiredSession.id}` } });
+    const expiredBody = await expired.json();
+
+    assert.equal(missingTicket.status, 400);
+    assert.equal(missingTicketBody.error.code, "MISSING_TICKET");
+    assert.equal(expired.status, 401);
+    assert.equal(expiredBody.error.code, "UNAUTHORIZED");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("createApp maps Moling launch identities into local users", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "db.json"),
+    collections: ["sessions", "users"],
+  });
+  await database.initialize();
+  const app = createApp({
+    database,
+    defaultEntitlementId: 88,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: {
+      verifyLaunchTicket: async () => ({
+        user_id: 7,
+        app_id: 15,
+        product_id: 73,
+        display_name: "Local User",
+        avatar_url: "https://example.test/avatar.png",
+      }),
+    },
+    sessionCookieName: "sid",
+  });
+
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ticket_1`, { redirect: "manual" });
+    assert.equal(enter.status, 302);
+
+    const users = await database.find("users");
+    assert.equal(users.length, 1);
+    assert.equal(users[0].moling_user_id, 7);
+    assert.equal(users[0].display_name, "Local User");
+    assert.equal(users[0].avatar_url, "https://example.test/avatar.png");
+    assert.equal(users[0].status, "active");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
 });
 

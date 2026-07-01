@@ -37,18 +37,19 @@ export class MockAiProvider {
    * @param {{outline: {slides: object[], theme?: string}}} input
    * @returns {Promise<object[]>}
    */
-  async generateSlides({ outline }) {
+  async generateSlides({ outline, template }) {
     if (this.failNextDeck) {
       this.failNextDeck = false;
       throw new Error("AI_PROVIDER_FAILED");
     }
+    const transformer = slideTransformerForTemplate(template);
     return outline.slides.map((slide, index) => ({
       id: `slide_${index + 1}`,
       sortOrder: index + 1,
       title: slide.title,
-      bullets: slide.bullets || [],
-      speakerNotes: `Talk through ${slide.title}`,
-      layout: index === 0 ? "title" : "content",
+      bullets: transformer.bullets(slide.bullets || []),
+      speakerNotes: `${transformer.notesPrefix} ${slide.title}`,
+      layout: index === 0 ? transformer.coverLayout : transformer.contentLayout,
       theme: outline.theme || "modern",
     }));
   }
@@ -65,6 +66,36 @@ export class MockAiProvider {
       bullets: [...(slide.bullets || []), instruction],
     };
   }
+}
+
+/**
+ * Returns deterministic mock slide transformations for template-driven generation.
+ * @param {object | undefined} template
+ * @returns {{bullets(bullets: string[]): string[], notesPrefix: string, coverLayout: string, contentLayout: string}}
+ */
+function slideTransformerForTemplate(template) {
+  if (template?.id === "pitch") {
+    return {
+      bullets: (bullets) => bullets.map((bullet) => `Pitch angle: ${bullet}`),
+      notesPrefix: "Frame as investor-ready narrative for",
+      coverLayout: "hero",
+      contentLayout: "story",
+    };
+  }
+  if (template?.id === "education") {
+    return {
+      bullets: (bullets) => bullets.map((bullet) => `Learning point: ${bullet}`),
+      notesPrefix: "Explain step by step for",
+      coverLayout: "lesson-title",
+      contentLayout: "lesson-content",
+    };
+  }
+  return {
+    bullets: (bullets) => bullets,
+    notesPrefix: "Talk through",
+    coverLayout: "title",
+    contentLayout: "content",
+  };
 }
 
 /**

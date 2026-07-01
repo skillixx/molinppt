@@ -1,13 +1,15 @@
-import path from "node:path";
-
 import { createApp } from "./app.js";
 import { HttpAiProvider, MockAiProvider } from "./ai-provider.js";
 import { BillingClient } from "./billing.js";
 import { loadConfig } from "./config.js";
-import { JsonFileDatabase } from "./database.js";
-import { LocalFileStorage } from "./files.js";
+import { createDatabase } from "./database-factory.js";
+import { ImageGenerationService } from "./image-generation-service.js";
+import { createStorage } from "./storage-factory.js";
 import { Logger } from "./logger.js";
+import { MetricsRegistry } from "./metrics.js";
+import { HttpImageProvider, HttpVisionProvider, MockImageProvider, MockVisionProvider } from "./model-providers.js";
 import { LocalMolingClient, MolingClient } from "./moling-client.js";
+import { PersonalTemplateService } from "./personal-template-service.js";
 import { PromptManager } from "./prompt-manager.js";
 import { PptExportService } from "./ppt-exporter.js";
 import { PptService } from "./ppt-service.js";
@@ -16,9 +18,10 @@ import { TemplateManager } from "./templates.js";
 
 const config = loadConfig();
 const logger = new Logger({ level: config.logging.level });
-const database = new JsonFileDatabase({
-  filePath: resolveDatabasePath(config.database.url),
-  collections: ["sessions", "files", "tasks", "users", "billing_events", "outlines", "decks", "generation_tasks", "call_logs"],
+const metrics = new MetricsRegistry();
+const database = createDatabase({
+  url: config.database.url,
+  collections: ["sessions", "files", "tasks", "users", "billing_events", "outlines", "decks", "generation_tasks", "call_logs", "templates", "template_categories", "ppt_assets", "storage_objects", "user_usage_counters", "admin_change_logs"],
 });
 await database.initialize();
 
@@ -35,12 +38,16 @@ const molingClient = config.moling.localMock
     internalToken: config.moling.internalToken,
   });
 const billingClient = new BillingClient({ molingClient });
-const storage = new LocalFileStorage({
-  storageDir: config.storage.directory,
+const storage = createStorage({
+  config: config.storage,
   database,
 });
 const taskCenter = new MemoryTaskCenter();
-const templateManager = new TemplateManager();
+const templateManager = new TemplateManager({ database });
+const visionProvider = createVisionProvider(config);
+const imageProvider = createImageProvider(config);
+const personalTemplateService = new PersonalTemplateService({ database, storage, visionProvider });
+const imageGenerationService = new ImageGenerationService({ storage, templateManager, imageProvider });
 const aiProvider = config.ai.llmProvider === "http"
   ? new HttpAiProvider({
     endpoint: config.ai.llmApiUrl,
@@ -55,10 +62,12 @@ const pptService = new PptService({
   storage,
   taskCenter,
   templateManager,
+  personalTemplateService,
   aiProvider,
   promptManager: new PromptManager(),
   exporter: new PptExportService(),
   billingClient,
+  metrics,
 });
 
 const app = createApp({
@@ -68,29 +77,50 @@ const app = createApp({
   expectedAppId: config.app.molingAppId,
   expectedProductId: config.app.molingProductId,
   logger,
+  metrics,
   molingClient,
   billingClient,
   storage,
   taskCenter,
   templateManager,
+  personalTemplateService,
   aiProvider,
+  imageGenerationService,
   pptService,
   internalToken: config.moling.internalToken,
   sessionCookieName: config.auth.sessionCookieName,
   sessionTtlMs: config.auth.sessionTtlMs,
   sessionCookieSecure: config.auth.sessionCookieSecure,
+  rateLimit: {
+    maxRequests: config.limits.rateLimitMaxRequests,
+    windowMs: config.limits.rateLimitWindowMs,
+  },
 });
 
 app.listen(config.app.port, "0.0.0.0", () => {
   logger.info("server_started", { port: config.app.port });
 });
 
-/**
- * Resolves the JSON database URL to a file path.
- * @param {string} databaseUrl
- * @returns {string}
- */
-function resolveDatabasePath(databaseUrl) {
-  if (databaseUrl.startsWith("json:")) return databaseUrl.slice("json:".length);
-  return path.join("data", "ppt-ai-db.json");
+function createVisionProvider(config) {
+  if (config.ai.visionProvider === "http") {
+    return new HttpVisionProvider({
+      endpoint: config.ai.visionApiUrl,
+      apiKey: config.ai.visionApiKey,
+      model: config.ai.visionModel,
+    });
+  }
+  if (config.ai.visionProvider === "mock") return new MockVisionProvider();
+  return null;
+}
+
+function createImageProvider(config) {
+  if (config.ai.imageProvider === "http") {
+    return new HttpImageProvider({
+      endpoint: config.ai.imageApiUrl,
+      apiKey: config.ai.imageApiKey,
+      model: config.ai.imageModel,
+    });
+  }
+  if (config.ai.imageProvider === "mock") return new MockImageProvider();
+  return null;
 }

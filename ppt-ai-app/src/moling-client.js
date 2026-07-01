@@ -124,6 +124,7 @@ export class LocalMolingClient {
     this.used = 0;
     this.reserved = 0;
     this.holds = new Map();
+    this.idempotencyResponses = new Map();
     this.nextHoldId = 1;
   }
 
@@ -133,7 +134,9 @@ export class LocalMolingClient {
    * @returns {Promise<object>}
    */
   async verifyLaunchTicket(ticket) {
-    if (!ticket) throw new AppError({ code: "40003", status: 403, message: "Invalid local launch ticket" });
+    if (!ticket || !String(ticket).startsWith("local_")) {
+      throw new AppError({ code: "40003", status: 403, message: "Invalid local launch ticket" });
+    }
     return { user_id: this.userId, app_id: this.appId, product_id: this.productId };
   }
 
@@ -187,6 +190,8 @@ export class LocalMolingClient {
    * @returns {object}
    */
   #reserve(body) {
+    const cached = this.#readIdempotentResponse(body);
+    if (cached) return cached;
     this.#assertUserAndEntitlement(body);
     const amount = Number(body.amount);
     if (this.#available() < amount) {
@@ -195,7 +200,7 @@ export class LocalMolingClient {
     const holdId = this.nextHoldId++;
     this.reserved += amount;
     this.holds.set(holdId, { amount, status: "reserved" });
-    return { hold_id: holdId, reserved: body.amount, available: String(this.#available()), status: "reserved" };
+    return this.#storeIdempotentResponse(body, { hold_id: holdId, reserved: body.amount, available: String(this.#available()), status: "reserved" });
   }
 
   /**
@@ -204,12 +209,14 @@ export class LocalMolingClient {
    * @returns {object}
    */
   #settle(body) {
+    const cached = this.#readIdempotentResponse(body);
+    if (cached) return cached;
     const hold = this.#getHold(body.hold_id);
     const actual = Number(body.actual_amount);
     this.reserved -= hold.amount;
     this.used += actual;
     hold.status = "settled";
-    return { ...this.#balance(), hold_id: Number(body.hold_id), status: "settled", settled_amount: body.actual_amount };
+    return this.#storeIdempotentResponse(body, { ...this.#balance(), hold_id: Number(body.hold_id), status: "settled", settled_amount: body.actual_amount });
   }
 
   /**
@@ -218,10 +225,12 @@ export class LocalMolingClient {
    * @returns {object}
    */
   #release(body) {
+    const cached = this.#readIdempotentResponse(body);
+    if (cached) return cached;
     const hold = this.#getHold(body.hold_id);
     this.reserved -= hold.amount;
     hold.status = "released";
-    return { ...this.#balance(), hold_id: Number(body.hold_id), status: "released", settled_amount: "0" };
+    return this.#storeIdempotentResponse(body, { ...this.#balance(), hold_id: Number(body.hold_id), status: "released", settled_amount: "0" });
   }
 
   /**
@@ -230,13 +239,37 @@ export class LocalMolingClient {
    * @returns {object}
    */
   #consume(body) {
+    const cached = this.#readIdempotentResponse(body);
+    if (cached) return cached;
     this.#assertUserAndEntitlement(body);
     const amount = Number(body.amount);
     if (this.#available() < amount) {
       throw new AppError({ code: "60005", status: 400, message: "Insufficient local credits" });
     }
     this.used += amount;
-    return { status: "consumed", amount: body.amount, ...this.#balance() };
+    return this.#storeIdempotentResponse(body, { status: "consumed", amount: body.amount, ...this.#balance() });
+  }
+
+  /**
+   * Reads a previously stored response for the same idempotency key.
+   * @param {object} body
+   * @returns {object | undefined}
+   */
+  #readIdempotentResponse(body) {
+    const key = body.idempotency_key;
+    return key ? this.idempotencyResponses.get(key) : undefined;
+  }
+
+  /**
+   * Stores an operation response by idempotency key.
+   * @param {object} body
+   * @param {object} response
+   * @returns {object}
+   */
+  #storeIdempotentResponse(body, response) {
+    const key = body.idempotency_key;
+    if (key) this.idempotencyResponses.set(key, response);
+    return response;
   }
 
   /**

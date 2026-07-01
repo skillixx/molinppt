@@ -234,6 +234,78 @@ test("PptService reports required credits when balance is insufficient", async (
   );
 });
 
+test("PptService maps platform insufficient-credit reserve errors before AI generation", async () => {
+  let aiCalled = false;
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async () => {
+    aiCalled = true;
+    return [];
+  };
+  const context = await createBusinessContext({
+    aiProvider,
+    billingOverrides: {
+      reserveCredits: async (input) => {
+        context.billingCalls.push(["reserve", input]);
+        const error = new Error("平台积分不足");
+        error.code = "60005";
+        error.status = 400;
+        throw error;
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Reserve insufficient credits",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    (error) => {
+      assert.equal(error.code, "INSUFFICIENT_CREDITS");
+      assert.equal(error.status, 402);
+      assert.equal(error.publicDetails.entitlement_id, 88);
+      assert.equal(error.publicDetails.required_amount, "6");
+      return true;
+    },
+  );
+
+  assert.equal(aiCalled, false);
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve"]);
+});
+
+test("PptService persists deterministic generation billing idempotency keys", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Billing key persistence",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+  const events = await context.database.find("billing_events");
+
+  assert.deepEqual(events.map((event) => event.eventType), ["reserve", "settle"]);
+  assert.deepEqual(events.map((event) => event.idempotencyKey), [
+    `${result.task.id}:ppt_generate:reserve`,
+    `${result.task.id}:ppt_generate:settle`,
+  ]);
+  assert.deepEqual(context.billingCalls.filter((call) => call[0] !== "balance").map((call) => call[1].idempotencyKey), [
+    `${result.task.id}:ppt_generate:reserve`,
+    `${result.task.id}:ppt_generate:settle`,
+  ]);
+});
+
 test("PptService reconciles pending slide release events", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.regenerateSlide = async () => {
@@ -757,6 +829,309 @@ test("PptService enforces slide count and template theme rules", async () => {
   );
 });
 
+test("PptService can apply a different template to an existing outline without regenerating it", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Market expansion",
+    slideCount: 2,
+    templateId: "business",
+    theme: "modern",
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+    templateId: "pitch",
+    theme: "startup",
+  });
+  const persistedOutline = await context.database.findOne("outlines", (item) => item.id === outline.id);
+
+  assert.equal(persistedOutline.templateId, "business");
+  assert.equal(persistedOutline.theme, "modern");
+  assert.equal(result.deck.templateId, "pitch");
+  assert.equal(result.deck.theme, "startup");
+  assert.equal(result.deck.slides.length, outline.slides.length);
+  assert.match(result.deck.slides[0].title, /Market expansion - slide 1/);
+  assert.match(result.deck.slides[0].bullets[0], /Pitch angle:/);
+});
+
+test("PptService retries slide generation when slide JSON fails schema validation", async () => {
+  const calls = [];
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async (prompt) => {
+    calls.push(prompt);
+    if (calls.length === 1) {
+      return prompt.outline.slides.map((slide) => ({ title: slide.title, bullets: "not an array" }));
+    }
+    return prompt.outline.slides.map((slide, index) => ({
+      id: `retry_slide_${index + 1}`,
+      sortOrder: index + 1,
+      title: slide.title,
+      bullets: slide.bullets.map((bullet) => `Retried: ${bullet}`),
+      speakerNotes: `Retried notes for ${slide.title}`,
+      layout: index === 0 ? "title" : "content",
+      theme: prompt.outline.theme,
+    }));
+  };
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Schema retry",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].validation.retry, true);
+  assert.match(calls[1].validation.reason, /bullets/);
+  assert.equal(result.deck.slides.length, outline.slides.length);
+  assert.equal(result.deck.slides[0].id, "retry_slide_1");
+  assert.equal(result.deck.slides[0].bullets[0], "Retried: Key point 1");
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle"]);
+});
+
+test("PptService degrades to outline slides after repeated schema-invalid slide JSON", async () => {
+  const calls = [];
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async (prompt) => {
+    calls.push(prompt);
+    return prompt.outline.slides.map((slide) => ({
+      id: "",
+      title: slide.title,
+      bullets: ["valid looking extra slide"],
+    })).concat([{ title: "unexpected extra", bullets: ["extra"] }]);
+  };
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Schema fallback",
+    slideCount: 2,
+    templateId: "business",
+    theme: "modern",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "Stable title one", bullets: ["Stable point one", "Stable point two"] },
+      { title: "Stable title two", bullets: ["Stable point three"] },
+    ],
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: edited.id,
+    entitlementId: 88,
+    templateId: "education",
+    theme: "lecture",
+  });
+
+  assert.equal(calls.length, 2);
+  assert.equal(result.deck.templateId, "education");
+  assert.equal(result.deck.theme, "lecture");
+  assert.equal(result.deck.slides.length, edited.slides.length);
+  assert.deepEqual(result.deck.slides.map((slide) => slide.title), ["Stable title one", "Stable title two"]);
+  assert.deepEqual(result.deck.slides[0].bullets, ["Stable point one", "Stable point two"]);
+  assert.equal(result.deck.slides[0].fallback, true);
+  assert.equal(result.deck.slides[0].theme, "lecture");
+  assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "settle"]);
+});
+
+test("PptService normalizes generated slide layouts with the selected template schema", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async ({ outline }) => outline.slides.map((slide, index) => ({
+    id: `slide_${index + 1}`,
+    sortOrder: index + 1,
+    title: slide.title,
+    bullets: slide.bullets,
+    speakerNotes: "",
+    layout: "unknown-layout",
+    theme: outline.theme,
+  }));
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Layout schema",
+    slideCount: 2,
+    templateId: "pitch",
+    theme: "startup",
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  assert.equal(result.deck.slides[0].layout, "venture-cover");
+  assert.equal(result.deck.slides[1].layout, "venture-story");
+});
+
+test("PptService uses a user-owned template for preview and exports", async () => {
+  const context = await createBusinessContext();
+  await context.database.insert("template_categories", { id: "custom", name: "Custom", sortOrder: 20 });
+  await context.database.insert("templates", {
+    id: "user-template-7",
+    name: "User Template 7",
+    categoryId: "custom",
+    scope: "user",
+    status: "active",
+    ownerUserId: 7,
+    themes: [{ id: "custom-dark", name: "Custom Dark" }],
+    visual: {
+      primary: "123456",
+      accent: "ABCDEF",
+      background: "101820",
+      surface: "FFFFFF",
+      title: "F8FAFC",
+      body: "E2E8F0",
+      layout: "left-rail",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "lesson-title",
+      defaultContentLayout: "lesson-content",
+      allowedLayouts: ["lesson-title", "lesson-content"],
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "User template generation",
+    slideCount: 2,
+    templateId: "user-template-7",
+    theme: "custom-dark",
+  });
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: result.deck.id });
+  const pptx = await context.pptService.exportDeck({ ownerUserId: 7, deckId: result.deck.id, format: "pptx" });
+  const pdf = await context.pptService.exportDeck({ ownerUserId: 7, deckId: result.deck.id, format: "pdf" });
+  const pptxDownload = await context.storage.download({ ownerUserId: 7, fileId: pptx.file.id });
+  const pdfDownload = await context.storage.download({ ownerUserId: 7, fileId: pdf.file.id });
+
+  assert.match(preview, /data-template="user-template-7"/);
+  assert.match(preview, /--template-primary:#123456/);
+  assert.match(pptxDownload.content.toString("latin1"), /val="123456"/);
+  assert.match(pdfDownload.content.toString("latin1"), /0\.071 0\.204 0\.337 rg/);
+});
+
+test("PptService persists generated decks as owner-scoped PPT assets", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Managed asset",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  const assets = await context.pptService.listAssets({ ownerUserId: 7 });
+  const detail = await context.pptService.getAsset({ ownerUserId: 7, assetId: assets[0].id });
+
+  assert.equal(assets.length, 1);
+  assert.equal(assets[0].deckId, result.deck.id);
+  assert.equal(assets[0].title, "Managed asset");
+  assert.equal(assets[0].status, "active");
+  assert.equal(detail.asset.deckId, result.deck.id);
+  assert.equal(detail.deck.id, result.deck.id);
+  assert.equal((await context.pptService.listAssets({ ownerUserId: 9 })).length, 0);
+  await assert.rejects(
+    () => context.pptService.getAsset({ ownerUserId: 9, assetId: assets[0].id }),
+    { code: "ASSET_NOT_FOUND" },
+  );
+});
+
+test("PptService stores exported files in storage_objects with deck and asset metadata", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Indexed export",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+  const [asset] = await context.pptService.listAssets({ ownerUserId: 7 });
+
+  const pptx = await context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pptx" });
+  const pdf = await context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pdf" });
+  const objects = await context.database.find("storage_objects", (object) => object.ownerUserId === 7);
+
+  assert.deepEqual(objects.map((object) => object.fileRole), ["generated_pptx", "generated_pdf"]);
+  assert.deepEqual(objects.map((object) => object.assetId), [asset.id, asset.id]);
+  assert.deepEqual(objects.map((object) => object.deckId), [deck.id, deck.id]);
+  assert.deepEqual(objects.map((object) => object.fileId), [pptx.file.id, pdf.file.id]);
+  assert.equal(objects.every((object) => object.visibility === "private" && object.status === "available"), true);
+});
+
+test("PptService enforces a 100 active PPT asset quota and soft delete releases a slot", async () => {
+  const context = await createBusinessContext();
+  for (let index = 0; index < 100; index += 1) {
+    await context.database.insert("ppt_assets", {
+      ownerUserId: 7,
+      deckId: `deck_${index}`,
+      outlineId: `outline_${index}`,
+      title: `Asset ${index}`,
+      status: "active",
+      slideCount: 1,
+      templateId: "business",
+      theme: "modern",
+    });
+  }
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Quota blocked",
+    slideCount: 1,
+    templateId: "business",
+  });
+
+  await assert.rejects(
+    () => context.pptService.generateDeck({
+      ownerUserId: 7,
+      outlineId: outline.id,
+      entitlementId: 88,
+    }),
+    (error) => {
+      assert.equal(error.code, "PPT_ASSET_LIMIT_REACHED");
+      assert.equal(error.status, 409);
+      assert.equal(error.publicDetails.limit, 100);
+      return true;
+    },
+  );
+  assert.deepEqual(context.billingCalls, []);
+
+  const [firstAsset] = await context.pptService.listAssets({ ownerUserId: 7 });
+  const deleted = await context.pptService.deleteAsset({ ownerUserId: 7, assetId: firstAsset.id });
+  const generated = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+  const assets = await context.pptService.listAssets({ ownerUserId: 7 });
+
+  assert.equal(deleted.status, "deleted");
+  assert.equal(generated.deck.status, "ready");
+  assert.equal(assets.length, 100);
+  assert.equal(assets.some((asset) => asset.id === firstAsset.id), false);
+});
+
 test("PptService marks failed generation retryable and retry succeeds", async () => {
   const context = await createBusinessContext({
     aiProvider: new MockAiProvider({ failNextDeck: true }),
@@ -952,6 +1327,293 @@ test("HTTP API supports document upload based outline and deck generation", asyn
   }
 });
 
+test("HTTP API preview exposes selected template visual styling", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Business styling",
+      slide_count: 2,
+      template_id: "business",
+      theme: "modern",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const html = await preview.text();
+
+    assert.equal(preview.status, 200);
+    assert.match(html, /data-template="business"/);
+    assert.match(html, /--template-primary:#B80F1A/);
+    assert.match(html, /--template-accent:#F6D48A/);
+    assert.match(html, /data-layout="red-gold"/);
+    assert.match(html, /class="preview-page"/);
+    assert.match(html, /aspect-ratio:16\/9/);
+    assert.match(html, /class="page-number">1 \/ 2/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API generates a new deck from an existing outline with the currently selected template", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Template switch",
+      slide_count: 2,
+      template_id: "business",
+      theme: "modern",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+      template_id: "pitch",
+      theme: "startup",
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const html = await preview.text();
+
+    assert.equal(deckResponse.status, 201);
+    assert.equal(deckBody.deck.templateId, "pitch");
+    assert.equal(deckBody.deck.theme, "startup");
+    assert.equal(deckBody.deck.slides.length, outline.outline.slides.length);
+    assert.match(deckBody.deck.slides[0].bullets[0], /Pitch angle:/);
+    assert.match(html, /data-template="pitch"/);
+    assert.match(html, /--template-primary:#111827/);
+    assert.match(html, /data-layout="venture"/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API lists template categories and merges official active templates with owner templates", async () => {
+  const context = await createBusinessContext();
+  await context.database.insert("template_categories", { id: "custom", name: "Custom", sortOrder: 20 });
+  await context.database.insert("templates", {
+    id: "official-custom",
+    name: "Official Custom",
+    categoryId: "custom",
+    scope: "official",
+    status: "active",
+    themes: [{ id: "clean", name: "Clean" }],
+  });
+  await context.database.insert("templates", {
+    id: "disabled-custom",
+    name: "Disabled Custom",
+    categoryId: "custom",
+    scope: "official",
+    status: "disabled",
+  });
+  await context.database.insert("templates", {
+    id: "my-custom",
+    name: "My Custom",
+    categoryId: "custom",
+    scope: "user",
+    status: "active",
+    ownerUserId: 7,
+    themes: [{ id: "mine", name: "Mine" }],
+  });
+  await context.database.insert("templates", {
+    id: "their-custom",
+    name: "Their Custom",
+    categoryId: "custom",
+    scope: "user",
+    status: "active",
+    ownerUserId: 9,
+  });
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const categoriesResponse = await fetch(`${baseUrl}/api/template-categories`, { headers: { cookie } });
+    const templatesResponse = await fetch(`${baseUrl}/api/templates?category_id=custom`, { headers: { cookie } });
+    const categories = await categoriesResponse.json();
+    const templates = await templatesResponse.json();
+
+    assert.equal(categoriesResponse.status, 200);
+    assert.equal(categories.categories.some((category) => category.id === "custom"), true);
+    assert.equal(templatesResponse.status, 200);
+    assert.deepEqual(templates.templates.map((template) => template.id), ["official-custom", "my-custom"]);
+    assert.equal(templates.templates[0].category.id, "custom");
+    assert.equal(templates.templates[1].scope, "user");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API persists generated PPT assets across sessions and isolates owners", async () => {
+  const context = await createBusinessContext();
+  let nextIdentity = { user_id: 7, app_id: 15, product_id: 73 };
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => nextIdentity },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const firstEnter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const firstCookie = firstEnter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, firstCookie, {
+      topic: "Persistent history",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outlineBody = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, firstCookie, {
+      outline_id: outlineBody.outline.id,
+    });
+    assert.equal(deckResponse.status, 201);
+
+    const secondEnter = await fetch(`${baseUrl}/enter?ticket=again`, { redirect: "manual" });
+    const secondCookie = secondEnter.headers.get("set-cookie").split(";")[0];
+    const listResponse = await fetch(`${baseUrl}/api/ppt/assets`, { headers: { cookie: secondCookie } });
+    const listBody = await listResponse.json();
+    const detailResponse = await fetch(`${baseUrl}/api/ppt/assets/${listBody.assets[0].id}`, { headers: { cookie: secondCookie } });
+    const detailBody = await detailResponse.json();
+
+    nextIdentity = { user_id: 9, app_id: 15, product_id: 73 };
+    const otherEnter = await fetch(`${baseUrl}/enter?ticket=other`, { redirect: "manual" });
+    const otherCookie = otherEnter.headers.get("set-cookie").split(";")[0];
+    const otherListResponse = await fetch(`${baseUrl}/api/ppt/assets`, { headers: { cookie: otherCookie } });
+    const otherListBody = await otherListResponse.json();
+    const forbiddenDetail = await fetch(`${baseUrl}/api/ppt/assets/${listBody.assets[0].id}`, { headers: { cookie: otherCookie } });
+
+    const deleteResponse = await fetch(`${baseUrl}/api/ppt/assets/${listBody.assets[0].id}`, {
+      method: "DELETE",
+      headers: { cookie: secondCookie },
+    });
+    const afterDeleteResponse = await fetch(`${baseUrl}/api/ppt/assets`, { headers: { cookie: secondCookie } });
+    const afterDeleteBody = await afterDeleteResponse.json();
+
+    assert.equal(listResponse.status, 200);
+    assert.equal(listBody.assets.length, 1);
+    assert.equal(listBody.assets[0].title, "Persistent history");
+    assert.equal(detailResponse.status, 200);
+    assert.equal(detailBody.asset.title, "Persistent history");
+    assert.equal(detailBody.deck.id, listBody.assets[0].deckId);
+    assert.deepEqual(otherListBody.assets, []);
+    assert.equal(forbiddenDetail.status, 404);
+    assert.equal(deleteResponse.status, 200);
+    assert.deepEqual(afterDeleteBody.assets, []);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API blocks downloads for files belonging to deleted PPT assets", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    defaultEntitlementId: 62,
+    internalToken: "download-secret",
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Deleted download",
+      slide_count: 2,
+      template_id: "business",
+    });
+    const outlineBody = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outlineBody.outline.id,
+    });
+    const deckBody = await deckResponse.json();
+    const [asset] = await context.pptService.listAssets({ ownerUserId: 7 });
+    const exportResponse = await postJson(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/exports`, cookie, { format: "pdf" });
+    const exportBody = await exportResponse.json();
+    const signedResponse = await fetch(`${baseUrl}/api/files/${exportBody.file.id}/download-url`, { headers: { cookie } });
+    const signedBody = await signedResponse.json();
+
+    const deleteResponse = await fetch(`${baseUrl}/api/ppt/assets/${asset.id}`, { method: "DELETE", headers: { cookie } });
+    const directDownload = await fetch(`${baseUrl}/api/files/${exportBody.file.id}`, { headers: { cookie } });
+    const signedDownload = await fetch(`${baseUrl}${signedBody.url}`);
+    const directBody = await directDownload.json();
+    const signedDownloadBody = await signedDownload.json();
+
+    assert.equal(exportResponse.status, 201);
+    assert.equal(signedResponse.status, 200);
+    assert.equal(deleteResponse.status, 200);
+    assert.equal(directDownload.status, 404);
+    assert.equal(directBody.error.code, "FILE_NOT_FOUND");
+    assert.equal(signedDownload.status, 404);
+    assert.equal(signedDownloadBody.error.code, "FILE_NOT_FOUND");
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("HTTP API rejects invalid outline edits before deck generation", async () => {
   const context = await createBusinessContext();
   const app = createApp({
@@ -1063,19 +1725,103 @@ test("workspace page exposes the AI PPT generation controls after login", async 
 
     assert.equal(page.status, 200);
     assert.match(html, /AI PPT 工作台/);
+    assert.match(html, /生成工作台/);
+    assert.match(html, /模板管理/);
+    assert.match(html, /资产库/);
+    assert.match(html, /状态中心/);
     assert.match(html, /id="topic"/);
+    assert.match(html, /PPT 生成步骤/);
+    assert.match(html, /填写主题或文档/);
+    assert.match(html, /生成并确认大纲/);
+    assert.match(html, /选择模板并生成 PPT/);
+    assert.match(html, /预览并下载/);
+    assert.match(html, /data-flow-step="download"/);
+    assert.match(html, /data-flow-panel="input preview"/);
+    assert.match(html, /data-flow-panel="outline"/);
+    assert.match(html, /data-flow-panel="preview"/);
+    assert.match(html, /data-flow-panel="outline preview"/);
+    assert.match(html, /setFlowStep/);
+    assert.match(html, /setFlowStage/);
+    assert.match(html, /applyWorkspaceVisibility/);
     assert.match(html, /id="outline-editor"/);
+    assert.match(html, /id="outline-board"/);
+    assert.match(html, /id="outline-summary"/);
+    assert.match(html, /大纲信息/);
+    assert.match(html, /大纲确认/);
+    assert.match(html, /当前状态/);
+    assert.match(html, /可编辑要点/);
+    assert.match(html, /class="outline-shell"/);
+    assert.match(html, /renderOutlineBoard/);
+    assert.match(html, /renderOutlineLoading/);
+    assert.match(html, /loading-spinner/);
+    assert.match(html, /正在生成大纲/);
+    assert.match(html, /理解主题和文档内容/);
+    assert.match(html, /OUTLINE_REVEAL_INTERVAL_MS = 620/);
+    assert.match(html, /revealOutlineCards/);
+    assert.match(html, /data-outline-reveal-list/);
+    assert.match(html, /is-revealing/);
+    assert.match(html, /stagger: true/);
+    assert.match(html, /requireEditableOutlineSlides/);
     assert.match(html, /loadTemplates/);
     assert.match(html, /\/api\/templates/);
+    assert.match(html, /id="template-gallery"/);
+    assert.match(html, /模板内容样式预览/);
+    assert.match(html, /class="template-card"/);
+    assert.match(html, /class="template-thumb"/);
+    assert.match(html, /data-template-card/);
+    assert.match(html, /renderTemplateGallery/);
+    assert.match(html, /selectTemplateCard/);
+    assert.match(html, /normalizedTemplateVisual/);
     assert.match(html, /id="generate-outline"/);
+    assert.match(html, /generateButton\.disabled = true/);
     assert.match(html, /id="save-outline"/);
+    assert.match(html, /每行一个要点/);
+    assert.match(html, /\/api\/ppt\/outlines\/" \+ state\.outlineId/);
     assert.match(html, /id="preview"/);
+    assert.match(html, /data-page-panel="create assets"/);
+    assert.match(html, /保存大纲后才能生成并查看模板预览/);
+    assert.match(html, /下载文件/);
+    assert.match(html, /download-button/);
+    assert.match(html, /AI 单页润色/);
+    assert.match(html, /在中间预览中点击要优化的页面/);
+    assert.match(html, /id="selected-slide-label"/);
+    assert.match(html, /未选择页面/);
+    assert.match(html, /attachPreviewSlidePicker/);
+    assert.match(html, /selectPreviewSlide/);
+    assert.match(html, /点击选择第 /);
+    assert.match(html, /润色建议/);
+    assert.match(html, /AI 润色本页/);
+    assert.match(html, /setSlideRegenerationBusy/);
+    assert.match(html, /请先应用模板生成 PPT，再使用 AI 润色单页/);
+    assert.match(html, /请先用鼠标在在线预览中选择要润色的页面/);
+    assert.match(html, /class="preview-frame"/);
+    assert.match(html, /deck-loading/);
+    assert.match(html, /正在应用当前模板生成 PPT/);
+    assert.match(html, /deck-progress-bar/);
+    assert.match(html, /deck-loading-slide/);
+    assert.match(html, /renderDeckGeneratingPreview/);
+    assert.match(html, /updateDeckGeneratingPreview/);
+    assert.match(html, /setDeckGenerationBusy/);
+    assert.match(html, /DECK_REVEAL_INTERVAL_MS = 700/);
+    assert.match(html, /DECK_MIN_LOADING_MS = 2200/);
+    assert.match(html, /waitForDeckLoadingRhythm/);
+    assert.match(html, /\.preview-stage \{ display: grid; min-height: 0;/);
+    assert.match(html, /\.preview\.is-deck-loaded \{ height: 100%; min-height: 0;/);
+    assert.match(html, /\.preview\.is-deck-loaded \.preview-frame \{ height: 100%; min-height: 0;/);
+    assert.match(html, /\.preview, \.preview-frame, \.preview\.is-deck-loaded, \.preview\.is-deck-loaded \.preview-frame \{ min-height: 420px;/);
+    assert.match(html, /renderDeckPreviewFrame/);
+    assert.doesNotMatch(html, /fetch\("\/api\/ppt\/decks\/" \+ state\.deckId \+ "\/preview"\)\.then\(\(res\) => res\.text\(\)\)/);
+    assert.match(html, /id="asset-list"/);
+    assert.match(html, /loadAssets/);
+    assert.match(html, /\/api\/ppt\/assets/);
     assert.match(html, /id="entitlement" value="62"/);
-    assert.match(html, /id="slide-id"/);
     assert.match(html, /id="regenerate-slide"/);
+    assert.match(html, /\/slides\/" \+ slideId \+ "\/regenerate/);
     assert.match(html, /id="retry-task"/);
+    assert.match(html, /setWorkspacePage/);
     assert.match(html, /PPTX/);
     assert.match(html, /PDF/);
+    assert.match(html, /请先应用模板生成 PPT，再下载文件/);
     const script = html.match(/<script>([\s\S]*)<\/script>/)?.[1];
     assert.ok(script);
     assert.doesNotThrow(() => new Function(script));
@@ -1611,8 +2357,11 @@ test("workspace page exposes package balance status", async () => {
     assert.equal(page.status, 200);
     assert.match(html, /id="balance-status"/);
     assert.match(html, /\/api\/billing\/balance/);
+    assert.match(html, /balance-progress/);
+    assert.match(html, /套餐正常/);
+    assert.match(html, /总额 /);
     assert.ok(
-      html.indexOf("\n    loadBalance();") < html.indexOf("addEventListener"),
+      html.indexOf("\n    loadBalance();") < html.indexOf('document.querySelector("#template").addEventListener'),
       "balance should start loading before optional control event binding",
     );
   } finally {
@@ -1695,14 +2444,12 @@ test("HTTP API falls back to configured entitlement for restored sessions withou
 async function createBusinessContext(options = {}) {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
-    collections: ["sessions", "files", "tasks", "outlines", "decks", "generation_tasks", "billing_events", "call_logs"],
+    collections: ["sessions", "files", "tasks", "outlines", "decks", "generation_tasks", "billing_events", "call_logs", "templates", "template_categories", "ppt_assets", "storage_objects"],
   });
   await database.initialize();
   const storage = new LocalFileStorage({ storageDir: path.join(tempDir, "storage"), database });
   const taskCenter = new MemoryTaskCenter();
-  const templateManager = new TemplateManager({
-    templates: [{ id: "business", name: "Business", style: "clean", themes: ["modern", "classic"] }],
-  });
+  const templateManager = new TemplateManager({ database });
   const billingCalls = [];
   const billingClient = {
     getBalance: async (input) => {

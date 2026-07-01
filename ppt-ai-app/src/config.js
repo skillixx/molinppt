@@ -12,6 +12,14 @@ export function loadConfig(env = process.env) {
   if (llmProvider === "http" && !env.LLM_API_URL) {
     missing.push("LLM_API_URL");
   }
+  const visionProvider = env.VISION_PROVIDER || "none";
+  if (visionProvider === "http" && !env.VISION_API_URL) {
+    missing.push("VISION_API_URL");
+  }
+  const imageProvider = env.IMAGE_PROVIDER || "none";
+  if (imageProvider === "http" && !env.IMAGE_API_URL) {
+    missing.push("IMAGE_API_URL");
+  }
   if (missing.length) {
     throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
   }
@@ -57,6 +65,10 @@ export function loadConfig(env = process.env) {
     logging: {
       level: env.LOG_LEVEL || "info",
     },
+    limits: {
+      rateLimitMaxRequests: readPositiveInteger(env.RATE_LIMIT_MAX_REQUESTS, 120, "RATE_LIMIT_MAX_REQUESTS"),
+      rateLimitWindowMs: readPositiveInteger(env.RATE_LIMIT_WINDOW_MS, 60_000, "RATE_LIMIT_WINDOW_MS"),
+    },
     ai: {
       llmProvider,
       llmApiUrl: env.LLM_API_URL || "",
@@ -64,8 +76,14 @@ export function loadConfig(env = process.env) {
       llmModel: env.LLM_MODEL || "",
       llmTimeoutMs: readPositiveInteger(env.LLM_TIMEOUT_MS, 30000, "LLM_TIMEOUT_MS"),
       llmMaxRetries: readNonNegativeInteger(env.LLM_MAX_RETRIES, 0, "LLM_MAX_RETRIES"),
-      imageProvider: env.IMAGE_PROVIDER || "mock",
+      visionProvider,
+      visionApiUrl: env.VISION_API_URL || "",
+      visionApiKey: env.VISION_API_KEY || "",
+      visionModel: env.VISION_MODEL || "",
+      imageProvider,
+      imageApiUrl: env.IMAGE_API_URL || "",
       imageApiKey: env.IMAGE_API_KEY || "",
+      imageModel: env.IMAGE_MODEL || "",
     },
     auth: {
       sessionCookieName: env.SESSION_COOKIE_NAME || "ppt_ai_session",
