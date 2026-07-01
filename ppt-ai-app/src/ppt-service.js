@@ -898,6 +898,8 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-card-text{display:block;font-size:14px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
+    body[data-layout="red-gold"] .dome-next-plan-phase{display:block;font-size:18px;line-height:1;color:var(--template-title);font-weight:900;}
+    body[data-layout="red-gold"] .dome-next-plan-action{display:block;font-size:13px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-metric-value{display:block;font-size:26px;line-height:1;color:var(--template-title);font-weight:900;}
     body[data-layout="red-gold"] .dome-metric-label{display:block;font-size:13px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-metric-grid{left:12%;right:34%;bottom:25%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
@@ -1025,7 +1027,8 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
-    const cards = Array.from({ length: 4 }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
+    // 下一步计划页支持“阶段: 动作”结构化输入，预览端拆成阶段和动作两个占位层。
+    const cards = normalizeDomePreviewPlanItems(slide, 4).map((item) => `<div class="dome-step-card"><span class="dome-next-plan-phase">${escapeHtml(item.phase)}</span><span class="dome-next-plan-action">${escapeHtml(item.action)}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
   }
   if (role === "closing") {
@@ -1060,6 +1063,23 @@ function normalizeDomePreviewMetricItems(slide, count) {
     const match = item.match(/^(.+?)\s*[:：|]\s*(.+)$/);
     if (!match) return { label: item, value: `0${index + 1}` };
     return { label: match[1].trim(), value: match[2].trim() };
+  });
+}
+
+/**
+ * 解析 dome 下一步计划页的结构化要点。
+ * 支持“阶段: 动作 / 阶段：动作 / 阶段|动作”，无分隔符时按旧编号兜底。
+ * @param {object} slide
+ * @param {number} count
+ * @returns {{phase: string, action: string}[]}
+ */
+function normalizeDomePreviewPlanItems(slide, count) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: count }, (_, index) => {
+    const item = String(bullets[index] ?? "");
+    const match = item.match(/^(.+?)\s*[:：|]\s*(.*)$/);
+    if (!match) return { phase: `0${index + 1}`, action: item };
+    return { phase: match[1].trim(), action: match[2].trim() };
   });
 }
 

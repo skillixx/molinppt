@@ -432,14 +432,21 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
     const count = role === "three-steps" ? 3 : 4;
     const bulletItems = normalizeDomeBulletItems(slide, count);
+    const planItems = role === "next-plan" ? normalizeDomePlanItems(slide, count) : [];
     const sectionLabel = textShapeXml({ id: 80, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
     const steps = Array.from({ length: count }, (_, stepIndex) => {
       const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
       const y = 2895600;
-      const textName = role === "next-plan" ? `Dome Next Plan Text ${stepIndex + 1}` : `Dome Step Text ${stepIndex + 1}`;
-      return solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: count === 3 ? 1676400 : 1371600, cy: 914400, fill: stepIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+      const card = solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: count === 3 ? 1676400 : 1371600, cy: 914400, fill: stepIndex % 2 === 0 ? "FFF8E6" : visual.accent });
+      if (role === "next-plan") {
+        const planItem = planItems[stepIndex];
+        return card
+          + textShapeXml({ id: 40 + stepIndex, name: `Dome Next Plan Phase ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: planItem.phase, size: 1800, bold: true, color: visual.title })
+          + textShapeXml({ id: 50 + stepIndex, name: `Dome Next Plan Action ${stepIndex + 1}`, x: x + 182880, y: y + 487680, cx: 1005840, cy: 304800, text: planItem.action, size: 1100, bold: true, color: visual.title });
+      }
+      return card
         + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title })
-        + textShapeXml({ id: 50 + stepIndex, name: textName, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
+        + textShapeXml({ id: 50 + stepIndex, name: `Dome Step Text ${stepIndex + 1}`, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
     // 三/四步骤流程页增加横向连接线，让独立卡片形成清晰的流程关系。
     const stepConnector = role === "next-plan"
@@ -568,6 +575,21 @@ function domeContentSectionLabelText(slide, index) {
 function normalizeDomeBulletItems(slide, count) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return Array.from({ length: count }, (_, index) => String(bullets[index] ?? ""));
+}
+
+/**
+ * 解析下一步计划页的结构化要点。
+ * 推荐输入为“阶段: 动作”；旧数据没有分隔符时，用序号作阶段、原文作动作。
+ * @param {object} slide
+ * @param {number} count
+ * @returns {{phase: string, action: string}[]}
+ */
+function normalizeDomePlanItems(slide, count) {
+  return normalizeDomeBulletItems(slide, count).map((item, index) => {
+    const match = item.match(/^(.+?)\s*[:：|]\s*(.*)$/);
+    if (!match) return { phase: `0${index + 1}`, action: item };
+    return { phase: match[1].trim(), action: match[2].trim() };
+  });
 }
 
 /**

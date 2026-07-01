@@ -1578,7 +1578,7 @@ test("PptService preview renders dome role classes and business image assets", a
       { title: "数据指标", bullets: ["Revenue growth: 32%", "Retention rate: 88%", "Delivery speed: 2.4d"], layout: "metrics" },
       { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase", sectionLabel: "PART 02" },
       { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
-      { title: "下一步计划", bullets: ["Quarter roadmap", "Key action", "Owner review"], layout: "next-plan" },
+      { title: "下一步计划", bullets: ["Q1: Quarter roadmap", "Q2: Key action", "Q3: Owner review"], layout: "next-plan" },
       { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
     ],
   });
@@ -1622,6 +1622,8 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.equal([...html.matchAll(/class="dome-retrospective-card"/g)].length, 3);
   assert.equal([...html.matchAll(/class="dome-retrospective-label"/g)].length, 3);
   assert.match(html, /dome-plan-timeline/);
+  assert.equal([...html.matchAll(/class="dome-next-plan-phase"/g)].length, 4);
+  assert.equal([...html.matchAll(/class="dome-next-plan-action"/g)].length, 4);
   assert.match(html, /class="dome-role-decor dome-cover-subtitle">年度汇报<\/div>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Discovery<\/span>/);
   assert.match(html, /<span class="dome-metric-value">2\.4d<\/span><span class="dome-metric-label">Delivery speed<\/span>/);
@@ -1629,7 +1631,8 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<span class="dome-retrospective-label">风险<\/span><span class="dome-card-text">Risk signal<\/span>/);
   assert.match(html, /<span class="dome-retrospective-label">原因<\/span><span class="dome-card-text">Root cause<\/span>/);
   assert.match(html, /<span class="dome-retrospective-label">措施<\/span><span class="dome-card-text">Mitigation<\/span>/);
-  assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Quarter roadmap<\/span>/);
+  assert.match(html, /<span class="dome-next-plan-phase">Q1<\/span><span class="dome-next-plan-action">Quarter roadmap<\/span>/);
+  assert.match(html, /<span class="dome-next-plan-phase">Q3<\/span><span class="dome-next-plan-action">Owner review<\/span>/);
   assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<li>Discovery<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="metrics"[\s\S]*<li>Retention rate<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="image-report"[\s\S]*<li>团队投入<\/li>/);

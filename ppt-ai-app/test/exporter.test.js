@@ -125,7 +125,7 @@ test("PptExportService maps structured dome roles to business image and data pla
         { title: "数据指标", bullets: ["Revenue growth: 32%", "Retention rate: 88%", "Delivery speed: 2.4d"], layout: "metrics" },
         { title: "成果展示", bullets: ["Project wins", "Client feedback", "Team awards"], layout: "showcase", sectionLabel: "PART 02" },
         { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
-        { title: "下一步计划", bullets: ["Quarter roadmap", "Key action", "Owner review"], layout: "next-plan" },
+        { title: "下一步计划", bullets: ["Q1: Quarter roadmap", "Q2: Key action", "Q3: Owner review"], layout: "next-plan" },
         { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
       ],
     },
@@ -174,7 +174,10 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Retrospective Text 2"[\s\S]*<a:t>Root cause<\/a:t>/);
   assert.match(text, /name="Dome Next Plan Timeline"/);
   assert.match(text, /name="Dome Next Plan Image"/);
-  assert.match(text, /name="Dome Next Plan Text 1"[\s\S]*<a:t>Quarter roadmap<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Phase 1"[\s\S]*<a:t>Q1<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Action 1"[\s\S]*<a:t>Quarter roadmap<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Phase 3"[\s\S]*<a:t>Q3<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Action 3"[\s\S]*<a:t>Owner review<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide10\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 09<\/a:t>/s);
   assert.match(text, /name="Dome Closing Subtitle"/);
 });
