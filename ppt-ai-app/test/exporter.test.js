@@ -179,6 +179,26 @@ test("PptExportService respects an explicit dome cover layout on any slide", () 
   assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Cover Sailboat Background"/);
 });
 
+test("PptExportService infers image-report role from work summary titles", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "隐式工作概况",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "封面", bullets: ["年度汇报"] },
+        { title: "年度工作概况", bullets: ["业务进展", "团队投入", "关键成果"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+
+  assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Image Report Card 1"/);
+  assert.doesNotMatch(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Step 1"/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });

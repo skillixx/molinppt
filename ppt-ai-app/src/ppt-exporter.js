@@ -379,6 +379,7 @@ function resolveSlideRole(slide, index, total) {
   if (/成果|展示|亮点/i.test(String(slide?.title || ""))) return "showcase";
   if (/问题|复盘|不足|风险/i.test(String(slide?.title || ""))) return "retrospective";
   if (/计划|下一步|下步/i.test(String(slide?.title || ""))) return "next-plan";
+  if (/概况|汇报|图文|进展/i.test(String(slide?.title || ""))) return "image-report";
   if ((slide?.bullets || []).length >= 4) return "four-steps";
   if ((slide?.bullets || []).length === 3) return "three-steps";
   return "image-report";

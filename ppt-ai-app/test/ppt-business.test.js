@@ -1622,6 +1622,37 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(explicitCoverSlide?.[1] || "", /\bslide-cover\b/);
 });
 
+test("PptService preview infers image-report role from work summary titles", async () => {
+  const context = await createBusinessContext();
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "outline-dome-implicit-summary",
+    title: "Dome implicit summary",
+    templateId: "business",
+    templateName: "Executive Business",
+    templateVisual: {
+      primary: "B80F1A",
+      accent: "F6D48A",
+      background: "8F0613",
+      surface: "FFF8E6",
+      title: "7A0611",
+      body: "3C1F1F",
+      layout: "red-gold",
+    },
+    theme: "modern",
+    status: "ready",
+    slides: [
+      { title: "封面", bullets: ["年度汇报"] },
+      { title: "年度工作概况", bullets: ["业务进展", "团队投入", "关键成果"] },
+    ],
+  });
+
+  const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-dome-role="image-report"[\s\S]*<h2>年度工作概况<\/h2>/);
+  assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<h2>年度工作概况<\/h2>/);
+});
+
 test("HTTP API generates a new deck from an existing outline with the currently selected template", async () => {
   const context = await createBusinessContext();
   const app = createApp({
