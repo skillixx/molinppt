@@ -1620,13 +1620,15 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<span class="dome-showcase-number">03<\/span><span class="dome-showcase-text">团队荣誉<\/span>/);
   assert.match(html, /dome-risk-card/);
   assert.equal([...html.matchAll(/class="dome-retrospective-card"/g)].length, 3);
+  assert.equal([...html.matchAll(/class="dome-retrospective-label"/g)].length, 3);
   assert.match(html, /dome-plan-timeline/);
   assert.match(html, /class="dome-role-decor dome-cover-subtitle">年度汇报<\/div>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Discovery<\/span>/);
   assert.match(html, /<span class="dome-metric-value">2\.4d<\/span><span class="dome-metric-label">Delivery speed<\/span>/);
   assert.match(html, /<span class="dome-card-text">团队投入<\/span>/);
-  assert.match(html, /<span class="dome-card-text">Risk signal<\/span>/);
-  assert.match(html, /<span class="dome-card-text">Root cause<\/span>/);
+  assert.match(html, /<span class="dome-retrospective-label">风险<\/span><span class="dome-card-text">Risk signal<\/span>/);
+  assert.match(html, /<span class="dome-retrospective-label">原因<\/span><span class="dome-card-text">Root cause<\/span>/);
+  assert.match(html, /<span class="dome-retrospective-label">措施<\/span><span class="dome-card-text">Mitigation<\/span>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Quarter roadmap<\/span>/);
   assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<li>Discovery<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="metrics"[\s\S]*<li>Retention rate<\/li>/);

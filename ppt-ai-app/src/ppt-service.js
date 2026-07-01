@@ -910,7 +910,8 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-showcase-text{font-size:14px;line-height:1.25;overflow-wrap:anywhere;min-width:0;}
     body[data-layout="red-gold"] .dome-showcase-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-retrospective-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
-    body[data-layout="red-gold"] .dome-retrospective-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;}
+    body[data-layout="red-gold"] .dome-retrospective-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;min-width:0;}
+    body[data-layout="red-gold"] .dome-retrospective-label{font-size:13px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-retrospective-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-risk-card{right:10.5%;bottom:25%;width:24%;border-radius:12px;background:rgba(246,212,138,.94);padding:16px;color:var(--template-title);font-size:18px;font-weight:800;text-align:center;box-shadow:0 14px 22px rgba(82,5,12,.18);display:grid;place-items:center;}
     body[data-layout="red-gold"] .dome-plan-timeline{left:13%;right:13%;bottom:33%;height:3px;background:var(--template-accent);}
@@ -1018,8 +1019,9 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
-    // 问题复盘页固定输出三张要点卡片，避免只显示第一条风险提示而丢失后续复盘内容。
-    const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-retrospective-card", index, bullets[index])).join("");
+    // 问题复盘页固定输出“风险/原因/措施”语义标签，和 PPTX 端的独立标签占位保持一致。
+    const labels = ["风险", "原因", "措施"];
+    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-retrospective-card"><span class="dome-retrospective-label">${labels[index]}</span><span class="dome-card-text">${escapeHtml(bullets[index] || "")}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
