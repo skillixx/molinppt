@@ -131,6 +131,8 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Step 4"/);
   assert.match(text, /name="Dome Step Text 1"[\s\S]*<a:t>Discovery<\/a:t>/);
   assert.match(text, /name="Dome Step Text 4"[\s\S]*<a:t>Review loop<\/a:t>/);
+  assert.equal((text.match(/<a:t>Discovery<\/a:t>/g) || []).length, 1);
+  assert.equal((text.match(/<a:t>Retention rate<\/a:t>/g) || []).length, 1);
   assert.match(text, /name="Dome Metric Card 3"/);
   assert.match(text, /name="Dome Metric Text 2"[\s\S]*<a:t>Retention rate<\/a:t>/);
   assert.match(text, /name="Dome Showcase Image"/);

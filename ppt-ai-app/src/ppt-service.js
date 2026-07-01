@@ -815,7 +815,10 @@ function escapeHtml(value) {
 function renderDeckPreview({ deck, visual }) {
   const slides = deck.slides.map((slide, index) => {
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
+      ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
+      : "";
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
@@ -897,6 +900,18 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:#ffe8b0;}
     @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
+}
+
+/**
+ * 判断 dome 预览页是否还需要普通正文列表。
+ * 对已经有模板卡片承载 bullets 的版式，预览端隐藏普通列表，避免用户看到重复内容。
+ * @param {object} visual
+ * @param {string} role
+ * @returns {boolean}
+ */
+function shouldRenderDomePreviewBodyList(visual, role) {
+  if (visual.layout !== "red-gold") return true;
+  return !["agenda", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
 }
 
 /**
