@@ -52,6 +52,8 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   assert.match(businessText, /name="Moling Executive Business"/);
   assert.match(businessText, /val="B80F1A"/);
   assert.match(businessText, /name="Lower Gold Wave"/);
+  assert.match(businessText, /name="Dome Gold Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
+  assert.match(businessText, /name="Dome Light Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
   assert.match(businessText, /name="Content Placement Card"/);
   assert.match(businessText, /name="Right Golden Motif"/);
   assert.match(pitchText, /name="Moling Venture Pitch"/);

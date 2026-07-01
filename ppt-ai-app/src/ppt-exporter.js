@@ -350,9 +350,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       cx: 9144000,
       cy: 5143500,
     });
+    // dome.pptx 底部是多层金色弧线和色块叠出的波浪，不只是单块红色背景；这里保留色带并补充圆弧线条层。
     const waves = solidShapeXml({ id: 4, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3886200, cx: 4876800, cy: 914400, fill: "FFE8B0" })
       + solidShapeXml({ id: 5, name: "Lower Light Wave", geom: "parallelogram", x: 2590800, y: 3657600, cx: 5181600, cy: 914400, fill: visual.accent })
-      + solidShapeXml({ id: 6, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: "9D0612" });
+      + solidShapeXml({ id: 6, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: "9D0612" })
+      + arcLineShapeXml({ id: 12, name: "Dome Gold Wave Arc", x: -609600, y: 3505200, cx: 4876800, cy: 1447800, stroke: "FFE8B0", width: 91440 })
+      + arcLineShapeXml({ id: 13, name: "Dome Light Wave Arc", x: 2514600, y: 3276600, cx: 5486400, cy: 1600200, stroke: visual.accent, width: 76200 });
     const footer = rectShapeXml({ id: 7, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
       + textShapeXml({ id: 8, name: "Dome Footer Decoration", x: 609600, y: isCover ? 4572000 : 4686300, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: "FFE8B0" });
     const roleDecoration = domeRoleDecorationXml({ role, index, layout, visual, slide });
@@ -907,6 +910,16 @@ function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
  */
 function solidShapeXml({ id, name, geom, x, y, cx, cy, fill }) {
   return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${fill}"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>`;
+}
+
+/**
+ * 创建 dome 底部波浪用的圆弧线条。
+ * 线条层叠在底部色带上，用来模拟 dome.pptx 里更柔和的金色波浪走势。
+ * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, stroke: string, width: number}} input
+ * @returns {string}
+ */
+function arcLineShapeXml({ id, name, x, y, cx, cy, stroke, width }) {
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="arc"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}"/></a:solidFill></a:ln></p:spPr></p:sp>`;
 }
 
 /**
