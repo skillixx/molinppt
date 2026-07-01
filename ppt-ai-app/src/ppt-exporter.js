@@ -4,6 +4,13 @@ import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
 
 const DOME_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
+const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scaleY: 1, type: "screen16x9" };
+const DOME_SLIDE_METRICS = {
+  width: 12192000,
+  height: 6858000,
+  scaleX: 12192000 / 9144000,
+  scaleY: 6858000 / 5143500,
+};
 
 // dome.pptx 的核心视觉不是程序绘制出来的色块，而是可复用的红金背景图。
 // 导出器在启动时读取这些本仓库内资产，并在生成 PPTX 时作为 media part 写入。
@@ -50,7 +57,7 @@ export class PptExportService {
     const files = {
       "[Content_Types].xml": contentTypesXml(deck),
       "_rels/.rels": packageRelsXml(),
-      "ppt/presentation.xml": presentationXml(deck),
+      "ppt/presentation.xml": presentationXml(deck, visual),
       "ppt/_rels/presentation.xml.rels": presentationRelsXml(deck),
       ...slideFiles(deck, visual),
       "ppt/slideLayouts/slideLayout1.xml": slideLayoutXml(visual),
@@ -202,11 +209,14 @@ function packageRelsXml() {
 /**
  * Creates presentation XML.
  * @param {object} deck
+ * @param {object} visual
  * @returns {string}
  */
-function presentationXml(deck) {
+function presentationXml(deck, visual = resolveDeckVisual(deck)) {
+  const metrics = slideMetrics(visual);
   const slideIds = deck.slides.map((_, index) => `<p:sldId id="${256 + index}" r:id="rId${index + 1}"/>`).join("");
-  return `<?xml version="1.0" encoding="UTF-8"?><p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId${deck.slides.length + 1}"/></p:sldMasterIdLst><p:sldIdLst>${slideIds}</p:sldIdLst><p:sldSz cx="9144000" cy="5143500" type="screen16x9"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>`;
+  const type = metrics.type ? ` type="${metrics.type}"` : "";
+  return `<?xml version="1.0" encoding="UTF-8"?><p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId${deck.slides.length + 1}"/></p:sldMasterIdLst><p:sldIdLst>${slideIds}</p:sldIdLst><p:sldSz cx="${metrics.width}" cy="${metrics.height}"${type}/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>`;
 }
 
 /**
@@ -234,10 +244,40 @@ function slideFiles(deck, visual) {
     const bodyColor = layout.bodyColor || visual.body;
     const bodySize = layout.bodySize || 2200;
     const bullets = (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}"><a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("");
-    files[`ppt/slides/slide${index + 1}.xml`] = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor), size: bodySize, bold: false, color: bodyColor })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor), size: bodySize, bold: false, color: bodyColor })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
   return files;
+}
+
+/**
+ * 根据模板选择 PPT 画布尺寸。
+ * dome.pptx 原始文件是 12192000 x 6858000；其他模板继续使用现有 16:9 screen 尺寸，避免影响旧导出。
+ * @param {object} visual
+ * @returns {{width: number, height: number, scaleX: number, scaleY: number, type?: string}}
+ */
+function slideMetrics(visual) {
+  return visual.layout === "red-gold" ? DOME_SLIDE_METRICS : DEFAULT_SLIDE_METRICS;
+}
+
+/**
+ * 将 red-gold 页面坐标从旧的标准 16:9 基准等比放大到 dome.pptx 的真实画布。
+ * 字号不在这里缩放，因为字号本身是 pt 值；这里只处理 OOXML 里的位置和尺寸。
+ * @param {string} xml
+ * @param {object} visual
+ * @returns {string}
+ */
+function scaleTemplateGeometryXml(xml, visual) {
+  const metrics = slideMetrics(visual);
+  if (metrics.scaleX === 1 && metrics.scaleY === 1) return xml;
+  return xml.replace(/<a:(off|ext|chOff|chExt)\b([^>]*)\/>/g, (tag, element, attributes) => {
+    const scaled = attributes.replace(/\b(x|y|cx|cy)="(-?\d+)"/g, (_, name, rawValue) => {
+      const scale = name === "x" || name === "cx" ? metrics.scaleX : metrics.scaleY;
+      return `${name}="${Math.round(Number(rawValue) * scale)}"`;
+    });
+    return `<a:${element}${scaled}/>`;
+  });
 }
 
 function templateDecorationsXml(visual, index, layout, role, slide) {

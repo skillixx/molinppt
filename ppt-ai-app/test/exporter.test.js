@@ -83,6 +83,8 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /ppt\/media\/dome-content\.jpg/);
   assert.match(text, /Target="\.\.\/media\/dome-cover\.jpg"/);
   assert.match(text, /Target="\.\.\/media\/dome-content\.jpg"/);
+  assert.match(text, /<p:sldSz cx="12192000" cy="6858000"\/>/);
+  assert.match(text, /name="Dome Cover Sailboat Background"[\s\S]*<a:ext cx="12192000" cy="6858000"\/>/);
   assert.match(text, /name="Dome Cover Sailboat Background"/);
   assert.match(text, /name="Dome Agenda Card 1"/);
   assert.match(text, /name="Dome Section Number"/);
