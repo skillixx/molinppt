@@ -433,6 +433,8 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     const count = role === "three-steps" ? 3 : 4;
     const bulletItems = normalizeDomeBulletItems(slide, count);
     const planItems = role === "next-plan" ? normalizeDomePlanItems(slide, count) : [];
+    // 流程和计划页也需要 dome.pptx 的浅色内容承载面，否则卡片会直接漂在红金背景上。
+    const contentSurface = solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface });
     const sectionLabel = textShapeXml({ id: 80, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
     const steps = Array.from({ length: count }, (_, stepIndex) => {
       const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
@@ -461,13 +463,14 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       ? pictureXml({ id: 71, name: "Dome Next Plan Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
     return role === "next-plan"
-      ? sectionLabel + nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
-      : sectionLabel + fourStepsImage + stepConnector + steps;
+      ? contentSurface + sectionLabel + nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
+      : contentSurface + sectionLabel + fourStepsImage + stepConnector + steps;
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeMetricItems(slide, 3);
-    // 指标页也保留右上章节标签，使所有内容页都有 dome.pptx 风格的章节定位。
-    return textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
+    // 指标页保留浅色承载面和右上章节标签，使数据卡片与 dome.pptx 内容页层级一致。
+    return solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       + Array.from({ length: 3 }, (_, metricIndex) => {
       const x = 1219200 + metricIndex * 2286000;

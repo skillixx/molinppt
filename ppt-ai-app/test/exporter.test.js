@@ -133,6 +133,10 @@ test("PptExportService maps structured dome roles to business image and data pla
   });
   const text = result.content.toString("latin1");
   const utf8Text = result.content.toString("utf8");
+  const threeStepsSlide = pptPartText(text, "ppt/slides/slide5.xml");
+  const fourStepsSlide = pptPartText(text, "ppt/slides/slide6.xml");
+  const metricsSlide = pptPartText(text, "ppt/slides/slide7.xml");
+  const nextPlanSlide = pptPartText(text, "ppt/slides/slide10.xml");
 
   assert.match(text, /ppt\/media\/dome-business-1\.jpeg/);
   assert.match(text, /ppt\/media\/dome-business-2\.jpeg/);
@@ -153,12 +157,15 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Step Text 4"[\s\S]*<a:t>Review loop<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide5\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 04<\/a:t>/s);
   assert.match(text, /ppt\/slides\/slide6\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 05<\/a:t>/s);
+  assert.match(threeStepsSlide, /name="Content Placement Card"/);
+  assert.match(fourStepsSlide, /name="Content Placement Card"/);
   assert.equal((text.match(/<a:t>Discovery<\/a:t>/g) || []).length, 1);
   assert.equal((text.match(/<a:t>Retention rate<\/a:t>/g) || []).length, 1);
   assert.match(text, /name="Dome Metric Card 3"/);
   assert.match(text, /name="Dome Metric Value 2"[\s\S]*<a:t>88%<\/a:t>/);
   assert.match(text, /name="Dome Metric Label 2"[\s\S]*<a:t>Retention rate<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide7\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 06<\/a:t>/s);
+  assert.match(metricsSlide, /name="Content Placement Card"/);
   assert.match(text, /name="Dome Showcase Image"/);
   assert.match(text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 02<\/a:t>/s);
   assert.match(text, /name="Dome Showcase Card 3"/);
@@ -179,6 +186,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Next Plan Phase 3"[\s\S]*<a:t>Q3<\/a:t>/);
   assert.match(text, /name="Dome Next Plan Action 3"[\s\S]*<a:t>Owner review<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide10\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 09<\/a:t>/s);
+  assert.match(nextPlanSlide, /name="Content Placement Card"/);
   assert.match(text, /name="Dome Closing Subtitle"/);
 });
 
@@ -335,4 +343,12 @@ function pdfHex(value) {
     utf16be[index + 1] = utf16le[index];
   }
   return `<${utf16be.toString("hex").toUpperCase()}>`;
+}
+
+function pptPartText(zipText, partPath) {
+  const marker = "PK\x03\x04";
+  const start = zipText.indexOf(`${partPath}<?xml`);
+  if (start === -1) return "";
+  const nextPart = zipText.indexOf(marker, start + partPath.length);
+  return zipText.slice(start, nextPart === -1 ? undefined : nextPart);
 }
