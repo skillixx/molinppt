@@ -105,12 +105,12 @@ test("PptExportService maps structured dome roles to business image and data pla
         { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
         { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
         { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
-        { title: "三步骤流程", bullets: ["识别问题", "制定方案", "落地执行"], layout: "three-steps" },
-        { title: "四步骤流程", bullets: ["目标拆解", "资源配置", "过程跟踪", "复盘优化"], layout: "four-steps" },
-        { title: "数据指标", bullets: ["收入增长", "客户留存", "交付效率"], layout: "metrics" },
+        { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
+        { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
+        { title: "数据指标", bullets: ["Revenue growth", "Retention rate", "Delivery speed"], layout: "metrics" },
         { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase" },
-        { title: "问题复盘", bullets: ["风险识别", "原因分析", "改进动作"], layout: "retrospective" },
-        { title: "下一步计划", bullets: ["重点目标", "关键举措", "保障机制"], layout: "next-plan" },
+        { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
+        { title: "下一步计划", bullets: ["Quarter roadmap", "Key action", "Owner review"], layout: "next-plan" },
         { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
       ],
     },
@@ -125,10 +125,15 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Business Image"/);
   assert.match(text, /name="Dome Step 3"/);
   assert.match(text, /name="Dome Step 4"/);
+  assert.match(text, /name="Dome Step Text 1"[\s\S]*<a:t>Discovery<\/a:t>/);
+  assert.match(text, /name="Dome Step Text 4"[\s\S]*<a:t>Review loop<\/a:t>/);
   assert.match(text, /name="Dome Metric Card 3"/);
+  assert.match(text, /name="Dome Metric Text 2"[\s\S]*<a:t>Retention rate<\/a:t>/);
   assert.match(text, /name="Dome Showcase Image"/);
   assert.match(text, /name="Dome Retrospective Risk Card"/);
+  assert.match(text, /name="Dome Retrospective Risk Text"[\s\S]*<a:t>Risk signal<\/a:t>/);
   assert.match(text, /name="Dome Next Plan Timeline"/);
+  assert.match(text, /name="Dome Next Plan Text 1"[\s\S]*<a:t>Quarter roadmap<\/a:t>/);
 });
 
 test("PptExportService applies template-specific visual colors to PDF output", () => {

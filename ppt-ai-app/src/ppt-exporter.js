@@ -390,21 +390,27 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
     const count = role === "three-steps" ? 3 : 4;
+    const bulletItems = normalizeDomeBulletItems(slide, count);
     const steps = Array.from({ length: count }, (_, stepIndex) => {
       const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
       const y = 2895600;
+      const textName = role === "next-plan" ? `Dome Next Plan Text ${stepIndex + 1}` : `Dome Step Text ${stepIndex + 1}`;
       return solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: count === 3 ? 1676400 : 1371600, cy: 914400, fill: stepIndex % 2 === 0 ? "FFF8E6" : visual.accent })
-        + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 182880, cx: 914400, cy: 365760, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title });
+        + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title })
+        + textShapeXml({ id: 50 + stepIndex, name: textName, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
     return role === "next-plan"
       ? steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
       : steps;
   }
   if (role === "metrics") {
+    const metricItems = normalizeDomeBulletItems(slide, 3);
     return pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       + Array.from({ length: 3 }, (_, metricIndex) => {
       const x = 1219200 + metricIndex * 2286000;
-      return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" });
+      return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" })
+        + textShapeXml({ id: 40 + metricIndex, name: `Dome Metric Number ${metricIndex + 1}`, x: x + 228600, y: 2743200, cx: 1219200, cy: 304800, text: `0${metricIndex + 1}`, size: 1800, bold: true, color: visual.title })
+        + textShapeXml({ id: 50 + metricIndex, name: `Dome Metric Text ${metricIndex + 1}`, x: x + 228600, y: 3200400, cx: 1371600, cy: 304800, text: metricItems[metricIndex], size: 1200, bold: true, color: visual.body });
     }).join("");
   }
   if (role === "showcase") {
@@ -414,9 +420,11 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
   }
   if (role === "retrospective") {
+    const riskItems = normalizeDomeBulletItems(slide, 1);
     return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
       + pictureXml({ id: 30, name: "Dome Business Image", relId: "rId3", x: 5486400, y: 1524000, cx: 2133600, cy: 1371600 })
       + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: visual.accent })
+      + textShapeXml({ id: 34, name: "Dome Retrospective Risk Text", x: 5715000, y: 3352800, cx: 1676400, cy: 304800, text: riskItems[0], size: 1300, bold: true, color: visual.title })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
   }
   if (role === "closing") {
@@ -427,6 +435,18 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
     + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+}
+
+/**
+ * 从用户结构化 bullets 中取出当前版式需要的占位文案。
+ * bullets 不足时使用空字符串，保证卡片数量和模板版式稳定。
+ * @param {object} slide
+ * @param {number} count
+ * @returns {string[]}
+ */
+function normalizeDomeBulletItems(slide, count) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: count }, (_, index) => String(bullets[index] ?? ""));
 }
 
 /**
