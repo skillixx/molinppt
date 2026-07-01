@@ -454,6 +454,10 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     const stepConnector = role === "next-plan"
       ? ""
       : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: visual.accent });
+    // 三步骤流程页补齐商务图片层，保持流程类内容页也有 dome.pptx 的图文商务气质。
+    const threeStepsImage = role === "three-steps"
+      ? pictureXml({ id: 69, name: "Dome Three Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
+      : "";
     // 四步骤流程页复用 dome.pptx 的第 4 张商务图，避免提取出的业务视觉资产闲置。
     const fourStepsImage = role === "four-steps"
       ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
@@ -464,7 +468,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       : "";
     return role === "next-plan"
       ? contentSurface + sectionLabel + nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
-      : contentSurface + sectionLabel + fourStepsImage + stepConnector + steps;
+      : contentSurface + sectionLabel + threeStepsImage + fourStepsImage + stepConnector + steps;
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeMetricItems(slide, 3);
@@ -618,6 +622,7 @@ function normalizeDomeMetricItems(slide, count) {
 function domeRoleBusinessMedia(role) {
   const mapping = {
     "image-report": "dome-business-1.jpeg",
+    "three-steps": "dome-business-3.jpeg",
     "four-steps": "dome-business-4.jpeg",
     metrics: "dome-business-5.jpeg",
     showcase: "dome-business-2.jpeg",

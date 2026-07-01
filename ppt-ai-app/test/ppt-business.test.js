@@ -1603,6 +1603,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /--dome-business-1:url\("data:image\/jpeg;base64,/);
   assert.match(html, /--dome-business-4:url\("data:image\/jpeg;base64,/);
   assert.match(html, /--dome-business-6:url\("data:image\/jpeg;base64,/);
+  assert.match(html, /\.slide\[data-dome-role="three-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-3\);\}/);
   assert.match(html, /\.slide\[data-dome-role="four-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-4\);\}/);
   assert.match(html, /class="dome-role-visual"/);
   assert.equal([...html.matchAll(/class="dome-role-decor dome-footer-decoration"/g)].length, 12);
@@ -1618,6 +1619,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /data-dome-role="section-divider"[\s\S]*class="dome-role-decor dome-section-divider-line"/);
   assert.match(html, /data-dome-role="image-report"[\s\S]*class="dome-role-decor dome-section-label">PART 03<\/div>/);
   assert.match(html, /data-dome-role="three-steps"[\s\S]*class="dome-role-decor dome-section-label">PART 05<\/div>/);
+  assert.match(html, /data-dome-role="three-steps"[\s\S]*class="dome-role-visual"/);
   assert.match(html, /data-dome-role="four-steps"[\s\S]*class="dome-role-decor dome-section-label">PART 06<\/div>/);
   assert.equal([...html.matchAll(/class="dome-role-decor dome-step-connector"/g)].length, 2);
   assert.match(html, /data-dome-role="three-steps"[\s\S]*class="dome-role-decor dome-step-connector"/);
@@ -1690,8 +1692,9 @@ test("PptService preview infers image-report role from work summary titles", asy
 
   const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(html, /data-dome-role="image-report"[\s\S]*<h2>年度工作概况<\/h2>/);
-  assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<h2>年度工作概况<\/h2>/);
+  const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
+  const summarySlide = previewSlides.find(([, , , title]) => title === "年度工作概况");
+  assert.equal(summarySlide?.[2], "image-report");
 });
 
 test("PptService preview fills a default dome section number when omitted", async () => {

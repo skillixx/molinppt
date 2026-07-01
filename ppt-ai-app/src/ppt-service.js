@@ -920,6 +920,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-plan-timeline{left:13%;right:13%;bottom:33%;height:3px;background:var(--template-accent);}
     body[data-layout="red-gold"] .dome-closing-subtitle{left:50%;top:58%;transform:translateX(-50%);width:42%;color:#ffe8b0;font-size:16px;font-weight:800;text-align:center;text-shadow:0 10px 22px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .dome-role-visual{background-image:var(--dome-business-2);}
+    body[data-layout="red-gold"] .slide[data-dome-role="three-steps"] .dome-role-visual{background-image:var(--dome-business-3);}
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .dome-role-visual{background-image:var(--dome-business-3);}
     body[data-layout="red-gold"] .slide[data-dome-role="four-steps"] .dome-role-visual{background-image:var(--dome-business-4);}
     body[data-layout="red-gold"] .slide[data-dome-role="next-plan"] .dome-role-visual{background-image:var(--dome-business-6);}
@@ -1005,7 +1006,8 @@ function renderDomePreviewDecoration(role, slide, index) {
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
     const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
-    const visual = role === "four-steps" ? `<div class="dome-role-visual"></div>` : "";
+    // 三/四步骤流程页都显示商务图片层，让预览与 PPTX 导出的流程页视觉结构一致。
+    const visual = `<div class="dome-role-visual"></div>`;
     return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-connector"></div><div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
   }
   if (role === "metrics") {
