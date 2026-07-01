@@ -1615,6 +1615,9 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /dome-metric-card/);
   assert.match(html, /<span class="dome-metric-value">88%<\/span><span class="dome-metric-label">Retention rate<\/span>/);
   assert.equal([...html.matchAll(/class="dome-showcase-card"/g)].length, 3);
+  assert.equal([...html.matchAll(/class="dome-showcase-number"/g)].length, 3);
+  assert.match(html, /<span class="dome-showcase-number">01<\/span><span class="dome-showcase-text">项目成果<\/span>/);
+  assert.match(html, /<span class="dome-showcase-number">03<\/span><span class="dome-showcase-text">团队荣誉<\/span>/);
   assert.match(html, /dome-risk-card/);
   assert.equal([...html.matchAll(/class="dome-retrospective-card"/g)].length, 3);
   assert.match(html, /dome-plan-timeline/);

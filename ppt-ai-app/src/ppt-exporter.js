@@ -473,11 +473,12 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "showcase") {
     const showcaseItems = normalizeDomeBulletItems(slide, 3);
-    // 成果展示页把结构化要点放入三张成果卡片，避免退化成普通列表页。
+    // 成果展示页拆成编号和正文两个占位符，贴近 dome.pptx 的成果卡层级，而不是整段文本列表。
     const showcaseCards = Array.from({ length: 3 }, (_, cardIndex) => {
       const y = 2438400 + cardIndex * 640080;
       return solidShapeXml({ id: 34 + cardIndex, name: `Dome Showcase Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
-        + textShapeXml({ id: 44 + cardIndex, name: `Dome Showcase Text ${cardIndex + 1}`, x: 1524000, y: y + 121920, cx: 2590800, cy: 213360, text: showcaseItems[cardIndex], size: 1200, bold: true, color: visual.title });
+        + textShapeXml({ id: 44 + cardIndex, name: `Dome Showcase Number ${cardIndex + 1}`, x: 1447800, y: y + 121920, cx: 457200, cy: 213360, text: `0${cardIndex + 1}`, size: 1300, bold: true, color: visual.title })
+        + textShapeXml({ id: 54 + cardIndex, name: `Dome Showcase Text ${cardIndex + 1}`, x: 1981200, y: y + 121920, cx: 2133600, cy: 213360, text: showcaseItems[cardIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
     return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
       + pictureXml({ id: 30, name: "Dome Showcase Image", relId: "rId3", x: 5334000, y: 1371600, cx: 2438400, cy: 1828800 })

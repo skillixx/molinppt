@@ -905,7 +905,9 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-image-report-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-image-report-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-showcase-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
-    body[data-layout="red-gold"] .dome-showcase-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-size:14px;font-weight:800;line-height:1.25;overflow-wrap:anywhere;}
+    body[data-layout="red-gold"] .dome-showcase-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;min-width:0;}
+    body[data-layout="red-gold"] .dome-showcase-number{font-size:16px;line-height:1;color:var(--template-title);}
+    body[data-layout="red-gold"] .dome-showcase-text{font-size:14px;line-height:1.25;overflow-wrap:anywhere;min-width:0;}
     body[data-layout="red-gold"] .dome-showcase-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-retrospective-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-retrospective-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;}
@@ -1006,8 +1008,8 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase") {
-    // 成果展示页使用三张固定卡片承载要点，预览结构和 PPTX 导出保持一致。
-    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card">${escapeHtml(bullets[index] || "")}</div>`).join("");
+    // 成果展示页将编号和成果内容拆成两个视觉层，和 PPTX 的 Dome Showcase Number/Text 占位保持一致。
+    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card"><span class="dome-showcase-number">0${index + 1}</span><span class="dome-showcase-text">${escapeHtml(bullets[index] || "")}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
   if (role === "image-report") {
