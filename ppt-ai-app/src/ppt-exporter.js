@@ -424,8 +424,12 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     const fourStepsImage = role === "four-steps"
       ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
+    // 下一步计划页复用 dome.pptx 的第 6 张商务图，与预览端的 next-plan 视觉保持一致。
+    const nextPlanImage = role === "next-plan"
+      ? pictureXml({ id: 71, name: "Dome Next Plan Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
+      : "";
     return role === "next-plan"
-      ? steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
+      ? nextPlanImage + steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
       : fourStepsImage + steps;
   }
   if (role === "metrics") {
