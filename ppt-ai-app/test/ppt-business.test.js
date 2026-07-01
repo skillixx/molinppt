@@ -1433,7 +1433,7 @@ test("PptService preview renders dome role classes and business image assets", a
     status: "ready",
     slides: [
       { title: "封面", bullets: ["年度汇报"], layout: "cover" },
-      { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
+      { title: "目录", bullets: ["工作汇报", "成果展示"], layout: "agenda" },
       { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
       { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
       { title: "追加封面", bullets: ["Manual cover"], layout: "cover" },
@@ -1458,6 +1458,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /\.slide\[data-dome-role="four-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-4\);\}/);
   assert.match(html, /class="dome-role-visual"/);
   assert.match(html, /dome-agenda-card/);
+  assert.equal([...html.matchAll(/class="dome-agenda-card"/g)].length, 4);
   assert.match(html, /class="dome-role-decor dome-section-number">PART 01<\/div>/);
   assert.match(html, /class="dome-role-decor dome-section-label">PART 02<\/div>/);
   assert.match(html, /dome-metric-card/);

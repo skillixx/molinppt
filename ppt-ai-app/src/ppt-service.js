@@ -953,7 +953,8 @@ function resolvePreviewDomeRole(slide, index, total) {
 function renderDomePreviewDecoration(role, slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   if (role === "agenda") {
-    const cards = bullets.slice(0, 4).map((item) => `<div class="dome-agenda-card">${escapeHtml(item)}</div>`).join("");
+    // 目录页固定保留 4 个卡片占位符，和 dome.pptx/PPTX 导出保持一致，避免少量目录项导致版式塌陷。
+    const cards = Array.from({ length: 4 }, (_, index) => `<div class="dome-agenda-card">${escapeHtml(bullets[index] || "")}</div>`).join("");
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
   if (role === "section-divider") {
