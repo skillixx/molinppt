@@ -354,7 +354,7 @@ function templateMediaFiles(visual) {
  */
 function resolveSlideRole(slide, index, total) {
   const explicit = String(slide?.layout || "").toLowerCase();
-  if (["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) {
+  if (["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) {
     return explicit;
   }
   if (index === 0) return "cover";

@@ -1436,6 +1436,7 @@ test("PptService preview renders dome role classes and business image assets", a
       { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
       { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
       { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
+      { title: "追加封面", bullets: ["Manual cover"], layout: "cover" },
       { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
       { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
       { title: "数据指标", bullets: ["Revenue growth", "Retention rate", "Delivery speed"], layout: "metrics" },
@@ -1462,6 +1463,9 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<span class="dome-card-index">02<\/span><span class="dome-card-text">Retention rate<\/span>/);
   assert.match(html, /<span class="dome-card-text">Risk signal<\/span>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Quarter roadmap<\/span>/);
+  const previewSlides = [...html.matchAll(/<div class="slide[^"]*" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
+  const explicitCoverSlide = previewSlides.find(([, , title]) => title === "追加封面");
+  assert.equal(explicitCoverSlide?.[1], "cover");
 });
 
 test("HTTP API generates a new deck from an existing outline with the currently selected template", async () => {

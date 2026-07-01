@@ -909,7 +909,7 @@ function renderDeckPreview({ deck, visual }) {
  */
 function resolvePreviewDomeRole(slide, index, total) {
   const explicit = String(slide?.layout || "").toLowerCase();
-  if (["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) return explicit;
+  if (["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) return explicit;
   if (index === 0) return "cover";
   if (index === total - 1 && /结束|谢谢|感谢|thanks/i.test(String(slide?.title || ""))) return "closing";
   if (/目录|contents?/i.test(String(slide?.title || ""))) return "agenda";
