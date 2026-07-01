@@ -461,12 +461,19 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       + showcaseCards;
   }
   if (role === "retrospective") {
-    const riskItems = normalizeDomeBulletItems(slide, 1);
+    const riskItems = normalizeDomeBulletItems(slide, 3);
+    // 问题复盘页除了右侧风险高亮，还要把三条结构化复盘要点放进固定卡片槽位。
+    const retrospectiveCards = Array.from({ length: 3 }, (_, cardIndex) => {
+      const y = 2438400 + cardIndex * 640080;
+      return solidShapeXml({ id: 35 + cardIndex, name: `Dome Retrospective Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+        + textShapeXml({ id: 45 + cardIndex, name: `Dome Retrospective Text ${cardIndex + 1}`, x: 1524000, y: y + 121920, cx: 2590800, cy: 213360, text: riskItems[cardIndex], size: 1200, bold: true, color: visual.title });
+    }).join("");
     return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
       + pictureXml({ id: 30, name: "Dome Business Image", relId: "rId3", x: 5486400, y: 1524000, cx: 2133600, cy: 1371600 })
       + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: visual.accent })
       + textShapeXml({ id: 34, name: "Dome Retrospective Risk Text", x: 5715000, y: 3352800, cx: 1676400, cy: 304800, text: riskItems[0], size: 1300, bold: true, color: visual.title })
-      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
+      + retrospectiveCards;
   }
   if (role === "closing") {
     return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" });
