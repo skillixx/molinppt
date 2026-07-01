@@ -1,5 +1,19 @@
+import { readFileSync } from "node:fs";
+
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
+
+const DOME_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
+const DOME_PREVIEW_ASSETS = {
+  cover: readFileSync(new URL("dome-cover.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  content: readFileSync(new URL("dome-content.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business1: readFileSync(new URL("dome-business-1.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business2: readFileSync(new URL("dome-business-2.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business3: readFileSync(new URL("dome-business-3.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business4: readFileSync(new URL("dome-business-4.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business5: readFileSync(new URL("dome-business-5.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+  business6: readFileSync(new URL("dome-business-6.jpeg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
+};
 
 const GENERATE_AMOUNT = "6";
 const REGENERATE_SLIDE_AMOUNT = "2";
@@ -799,11 +813,15 @@ function escapeHtml(value) {
  * @returns {string}
  */
 function renderDeckPreview({ deck, visual }) {
-  const slides = deck.slides.map((slide, index) => (
-    `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}"><div class="accent"></div><div class="motif"></div><div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`
-  )).join("");
+  const slides = deck.slides.map((slide, index) => {
+    const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${(slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+  }).join("");
+  const domePreviewVars = visual.layout === "red-gold"
+    ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
+    : "";
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title><style>
-    :root{--template-primary:#${visual.primary};--template-accent:#${visual.accent};--template-bg:#${visual.background};--template-surface:#${visual.surface};--template-title:#${visual.title};--template-body:#${visual.body};}
+    :root{--template-primary:#${visual.primary};--template-accent:#${visual.accent};--template-bg:#${visual.background};--template-surface:#${visual.surface};--template-title:#${visual.title};--template-body:#${visual.body};${domePreviewVars}}
     *{box-sizing:border-box} html{background:var(--template-bg);} body{margin:0;padding:28px;background:linear-gradient(135deg,var(--template-bg),#ffffff 58%,var(--template-bg));color:var(--template-body);font-family:Arial,"Microsoft YaHei",sans-serif;}
     main{display:grid;gap:34px;width:min(100%,1120px);margin:0 auto;}
     .preview-page{display:grid;gap:10px;}
@@ -839,7 +857,8 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="venture"] .slide::after{content:"";position:absolute;inset:9% 6% 11%;background:var(--template-surface);box-shadow:0 22px 54px rgba(17,24,39,.20);}
     body[data-layout="venture"] .accent{top:auto;left:9%;right:9%;bottom:14%;height:2.2%;border-radius:999px;background:var(--template-accent);}
     body[data-layout="venture"] h2{max-width:82%;font-size:46px;}
-    body[data-layout="red-gold"] .slide{background:linear-gradient(135deg,var(--template-primary),#d91d24 58%,#7d0610);border:0;padding:10.5% 12% 9%;box-shadow:0 22px 58px rgba(104,5,13,.24);}
+    body[data-layout="red-gold"] .slide{background-image:var(--dome-content-bg),linear-gradient(135deg,var(--template-primary),#d91d24 58%,#7d0610);background-size:cover;background-position:center;border:0;padding:10.5% 12% 9%;box-shadow:0 22px 58px rgba(104,5,13,.24);}
+    body[data-layout="red-gold"] .slide-cover{background-image:var(--dome-cover-bg),linear-gradient(135deg,var(--template-primary),#d91d24 58%,#7d0610);}
     body[data-layout="red-gold"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 44%),repeating-linear-gradient(115deg,rgba(255,232,176,.08) 0 1px,transparent 1px 42px);}
     body[data-layout="red-gold"] .slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:25%;background:linear-gradient(135deg,rgba(255,248,204,.92),rgba(246,212,138,.78) 34%,rgba(184,15,26,.28) 35%,rgba(126,6,16,.68));clip-path:polygon(0 66%,14% 48%,28% 58%,44% 34%,60% 52%,76% 30%,100% 44%,100% 100%,0 100%);}
     body[data-layout="red-gold"] .accent{left:0;right:0;top:auto;bottom:23.2%;height:2px;background:var(--template-accent);}
@@ -858,8 +877,81 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide:not(.slide-cover) h2{max-width:66%;font-size:42px;color:var(--template-title);text-shadow:none;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) ul{max-width:64%;font-size:21px;color:var(--template-body);}
     body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;right:11%;top:30%;width:7.8%;height:34%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(82,5,12,.18);}
+    body[data-layout="red-gold"] .dome-role-visual{position:absolute;z-index:2;right:10.5%;top:27%;width:24%;height:35%;border-radius:10px;background:var(--dome-business-1) center/cover no-repeat;box-shadow:0 18px 30px rgba(82,5,12,.22);overflow:hidden;}
+    body[data-layout="red-gold"] .dome-role-decor{position:absolute;z-index:3;pointer-events:none;}
+    body[data-layout="red-gold"] .dome-agenda-grid{left:13%;right:13%;top:33%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+    body[data-layout="red-gold"] .dome-agenda-card{min-height:74px;border-radius:12px;background:rgba(246,212,138,.92);box-shadow:0 14px 22px rgba(82,5,12,.20);color:var(--template-title);font-size:20px;font-weight:800;display:grid;place-items:center;}
+    body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;}
+    body[data-layout="red-gold"] .dome-metric-grid{left:12%;right:34%;bottom:25%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="red-gold"] .dome-risk-card{right:10.5%;bottom:25%;width:24%;border-radius:12px;background:rgba(246,212,138,.94);padding:16px;color:var(--template-title);font-size:18px;font-weight:800;text-align:center;box-shadow:0 14px 22px rgba(82,5,12,.18);}
+    body[data-layout="red-gold"] .dome-plan-timeline{left:13%;right:13%;bottom:33%;height:3px;background:var(--template-accent);}
+    body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .dome-role-visual{background-image:var(--dome-business-2);}
+    body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .dome-role-visual{background-image:var(--dome-business-3);}
+    body[data-layout="red-gold"] .slide[data-dome-role="next-plan"] .dome-role-visual{background-image:var(--dome-business-6);}
+    body[data-layout="red-gold"] .slide[data-dome-role="metrics"] .dome-role-visual{background-image:var(--dome-business-5);top:24%;height:28%;}
+    body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
+    body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:#ffe8b0;}
+    body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:#ffe8b0;}
     @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
+}
+
+/**
+ * 预览端使用与 PPTX 导出一致的页面角色判断。
+ * 这样用户看到的封面、目录、章节页和结束页，不会在导出时变成另一套布局。
+ * @param {object} slide
+ * @param {number} index
+ * @param {number} total
+ * @returns {string}
+ */
+function resolvePreviewDomeRole(slide, index, total) {
+  const explicit = String(slide?.layout || "").toLowerCase();
+  if (["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) return explicit;
+  if (index === 0) return "cover";
+  if (index === total - 1 && /结束|谢谢|感谢|thanks/i.test(String(slide?.title || ""))) return "closing";
+  if (/目录|contents?/i.test(String(slide?.title || ""))) return "agenda";
+  if (/part|章节|工作汇报|成果展示|问题不足|下步计划/i.test(String(slide?.title || "")) && (slide?.bullets || []).length <= 1) return "section-divider";
+  if (/指标|数据|kpi|metric/i.test(String(slide?.title || ""))) return "metrics";
+  if (/成果|展示|亮点/i.test(String(slide?.title || ""))) return "showcase";
+  if (/问题|复盘|不足|风险/i.test(String(slide?.title || ""))) return "retrospective";
+  if (/计划|下一步|下步/i.test(String(slide?.title || ""))) return "next-plan";
+  if ((slide?.bullets || []).length >= 4) return "four-steps";
+  if ((slide?.bullets || []).length === 3) return "three-steps";
+  return "image-report";
+}
+
+/**
+ * 为 HTML 预览生成与 dome 角色匹配的视觉占位符。
+ * PPTX 导出会生成真实 OOXML 形状；这里生成轻量 HTML 层，保证用户预览时能看到同样的版式意图。
+ * @param {string} role
+ * @param {object} slide
+ * @returns {string}
+ */
+function renderDomePreviewDecoration(role, slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  if (role === "agenda") {
+    const cards = bullets.slice(0, 4).map((item) => `<div class="dome-agenda-card">${escapeHtml(item)}</div>`).join("");
+    return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
+  }
+  if (role === "three-steps" || role === "four-steps") {
+    const count = role === "three-steps" ? 3 : 4;
+    const cards = Array.from({ length: count }, (_, index) => `<div class="dome-step-card">0${index + 1}</div>`).join("");
+    return `<div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
+  }
+  if (role === "metrics") {
+    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid"><div class="dome-metric-card">01</div><div class="dome-metric-card">02</div><div class="dome-metric-card">03</div></div>`;
+  }
+  if (role === "showcase" || role === "image-report") {
+    return `<div class="dome-role-visual"></div>`;
+  }
+  if (role === "retrospective") {
+    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-risk-card">RISK</div>`;
+  }
+  if (role === "next-plan") {
+    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div>`;
+  }
+  return "";
 }
 
 /**

@@ -59,6 +59,76 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   assert.notEqual(businessText, pitchText);
 });
 
+test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "年度工作汇报",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "年度工作汇报", bullets: ["2026 年度经营复盘"] },
+        { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
+        { title: "工作汇报", bullets: ["PART 01"], layout: "section-divider" },
+        { title: "年度工作概况", bullets: ["核心目标达成情况", "关键业务指标完成率", "团队协作与资源投入概况"], layout: "image-report" },
+        { title: "下步计划", bullets: ["目标拆解", "资源配置", "执行跟踪", "复盘优化"], layout: "four-steps" },
+        { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+
+  assert.match(text, /ppt\/media\/dome-cover\.jpg/);
+  assert.match(text, /ppt\/media\/dome-content\.jpg/);
+  assert.match(text, /Target="\.\.\/media\/dome-cover\.jpg"/);
+  assert.match(text, /Target="\.\.\/media\/dome-content\.jpg"/);
+  assert.match(text, /name="Dome Cover Sailboat Background"/);
+  assert.match(text, /name="Dome Agenda Card 1"/);
+  assert.match(text, /name="Dome Section Number"/);
+  assert.match(text, /name="Dome Image Placeholder"/);
+  assert.match(text, /name="Dome Step 4"/);
+  assert.match(text, /name="Dome Closing Mark"/);
+});
+
+test("PptExportService maps structured dome roles to business image and data placeholders", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "经营复盘",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "封面", bullets: ["年度汇报"], layout: "cover" },
+        { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
+        { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
+        { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
+        { title: "三步骤流程", bullets: ["识别问题", "制定方案", "落地执行"], layout: "three-steps" },
+        { title: "四步骤流程", bullets: ["目标拆解", "资源配置", "过程跟踪", "复盘优化"], layout: "four-steps" },
+        { title: "数据指标", bullets: ["收入增长", "客户留存", "交付效率"], layout: "metrics" },
+        { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase" },
+        { title: "问题复盘", bullets: ["风险识别", "原因分析", "改进动作"], layout: "retrospective" },
+        { title: "下一步计划", bullets: ["重点目标", "关键举措", "保障机制"], layout: "next-plan" },
+        { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+
+  assert.match(text, /ppt\/media\/dome-business-1\.jpeg/);
+  assert.match(text, /ppt\/media\/dome-business-2\.jpeg/);
+  assert.match(text, /Target="\.\.\/media\/dome-business-1\.jpeg"/);
+  assert.match(text, /Target="\.\.\/media\/dome-business-2\.jpeg"/);
+  assert.match(text, /name="Dome Business Image"/);
+  assert.match(text, /name="Dome Step 3"/);
+  assert.match(text, /name="Dome Step 4"/);
+  assert.match(text, /name="Dome Metric Card 3"/);
+  assert.match(text, /name="Dome Showcase Image"/);
+  assert.match(text, /name="Dome Retrospective Risk Card"/);
+  assert.match(text, /name="Dome Next Plan Timeline"/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });

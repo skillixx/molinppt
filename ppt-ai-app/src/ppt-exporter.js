@@ -1,5 +1,22 @@
+import { readFileSync } from "node:fs";
+
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
+
+const DOME_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
+
+// dome.pptx 的核心视觉不是程序绘制出来的色块，而是可复用的红金背景图。
+// 导出器在启动时读取这些本仓库内资产，并在生成 PPTX 时作为 media part 写入。
+const DOME_ASSETS = {
+  cover: readFileSync(new URL("dome-cover.jpg", DOME_ASSET_BASE_URL)),
+  content: readFileSync(new URL("dome-content.jpg", DOME_ASSET_BASE_URL)),
+  business1: readFileSync(new URL("dome-business-1.jpeg", DOME_ASSET_BASE_URL)),
+  business2: readFileSync(new URL("dome-business-2.jpeg", DOME_ASSET_BASE_URL)),
+  business3: readFileSync(new URL("dome-business-3.jpeg", DOME_ASSET_BASE_URL)),
+  business4: readFileSync(new URL("dome-business-4.jpeg", DOME_ASSET_BASE_URL)),
+  business5: readFileSync(new URL("dome-business-5.jpeg", DOME_ASSET_BASE_URL)),
+  business6: readFileSync(new URL("dome-business-6.jpeg", DOME_ASSET_BASE_URL)),
+};
 
 /**
  * Exports generated decks into downloadable document buffers.
@@ -41,6 +58,7 @@ export class PptExportService {
       "ppt/slideMasters/slideMaster1.xml": slideMasterXml(visual),
       "ppt/slideMasters/_rels/slideMaster1.xml.rels": slideMasterRelsXml(),
       "ppt/theme/theme1.xml": themeXml(visual),
+      ...templateMediaFiles(visual),
     };
     return {
       fileName: `${safeFileName(deck.title)}.pptx`,
@@ -170,7 +188,7 @@ function wrapPdfLine(value) {
  */
 function contentTypesXml(deck) {
   const slides = deck.slides.map((_, index) => `<Override PartName="/ppt/slides/slide${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>`).join("");
-  return `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>${slides}<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/></Types>`;
+  return `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>${slides}<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/></Types>`;
 }
 
 /**
@@ -210,32 +228,42 @@ function presentationRelsXml(deck) {
 function slideFiles(deck, visual) {
   const files = {};
   for (const [index, slide] of deck.slides.entries()) {
-    const layout = templateLayout(visual, index);
+    const role = resolveSlideRole(slide, index, deck.slides.length);
+    const layout = templateLayout(visual, index, role);
     const titleColor = layout.titleColor || visual.title;
     const bodyColor = layout.bodyColor || visual.body;
     const bodySize = layout.bodySize || 2200;
     const bullets = (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}"><a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("");
-    files[`ppt/slides/slide${index + 1}.xml`] = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor), size: bodySize, bold: false, color: bodyColor })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
-    files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml();
+    files[`ppt/slides/slide${index + 1}.xml`] = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor), size: bodySize, bold: false, color: bodyColor })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
   return files;
 }
 
-function templateDecorationsXml(visual, index, layout) {
+function templateDecorationsXml(visual, index, layout, role, slide) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
   if (visual.layout === "red-gold") {
-    const isCover = index === 0;
-    return base
-      + rectShapeXml({ id: 3, name: "Red Gold Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.primary })
-      + solidShapeXml({ id: 4, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3886200, cx: 4876800, cy: 914400, fill: "FFE8B0" })
+    const isCover = role === "cover";
+    const background = pictureXml({
+      id: 3,
+      name: isCover ? "Dome Cover Sailboat Background" : "Dome Red Gold Background",
+      relId: "rId2",
+      x: 0,
+      y: 0,
+      cx: 9144000,
+      cy: 5143500,
+    });
+    const waves = solidShapeXml({ id: 4, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3886200, cx: 4876800, cy: 914400, fill: "FFE8B0" })
       + solidShapeXml({ id: 5, name: "Lower Light Wave", geom: "parallelogram", x: 2590800, y: 3657600, cx: 5181600, cy: 914400, fill: visual.accent })
-      + solidShapeXml({ id: 6, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: "9D0612" })
-      + rectShapeXml({ id: 7, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
-      + (isCover
-        ? textShapeXml({ id: 8, name: "Template Series Label", x: 609600, y: 4572000, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: "FFE8B0" })
-        : solidShapeXml({ id: 8, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
-          + solidShapeXml({ id: 9, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
-          + textShapeXml({ id: 10, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent }));
+      + solidShapeXml({ id: 6, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: "9D0612" });
+    const footer = rectShapeXml({ id: 7, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 8, name: "Dome Footer Decoration", x: 609600, y: isCover ? 4572000 : 4686300, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: "FFE8B0" });
+    const roleDecoration = domeRoleDecorationXml({ role, index, layout, visual, slide });
+    return base
+      + background
+      + waves
+      + footer
+      + roleDecoration;
   }
   if (["executive", "academy", "venture"].includes(visual.layout)) {
     return base
@@ -251,22 +279,177 @@ function templateDecorationsXml(visual, index, layout) {
 }
 
 /**
+ * Adds media files required by a template.
+ * @param {object} visual
+ * @returns {Record<string, Buffer>}
+ */
+function templateMediaFiles(visual) {
+  if (visual.layout !== "red-gold") return {};
+  return {
+    "ppt/media/dome-cover.jpg": DOME_ASSETS.cover,
+    "ppt/media/dome-content.jpg": DOME_ASSETS.content,
+    "ppt/media/dome-business-1.jpeg": DOME_ASSETS.business1,
+    "ppt/media/dome-business-2.jpeg": DOME_ASSETS.business2,
+    "ppt/media/dome-business-3.jpeg": DOME_ASSETS.business3,
+    "ppt/media/dome-business-4.jpeg": DOME_ASSETS.business4,
+    "ppt/media/dome-business-5.jpeg": DOME_ASSETS.business5,
+    "ppt/media/dome-business-6.jpeg": DOME_ASSETS.business6,
+  };
+}
+
+/**
+ * 将结构化页面映射到 dome 模板角色。
+ * 这里优先尊重 AI 或前端传入的 slide.layout；没有显式布局时，再按页序和标题关键词兜底。
+ * @param {object} slide
+ * @param {number} index
+ * @param {number} total
+ * @returns {string}
+ */
+function resolveSlideRole(slide, index, total) {
+  const explicit = String(slide?.layout || "").toLowerCase();
+  if (["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(explicit)) {
+    return explicit;
+  }
+  if (index === 0) return "cover";
+  if (index === total - 1 && /结束|谢谢|感谢|thanks/i.test(String(slide?.title || ""))) return "closing";
+  if (/目录|contents?/i.test(String(slide?.title || ""))) return "agenda";
+  if (/part|章节|工作汇报|成果展示|问题不足|下步计划/i.test(String(slide?.title || "")) && (slide?.bullets || []).length <= 1) return "section-divider";
+  if (/指标|数据|kpi|metric/i.test(String(slide?.title || ""))) return "metrics";
+  if (/成果|展示|亮点/i.test(String(slide?.title || ""))) return "showcase";
+  if (/问题|复盘|不足|风险/i.test(String(slide?.title || ""))) return "retrospective";
+  if (/计划|下一步|下步/i.test(String(slide?.title || ""))) return "next-plan";
+  if ((slide?.bullets || []).length >= 4) return "four-steps";
+  if ((slide?.bullets || []).length === 3) return "three-steps";
+  return "image-report";
+}
+
+/**
+ * 根据 dome 页面角色生成装饰层和占位符。
+ * 这些形状的命名用于测试和后续维护，也让 PPT 编辑器里能看出每个层级的用途。
+ * @param {{role: string, index: number, layout: object, visual: object, slide: object}} input
+ * @returns {string}
+ */
+function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
+  if (role === "cover") {
+    return textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: "FFE8B0" });
+  }
+  if (role === "agenda") {
+    const agendaItems = (slide.bullets || ["工作汇报", "成果展示", "问题不足", "下步计划"]).slice(0, 4);
+    return agendaItems.map((item, itemIndex) => {
+      const column = itemIndex % 2;
+      const row = Math.floor(itemIndex / 2);
+      const x = 1219200 + column * 3429000;
+      const y = 1371600 + row * 1219200;
+      return solidShapeXml({ id: 30 + itemIndex, name: `Dome Agenda Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2743200, cy: 838200, fill: visual.accent })
+        + textShapeXml({ id: 40 + itemIndex, name: `Dome Agenda Text ${itemIndex + 1}`, x: x + 304800, y: y + 213360, cx: 1828800, cy: 365760, text: String(item), size: 2000, bold: true, color: visual.title });
+    }).join("");
+  }
+  if (role === "section-divider") {
+    return textShapeXml({ id: 30, name: "Dome Section Number", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1800, bold: true, color: "FFE8B0" })
+      + rectShapeXml({ id: 31, name: "Dome Section Divider Line", x: 3429000, y: 2743200, cx: 2286000, cy: 30480, fill: visual.accent });
+  }
+  if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
+    const count = role === "three-steps" ? 3 : 4;
+    const steps = Array.from({ length: count }, (_, stepIndex) => {
+      const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
+      const y = 2895600;
+      return solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: count === 3 ? 1676400 : 1371600, cy: 914400, fill: stepIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+        + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 182880, cx: 914400, cy: 365760, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title });
+    }).join("");
+    return role === "next-plan"
+      ? steps + rectShapeXml({ id: 70, name: "Dome Next Plan Timeline", x: 1219200, y: 2438400, cx: 6400800, cy: 30480, fill: visual.accent })
+      : steps;
+  }
+  if (role === "metrics") {
+    return pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
+      + Array.from({ length: 3 }, (_, metricIndex) => {
+      const x = 1219200 + metricIndex * 2286000;
+      return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" });
+    }).join("");
+  }
+  if (role === "showcase") {
+    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+      + pictureXml({ id: 30, name: "Dome Showcase Image", relId: "rId3", x: 5334000, y: 1371600, cx: 2438400, cy: 1828800 })
+      + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+  }
+  if (role === "retrospective") {
+    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+      + pictureXml({ id: 30, name: "Dome Business Image", relId: "rId3", x: 5486400, y: 1524000, cx: 2133600, cy: 1371600 })
+      + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: visual.accent })
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+  }
+  if (role === "closing") {
+    return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" });
+  }
+  return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    + solidShapeXml({ id: 34, name: "Dome Image Placeholder", geom: "roundRect", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800, fill: visual.accent })
+    + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
+    + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
+    + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+}
+
+/**
+ * 为不同内容角色挑选 dome.pptx 中的商务图片。
+ * @param {string} role
+ * @returns {string}
+ */
+function domeRoleBusinessMedia(role) {
+  const mapping = {
+    "image-report": "dome-business-1.jpeg",
+    metrics: "dome-business-5.jpeg",
+    showcase: "dome-business-2.jpeg",
+    retrospective: "dome-business-3.jpeg",
+    "next-plan": "dome-business-6.jpeg",
+  };
+  return mapping[role] || "";
+}
+
+/**
  * Returns slide geometry for the selected visual template.
  * @param {object} visual
  * @param {number} index
  * @returns {{accent: object, title: object, content: object, titleSize: number}}
  */
-function templateLayout(visual, index) {
+function templateLayout(visual, index, role = index === 0 ? "cover" : "content") {
   if (visual.layout === "red-gold") {
-    if (index === 0) {
+    if (role === "cover" || role === "closing") {
       return {
         surface: { x: 2438400, y: 1066800, cx: 4267200, cy: 2438400 },
         accent: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
         secondaryAccent: { x: 6781800, y: 1600200, cx: 914400, cy: 2057400 },
         label: { x: 5943600, y: 914400, cx: 1524000, cy: 365760 },
-        title: { x: 2895600, y: 1371600, cx: 3962400, cy: 914400 },
+        title: { x: role === "closing" ? 3048000 : 2895600, y: 1371600, cx: 3962400, cy: 914400 },
         content: { x: 2971800, y: 2514600, cx: 3886200, cy: 914400 },
         titleSize: 5200,
+        bodySize: 2100,
+        titleColor: "FFF2B8",
+        bodyColor: "FFE8B0",
+      };
+    }
+    if (role === "agenda") {
+      return {
+        surface: { x: 914400, y: 1143000, cx: 7315200, cy: 2667000 },
+        accent: { x: 0, y: 0, cx: 9144000, cy: 685800 },
+        secondaryAccent: { x: 0, y: 0, cx: 0, cy: 0 },
+        label: { x: 609600, y: 304800, cx: 1524000, cy: 365760 },
+        title: { x: 3657600, y: 457200, cx: 1828800, cy: 609600 },
+        content: { x: 1371600, y: 1371600, cx: 6400800, cy: 2133600 },
+        titleSize: 3600,
+        bodySize: 1900,
+        titleColor: "FFF2B8",
+        bodyColor: visual.body,
+      };
+    }
+    if (role === "section-divider") {
+      return {
+        surface: { x: 0, y: 0, cx: 0, cy: 0 },
+        accent: { x: 0, y: 0, cx: 9144000, cy: 685800 },
+        secondaryAccent: { x: 0, y: 0, cx: 0, cy: 0 },
+        label: { x: 3200400, y: 1295400, cx: 2743200, cy: 457200 },
+        title: { x: 2743200, y: 1905000, cx: 3657600, cy: 822960 },
+        content: { x: 2743200, y: 2895600, cx: 3657600, cy: 609600 },
+        titleSize: 5000,
         bodySize: 2100,
         titleColor: "FFF2B8",
         bodyColor: "FFE8B0",
@@ -379,8 +562,15 @@ function templateLayout(visual, index) {
  * Creates slide relationship XML.
  * @returns {string}
  */
-function slideRelsXml() {
-  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>`;
+function slideRelsXml(visual, role = "content") {
+  const imageRel = visual.layout === "red-gold"
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${role === "cover" ? "dome-cover" : "dome-content"}.jpg"/>`
+    : "";
+  const businessImage = visual.layout === "red-gold" ? domeRoleBusinessMedia(role) : "";
+  const businessImageRel = businessImage
+    ? `<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${businessImage}"/>`
+    : "";
+  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}</Relationships>`;
 }
 
 /**
@@ -447,6 +637,15 @@ function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
  */
 function solidShapeXml({ id, name, geom, x, y, cx, cy, fill }) {
   return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${fill}"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>`;
+}
+
+/**
+ * Creates an OOXML picture shape bound to a slide relationship id.
+ * @param {{id: number, name: string, relId: string, x: number, y: number, cx: number, cy: number}} input
+ * @returns {string}
+ */
+function pictureXml({ id, name, relId, x, y, cx, cy }) {
+  return `<p:pic><p:nvPicPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="${escapeXml(relId)}"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></p:spPr></p:pic>`;
 }
 
 /**

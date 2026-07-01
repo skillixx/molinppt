@@ -33,6 +33,26 @@ const VENTURE_LAYOUT_SCHEMA = {
   allowedLayouts: ["venture-cover", "venture-story", "hero", "story"],
 };
 
+const DOME_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "cover",
+  defaultContentLayout: "image-report",
+  allowedLayouts: [
+    "cover",
+    "agenda",
+    "section-divider",
+    "image-report",
+    "three-steps",
+    "four-steps",
+    "metrics",
+    "showcase",
+    "retrospective",
+    "next-plan",
+    "closing",
+    "title",
+    "content",
+  ],
+};
+
 /**
  * Built-in template catalog used when no external catalog is configured.
  */
@@ -59,7 +79,7 @@ export const DEFAULT_TEMPLATES = [
       body: "3C1F1F",
       layout: "red-gold",
     },
-    layoutSchema: EXECUTIVE_LAYOUT_SCHEMA,
+    layoutSchema: DOME_LAYOUT_SCHEMA,
   },
   {
     id: "strategy-consulting",

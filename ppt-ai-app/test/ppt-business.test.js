@@ -975,6 +975,41 @@ test("PptService normalizes generated slide layouts with the selected template s
   assert.equal(result.deck.slides[1].layout, "venture-story");
 });
 
+test("PptService preserves dome layout roles for the business template", async () => {
+  const roles = ["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"];
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateOutline = async () => roles.map((role, index) => ({
+    title: `Dome ${role}`,
+    bullets: index === 0 ? ["年度汇报"] : ["要点一", "要点二", "要点三"],
+    layout: role,
+  }));
+  aiProvider.generateSlides = async ({ outline }) => outline.slides.map((slide, index) => ({
+    id: `slide_${index + 1}`,
+    sortOrder: index + 1,
+    title: slide.title,
+    bullets: slide.bullets,
+    speakerNotes: "",
+    layout: roles[index],
+    theme: outline.theme,
+  }));
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Dome layout roles",
+    slideCount: roles.length,
+    templateId: "business",
+    theme: "modern",
+  });
+
+  const result = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  assert.deepEqual(result.deck.slides.map((slide) => slide.layout), roles);
+});
+
 test("PptService uses a user-owned template for preview and exports", async () => {
   const context = await createBusinessContext();
   await context.database.insert("template_categories", { id: "custom", name: "Custom", sortOrder: 20 });
@@ -1366,12 +1401,63 @@ test("HTTP API preview exposes selected template visual styling", async () => {
     assert.match(html, /--template-primary:#B80F1A/);
     assert.match(html, /--template-accent:#F6D48A/);
     assert.match(html, /data-layout="red-gold"/);
+    assert.match(html, /data-dome-role="cover"/);
+    assert.match(html, /--dome-cover-bg:url\("data:image\/jpeg;base64,/);
+    assert.match(html, /--dome-content-bg:url\("data:image\/jpeg;base64,/);
     assert.match(html, /class="preview-page"/);
     assert.match(html, /aspect-ratio:16\/9/);
     assert.match(html, /class="page-number">1 \/ 2/);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
+});
+
+test("PptService preview renders dome role classes and business image assets", async () => {
+  const context = await createBusinessContext();
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "outline-dome-preview",
+    title: "Dome preview",
+    templateId: "business",
+    templateName: "Executive Business",
+    templateVisual: {
+      primary: "B80F1A",
+      accent: "F6D48A",
+      background: "8F0613",
+      surface: "FFF8E6",
+      title: "7A0611",
+      body: "3C1F1F",
+      layout: "red-gold",
+    },
+    theme: "modern",
+    status: "ready",
+    slides: [
+      { title: "封面", bullets: ["年度汇报"], layout: "cover" },
+      { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
+      { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
+      { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
+      { title: "三步骤流程", bullets: ["识别问题", "制定方案", "落地执行"], layout: "three-steps" },
+      { title: "四步骤流程", bullets: ["目标拆解", "资源配置", "过程跟踪", "复盘优化"], layout: "four-steps" },
+      { title: "数据指标", bullets: ["收入增长", "客户留存", "交付效率"], layout: "metrics" },
+      { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase" },
+      { title: "问题复盘", bullets: ["风险识别", "原因分析", "改进动作"], layout: "retrospective" },
+      { title: "下一步计划", bullets: ["重点目标", "关键举措", "保障机制"], layout: "next-plan" },
+      { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
+    ],
+  });
+
+  const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  for (const role of ["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"]) {
+    assert.match(html, new RegExp(`data-dome-role="${role}"`));
+  }
+  assert.match(html, /--dome-business-1:url\("data:image\/jpeg;base64,/);
+  assert.match(html, /--dome-business-6:url\("data:image\/jpeg;base64,/);
+  assert.match(html, /class="dome-role-visual"/);
+  assert.match(html, /dome-agenda-card/);
+  assert.match(html, /dome-metric-card/);
+  assert.match(html, /dome-risk-card/);
+  assert.match(html, /dome-plan-timeline/);
 });
 
 test("HTTP API generates a new deck from an existing outline with the currently selected template", async () => {
