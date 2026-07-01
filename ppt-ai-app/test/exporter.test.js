@@ -152,6 +152,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Next Plan Timeline"/);
   assert.match(text, /name="Dome Next Plan Image"/);
   assert.match(text, /name="Dome Next Plan Text 1"[\s\S]*<a:t>Quarter roadmap<\/a:t>/);
+  assert.match(text, /name="Dome Closing Subtitle"/);
 });
 
 test("PptExportService respects an explicit dome cover layout on any slide", () => {

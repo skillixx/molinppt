@@ -268,7 +268,7 @@ function slideFiles(deck, visual) {
  */
 function shouldRenderDomeBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
 }
 
 /**
@@ -476,7 +476,10 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       + retrospectiveCards;
   }
   if (role === "closing") {
-    return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" });
+    const [subtitle] = normalizeDomeBulletItems(slide, 1);
+    // 结束页使用专用副标题承载用户输入，不再退回普通项目符号列表。
+    return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" })
+      + textShapeXml({ id: 31, name: "Dome Closing Subtitle", x: 3200400, y: 3048000, cx: 2743200, cy: 365760, text: subtitle, size: 1300, bold: true, color: "FFE8B0" });
   }
   const imageReportItems = normalizeDomeBulletItems(slide, 3);
   // 工作汇报图文页使用三张汇报卡片承载结构化要点，右侧继续复用 dome.pptx 的商务配图。

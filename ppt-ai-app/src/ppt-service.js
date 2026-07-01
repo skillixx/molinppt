@@ -904,6 +904,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-retrospective-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-risk-card{right:10.5%;bottom:25%;width:24%;border-radius:12px;background:rgba(246,212,138,.94);padding:16px;color:var(--template-title);font-size:18px;font-weight:800;text-align:center;box-shadow:0 14px 22px rgba(82,5,12,.18);display:grid;place-items:center;}
     body[data-layout="red-gold"] .dome-plan-timeline{left:13%;right:13%;bottom:33%;height:3px;background:var(--template-accent);}
+    body[data-layout="red-gold"] .dome-closing-subtitle{left:50%;top:58%;transform:translateX(-50%);width:42%;color:#ffe8b0;font-size:16px;font-weight:800;text-align:center;text-shadow:0 10px 22px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .dome-role-visual{background-image:var(--dome-business-2);}
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .dome-role-visual{background-image:var(--dome-business-3);}
     body[data-layout="red-gold"] .slide[data-dome-role="four-steps"] .dome-role-visual{background-image:var(--dome-business-4);}
@@ -925,7 +926,7 @@ function renderDeckPreview({ deck, visual }) {
  */
 function shouldRenderDomePreviewBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
 }
 
 /**
@@ -997,6 +998,10 @@ function renderDomePreviewDecoration(role, slide) {
   if (role === "next-plan") {
     const cards = Array.from({ length: 4 }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
     return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
+  }
+  if (role === "closing") {
+    // 结束页把用户输入作为模板副标题输出，避免破坏 THANKS 结束版式。
+    return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bullets[0] || "")}</div>`;
   }
   return "";
 }

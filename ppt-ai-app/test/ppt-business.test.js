@@ -1478,6 +1478,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.doesNotMatch(html, /data-dome-role="image-report"[\s\S]*<li>团队投入<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="showcase"[\s\S]*<li>客户反馈<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="retrospective"[\s\S]*<li>Root cause<\/li>/);
+  assert.doesNotMatch(html, /data-dome-role="closing"[\s\S]*<li>感谢观看<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="section-divider"[\s\S]*<li>PART 01<\/li>/);
   const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
   const explicitCoverSlide = previewSlides.find(([, , , title]) => title === "追加封面");
