@@ -76,7 +76,7 @@ function buildTemplateInstructions(template) {
   return {
     templateSystem: "dome-red-gold",
     layoutRoles: DOME_LAYOUT_ROLES,
-    contentContract: "按 outline 页序或标题选择 layout；把 bullets 填入对应占位符；目录固定 4 项，流程/成果/复盘/计划按模板卡片槽位填充；指标页 bullets 必须使用“指标名: 指标值”格式；下一步计划页 bullets 必须使用“阶段: 动作”格式；封面和结束页使用副标题占位；不要生成普通项目符号列表。",
+    contentContract: "按 outline 页序或标题选择 layout；把 bullets 填入对应占位符；目录固定 4 项，流程/成果/复盘/计划按模板卡片槽位填充；指标页 bullets 必须使用“指标名: 指标值”格式；问题复盘页 bullets 必须按风险、原因、措施顺序输出；下一步计划页 bullets 必须使用“阶段: 动作”格式；封面和结束页使用副标题占位；不要生成普通项目符号列表。",
     roleHints: {
       cover: "封面页：title 是主标题，bullets[0] 是封面副标题。",
       agenda: "目录页：bullets 填入 4 个目录卡片。",
@@ -86,7 +86,7 @@ function buildTemplateInstructions(template) {
       "four-steps": "四步骤流程页：4 条 bullets 填入流程卡片。",
       metrics: "数据指标页：3 条 bullets 填入指标卡片；每条必须写成“指标名: 指标值”，例如“Revenue growth: 32%”。",
       showcase: "成果展示页：3 条 bullets 填入成果卡片。",
-      retrospective: "问题复盘页：3 条 bullets 填入复盘卡片，第一条同时作为风险高亮。",
+      retrospective: "问题复盘页：3 条 bullets 必须按风险、原因、措施顺序填入复盘卡片，第一条同时作为风险高亮。",
       "next-plan": "下一步计划页：4 条 bullets 填入计划时间线卡片；每条必须写成“阶段: 动作”，例如“Q1: Launch pilot”。",
       closing: "结束页：bullets[0] 是结束页副标题。",
     },
