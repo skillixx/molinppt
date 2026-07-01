@@ -268,7 +268,7 @@ function slideFiles(deck, visual) {
  */
 function shouldRenderDomeBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
 }
 
 /**
@@ -406,7 +406,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     }).join("");
   }
   if (role === "section-divider") {
-    return textShapeXml({ id: 30, name: "Dome Section Number", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1800, bold: true, color: "FFE8B0" })
+    return textShapeXml({ id: 30, name: "Dome Section Number", ...layout.label, text: domeSectionNumberText(slide, index), size: 1800, bold: true, color: "FFE8B0" })
       + rectShapeXml({ id: 31, name: "Dome Section Divider Line", x: 3429000, y: 2743200, cx: 2286000, cy: 30480, fill: visual.accent });
   }
   if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
@@ -456,6 +456,18 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
     + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+}
+
+/**
+ * 读取章节分隔页的结构化编号。
+ * 用户传入 bullets[0] 时优先作为 PART 编号占位符；缺省时才按页序生成兜底文案。
+ * @param {object} slide
+ * @param {number} index
+ * @returns {string}
+ */
+function domeSectionNumberText(slide, index) {
+  const [sectionNumber] = normalizeDomeBulletItems(slide, 1);
+  return sectionNumber || `PART ${String(index).padStart(2, "0")}`;
 }
 
 /**

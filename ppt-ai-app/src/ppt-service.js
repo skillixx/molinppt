@@ -886,6 +886,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-role-decor{position:absolute;z-index:3;pointer-events:none;}
     body[data-layout="red-gold"] .dome-agenda-grid{left:13%;right:13%;top:33%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
     body[data-layout="red-gold"] .dome-agenda-card{min-height:74px;border-radius:12px;background:rgba(246,212,138,.92);box-shadow:0 14px 22px rgba(82,5,12,.20);color:var(--template-title);font-size:20px;font-weight:800;display:grid;place-items:center;}
+    body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:#ffe8b0;font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
@@ -913,7 +914,7 @@ function renderDeckPreview({ deck, visual }) {
  */
 function shouldRenderDomePreviewBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
 }
 
 /**
@@ -953,6 +954,9 @@ function renderDomePreviewDecoration(role, slide) {
     const cards = bullets.slice(0, 4).map((item) => `<div class="dome-agenda-card">${escapeHtml(item)}</div>`).join("");
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
+  if (role === "section-divider") {
+    return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide))}</div>`;
+  }
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
     const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
@@ -973,6 +977,17 @@ function renderDomePreviewDecoration(role, slide) {
     return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
   }
   return "";
+}
+
+/**
+ * 读取预览端章节分隔页的结构化编号。
+ * 与 PPTX 导出一致，优先使用 bullets[0]，避免章节号在预览和导出中不一致。
+ * @param {object} slide
+ * @returns {string}
+ */
+function domePreviewSectionNumberText(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return String(bullets[0] || "PART 00");
 }
 
 /**
