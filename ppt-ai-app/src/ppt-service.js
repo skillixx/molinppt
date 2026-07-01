@@ -1007,9 +1007,11 @@ function resolvePreviewDomeRole(slide, index, total) {
  */
 function renderDomePreviewDecoration(role, slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  // 统一从结构化 bullet 中读取展示文本，避免不同页面角色各自直出对象导致预览出现 [object Object]。
+  const bulletText = (itemIndex) => domePreviewStructuredText(bullets[itemIndex], ["text", "title", "label", "name", "action", "task", "description", "value"]);
   if (role === "cover") {
     // 封面页把第一条结构化内容放入副标题占位，预览时保持 dome.pptx 帆船封面的简洁留白。
-    return `<div class="dome-role-decor dome-cover-subtitle">${escapeHtml(bullets[0] || "")}</div>`;
+    return `<div class="dome-role-decor dome-cover-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   if (role === "agenda") {
     // 目录页固定保留 4 个卡片占位符，和 dome.pptx/PPTX 导出保持一致，避免少量目录项导致版式塌陷。
@@ -1022,7 +1024,7 @@ function renderDomePreviewDecoration(role, slide, index) {
   }
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
-    const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
+    const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bulletText(index))).join("");
     // 三/四步骤流程页都显示商务图片层，让预览与 PPTX 导出的流程页视觉结构一致。
     const visual = `<div class="dome-role-visual"></div>`;
     return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-connector"></div><div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
@@ -1033,19 +1035,19 @@ function renderDomePreviewDecoration(role, slide, index) {
   }
   if (role === "showcase") {
     // 成果展示页将编号和成果内容拆成两个视觉层，和 PPTX 的 Dome Showcase Number/Text 占位保持一致。
-    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card"><span class="dome-showcase-number">0${index + 1}</span><span class="dome-showcase-text">${escapeHtml(bullets[index] || "")}</span></div>`).join("");
+    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card"><span class="dome-showcase-number">0${index + 1}</span><span class="dome-showcase-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
   if (role === "image-report") {
     // 工作汇报图文页用三张固定卡片承载要点，保持图文模板的占位符结构。
-    const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-image-report-card", index, bullets[index])).join("");
+    const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-image-report-card", index, bulletText(index))).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
     // 问题复盘页固定输出“风险/原因/措施”语义标签，和 PPTX 端的独立标签占位保持一致。
     const labels = ["风险", "原因", "措施"];
-    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-retrospective-card"><span class="dome-retrospective-label">${labels[index]}</span><span class="dome-card-text">${escapeHtml(bullets[index] || "")}</span></div>`).join("");
-    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
+    const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-retrospective-card"><span class="dome-retrospective-label">${labels[index]}</span><span class="dome-card-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bulletText(0) || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
     // 下一步计划页支持“阶段: 动作”结构化输入，预览端拆成阶段和动作两个占位层。
@@ -1054,7 +1056,7 @@ function renderDomePreviewDecoration(role, slide, index) {
   }
   if (role === "closing") {
     // 结束页把用户输入作为模板副标题输出，避免破坏 THANKS 结束版式。
-    return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bullets[0] || "")}</div>`;
+    return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   return "";
 }
