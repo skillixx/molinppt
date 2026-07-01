@@ -161,6 +161,8 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /ppt\/slides\/slide6\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 05<\/a:t>/s);
   assert.match(threeStepsSlide, /name="Content Placement Card"/);
   assert.match(fourStepsSlide, /name="Content Placement Card"/);
+  assert.doesNotMatch(threeStepsSlide, /name="Content 2"/);
+  assert.doesNotMatch(fourStepsSlide, /name="Content 2"/);
   assert.equal((text.match(/<a:t>Discovery<\/a:t>/g) || []).length, 1);
   assert.equal((text.match(/<a:t>Retention rate<\/a:t>/g) || []).length, 1);
   assert.match(text, /name="Dome Metric Card 3"/);
@@ -168,6 +170,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Metric Label 2"[\s\S]*<a:t>Retention rate<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide7\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 06<\/a:t>/s);
   assert.match(metricsSlide, /name="Content Placement Card"/);
+  assert.doesNotMatch(metricsSlide, /name="Content 2"/);
   assert.match(text, /name="Dome Showcase Image"/);
   assert.match(text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 02<\/a:t>/s);
   assert.match(text, /name="Dome Showcase Card 3"/);
@@ -189,6 +192,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Next Plan Action 3"[\s\S]*<a:t>Owner review<\/a:t>/);
   assert.match(text, /ppt\/slides\/slide10\.xml<\?xml[\s\S]*name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 09<\/a:t>/s);
   assert.match(nextPlanSlide, /name="Content Placement Card"/);
+  assert.doesNotMatch(nextPlanSlide, /name="Content 2"/);
   assert.match(text, /name="Dome Closing Subtitle"/);
 });
 
