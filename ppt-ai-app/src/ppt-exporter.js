@@ -27,11 +27,11 @@ const DOME_ASSETS = {
 };
 
 /**
- * Exports generated decks into downloadable document buffers.
+ * 将生成后的 deck 导出为可下载文件。
  */
 export class PptExportService {
   /**
-   * Exports a deck to the requested format.
+   * 按请求格式导出 deck。
    * @param {{deck: object, format: string}} input
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -49,7 +49,8 @@ export class PptExportService {
   }
 
   /**
-   * Creates a minimal Office Open XML PPTX package.
+   * 创建最小可打开的 Office Open XML PPTX 包。
+   * red-gold 模板会在这里注入 dome.pptx 的媒体资源、主题字体和版式装饰。
    * @param {object} deck
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -76,7 +77,8 @@ export class PptExportService {
   }
 
   /**
-   * Creates a minimal PDF with xref and trailer sections.
+   * 创建带 xref 和 trailer 的最小 PDF。
+   * PDF 导出是文本摘要，不承担 dome.pptx 视觉复刻职责。
    * @param {object} deck
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -102,7 +104,7 @@ export class PptExportService {
 }
 
 /**
- * Builds a PDF text content stream with one positioned text operation per line.
+ * 构建 PDF 文本流，每行内容对应一个绝对定位的文本操作。
  * @param {object} deck
  * @returns {string}
  */
@@ -133,7 +135,7 @@ function buildPdfTextStream(deck, visual = resolveDeckVisual(deck)) {
 }
 
 /**
- * Resolves deck visual settings including persisted user-template snapshots.
+ * 解析 deck 使用的视觉配置，兼容用户模板保存下来的 visual 快照。
  * @param {object} deck
  * @returns {object}
  */
@@ -145,7 +147,7 @@ function resolveDeckVisual(deck) {
 }
 
 /**
- * Creates a PDF fill color operation from a six-digit hex color.
+ * 将六位十六进制颜色转换成 PDF 填充色操作。
  * @param {string} hex
  * @returns {string}
  */
@@ -158,7 +160,7 @@ function pdfColor(hex) {
 }
 
 /**
- * Formats a PDF color channel.
+ * 格式化 PDF 颜色通道，避免输出冗余小数。
  * @param {number} value
  * @returns {string}
  */
@@ -167,7 +169,7 @@ function formatPdfNumber(value) {
 }
 
 /**
- * Creates one absolute-positioned PDF text operation.
+ * 创建一条绝对定位的 PDF 文本操作。
  * @param {{text: unknown, size: number, x: number, y: number}} input
  * @returns {string}
  */
@@ -176,7 +178,7 @@ function pdfTextLine({ text, size, x, y }) {
 }
 
 /**
- * Wraps long text into short PDF lines.
+ * 将长文本切成较短的 PDF 行，避免一行撑出页面。
  * @param {unknown} value
  * @returns {string[]}
  */
@@ -190,7 +192,7 @@ function wrapPdfLine(value) {
 }
 
 /**
- * Creates content types metadata.
+ * 创建 PPTX 内容类型清单。
  * @param {object} deck
  * @returns {string}
  */
@@ -200,7 +202,7 @@ function contentTypesXml(deck) {
 }
 
 /**
- * Creates package relationships metadata.
+ * 创建 PPTX 根 relationships 元数据。
  * @returns {string}
  */
 function packageRelsXml() {
@@ -208,7 +210,8 @@ function packageRelsXml() {
 }
 
 /**
- * Creates presentation XML.
+ * 创建 presentation.xml。
+ * red-gold 使用 dome.pptx 的真实画布尺寸，其他模板保持原 16:9 screen 尺寸。
  * @param {object} deck
  * @param {object} visual
  * @returns {string}
@@ -221,7 +224,7 @@ function presentationXml(deck, visual = resolveDeckVisual(deck)) {
 }
 
 /**
- * Creates presentation relationship XML.
+ * 创建 presentation.xml.rels，把每页 slide 和 slide master 连接起来。
  * @param {object} deck
  * @returns {string}
  */
@@ -231,7 +234,8 @@ function presentationRelsXml(deck) {
 }
 
 /**
- * Creates slide XML files.
+ * 创建每页 slide XML 和对应 relationships。
+ * 这里负责把结构化 slides 映射到 dome 角色、插入装饰层、文本层和媒体关系。
  * @param {object} deck
  * @param {object} visual
  * @returns {Record<string, string>}
@@ -321,7 +325,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
 }
 
 /**
- * Adds media files required by a template.
+ * 添加模板所需的媒体文件。
+ * red-gold 会把从 dome.pptx 提取出的封面、内容背景和商务图片写入 ppt/media。
  * @param {object} visual
  * @returns {Record<string, Buffer>}
  */
@@ -468,7 +473,8 @@ function domeRoleBusinessMedia(role) {
 }
 
 /**
- * Returns slide geometry for the selected visual template.
+ * 返回当前模板的页面几何布局。
+ * red-gold 分支按 dome 角色拆出封面、目录、章节、内容、流程、指标和结束页的位置。
  * @param {object} visual
  * @param {number} index
  * @returns {{accent: object, title: object, content: object, titleSize: number}}
@@ -621,7 +627,8 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
 }
 
 /**
- * Creates slide relationship XML.
+ * 创建 slide relationships。
+ * red-gold 页面会把 rId2 绑定到 dome 背景图，部分角色再用 rId3 绑定商务配图。
  * @returns {string}
  */
 function slideRelsXml(visual, role = "content") {
@@ -636,7 +643,8 @@ function slideRelsXml(visual, role = "content") {
 }
 
 /**
- * Creates a blank slide layout part.
+ * 创建空白 slide layout。
+ * 实际视觉内容都在每页 slide XML 中生成，layout 只提供 Office 所需结构。
  * @returns {string}
  */
 function slideLayoutXml(visual) {
@@ -644,7 +652,7 @@ function slideLayoutXml(visual) {
 }
 
 /**
- * Creates slide layout relationship XML.
+ * 创建 slide layout relationship XML。
  * @returns {string}
  */
 function slideLayoutRelsXml() {
@@ -652,7 +660,8 @@ function slideLayoutRelsXml() {
 }
 
 /**
- * Creates a minimal slide master part.
+ * 创建最小 slide master。
+ * 主题色从 visual 注入，具体 dome 装饰不放在 master，便于每页按角色差异化。
  * @returns {string}
  */
 function slideMasterXml(visual) {
@@ -660,7 +669,7 @@ function slideMasterXml(visual) {
 }
 
 /**
- * Creates slide master relationship XML.
+ * 创建 slide master relationship XML。
  * @returns {string}
  */
 function slideMasterRelsXml() {
@@ -668,7 +677,8 @@ function slideMasterRelsXml() {
 }
 
 /**
- * Creates a minimal Office theme part.
+ * 创建最小 Office theme。
+ * red-gold 在这里复用 dome.pptx 的 588ku 字体方案。
  * @returns {string}
  */
 function themeXml(visual) {
@@ -689,7 +699,7 @@ function fontSchemeXml(visual) {
 }
 
 /**
- * Creates required root group shape metadata.
+ * 创建 PPTX slide 必需的根 group shape 元数据。
  * @returns {string}
  */
 function groupShapeXml() {
@@ -697,7 +707,7 @@ function groupShapeXml() {
 }
 
 /**
- * Creates a filled rectangle shape.
+ * 创建填充矩形形状。
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, fill: string}} input
  * @returns {string}
  */
@@ -706,7 +716,8 @@ function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
 }
 
 /**
- * Creates a filled preset geometry shape.
+ * 创建填充的预设几何形状。
+ * 用于金色波浪、红色底浪、卡片和右侧装饰块。
  * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, fill: string}} input
  * @returns {string}
  */
@@ -715,7 +726,7 @@ function solidShapeXml({ id, name, geom, x, y, cx, cy, fill }) {
 }
 
 /**
- * Creates an OOXML picture shape bound to a slide relationship id.
+ * 创建绑定到 slide relationship id 的 OOXML 图片形状。
  * @param {{id: number, name: string, relId: string, x: number, y: number, cx: number, cy: number}} input
  * @returns {string}
  */
@@ -724,7 +735,8 @@ function pictureXml({ id, name, relId, x, y, cx, cy }) {
 }
 
 /**
- * Creates a positioned text box shape.
+ * 创建绝对定位文本框。
+ * dome 相关文本框默认写入 Source Han Sans 字体声明，贴近原模板字形。
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, text?: string, body?: string, size: number, bold: boolean, color?: string}} input
  * @returns {string}
  */
@@ -734,7 +746,7 @@ function textShapeXml({ id, name, x, y, cx, cy, text, body, size, bold, color = 
 }
 
 /**
- * Creates one DrawingML paragraph.
+ * 创建一个 DrawingML 段落。
  * @param {unknown} value
  * @param {number} [size]
  * @param {boolean} [bold]
@@ -757,7 +769,8 @@ function fontFaceXml(fontFace) {
 }
 
 /**
- * Creates a store-only ZIP archive.
+ * 创建 store-only ZIP 包。
+ * 这里不压缩文件内容，直接拼出 PPTX 需要的 ZIP 结构和 CRC。
  * @param {Record<string, string>} files
  * @returns {Buffer}
  */
@@ -828,7 +841,7 @@ function crc32(buffer) {
 }
 
 /**
- * Builds a minimal PDF file.
+ * 构建最小 PDF 文件。
  * @param {string[]} objects
  * @returns {string}
  */
