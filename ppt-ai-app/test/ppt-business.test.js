@@ -1467,6 +1467,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /dome-risk-card/);
   assert.equal([...html.matchAll(/class="dome-retrospective-card"/g)].length, 3);
   assert.match(html, /dome-plan-timeline/);
+  assert.match(html, /class="dome-role-decor dome-cover-subtitle">年度汇报<\/div>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Discovery<\/span>/);
   assert.match(html, /<span class="dome-card-index">02<\/span><span class="dome-card-text">Retention rate<\/span>/);
   assert.match(html, /<span class="dome-card-text">团队投入<\/span>/);
@@ -1479,6 +1480,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.doesNotMatch(html, /data-dome-role="showcase"[\s\S]*<li>客户反馈<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="retrospective"[\s\S]*<li>Root cause<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="closing"[\s\S]*<li>感谢观看<\/li>/);
+  assert.doesNotMatch(html, /data-dome-role="cover"[\s\S]*<li>年度汇报<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="section-divider"[\s\S]*<li>PART 01<\/li>/);
   const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
   const explicitCoverSlide = previewSlides.find(([, , , title]) => title === "追加封面");

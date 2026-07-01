@@ -261,14 +261,14 @@ function slideFiles(deck, visual) {
 
 /**
  * 判断当前 dome 页面是否还需要普通正文列表。
- * 目录、步骤、指标、复盘和计划页已经把 bullets 填进专用卡片，占位符页不再重复显示一份列表。
+ * 封面、目录、步骤、指标、复盘和计划页已经把 bullets 填进专用占位符，不再重复显示一份普通列表。
  * @param {object} visual
  * @param {string} role
  * @returns {boolean}
  */
 function shouldRenderDomeBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
+  return !["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
 }
 
 /**
@@ -392,7 +392,10 @@ function resolveSlideRole(slide, index, total) {
  */
 function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "cover") {
-    return textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: "FFE8B0" });
+    const [subtitle] = normalizeDomeBulletItems(slide, 1);
+    // 封面页用专用副标题承载用户输入，避免普通列表破坏 dome.pptx 的帆船封面留白。
+    return textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: "FFE8B0" })
+      + textShapeXml({ id: 11, name: "Dome Cover Subtitle", x: 2971800, y: 3048000, cx: 3962400, cy: 365760, text: subtitle, size: 1500, bold: true, color: "FFE8B0" });
   }
   if (role === "agenda") {
     // 目录页固定输出 4 个卡片槽位，保持 dome.pptx 的卡片式目录骨架不因用户少填内容而变化。

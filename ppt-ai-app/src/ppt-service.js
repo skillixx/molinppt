@@ -870,6 +870,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide-content{align-content:center;justify-items:center;text-align:center;color:#ffe8b0;}
     body[data-layout="red-gold"] .slide-cover h2{max-width:78%;margin-bottom:2.8%;font-size:58px;color:#fff2b8;text-shadow:0 3px 0 rgba(90,4,10,.32),0 12px 24px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .slide-cover ul{max-width:60%;padding:0;list-style:none;color:#ffe8b0;text-align:center;}
+    body[data-layout="red-gold"] .dome-cover-subtitle{left:50%;top:58%;transform:translateX(-50%);width:46%;color:#ffe8b0;font-size:18px;font-weight:800;text-align:center;text-shadow:0 10px 22px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .slide-content::before{content:"商务办公系列 PPT 模板";position:absolute;left:-4%;bottom:-30%;color:rgba(255,232,176,.82);font-size:12px;letter-spacing:0;}
     body[data-layout="red-gold"] .slide-content::after{content:"";position:absolute;z-index:0;inset:18% 13% 12%;border:1px solid rgba(255,232,176,.18);border-radius:18px;}
     body[data-layout="red-gold"] .slide-content>*{z-index:2;}
@@ -919,14 +920,14 @@ function renderDeckPreview({ deck, visual }) {
 
 /**
  * 判断 dome 预览页是否还需要普通正文列表。
- * 对已经有模板卡片承载 bullets 的版式，预览端隐藏普通列表，避免用户看到重复内容。
+ * 对已经有模板占位符承载 bullets 的版式，预览端隐藏普通列表，避免用户看到重复内容。
  * @param {object} visual
  * @param {string} role
  * @returns {boolean}
  */
 function shouldRenderDomePreviewBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
+  return !["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
 }
 
 /**
@@ -962,6 +963,10 @@ function resolvePreviewDomeRole(slide, index, total) {
  */
 function renderDomePreviewDecoration(role, slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  if (role === "cover") {
+    // 封面页把第一条结构化内容放入副标题占位，预览时保持 dome.pptx 帆船封面的简洁留白。
+    return `<div class="dome-role-decor dome-cover-subtitle">${escapeHtml(bullets[0] || "")}</div>`;
+  }
   if (role === "agenda") {
     // 目录页固定保留 4 个卡片占位符，和 dome.pptx/PPTX 导出保持一致，避免少量目录项导致版式塌陷。
     const cards = Array.from({ length: 4 }, (_, index) => `<div class="dome-agenda-card">${escapeHtml(bullets[index] || "")}</div>`).join("");

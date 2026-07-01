@@ -78,6 +78,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
     format: "pptx",
   });
   const text = result.content.toString("latin1");
+  const utf8Text = result.content.toString("utf8");
 
   assert.match(text, /ppt\/media\/dome-cover\.jpg/);
   assert.match(text, /ppt\/media\/dome-content\.jpg/);
@@ -90,6 +91,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /typeface="Source Han Sans CN Heavy"/);
   assert.match(text, /name="Title 1"[\s\S]*<a:gradFill>[\s\S]*val="FFF8CC"[\s\S]*val="FCD696"/);
   assert.match(text, /name="Dome Cover Sailboat Background"/);
+  assert.match(utf8Text, /name="Dome Cover Subtitle"[\s\S]*<a:t>2026 年度经营复盘<\/a:t>/);
   assert.match(text, /name="Dome Agenda Card 1"/);
   assert.match(text, /name="Dome Agenda Card 4"/);
   assert.match(text, /name="Dome Section Number"/);
@@ -122,6 +124,7 @@ test("PptExportService maps structured dome roles to business image and data pla
     format: "pptx",
   });
   const text = result.content.toString("latin1");
+  const utf8Text = result.content.toString("utf8");
 
   assert.match(text, /ppt\/media\/dome-business-1\.jpeg/);
   assert.match(text, /ppt\/media\/dome-business-2\.jpeg/);
@@ -129,6 +132,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /Target="\.\.\/media\/dome-business-2\.jpeg"/);
   assert.match(text, /Target="\.\.\/media\/dome-business-4\.jpeg"/);
   assert.match(text, /name="Dome Business Image"/);
+  assert.match(utf8Text, /name="Dome Cover Subtitle"[\s\S]*<a:t>年度汇报<\/a:t>/);
   assert.match(text, /name="Dome Image Report Card 3"/);
   assert.match(text, /name="Dome Image Report Text 2"[\s\S]*<a:t>Team investment<\/a:t>/);
   assert.match(text, /name="Dome Section Number"(?:(?!<\/p:sp>).)*<a:t>PART 01<\/a:t>/s);
