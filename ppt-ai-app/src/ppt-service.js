@@ -818,10 +818,13 @@ function renderDeckPreview({ deck, visual }) {
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
     // dome 模板允许任意页显式声明封面/结束版式，预览 class 必须跟随角色才能套用帆船背景。
     const slideKind = visual.layout === "red-gold" && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "content";
-    const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
+    const renderBodyList = shouldRenderDomePreviewBodyList(visual, domeRole);
+    const bullets = renderBodyList
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    // dome 模板化页面的内容已经落入专用视觉层，不输出空 ul，避免预览层级和间距被普通列表干扰。
+    const bodyList = renderBodyList ? `<ul>${bullets}</ul>` : "";
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`

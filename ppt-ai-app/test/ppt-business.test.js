@@ -1648,6 +1648,9 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<span class="dome-retrospective-label">措施<\/span><span class="dome-card-text">Mitigation<\/span>/);
   assert.match(html, /<span class="dome-next-plan-phase">Q1<\/span><span class="dome-next-plan-action">Quarter roadmap<\/span>/);
   assert.match(html, /<span class="dome-next-plan-phase">Q3<\/span><span class="dome-next-plan-action">Owner review<\/span>/);
+  for (const role of ["cover", "three-steps", "metrics", "closing"]) {
+    assert.doesNotMatch(previewRoleHtml(html, role), /<ul><\/ul>/);
+  }
   assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<li>Discovery<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="metrics"[\s\S]*<li>Retention rate<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="image-report"[\s\S]*<li>团队投入<\/li>/);
@@ -2849,4 +2852,11 @@ async function postJson(url, cookie, body) {
     headers: { cookie, "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+function previewRoleHtml(html, role) {
+  const start = html.indexOf(`data-dome-role="${role}"`);
+  if (start === -1) return "";
+  const articleEnd = html.indexOf("</article>", start);
+  return html.slice(start, articleEnd === -1 ? undefined : articleEnd);
 }
