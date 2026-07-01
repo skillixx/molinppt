@@ -887,6 +887,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-agenda-grid{left:13%;right:13%;top:33%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
     body[data-layout="red-gold"] .dome-agenda-card{min-height:74px;border-radius:12px;background:rgba(246,212,138,.92);box-shadow:0 14px 22px rgba(82,5,12,.20);color:var(--template-title);font-size:20px;font-weight:800;display:grid;place-items:center;}
     body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:#ffe8b0;font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(60,0,0,.24);}
+    body[data-layout="red-gold"] .dome-section-label{left:12%;top:13%;color:var(--template-accent);font-size:12px;font-weight:800;letter-spacing:0;}
     body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
@@ -969,10 +970,10 @@ function renderDomePreviewDecoration(role, slide) {
     return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase" || role === "image-report") {
-    return `<div class="dome-role-visual"></div>`;
+    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div>`;
   }
   if (role === "retrospective") {
-    return `<div class="dome-role-visual"></div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
+    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
     const cards = Array.from({ length: 4 }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
@@ -990,6 +991,17 @@ function renderDomePreviewDecoration(role, slide) {
 function domePreviewSectionNumberText(slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return String(bullets[0] || "PART 00");
+}
+
+/**
+ * 渲染内容页预览右上角章节标签。
+ * 仅在 outline 提供结构化章节字段时输出，避免旧数据预览出现无意义页序噪音。
+ * @param {object} slide
+ * @returns {string}
+ */
+function renderDomePreviewSectionLabel(slide) {
+  const label = String(slide?.sectionLabel || slide?.section || "");
+  return label ? `<div class="dome-role-decor dome-section-label">${escapeHtml(label)}</div>` : "";
 }
 
 /**

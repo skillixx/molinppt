@@ -446,7 +446,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
       + pictureXml({ id: 30, name: "Dome Showcase Image", relId: "rId3", x: 5334000, y: 1371600, cx: 2438400, cy: 1828800 })
       + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
-      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
   }
   if (role === "retrospective") {
     const riskItems = normalizeDomeBulletItems(slide, 1);
@@ -454,7 +454,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       + pictureXml({ id: 30, name: "Dome Business Image", relId: "rId3", x: 5486400, y: 1524000, cx: 2133600, cy: 1371600 })
       + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: visual.accent })
       + textShapeXml({ id: 34, name: "Dome Retrospective Risk Text", x: 5715000, y: 3352800, cx: 1676400, cy: 304800, text: riskItems[0], size: 1300, bold: true, color: visual.title })
-      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
   }
   if (role === "closing") {
     return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" });
@@ -463,7 +463,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     + solidShapeXml({ id: 34, name: "Dome Image Placeholder", geom: "roundRect", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800, fill: visual.accent })
     + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
-    + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: `PART ${String(index).padStart(2, "0")}`, size: 1500, bold: true, color: visual.accent });
+    + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
 }
 
 /**
@@ -476,6 +476,17 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
 function domeSectionNumberText(slide, index) {
   const [sectionNumber] = normalizeDomeBulletItems(slide, 1);
   return sectionNumber || `PART ${String(index).padStart(2, "0")}`;
+}
+
+/**
+ * 读取内容页右上角章节标签。
+ * 优先使用 outline 里的结构化章节字段，缺省时按页序兜底，保证旧数据仍能稳定导出。
+ * @param {object} slide
+ * @param {number} index
+ * @returns {string}
+ */
+function domeContentSectionLabelText(slide, index) {
+  return String(slide?.sectionLabel || slide?.section || `PART ${String(index).padStart(2, "0")}`);
 }
 
 /**
