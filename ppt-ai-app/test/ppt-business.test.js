@@ -788,11 +788,11 @@ test("PptService preserves dome layout metadata during slide regeneration", asyn
     templateId: "business",
     templateName: "Executive Business",
     templateVisual: {
-      primary: "B80F1A",
-      accent: "F6D48A",
+      primary: "1F4E79",
+      accent: "F4A261",
       background: "8F0613",
       surface: "FFF8E6",
-      title: "7A0611",
+      title: "0F2945",
       body: "3C1F1F",
       layout: "red-gold",
     },
@@ -1546,15 +1546,65 @@ test("HTTP API preview exposes selected template visual styling", async () => {
 
     assert.equal(preview.status, 200);
     assert.match(html, /data-template="business"/);
-    assert.match(html, /--template-primary:#B80F1A/);
-    assert.match(html, /--template-accent:#F6D48A/);
+    assert.match(html, /--template-primary:#1F4E79/);
+    assert.match(html, /--template-accent:#F4A261/);
     assert.match(html, /data-layout="red-gold"/);
     assert.match(html, /data-dome-role="cover"/);
-    assert.match(html, /--dome-cover-bg:url\("data:image\/jpeg;base64,/);
-    assert.match(html, /--dome-content-bg:url\("data:image\/jpeg;base64,/);
-    assert.match(html, /class="preview-page"/);
+  assert.match(html, /--dome-cover-bg:url\("data:image\/jpeg;base64,/);
+  assert.match(html, /--dome-content-bg:url\("data:image\/jpeg;base64,/);
+  assert.match(html, /--dome-title-grad-start:#?[0-9A-Fa-f]{6}/);
+  assert.match(html, /--dome-card-fill:\#[0-9A-Fa-f]{6}/);
+  assert.match(html, /--dome-card-fill-strong:\#[0-9A-Fa-f]{6}/);
+  assert.match(html, /class="preview-page"/);
     assert.match(html, /aspect-ratio:16\/9/);
     assert.match(html, /class="page-number">1 \/ 2/);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
+test("HTTP API preview reflects business minimal theme layout override", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Minimal template validation",
+      slide_count: 2,
+      template_id: "business",
+      theme: "minimal",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const html = await preview.text();
+
+    assert.equal(deckBody.deck.templateId, "business");
+    assert.equal(deckBody.deck.theme, "minimal");
+    assert.equal(preview.status, 200);
+    assert.match(html, /data-layout="top-band"/);
+    assert.match(html, /--template-accent:#6B7280/);
+    assert.match(html, /class="top-band-ribbon"/);
+    assert.match(html, /class="top-band-page-chip"/);
+    assert.match(html, />01<\//);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
@@ -1569,11 +1619,11 @@ test("PptService preview renders dome role classes and business image assets", a
     templateId: "business",
     templateName: "Executive Business",
     templateVisual: {
-      primary: "B80F1A",
-      accent: "F6D48A",
+      primary: "1F4E79",
+      accent: "F4A261",
       background: "8F0613",
       surface: "FFF8E6",
-      title: "7A0611",
+      title: "0F2945",
       body: "3C1F1F",
       layout: "red-gold",
     },
@@ -1682,11 +1732,11 @@ test("PptService preview infers image-report role from work summary titles", asy
     templateId: "business",
     templateName: "Executive Business",
     templateVisual: {
-      primary: "B80F1A",
-      accent: "F6D48A",
+      primary: "1F4E79",
+      accent: "F4A261",
       background: "8F0613",
       surface: "FFF8E6",
-      title: "7A0611",
+      title: "0F2945",
       body: "3C1F1F",
       layout: "red-gold",
     },
@@ -1714,11 +1764,11 @@ test("PptService preview fills a default dome section number when omitted", asyn
     templateId: "business",
     templateName: "Executive Business",
     templateVisual: {
-      primary: "B80F1A",
-      accent: "F6D48A",
+      primary: "1F4E79",
+      accent: "F4A261",
       background: "8F0613",
       surface: "FFF8E6",
-      title: "7A0611",
+      title: "0F2945",
       body: "3C1F1F",
       layout: "red-gold",
     },

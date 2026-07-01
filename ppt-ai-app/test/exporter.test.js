@@ -50,7 +50,7 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   const pitchText = pitch.content.toString("latin1");
 
   assert.match(businessText, /name="Moling Executive Business"/);
-  assert.match(businessText, /val="B80F1A"/);
+  assert.match(businessText, /val="1F4E79"/);
   assert.match(businessText, /name="Lower Gold Wave"/);
   assert.match(businessText, /name="Dome Gold Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
   assert.match(businessText, /name="Dome Light Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
@@ -59,6 +59,26 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   assert.match(pitchText, /name="Moling Venture Pitch"/);
   assert.match(pitchText, /val="111827"/);
   assert.notEqual(businessText, pitchText);
+});
+
+test("PptExportService uses dedicated top-band decorations for business minimal theme", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "business", theme: "minimal" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Top Band Surface"/);
+  assert.match(slide1, /name="Primary Rail"/);
+  assert.match(slide1, /name="Top Band Outline"/);
+  assert.match(slide1, /name="Top Band Accent Ribbon"/);
+  assert.match(slide1, /name="Top Band Side Cap"/);
+  assert.match(slide1, /name="Top Band Index Ring"/);
+  assert.match(slide1, /name="Top Band Ring Number"/);
+  assert.match(slide1, /name="Top Band Footer"/);
+  assert.match(slide1, /name="Section Label"/);
 });
 
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {
@@ -91,7 +111,10 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /<a:fontScheme name="588ku">/);
   assert.match(text, /<a:latin typeface="Arial Black"\/>/);
   assert.match(text, /typeface="Source Han Sans CN Heavy"/);
-  assert.match(text, /name="Dome Cover Title"[\s\S]*<a:gradFill>[\s\S]*val="FFF8CC"[\s\S]*val="FCD696"/);
+  assert.match(
+    text,
+    /name="Dome Cover Title"[\s\S]*<a:gradFill>[\s\S]*<a:srgbClr val="[0-9A-Fa-f]{6}"\/>[\s\S]*<a:srgbClr val="[0-9A-Fa-f]{6}"\/>/,
+  );
   assert.match(text, /name="Dome Cover Sailboat Background"/);
   assert.match(utf8Text, /name="Dome Cover Subtitle"[\s\S]*<a:t>2026 年度经营复盘<\/a:t>/);
   assert.match(text, /name="Dome Agenda Card 1"/);
@@ -104,7 +127,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /name="Dome Image Placeholder"/);
   assert.match(utf8Text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 03<\/a:t>/s);
   const slide4Title = utf8Text.match(/ppt\/slides\/slide4\.xml<\?xml[\s\S]*?name="Dome Content Title"[\s\S]*?<\/p:sp>/)?.[0] || "";
-  assert.match(slide4Title, /<a:solidFill><a:srgbClr val="7A0611"\/><\/a:solidFill>/);
+  assert.match(slide4Title, /<a:solidFill><a:srgbClr val="0F2945"\/><\/a:solidFill>/);
   assert.doesNotMatch(slide4Title, /<a:gradFill>/);
   assert.match(text, /name="Dome Step 4"/);
   assert.match(text, /name="Dome Closing Mark"/);
@@ -316,7 +339,7 @@ test("PptExportService applies template-specific visual colors to PDF output", (
   const businessText = business.content.toString("latin1");
   const pitchText = pitch.content.toString("latin1");
 
-  assert.match(businessText, /0\.722 0\.059 0\.102 rg/);
+  assert.match(businessText, /0\.122 0\.306 0\.475 rg/);
   assert.match(pitchText, /0\.067 0\.094 0\.153 rg/);
   assert.notEqual(businessText, pitchText);
 });

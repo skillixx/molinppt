@@ -27,6 +27,77 @@ const DOME_ASSETS = {
   business6: readFileSync(new URL("dome-business-6.jpeg", DOME_ASSET_BASE_URL)),
 };
 
+function normalizeHexColor(hex) {
+  const normalized = String(hex || "000000").replace(/^#/, "").trim().padEnd(6, "0").slice(0, 6);
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return "000000";
+  return normalized.toUpperCase();
+}
+
+function blendHexColor(base, blend, amount = 0.5) {
+  const baseHex = normalizeHexColor(base);
+  const blendHex = normalizeHexColor(blend);
+  const ratio = Math.max(0, Math.min(1, amount));
+  const baseR = Number.parseInt(baseHex.slice(0, 2), 16);
+  const baseG = Number.parseInt(baseHex.slice(2, 4), 16);
+  const baseB = Number.parseInt(baseHex.slice(4, 6), 16);
+  const blendR = Number.parseInt(blendHex.slice(0, 2), 16);
+  const blendG = Number.parseInt(blendHex.slice(2, 4), 16);
+  const blendB = Number.parseInt(blendHex.slice(4, 6), 16);
+  const r = Math.round(baseR * (1 - ratio) + blendR * ratio);
+  const g = Math.round(baseG * (1 - ratio) + blendG * ratio);
+  const b = Math.round(baseB * (1 - ratio) + blendB * ratio);
+  return `${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`.toUpperCase();
+}
+
+function redGoldColorPalette(visual) {
+  const primary = normalizeHexColor(visual?.primary);
+  const accent = normalizeHexColor(visual?.accent);
+  const surface = normalizeHexColor(visual?.surface || "FFFFFF");
+  const neutralTint = blendHexColor(surface, "F8FAFC", 0.72);
+  return {
+    titleGradientStart: blendHexColor(primary, "FFFFFF", 0.55),
+    titleGradientEnd: blendHexColor(primary, accent, 0.28),
+    cardFill: blendHexColor(accent, surface, 0.24),
+    cardFillStrong: blendHexColor(accent, surface, 0.34),
+    contentPanel: blendHexColor(surface, neutralTint, 0.18),
+    bottomGradientHigh: blendHexColor(primary, "FFFFFF", 0.70),
+    bottomGradientMid: blendHexColor(accent, "FFFFFF", 0.30),
+    bottomGradientLow: blendHexColor(primary, "0F172A", 0.48),
+    surfaceText: "FFFFFF",
+    surfaceHighlight: blendHexColor(surface, "FFFFFF", 0.10),
+    surfaceDecor: blendHexColor(surface, primary, 0.05),
+    surfaceStroke: blendHexColor(surface, primary, 0.09),
+    softLine: blendHexColor(surface, primary, 0.12),
+    cardStroke: blendHexColor(accent, "64748B", 0.22),
+    frameStroke: blendHexColor(primary, accent, 0.16),
+    softRgb: `${Number.parseInt(accent.slice(0, 2), 16)},${Number.parseInt(accent.slice(2, 4), 16)},${Number.parseInt(accent.slice(4, 6), 16)}`,
+    primaryRgb: `${Number.parseInt(primary.slice(0, 2), 16)},${Number.parseInt(primary.slice(2, 4), 16)},${Number.parseInt(primary.slice(4, 6), 16)}`,
+  };
+}
+
+function topBandColorPalette(visual) {
+  const primary = normalizeHexColor(visual?.primary);
+  const accent = normalizeHexColor(visual?.accent);
+  const surface = normalizeHexColor(visual?.surface || "FFFFFF");
+  const background = normalizeHexColor(visual?.background || "F8FAFC");
+  return {
+    surface: blendHexColor(surface, "FFFFFF", 0.06),
+    panel: blendHexColor(surface, background, 0.34),
+    panelFrame: blendHexColor(accent, "64748B", 0.25),
+    rail: blendHexColor(primary, "111827", 0.2),
+    stripe: blendHexColor(accent, background, 0.3),
+    sheen: blendHexColor(surface, primary, 0.16),
+    footer: blendHexColor(surface, primary, 0.14),
+    rule: blendHexColor(primary, accent, 0.45),
+    indexTag: blendHexColor(primary, accent, 0.12),
+    titleGradientStart: blendHexColor(primary, "FFFFFF", 0.72),
+    titleGradientEnd: blendHexColor(accent, "F8FAFC", 0.35),
+    marker: blendHexColor(accent, "F59E0B", 0.22),
+    ribbon: blendHexColor(primary, accent, 0.24),
+    edge: blendHexColor(primary, surface, 0.08),
+  };
+}
+
 /**
  * 将生成后的 deck 导出为可下载文件。
  */
@@ -143,6 +214,7 @@ function buildPdfTextStream(deck, visual = resolveDeckVisual(deck)) {
 function resolveDeckVisual(deck) {
   return resolveTemplateVisual({
     templateId: deck.templateId,
+    theme: deck.theme,
     template: { id: deck.templateId, name: deck.templateName, visual: deck.templateVisual },
   });
 }
@@ -250,7 +322,7 @@ function slideFiles(deck, visual) {
     const bodyColor = layout.bodyColor || visual.body;
     const bodySize = layout.bodySize || 2200;
     const fontFace = visual.layout === "red-gold" ? DOME_TEXT_FONT : "";
-    const titleFillStyle = domeTitleFillStyle(visual, role);
+    const titleFillStyle = visual.layout === "top-band" ? topBandTitleFillStyle(visual) : domeTitleFillStyle(visual, role);
     const renderBodyList = shouldRenderDomeBodyList(visual, role);
     const bullets = renderBodyList
       ? (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}">${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("")
@@ -276,7 +348,15 @@ function slideFiles(deck, visual) {
  */
 function domeTitleFillStyle(visual, role) {
   if (visual.layout !== "red-gold") return "";
-  return ["cover", "agenda", "section-divider", "closing"].includes(role) ? "dome-gold-gradient" : "";
+  if (!["cover", "agenda", "section-divider", "closing"].includes(role)) return "";
+  const redGoldPalette = redGoldColorPalette(visual);
+  return `dome-gold-gradient:${redGoldPalette.titleGradientStart}:${redGoldPalette.titleGradientEnd}`;
+}
+
+function topBandTitleFillStyle(visual) {
+  if (visual.layout !== "top-band") return "";
+  const topBandPalette = topBandColorPalette(visual);
+  return `top-band-title-gradient:${topBandPalette.titleGradientStart}:${topBandPalette.titleGradientEnd}`;
 }
 
 /**
@@ -340,6 +420,7 @@ function scaleTemplateGeometryXml(xml, visual) {
 function templateDecorationsXml(visual, index, layout, role, slide) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
   if (visual.layout === "red-gold") {
+    const redGoldPalette = redGoldColorPalette(visual);
     const isCover = ["cover", "closing"].includes(role);
     const background = pictureXml({
       id: 3,
@@ -350,17 +431,44 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       cx: 9144000,
       cy: 5143500,
     });
+    const frame = lineFrameShapeXml({
+      id: 17,
+      name: "Dome Outer Frame",
+      x: 120650,
+      y: 120650,
+      cx: 8902700,
+      cy: 4902200,
+      stroke: redGoldPalette.frameStroke,
+      width: 19050,
+    });
+    const contentFrame = ["cover", "closing"].includes(role)
+      ? ""
+      : lineFrameShapeXml({
+          id: 18,
+          name: "Dome Content Frame",
+          x: 609600,
+          y: 457200,
+          cx: 7924800,
+          cy: 4219260,
+          stroke: redGoldPalette.surfaceStroke,
+          width: 15240,
+        });
     // dome.pptx 底部是多层金色弧线和色块叠出的波浪，不只是单块红色背景；这里保留色带并补充圆弧线条层。
-    const waves = solidShapeXml({ id: 4, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3886200, cx: 4876800, cy: 914400, fill: "FFE8B0" })
-      + solidShapeXml({ id: 5, name: "Lower Light Wave", geom: "parallelogram", x: 2590800, y: 3657600, cx: 5181600, cy: 914400, fill: visual.accent })
-      + solidShapeXml({ id: 6, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: "9D0612" })
-      + arcLineShapeXml({ id: 12, name: "Dome Gold Wave Arc", x: -609600, y: 3505200, cx: 4876800, cy: 1447800, stroke: "FFE8B0", width: 91440 })
-      + arcLineShapeXml({ id: 13, name: "Dome Light Wave Arc", x: 2514600, y: 3276600, cx: 5486400, cy: 1600200, stroke: visual.accent, width: 76200 });
-    const footer = rectShapeXml({ id: 7, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
-      + textShapeXml({ id: 8, name: "Dome Footer Decoration", x: 609600, y: isCover ? 4572000 : 4686300, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: "FFE8B0" });
+    const topGuard = solidShapeXml({ id: 4, name: "Dome Top Guard", x: 0, y: 0, cx: 9144000, cy: 365760, fill: redGoldPalette.surfaceStroke })
+      + solidShapeXml({ id: 12, name: "Dome Edge Accent", x: 685800, y: 114300, cx: 7772400, cy: 45720, fill: redGoldPalette.surfaceText });
+    const waves = solidShapeXml({ id: 5, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3921120, cx: 4876800, cy: 889540, fill: redGoldPalette.surfaceDecor })
+      + solidShapeXml({ id: 6, name: "Lower Light Wave", geom: "parallelogram", x: 2590800, y: 3695328, cx: 5181600, cy: 889540, fill: blendHexColor(redGoldPalette.surfaceDecor, redGoldPalette.surfaceText, 0.15) })
+      + solidShapeXml({ id: 7, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: redGoldPalette.bottomGradientLow })
+      + arcLineShapeXml({ id: 13, name: "Dome Gold Wave Arc", x: -533400, y: 3505200, cx: 4876800, cy: 1447800, stroke: redGoldPalette.titleGradientStart, width: 57150 })
+      + arcLineShapeXml({ id: 14, name: "Dome Light Wave Arc", x: 2514600, y: 3333750, cx: 5486400, cy: 1629416, stroke: redGoldPalette.titleGradientEnd, width: 45720 });
+    const footer = rectShapeXml({ id: 15, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 16, name: "Dome Footer Decoration", x: 609600, y: isCover ? 4572000 : 4686300, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: redGoldPalette.surfaceText });
     const roleDecoration = domeRoleDecorationXml({ role, index, layout, visual, slide });
     return base
       + background
+      + frame
+      + contentFrame
+      + topGuard
       + waves
       + footer
       + roleDecoration;
@@ -374,6 +482,71 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + rectShapeXml({ id: 6, name: "Top Rule", x: 685800, y: 342900, cx: 7772400, cy: 30480, fill: visual.accent })
       + rectShapeXml({ id: 9, name: "Fine Divider", x: 914400, y: index === 0 ? 2743200 : 1516380, cx: 4267200, cy: 15240, fill: visual.accent })
       + textShapeXml({ id: 7, name: "Section Label", ...layout.label, text: index === 0 ? visual.name : `0${index + 1}`, size: 1200, bold: true, color: index === 0 ? visual.surface : visual.accent });
+  }
+  if (visual.layout === "top-band") {
+    const isCover = index === 0;
+    const panelY = isCover ? 914400 : 685800;
+    const panelHeight = isCover ? 3657600 : 4114800;
+    const panelBottom = panelY + panelHeight;
+    const palette = topBandColorPalette(visual);
+    return base
+      + rectShapeXml({ id: 3, name: "Top Band Surface", ...layout.surface, fill: visual.surface })
+      + solidShapeXml({ id: 13, name: "Top Band Surface Sheen", x: 685800, y: panelY + 152400, cx: 7772400, cy: panelHeight - 304800, fill: palette.sheen })
+      + solidShapeXml({ id: 9, name: "Top Band Content Panel", geom: "roundRect", x: 685800, y: panelY, cx: 7772400, cy: panelHeight, fill: palette.panel })
+      + lineFrameShapeXml({ id: 10, name: "Top Band Panel Frame", geom: "roundRect", x: 628650, y: panelY - 152400, cx: 7886700, cy: panelHeight + 304800, stroke: palette.panelFrame, width: 15240 })
+      + rectShapeXml({ id: 11, name: "Top Band Focus Stripe", x: 685800, y: 228600, cx: 8289600, cy: 304800, fill: palette.stripe })
+      + rectShapeXml({ id: 4, name: "Primary Rail", x: 0, y: 0, cx: 228600, cy: 5143500, fill: palette.rail })
+      + rectShapeXml({ id: 5, name: "Accent Header", ...layout.accent, fill: visual.accent })
+      + lineFrameShapeXml({ id: 6, name: "Top Band Outline", x: 114300, y: 342900, cx: 8915400, cy: 4478700, stroke: palette.rule, width: 15240 })
+      + rectShapeXml({ id: 12, name: "Top Band Signature", x: 914400, y: panelY, cx: 228600, cy: 304800, fill: palette.footer })
+      + rectShapeXml({ id: 14, name: "Top Band Marker Band", x: 4572000, y: panelY + 228600, cx: 4064000, cy: 152400, fill: palette.marker })
+      + solidShapeXml({ id: 17, name: "Top Band Accent Ribbon", geom: "parallelogram", x: 6553200, y: isCover ? 548640 : 365760, cx: 2311400, cy: 304800, fill: palette.ribbon })
+      + rectShapeXml({ id: 18, name: "Top Band Side Cap", x: 114300, y: isCover ? 228600 : 152400, cx: 285750, cy: 685800, fill: palette.edge })
+      + solidShapeXml({ id: 15, name: "Top Band Index Dot", geom: "ellipse", x: 171450, y: panelBottom - 548640, cx: 685800, cy: 685800, fill: palette.indexTag })
+      + textShapeXml({
+        id: 16,
+        name: "Top Band Index Badge",
+        x: 685800,
+        y: panelBottom - 457200,
+        cx: 3657600,
+        cy: 304800,
+        text: isCover ? "EXECUTIVE BRIEFING" : `PAGE ${index + 1}`,
+        size: 900,
+        bold: true,
+        color: palette.surface,
+      })
+      + lineFrameShapeXml({
+        id: 19,
+        name: "Top Band Index Ring",
+        geom: "ellipse",
+        x: 685800,
+        y: panelBottom - 1270000,
+        cx: 431800,
+        cy: 431800,
+        stroke: palette.rule,
+      })
+      + textShapeXml({
+        id: 20,
+        name: "Top Band Ring Number",
+        x: 771525,
+        y: panelBottom - 1219200,
+        cx: 260000,
+        cy: 165100,
+        text: String(index + 1).padStart(2, "0"),
+        size: 1200,
+        bold: true,
+        color: visual.title,
+      })
+      + textShapeXml({
+        id: 7,
+        name: "Section Label",
+        ...layout.label,
+        text: index === 0 ? visual.name : `0${index + 1}`,
+        size: 1100,
+        bold: true,
+        color: index === 0 ? visual.surface : visual.accent,
+      })
+      + rectShapeXml({ id: 8, name: "Top Band Footer", x: 0, y: 4800600, cx: 9144000, cy: 342900, fill: visual.background });
   }
   return base + rectShapeXml({ id: 3, name: "Template Accent", ...layout.accent, fill: visual.primary });
 }
@@ -432,11 +605,14 @@ function resolveSlideRole(slide, index, total) {
  * @returns {string}
  */
 function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
+  const palette = redGoldColorPalette(visual);
   if (role === "cover") {
     const [subtitle] = normalizeDomeBulletItems(slide, 1);
     // 封面页用专用副标题承载用户输入，避免普通列表破坏 dome.pptx 的帆船封面留白。
-    return textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: "FFE8B0" })
-      + textShapeXml({ id: 11, name: "Dome Cover Subtitle", x: 2971800, y: 3048000, cx: 3962400, cy: 365760, text: subtitle, size: 1500, bold: true, color: "FFE8B0" });
+    return rectShapeXml({ id: 8, name: "Dome Cover Halo", x: 0, y: 0, cx: 12192000, cy: 182880, fill: palette.surfaceStroke })
+      + rectShapeXml({ id: 9, name: "Dome Cover Accent", x: 0, y: 6680200, cx: 12192000, cy: 120650, fill: palette.surfaceStroke })
+      + textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: palette.surfaceText })
+      + textShapeXml({ id: 11, name: "Dome Cover Subtitle", x: 2971800, y: 3048000, cx: 3962400, cy: 365760, text: subtitle, size: 1500, bold: true, color: palette.surfaceText });
   }
   if (role === "agenda") {
     // 目录页固定输出 4 个卡片槽位，保持 dome.pptx 的卡片式目录骨架不因用户少填内容而变化。
@@ -446,26 +622,31 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       const row = Math.floor(itemIndex / 2);
       const x = 1219200 + column * 3429000;
       const y = 1371600 + row * 1219200;
-      return solidShapeXml({ id: 30 + itemIndex, name: `Dome Agenda Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2743200, cy: 838200, fill: visual.accent })
+      return solidShapeXml({ id: 30 + itemIndex, name: `Dome Agenda Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2743200, cy: 838200, fill: itemIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
+        + lineFrameShapeXml({ id: 60 + itemIndex, name: `Dome Agenda Card Frame ${itemIndex + 1}`, geom: "roundRect", x: x - 60960, y: y - 60960, cx: 2865120, cy: 960120, stroke: palette.cardStroke, width: 19050 })
         + textShapeXml({ id: 40 + itemIndex, name: `Dome Agenda Number ${itemIndex + 1}`, x: x + 304800, y: y + 152400, cx: 609600, cy: 304800, text: `0${itemIndex + 1}`, size: 1800, bold: true, color: visual.title })
         + textShapeXml({ id: 50 + itemIndex, name: `Dome Agenda Text ${itemIndex + 1}`, x: x + 914400, y: y + 213360, cx: 1524000, cy: 365760, text: String(item), size: 1900, bold: true, color: visual.title });
     }).join("");
   }
   if (role === "section-divider") {
-    return textShapeXml({ id: 30, name: "Dome Section Number", ...layout.label, text: domeSectionNumberText(slide, index), size: 1800, bold: true, color: "FFE8B0" })
-      + rectShapeXml({ id: 31, name: "Dome Section Divider Line", x: 3429000, y: 2743200, cx: 2286000, cy: 30480, fill: visual.accent });
+    return rectShapeXml({ id: 30, name: "Dome Section Divider Frame", x: 304800, y: 1238250, cx: 8534400, cy: 228600, fill: palette.surfaceStroke })
+      + lineFrameShapeXml({ id: 33, name: "Dome Section Divider Frame Border", x: 273050, y: 1178560, cx: 8607600, cy: 353060, stroke: palette.cardStroke, width: 19050 })
+      + textShapeXml({ id: 31, name: "Dome Section Number", ...layout.label, text: domeSectionNumberText(slide, index), size: 1800, bold: true, color: palette.surfaceText })
+      + rectShapeXml({ id: 32, name: "Dome Section Divider Line", x: 3429000, y: 2743200, cx: 2286000, cy: 30480, fill: palette.surfaceStroke });
   }
   if (role === "three-steps" || role === "four-steps" || role === "next-plan") {
     const count = role === "three-steps" ? 3 : 4;
     const bulletItems = normalizeDomeBulletItems(slide, count);
     const planItems = role === "next-plan" ? normalizeDomePlanItems(slide, count) : [];
     // 流程和计划页也需要 dome.pptx 的浅色内容承载面，否则卡片会直接漂在红金背景上。
-    const contentSurface = solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface });
+    const contentSurface = solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel });
     const sectionLabel = textShapeXml({ id: 80, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
     const steps = Array.from({ length: count }, (_, stepIndex) => {
       const x = 1219200 + stepIndex * (count === 3 ? 2286000 : 1752600);
       const y = 2895600;
-      const card = solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: count === 3 ? 1676400 : 1371600, cy: 914400, fill: stepIndex % 2 === 0 ? "FFF8E6" : visual.accent });
+      const cardWidth = count === 3 ? 1676400 : 1371600;
+      const card = solidShapeXml({ id: 30 + stepIndex, name: `Dome Step ${stepIndex + 1}`, geom: "roundRect", x, y, cx: cardWidth, cy: 914400, fill: stepIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
+        + lineFrameShapeXml({ id: 90 + stepIndex, name: `Dome Step Card Frame ${stepIndex + 1}`, geom: "roundRect", x: x - 76200, y: y - 76200, cx: cardWidth + 152400, cy: 1066800, stroke: palette.cardStroke, width: 19050 });
       if (role === "next-plan") {
         const planItem = planItems[stepIndex];
         return card
@@ -479,7 +660,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     // 三/四步骤流程页增加横向连接线，让独立卡片形成清晰的流程关系。
     const stepConnector = role === "next-plan"
       ? ""
-      : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: visual.accent });
+      : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: palette.surfaceStroke });
     // 三步骤流程页补齐商务图片层，保持流程类内容页也有 dome.pptx 的图文商务气质。
     const threeStepsImage = role === "three-steps"
       ? pictureXml({ id: 69, name: "Dome Three Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
@@ -499,13 +680,15 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "metrics") {
     const metricItems = normalizeDomeMetricItems(slide, 3);
     // 指标页保留浅色承载面和右上章节标签，使数据卡片与 dome.pptx 内容页层级一致。
-    return solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    return solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       + Array.from({ length: 3 }, (_, metricIndex) => {
       const x = 1219200 + metricIndex * 2286000;
+      const metricY = 2590800;
       const metric = metricItems[metricIndex];
-      return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" })
+      return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: metricY, cx: 1828800, cy: 1066800, fill: palette.cardFill })
+        + lineFrameShapeXml({ id: 80 + metricIndex, name: `Dome Metric Card Frame ${metricIndex + 1}`, geom: "roundRect", x: x - 60960, y: metricY - 10560, cx: 1950720, cy: 1085760, stroke: palette.cardStroke, width: 19050 })
         + textShapeXml({ id: 40 + metricIndex, name: `Dome Metric Number ${metricIndex + 1}`, x: x + 228600, y: 2743200, cx: 1219200, cy: 304800, text: `0${metricIndex + 1}`, size: 1800, bold: true, color: visual.title })
         + textShapeXml({ id: 60 + metricIndex, name: `Dome Metric Value ${metricIndex + 1}`, x: x + 228600, y: 3048000, cx: 1371600, cy: 365760, text: metric.value, size: 2100, bold: true, color: visual.title })
         + textShapeXml({ id: 70 + metricIndex, name: `Dome Metric Label ${metricIndex + 1}`, x: x + 228600, y: 3505200, cx: 1371600, cy: 304800, text: metric.label, size: 1100, bold: true, color: visual.body });
@@ -516,11 +699,12 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     // 成果展示页拆成编号和正文两个占位符，贴近 dome.pptx 的成果卡层级，而不是整段文本列表。
     const showcaseCards = Array.from({ length: 3 }, (_, cardIndex) => {
       const y = 2438400 + cardIndex * 640080;
-      return solidShapeXml({ id: 34 + cardIndex, name: `Dome Showcase Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+      return solidShapeXml({ id: 34 + cardIndex, name: `Dome Showcase Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
+        + lineFrameShapeXml({ id: 64 + cardIndex, name: `Dome Showcase Card Frame ${cardIndex + 1}`, geom: "roundRect", x: 1158240, y: y - 30480, cx: 3464560, cy: 518160, stroke: palette.cardStroke, width: 19050 })
         + textShapeXml({ id: 44 + cardIndex, name: `Dome Showcase Number ${cardIndex + 1}`, x: 1447800, y: y + 121920, cx: 457200, cy: 213360, text: `0${cardIndex + 1}`, size: 1300, bold: true, color: visual.title })
         + textShapeXml({ id: 54 + cardIndex, name: `Dome Showcase Text ${cardIndex + 1}`, x: 1981200, y: y + 121920, cx: 2133600, cy: 213360, text: showcaseItems[cardIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
-    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
       + pictureXml({ id: 30, name: "Dome Showcase Image", relId: "rId3", x: 5334000, y: 1371600, cx: 2438400, cy: 1828800 })
       + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
@@ -532,13 +716,15 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     // 问题复盘页将复盘语义标签和正文拆成固定占位符，便于结构化内容稳定落位。
     const retrospectiveCards = Array.from({ length: 3 }, (_, cardIndex) => {
       const y = 2438400 + cardIndex * 640080;
-      return solidShapeXml({ id: 35 + cardIndex, name: `Dome Retrospective Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+      return solidShapeXml({ id: 35 + cardIndex, name: `Dome Retrospective Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
+        + lineFrameShapeXml({ id: 67 + cardIndex, name: `Dome Retrospective Card Frame ${cardIndex + 1}`, geom: "roundRect", x: 1158240, y: y - 30480, cx: 3464560, cy: 518160, stroke: palette.cardStroke, width: 19050 })
         + textShapeXml({ id: 45 + cardIndex, name: `Dome Retrospective Label ${cardIndex + 1}`, x: 1447800, y: y + 106680, cx: 609600, cy: 243840, text: retrospectiveLabels[cardIndex], size: 1100, bold: true, color: visual.title })
         + textShapeXml({ id: 55 + cardIndex, name: `Dome Retrospective Text ${cardIndex + 1}`, x: 2133600, y: y + 121920, cx: 1981200, cy: 213360, text: riskItems[cardIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
-    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
       + pictureXml({ id: 30, name: "Dome Business Image", relId: "rId3", x: 5486400, y: 1524000, cx: 2133600, cy: 1371600 })
-      + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: visual.accent })
+      + solidShapeXml({ id: 32, name: "Dome Retrospective Risk Card", geom: "roundRect", x: 5486400, y: 3200400, cx: 2133600, cy: 609600, fill: palette.cardFillStrong })
+      + lineFrameShapeXml({ id: 70, name: "Dome Retrospective Risk Card Frame", geom: "roundRect", x: 5425440, y: 3193920, cx: 2255520, cy: 685800, stroke: palette.cardStroke, width: 19050 })
       + textShapeXml({ id: 34, name: "Dome Retrospective Risk Text", x: 5715000, y: 3352800, cx: 1676400, cy: 304800, text: riskItems[0], size: 1300, bold: true, color: visual.title })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + retrospectiveCards;
@@ -546,17 +732,18 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "closing") {
     const [subtitle] = normalizeDomeBulletItems(slide, 1);
     // 结束页使用专用副标题承载用户输入，不再退回普通项目符号列表。
-    return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: "FFE8B0" })
-      + textShapeXml({ id: 31, name: "Dome Closing Subtitle", x: 3200400, y: 3048000, cx: 2743200, cy: 365760, text: subtitle, size: 1300, bold: true, color: "FFE8B0" });
+    return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: palette.surfaceText })
+      + textShapeXml({ id: 31, name: "Dome Closing Subtitle", x: 3200400, y: 3048000, cx: 2743200, cy: 365760, text: subtitle, size: 1300, bold: true, color: palette.surfaceText });
   }
   const imageReportItems = normalizeDomeBulletItems(slide, 3);
   // 工作汇报图文页使用三张汇报卡片承载结构化要点，右侧继续复用 dome.pptx 的商务配图。
   const imageReportCards = Array.from({ length: 3 }, (_, cardIndex) => {
     const y = 2438400 + cardIndex * 640080;
-    return solidShapeXml({ id: 35 + cardIndex, name: `Dome Image Report Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+    return solidShapeXml({ id: 35 + cardIndex, name: `Dome Image Report Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
+      + lineFrameShapeXml({ id: 60 + cardIndex, name: `Dome Image Report Card Frame ${cardIndex + 1}`, geom: "roundRect", x: 1158240, y: y - 30480, cx: 3464560, cy: 518160, stroke: palette.cardStroke, width: 19050 })
       + textShapeXml({ id: 45 + cardIndex, name: `Dome Image Report Text ${cardIndex + 1}`, x: 1524000, y: y + 121920, cx: 2590800, cy: 213360, text: imageReportItems[cardIndex], size: 1200, bold: true, color: visual.title });
   }).join("");
-  return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
+  return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
     + solidShapeXml({ id: 34, name: "Dome Image Placeholder", geom: "roundRect", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800, fill: visual.accent })
     + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
@@ -709,6 +896,7 @@ function domeRoleBusinessMedia(role) {
  * @returns {{accent: object, title: object, content: object, titleSize: number}}
  */
 function templateLayout(visual, index, role = index === 0 ? "cover" : "content") {
+  const redGoldPalette = redGoldColorPalette(visual);
   if (visual.layout === "red-gold") {
     if (role === "cover" || role === "closing") {
       return {
@@ -720,8 +908,8 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         content: { x: 2971800, y: 2514600, cx: 3886200, cy: 914400 },
         titleSize: 5200,
         bodySize: 2100,
-        titleColor: "FFF2B8",
-        bodyColor: "FFE8B0",
+        titleColor: redGoldPalette.surfaceText,
+        bodyColor: redGoldPalette.surfaceText,
       };
     }
     if (role === "agenda") {
@@ -734,7 +922,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         content: { x: 1371600, y: 1371600, cx: 6400800, cy: 2133600 },
         titleSize: 3600,
         bodySize: 1900,
-        titleColor: "FFF2B8",
+        titleColor: redGoldPalette.surfaceText,
         bodyColor: visual.body,
       };
     }
@@ -748,8 +936,8 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         content: { x: 2743200, y: 2895600, cx: 3657600, cy: 609600 },
         titleSize: 5000,
         bodySize: 2100,
-        titleColor: "FFF2B8",
-        bodyColor: "FFE8B0",
+        titleColor: redGoldPalette.surfaceText,
+        bodyColor: redGoldPalette.surfaceText,
       };
     }
     return {
@@ -839,6 +1027,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       titleSize: 4300,
     };
   }
+  if (visual.layout === "top-band") {
+    if (index === 0) {
+      return {
+        surface: { x: 685800, y: 914400, cx: 8289600, cy: 3657600 },
+        accent: { x: 0, y: 0, cx: 9144000, cy: 514350 },
+        secondaryAccent: { x: 914400, y: 3886200, cx: 7772400, cy: 365760 },
+        label: { x: 685800, y: 685800, cx: 2438400, cy: 365760 },
+        title: { x: 1714500, y: 1371600, cx: 6400800, cy: 1066800 },
+        content: { x: 1714500, y: 2743200, cx: 6400800, cy: 914400 },
+        titleSize: 4600,
+        bodySize: 1900,
+      };
+    }
+    return {
+      surface: { x: 685800, y: 685800, cx: 8289600, cy: 4114800 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 457200 },
+      secondaryAccent: { x: 914400, y: 4000500, cx: 7772400, cy: 304800 },
+      label: { x: 685800, y: 685800, cx: 2209800, cy: 365760 },
+      title: { x: 1714500, y: 1346200, cx: 6146800, cy: 914400 },
+      content: { x: 1714500, y: 2453000, cx: 6400800, cy: 1097280 },
+      titleSize: 4000,
+      bodySize: 1850,
+    };
+  }
   if (visual.layout === "left-rail") {
     return {
       accent: { x: 0, y: 0, cx: 342900, cy: 5143500 },
@@ -912,7 +1124,12 @@ function slideMasterRelsXml() {
  * @returns {string}
  */
 function themeXml(visual) {
-  return `<?xml version="1.0" encoding="UTF-8"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Moling ${escapeXml(visual.name)}"><a:themeElements><a:clrScheme name="Moling ${escapeXml(visual.name)}"><a:dk1><a:srgbClr val="${visual.title}"/></a:dk1><a:lt1><a:srgbClr val="${visual.surface}"/></a:lt1><a:dk2><a:srgbClr val="${visual.body}"/></a:dk2><a:lt2><a:srgbClr val="${visual.background}"/></a:lt2><a:accent1><a:srgbClr val="${visual.primary}"/></a:accent1><a:accent2><a:srgbClr val="${visual.accent}"/></a:accent2><a:accent3><a:srgbClr val="F59E0B"/></a:accent3><a:accent4><a:srgbClr val="DC2626"/></a:accent4><a:accent5><a:srgbClr val="7C3AED"/></a:accent5><a:accent6><a:srgbClr val="0891B2"/></a:accent6><a:hlink><a:srgbClr val="${visual.primary}"/></a:hlink><a:folHlink><a:srgbClr val="${visual.accent}"/></a:folHlink></a:clrScheme>${fontSchemeXml(visual)}<a:fmtScheme name="Moling"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"/><a:gradFill rotWithShape="1"/></a:fillStyleLst><a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="25400"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="38100"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>`;
+  const redGoldPalette = visual.layout === "red-gold" ? redGoldColorPalette(visual) : null;
+  const accent4 = redGoldPalette ? redGoldPalette.titleGradientEnd : "DC2626";
+  const accent5 = redGoldPalette ? redGoldPalette.titleGradientStart : "7C3AED";
+  const accent6 = redGoldPalette ? visual.body : "0891B2";
+  const accent3 = redGoldPalette ? redGoldPalette.cardFill : "F59E0B";
+  return `<?xml version="1.0" encoding="UTF-8"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Moling ${escapeXml(visual.name)}"><a:themeElements><a:clrScheme name="Moling ${escapeXml(visual.name)}"><a:dk1><a:srgbClr val="${visual.title}"/></a:dk1><a:lt1><a:srgbClr val="${visual.surface}"/></a:lt1><a:dk2><a:srgbClr val="${visual.body}"/></a:dk2><a:lt2><a:srgbClr val="${visual.background}"/></a:lt2><a:accent1><a:srgbClr val="${visual.primary}"/></a:accent1><a:accent2><a:srgbClr val="${visual.accent}"/></a:accent2><a:accent3><a:srgbClr val="${accent3}"/></a:accent3><a:accent4><a:srgbClr val="${accent4}"/></a:accent4><a:accent5><a:srgbClr val="${accent5}"/></a:accent5><a:accent6><a:srgbClr val="${accent6}"/></a:accent6><a:hlink><a:srgbClr val="${visual.primary}"/></a:hlink><a:folHlink><a:srgbClr val="${visual.accent}"/></a:folHlink></a:clrScheme>${fontSchemeXml(visual)}<a:fmtScheme name="Moling"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"/><a:gradFill rotWithShape="1"/></a:fillStyleLst><a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="25400"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="38100"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>`;
 }
 
 /**
@@ -953,6 +1170,15 @@ function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
  */
 function solidShapeXml({ id, name, geom, x, y, cx, cy, fill }) {
   return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${fill}"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>`;
+}
+
+/**
+ * 创建仅描边形状（用于卡片边框/外框）.
+ * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, stroke: string, width?: number}} input
+ * @returns {string}
+ */
+function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050 }) {
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}"/></a:solidFill></a:ln></p:spPr></p:sp>`;
 }
 
 /**
@@ -1011,14 +1237,23 @@ function fontFaceXml(fontFace) {
 
 /**
  * 生成文本 run 的填充效果。
- * dome-gold-gradient 对齐 dome.pptx 中封面金色渐变字：FFF8CC -> FCD696，方向为 5400000。
+ * dome-gold-gradient 使用当前 red-gold 色板参数生成过渡色，方向为 5400000。
  * @param {string} color
  * @param {string} fillStyle
  * @returns {string}
  */
 function textFillXml(color, fillStyle = "") {
-  if (fillStyle === "dome-gold-gradient") {
-    return `<a:gradFill><a:gsLst><a:gs pos="0"><a:srgbClr val="FFF8CC"/></a:gs><a:gs pos="100000"><a:srgbClr val="FCD696"/></a:gs></a:gsLst><a:lin ang="5400000" scaled="1"/></a:gradFill>`;
+  if (fillStyle.startsWith("dome-gold-gradient")) {
+    const [, rawStart = "FFF8CC", rawEnd = "FCD696"] = fillStyle.split(":");
+    const start = normalizeHexColor(rawStart);
+    const end = normalizeHexColor(rawEnd);
+    return `<a:gradFill><a:gsLst><a:gs pos="0"><a:srgbClr val="${start}"/></a:gs><a:gs pos="100000"><a:srgbClr val="${end}"/></a:gs></a:gsLst><a:lin ang="5400000" scaled="1"/></a:gradFill>`;
+  }
+  if (fillStyle.startsWith("top-band-title-gradient")) {
+    const [, rawStart = "FFFFFF", rawEnd = "F8FAFC"] = fillStyle.split(":");
+    const start = normalizeHexColor(rawStart);
+    const end = normalizeHexColor(rawEnd);
+    return `<a:gradFill><a:gsLst><a:gs pos="0"><a:srgbClr val="${start}"/></a:gs><a:gs pos="100000"><a:srgbClr val="${end}"/></a:gs></a:gsLst><a:lin ang="16200000" scaled="1"/></a:gradFill>`;
   }
   return `<a:solidFill><a:srgbClr val="${color}"/></a:solidFill>`;
 }
