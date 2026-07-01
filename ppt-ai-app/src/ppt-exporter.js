@@ -12,6 +12,7 @@ const DOME_SLIDE_METRICS = {
   scaleY: 6858000 / 5143500,
 };
 const DOME_TEXT_FONT = "Source Han Sans CN Heavy";
+const DOME_AGENDA_DEFAULT_ITEMS = ["工作汇报", "成果展示", "问题不足", "下步计划"];
 
 // dome.pptx 的核心视觉不是程序绘制出来的色块，而是可复用的红金背景图。
 // 导出器在启动时读取这些本仓库内资产，并在生成 PPTX 时作为 media part 写入。
@@ -400,10 +401,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "agenda") {
     // 目录页固定输出 4 个卡片槽位，保持 dome.pptx 的卡片式目录骨架不因用户少填内容而变化。
-    const sourceItems = Array.isArray(slide?.bullets) && slide.bullets.length
-      ? slide.bullets
-      : ["工作汇报", "成果展示", "问题不足", "下步计划"];
-    const agendaItems = Array.from({ length: 4 }, (_, itemIndex) => sourceItems[itemIndex] || "");
+    const agendaItems = normalizeDomeAgendaItems(slide);
     return agendaItems.map((item, itemIndex) => {
       const column = itemIndex % 2;
       const row = Math.floor(itemIndex / 2);
@@ -498,6 +496,17 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
     + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
     + imageReportCards;
+}
+
+/**
+ * 生成 dome 目录页的 4 个卡片文案。
+ * 用户输入优先；不足 4 项时使用 dome.pptx 的四段目录默认文案补齐，避免卡片式目录出现空槽。
+ * @param {object} slide
+ * @returns {string[]}
+ */
+function normalizeDomeAgendaItems(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: 4 }, (_, index) => String(bullets[index] || DOME_AGENDA_DEFAULT_ITEMS[index] || ""));
 }
 
 /**

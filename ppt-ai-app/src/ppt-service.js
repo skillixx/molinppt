@@ -22,6 +22,7 @@ const MAX_SLIDE_COUNT = 20;
 const SLIDE_GENERATION_MAX_ATTEMPTS = 2;
 const MAX_ACTIVE_PPT_ASSETS = 100;
 const MAX_PROMPT_CHARS = 5000;
+const DOME_AGENDA_DEFAULT_ITEMS = ["工作汇报", "成果展示", "问题不足", "下步计划"];
 const RUNNING_GENERATION_STATUSES = new Set(["running", "reconcile_pending", "release_pending"]);
 
 /**
@@ -970,7 +971,7 @@ function renderDomePreviewDecoration(role, slide) {
   }
   if (role === "agenda") {
     // 目录页固定保留 4 个卡片占位符，和 dome.pptx/PPTX 导出保持一致，避免少量目录项导致版式塌陷。
-    const cards = Array.from({ length: 4 }, (_, index) => `<div class="dome-agenda-card">${escapeHtml(bullets[index] || "")}</div>`).join("");
+    const cards = normalizeDomePreviewAgendaItems(slide).map((item) => `<div class="dome-agenda-card">${escapeHtml(item)}</div>`).join("");
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
   if (role === "section-divider") {
@@ -1010,6 +1011,17 @@ function renderDomePreviewDecoration(role, slide) {
     return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bullets[0] || "")}</div>`;
   }
   return "";
+}
+
+/**
+ * 生成 dome 预览目录页的 4 个卡片文案。
+ * 用户少填目录项时使用模板默认四段补齐，让预览与导出的卡片式目录保持完整。
+ * @param {object} slide
+ * @returns {string[]}
+ */
+function normalizeDomePreviewAgendaItems(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: 4 }, (_, index) => String(bullets[index] || DOME_AGENDA_DEFAULT_ITEMS[index] || ""));
 }
 
 /**
