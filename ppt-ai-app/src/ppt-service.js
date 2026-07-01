@@ -991,17 +991,17 @@ function renderDomePreviewDecoration(role, slide, index) {
   if (role === "showcase") {
     // 成果展示页使用三张固定卡片承载要点，预览结构和 PPTX 导出保持一致。
     const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card">${escapeHtml(bullets[index] || "")}</div>`).join("");
-    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
   if (role === "image-report") {
     // 工作汇报图文页用三张固定卡片承载要点，保持图文模板的占位符结构。
     const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-image-report-card", index, bullets[index])).join("");
-    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
     // 问题复盘页固定输出三张要点卡片，避免只显示第一条风险提示而丢失后续复盘内容。
     const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-retrospective-card", index, bullets[index])).join("");
-    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
+    return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bullets[0] || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
     const cards = Array.from({ length: 4 }, (_, index) => renderDomePreviewCard("dome-step-card", index, bullets[index])).join("");
@@ -1039,13 +1039,14 @@ function domePreviewSectionNumberText(slide, index) {
 
 /**
  * 渲染内容页预览右上角章节标签。
- * 仅在 outline 提供结构化章节字段时输出，避免旧数据预览出现无意义页序噪音。
+ * 与 PPTX 导出一致：优先使用 outline 结构化章节字段，缺省时按页序兜底，确保预览能看到导出中的章节标签。
  * @param {object} slide
+ * @param {number} index
  * @returns {string}
  */
-function renderDomePreviewSectionLabel(slide) {
-  const label = String(slide?.sectionLabel || slide?.section || "");
-  return label ? `<div class="dome-role-decor dome-section-label">${escapeHtml(label)}</div>` : "";
+function renderDomePreviewSectionLabel(slide, index) {
+  const label = String(slide?.sectionLabel || slide?.section || `PART ${String(index).padStart(2, "0")}`);
+  return `<div class="dome-role-decor dome-section-label">${escapeHtml(label)}</div>`;
 }
 
 /**

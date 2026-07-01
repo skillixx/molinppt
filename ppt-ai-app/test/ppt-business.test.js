@@ -1597,6 +1597,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<div class="dome-agenda-card">下步计划<\/div>/);
   assert.equal([...html.matchAll(/class="dome-image-report-card"/g)].length, 3);
   assert.match(html, /class="dome-role-decor dome-section-number">PART 01<\/div>/);
+  assert.match(html, /data-dome-role="image-report"[\s\S]*class="dome-role-decor dome-section-label">PART 03<\/div>/);
   assert.match(html, /class="dome-role-decor dome-section-label">PART 02<\/div>/);
   assert.match(html, /dome-metric-card/);
   assert.equal([...html.matchAll(/class="dome-showcase-card"/g)].length, 3);

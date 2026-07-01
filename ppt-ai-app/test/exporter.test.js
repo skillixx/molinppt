@@ -98,6 +98,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(utf8Text, /name="Dome Agenda Text 4"[\s\S]*<a:t>下步计划<\/a:t>/);
   assert.match(text, /name="Dome Section Number"/);
   assert.match(text, /name="Dome Image Placeholder"/);
+  assert.match(utf8Text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 03<\/a:t>/s);
   assert.match(text, /name="Dome Step 4"/);
   assert.match(text, /name="Dome Closing Mark"/);
 });
