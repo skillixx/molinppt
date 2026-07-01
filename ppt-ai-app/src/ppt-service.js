@@ -815,10 +815,12 @@ function escapeHtml(value) {
 function renderDeckPreview({ deck, visual }) {
   const slides = deck.slides.map((slide, index) => {
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
+    // dome 模板允许任意页显式声明封面版式，预览 class 必须跟随角色才能套用封面背景。
+    const slideKind = visual.layout === "red-gold" && domeRole === "cover" ? "cover" : index === 0 ? "cover" : "content";
     const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${index === 0 ? "cover" : "content"}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
