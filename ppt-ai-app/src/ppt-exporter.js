@@ -250,14 +250,27 @@ function slideFiles(deck, visual) {
     const bodyColor = layout.bodyColor || visual.body;
     const bodySize = layout.bodySize || 2200;
     const fontFace = visual.layout === "red-gold" ? DOME_TEXT_FONT : "";
+    const titleFillStyle = domeTitleFillStyle(visual, role);
     const bullets = shouldRenderDomeBodyList(visual, role)
       ? (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}">${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("")
       : "";
-    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: visual.layout === "red-gold" ? "dome-gold-gradient" : "" })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })}${textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
     files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
   return files;
+}
+
+/**
+ * 判断 dome 标题是否需要使用封面同款金色渐变。
+ * 内容页标题应使用深红实色；只有红底封面、目录、章节分隔和结束页使用金色渐变标题。
+ * @param {object} visual
+ * @param {string} role
+ * @returns {string}
+ */
+function domeTitleFillStyle(visual, role) {
+  if (visual.layout !== "red-gold") return "";
+  return ["cover", "agenda", "section-divider", "closing"].includes(role) ? "dome-gold-gradient" : "";
 }
 
 /**

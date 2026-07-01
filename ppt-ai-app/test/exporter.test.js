@@ -99,6 +99,9 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /name="Dome Section Number"/);
   assert.match(text, /name="Dome Image Placeholder"/);
   assert.match(utf8Text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 03<\/a:t>/s);
+  const slide4Title = utf8Text.match(/ppt\/slides\/slide4\.xml<\?xml[\s\S]*?name="Title 1"[\s\S]*?<\/p:sp>/)?.[0] || "";
+  assert.match(slide4Title, /<a:solidFill><a:srgbClr val="7A0611"\/><\/a:solidFill>/);
+  assert.doesNotMatch(slide4Title, /<a:gradFill>/);
   assert.match(text, /name="Dome Step 4"/);
   assert.match(text, /name="Dome Closing Mark"/);
 });
