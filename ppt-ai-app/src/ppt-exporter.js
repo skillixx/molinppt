@@ -395,7 +395,11 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     return textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: "FFE8B0" });
   }
   if (role === "agenda") {
-    const agendaItems = (slide.bullets || ["工作汇报", "成果展示", "问题不足", "下步计划"]).slice(0, 4);
+    // 目录页固定输出 4 个卡片槽位，保持 dome.pptx 的卡片式目录骨架不因用户少填内容而变化。
+    const sourceItems = Array.isArray(slide?.bullets) && slide.bullets.length
+      ? slide.bullets
+      : ["工作汇报", "成果展示", "问题不足", "下步计划"];
+    const agendaItems = Array.from({ length: 4 }, (_, itemIndex) => sourceItems[itemIndex] || "");
     return agendaItems.map((item, itemIndex) => {
       const column = itemIndex % 2;
       const row = Math.floor(itemIndex / 2);

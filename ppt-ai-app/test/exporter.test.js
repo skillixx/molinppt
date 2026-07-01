@@ -68,7 +68,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
       theme: "modern",
       slides: [
         { title: "年度工作汇报", bullets: ["2026 年度经营复盘"] },
-        { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
+        { title: "目录", bullets: ["工作汇报", "成果展示"], layout: "agenda" },
         { title: "工作汇报", bullets: ["PART 01"], layout: "section-divider" },
         { title: "年度工作概况", bullets: ["核心目标达成情况", "关键业务指标完成率", "团队协作与资源投入概况"], layout: "image-report" },
         { title: "下步计划", bullets: ["目标拆解", "资源配置", "执行跟踪", "复盘优化"], layout: "four-steps" },
@@ -91,6 +91,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /name="Title 1"[\s\S]*<a:gradFill>[\s\S]*val="FFF8CC"[\s\S]*val="FCD696"/);
   assert.match(text, /name="Dome Cover Sailboat Background"/);
   assert.match(text, /name="Dome Agenda Card 1"/);
+  assert.match(text, /name="Dome Agenda Card 4"/);
   assert.match(text, /name="Dome Section Number"/);
   assert.match(text, /name="Dome Image Placeholder"/);
   assert.match(text, /name="Dome Step 4"/);
