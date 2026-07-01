@@ -893,6 +893,9 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-card-text{display:block;font-size:14px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-metric-grid{left:12%;right:34%;bottom:25%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="red-gold"] .dome-image-report-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="red-gold"] .dome-image-report-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;}
+    body[data-layout="red-gold"] .dome-image-report-card:nth-child(even){background:rgba(246,212,138,.92);}
     body[data-layout="red-gold"] .dome-showcase-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-showcase-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-size:14px;font-weight:800;line-height:1.25;overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-showcase-card:nth-child(even){background:rgba(246,212,138,.92);}
@@ -922,7 +925,7 @@ function renderDeckPreview({ deck, visual }) {
  */
 function shouldRenderDomePreviewBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role);
 }
 
 /**
@@ -982,7 +985,9 @@ function renderDomePreviewDecoration(role, slide) {
     return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
   if (role === "image-report") {
-    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div>`;
+    // 工作汇报图文页用三张固定卡片承载要点，保持图文模板的占位符结构。
+    const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-image-report-card", index, bullets[index])).join("");
+    return `${renderDomePreviewSectionLabel(slide)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
     // 问题复盘页固定输出三张要点卡片，避免只显示第一条风险提示而丢失后续复盘内容。

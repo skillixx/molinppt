@@ -109,7 +109,7 @@ test("PptExportService maps structured dome roles to business image and data pla
         { title: "封面", bullets: ["年度汇报"], layout: "cover" },
         { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
         { title: "第一章", bullets: ["PART 01"], layout: "section-divider" },
-        { title: "工作汇报图文页", bullets: ["业务进展", "团队投入", "关键成果"], layout: "image-report" },
+        { title: "工作汇报图文页", bullets: ["Business progress", "Team investment", "Key result"], layout: "image-report" },
         { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
         { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
         { title: "数据指标", bullets: ["Revenue growth", "Retention rate", "Delivery speed"], layout: "metrics" },
@@ -129,6 +129,8 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /Target="\.\.\/media\/dome-business-2\.jpeg"/);
   assert.match(text, /Target="\.\.\/media\/dome-business-4\.jpeg"/);
   assert.match(text, /name="Dome Business Image"/);
+  assert.match(text, /name="Dome Image Report Card 3"/);
+  assert.match(text, /name="Dome Image Report Text 2"[\s\S]*<a:t>Team investment<\/a:t>/);
   assert.match(text, /name="Dome Section Number"(?:(?!<\/p:sp>).)*<a:t>PART 01<\/a:t>/s);
   assert.match(text, /name="Dome Step 3"/);
   assert.match(text, /name="Dome Step 4"/);

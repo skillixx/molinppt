@@ -1459,6 +1459,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /class="dome-role-visual"/);
   assert.match(html, /dome-agenda-card/);
   assert.equal([...html.matchAll(/class="dome-agenda-card"/g)].length, 4);
+  assert.equal([...html.matchAll(/class="dome-image-report-card"/g)].length, 3);
   assert.match(html, /class="dome-role-decor dome-section-number">PART 01<\/div>/);
   assert.match(html, /class="dome-role-decor dome-section-label">PART 02<\/div>/);
   assert.match(html, /dome-metric-card/);
@@ -1468,11 +1469,13 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /dome-plan-timeline/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Discovery<\/span>/);
   assert.match(html, /<span class="dome-card-index">02<\/span><span class="dome-card-text">Retention rate<\/span>/);
+  assert.match(html, /<span class="dome-card-text">团队投入<\/span>/);
   assert.match(html, /<span class="dome-card-text">Risk signal<\/span>/);
   assert.match(html, /<span class="dome-card-text">Root cause<\/span>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Quarter roadmap<\/span>/);
   assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<li>Discovery<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="metrics"[\s\S]*<li>Retention rate<\/li>/);
+  assert.doesNotMatch(html, /data-dome-role="image-report"[\s\S]*<li>团队投入<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="showcase"[\s\S]*<li>客户反馈<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="retrospective"[\s\S]*<li>Root cause<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="section-divider"[\s\S]*<li>PART 01<\/li>/);
