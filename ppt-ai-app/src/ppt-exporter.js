@@ -268,7 +268,7 @@ function slideFiles(deck, visual) {
  */
 function shouldRenderDomeBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
-  return !["agenda", "section-divider", "three-steps", "four-steps", "metrics", "retrospective", "next-plan"].includes(role);
+  return !["agenda", "section-divider", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role);
 }
 
 /**
@@ -443,10 +443,18 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     }).join("");
   }
   if (role === "showcase") {
+    const showcaseItems = normalizeDomeBulletItems(slide, 3);
+    // 成果展示页把结构化要点放入三张成果卡片，避免退化成普通列表页。
+    const showcaseCards = Array.from({ length: 3 }, (_, cardIndex) => {
+      const y = 2438400 + cardIndex * 640080;
+      return solidShapeXml({ id: 34 + cardIndex, name: `Dome Showcase Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? "FFF8E6" : visual.accent })
+        + textShapeXml({ id: 44 + cardIndex, name: `Dome Showcase Text ${cardIndex + 1}`, x: 1524000, y: y + 121920, cx: 2590800, cy: 213360, text: showcaseItems[cardIndex], size: 1200, bold: true, color: visual.title });
+    }).join("");
     return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: visual.surface })
       + pictureXml({ id: 30, name: "Dome Showcase Image", relId: "rId3", x: 5334000, y: 1371600, cx: 2438400, cy: 1828800 })
       + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
-      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
+      + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
+      + showcaseCards;
   }
   if (role === "retrospective") {
     const riskItems = normalizeDomeBulletItems(slide, 1);

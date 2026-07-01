@@ -112,7 +112,7 @@ test("PptExportService maps structured dome roles to business image and data pla
         { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
         { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
         { title: "数据指标", bullets: ["Revenue growth", "Retention rate", "Delivery speed"], layout: "metrics" },
-        { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase", sectionLabel: "PART 02" },
+        { title: "成果展示", bullets: ["Project wins", "Client feedback", "Team awards"], layout: "showcase", sectionLabel: "PART 02" },
         { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
         { title: "下一步计划", bullets: ["Quarter roadmap", "Key action", "Owner review"], layout: "next-plan" },
         { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
@@ -140,6 +140,8 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Metric Text 2"[\s\S]*<a:t>Retention rate<\/a:t>/);
   assert.match(text, /name="Dome Showcase Image"/);
   assert.match(text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 02<\/a:t>/s);
+  assert.match(text, /name="Dome Showcase Card 3"/);
+  assert.match(text, /name="Dome Showcase Text 2"[\s\S]*<a:t>Client feedback<\/a:t>/);
   assert.match(text, /name="Dome Retrospective Risk Card"/);
   assert.match(text, /name="Dome Retrospective Risk Text"[\s\S]*<a:t>Risk signal<\/a:t>/);
   assert.match(text, /name="Dome Next Plan Timeline"/);
