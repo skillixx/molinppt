@@ -202,6 +202,25 @@ test("PptExportService uses the sailboat background for dome closing slides", ()
   assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Closing Mark"/);
 });
 
+test("PptExportService fills a default dome section number when omitted", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "默认章节编号",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "封面", bullets: ["年度汇报"], layout: "cover" },
+        { title: "第一章", bullets: [], layout: "section-divider" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("utf8");
+
+  assert.match(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Section Number"(?:(?!<\/p:sp>).)*<a:t>PART 01<\/a:t>/s);
+});
+
 test("PptExportService infers image-report role from work summary titles", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

@@ -821,7 +821,7 @@ function renderDeckPreview({ deck, visual }) {
     const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
@@ -961,9 +961,10 @@ function resolvePreviewDomeRole(slide, index, total) {
  * PPTX 导出会生成真实 OOXML 形状；这里生成轻量 HTML 层，保证用户预览时能看到同样的版式意图。
  * @param {string} role
  * @param {object} slide
+ * @param {number} index
  * @returns {string}
  */
-function renderDomePreviewDecoration(role, slide) {
+function renderDomePreviewDecoration(role, slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   if (role === "cover") {
     // 封面页把第一条结构化内容放入副标题占位，预览时保持 dome.pptx 帆船封面的简洁留白。
@@ -975,7 +976,7 @@ function renderDomePreviewDecoration(role, slide) {
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
   if (role === "section-divider") {
-    return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide))}</div>`;
+    return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide, index))}</div>`;
   }
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
@@ -1026,13 +1027,14 @@ function normalizeDomePreviewAgendaItems(slide) {
 
 /**
  * 读取预览端章节分隔页的结构化编号。
- * 与 PPTX 导出一致，优先使用 bullets[0]，避免章节号在预览和导出中不一致。
+ * 与 PPTX 导出一致，优先使用 bullets[0]；缺省时按页序生成稳定 PART 编号，避免预览出现 PART 00。
  * @param {object} slide
+ * @param {number} index
  * @returns {string}
  */
-function domePreviewSectionNumberText(slide) {
+function domePreviewSectionNumberText(slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  return String(bullets[0] || "PART 00");
+  return String(bullets[0] || `PART ${String(index).padStart(2, "0")}`);
 }
 
 /**

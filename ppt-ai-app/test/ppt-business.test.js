@@ -1658,6 +1658,37 @@ test("PptService preview infers image-report role from work summary titles", asy
   assert.doesNotMatch(html, /data-dome-role="three-steps"[\s\S]*<h2>年度工作概况<\/h2>/);
 });
 
+test("PptService preview fills a default dome section number when omitted", async () => {
+  const context = await createBusinessContext();
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "outline-dome-default-section",
+    title: "Dome default section",
+    templateId: "business",
+    templateName: "Executive Business",
+    templateVisual: {
+      primary: "B80F1A",
+      accent: "F6D48A",
+      background: "8F0613",
+      surface: "FFF8E6",
+      title: "7A0611",
+      body: "3C1F1F",
+      layout: "red-gold",
+    },
+    theme: "modern",
+    status: "ready",
+    slides: [
+      { title: "封面", bullets: ["年度汇报"], layout: "cover" },
+      { title: "第一章", bullets: [], layout: "section-divider" },
+    ],
+  });
+
+  const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-dome-role="section-divider"[\s\S]*class="dome-role-decor dome-section-number">PART 01<\/div>/);
+  assert.doesNotMatch(html, /class="dome-role-decor dome-section-number">PART 00<\/div>/);
+});
+
 test("HTTP API generates a new deck from an existing outline with the currently selected template", async () => {
   const context = await createBusinessContext();
   const app = createApp({
