@@ -1573,7 +1573,7 @@ test("PptService preview renders dome role classes and business image assets", a
       { title: "追加封面", bullets: ["Manual cover"], layout: "cover" },
       { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
       { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
-      { title: "数据指标", bullets: ["Revenue growth", "Retention rate", "Delivery speed"], layout: "metrics" },
+      { title: "数据指标", bullets: ["Revenue growth: 32%", "Retention rate: 88%", "Delivery speed: 2.4d"], layout: "metrics" },
       { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase", sectionLabel: "PART 02" },
       { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
       { title: "下一步计划", bullets: ["Quarter roadmap", "Key action", "Owner review"], layout: "next-plan" },
@@ -1611,13 +1611,14 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /class="dome-role-decor dome-section-label">PART 02<\/div>/);
   assert.match(html, /data-dome-role="next-plan"[\s\S]*class="dome-role-decor dome-section-label">PART 10<\/div>/);
   assert.match(html, /dome-metric-card/);
+  assert.match(html, /<span class="dome-metric-value">88%<\/span><span class="dome-metric-label">Retention rate<\/span>/);
   assert.equal([...html.matchAll(/class="dome-showcase-card"/g)].length, 3);
   assert.match(html, /dome-risk-card/);
   assert.equal([...html.matchAll(/class="dome-retrospective-card"/g)].length, 3);
   assert.match(html, /dome-plan-timeline/);
   assert.match(html, /class="dome-role-decor dome-cover-subtitle">年度汇报<\/div>/);
   assert.match(html, /<span class="dome-card-index">01<\/span><span class="dome-card-text">Discovery<\/span>/);
-  assert.match(html, /<span class="dome-card-index">02<\/span><span class="dome-card-text">Retention rate<\/span>/);
+  assert.match(html, /<span class="dome-metric-value">2\.4d<\/span><span class="dome-metric-label">Delivery speed<\/span>/);
   assert.match(html, /<span class="dome-card-text">团队投入<\/span>/);
   assert.match(html, /<span class="dome-card-text">Risk signal<\/span>/);
   assert.match(html, /<span class="dome-card-text">Root cause<\/span>/);

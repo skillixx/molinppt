@@ -458,15 +458,17 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       : sectionLabel + fourStepsImage + stepConnector + steps;
   }
   if (role === "metrics") {
-    const metricItems = normalizeDomeBulletItems(slide, 3);
+    const metricItems = normalizeDomeMetricItems(slide, 3);
     // 指标页也保留右上章节标签，使所有内容页都有 dome.pptx 风格的章节定位。
     return textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       + Array.from({ length: 3 }, (_, metricIndex) => {
       const x = 1219200 + metricIndex * 2286000;
+      const metric = metricItems[metricIndex];
       return solidShapeXml({ id: 30 + metricIndex, name: `Dome Metric Card ${metricIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 1828800, cy: 1066800, fill: "FFF8E6" })
         + textShapeXml({ id: 40 + metricIndex, name: `Dome Metric Number ${metricIndex + 1}`, x: x + 228600, y: 2743200, cx: 1219200, cy: 304800, text: `0${metricIndex + 1}`, size: 1800, bold: true, color: visual.title })
-        + textShapeXml({ id: 50 + metricIndex, name: `Dome Metric Text ${metricIndex + 1}`, x: x + 228600, y: 3200400, cx: 1371600, cy: 304800, text: metricItems[metricIndex], size: 1200, bold: true, color: visual.body });
+        + textShapeXml({ id: 60 + metricIndex, name: `Dome Metric Value ${metricIndex + 1}`, x: x + 228600, y: 3048000, cx: 1371600, cy: 365760, text: metric.value, size: 2100, bold: true, color: visual.title })
+        + textShapeXml({ id: 70 + metricIndex, name: `Dome Metric Label ${metricIndex + 1}`, x: x + 228600, y: 3505200, cx: 1371600, cy: 304800, text: metric.label, size: 1100, bold: true, color: visual.body });
     }).join("");
   }
   if (role === "showcase") {
@@ -563,6 +565,21 @@ function domeContentSectionLabelText(slide, index) {
 function normalizeDomeBulletItems(slide, count) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return Array.from({ length: count }, (_, index) => String(bullets[index] ?? ""));
+}
+
+/**
+ * 解析 dome 指标页的结构化要点。
+ * 推荐输入为“指标名: 指标值”；旧数据没有分隔符时，用序号作数值、原文作标签，避免历史 deck 失去内容。
+ * @param {object} slide
+ * @param {number} count
+ * @returns {{label: string, value: string}[]}
+ */
+function normalizeDomeMetricItems(slide, count) {
+  return normalizeDomeBulletItems(slide, count).map((item, index) => {
+    const match = item.match(/^(.+?)\s*[:：|]\s*(.+)$/);
+    if (!match) return { label: item, value: `0${index + 1}` };
+    return { label: match[1].trim(), value: match[2].trim() };
+  });
 }
 
 /**

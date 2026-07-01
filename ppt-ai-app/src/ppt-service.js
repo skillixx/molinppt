@@ -898,6 +898,8 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 22px rgba(82,5,12,.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-card-text{display:block;font-size:14px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
+    body[data-layout="red-gold"] .dome-metric-value{display:block;font-size:26px;line-height:1;color:var(--template-title);font-weight:900;}
+    body[data-layout="red-gold"] .dome-metric-label{display:block;font-size:13px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-metric-grid{left:12%;right:34%;bottom:25%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
     body[data-layout="red-gold"] .dome-image-report-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-image-report-card{border-radius:12px;background:rgba(255,248,230,.95);box-shadow:0 12px 20px rgba(82,5,12,.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;}
@@ -1000,7 +1002,7 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-connector"></div><div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
   }
   if (role === "metrics") {
-    const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-metric-card", index, bullets[index])).join("");
+    const cards = normalizeDomePreviewMetricItems(slide, 3).map((metric) => `<div class="dome-metric-card"><span class="dome-metric-value">${escapeHtml(metric.value)}</span><span class="dome-metric-label">${escapeHtml(metric.label)}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase") {
@@ -1038,6 +1040,23 @@ function renderDomePreviewDecoration(role, slide, index) {
 function normalizeDomePreviewAgendaItems(slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return Array.from({ length: 4 }, (_, index) => String(bullets[index] || DOME_AGENDA_DEFAULT_ITEMS[index] || ""));
+}
+
+/**
+ * 解析 dome 预览指标页的结构化要点。
+ * 支持“指标名: 指标值 / 指标名：指标值 / 指标名|指标值”，与 PPTX 导出保持一致。
+ * @param {object} slide
+ * @param {number} count
+ * @returns {{label: string, value: string}[]}
+ */
+function normalizeDomePreviewMetricItems(slide, count) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: count }, (_, index) => {
+    const item = String(bullets[index] ?? "");
+    const match = item.match(/^(.+?)\s*[:：|]\s*(.+)$/);
+    if (!match) return { label: item, value: `0${index + 1}` };
+    return { label: match[1].trim(), value: match[2].trim() };
+  });
 }
 
 /**
