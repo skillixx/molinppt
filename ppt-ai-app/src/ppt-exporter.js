@@ -421,7 +421,8 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       const x = 1219200 + column * 3429000;
       const y = 1371600 + row * 1219200;
       return solidShapeXml({ id: 30 + itemIndex, name: `Dome Agenda Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2743200, cy: 838200, fill: visual.accent })
-        + textShapeXml({ id: 40 + itemIndex, name: `Dome Agenda Text ${itemIndex + 1}`, x: x + 304800, y: y + 213360, cx: 1828800, cy: 365760, text: String(item), size: 2000, bold: true, color: visual.title });
+        + textShapeXml({ id: 40 + itemIndex, name: `Dome Agenda Number ${itemIndex + 1}`, x: x + 304800, y: y + 152400, cx: 609600, cy: 304800, text: `0${itemIndex + 1}`, size: 1800, bold: true, color: visual.title })
+        + textShapeXml({ id: 50 + itemIndex, name: `Dome Agenda Text ${itemIndex + 1}`, x: x + 914400, y: y + 213360, cx: 1524000, cy: 365760, text: String(item), size: 1900, bold: true, color: visual.title });
     }).join("");
   }
   if (role === "section-divider") {
