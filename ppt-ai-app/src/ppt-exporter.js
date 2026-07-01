@@ -259,7 +259,8 @@ function slideFiles(deck, visual) {
     const bodyShape = renderBodyList
       ? textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })
       : "";
-    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: "Title 1", ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const titleName = domeTitleShapeName(visual, role);
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: titleName, ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
     files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
@@ -276,6 +277,23 @@ function slideFiles(deck, visual) {
 function domeTitleFillStyle(visual, role) {
   if (visual.layout !== "red-gold") return "";
   return ["cover", "agenda", "section-divider", "closing"].includes(role) ? "dome-gold-gradient" : "";
+}
+
+/**
+ * 为 red-gold 标题对象设置可读名称，方便在 PPT 编辑器里识别 dome 页面层级。
+ * @param {object} visual
+ * @param {string} role
+ * @returns {string}
+ */
+function domeTitleShapeName(visual, role) {
+  if (visual.layout !== "red-gold") return "Title 1";
+  const mapping = {
+    cover: "Dome Cover Title",
+    agenda: "Dome Agenda Title",
+    "section-divider": "Dome Section Title",
+    closing: "Dome Closing Title",
+  };
+  return mapping[role] || "Dome Content Title";
 }
 
 /**

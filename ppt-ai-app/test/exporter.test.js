@@ -89,7 +89,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /<a:fontScheme name="588ku">/);
   assert.match(text, /<a:latin typeface="Arial Black"\/>/);
   assert.match(text, /typeface="Source Han Sans CN Heavy"/);
-  assert.match(text, /name="Title 1"[\s\S]*<a:gradFill>[\s\S]*val="FFF8CC"[\s\S]*val="FCD696"/);
+  assert.match(text, /name="Dome Cover Title"[\s\S]*<a:gradFill>[\s\S]*val="FFF8CC"[\s\S]*val="FCD696"/);
   assert.match(text, /name="Dome Cover Sailboat Background"/);
   assert.match(utf8Text, /name="Dome Cover Subtitle"[\s\S]*<a:t>2026 年度经营复盘<\/a:t>/);
   assert.match(text, /name="Dome Agenda Card 1"/);
@@ -101,7 +101,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /name="Dome Section Number"/);
   assert.match(text, /name="Dome Image Placeholder"/);
   assert.match(utf8Text, /name="Section Label"(?:(?!<\/p:sp>).)*<a:t>PART 03<\/a:t>/s);
-  const slide4Title = utf8Text.match(/ppt\/slides\/slide4\.xml<\?xml[\s\S]*?name="Title 1"[\s\S]*?<\/p:sp>/)?.[0] || "";
+  const slide4Title = utf8Text.match(/ppt\/slides\/slide4\.xml<\?xml[\s\S]*?name="Dome Content Title"[\s\S]*?<\/p:sp>/)?.[0] || "";
   assert.match(slide4Title, /<a:solidFill><a:srgbClr val="7A0611"\/><\/a:solidFill>/);
   assert.doesNotMatch(slide4Title, /<a:gradFill>/);
   assert.match(text, /name="Dome Step 4"/);
@@ -133,6 +133,7 @@ test("PptExportService maps structured dome roles to business image and data pla
   });
   const text = result.content.toString("latin1");
   const utf8Text = result.content.toString("utf8");
+  const coverSlide = pptPartText(text, "ppt/slides/slide1.xml");
   const threeStepsSlide = pptPartText(text, "ppt/slides/slide5.xml");
   const fourStepsSlide = pptPartText(text, "ppt/slides/slide6.xml");
   const metricsSlide = pptPartText(text, "ppt/slides/slide7.xml");
@@ -146,10 +147,12 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /Target="\.\.\/media\/dome-business-4\.jpeg"/);
   assert.match(text, /name="Dome Business Image"/);
   assert.match(utf8Text, /name="Dome Cover Subtitle"[\s\S]*<a:t>年度汇报<\/a:t>/);
+  assert.match(coverSlide, /name="Dome Cover Title"/);
   assert.match(text, /name="Dome Image Report Card 3"/);
   assert.match(text, /name="Dome Image Report Text 2"[\s\S]*<a:t>Team investment<\/a:t>/);
   assert.match(text, /name="Dome Section Number"(?:(?!<\/p:sp>).)*<a:t>PART 01<\/a:t>/s);
   assert.match(text, /name="Dome Step 3"/);
+  assert.match(threeStepsSlide, /name="Dome Content Title"/);
   assert.match(threeStepsSlide, /name="Dome Three Steps Image"/);
   assert.match(text, /name="Dome Step 4"/);
   assert.match(text, /name="Dome Step Connector 3"/);
