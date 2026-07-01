@@ -85,6 +85,9 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
   assert.match(text, /Target="\.\.\/media\/dome-content\.jpg"/);
   assert.match(text, /<p:sldSz cx="12192000" cy="6858000"\/>/);
   assert.match(text, /name="Dome Cover Sailboat Background"[\s\S]*<a:ext cx="12192000" cy="6858000"\/>/);
+  assert.match(text, /<a:fontScheme name="588ku">/);
+  assert.match(text, /<a:latin typeface="Arial Black"\/>/);
+  assert.match(text, /typeface="Source Han Sans CN Heavy"/);
   assert.match(text, /name="Dome Cover Sailboat Background"/);
   assert.match(text, /name="Dome Agenda Card 1"/);
   assert.match(text, /name="Dome Section Number"/);
