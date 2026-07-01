@@ -1031,6 +1031,35 @@ test("PptService assigns dome layout roles from outline structure when provider 
   ]);
 });
 
+test("PromptManager includes dome placeholder instructions for red-gold deck generation", () => {
+  const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
+  const prompt = new PromptManager().buildDeckPrompt({
+    outline: {
+      topic: "Dome prompt",
+      theme: "modern",
+      slides: [{ title: "年度工作汇报", bullets: ["2026 年度经营复盘"] }],
+    },
+    template,
+  });
+
+  assert.equal(prompt.templateInstructions?.templateSystem, "dome-red-gold");
+  assert.deepEqual(prompt.templateInstructions?.layoutRoles, [
+    "cover",
+    "agenda",
+    "section-divider",
+    "image-report",
+    "three-steps",
+    "four-steps",
+    "metrics",
+    "showcase",
+    "retrospective",
+    "next-plan",
+    "closing",
+  ]);
+  assert.match(prompt.templateInstructions?.contentContract || "", /把 bullets 填入对应占位符/);
+  assert.match(prompt.templateInstructions?.contentContract || "", /不要生成普通项目符号列表/);
+});
+
 test("PptService preserves dome layout roles for the business template", async () => {
   const roles = ["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"];
   const aiProvider = new MockAiProvider();
