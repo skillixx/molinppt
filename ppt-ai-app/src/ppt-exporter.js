@@ -572,7 +572,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
  */
 function normalizeDomeAgendaItems(slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  return Array.from({ length: 4 }, (_, index) => String(bullets[index] || DOME_AGENDA_DEFAULT_ITEMS[index] || ""));
+  return Array.from({ length: 4 }, (_, index) => domeStructuredText(bullets[index], ["text", "title", "label", "name"]) || DOME_AGENDA_DEFAULT_ITEMS[index] || "");
 }
 
 /**
@@ -607,7 +607,7 @@ function domeContentSectionLabelText(slide, index) {
  */
 function normalizeDomeBulletItems(slide, count) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  return Array.from({ length: count }, (_, index) => String(bullets[index] ?? ""));
+  return Array.from({ length: count }, (_, index) => domeStructuredText(bullets[index], ["text", "title", "label", "name", "action", "task"]));
 }
 
 /**
@@ -618,7 +618,16 @@ function normalizeDomeBulletItems(slide, count) {
  * @returns {{phase: string, action: string}[]}
  */
 function normalizeDomePlanItems(slide, count) {
-  return normalizeDomeBulletItems(slide, count).map((item, index) => {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: count }, (_, index) => {
+    const rawItem = bullets[index];
+    if (isPlainObject(rawItem)) {
+      return {
+        phase: domeStructuredText(rawItem, ["phase", "stage", "name", "label", "title"]) || `0${index + 1}`,
+        action: domeStructuredText(rawItem, ["action", "task", "text", "description", "value"]) || "",
+      };
+    }
+    const item = domeStructuredText(rawItem, ["text"]);
     const match = item.match(/^(.+?)\s*[:：|]\s*(.*)$/);
     if (!match) return { phase: `0${index + 1}`, action: item };
     return { phase: match[1].trim(), action: match[2].trim() };
@@ -633,11 +642,45 @@ function normalizeDomePlanItems(slide, count) {
  * @returns {{label: string, value: string}[]}
  */
 function normalizeDomeMetricItems(slide, count) {
-  return normalizeDomeBulletItems(slide, count).map((item, index) => {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return Array.from({ length: count }, (_, index) => {
+    const rawItem = bullets[index];
+    if (isPlainObject(rawItem)) {
+      return {
+        label: domeStructuredText(rawItem, ["label", "name", "title", "text"]) || "",
+        value: domeStructuredText(rawItem, ["value", "amount", "metric", "number"]) || `0${index + 1}`,
+      };
+    }
+    const item = domeStructuredText(rawItem, ["text"]);
     const match = item.match(/^(.+?)\s*[:：|]\s*(.+)$/);
     if (!match) return { label: item, value: `0${index + 1}` };
     return { label: match[1].trim(), value: match[2].trim() };
   });
+}
+
+/**
+ * 从对象或普通字符串中读取 dome 占位符文本。
+ * 支持模型直接返回结构化 bullet 对象，避免 PPTX 中出现 [object Object]。
+ * @param {unknown} value
+ * @param {string[]} preferredKeys
+ * @returns {string}
+ */
+function domeStructuredText(value, preferredKeys) {
+  if (value == null) return "";
+  if (!isPlainObject(value)) return String(value);
+  for (const key of preferredKeys) {
+    if (value[key] != null && value[key] !== "") return String(value[key]);
+  }
+  return "";
+}
+
+/**
+ * 判断值是否为普通对象，数组和 null 不按结构化 bullet 处理。
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 /**

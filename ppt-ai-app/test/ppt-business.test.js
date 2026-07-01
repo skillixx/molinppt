@@ -1587,10 +1587,10 @@ test("PptService preview renders dome role classes and business image assets", a
       { title: "追加封面", bullets: ["Manual cover"], layout: "cover" },
       { title: "三步骤流程", bullets: ["Discovery", "Planning", "Launch"], layout: "three-steps" },
       { title: "四步骤流程", bullets: ["Target split", "Resource plan", "Process tracking", "Review loop"], layout: "four-steps" },
-      { title: "数据指标", bullets: ["Revenue growth: 32%", "Retention rate: 88%", "Delivery speed: 2.4d"], layout: "metrics" },
+      { title: "数据指标", bullets: [{ label: "Revenue growth", value: "32%" }, { name: "Retention rate", amount: "88%" }, { label: "Delivery speed", value: "2.4d" }], layout: "metrics" },
       { title: "成果展示", bullets: ["项目成果", "客户反馈", "团队荣誉"], layout: "showcase", sectionLabel: "PART 02" },
       { title: "问题复盘", bullets: ["Risk signal", "Root cause", "Mitigation"], layout: "retrospective" },
-      { title: "下一步计划", bullets: ["Q1: Quarter roadmap", "Q2: Key action", "Q3: Owner review"], layout: "next-plan" },
+      { title: "下一步计划", bullets: [{ phase: "Q1", action: "Quarter roadmap" }, { stage: "Q2", task: "Key action" }, { phase: "Q3", action: "Owner review" }], layout: "next-plan" },
       { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
     ],
   });
@@ -1652,6 +1652,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /<span class="dome-retrospective-label">措施<\/span><span class="dome-card-text">Mitigation<\/span>/);
   assert.match(html, /<span class="dome-next-plan-phase">Q1<\/span><span class="dome-next-plan-action">Quarter roadmap<\/span>/);
   assert.match(html, /<span class="dome-next-plan-phase">Q3<\/span><span class="dome-next-plan-action">Owner review<\/span>/);
+  assert.doesNotMatch(html, /\[object Object\]/);
   for (const role of ["cover", "three-steps", "metrics", "closing"]) {
     assert.doesNotMatch(previewRoleHtml(html, role), /<ul><\/ul>/);
   }

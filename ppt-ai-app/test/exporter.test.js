@@ -201,6 +201,34 @@ test("PptExportService maps structured dome roles to business image and data pla
   assert.match(text, /name="Dome Closing Subtitle"/);
 });
 
+test("PptExportService fills dome placeholders from object structured bullets", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "对象结构内容",
+      templateId: "business",
+      theme: "modern",
+      slides: [
+        { title: "封面", bullets: ["年度汇报"], layout: "cover" },
+        { title: "数据指标", bullets: [{ label: "复购率", value: "76%" }, { name: "交付周期", amount: "5d" }], layout: "metrics" },
+        { title: "下一步计划", bullets: [{ phase: "Q1", action: "完成样板客户" }, { stage: "Q2", task: "扩展行业方案" }], layout: "next-plan" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("utf8");
+
+  assert.match(text, /name="Dome Metric Value 1"[\s\S]*<a:t>76%<\/a:t>/);
+  assert.match(text, /name="Dome Metric Label 1"[\s\S]*<a:t>复购率<\/a:t>/);
+  assert.match(text, /name="Dome Metric Value 2"[\s\S]*<a:t>5d<\/a:t>/);
+  assert.match(text, /name="Dome Metric Label 2"[\s\S]*<a:t>交付周期<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Phase 1"[\s\S]*<a:t>Q1<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Action 1"[\s\S]*<a:t>完成样板客户<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Phase 2"[\s\S]*<a:t>Q2<\/a:t>/);
+  assert.match(text, /name="Dome Next Plan Action 2"[\s\S]*<a:t>扩展行业方案<\/a:t>/);
+  assert.doesNotMatch(text, /\[object Object\]/);
+});
+
 test("PptExportService respects an explicit dome cover layout on any slide", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

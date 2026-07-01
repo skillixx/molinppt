@@ -1067,7 +1067,7 @@ function renderDomePreviewDecoration(role, slide, index) {
  */
 function normalizeDomePreviewAgendaItems(slide) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  return Array.from({ length: 4 }, (_, index) => String(bullets[index] || DOME_AGENDA_DEFAULT_ITEMS[index] || ""));
+  return Array.from({ length: 4 }, (_, index) => domePreviewStructuredText(bullets[index], ["text", "title", "label", "name"]) || DOME_AGENDA_DEFAULT_ITEMS[index] || "");
 }
 
 /**
@@ -1080,7 +1080,14 @@ function normalizeDomePreviewAgendaItems(slide) {
 function normalizeDomePreviewMetricItems(slide, count) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return Array.from({ length: count }, (_, index) => {
-    const item = String(bullets[index] ?? "");
+    const rawItem = bullets[index];
+    if (isPlainObject(rawItem)) {
+      return {
+        label: domePreviewStructuredText(rawItem, ["label", "name", "title", "text"]) || "",
+        value: domePreviewStructuredText(rawItem, ["value", "amount", "metric", "number"]) || `0${index + 1}`,
+      };
+    }
+    const item = domePreviewStructuredText(rawItem, ["text"]);
     const match = item.match(/^(.+?)\s*[:：|]\s*(.+)$/);
     if (!match) return { label: item, value: `0${index + 1}` };
     return { label: match[1].trim(), value: match[2].trim() };
@@ -1097,11 +1104,43 @@ function normalizeDomePreviewMetricItems(slide, count) {
 function normalizeDomePreviewPlanItems(slide, count) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
   return Array.from({ length: count }, (_, index) => {
-    const item = String(bullets[index] ?? "");
+    const rawItem = bullets[index];
+    if (isPlainObject(rawItem)) {
+      return {
+        phase: domePreviewStructuredText(rawItem, ["phase", "stage", "name", "label", "title"]) || `0${index + 1}`,
+        action: domePreviewStructuredText(rawItem, ["action", "task", "text", "description", "value"]) || "",
+      };
+    }
+    const item = domePreviewStructuredText(rawItem, ["text"]);
     const match = item.match(/^(.+?)\s*[:：|]\s*(.*)$/);
     if (!match) return { phase: `0${index + 1}`, action: item };
     return { phase: match[1].trim(), action: match[2].trim() };
   });
+}
+
+/**
+ * 从预览端结构化 bullet 中读取占位符文本。
+ * 支持对象输入，避免 HTML 预览出现 [object Object]，并保持与 PPTX 导出一致。
+ * @param {unknown} value
+ * @param {string[]} preferredKeys
+ * @returns {string}
+ */
+function domePreviewStructuredText(value, preferredKeys) {
+  if (value == null) return "";
+  if (!isPlainObject(value)) return String(value);
+  for (const key of preferredKeys) {
+    if (value[key] != null && value[key] !== "") return String(value[key]);
+  }
+  return "";
+}
+
+/**
+ * 判断值是否为普通结构化对象。
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -1113,7 +1152,7 @@ function normalizeDomePreviewPlanItems(slide, count) {
  */
 function domePreviewSectionNumberText(slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  return String(bullets[0] || `PART ${String(index).padStart(2, "0")}`);
+  return domePreviewStructuredText(bullets[0], ["text", "title", "label", "name"]) || `PART ${String(index).padStart(2, "0")}`;
 }
 
 /**
