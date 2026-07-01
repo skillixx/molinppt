@@ -1591,6 +1591,8 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /--dome-business-6:url\("data:image\/jpeg;base64,/);
   assert.match(html, /\.slide\[data-dome-role="four-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-4\);\}/);
   assert.match(html, /class="dome-role-visual"/);
+  assert.equal([...html.matchAll(/class="dome-role-decor dome-footer-decoration"/g)].length, 12);
+  assert.match(html, /class="dome-role-decor dome-footer-decoration">商务办公系列 PPT 模板<\/div>/);
   assert.match(html, /dome-agenda-card/);
   assert.equal([...html.matchAll(/class="dome-agenda-card"/g)].length, 4);
   assert.match(html, /<div class="dome-agenda-card">问题不足<\/div>/);

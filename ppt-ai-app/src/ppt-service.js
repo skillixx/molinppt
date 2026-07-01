@@ -821,7 +821,7 @@ function renderDeckPreview({ deck, visual }) {
     const bullets = shouldRenderDomePreviewBodyList(visual, domeRole)
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2>${escapeHtml(slide.title)}</h2><ul>${bullets}</ul></div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold"
     ? `--dome-cover-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.cover}");--dome-content-bg:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.content}");--dome-business-1:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business1}");--dome-business-2:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business2}");--dome-business-3:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business3}");--dome-business-4:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business4}");--dome-business-5:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business5}");--dome-business-6:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS.business6}");`
@@ -872,7 +872,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide-cover h2{max-width:78%;margin-bottom:2.8%;font-size:58px;color:#fff2b8;text-shadow:0 3px 0 rgba(90,4,10,.32),0 12px 24px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .slide-cover ul{max-width:60%;padding:0;list-style:none;color:#ffe8b0;text-align:center;}
     body[data-layout="red-gold"] .dome-cover-subtitle{left:50%;top:58%;transform:translateX(-50%);width:46%;color:#ffe8b0;font-size:18px;font-weight:800;text-align:center;text-shadow:0 10px 22px rgba(60,0,0,.24);}
-    body[data-layout="red-gold"] .slide-content::before{content:"商务办公系列 PPT 模板";position:absolute;left:-4%;bottom:-30%;color:rgba(255,232,176,.82);font-size:12px;letter-spacing:0;}
+    body[data-layout="red-gold"] .slide-content::before{content:"";position:absolute;left:-4%;bottom:-30%;color:rgba(255,232,176,.82);font-size:12px;letter-spacing:0;}
     body[data-layout="red-gold"] .slide-content::after{content:"";position:absolute;z-index:0;inset:18% 13% 12%;border:1px solid rgba(255,232,176,.18);border-radius:18px;}
     body[data-layout="red-gold"] .slide-content>*{z-index:2;}
     body[data-layout="red-gold"] .slide:not(.slide-cover){padding:12% 12% 10%;}
@@ -886,6 +886,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;right:11%;top:30%;width:7.8%;height:34%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(82,5,12,.18);}
     body[data-layout="red-gold"] .dome-role-visual{position:absolute;z-index:2;right:10.5%;top:27%;width:24%;height:35%;border-radius:10px;background:var(--dome-business-1) center/cover no-repeat;box-shadow:0 18px 30px rgba(82,5,12,.22);overflow:hidden;}
     body[data-layout="red-gold"] .dome-role-decor{position:absolute;z-index:3;pointer-events:none;}
+    body[data-layout="red-gold"] .dome-footer-decoration{left:7%;bottom:7.2%;color:rgba(255,232,176,.86);font-size:12px;font-weight:700;letter-spacing:0;text-shadow:0 8px 18px rgba(60,0,0,.24);}
     body[data-layout="red-gold"] .dome-agenda-grid{left:13%;right:13%;top:33%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
     body[data-layout="red-gold"] .dome-agenda-card{min-height:74px;border-radius:12px;background:rgba(246,212,138,.92);box-shadow:0 14px 22px rgba(82,5,12,.20);color:var(--template-title);font-size:20px;font-weight:800;display:grid;place-items:center;}
     body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:#ffe8b0;font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(60,0,0,.24);}
@@ -929,6 +930,17 @@ function renderDeckPreview({ deck, visual }) {
 function shouldRenderDomePreviewBodyList(visual, role) {
   if (visual.layout !== "red-gold") return true;
   return !["cover", "agenda", "section-divider", "image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan", "closing"].includes(role);
+}
+
+/**
+ * 渲染 dome 预览页脚装饰。
+ * PPTX 导出每页都会生成 Dome Footer Decoration，预览端也显式输出同名视觉层，避免预览和导出不一致。
+ * @param {object} visual
+ * @returns {string}
+ */
+function renderDomePreviewFooter(visual) {
+  if (visual.layout !== "red-gold") return "";
+  return `<div class="dome-role-decor dome-footer-decoration">商务办公系列 PPT 模板</div>`;
 }
 
 /**
