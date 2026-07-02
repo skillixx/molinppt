@@ -35,3 +35,9 @@ Deliverables:
 - The data layer currently uses a JSON file adapter for local and deterministic environments.
 - Production hardening target items include PostgreSQL migration and separate worker topology; these are tracked in `docs/development-plan.md` and related module notes.
 - API surface, workspace flow, and billing behaviors are covered by local tests and documented in `docs/api.md` and `docs/acceptance.md`.
+
+## Planning References
+
+- [PPT AI 应用 Goal 项目拆解](./ppt-ai-app-goals.md)
+- [PPT 资产库与模板体系设计](./ppt-library-and-template-design.md)
+- [PPT AI 应用调试命令清单](./debug-commands.md)

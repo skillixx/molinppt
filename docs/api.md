@@ -99,6 +99,19 @@ If slide regeneration fails and Moling release also fails, the API returns `BILL
 
 If slide regeneration succeeds but Moling settle fails, the deck is locked as `billing_pending` with a `settle_pending` event until reconciliation succeeds.
 
+### `POST /api/ppt/generated-images`
+
+Generates an owner-scoped image asset through the optional image generation provider. This route is an enhancement path only; when `IMAGE_PROVIDER=none` or no image provider is configured, it returns `IMAGE_PROVIDER_NOT_CONFIGURED` and does not affect outline, deck, template, preview, or export flows.
+
+Request fields:
+
+- `topic`: required non-empty topic for the asset.
+- `kind`: one of `cover`, `illustration`, `icon`, or `variant`.
+- `template_id`: optional template context.
+- `theme`: optional theme context.
+
+Response fields: `file` contains the stored private image file, and `asset` contains `fileId`, `topic`, `kind`, template context, and provider prompt metadata when available.
+
 ### `POST /api/ppt/tasks/{task_id}/retry`
 
 Retries a failed generation task using the stored outline and a new billing operation.

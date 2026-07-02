@@ -1,0 +1,12 @@
+[
+  { "id": "business", "name": "Business", "sortOrder": 10 },
+  { "id": "strategy", "name": "Strategy", "sortOrder": 20 },
+  { "id": "finance", "name": "Finance", "sortOrder": 30 },
+  { "id": "sales", "name": "Sales", "sortOrder": 40 },
+  { "id": "product", "name": "Product", "sortOrder": 50 },
+  { "id": "marketing", "name": "Marketing", "sortOrder": 60 },
+  { "id": "data", "name": "Data", "sortOrder": 70 },
+  { "id": "education", "name": "Education", "sortOrder": 80 },
+  { "id": "pitch", "name": "Pitch", "sortOrder": 90 },
+  { "id": "open-source-samples", "name": "Open Source Samples", "sortOrder": 95 }
+]

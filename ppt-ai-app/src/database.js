@@ -16,6 +16,7 @@ export class JsonFileDatabase {
     this.filePath = filePath;
     this.collections = collections;
     this.state = null;
+    this.locks = new Set();
   }
 
   /**
@@ -34,6 +35,22 @@ export class JsonFileDatabase {
     }
     await this.#persist();
     return this.state;
+  }
+
+  /**
+   * Reloads one collection from disk into memory.
+   * @param {string} collection
+   * @returns {Promise<object[]>}
+   */
+  async reloadCollection(collection) {
+    this.#requireCollection(collection);
+    try {
+      const latest = JSON.parse(await readFile(this.filePath, "utf8"));
+      this.state[collection] = Array.isArray(latest[collection]) ? latest[collection] : [];
+    } catch {
+      this.state[collection] = [];
+    }
+    return this.state[collection];
   }
 
   /**
@@ -93,6 +110,21 @@ export class JsonFileDatabase {
     };
     await this.#persist();
     return this.state[collection][index];
+  }
+
+  /**
+   * Acquires a named process-local lock for development and tests.
+   * @param {string} key
+   * @returns {Promise<{release: () => Promise<void>} | null>}
+   */
+  async acquireLock(key) {
+    if (this.locks.has(key)) return null;
+    this.locks.add(key);
+    return {
+      release: async () => {
+        this.locks.delete(key);
+      },
+    };
   }
 
   /** @param {string} collection */

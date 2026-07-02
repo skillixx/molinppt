@@ -25,11 +25,19 @@ test("loadConfig reads every framework setting from environment variables", () =
     LLM_MODEL: "deepseek-v4-flash",
     LLM_TIMEOUT_MS: "1500",
     LLM_MAX_RETRIES: "2",
-    IMAGE_PROVIDER: "mock-image",
+    VISION_PROVIDER: "http",
+    VISION_API_URL: "http://vision.test/analyze",
+    VISION_API_KEY: "vision-key",
+    VISION_MODEL: "vision-model",
+    IMAGE_PROVIDER: "http",
+    IMAGE_API_URL: "http://image.test/generate",
     IMAGE_API_KEY: "image-key",
+    IMAGE_MODEL: "image-model",
     SESSION_COOKIE_NAME: "sid",
     SESSION_TTL_SECONDS: "3600",
     SESSION_COOKIE_SECURE: "false",
+    RATE_LIMIT_MAX_REQUESTS: "42",
+    RATE_LIMIT_WINDOW_MS: "30000",
   });
 
   assert.equal(config.app.port, 5180);
@@ -41,12 +49,22 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.auth.sessionCookieName, "sid");
   assert.equal(config.auth.sessionTtlMs, 3600000);
   assert.equal(config.auth.sessionCookieSecure, false);
+  assert.equal(config.limits.rateLimitMaxRequests, 42);
+  assert.equal(config.limits.rateLimitWindowMs, 30000);
   assert.equal(config.storage.directory, "./tmp/storage");
   assert.equal(config.ai.llmProvider, "mock");
   assert.equal(config.ai.llmApiUrl, "http://ai.test/generate");
   assert.equal(config.ai.llmModel, "deepseek-v4-flash");
   assert.equal(config.ai.llmTimeoutMs, 1500);
   assert.equal(config.ai.llmMaxRetries, 2);
+  assert.equal(config.ai.visionProvider, "http");
+  assert.equal(config.ai.visionApiUrl, "http://vision.test/analyze");
+  assert.equal(config.ai.visionApiKey, "vision-key");
+  assert.equal(config.ai.visionModel, "vision-model");
+  assert.equal(config.ai.imageProvider, "http");
+  assert.equal(config.ai.imageApiUrl, "http://image.test/generate");
+  assert.equal(config.ai.imageApiKey, "image-key");
+  assert.equal(config.ai.imageModel, "image-model");
 });
 
 test("loadConfig secures session cookies by default in production", () => {
@@ -93,11 +111,17 @@ test("loadConfig treats empty numeric env values as defaults", () => {
     SESSION_TTL_SECONDS: "",
     LLM_TIMEOUT_MS: "",
     LLM_MAX_RETRIES: "",
+    RATE_LIMIT_MAX_REQUESTS: "",
+    RATE_LIMIT_WINDOW_MS: "",
   });
 
   assert.equal(config.auth.sessionTtlMs, 7 * 24 * 60 * 60 * 1000);
   assert.equal(config.ai.llmTimeoutMs, 30000);
   assert.equal(config.ai.llmMaxRetries, 0);
+  assert.equal(config.ai.visionProvider, "none");
+  assert.equal(config.ai.imageProvider, "none");
+  assert.equal(config.limits.rateLimitMaxRequests, 120);
+  assert.equal(config.limits.rateLimitWindowMs, 60_000);
 });
 
 test("loadConfig rejects missing required secrets", () => {
@@ -148,5 +172,24 @@ test("loadConfig rejects missing LLM API URL for HTTP provider", () => {
       LLM_PROVIDER: "http",
     }),
     /LLM_API_URL/,
+  );
+});
+
+test("loadConfig rejects missing vision and image API URLs for HTTP providers", () => {
+  assert.throws(
+    () => loadConfig({
+      MOLING_API_BASE_URL: "http://moling.test",
+      INTERNAL_API_TOKEN: "token",
+      VISION_PROVIDER: "http",
+    }),
+    /VISION_API_URL/,
+  );
+  assert.throws(
+    () => loadConfig({
+      MOLING_API_BASE_URL: "http://moling.test",
+      INTERNAL_API_TOKEN: "token",
+      IMAGE_PROVIDER: "http",
+    }),
+    /IMAGE_API_URL/,
   );
 });

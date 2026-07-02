@@ -104,4 +104,5 @@ test("runtime database collections include persisted sessions", async () => {
   const serverSource = await readFile(new URL("src/server.js", appRoot), "utf8");
 
   assert.match(serverSource, /collections:\s*\[[^\]]*"sessions"/s);
+  assert.match(serverSource, /personalTemplateService,/);
 });

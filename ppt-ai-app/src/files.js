@@ -5,13 +5,14 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "./errors.js";
 import { requirePermission } from "./permissions.js";
 
-export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
 const SUPPORTED_MIME_TYPES = new Set([
   "text/plain",
   "text/markdown",
   "application/json",
   "application/pdf",
+  "image/png",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ]);
@@ -31,26 +32,37 @@ export class LocalFileStorage {
 
   /**
    * Uploads a file owned by a user.
-   * @param {{ownerUserId: number, fileName: string, mimeType: string, content: Buffer}} input
+   * @param {{ownerUserId: number, fileName: string, mimeType: string, content: Buffer, fileRole?: string, visibility?: string, assetId?: string, deckId?: string, templateSlug?: string, storageKey?: string}} input
    * @returns {Promise<object>}
    */
-  async upload({ ownerUserId, fileName, mimeType, content }) {
+  async upload({ ownerUserId, fileName, mimeType, content, fileRole = "upload", visibility = "private", assetId, deckId, templateSlug, storageKey }) {
     validateUploadPayload({ fileName, mimeType, content });
     await mkdir(this.storageDir, { recursive: true });
     const id = randomUUID();
-    const storageKey = `${ownerUserId}/${id}-${sanitizeFileName(fileName)}`;
-    const fullPath = path.join(this.storageDir, storageKey);
+    const resolvedStorageKey = storageKey || `${ownerUserId}/${id}-${sanitizeFileName(fileName)}`;
+    validateStorageKey(resolvedStorageKey);
+    const fullPath = path.join(this.storageDir, resolvedStorageKey);
     await mkdir(path.dirname(fullPath), { recursive: true });
     await writeFile(fullPath, content);
-    return this.database.insert("files", {
+    const file = await this.database.insert("files", {
       id,
       ownerUserId,
       fileName,
       mimeType,
-      storageKey,
+      storageKey: resolvedStorageKey,
       sizeBytes: content.length,
       status: "available",
     });
+    await this.#insertStorageObject({
+      file,
+      ownerUserId,
+      fileRole,
+      visibility,
+      assetId,
+      deckId,
+      templateSlug,
+    });
+    return file;
   }
 
   /**
@@ -60,16 +72,73 @@ export class LocalFileStorage {
    */
   async download({ fileId, ownerUserId }) {
     const file = await this.database.findOne("files", (record) => record.id === fileId);
-    if (!file) throw new AppError({ code: "FILE_NOT_FOUND", status: 404, message: "File not found" });
+    if (!file || file.status !== "available") throw new AppError({ code: "FILE_NOT_FOUND", status: 404, message: "File not found" });
     requirePermission({
       actor: { userId: ownerUserId, role: "user" },
       resource: { ownerUserId: file.ownerUserId },
       action: "download",
     });
+    await this.#assertStorageObjectDownloadable({ file, ownerUserId });
     return {
       file,
       content: await readFile(path.join(this.storageDir, file.storageKey)),
     };
+  }
+
+  /**
+   * Stores a storage object index row when that collection is available.
+   * @param {{file: object, ownerUserId: number, fileRole: string, visibility: string, assetId?: string, deckId?: string, templateSlug?: string}} input
+   * @returns {Promise<void>}
+   */
+  async #insertStorageObject({ file, ownerUserId, fileRole, visibility, assetId, deckId, templateSlug }) {
+    try {
+      await this.database.insert("storage_objects", {
+        fileId: file.id,
+        ownerUserId,
+        fileName: file.fileName,
+        mimeType: file.mimeType,
+        storageKey: file.storageKey,
+        sizeBytes: file.sizeBytes,
+        fileRole,
+        visibility,
+        assetId,
+        deckId,
+        templateSlug,
+        status: "available",
+      });
+    } catch (error) {
+      if (error?.code !== "DATABASE_NOT_INITIALIZED") throw error;
+    }
+  }
+
+  /**
+   * Blocks downloads for deleted storage objects or files tied to deleted PPT assets.
+   * @param {{file: object, ownerUserId: number}} input
+   * @returns {Promise<void>}
+   */
+  async #assertStorageObjectDownloadable({ file, ownerUserId }) {
+    let object;
+    try {
+      object = await this.database.findOne("storage_objects", (item) => item.fileId === file.id);
+    } catch (error) {
+      if (error?.code === "DATABASE_NOT_INITIALIZED") return;
+      throw error;
+    }
+    if (!object) return;
+    if (object.status !== "available") throw new AppError({ code: "FILE_NOT_FOUND", status: 404, message: "File not found" });
+    requirePermission({
+      actor: { userId: ownerUserId, role: "user" },
+      resource: { ownerUserId: object.ownerUserId },
+      action: "download",
+    });
+    if (!object.assetId) return;
+    try {
+      const asset = await this.database.findOne("ppt_assets", (item) => item.id === object.assetId);
+      if (!asset || asset.status !== "active") throw new AppError({ code: "FILE_NOT_FOUND", status: 404, message: "File not found" });
+    } catch (error) {
+      if (error?.code === "DATABASE_NOT_INITIALIZED") return;
+      throw error;
+    }
   }
 }
 
@@ -113,4 +182,15 @@ function validateUploadPayload({ fileName, mimeType, content }) {
  */
 function sanitizeFileName(fileName) {
   return fileName.replaceAll(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+/**
+ * Validates a storage object key.
+ * @param {string} storageKey
+ * @returns {void}
+ */
+function validateStorageKey(storageKey) {
+  if (!storageKey || typeof storageKey !== "string" || path.isAbsolute(storageKey) || storageKey.split(/[\\/]/).includes("..")) {
+    throw new AppError({ code: "FILE_STORAGE_KEY_INVALID", status: 400, message: "File storage key is invalid" });
+  }
 }
