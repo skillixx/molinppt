@@ -29,6 +29,7 @@
 | [billing-integration-spec.md](./billing-integration-spec.md) | 开发者 | 字段级接口契约：上报用量/额度扣减/查询，鉴权与幂等 |
 | [developer-requirements.md](./developer-requirements.md) | 开发者 | 硬性需求、商品单价设计、会员设计、易错坑、4 个开发案例、自检清单 |
 | [billing-integration-design.md](./billing-integration-design.md) | 平台方/开发者 | 应用如何挂成商品、购买扣费 + 使用扣费的端到端设计 |
+| [branching-convention.md](./branching-convention.md) | 开发者 | 分支与提交规范：每个阶段/任务建对应分支、命名、PR 与合并门槛 |
 
 ---
 

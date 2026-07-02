@@ -18,7 +18,7 @@
 | 任务 | 说明 | 给谁 |
 |---|---|---|
 | 开管理员账号或代配 | 配应用/商品需 `app:manage` + `product:view/create/edit` 权限；若不想给开发者后台权限，则由你代为配置 | 自己/开发者 |
-| 确认环境 | 测试环境 API 可用（测试服 `8.130.9.163:8080`），开发者能调通 | — |
+| 确认环境 | 测试环境 API 可用（测试服地址通过安全渠道提供），开发者能调通 | — |
 | 准备内部接口凭证 | 若涉及"使用扣费/额度消费"，需 `INTERNAL_API_TOKEN`（共享密钥）；用 `openssl rand -hex 32` 生成，配进平台 env | 自己配 |
 | 配 IP 白名单 | 把开发者应用服务器的出口 IP 加进 `INTERNAL_ALLOWED_IPS`，否则其调 `/api/internal/*` 全被拒 | 自己配 |
 | 身份打通方案 | 统一走 **SSO 一次性票据**：用户点「进入应用」带 `?ticket=lt_xxx` 跳转，开发者后端调 `POST /api/internal/app-launch/verify`（带 `X-Internal-Token`）换 `user_id`，完成免登。**禁止把平台 JWT 验签密钥下发给开发者**。开发者若已有自有账号体系，可改用 `GET /api/my/assets`（用户 JWT）自行核对，但需可信免登交接时一律走票据 | 商定 |

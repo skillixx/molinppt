@@ -1,0 +1,10 @@
+.worktrees/
+worktrees/
+.env
+.env.*
+ppt-ai-app/.env
+ppt-ai-app/.env.*
+ppt-ai-app/data/
+ppt-ai-app/test-results/
+data/
+node_modules/
