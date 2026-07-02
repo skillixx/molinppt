@@ -56,6 +56,7 @@ templates/official/
 
 ```bash
 cd ppt-ai-app
+OFFICIAL_TEMPLATES_DIR='../templates/official'
 npm run seed:official-template-categories
 npm run seed:official-templates
 ```
@@ -66,3 +67,61 @@ npm run seed:official-templates
 - `STORAGE_DIR`：默认 `./data/storage`。
 - `STORAGE_ENDPOINT`、`STORAGE_BUCKET`、`STORAGE_ACCESS_KEY_ID`、`STORAGE_SECRET_ACCESS_KEY`：配置后模板文件上传到 MinIO/S3-compatible 对象存储。
 - `OFFICIAL_TEMPLATES_DIR`：默认仓库根目录下 `templates/official`。
+  - 从 `ppt-ai-app/` 目录运行命令时，建议显式传 `OFFICIAL_TEMPLATES_DIR='../templates/official'`。
+
+当前仓库内目前可直接接入的开源模板源：
+
+- `open-city-template`
+  - GitHub：`https://github.com/burkeholland/powerpoints`
+  - 许可：`MIT`
+- `open-powerpoint-sample`
+  - GitHub：`https://github.com/Suparnapaul393/PowerPoint-Sample`
+  - 许可：`Apache-2.0`
+
+可直接复用且建议先做验收的模板文件：
+
+- `burkeholland/powerpoints`
+  - `city-template.pptx`
+- `Suparnapaul393/PowerPoint-Sample`
+  - `Journey.pptx`
+  - `Journey1.pptx`
+  - `PowerPoint skill Test.pptx`
+  - `suparna.pptx`
+
+新增一个开源模板到系统的方法：
+
+1. 在 `templates/official/` 下新增目录（目录名即 `slug`）并放入：
+   - `manifest.json`
+   - `source.pptx`
+   - `thumbnail.png`
+   - `template.json`
+2. 按本文上方“manifest”规则填写元数据并确认许可协议允许商用/再分发。
+3. 跑同步：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+DATABASE_URL='json:./data/ppt-ai-db.json'
+npm run seed:official-template-categories
+npm run seed:official-templates
+```
+
+4. 验证：
+
+```bash
+# 看当前数据库中是否入库（本地 json 文件示例）
+node --input-type=module -e "import fs from 'node:fs'; const d=JSON.parse(fs.readFileSync('data/ppt-ai-db.json','utf8')); console.log((d.templates||[]).filter(t=>t.scope==='official').map(t=>t.slug));"
+```
+
+预检官方模板目录（不落库）：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+npm run list:official-templates
+```
+
+输出 JSON（适合脚本）：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+npm run list:official-templates -- --json
+```

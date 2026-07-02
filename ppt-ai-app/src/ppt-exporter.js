@@ -1,31 +1,18 @@
-import { readFileSync } from "node:fs";
-
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
+import {
+  masterBackgroundFile,
+  masterBusinessMedia,
+  masterCanvasMetrics,
+  masterFont,
+  masterMediaFiles,
+  resolveMasterDescriptor,
+} from "./master-templates.js";
 
-const DOME_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
 const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scaleY: 1, type: "screen16x9" };
-const DOME_SLIDE_METRICS = {
-  width: 12192000,
-  height: 6858000,
-  scaleX: 12192000 / 9144000,
-  scaleY: 6858000 / 5143500,
-};
+// "Dome" 命名形状在无显式字体时的兜底中文重字体(仅 master 渲染代码会产生这类命名)。
 const DOME_TEXT_FONT = "Source Han Sans CN Heavy";
 const DOME_AGENDA_DEFAULT_ITEMS = ["工作汇报", "成果展示", "问题不足", "下步计划"];
-
-// dome.pptx 的核心视觉不是程序绘制出来的色块，而是可复用的红金背景图。
-// 导出器在启动时读取这些本仓库内资产，并在生成 PPTX 时作为 media part 写入。
-const DOME_ASSETS = {
-  cover: readFileSync(new URL("dome-cover.jpg", DOME_ASSET_BASE_URL)),
-  content: readFileSync(new URL("dome-content.jpg", DOME_ASSET_BASE_URL)),
-  business1: readFileSync(new URL("dome-business-1.jpeg", DOME_ASSET_BASE_URL)),
-  business2: readFileSync(new URL("dome-business-2.jpeg", DOME_ASSET_BASE_URL)),
-  business3: readFileSync(new URL("dome-business-3.jpeg", DOME_ASSET_BASE_URL)),
-  business4: readFileSync(new URL("dome-business-4.jpeg", DOME_ASSET_BASE_URL)),
-  business5: readFileSync(new URL("dome-business-5.jpeg", DOME_ASSET_BASE_URL)),
-  business6: readFileSync(new URL("dome-business-6.jpeg", DOME_ASSET_BASE_URL)),
-};
 
 function normalizeHexColor(hex) {
   const normalized = String(hex || "000000").replace(/^#/, "").trim().padEnd(6, "0").slice(0, 6);
@@ -81,20 +68,28 @@ function topBandColorPalette(visual) {
   const surface = normalizeHexColor(visual?.surface || "FFFFFF");
   const background = normalizeHexColor(visual?.background || "F8FAFC");
   return {
-    surface: blendHexColor(surface, "FFFFFF", 0.06),
-    panel: blendHexColor(surface, background, 0.34),
-    panelFrame: blendHexColor(accent, "64748B", 0.25),
-    rail: blendHexColor(primary, "111827", 0.2),
-    stripe: blendHexColor(accent, background, 0.3),
-    sheen: blendHexColor(surface, primary, 0.16),
-    footer: blendHexColor(surface, primary, 0.14),
-    rule: blendHexColor(primary, accent, 0.45),
-    indexTag: blendHexColor(primary, accent, 0.12),
-    titleGradientStart: blendHexColor(primary, "FFFFFF", 0.72),
-    titleGradientEnd: blendHexColor(accent, "F8FAFC", 0.35),
-    marker: blendHexColor(accent, "F59E0B", 0.22),
-    ribbon: blendHexColor(primary, accent, 0.24),
-    edge: blendHexColor(primary, surface, 0.08),
+    surface: blendHexColor(surface, "FFFFFF", 0.08),
+    panel: blendHexColor(surface, background, 0.26),
+    panelFrame: blendHexColor(primary, accent, 0.28),
+    panelSheen: blendHexColor(surface, primary, 0.07),
+    ambient: blendHexColor(surface, "F8FAFC", 0.92),
+    rail: blendHexColor(primary, "0F172A", 0.18),
+    stripe: blendHexColor(accent, background, 0.34),
+    sheen: blendHexColor(surface, primary, 0.12),
+    footer: blendHexColor(surface, primary, 0.18),
+    rule: blendHexColor(primary, accent, 0.50),
+    indexTag: blendHexColor(primary, accent, 0.38),
+    titleGradientStart: blendHexColor(primary, "FFFFFF", 0.56),
+    titleGradientEnd: blendHexColor(primary, accent, 0.20),
+    marker: blendHexColor(accent, primary, 0.45),
+    ribbon: blendHexColor(primary, accent, 0.36),
+    edge: blendHexColor(primary, background, 0.12),
+    glow: blendHexColor(surface, accent, 0.18),
+    lightLine: blendHexColor(background, "FFFFFF", 0.88),
+    ruleLine: blendHexColor(accent, primary, 0.42),
+    panelShadow: blendHexColor(accent, "1F2937", 0.12),
+    focus: blendHexColor(primary, accent, 0.18),
+    glass: blendHexColor(surface, "FFFFFF", 0.30),
   };
 }
 
@@ -321,7 +316,8 @@ function slideFiles(deck, visual) {
     const titleColor = layout.titleColor || visual.title;
     const bodyColor = layout.bodyColor || visual.body;
     const bodySize = layout.bodySize || 2200;
-    const fontFace = visual.layout === "red-gold" ? DOME_TEXT_FONT : "";
+    const masterDescriptor = resolveMasterDescriptor(visual);
+    const fontFace = masterDescriptor ? masterFont(masterDescriptor) : "";
     const titleFillStyle = visual.layout === "top-band" ? topBandTitleFillStyle(visual) : domeTitleFillStyle(visual, role);
     const renderBodyList = shouldRenderDomeBodyList(visual, role);
     const bullets = renderBodyList
@@ -355,8 +351,7 @@ function domeTitleFillStyle(visual, role) {
 
 function topBandTitleFillStyle(visual) {
   if (visual.layout !== "top-band") return "";
-  const topBandPalette = topBandColorPalette(visual);
-  return `top-band-title-gradient:${topBandPalette.titleGradientStart}:${topBandPalette.titleGradientEnd}`;
+  return "";
 }
 
 /**
@@ -395,7 +390,8 @@ function shouldRenderDomeBodyList(visual, role) {
  * @returns {{width: number, height: number, scaleX: number, scaleY: number, type?: string}}
  */
 function slideMetrics(visual) {
-  return visual.layout === "red-gold" ? DOME_SLIDE_METRICS : DEFAULT_SLIDE_METRICS;
+  const descriptor = resolveMasterDescriptor(visual);
+  return descriptor ? masterCanvasMetrics(descriptor) : DEFAULT_SLIDE_METRICS;
 }
 
 /**
@@ -489,19 +485,91 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
     const panelHeight = isCover ? 3657600 : 4114800;
     const panelBottom = panelY + panelHeight;
     const palette = topBandColorPalette(visual);
+    const ambientY = isCover ? 228600 : panelY + 228600;
+    const ambientHeight = isCover ? 365760 : 182880;
+    const ambientSweep = solidShapeXml({ id: 35, name: "Top Band Ambient Sweep", x: 685800, y: ambientY, cx: 7772400, cy: ambientHeight, fill: palette.ambient });
+    const roleDecor = isCover
+      ? (
+          solidShapeXml({ id: 24, name: "Top Band Hero Halo", geom: "roundRect", x: 457200, y: 457200, cx: 8229600, cy: 742950, fill: palette.glow })
+          + rectShapeXml({ id: 25, name: "Top Band Cover Accent Band", x: 0, y: 120650, cx: 9144000, cy: 121920, fill: palette.lightLine })
+          + solidShapeXml({ id: 26, name: "Top Band Cover Glow", geom: "ellipse", x: 1600200, y: panelY + 228600, cx: 450000, cy: 450000, fill: palette.glass })
+          + solidShapeXml({ id: 29, name: "Top Band Cover Halo", x: 685800, y: 365760, cx: 7772400, cy: 182880, fill: palette.panelSheen })
+          + lineFrameShapeXml({
+            id: 27,
+            name: "Top Band Cover Focus Frame",
+            geom: "roundRect",
+            x: 285750,
+            y: 685800,
+            cx: 8572500,
+            cy: 3327400,
+            stroke: palette.ruleLine,
+            width: 15240,
+          })
+          + lineFrameShapeXml({
+            id: 28,
+            name: "Top Band Cover Detail Stripe",
+            x: 342900,
+            y: 1714500,
+            cx: 8382000,
+            cy: 152400,
+            stroke: palette.panelShadow,
+            width: 7620,
+          })
+          + lineFrameShapeXml({
+            id: 30,
+            name: "Top Band Cover Accent Ring",
+            geom: "ellipse",
+            x: 685800,
+            y: 685800,
+            cx: 1778000,
+            cy: 228600,
+            stroke: palette.rule,
+            width: 11430,
+          })
+        )
+      : (
+          rectShapeXml({ id: 24, name: "Top Band Side Rail", x: 0, y: panelY + 685800, cx: 171450, cy: 3657600, fill: palette.glass })
+          + solidShapeXml({ id: 29, name: "Top Band Content Glow", x: 2286000, y: panelY + 165100, cx: 4572000, cy: 228600, fill: palette.panelSheen })
+          + lineFrameShapeXml({ id: 25, name: "Top Band Content Rule", x: 228600, y: panelBottom - 685800, cx: 431800, cy: 120650, stroke: palette.rule, width: 7620 })
+          + lineFrameShapeXml({
+            id: 27,
+            name: "Top Band Content Divider",
+            x: 685800,
+            y: panelY + 1302000,
+            cx: 6400800,
+            cy: 101600,
+            stroke: palette.lightLine,
+            width: 5715,
+          })
+          + lineFrameShapeXml({
+            id: 28,
+            name: "Top Band Content Accent Band",
+            x: 1143000,
+            y: panelY + 3009900,
+            cx: 5829300,
+            cy: 914400,
+            stroke: palette.ruleLine,
+            width: 3810,
+          })
+        );
+    const contentPanelY = isCover ? panelY + 114300 : panelY + 152400;
+    const contentPanelHeight = isCover ? panelHeight : panelHeight - 228600;
     return base
       + rectShapeXml({ id: 3, name: "Top Band Surface", ...layout.surface, fill: visual.surface })
-      + solidShapeXml({ id: 13, name: "Top Band Surface Sheen", x: 685800, y: panelY + 152400, cx: 7772400, cy: panelHeight - 304800, fill: palette.sheen })
-      + solidShapeXml({ id: 9, name: "Top Band Content Panel", geom: "roundRect", x: 685800, y: panelY, cx: 7772400, cy: panelHeight, fill: palette.panel })
-      + lineFrameShapeXml({ id: 10, name: "Top Band Panel Frame", geom: "roundRect", x: 628650, y: panelY - 152400, cx: 7886700, cy: panelHeight + 304800, stroke: palette.panelFrame, width: 15240 })
-      + rectShapeXml({ id: 11, name: "Top Band Focus Stripe", x: 685800, y: 228600, cx: 8289600, cy: 304800, fill: palette.stripe })
+      + ambientSweep
+      + solidShapeXml({ id: 13, name: "Top Band Surface Sheen", x: 685800, y: contentPanelY, cx: 7772400, cy: contentPanelHeight, fill: palette.sheen })
+      + solidShapeXml({ id: 9, name: "Top Band Content Panel", geom: "roundRect", x: 685800, y: contentPanelY, cx: 7772400, cy: contentPanelHeight, fill: palette.panel })
+      + lineFrameShapeXml({ id: 10, name: "Top Band Panel Frame", geom: "roundRect", x: 571500, y: contentPanelY - 120650, cx: 7995900, cy: contentPanelHeight + 241300, stroke: palette.panelFrame, width: 15240 })
+      + rectShapeXml({ id: 11, name: "Top Band Focus Stripe", x: 685800, y: isCover ? 228600 : 228600, cx: 8289600, cy: isCover ? 304800 : 228600, fill: palette.stripe })
       + rectShapeXml({ id: 4, name: "Primary Rail", x: 0, y: 0, cx: 228600, cy: 5143500, fill: palette.rail })
       + rectShapeXml({ id: 5, name: "Accent Header", ...layout.accent, fill: visual.accent })
-      + lineFrameShapeXml({ id: 6, name: "Top Band Outline", x: 114300, y: 342900, cx: 8915400, cy: 4478700, stroke: palette.rule, width: 15240 })
-      + rectShapeXml({ id: 12, name: "Top Band Signature", x: 914400, y: panelY, cx: 228600, cy: 304800, fill: palette.footer })
-      + rectShapeXml({ id: 14, name: "Top Band Marker Band", x: 4572000, y: panelY + 228600, cx: 4064000, cy: 152400, fill: palette.marker })
+      + lineFrameShapeXml({ id: 6, name: "Top Band Outline", x: 114300, y: 342900, cx: 8915400, cy: 4478700, stroke: palette.rule, width: 19050 })
+      + rectShapeXml({ id: 12, name: "Top Band Signature", x: 914400, y: contentPanelY + (isCover ? 0 : 152400), cx: 228600, cy: 304800, fill: palette.footer })
+      + rectShapeXml({ id: 14, name: "Top Band Marker Band", x: 4572000, y: contentPanelY + 228600, cx: 4064000, cy: isCover ? 152400 : 228600, fill: palette.marker })
       + solidShapeXml({ id: 17, name: "Top Band Accent Ribbon", geom: "parallelogram", x: 6553200, y: isCover ? 548640 : 365760, cx: 2311400, cy: 304800, fill: palette.ribbon })
       + rectShapeXml({ id: 18, name: "Top Band Side Cap", x: 114300, y: isCover ? 228600 : 152400, cx: 285750, cy: 685800, fill: palette.edge })
+      + lineFrameShapeXml({ id: 36, name: "Top Band Panel Shadow", x: 628650, y: panelY - 120650, cx: 7886700, cy: panelHeight + 152400, stroke: palette.panelShadow, width: 5715 })
+      + roleDecor
       + solidShapeXml({ id: 15, name: "Top Band Index Dot", geom: "ellipse", x: 171450, y: panelBottom - 548640, cx: 685800, cy: 685800, fill: palette.indexTag })
       + textShapeXml({
         id: 16,
@@ -558,17 +626,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
  * @returns {Record<string, Buffer>}
  */
 function templateMediaFiles(visual) {
-  if (visual.layout !== "red-gold") return {};
-  return {
-    "ppt/media/dome-cover.jpg": DOME_ASSETS.cover,
-    "ppt/media/dome-content.jpg": DOME_ASSETS.content,
-    "ppt/media/dome-business-1.jpeg": DOME_ASSETS.business1,
-    "ppt/media/dome-business-2.jpeg": DOME_ASSETS.business2,
-    "ppt/media/dome-business-3.jpeg": DOME_ASSETS.business3,
-    "ppt/media/dome-business-4.jpeg": DOME_ASSETS.business4,
-    "ppt/media/dome-business-5.jpeg": DOME_ASSETS.business5,
-    "ppt/media/dome-business-6.jpeg": DOME_ASSETS.business6,
-  };
+  const descriptor = resolveMasterDescriptor(visual);
+  return descriptor ? masterMediaFiles(descriptor) : {};
 }
 
 /**
@@ -745,7 +804,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }).join("");
   return solidShapeXml({ id: 31, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
     + solidShapeXml({ id: 34, name: "Dome Image Placeholder", geom: "roundRect", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800, fill: visual.accent })
-    + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
+    + pictureXml({ id: 30, name: "Dome Business Image", relId: domeRoleBusinessMedia(visual, role) ? "rId3" : "rId2", x: 5486400, y: 1524000, cx: 2133600, cy: 1828800 })
     + solidShapeXml({ id: 32, name: "Right Golden Motif", geom: "roundRect", ...layout.secondaryAccent, fill: visual.accent })
     + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
     + imageReportCards;
@@ -875,17 +934,9 @@ function isPlainObject(value) {
  * @param {string} role
  * @returns {string}
  */
-function domeRoleBusinessMedia(role) {
-  const mapping = {
-    "image-report": "dome-business-1.jpeg",
-    "three-steps": "dome-business-3.jpeg",
-    "four-steps": "dome-business-4.jpeg",
-    metrics: "dome-business-5.jpeg",
-    showcase: "dome-business-2.jpeg",
-    retrospective: "dome-business-3.jpeg",
-    "next-plan": "dome-business-6.jpeg",
-  };
-  return mapping[role] || "";
+function domeRoleBusinessMedia(visual, role) {
+  const descriptor = resolveMasterDescriptor(visual);
+  return descriptor ? masterBusinessMedia(descriptor, role) : "";
 }
 
 /**
@@ -904,9 +955,12 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         accent: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
         secondaryAccent: { x: 6781800, y: 1600200, cx: 914400, cy: 2057400 },
         label: { x: 5943600, y: 914400, cx: 1524000, cy: 365760 },
-        title: { x: role === "closing" ? 3048000 : 2895600, y: 1371600, cx: 3962400, cy: 914400 },
+        // 封面标题原框窄(cx 3962400)且右缘伸进帆船区,长标题会从词中间断行;加宽并左移避开帆船,降字号让长标题在净区内均衡换行。
+        title: role === "closing"
+          ? { x: 3048000, y: 1371600, cx: 3962400, cy: 914400 }
+          : { x: 609600, y: 1219200, cx: 5334000, cy: 1371600 },
         content: { x: 2971800, y: 2514600, cx: 3886200, cy: 914400 },
-        titleSize: 5200,
+        titleSize: role === "closing" ? 5200 : 4400,
         bodySize: 2100,
         titleColor: redGoldPalette.surfaceText,
         bodyColor: redGoldPalette.surfaceText,
@@ -949,7 +1003,8 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 1524000, y: 2133600, cx: 4876800, cy: 1371600 },
       titleSize: 3600,
       bodySize: 2100,
-      titleColor: visual.title,
+      // 顶部卡片版式的内容页标题压在红底上,深色标题几乎不可读,改用浅色(与预览一致)。
+      titleColor: ["image-report", "showcase", "retrospective"].includes(role) ? redGoldPalette.surfaceText : visual.title,
       bodyColor: visual.body,
     };
   }
@@ -1034,10 +1089,10 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         accent: { x: 0, y: 0, cx: 9144000, cy: 514350 },
         secondaryAccent: { x: 914400, y: 3886200, cx: 7772400, cy: 365760 },
         label: { x: 685800, y: 685800, cx: 2438400, cy: 365760 },
-        title: { x: 1714500, y: 1371600, cx: 6400800, cy: 1066800 },
-        content: { x: 1714500, y: 2743200, cx: 6400800, cy: 914400 },
-        titleSize: 4600,
-        bodySize: 1900,
+        title: { x: 1663700, y: 1295400, cx: 6464300, cy: 1047750 },
+        content: { x: 1663700, y: 2616200, cx: 6464300, cy: 1016000 },
+        titleSize: 5200,
+        bodySize: 2000,
       };
     }
     return {
@@ -1045,10 +1100,10 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       accent: { x: 0, y: 0, cx: 9144000, cy: 457200 },
       secondaryAccent: { x: 914400, y: 4000500, cx: 7772400, cy: 304800 },
       label: { x: 685800, y: 685800, cx: 2209800, cy: 365760 },
-      title: { x: 1714500, y: 1346200, cx: 6146800, cy: 914400 },
-      content: { x: 1714500, y: 2453000, cx: 6400800, cy: 1097280 },
-      titleSize: 4000,
-      bodySize: 1850,
+      title: { x: 1663700, y: 1270000, cx: 6400800, cy: 914400 },
+      content: { x: 1663700, y: 2387600, cx: 6515100, cy: 1097280 },
+      titleSize: 4080,
+      bodySize: 1860,
     };
   }
   if (visual.layout === "left-rail") {
@@ -1073,11 +1128,12 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
  * @returns {string}
  */
 function slideRelsXml(visual, role = "content") {
-  const usesDomeCoverBackground = ["cover", "closing"].includes(role);
-  const imageRel = visual.layout === "red-gold"
-    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${usesDomeCoverBackground ? "dome-cover" : "dome-content"}.jpg"/>`
+  const descriptor = resolveMasterDescriptor(visual);
+  const backgroundFile = descriptor ? masterBackgroundFile(descriptor, role) : "";
+  const imageRel = backgroundFile
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${backgroundFile}"/>`
     : "";
-  const businessImage = visual.layout === "red-gold" ? domeRoleBusinessMedia(role) : "";
+  const businessImage = domeRoleBusinessMedia(visual, role);
   const businessImageRel = businessImage
     ? `<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${businessImage}"/>`
     : "";

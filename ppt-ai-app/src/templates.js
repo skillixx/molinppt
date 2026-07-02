@@ -66,17 +66,66 @@ export const DEFAULT_TEMPLATES = [
     style: "executive-report",
     description: "Boardroom-ready operating review template with strong hierarchy and restrained corporate accents.",
     themes: [
-      { id: "modern", name: "Modern" },
-      { id: "classic", name: "Classic" },
-      { id: "executive", name: "Executive" },
+      {
+        id: "minimal",
+        name: "Minimal",
+        visual: {
+          primary: "1E3A8A",
+          accent: "6B7280",
+          background: "F8FAFC",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "top-band",
+        },
+      },
+      {
+        id: "modern",
+        name: "Modern",
+        visual: {
+          primary: "1F4E79",
+          accent: "F4A261",
+          background: "F1F5F9",
+          surface: "FFFFFF",
+          title: "0F2945",
+          body: "334155",
+          layout: "red-gold",
+        },
+      },
+      {
+        id: "classic",
+        name: "Classic",
+        visual: {
+          primary: "243B53",
+          accent: "9D8A60",
+          background: "F5F7FA",
+          surface: "FFFFFF",
+          title: "1F2937",
+          body: "4B5563",
+          layout: "executive",
+        },
+      },
+      {
+        id: "executive",
+        name: "Executive",
+        visual: {
+          primary: "18344E",
+          accent: "CFAF70",
+          background: "F2F5F8",
+          surface: "FFFFFF",
+          title: "10263C",
+          body: "2F4255",
+          layout: "venture",
+        },
+      },
     ],
     visual: {
-      primary: "B80F1A",
-      accent: "F6D48A",
-      background: "8F0613",
-      surface: "FFF8E6",
-      title: "7A0611",
-      body: "3C1F1F",
+      primary: "1F4E79",
+      accent: "F4A261",
+      background: "F1F5F9",
+      surface: "FFFFFF",
+      title: "0F2945",
+      body: "334155",
       layout: "red-gold",
     },
     layoutSchema: DOME_LAYOUT_SCHEMA,
@@ -407,12 +456,13 @@ export class TemplateManager {
 
 /**
  * Resolves presentation visual settings for a deck or template.
- * @param {{templateId?: string, template?: object}} input
+ * @param {{templateId?: string, template?: object, visual?: object, theme?: string}} input
  * @returns {{id: string, name: string, primary: string, accent: string, background: string, surface: string, title: string, body: string, layout: string}}
  */
 export function resolveTemplateVisual(input = {}) {
   const baseTemplate = DEFAULT_TEMPLATES.find((item) => item.id === input.templateId) || DEFAULT_TEMPLATES[0];
   const templateOverrides = input.template ? removeUndefinedValues(input.template) : null;
+  const selectedTheme = String(input.theme || "").trim();
   const template = input.template
     ? {
       ...baseTemplate,
@@ -420,7 +470,10 @@ export function resolveTemplateVisual(input = {}) {
       visual: { ...(baseTemplate.visual || {}), ...(templateOverrides.visual || {}) },
     }
     : (input.visual ? { ...baseTemplate, visual: { ...(baseTemplate.visual || {}), ...input.visual } } : baseTemplate);
-  const visual = { ...DEFAULT_VISUAL, ...(template.visual || {}) };
+  const hasVisualOverride = hasVisualOverrideAgainstBase(template.visual, baseTemplate.visual || {});
+  const themeVisual = !hasVisualOverride ? resolveThemeVisual(template.themes || baseTemplate.themes || [], selectedTheme) : null;
+  const mergedVisual = { ...template.visual, ...(templateOverrides?.visual || {}), ...(themeVisual || {}) };
+  const visual = { ...DEFAULT_VISUAL, ...(mergedVisual || {}) };
   return {
     id: template.id || "business",
     name: template.name || "Business",
@@ -431,6 +484,42 @@ export function resolveTemplateVisual(input = {}) {
     title: normalizeHex(visual.title, DEFAULT_VISUAL.title),
     body: normalizeHex(visual.body, DEFAULT_VISUAL.body),
     layout: visual.layout || DEFAULT_VISUAL.layout,
+  };
+}
+
+function resolveThemeVisual(themes, themeId) {
+  if (!themeId || !Array.isArray(themes) || themes.length === 0) return null;
+  const match = themes.find((candidate) => {
+    if (!candidate || typeof candidate !== "object") return false;
+    const id = String(candidate.id || candidate.value || candidate.name || "").trim();
+    return id === themeId;
+  });
+  if (!match || typeof match.visual !== "object") return null;
+  return normalizeThemeVisual(match.visual);
+}
+
+function hasVisualOverrideAgainstBase(visual, baseVisual) {
+  if (!visual || !baseVisual) return false;
+  const keys = ["primary", "accent", "background", "surface", "title", "body", "layout"];
+  for (const key of keys) {
+    if (key === "layout") {
+      if (String(visual.layout || "").trim() !== String(baseVisual.layout || "").trim()) return true;
+      continue;
+    }
+    if (normalizeHex(visual[key] || "") !== normalizeHex(baseVisual[key] || "")) return true;
+  }
+  return false;
+}
+
+function normalizeThemeVisual(themeVisual) {
+  return {
+    primary: normalizeHex(themeVisual.primary),
+    accent: normalizeHex(themeVisual.accent),
+    background: normalizeHex(themeVisual.background),
+    surface: normalizeHex(themeVisual.surface),
+    title: normalizeHex(themeVisual.title),
+    body: normalizeHex(themeVisual.body),
+    layout: typeof themeVisual.layout === "string" ? themeVisual.layout : "",
   };
 }
 

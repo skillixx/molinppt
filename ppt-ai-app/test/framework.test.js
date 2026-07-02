@@ -9,7 +9,7 @@ import { AppError } from "../src/errors.js";
 import { JsonFileDatabase } from "../src/database.js";
 import { LocalFileStorage, MAX_UPLOAD_BYTES } from "../src/files.js";
 import { MemoryTaskCenter } from "../src/tasks.js";
-import { TemplateManager } from "../src/templates.js";
+import { TemplateManager, resolveTemplateVisual } from "../src/templates.js";
 import { HttpAiProvider, MockAiProvider } from "../src/ai-provider.js";
 import { LocalMolingClient, MolingClient } from "../src/moling-client.js";
 import { BillingClient } from "../src/billing.js";
@@ -346,6 +346,23 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   assert.equal(catalog.every((template) => template.category?.id), true);
   assert.equal(catalog.every((template) => template.layoutSchema?.defaultContentLayout), true);
   assert.equal(templates.getTemplate("pitch").style, "venture-story");
+});
+
+test("resolveTemplateVisual applies business theme visual overrides", () => {
+  const defaultVisual = resolveTemplateVisual({ templateId: "business", theme: "modern" });
+  const classicVisual = resolveTemplateVisual({ templateId: "business", theme: "classic" });
+  const executiveVisual = resolveTemplateVisual({ templateId: "business", theme: "executive" });
+  const minimalVisual = resolveTemplateVisual({ templateId: "business", theme: "minimal" });
+
+  assert.equal(defaultVisual.primary, "1F4E79");
+  assert.equal(classicVisual.accent, "9D8A60");
+  assert.equal(executiveVisual.accent, "CFAF70");
+  assert.equal(minimalVisual.accent, "6B7280");
+  assert.equal(minimalVisual.title, "0F172A");
+  assert.equal(minimalVisual.layout, "top-band");
+  assert.equal(defaultVisual.layout, "red-gold");
+  assert.equal(classicVisual.layout, "executive");
+  assert.equal(executiveVisual.layout, "venture");
 });
 
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {

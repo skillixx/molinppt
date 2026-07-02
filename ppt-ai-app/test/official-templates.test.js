@@ -185,6 +185,7 @@ test("repository official templates include usable open-source samples", async (
     storage: context.storage,
   });
   const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7, categoryId: "open-source-samples" });
+  const byId = Object.fromEntries(visible.map((item) => [item.id, item]));
 
   assert.equal(result.active >= 2, true);
   assert.deepEqual(visible.map((template) => template.id).sort(), ["open-city-template", "open-powerpoint-sample"]);
@@ -192,6 +193,12 @@ test("repository official templates include usable open-source samples", async (
   assert.equal(visible.every((template) => template.status === "active"), true);
   assert.equal(visible.every((template) => template.sourceFileId), true);
   assert.equal(visible.every((template) => template.thumbnailFileId), true);
+  assert.equal(byId["open-city-template"].visual.layout, "venture");
+  assert.equal(byId["open-city-template"].visual.primary, "0B4F6C");
+  assert.equal(byId["open-city-template"].visual.accent, "F59E0B");
+  assert.equal(byId["open-powerpoint-sample"].visual.layout, "executive");
+  assert.equal(byId["open-powerpoint-sample"].visual.primary, "1F4E79");
+  assert.equal(byId["open-powerpoint-sample"].visual.accent, "E76F51");
 });
 
 async function createSyncContext() {

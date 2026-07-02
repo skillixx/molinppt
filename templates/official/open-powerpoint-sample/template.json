@@ -1,21 +1,22 @@
 {
   "themes": [
     { "id": "journey", "name": "Journey" },
-    { "id": "sample", "name": "Sample" }
+    { "id": "academy", "name": "Academy" },
+    { "id": "product", "name": "Product" }
   ],
   "visual": {
-    "primary": "224A5E",
-    "accent": "D97941",
-    "background": "F4F0EA",
+    "primary": "1F4E79",
+    "accent": "E76F51",
+    "background": "F8FAFC",
     "surface": "FFFFFF",
-    "title": "182C36",
-    "body": "42515A",
-    "layout": "academy"
+    "title": "102A43",
+    "body": "34495E",
+    "layout": "executive"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
-    "allowedLayouts": ["academy-cover", "academy-content", "lesson-title", "lesson-content", "title", "content"]
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": ["executive-cover", "executive-content", "title", "content"]
   },
   "source": {
     "repository": "https://github.com/Suparnapaul393/PowerPoint-Sample",

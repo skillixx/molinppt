@@ -12,6 +12,7 @@
     "migrate": "node scripts/migrate.js",
     "seed:official-template-categories": "node --env-file=.env scripts/seed-official-template-categories.js",
     "seed:official-templates": "node --env-file=.env scripts/seed-official-templates.js",
+    "list:official-templates": "node --env-file=.env scripts/list-official-templates.js",
     "admin:disable-user": "node --env-file=.env scripts/admin-disable-user.js",
     "admin:restore-user": "node --env-file=.env scripts/admin-restore-user.js",
     "admin:recalculate-usage": "node --env-file=.env scripts/admin-recalculate-usage.js",

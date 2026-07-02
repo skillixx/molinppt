@@ -1068,7 +1068,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       var(--thumb-bg); }
     .template-thumb::after { content: ""; position: absolute; inset: 10% 7% 11%; border-radius: 6px; border: 1px solid rgba(15,23,42,.06); background: var(--thumb-surface); box-shadow: 0 16px 28px rgba(15,23,42,.10); }
     .template-thumb-band { position: absolute; z-index: 1; inset: 0 auto 0 0; width: 18%; background: var(--thumb-primary); }
-    .template-thumb[data-layout="top-band"] .template-thumb-band { inset: 0 0 auto 0; width: auto; height: 20%; }
+    .template-thumb[data-layout="top-band"] { background: linear-gradient(135deg, rgba(255,255,255,.80), color-mix(in srgb, var(--thumb-surface) 88%, #ffffff 12%)); }
+    .template-thumb[data-layout="top-band"] .template-thumb-band { inset: 0 0 auto 0; width: auto; height: 24%; background: linear-gradient(90deg, rgba(255,255,255,.96), color-mix(in srgb, var(--thumb-accent) 60%, var(--thumb-title) 40%)); }
+    .template-thumb[data-layout="top-band"]::after { inset: 56% 9% 8%; border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--thumb-bg) 76%, var(--thumb-surface) 24%); box-shadow: 0 12px 24px rgba(15,23,42,.16); }
     .template-thumb[data-layout="hero"] .template-thumb-band { inset: 0; width: 100%; opacity: .16; }
     .template-thumb[data-layout="hero"] .template-thumb-content { width: 68%; top: 24%; left: 10%; }
     .template-thumb[data-layout="executive"] .template-thumb-band { inset: 11% 7% auto 7%; width: auto; height: 12%; border-radius: 6px 6px 0 0; }
@@ -1104,6 +1106,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb-line { height: 7px; border-radius: 999px; background: var(--thumb-body); opacity: .48; }
     .template-thumb-line:nth-child(3) { width: 72%; }
     .template-thumb-accent { position: absolute; z-index: 2; right: 9%; bottom: 12%; width: 18%; height: 7px; border-radius: 999px; background: var(--thumb-accent); }
+    .template-thumb-palette { position: absolute; z-index: 3; right: 9%; top: 9%; display: inline-flex; gap: 4px; }
+    .template-thumb-swatch { width: 10px; height: 22px; border-radius: 999px; border: 1px solid rgba(15,23,42,.12); }
     .template-card-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -1300,7 +1304,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="row">
         <div>
           <label for="theme">主题风格</label>
-          <select id="theme"><option value="modern">modern</option></select>
+          <select id="theme"><option value="minimal">minimal</option></select>
         </div>
         <div>
           <label for="template-scope">模板来源</label>
@@ -1620,16 +1624,21 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const themes = Array.isArray(template.themes) ? template.themes : [];
       const selectedThemeId = document.querySelector("#theme").value;
       const selectedTheme = themes.find((theme) => (theme.id || theme) === selectedThemeId);
-      const displayTheme = (template.id === selectedId && selectedTheme) || themes[0] || { id: "modern", name: "Modern" };
+      const fallbackTheme = themes[0] || { id: "modern", name: "Modern" };
+      const hasSelectedTemplate = template.id === selectedId;
+      const displayTheme = (hasSelectedTemplate && selectedTheme) || fallbackTheme;
+      const displayVisual = resolveTemplateCardVisual(template.visual, hasSelectedTemplate ? selectedTheme : null, visual);
       const categoryName = template.category?.name || template.category || "未分类";
-      const hasDomeAsset = visual.layout === "red-gold";
+      const displayLayout = displayVisual.layout;
+      const hasDomeAsset = displayLayout === "red-gold";
       const thumbnailUrl = template.thumbnailUrl ? "url('" + cssUrl(template.thumbnailUrl) + "')" : "";
-      const style = "--thumb-primary:#" + visual.primary + ";--thumb-accent:#" + visual.accent + ";--thumb-bg:#" + visual.background + ";--thumb-surface:#" + visual.surface + ";--thumb-title:#" + visual.title + ";--thumb-body:#" + visual.body + ";" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
+      const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
       return ''
         + '<button type="button" class="template-card" data-template-card="' + escapeHtml(template.id) + '" aria-selected="' + (template.id === selectedId ? 'true' : 'false') + '">'
         + '<span class="template-card-head"><span class="template-card-title">' + escapeHtml(template.name) + '</span><span class="template-card-scope">' + (template.scope === "user" ? '个人' : '官方') + '</span></span>'
-        + '<span class="template-thumb" data-layout="' + escapeHtml(visual.layout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
+        + '<span class="template-thumb" data-layout="' + escapeHtml(displayLayout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
         + '<span class="template-thumb-band"></span><span class="template-thumb-content"><span class="template-thumb-title"></span><span class="template-thumb-line"></span><span class="template-thumb-line"></span></span><span class="template-thumb-accent"></span>'
+        + '<span class="template-thumb-palette"><span class="template-thumb-swatch" style="background:#' + displayVisual.primary + ';"></span><span class="template-thumb-swatch" style="background:#' + displayVisual.accent + ';"></span><span class="template-thumb-swatch" style="background:#' + displayVisual.title + ';"></span></span>'
         + '</span>'
         + '<span class="template-card-meta"><span>' + escapeHtml(categoryName) + '</span><span>' + escapeHtml(displayTheme.name || displayTheme.id || displayTheme) + '</span></span>'
         + '</button>';
@@ -1650,6 +1659,22 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         body: normalizeHexColor(visual.body, "475569"),
         layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "red-gold"].includes(visual.layout) ? visual.layout : "top-band"
       };
+    }
+    function resolveTemplateCardVisual(baseVisual, theme, fallbackVisual) {
+      if (!theme || !theme.visual) return fallbackVisual;
+      const merged = {
+        ...baseVisual,
+        primary: normalizeHexColor(theme.visual.primary, baseVisual.primary),
+        accent: normalizeHexColor(theme.visual.accent, baseVisual.accent),
+        background: normalizeHexColor(theme.visual.background, baseVisual.background),
+        surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
+        title: normalizeHexColor(theme.visual.title, baseVisual.title),
+        body: normalizeHexColor(theme.visual.body, baseVisual.body),
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "red-gold"].includes(theme.visual.layout)
+          ? theme.visual.layout
+          : baseVisual.layout,
+      };
+      return merged;
     }
     function normalizeHexColor(value, fallback) {
       const normalized = String(value || "").replace(/^#/, "").trim().toUpperCase();

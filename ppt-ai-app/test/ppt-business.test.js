@@ -1602,6 +1602,18 @@ test("HTTP API preview reflects business minimal theme layout override", async (
     assert.equal(preview.status, 200);
     assert.match(html, /data-layout="top-band"/);
     assert.match(html, /--template-accent:#6B7280/);
+    assert.match(html, /class="top-band-cover-glow"/);
+    assert.match(html, /class="top-band-cover-kicker"/);
+    assert.match(html, /class="top-band-cover-frame"/);
+    assert.match(html, /class="top-band-cover-sheen"/);
+    assert.match(html, /class="top-band-cover-label"/);
+    assert.match(html, /class="top-band-cover-title"/);
+    assert.match(html, /class="top-band-content-title"/);
+    assert.match(html, /class="top-band-cover-bullets"/);
+    assert.match(html, /class="top-band-content-bullets"/);
+    assert.match(html, /class="top-band-content-rail"/);
+    assert.match(html, /class="top-band-content-wave"/);
+    assert.match(html, /class="top-band-content-rule"/);
     assert.match(html, /class="top-band-ribbon"/);
     assert.match(html, /class="top-band-page-chip"/);
     assert.match(html, />01<\//);

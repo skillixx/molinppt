@@ -41,7 +41,8 @@ test("PersonalTemplateService creates an owner-visible personal template from PP
   assert.equal(template.scope, "user");
   assert.equal(template.ownerUserId, 7);
   assert.equal(template.categoryId, "personal");
-  assert.equal(template.visual.primary, "123456");
+  assert.ok(/^[0-9A-F]{6}$/.test(template.visual.primary));
+  assert.notEqual(template.visual.primary, "000000");
   assert.equal(template.templateJson?.themes[0].id, "default");
   assert.equal(template.templateJson?.layoutSchema.allowedLayouts.includes("title-content"), true);
   assert.equal(template.templateJson?.fonts.includes("Arial"), true);

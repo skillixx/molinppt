@@ -69,16 +69,34 @@ test("PptExportService uses dedicated top-band decorations for business minimal 
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
   assert.match(slide1, /name="Top Band Surface"/);
   assert.match(slide1, /name="Primary Rail"/);
   assert.match(slide1, /name="Top Band Outline"/);
+  assert.match(slide1, /name="Top Band Hero Halo"/);
+  assert.match(slide1, /name="Top Band Cover Accent Band"/);
+  assert.match(slide1, /name="Top Band Cover Glow"/);
+  assert.match(slide1, /name="Top Band Cover Focus Frame"/);
+  assert.match(slide1, /name="Top Band Cover Detail Stripe"/);
   assert.match(slide1, /name="Top Band Accent Ribbon"/);
   assert.match(slide1, /name="Top Band Side Cap"/);
   assert.match(slide1, /name="Top Band Index Ring"/);
   assert.match(slide1, /name="Top Band Ring Number"/);
   assert.match(slide1, /name="Top Band Footer"/);
   assert.match(slide1, /name="Section Label"/);
+  assert.match(slide2, /name="Top Band Content Divider"/);
+  assert.match(slide2, /name="Top Band Content Accent Band"/);
+  assert.match(slide1, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="2000"/);
+  assert.match(slide1, /name="Content 2"[\s\S]*?<a:t>Revenue grew<\/a:t>/);
+  assert.match(slide2, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="1860"/);
+  assert.match(slide2, /name="Content 2"[\s\S]*?<a:t>Launch pilot<\/a:t>/);
+  const coverTitleBlock = slide1.match(/name="Title 1"[\s\S]*?<\/p:txBody><\/p:sp>/)?.[0] || "";
+  const contentTitleBlock = slide2.match(/name="Title 1"[\s\S]*?<\/p:txBody><\/p:sp>/)?.[0] || "";
+  const coverTitleSize = Number((coverTitleBlock.match(/a:rPr[^>]* sz="(\d+)"/) || [])[1]);
+  const contentTitleSize = Number((contentTitleBlock.match(/a:rPr[^>]* sz="(\d+)"/) || [])[1]);
+  assert.equal(coverTitleSize > contentTitleSize, true);
+  assert.equal(coverTitleSize, 5200);
 });
 
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {

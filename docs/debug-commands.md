@@ -360,17 +360,39 @@ npm run ops:cleanup-storage -- --dry-run
 find /home/pc-w1/ppt/templates/official -maxdepth 2 -type f | sort
 ```
 
-未来官方模板同步命令建议：
+官方模板同步命令建议：
 
 ```bash
 npm run seed:official-template-categories
 npm run seed:official-templates
 ```
 
-未来 manifest 校验命令建议：
+官方模板目录预检（不写库）：
 
 ```bash
-npm run validate:official-templates
+cd /home/pc-w1/ppt/ppt-ai-app
+npm run list:official-templates
+```
+
+JSON 输出（脚本化检查）：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+npm run list:official-templates -- --json | node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync(0, 'utf8')); console.log(data.filter((item) => item.usable).length + '/' + data.length);"
+```
+
+模板清单和文件完整性快速校验（替代单独 validate 脚本）：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+node --env-file=.env --input-type=module -e "import fs from 'node:fs'; const data=JSON.parse(fs.readFileSync('data/ppt-ai-db.json','utf8')); const official=(data.templates||[]).filter(t=>t.scope==='official'); console.log(JSON.stringify(official.map(t=>({slug:t.slug,name:t.name,status:t.status,categoryId:t.categoryId})),null,2));"
+```
+
+也可以直接运行官方模板回归测试：
+
+```bash
+cd /home/pc-w1/ppt/ppt-ai-app
+npm test -- test/official-templates.test.js
 ```
 
 ## 9. 真实 Moling 联调
