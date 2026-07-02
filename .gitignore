@@ -2,8 +2,10 @@
 worktrees/
 .env
 .env.*
+!.env.example
 ppt-ai-app/.env
 ppt-ai-app/.env.*
+!ppt-ai-app/.env.example
 ppt-ai-app/data/
 ppt-ai-app/test-results/
 data/

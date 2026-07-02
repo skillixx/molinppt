@@ -197,6 +197,7 @@ export class HttpAiProvider {
 }
 
 const OPENAI_SYSTEM_PROMPT = "You are an internal PPT generation service. Return only JSON, no markdown. Include exactly one top-level field for the requested operation.";
+const DESIGN_SKILL_SYSTEM_PROMPT = "If input.designSkill is present, follow its role, rules and antiPatterns before producing JSON. Prefer varied professional PPT structures over repetitive three-bullet slides.";
 
 /**
  * Builds the body sent to the configured provider.
@@ -212,7 +213,7 @@ function buildRequestPayload(body, model, useChatCompletionsPayload) {
   const operationInstruction = buildOperationInstruction(body.operation);
   const request = {
     messages: [
-      { role: "system", content: `${OPENAI_SYSTEM_PROMPT}\n${operationInstruction}` },
+      { role: "system", content: `${OPENAI_SYSTEM_PROMPT}\n${DESIGN_SKILL_SYSTEM_PROMPT}\n${operationInstruction}` },
       { role: "user", content: JSON.stringify(body) },
     ],
   };

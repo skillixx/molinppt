@@ -62,6 +62,11 @@ export function loadConfig(env = process.env) {
       accessKeyId: env.STORAGE_ACCESS_KEY_ID || "",
       secretAccessKey: env.STORAGE_SECRET_ACCESS_KEY || "",
     },
+    preview: {
+      rendererCommand: env.PPT_PREVIEW_RENDERER_COMMAND || "",
+      imageRendererCommand: env.PPT_PREVIEW_IMAGE_RENDERER_COMMAND || "",
+      rendererTimeoutMs: readPositiveInteger(env.PPT_PREVIEW_RENDERER_TIMEOUT_MS, 30_000, "PPT_PREVIEW_RENDERER_TIMEOUT_MS"),
+    },
     logging: {
       level: env.LOG_LEVEL || "info",
     },

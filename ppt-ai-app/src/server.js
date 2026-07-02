@@ -12,6 +12,7 @@ import { LocalMolingClient, MolingClient } from "./moling-client.js";
 import { PersonalTemplateService } from "./personal-template-service.js";
 import { PromptManager } from "./prompt-manager.js";
 import { PptExportService } from "./ppt-exporter.js";
+import { LibreOfficePptPreviewRenderer } from "./ppt-preview-renderer.js";
 import { PptService } from "./ppt-service.js";
 import { MemoryTaskCenter } from "./tasks.js";
 import { TemplateManager } from "./templates.js";
@@ -66,6 +67,12 @@ const pptService = new PptService({
   aiProvider,
   promptManager: new PromptManager(),
   exporter: new PptExportService(),
+  pptPreviewRenderer: new LibreOfficePptPreviewRenderer({
+    command: config.preview.rendererCommand,
+    imageCommand: config.preview.imageRendererCommand,
+    timeoutMs: config.preview.rendererTimeoutMs,
+    logger,
+  }),
   billingClient,
   metrics,
 });

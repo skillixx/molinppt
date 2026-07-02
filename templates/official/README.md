@@ -69,21 +69,7 @@ npm run seed:official-templates
 - `OFFICIAL_TEMPLATES_DIR`：默认仓库根目录下 `templates/official`。
   - 从 `ppt-ai-app/` 目录运行命令时，建议显式传 `OFFICIAL_TEMPLATES_DIR='../templates/official'`。
 
-当前仓库内目前可直接接入的开源模板源：
-
-- `open-city-template`
-  - GitHub：`https://github.com/burkeholland/powerpoints`
-  - 许可：`MIT`
-- `open-powerpoint-sample`
-  - GitHub：`https://github.com/Suparnapaul393/PowerPoint-Sample`
-  - 许可：`Apache-2.0`
-
-可直接复用且建议先做验收的模板文件：
-
-- `burkeholland/powerpoints`
-  - `city-template.pptx`
-- `Suparnapaul393/PowerPoint-Sample`
-  - `Journey.pptx`
+当前仓库内不再内置开源样例模板。新增官方模板时，请按上方目录结构补充 `manifest.json`、`template.json`、源 PPTX 和缩略图后再执行同步命令。
   - `Journey1.pptx`
   - `PowerPoint skill Test.pptx`
   - `suparna.pptx`

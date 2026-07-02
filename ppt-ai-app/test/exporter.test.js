@@ -4,7 +4,10 @@ import { test } from "node:test";
 import { PptExportService } from "../src/ppt-exporter.js";
 
 const deck = {
+  id: "deck-abcdef123456",
   title: "Executive Review",
+  templateId: "business",
+  createdAt: "2026-07-02T10:20:00.000Z",
   slides: [
     { title: "Overview", bullets: ["Revenue grew", "Retention improved"] },
     { title: "Next Steps", bullets: ["Launch pilot"] },
@@ -17,7 +20,7 @@ test("PptExportService creates a PPTX zip package with presentation parts", () =
   const text = result.content.toString("latin1");
 
   assert.equal(result.content.subarray(0, 2).toString("utf8"), "PK");
-  assert.equal(result.fileName, "Executive_Review.pptx");
+  assert.equal(result.fileName, "PPT-Executive-Review-business-2p-20260702-1820-123456.pptx");
   assert.match(text, /\[Content_Types\]\.xml/);
   assert.match(text, /ppt\/presentation\.xml/);
   assert.match(text, /ppt\/slides\/slide1\.xml/);
@@ -49,14 +52,14 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   const businessText = business.content.toString("latin1");
   const pitchText = pitch.content.toString("latin1");
 
-  assert.match(businessText, /name="Moling Executive Business"/);
+  assert.match(businessText, /name="Moling Theme"/);
   assert.match(businessText, /val="1F4E79"/);
   assert.match(businessText, /name="Lower Gold Wave"/);
   assert.match(businessText, /name="Dome Gold Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
   assert.match(businessText, /name="Dome Light Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
   assert.match(businessText, /name="Content Placement Card"/);
   assert.match(businessText, /name="Right Golden Motif"/);
-  assert.match(pitchText, /name="Moling Venture Pitch"/);
+  assert.match(pitchText, /name="Moling Theme"/);
   assert.match(pitchText, /val="111827"/);
   assert.notEqual(businessText, pitchText);
 });
@@ -367,7 +370,7 @@ test("PptExportService creates a minimal PDF document with xref and trailer", ()
   const result = exporter.exportDeck({ deck, format: "pdf" });
   const text = result.content.toString("utf8");
 
-  assert.equal(result.fileName, "Executive_Review.pdf");
+  assert.equal(result.fileName, "PPT-Executive-Review-business-2p-20260702-1820-123456.pdf");
   assert.match(text, /^%PDF-1\.4/);
   assert.match(text, /xref/);
   assert.match(text, /trailer/);

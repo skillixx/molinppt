@@ -38,6 +38,9 @@ test("loadConfig reads every framework setting from environment variables", () =
     SESSION_COOKIE_SECURE: "false",
     RATE_LIMIT_MAX_REQUESTS: "42",
     RATE_LIMIT_WINDOW_MS: "30000",
+    PPT_PREVIEW_RENDERER_COMMAND: "C:\\Program Files\\LibreOffice\\program\\soffice.exe",
+    PPT_PREVIEW_IMAGE_RENDERER_COMMAND: "C:\\poppler\\bin\\pdftoppm.exe",
+    PPT_PREVIEW_RENDERER_TIMEOUT_MS: "45000",
   });
 
   assert.equal(config.app.port, 5180);
@@ -65,6 +68,9 @@ test("loadConfig reads every framework setting from environment variables", () =
   assert.equal(config.ai.imageApiUrl, "http://image.test/generate");
   assert.equal(config.ai.imageApiKey, "image-key");
   assert.equal(config.ai.imageModel, "image-model");
+  assert.equal(config.preview.rendererCommand, "C:\\Program Files\\LibreOffice\\program\\soffice.exe");
+  assert.equal(config.preview.imageRendererCommand, "C:\\poppler\\bin\\pdftoppm.exe");
+  assert.equal(config.preview.rendererTimeoutMs, 45000);
 });
 
 test("loadConfig secures session cookies by default in production", () => {
@@ -122,6 +128,9 @@ test("loadConfig treats empty numeric env values as defaults", () => {
   assert.equal(config.ai.imageProvider, "none");
   assert.equal(config.limits.rateLimitMaxRequests, 120);
   assert.equal(config.limits.rateLimitWindowMs, 60_000);
+  assert.equal(config.preview.rendererCommand, "");
+  assert.equal(config.preview.imageRendererCommand, "");
+  assert.equal(config.preview.rendererTimeoutMs, 30_000);
 });
 
 test("loadConfig rejects missing required secrets", () => {

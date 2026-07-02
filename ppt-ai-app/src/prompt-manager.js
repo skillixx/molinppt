@@ -1,3 +1,5 @@
+import { loadPptDesignMasterSkill } from "./ppt-design-skill.js";
+
 const DOME_LAYOUT_ROLES = [
   "cover",
   "agenda",
@@ -18,16 +20,18 @@ const DOME_LAYOUT_ROLES = [
 export class PromptManager {
   /**
    * 构建大纲生成提示词。
-   * @param {{topic?: string, documentText?: string, slideCount: number, theme?: string}} input
+   * @param {{topic?: string, documentText?: string, slideCount: number, theme?: string, template?: object}} input
    * @returns {object}
    */
-  buildOutlinePrompt({ topic, documentText, slideCount, theme }) {
+  buildOutlinePrompt({ topic, documentText, slideCount, theme, template }) {
     return {
       kind: "outline",
       topic: topic || "Document generated presentation",
       documentText: documentText || "",
       slideCount,
       theme: theme || "modern",
+      templateContext: buildTemplateContext(template),
+      designSkill: loadPptDesignMasterSkill("outline"),
     };
   }
 
@@ -42,6 +46,7 @@ export class PromptManager {
       kind: "deck",
       outline,
       template,
+      designSkill: loadPptDesignMasterSkill("deck"),
       templateInstructions: buildTemplateInstructions(template),
     };
   }
@@ -56,8 +61,25 @@ export class PromptManager {
       kind: "regenerate_slide",
       slide,
       instruction,
+      designSkill: loadPptDesignMasterSkill("regenerate_slide"),
     };
   }
+}
+
+/**
+ * 为大纲阶段提供轻量模板上下文，帮助模型提前规划差异化页面结构。
+ * @param {object | undefined} template
+ * @returns {object}
+ */
+function buildTemplateContext(template) {
+  if (!template) return {};
+  return {
+    id: template.id,
+    name: template.name,
+    categoryId: template.categoryId,
+    allowedLayouts: Array.isArray(template?.layoutSchema?.allowedLayouts) ? template.layoutSchema.allowedLayouts : [],
+    visualLayout: template?.visual?.layout || "",
+  };
 }
 
 /**

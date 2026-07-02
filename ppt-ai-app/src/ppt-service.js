@@ -18,7 +18,7 @@ const DOME_PREVIEW_ASSETS = {
 const GENERATE_AMOUNT = "6";
 const REGENERATE_SLIDE_AMOUNT = "2";
 const MIN_SLIDE_COUNT = 1;
-const MAX_SLIDE_COUNT = 20;
+const MAX_SLIDE_COUNT = 32;
 const SLIDE_GENERATION_MAX_ATTEMPTS = 2;
 const MAX_ACTIVE_PPT_ASSETS = 100;
 const MAX_PROMPT_CHARS = 5000;
@@ -90,9 +90,9 @@ function hexToRgbString(hex) {
 export class PptService {
   /**
    * Creates a PPT workflow service.
-   * @param {{database: object, storage: object, taskCenter: object, templateManager: object, aiProvider: object, promptManager: object, exporter: object, billingClient: object, metrics?: object, generationLocks?: Set<string>}} input
+   * @param {{database: object, storage: object, taskCenter: object, templateManager: object, aiProvider: object, promptManager: object, exporter: object, billingClient: object, metrics?: object, generationLocks?: Set<string>, pptPreviewRenderer?: object}} input
    */
-  constructor({ database, storage, taskCenter, templateManager, aiProvider, promptManager, exporter, billingClient, metrics, generationLocks }) {
+  constructor({ database, storage, taskCenter, templateManager, aiProvider, promptManager, exporter, billingClient, metrics, generationLocks, pptPreviewRenderer }) {
     this.database = database;
     this.storage = storage;
     this.taskCenter = taskCenter;
@@ -103,6 +103,7 @@ export class PptService {
     this.billingClient = billingClient;
     this.metrics = metrics;
     this.generationLocks = generationLocks || new Set();
+    this.pptPreviewRenderer = pptPreviewRenderer;
   }
 
   /**
@@ -115,7 +116,7 @@ export class PptService {
     const documentText = sourceFileId ? await this.#readDocumentText({ sourceFileId, ownerUserId }) : "";
     const template = this.templateManager.getTemplate(templateId, { ownerUserId });
     validateTemplateTheme({ template, theme });
-    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme });
+    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme, template });
     this.#assertPromptWithinLimit({ operation: "outline", prompt });
     let slides;
     try {
@@ -500,6 +501,15 @@ export class PptService {
   async previewDeck({ ownerUserId, deckId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
+    if (this.pptPreviewRenderer) {
+      const pptx = this.exporter.exportDeck({ deck, format: "pptx" });
+      const rendered = await this.pptPreviewRenderer.render({
+        deck,
+        pptx: pptx.content,
+        fileName: pptx.fileName,
+      });
+      if (rendered) return rendered;
+    }
     const visual = resolveTemplateVisual({
       templateId: deck.templateId,
       theme: deck.theme,
@@ -879,9 +889,10 @@ function escapeHtml(value) {
  */
 function renderDeckPreview({ deck, visual }) {
   const slides = deck.slides.map((slide, index) => {
+    const isDomeLayout = visual.layout === "red-gold";
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
     // dome 模板允许任意页显式声明封面/结束版式，预览 class 必须跟随角色才能套用帆船背景。
-    const slideKind = visual.layout === "red-gold" && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "content";
+    const slideKind = isDomeLayout && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "content";
     const renderBodyList = shouldRenderDomePreviewBodyList(visual, domeRole);
     const bullets = renderBodyList
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
@@ -895,7 +906,7 @@ function renderDeckPreview({ deck, visual }) {
         ? `<ul class="${index === 0 ? "top-band-cover-bullets" : "top-band-content-bullets"}">${bullets}</ul>`
         : `<ul>${bullets}</ul>`
       : "";
-    const topBandBrand = visual.layout === "top-band" ? `${escapeHtml(visual.name)}${index === 0 ? " / EXECUTIVE" : ""}` : "";
+    const topBandBrand = "";
     const topBandMark = visual.layout === "top-band"
       ? (
           `${index === 0
@@ -908,7 +919,10 @@ function renderDeckPreview({ deck, visual }) {
         )
       : "";
     const topBandHeadingClass = topBandTitleClass ? ` class="${topBandTitleClass}"` : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    const domeChrome = isDomeLayout
+      ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
+      : "";
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${domeChrome}<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title><style>
@@ -992,24 +1006,26 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-canvas-frame{position:absolute;left:4%;top:4%;right:4%;bottom:4%;z-index:2;pointer-events:none;border:1px solid rgba(var(--dome-frame-stroke-rgb),.38);border-radius:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);}
     body[data-layout="red-gold"] .dome-canvas-frame::before{content:"";position:absolute;inset:12px;pointer-events:none;background:radial-gradient(circle at 18% 14%,rgba(255,255,255,.08),transparent 38%);mix-blend-mode:screen;opacity:.55;}
     body[data-layout="red-gold"] .dome-canvas-frame::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:0 0 24px 4px rgba(var(--dome-accent-rgb),.08);pointer-events:none;}
+    body[data-layout="red-gold"] .dome-content-frame{left:6.67%;top:8.89%;width:86.67%;height:82.07%;z-index:2;border:1px solid rgba(var(--dome-frame-stroke-rgb),.50);}
+    body[data-layout="red-gold"] .dome-content-surface{left:10%;top:17.8%;width:78.3%;height:66.7%;z-index:1;border-radius:58px;background:var(--dome-content-panel);box-shadow:0 20px 44px rgba(var(--dome-soft-rgb),.16);border:1px solid rgba(var(--dome-card-stroke-rgb),.45);}
     body[data-layout="red-gold"] .slide-content>*{z-index:2;}
-    body[data-layout="red-gold"] .slide:not(.slide-cover){padding:12% 12% 10%;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover){padding:0;}
     body[data-layout="red-gold"] .slide:not(.slide-cover)::before{background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 42%),repeating-linear-gradient(115deg,rgba(var(--dome-accent-rgb),.05) 0 1px,transparent 1px 42px);}
     body[data-layout="red-gold"] .slide:not(.slide-cover)::after{inset:12% 7.5% 16%;height:auto;border-radius:20px;background:rgba(var(--dome-accent-rgb),.045);box-shadow:0 22px 42px rgba(var(--dome-soft-rgb),.16);}
-    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content{align-content:start;justify-items:start;text-align:left;}
-    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::before{content:"BUSINESS REPORT";left:0;top:-12%;bottom:auto;color:var(--template-accent);font-size:12px;font-weight:800;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content{position:absolute;inset:0;display:block;text-align:left;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::before{content:"BUSINESS REPORT";left:15%;top:44.7%;bottom:auto;color:var(--template-accent);font-size:12px;font-weight:800;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::after{display:none;}
-    body[data-layout="red-gold"] .slide:not(.slide-cover) h2{max-width:66%;font-size:42px;color:var(--template-title);text-shadow:none;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) h2{position:absolute;left:15%;top:23.7%;width:47.5%;max-width:none;margin:0;font-size:42px;color:var(--template-title);text-shadow:none;}
     /* 顶部卡片版式(image-report/showcase/retrospective)标题不再被内层块垂直居中压住卡片:置顶 + 浅色可读。 */
-    body[data-layout="red-gold"] .slide[data-dome-role="image-report"].slide-content,
-    body[data-layout="red-gold"] .slide[data-dome-role="showcase"].slide-content,
-    body[data-layout="red-gold"] .slide[data-dome-role="retrospective"].slide-content{align-content:start;}
+    body[data-layout="red-gold"] .slide[data-dome-role="image-report"] .slide-content,
+    body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .slide-content,
+    body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .slide-content{align-content:start;}
     body[data-layout="red-gold"] .slide[data-dome-role="image-report"] .slide-content h2,
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .slide-content h2,
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .slide-content h2{color:var(--dome-surface-text);text-shadow:0 6px 16px rgba(var(--dome-primary-rgb),.28);}
-    body[data-layout="red-gold"] .slide:not(.slide-cover) ul{max-width:64%;font-size:21px;color:var(--template-body);}
-    body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;right:11%;top:30%;width:7.8%;height:34%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(var(--dome-accent-rgb),.18);}
-    body[data-layout="red-gold"] .dome-role-visual{position:absolute;z-index:2;right:10.5%;top:27%;width:24%;height:35%;border-radius:10px;background:var(--dome-business-1) center/cover no-repeat;box-shadow:0 18px 30px rgba(var(--dome-accent-rgb),.22);overflow:hidden;}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) ul{position:absolute;left:16.7%;top:41.5%;width:53.3%;max-width:none;font-size:21px;color:var(--template-body);}
+    body[data-layout="red-gold"] .slide:not(.slide-cover) .motif{display:block;left:75.83%;top:35.56%;width:8.33%;height:35.56%;border-radius:12px;background:var(--template-accent);box-shadow:0 18px 28px rgba(var(--dome-accent-rgb),.18);}
+    body[data-layout="red-gold"] .dome-role-visual{position:absolute;z-index:2;left:60%;top:29.63%;width:23.33%;height:35.56%;border-radius:10px;background:var(--dome-business-1) center/cover no-repeat;box-shadow:0 18px 30px rgba(var(--dome-accent-rgb),.22);overflow:hidden;}
     body[data-layout="red-gold"] .dome-role-decor{position:absolute;z-index:3;pointer-events:none;}
     body[data-layout="red-gold"] .dome-wave-arc{z-index:2;border-radius:50%;border-top-style:solid;border-left:0;border-right:0;border-bottom:0;background:transparent;}
     body[data-layout="red-gold"] .dome-wave-arc.dome-wave-gold{left:-7%;bottom:7.8%;width:54%;height:25%;border-top-width:8px;border-top-color:rgba(var(--dome-accent-rgb),.92);}
@@ -1022,8 +1038,8 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-section-number{left:50%;top:32%;transform:translateX(-50%);color:var(--dome-surface-text);font-size:28px;font-weight:900;letter-spacing:0;text-shadow:0 10px 22px rgba(var(--dome-primary-rgb),.24);}
     body[data-layout="red-gold"] .dome-section-divider-line{left:37.5%;right:37.5%;top:53.5%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(var(--dome-primary-rgb),.20);}
     body[data-layout="red-gold"] .dome-section-label{left:12%;top:13%;color:var(--template-accent);font-size:12px;font-weight:800;letter-spacing:0;}
-    body[data-layout="red-gold"] .dome-step-connector{left:14%;right:14%;bottom:36%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(var(--dome-accent-rgb),.14);z-index:2;}
-    body[data-layout="red-gold"] .dome-step-row{left:12%;right:12%;bottom:26%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="red-gold"] .dome-step-connector{left:15%;top:65.2%;width:71.67%;height:3px;background:var(--template-accent);box-shadow:0 8px 16px rgba(var(--dome-accent-rgb),.14);z-index:2;}
+    body[data-layout="red-gold"] .dome-step-row{left:13.33%;right:auto;top:56.3%;width:72%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
     body[data-layout="red-gold"] .dome-step-card,.dome-metric-card{position:relative;border-radius:12px;background:var(--dome-card-fill);box-shadow:0 12px 22px rgba(var(--dome-accent-rgb),.16);padding:16px;color:var(--template-title);font-weight:800;text-align:center;display:grid;gap:8px;align-content:center;min-width:0;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
     body[data-layout="red-gold"] .dome-card-index{display:block;font-size:20px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-card-text{display:block;font-size:14px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
@@ -1031,28 +1047,32 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .dome-next-plan-action{display:block;font-size:13px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
     body[data-layout="red-gold"] .dome-metric-value{display:block;font-size:26px;line-height:1;color:var(--template-title);font-weight:900;}
     body[data-layout="red-gold"] .dome-metric-label{display:block;font-size:13px;line-height:1.25;color:var(--template-body);overflow-wrap:anywhere;}
-    body[data-layout="red-gold"] .dome-metric-grid{left:12%;right:34%;bottom:25%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
-    body[data-layout="red-gold"] .dome-image-report-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="red-gold"] .dome-metric-grid{left:13.33%;top:50.4%;width:60%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="red-gold"] .dome-image-report-grid{left:13.33%;top:47.4%;width:36.67%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-image-report-card{position:relative;border-radius:12px;background:var(--dome-card-fill);box-shadow:0 12px 20px rgba(var(--dome-accent-rgb),.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;gap:6px;align-content:center;min-width:0;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
     body[data-layout="red-gold"] .dome-image-report-card:nth-child(even){background:var(--dome-card-fill-strong);}
-    body[data-layout="red-gold"] .dome-showcase-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="red-gold"] .dome-showcase-grid{left:13.33%;top:47.4%;width:36.67%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-showcase-card{position:relative;border-radius:12px;background:var(--dome-card-fill);box-shadow:0 12px 20px rgba(var(--dome-accent-rgb),.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;min-width:0;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
     body[data-layout="red-gold"] .dome-showcase-number{font-size:16px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-showcase-text{font-size:14px;line-height:1.25;overflow-wrap:anywhere;min-width:0;}
     body[data-layout="red-gold"] .dome-showcase-card:nth-child(even){background:var(--dome-card-fill-strong);}
-    body[data-layout="red-gold"] .dome-retrospective-grid{left:12%;top:47%;width:36%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="red-gold"] .dome-retrospective-grid{left:13.33%;top:47.4%;width:36.67%;display:grid;grid-template-columns:1fr;gap:10px;}
     body[data-layout="red-gold"] .dome-retrospective-card{position:relative;border-radius:12px;background:var(--dome-card-fill);box-shadow:0 12px 20px rgba(var(--dome-accent-rgb),.14);padding:13px 16px;color:var(--template-title);font-weight:800;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;min-width:0;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
     body[data-layout="red-gold"] .dome-retrospective-label{font-size:13px;line-height:1;color:var(--template-title);}
     body[data-layout="red-gold"] .dome-retrospective-card:nth-child(even){background:var(--dome-card-fill-strong);}
-    body[data-layout="red-gold"] .dome-risk-card{right:10.5%;bottom:25%;width:24%;border-radius:12px;background:var(--dome-card-fill-strong);padding:16px;color:var(--template-title);font-size:18px;font-weight:800;text-align:center;box-shadow:0 14px 22px rgba(var(--dome-accent-rgb),.18);display:grid;place-items:center;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
-    body[data-layout="red-gold"] .dome-plan-timeline{left:13%;right:13%;bottom:33%;height:3px;background:var(--template-accent);}
+    body[data-layout="red-gold"] .dome-risk-card{left:60%;top:62.2%;width:23.33%;height:11.85%;border-radius:12px;background:var(--dome-card-fill-strong);padding:16px;color:var(--template-title);font-size:18px;font-weight:800;text-align:center;box-shadow:0 14px 22px rgba(var(--dome-accent-rgb),.18);display:grid;place-items:center;border:1px solid rgba(var(--dome-card-stroke-rgb),.48);}
+    body[data-layout="red-gold"] .dome-plan-timeline{left:13.33%;top:47.4%;width:70%;height:3px;background:var(--template-accent);}
     body[data-layout="red-gold"] .dome-closing-subtitle{left:50%;top:58%;transform:translateX(-50%);width:42%;color:var(--dome-surface-text);font-size:16px;font-weight:800;text-align:center;text-shadow:0 10px 22px rgba(var(--dome-primary-rgb),.24);}
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .dome-role-visual{background-image:var(--dome-business-2);}
     body[data-layout="red-gold"] .slide[data-dome-role="three-steps"] .dome-role-visual{background-image:var(--dome-business-3);}
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .dome-role-visual{background-image:var(--dome-business-3);}
     body[data-layout="red-gold"] .slide[data-dome-role="four-steps"] .dome-role-visual{background-image:var(--dome-business-4);}
     body[data-layout="red-gold"] .slide[data-dome-role="next-plan"] .dome-role-visual{background-image:var(--dome-business-6);}
-    body[data-layout="red-gold"] .slide[data-dome-role="metrics"] .dome-role-visual{background-image:var(--dome-business-5);top:24%;height:28%;}
+    body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .dome-role-visual{left:58.33%;top:26.67%;width:26.67%;height:35.56%;}
+    body[data-layout="red-gold"] .slide[data-dome-role="three-steps"] .dome-role-visual,
+    body[data-layout="red-gold"] .slide[data-dome-role="four-steps"] .dome-role-visual,
+    body[data-layout="red-gold"] .slide[data-dome-role="next-plan"] .dome-role-visual{left:65%;top:26.67%;width:20%;height:23.7%;}
+    body[data-layout="red-gold"] .slide[data-dome-role="metrics"] .dome-role-visual{background-image:var(--dome-business-5);left:65%;top:26.67%;width:20%;height:23.7%;}
     body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
     body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
@@ -1085,6 +1105,28 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 }
 
 /**
+ * 渲染与 PPTX 导出端 Content Placement Card 对齐的内容承载面。
+ * 这些角色在导出文件里都有白色圆角大面板，预览端也必须输出同层级结构，避免用户看到的页面和下载 PPTX 不一致。
+ * @param {string} role
+ * @returns {string}
+ */
+function renderDomePreviewContentSurface(role) {
+  if (!["image-report", "three-steps", "four-steps", "metrics", "showcase", "retrospective", "next-plan"].includes(role)) return "";
+  return `<div class="dome-role-decor dome-content-surface"></div>`;
+}
+
+/**
+ * 渲染与 PPTX 导出端 Dome Content Frame 对齐的内容内框。
+ * 导出端除封面/结束页外都会写入该框线，预览端同步输出，避免用户看到的边框层级和 WPS 打开的 PPTX 不一致。
+ * @param {string} role
+ * @returns {string}
+ */
+function renderDomePreviewContentFrame(role) {
+  if (["cover", "closing"].includes(role)) return "";
+  return `<div class="dome-role-decor dome-content-frame"></div>`;
+}
+
+/**
  * 渲染 dome 预览页脚装饰。
  * PPTX 导出每页都会生成 Dome Footer Decoration，预览端也显式输出同名视觉层，避免预览和导出不一致。
  * @param {object} visual
@@ -1092,7 +1134,7 @@ function shouldRenderDomePreviewBodyList(visual, role) {
  */
 function renderDomePreviewFooter(visual) {
   if (visual.layout !== "red-gold") return "";
-  return `<div class="dome-role-decor dome-footer-decoration">商务办公系列 PPT 模板</div>`;
+  return `<div class="dome-role-decor dome-footer-decoration"></div>`;
 }
 
 /**

@@ -77,6 +77,49 @@ test("PptService completes topic to outline to editable deck to PPTX/PDF with bi
   assert.equal((await context.database.find("call_logs")).length >= 5, true);
 });
 
+test("PptService prefers rendered PPTX preview when a renderer is available", async () => {
+  const renderCalls = [];
+  const pptPreviewRenderer = {
+    render: async (input) => {
+      renderCalls.push(input);
+      return "<!doctype html><body data-preview-source=\"rendered-pptx\">真实 PPTX</body>";
+    },
+  };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Rendered preview source",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /data-preview-source="rendered-pptx"/);
+  assert.equal(renderCalls.length, 1);
+  assert.equal(renderCalls[0].deck.id, deck.id);
+  assert.equal(Buffer.isBuffer(renderCalls[0].pptx), true);
+  assert.match(renderCalls[0].fileName, /\.pptx$/);
+});
+
+test("PptService falls back to HTML preview when PPTX renderer is unavailable", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Fallback preview source",
+    slideCount: 2,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /Fallback preview source/);
+  assert.doesNotMatch(preview, /data-preview-source="rendered-pptx"/);
+});
+
 test("PptService returns provider failure for outline generation as AI_PROVIDER_FAILED", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.generateOutline = async () => {
@@ -859,7 +902,7 @@ test("PptService enforces slide count and template theme rules", async () => {
     () => context.pptService.generateOutline({
       ownerUserId: 7,
       topic: "Too long",
-      slideCount: 21,
+      slideCount: 33,
       templateId: "business",
       theme: "modern",
     }),
@@ -1121,6 +1164,52 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
   assert.match(prompt.templateInstructions?.roleHints?.["next-plan"] || "", /阶段: 动作/);
   assert.match(prompt.templateInstructions?.roleHints?.closing || "", /必须使用结束页副标题占位/);
   assert.match(prompt.templateInstructions?.contentContract || "", /不要生成普通项目符号列表/);
+});
+
+test("PromptManager auto-loads PPT design master skill for outline, deck, and slide polish", () => {
+  const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
+  const manager = new PromptManager();
+  const outlinePrompt = manager.buildOutlinePrompt({
+    topic: "季度经营复盘",
+    slideCount: 6,
+    theme: "modern",
+    template,
+  });
+  const deckPrompt = manager.buildDeckPrompt({
+    outline: { topic: "季度经营复盘", theme: "modern", slides: [{ title: "增长概览", bullets: ["收入增长 18%"] }] },
+    template,
+  });
+  const polishPrompt = manager.buildRegenerateSlidePrompt({
+    slide: { id: "slide_1", title: "增长概览", bullets: ["收入增长 18%"] },
+    instruction: "强化专业表达",
+  });
+
+  assert.equal(outlinePrompt.designSkill.id, "ppt-design-master");
+  assert.equal(deckPrompt.designSkill.id, "ppt-design-master");
+  assert.equal(polishPrompt.designSkill.id, "ppt-design-master");
+  assert.match(outlinePrompt.designSkill.rules.join("\n"), /避免固定三段式/);
+  assert.match(outlinePrompt.designSkill.rules.join("\n"), /避免从三段式滑向四段式卡片堆砌/);
+  assert.match(outlinePrompt.designSkill.rules.join("\n"), /至少 25% 的内容页应该是详情展开页/);
+  assert.match(outlinePrompt.designSkill.rules.join("\n"), /知识点详情挖掘页/);
+  assert.match(outlinePrompt.designSkill.rules.join("\n"), /侧重点/);
+  assert.match(deckPrompt.designSkill.rules.join("\n"), /版式化表达/);
+  assert.match(deckPrompt.designSkill.rules.join("\n"), /detail-analysis/);
+  assert.match(deckPrompt.designSkill.rules.join("\n"), /knowledge-detail/);
+  assert.match(deckPrompt.designSkill.rules.join("\n"), /40-80 字重点解释/);
+  assert.match(polishPrompt.designSkill.rules.join("\n"), /结论标题/);
+  assert.match(polishPrompt.designSkill.rules.join("\n"), /详情展开页/);
+  assert.match(polishPrompt.designSkill.rules.join("\n"), /解释某个知识点/);
+  assert.deepEqual(outlinePrompt.designSkill.detailPageTypes, [
+    "knowledge-detail",
+    "detail-analysis",
+    "deep-dive",
+    "case-detail",
+    "problem-detail",
+    "plan-detail",
+  ]);
+  assert.match(outlinePrompt.designSkill.antiPatterns.join("\n"), /四段式卡片/);
+  assert.match(outlinePrompt.designSkill.antiPatterns.join("\n"), /知识点只列名词/);
+  assert.deepEqual(outlinePrompt.templateContext.allowedLayouts, template.layoutSchema.allowedLayouts);
 });
 
 test("PptService preserves dome layout roles for the business template", async () => {
@@ -1443,7 +1532,7 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
     assert.equal(pptxBody.file.mimeType.includes("presentationml"), true);
     assert.equal(pdfBody.file.mimeType, "application/pdf");
     assert.equal(downloadedPptx.status, 200);
-    assert.match(downloadedPptx.headers.get("content-disposition"), /filename="Board_update\.pptx"/);
+    assert.match(downloadedPptx.headers.get("content-disposition"), /filename="PPT-Board-update-business-2p-\d{8}-\d{4}-[a-zA-Z0-9]+\.pptx"/);
     assert.equal((await downloadedPptx.arrayBuffer()).byteLength > 0, true);
     assert.equal(logsBody.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pptxBody.file.id), true);
   } finally {
@@ -1617,6 +1706,7 @@ test("HTTP API preview reflects business minimal theme layout override", async (
     assert.match(html, /class="top-band-ribbon"/);
     assert.match(html, /class="top-band-page-chip"/);
     assert.match(html, />01<\//);
+    assert.doesNotMatch(html, /class="dome-role-decor/);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
@@ -1668,12 +1758,15 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.match(html, /\.slide\[data-dome-role="three-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-3\);\}/);
   assert.match(html, /\.slide\[data-dome-role="four-steps"\] \.dome-role-visual\{background-image:var\(--dome-business-4\);\}/);
   assert.match(html, /class="dome-role-visual"/);
+  assert.equal([...html.matchAll(/class="dome-role-decor dome-content-frame"/g)].length, 9);
+  assert.equal([...html.matchAll(/class="dome-role-decor dome-content-surface"/g)].length, 7);
   assert.match(html, /\.dome-wave-arc\.dome-wave-gold/);
   assert.match(html, /\.dome-wave-arc\.dome-wave-light/);
   assert.equal([...html.matchAll(/class="dome-role-decor dome-wave-arc dome-wave-gold"/g)].length, 12);
   assert.equal([...html.matchAll(/class="dome-role-decor dome-wave-arc dome-wave-light"/g)].length, 12);
   assert.equal([...html.matchAll(/class="dome-role-decor dome-footer-decoration"/g)].length, 12);
-  assert.match(html, /class="dome-role-decor dome-footer-decoration">商务办公系列 PPT 模板<\/div>/);
+  assert.doesNotMatch(html, /商务办公系列 PPT 模板/);
+  assert.doesNotMatch(html, /Executive Business/);
   assert.match(html, /dome-agenda-card/);
   assert.equal([...html.matchAll(/class="dome-agenda-card"/g)].length, 4);
   assert.equal([...html.matchAll(/class="dome-agenda-number"/g)].length, 4);
@@ -2121,7 +2214,7 @@ test("HTTP API keeps edited outline slide count within page limits", async () =>
       theme: "modern",
     });
     const outlineBody = await outlineResponse.json();
-    const tooManySlides = Array.from({ length: 21 }, (_, index) => ({
+    const tooManySlides = Array.from({ length: 33 }, (_, index) => ({
       title: `Slide ${index + 1}`,
       bullets: ["A"],
     }));
@@ -2176,7 +2269,7 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /选择模板并生成 PPT/);
     assert.match(html, /预览并下载/);
     assert.match(html, /data-flow-step="download"/);
-    assert.match(html, /data-flow-panel="input preview"/);
+    assert.match(html, /data-flow-panel="input outline preview"/);
     assert.match(html, /data-flow-panel="outline"/);
     assert.match(html, /data-flow-panel="preview"/);
     assert.match(html, /data-flow-panel="outline preview"/);
@@ -2186,11 +2279,22 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /id="outline-editor"/);
     assert.match(html, /id="outline-board"/);
     assert.match(html, /id="outline-summary"/);
+    assert.match(html, /id="back-to-outline"/);
+    assert.match(html, /setFlowStage\("outline"\)/);
+    assert.match(html, /返回资产库/);
+    assert.match(html, /已返回资产库/);
     assert.match(html, /大纲信息/);
     assert.match(html, /大纲确认/);
     assert.match(html, /当前状态/);
     assert.match(html, /可编辑要点/);
     assert.match(html, /class="outline-shell"/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="input"\] main \{ grid-template-columns: minmax\(0, 760px\); justify-content: center/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="outline"\] main \{ grid-template-columns: minmax\(0, 1180px\); justify-content: center/);
+    assert.match(html, /data-flow-panel="input outline"/);
+    assert.match(html, /\.workflow > \.panel\[data-flow-panel~="input"\]/);
+    assert.match(html, /\.workflow > \.panel\[data-flow-panel~="outline"\]/);
+    assert.match(html, /\.outline-shell\[data-flow-panel="input"\] \{ display: none !important; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="outline"\] \.outline-shell \{ margin-top: 18px; \}/);
     assert.match(html, /renderOutlineBoard/);
     assert.match(html, /renderOutlineLoading/);
     assert.match(html, /loading-spinner/);
@@ -2208,6 +2312,10 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /模板内容样式预览/);
     assert.match(html, /class="template-card"/);
     assert.match(html, /class="template-thumb"/);
+    assert.match(html, /template-thumb-back/);
+    assert.match(html, /template-thumb-cover/);
+    assert.match(html, /template-thumb-image/);
+    assert.match(html, /template-thumb-wave/);
     assert.match(html, /--dome-template-thumb:url\("data:image\/jpeg;base64,/);
     assert.match(html, /data-has-dome-asset="true"/);
     assert.match(html, /data-template-card/);
@@ -2215,6 +2323,8 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /selectTemplateCard/);
     assert.match(html, /normalizedTemplateVisual/);
     assert.match(html, /id="generate-outline"/);
+    assert.match(html, /<select id="slide-count">/);
+    assert.match(html, /<option value="32">32 页<\/option>/);
     assert.match(html, /generateButton\.disabled = true/);
     assert.match(html, /id="save-outline"/);
     assert.match(html, /每行一个要点/);
@@ -2224,16 +2334,33 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /保存大纲后才能生成并查看模板预览/);
     assert.match(html, /下载文件/);
     assert.match(html, /download-button/);
+    assert.match(html, /PPT 结构调整/);
+    assert.match(html, /id="structure-slide-title"/);
+    assert.match(html, /id="structure-slide-layout"/);
+    assert.match(html, /id="structure-slide-bullets"/);
+    assert.match(html, /id="apply-structure-preview"/);
+    assert.match(html, /id="slide-edit-modal"/);
+    assert.match(html, /id="single-page-ai-toggle"/);
+    assert.match(html, /AI 优化本页/);
+    assert.match(html, /structure-side-panel/);
+    assert.match(html, /ai-polish-side-panel/);
+    assert.match(html, /应用结构并重新预览/);
+    assert.match(html, /renderStructureEditor/);
+    assert.match(html, /applyStructureEditorToSelectedSlide/);
     assert.match(html, /AI 单页润色/);
     assert.match(html, /在中间预览中点击要优化的页面/);
-    assert.match(html, /id="selected-slide-label"/);
+    assert.doesNotMatch(html, /id="selected-slide-label"/);
     assert.match(html, /未选择页面/);
     assert.match(html, /attachPreviewSlidePicker/);
     assert.match(html, /selectPreviewSlide/);
-    assert.match(html, /点击选择第 /);
+    assert.match(html, /点击第 /);
     assert.match(html, /润色建议/);
-    assert.match(html, /AI 润色本页/);
+    assert.match(html, /请先勾选需要 AI 单页优化/);
     assert.match(html, /setSlideRegenerationBusy/);
+    assert.match(html, /preview-polish-loading/);
+    assert.match(html, /polish-spinner/);
+    assert.match(html, /button-spinner/);
+    assert.match(html, /is-polishing/);
     assert.match(html, /请先应用模板生成 PPT，再使用 AI 润色单页/);
     assert.match(html, /请先用鼠标在在线预览中选择要润色的页面/);
     assert.match(html, /class="preview-frame"/);
@@ -2247,16 +2374,51 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /DECK_REVEAL_INTERVAL_MS = 700/);
     assert.match(html, /DECK_MIN_LOADING_MS = 2200/);
     assert.match(html, /waitForDeckLoadingRhythm/);
-    assert.match(html, /\.preview-stage \{ display: grid; min-height: 0;/);
+    assert.match(html, /\.preview-stage \{ position: relative; display: grid; min-height: 0;/);
     assert.match(html, /\.preview\.is-deck-loaded \{ height: 100%; min-height: 0;/);
     assert.match(html, /\.preview\.is-deck-loaded \.preview-frame \{ height: 100%; min-height: 0;/);
     assert.match(html, /\.preview, \.preview-frame, \.preview\.is-deck-loaded, \.preview\.is-deck-loaded \.preview-frame \{ min-height: 420px;/);
     assert.match(html, /renderDeckPreviewFrame/);
     assert.doesNotMatch(html, /fetch\("\/api\/ppt\/decks\/" \+ state\.deckId \+ "\/preview"\)\.then\(\(res\) => res\.text\(\)\)/);
     assert.match(html, /id="asset-list"/);
+    assert.match(html, /id="asset-search"/);
+    assert.match(html, /id="asset-time-filter"/);
+    assert.match(html, /全部时间/);
+    assert.match(html, /近 7 天/);
+    assert.match(html, /assetMatchesTimeFilter/);
+    assert.match(html, /assetTimeFilter/);
+    assert.match(html, /id="asset-pagination"/);
+    assert.match(html, /ASSET_PAGE_SIZE = 20/);
+    assert.match(html, /function assetThumbHtml/);
+    assert.match(html, /asset-thumb-title/);
+    assert.match(html, /assetSearchQuery/);
+    assert.match(html, /renderAssetPagination/);
     assert.match(html, /loadAssets/);
+    assert.match(html, /assetPreviewOpen/);
+    assert.match(html, /data-asset-preview-panel="true"/);
+    assert.match(html, /data-asset-preview-open="false"/);
+    assert.match(html, /打开预览/);
+    assert.match(html, /assetCatalog = data\.assets \|\| \[\]/);
+    assert.match(html, /state\.assetPreviewOpen = true/);
+    assert.match(html, /setTemplateSelectionFromDeck/);
+    assert.doesNotMatch(html, /syncTemplateScope/);
+    assert.match(html, /state\.outlineId = deck\.outlineId \|\| null/);
+    assert.match(html, /renderOutlineBoard\(deck\.slides \|\| \[\]\)/);
+    assert.match(html, /previewRevision/);
+    assert.match(html, /function slideIdForNumber/);
+    assert.match(html, /function updateCurrentPreviewSlide/);
+    assert.match(html, /updateCurrentPreviewSlide\(data\.slide\)/);
+    assert.match(html, /dome-showcase-text/);
+    assert.match(html, /async function refreshDeckPreviewFrame/);
+    assert.match(html, /frame\.srcdoc = html/);
+    assert.match(html, /await refreshDeckPreviewFrame\(state\.deckId\)/);
+    assert.match(html, /renderDeckPreviewFrame\(state\.deckId, \{ bustCache: true \}\)/);
+    assert.match(html, /\/preview\?v=/);
+    assert.match(html, /state\.outlineSlides = normalizeOutlineSlides\(data\.deck\.slides\)/);
+    assert.match(html, /已打开历史 PPT，可继续调整结构、AI 润色单页并重新下载/);
+    assert.match(html, /data-page-panel="create assets" data-flow-panel="preview"/);
     assert.match(html, /\/api\/ppt\/assets/);
-    assert.match(html, /id="entitlement" value="62"/);
+    assert.match(html, /id="entitlement" type="hidden" value="62"/);
     assert.match(html, /id="regenerate-slide"/);
     assert.match(html, /\/slides\/" \+ slideId \+ "\/regenerate/);
     assert.match(html, /id="retry-task"/);
@@ -2443,7 +2605,7 @@ test("HTTP API prefers the launch identity entitlement over the configured defau
     });
     const deckBody = await deckResponse.json();
 
-    assert.match(html, /id="entitlement" value="91"/);
+    assert.match(html, /id="entitlement" type="hidden" value="91"/);
     assert.equal(deckResponse.status, 201);
     assert.equal(deckBody.task.status, "succeeded");
     assert.equal(context.billingCalls[0][1].entitlementId, 91);
@@ -2574,7 +2736,7 @@ test("HTTP API resolves camelCase entitlement fields from launch identity", asyn
     });
     const deckBody = await deckResponse.json();
 
-    assert.match(html, /id="entitlement" value="91"/);
+    assert.match(html, /id="entitlement" type="hidden" value="91"/);
     assert.equal(deckResponse.status, 201);
     assert.equal(deckBody.task.status, "succeeded");
     assert.equal(context.billingCalls[0][1].entitlementId, 91);
@@ -2874,7 +3036,7 @@ test("HTTP API falls back to configured entitlement for restored sessions withou
     const balanceBody = await balance.json();
 
     assert.equal(page.status, 200);
-    assert.match(html, /id="entitlement" value="62"/);
+    assert.match(html, /id="entitlement" type="hidden" value="62"/);
     assert.equal(balance.status, 200);
     assert.equal(balanceBody.entitlement_id, 62);
     assert.equal(context.billingCalls[0][1].entitlementId, 62);
@@ -2925,6 +3087,7 @@ async function createBusinessContext(options = {}) {
     aiProvider,
     promptManager: options.promptManager || new PromptManager(),
     exporter: new PptExportService(),
+    pptPreviewRenderer: options.pptPreviewRenderer,
     billingClient,
   });
 

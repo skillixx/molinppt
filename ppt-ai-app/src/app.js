@@ -934,6 +934,10 @@ function sendHtml(response, html, status = 200) {
  */
 function renderWorkspace({ defaultEntitlementId } = {}) {
   const entitlementValue = defaultEntitlementId ? String(defaultEntitlementId) : "";
+  const slideCountOptions = Array.from({ length: 32 }, (_, index) => {
+    const value = index + 1;
+    return `<option value="${value}"${value === 6 ? " selected" : ""}>${value} 页</option>`;
+  }).join("");
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -1005,13 +1009,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .status-chip { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 700; }
     .status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--success); }
     main { position: relative; display: grid; grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr) minmax(300px, 360px); gap: 18px; padding: 18px; max-width: 1680px; margin: 0 auto; }
-    body[data-workspace-page="create"][data-flow-stage="input"] main { grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr); }
-    body[data-workspace-page="create"][data-flow-stage="outline"] main { grid-template-columns: minmax(620px, 1fr) minmax(300px, 360px); }
+    body[data-workspace-page="create"][data-flow-stage="input"] main { grid-template-columns: minmax(0, 760px); justify-content: center; align-items: start; padding-top: 34px; }
+    body[data-workspace-page="create"][data-flow-stage="outline"] main { grid-template-columns: minmax(0, 1180px); justify-content: center; align-items: start; }
     body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(300px, 360px) minmax(640px, 1fr) minmax(280px, 340px); }
     body[data-workspace-page="templates"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .workflow { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .template-gallery-wrap { width: 100%; }
-    body[data-workspace-page="templates"] .template-category-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    body[data-workspace-page="templates"] .panel { box-shadow: none; }
+    body[data-workspace-page="status"] main { grid-template-columns: minmax(0, 1fr); }
+    body[data-workspace-page="status"] .context { grid-template-columns: minmax(0, 1fr); }
     .preview-shell, .outline-shell, .panel { background: rgba(255,255,255,.96); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
     .workflow, .context { display: grid; gap: 14px; align-content: start; }
     .panel { padding: 16px; }
@@ -1032,11 +1038,70 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .flow-dot { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: #eaf2ff; color: var(--primary); font-size: 12px; font-weight: 850; }
     .stage-empty { min-height: 520px; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); background: #f8fbff; border: 1px dashed #bfd0e6; border-radius: 8px; }
     .stage-empty strong { display: block; margin-bottom: 8px; color: #1e3a8a; font-size: 22px; }
-    .template-gallery-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .workflow,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow { width: 100%; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"],
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] {
+      position: relative; overflow: hidden; padding: 28px; border-color: #cfe0ff;
+      background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(239,246,255,.96));
+      box-shadow: 0 28px 70px rgba(37,99,235,.12);
+    }
+    body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"]::after,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"]::after {
+      content: ""; position: absolute; right: -86px; top: -112px; width: 260px; height: 260px; border-radius: 999px;
+      background: rgba(37,99,235,.10); pointer-events: none;
+    }
+    body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"] > *,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] > * { position: relative; z-index: 1; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .panel-head,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow .panel-head { justify-content: center; text-align: center; margin-bottom: 18px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .panel-title,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow .panel-title { justify-content: center; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .panel-title h2,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow .panel-title h2 { font-size: 22px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .panel-note,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .workflow .panel-note { max-width: 560px; margin: 0 auto 18px; text-align: center; font-size: 13px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 20px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .flow-step,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .flow-step { display: grid; grid-template-columns: 1fr; justify-items: center; text-align: center; min-height: 108px; padding: 12px 10px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .flow-step span,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .flow-step span { font-size: 11px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] #topic,
+    body[data-workspace-page="create"][data-flow-stage="outline"] #topic { min-height: 122px; font-size: 16px; line-height: 1.65; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .primary-action,
+    body[data-workspace-page="create"][data-flow-stage="outline"] .primary-action { max-width: 260px; margin: 6px auto 0; min-height: 46px; }
+    body[data-workspace-page="create"][data-flow-stage="input"] .outline-shell[data-flow-panel="input"] { display: none !important; }
+    body[data-workspace-page="create"][data-flow-stage="outline"] .outline-shell { margin-top: 18px; }
+    body[data-workspace-page="create"][data-flow-stage="outline"] .context { display: none !important; }
+    .template-browser-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .template-browser-head h2 { margin: 0; font-size: 20px; color: #0f172a; letter-spacing: 0; }
+    .template-gallery-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 18px; border-bottom: 1px solid #edf2f7; }
     .template-gallery-title { font-size: 12px; color: var(--muted); }
-    .template-gallery-count { font-size: 12px; color: #475569; background: #eaf2ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+    #template-scope,
+    label[for="template-scope"],
+    .template-manage-split,
+    .template-manage-split ~ .panel-head,
+    .template-manage-split ~ .row,
+    .template-manage-split ~ .actions { display: none !important; }
+    .template-gallery-count { font-size: 12px; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+    .template-category-tabs { display: flex; align-items: center; gap: 30px; min-height: 38px; overflow-x: auto; scrollbar-width: thin; }
+    .template-category-tab {
+      position: relative; flex: 0 0 auto; min-height: 38px; padding: 0; border-radius: 0; background: transparent; color: #374151;
+      box-shadow: none; transform: none; font-size: 14px; font-weight: 650;
+    }
+    .template-category-tab:hover { background: transparent; color: #6d28d9; box-shadow: none; transform: none; }
+    .template-category-tab[aria-selected="true"] { color: #111827; }
+    .template-category-tab[aria-selected="true"]::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 999px; background: #7c3aed;
+    }
+    .template-more-link {
+      flex: 0 0 auto; min-height: 38px; padding: 0; border-radius: 0; background: transparent; color: #4b5563;
+      box-shadow: none; transform: none; font-size: 13px; font-weight: 650;
+    }
+    .template-more-link:hover { background: transparent; color: #6d28d9; box-shadow: none; transform: none; }
     .template-gallery-wrap { border: 0; border-radius: 8px; padding: 0; background: transparent; }
-    .template-gallery { display: grid; gap: 18px; margin-top: 0; }
+    .template-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 30px; margin-top: 0; }
     .template-category-block { border: 1px solid var(--line); border-radius: 11px; background: #fff; padding: 12px; box-shadow: var(--shadow); }
     .template-category-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid #e8eef7; }
     .template-category-head h3 { margin: 0; font-size: 13px; letter-spacing: 0; color: #1e3a8a; font-weight: 800; }
@@ -1044,49 +1109,106 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
     .template-manage-split { height: 8px; }
     .template-card {
-      display: grid; gap: 9px; width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 10px;
-      background: #fff; color: var(--text); text-align: left; box-shadow: none; transform: none;
+      display: grid; gap: 12px; width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px;
+      background: #fff; color: var(--text); text-align: center; box-shadow: none; transform: none;
     }
-    .template-card:hover { background: #f8fbff; border-color: #bfdbfe; box-shadow: 0 12px 28px rgba(37,99,235,.10); transform: translateY(-1px); }
-    .template-card[aria-selected="true"] { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .template-card:hover { background: #fff; border-color: #d8b4fe; box-shadow: 0 16px 32px rgba(124,58,237,.12); transform: translateY(-1px); }
+    .template-card[aria-selected="true"] { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
     .template-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .template-card-title { font-size: 13px; font-weight: 850; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .template-card-title { display: block; min-width: 0; padding: 0 6px 8px; font-size: 15px; font-weight: 650; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .template-card-scope { flex: 0 0 auto; min-height: 22px; display: inline-flex; align-items: center; padding: 0 7px; border-radius: 999px; background: #eef4ff; color: #1d4ed8; font-size: 11px; font-weight: 800; }
+    .selected-template-preview {
+      display: grid; gap: 12px; align-content: start; min-height: 360px; padding: 14px; border: 1px solid var(--line);
+      border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: var(--shadow);
+    }
+    .selected-template-preview-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .selected-template-preview-title { display: grid; gap: 4px; min-width: 0; }
+    .selected-template-preview-title strong { color: #0f172a; font-size: 15px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .selected-template-preview-title span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .selected-template-preview-badge { flex: 0 0 auto; border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 4px 9px; font-size: 12px; font-weight: 800; }
+    .selected-template-preview-empty { min-height: 280px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 8px; color: var(--muted); background: #f8fbff; font-size: 13px; }
+    .selected-template-preview .template-thumb { border-radius: 8px; box-shadow: 0 18px 42px rgba(15,23,42,.12); }
     .template-thumb {
-      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 7px; border: 1px solid rgba(23,32,51,.10);
-      background: var(--thumb-bg); color: var(--thumb-body);
+      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 1px solid rgba(23,32,51,.08);
+      background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
     }
     .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
     .template-thumb[data-has-thumbnail="true"]::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(15,23,42,.10)); }
     .template-thumb[data-has-thumbnail="true"]::after,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-back,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-cover,
     .template-thumb[data-has-thumbnail="true"] .template-thumb-band,
     .template-thumb[data-has-thumbnail="true"] .template-thumb-content,
-    .template-thumb[data-has-thumbnail="true"] .template-thumb-accent { display: none; }
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-image,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-accent,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-wave,
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-palette { display: none; }
     .template-thumb::before { content: ""; position: absolute; inset: 0; background:
-      linear-gradient(135deg, rgba(255,255,255,.70), rgba(255,255,255,.18)),
-      repeating-linear-gradient(90deg, rgba(15,23,42,.035) 0 1px, transparent 1px 24px),
+      radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--thumb-accent) 24%, transparent), transparent 24%),
+      linear-gradient(135deg, rgba(255,255,255,.86), rgba(255,255,255,.24)),
+      repeating-linear-gradient(90deg, rgba(15,23,42,.035) 0 1px, transparent 1px 30px),
       var(--thumb-bg); }
-    .template-thumb::after { content: ""; position: absolute; inset: 10% 7% 11%; border-radius: 6px; border: 1px solid rgba(15,23,42,.06); background: var(--thumb-surface); box-shadow: 0 16px 28px rgba(15,23,42,.10); }
-    .template-thumb-band { position: absolute; z-index: 1; inset: 0 auto 0 0; width: 18%; background: var(--thumb-primary); }
-    .template-thumb[data-layout="top-band"] { background: linear-gradient(135deg, rgba(255,255,255,.80), color-mix(in srgb, var(--thumb-surface) 88%, #ffffff 12%)); }
-    .template-thumb[data-layout="top-band"] .template-thumb-band { inset: 0 0 auto 0; width: auto; height: 24%; background: linear-gradient(90deg, rgba(255,255,255,.96), color-mix(in srgb, var(--thumb-accent) 60%, var(--thumb-title) 40%)); }
-    .template-thumb[data-layout="top-band"]::after { inset: 56% 9% 8%; border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--thumb-bg) 76%, var(--thumb-surface) 24%); box-shadow: 0 12px 24px rgba(15,23,42,.16); }
-    .template-thumb[data-layout="hero"] .template-thumb-band { inset: 0; width: 100%; opacity: .16; }
-    .template-thumb[data-layout="hero"] .template-thumb-content { width: 68%; top: 24%; left: 10%; }
-    .template-thumb[data-layout="executive"] .template-thumb-band { inset: 11% 7% auto 7%; width: auto; height: 12%; border-radius: 6px 6px 0 0; }
-    .template-thumb[data-layout="executive"] .template-thumb-content { left: 14%; right: 30%; top: 30%; }
-    .template-thumb[data-layout="executive"] .template-thumb-accent { right: 12%; top: 27%; bottom: auto; width: 11%; height: 46%; border-radius: 5px; box-shadow: 0 10px 18px rgba(15,23,42,.10); }
-    .template-thumb[data-layout="academy"] .template-thumb-band { inset: 12% 7% auto 7%; width: auto; height: 10%; border-radius: 6px 6px 0 0; }
-    .template-thumb[data-layout="academy"] .template-thumb-content { left: 13%; right: 22%; top: 28%; }
-    .template-thumb[data-layout="academy"] .template-thumb-accent { right: 10%; top: 28%; bottom: auto; width: 8%; height: 44%; border-radius: 5px; box-shadow: 0 10px 18px rgba(15,23,42,.08); }
+    .template-thumb::after { content: ""; position: absolute; z-index: 1; inset: 7% 5% 10%; border-radius: 8px; border: 1px solid rgba(15,23,42,.07); background: rgba(255,255,255,.64); box-shadow: 0 16px 28px rgba(15,23,42,.11); }
+    .template-thumb-back { position: absolute; z-index: 2; overflow: hidden; border-radius: 7px; border: 1px solid rgba(15,23,42,.07); background: var(--thumb-surface); box-shadow: 0 12px 22px rgba(15,23,42,.10); }
+    .template-thumb-back::before { content: ""; position: absolute; left: 6%; top: 10%; width: 16%; height: 72%; border-radius: 5px; background:
+      linear-gradient(var(--thumb-primary), var(--thumb-primary)) 50% 8% / 42% 5% no-repeat,
+      linear-gradient(var(--thumb-accent), var(--thumb-accent)) 50% 30% / 52% 4% no-repeat,
+      linear-gradient(var(--thumb-primary), var(--thumb-primary)) 50% 52% / 48% 4% no-repeat,
+      linear-gradient(color-mix(in srgb, var(--thumb-body) 20%, #ffffff 80%), color-mix(in srgb, var(--thumb-body) 20%, #ffffff 80%));
+      opacity: .72; }
+    .template-thumb-back::after { content: ""; position: absolute; right: 7%; top: 14%; width: 22%; height: 58%; border-radius: 5px; background:
+      linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 72%, #ffffff 28%), color-mix(in srgb, var(--thumb-accent) 70%, #ffffff 30%));
+      box-shadow: -34px 16px 0 -9px rgba(255,255,255,.72), -56px 29px 0 -18px color-mix(in srgb, var(--thumb-accent) 48%, #ffffff 52%); opacity: .80; }
+    .template-thumb-back-left { inset: 8% auto 15% 5%; width: 58%; transform: translateX(-1%); background:
+      linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 76%, #ffffff 24%) 0 16%, rgba(255,255,255,.96) 16%),
+      repeating-linear-gradient(0deg, rgba(15,23,42,.07) 0 1px, transparent 1px 18px); }
+    .template-thumb-back-right { inset: 10% 5% 13% auto; width: 58%; background:
+      linear-gradient(180deg, rgba(255,255,255,.94) 0 20%, color-mix(in srgb, var(--thumb-bg) 82%, #ffffff 18%) 20%),
+      repeating-linear-gradient(90deg, rgba(15,23,42,.055) 0 1px, transparent 1px 22px); }
+    /* 缩略图模拟真实封面层级：大标题、章节、摘要和标签都直接呈现。 */
+    .template-thumb-cover { position: absolute; z-index: 8; left: var(--thumb-cover-left); right: var(--thumb-cover-right); top: var(--thumb-cover-top); bottom: 19%; display: grid; align-content: center; gap: 4px; padding: 7% 11%; border-radius: 8px; background:
+      linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 92%, #111827 8%), color-mix(in srgb, var(--thumb-primary) 70%, var(--thumb-accent) 30%));
+      box-shadow: 0 18px 32px rgba(15,23,42,.22); }
+    .template-thumb-cover::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background:
+      radial-gradient(circle at 92% 12%, rgba(255,255,255,.20), transparent 24%),
+      linear-gradient(115deg, transparent 0 58%, rgba(255,255,255,.13) 58% 66%, transparent 66%);
+      pointer-events: none; }
+    .template-thumb-cover > span { position: relative; z-index: 1; }
+    .template-thumb-date { display: block; color: color-mix(in srgb, var(--thumb-accent) 28%, #ffffff 72%); font-size: 10px; line-height: 1.1; font-weight: 800; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .template-thumb-kicker { position: relative; display: block; margin-top: 1px; color: rgba(255,255,255,.76); font-size: 8px; line-height: 1.1; font-weight: 750; letter-spacing: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* 一级标题优先完整展示，允许换行，避免被图片区和装饰元素挤压。 */
+    .template-thumb-heading { position: relative; display: block; max-width: 100%; min-height: 38px; margin-top: 2px; color: #ffffff; font-size: 18px; line-height: 1.08; font-weight: 900; letter-spacing: 0; text-shadow: 0 2px 10px rgba(15,23,42,.18); white-space: normal; overflow: hidden; overflow-wrap: anywhere; word-break: break-word; }
+    .template-thumb-summary { position: relative; display: grid; gap: 2px; margin-top: 2px; max-width: 82%; color: rgba(255,255,255,.86); font-size: 8px; line-height: 1.25; font-weight: 650; }
+    .template-thumb-line { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .template-thumb-tag { position: relative; display: inline-flex; align-items: center; justify-content: center; width: max-content; max-width: 46%; min-height: 13px; margin-top: 3px; padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.90); color: var(--thumb-primary); font-size: 8px; line-height: 1; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .template-thumb-image { position: absolute; z-index: 3; right: 7%; top: var(--thumb-image-top); width: var(--thumb-image-width); height: 43%; overflow: hidden; border-radius: 7px; background:
+      linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.08)),
+      linear-gradient(135deg, color-mix(in srgb, var(--thumb-accent) 72%, #ffffff 28%), color-mix(in srgb, var(--thumb-primary) 62%, #000000 38%));
+      box-shadow: 0 14px 22px rgba(15,23,42,.18); opacity: .64; }
+    .template-thumb-image::before { content: ""; position: absolute; inset: 0; background:
+      radial-gradient(circle at 74% 24%, rgba(255,255,255,.64), transparent 11%),
+      linear-gradient(135deg, transparent 0 48%, rgba(255,255,255,.22) 48% 50%, transparent 50%),
+      linear-gradient(160deg, rgba(255,255,255,.10), transparent); }
+    .template-thumb-image::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 12%; height: 15%; border-radius: 999px; background: rgba(255,255,255,.58); }
+    .template-thumb-band { position: absolute; z-index: 4; inset: auto 0 0 0; width: auto; height: 20%; background: linear-gradient(90deg, var(--thumb-primary), color-mix(in srgb, var(--thumb-primary) 72%, var(--thumb-accent) 28%)); }
+    .template-thumb-accent { position: absolute; z-index: 3; right: 8%; top: 9%; width: 5%; height: 13%; border-radius: 999px; background: var(--thumb-accent); box-shadow: 0 8px 16px rgba(15,23,42,.12); opacity: .78; }
+    .template-thumb-wave { position: absolute; z-index: 4; left: -4%; right: -4%; bottom: 2%; height: var(--thumb-wave-height); background:
+      linear-gradient(135deg, rgba(255,255,255,.80), color-mix(in srgb, var(--thumb-accent) 55%, #ffffff 45%) 50%, color-mix(in srgb, var(--thumb-primary) 76%, #ffffff 24%));
+      clip-path: polygon(0 55%, 14% 42%, 27% 52%, 43% 30%, 58% 48%, 73% 28%, 88% 43%, 100% 33%, 100% 100%, 0 100%); opacity: .86; }
+    .template-thumb[data-layout="top-band"] .template-thumb-band { top: 0; bottom: auto; height: 20%; background: linear-gradient(90deg, rgba(255,255,255,.96), color-mix(in srgb, var(--thumb-accent) 60%, var(--thumb-title) 40%)); }
+    .template-thumb[data-layout="top-band"] .template-thumb-cover { top: 26%; bottom: 16%; }
+    .template-thumb[data-layout="hero"] .template-thumb-cover { left: 9%; right: 9%; top: 19%; bottom: 18%; background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 88%, #111827 12%), color-mix(in srgb, var(--thumb-accent) 76%, var(--thumb-primary) 24%)); }
+    .template-thumb[data-layout="hero"] .template-thumb-image { right: 6%; top: 20%; height: 52%; }
+    .template-thumb[data-layout="executive"] .template-thumb-cover,
+    .template-thumb[data-layout="academy"] .template-thumb-cover { right: 10%; }
+    .template-thumb[data-layout="academy"] .template-thumb-cover { background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 84%, #064e3b 16%), color-mix(in srgb, var(--thumb-accent) 62%, var(--thumb-primary) 38%)); }
+    .template-thumb[data-layout="academy"] .template-thumb-wave { background: linear-gradient(135deg, rgba(255,255,255,.86), color-mix(in srgb, var(--thumb-bg) 76%, #ffffff 24%) 44%, color-mix(in srgb, var(--thumb-primary) 58%, #ffffff 42%)); }
     .template-thumb[data-layout="venture"] { background: var(--thumb-bg); }
     .template-thumb[data-layout="venture"]::before { background:
       radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--thumb-accent) 26%, transparent), transparent 34%),
       linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 94%, #ffffff 6%), color-mix(in srgb, var(--thumb-primary) 78%, var(--thumb-bg) 22%)); }
-    .template-thumb[data-layout="venture"]::after { inset: 9% 7% 12%; background: var(--thumb-surface); opacity: .98; }
-    .template-thumb[data-layout="venture"] .template-thumb-band { inset: auto 10% 16% 10%; width: auto; height: 6%; background: var(--thumb-accent); border-radius: 999px; }
-    .template-thumb[data-layout="venture"] .template-thumb-content { left: 13%; right: 14%; top: 29%; }
-    .template-thumb[data-layout="venture"] .template-thumb-accent { display: none; }
+    .template-thumb[data-layout="venture"] .template-thumb-cover { background: linear-gradient(135deg, #151923, color-mix(in srgb, var(--thumb-primary) 76%, #111827 24%)); }
+    .template-thumb[data-layout="venture"] .template-thumb-tag { color: #111827; background: color-mix(in srgb, var(--thumb-accent) 86%, #ffffff 14%); }
     .template-thumb[data-layout="red-gold"] { background: var(--thumb-primary); }
     .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"] { background-image: var(--dome-template-thumb), linear-gradient(135deg, var(--thumb-primary), #7d0610); background-size: cover; background-position: center; }
     .template-thumb[data-layout="red-gold"]::before {
@@ -1095,29 +1217,37 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 96%, #000000 4%), color-mix(in srgb, var(--thumb-primary) 78%, #f97316 22%));
     }
     .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"]::before { background: linear-gradient(90deg, rgba(111,4,13,.14), rgba(111,4,13,.02) 48%, rgba(255,232,176,.10)); }
-    .template-thumb[data-layout="red-gold"]::after { inset: 18% 12% 25% 12%; background: rgba(255,248,230,.94); border-color: rgba(246,212,138,.50); box-shadow: 0 18px 30px rgba(82,5,12,.22); }
-    .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"]::after { display:none; }
-    .template-thumb[data-layout="red-gold"] .template-thumb-band { inset: auto 0 0 0; width: auto; height: 28%; background: linear-gradient(135deg, rgba(255,248,204,.94), color-mix(in srgb, var(--thumb-accent) 82%, #ffffff 18%) 36%, rgba(184,15,26,.25) 37%, color-mix(in srgb, var(--thumb-primary) 80%, #3f0308 20%)); clip-path: polygon(0 64%, 15% 48%, 29% 58%, 45% 34%, 61% 53%, 76% 31%, 100% 44%, 100% 100%, 0 100%); }
-    .template-thumb[data-layout="red-gold"] .template-thumb-content { left: 19%; right: 24%; top: 34%; }
-    .template-thumb[data-layout="red-gold"] .template-thumb-title { background: var(--thumb-title); }
-    .template-thumb[data-layout="red-gold"] .template-thumb-accent { right: 15%; top: 33%; bottom: auto; width: 9%; height: 36%; border-radius: 7px; box-shadow: 0 10px 18px rgba(82,5,12,.22); }
-    .template-thumb-content { position: absolute; z-index: 2; top: 24%; left: 24%; right: 9%; display: grid; gap: 7px; }
-    .template-thumb-title { width: 78%; height: 13px; border-radius: 999px; background: var(--thumb-title); }
-    .template-thumb-line { height: 7px; border-radius: 999px; background: var(--thumb-body); opacity: .48; }
-    .template-thumb-line:nth-child(3) { width: 72%; }
-    .template-thumb-accent { position: absolute; z-index: 2; right: 9%; bottom: 12%; width: 18%; height: 7px; border-radius: 999px; background: var(--thumb-accent); }
-    .template-thumb-palette { position: absolute; z-index: 3; right: 9%; top: 9%; display: inline-flex; gap: 4px; }
-    .template-thumb-swatch { width: 10px; height: 22px; border-radius: 999px; border: 1px solid rgba(15,23,42,.12); }
-    .template-card-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .template-thumb[data-layout="red-gold"] .template-thumb-cover { background: linear-gradient(135deg, rgba(255,248,230,.98), rgba(255,232,176,.94)); box-shadow: 0 18px 30px rgba(82,5,12,.22); }
+    .template-thumb[data-layout="red-gold"] .template-thumb-date { color: #b45309; }
+    .template-thumb[data-layout="red-gold"] .template-thumb-kicker { color: rgba(82,5,12,.58); }
+    .template-thumb[data-layout="red-gold"] .template-thumb-heading { color: color-mix(in srgb, var(--thumb-primary) 86%, #111827 14%); text-shadow: none; }
+    .template-thumb[data-layout="red-gold"] .template-thumb-summary { color: rgba(82,5,12,.78); }
+    .template-thumb[data-layout="red-gold"] .template-thumb-tag { background: var(--thumb-primary); color: #fff7ed; }
+    .template-thumb[data-layout="red-gold"] .template-thumb-band { background: linear-gradient(135deg, rgba(255,248,204,.94), color-mix(in srgb, var(--thumb-accent) 82%, #ffffff 18%) 36%, rgba(184,15,26,.25) 37%, color-mix(in srgb, var(--thumb-primary) 80%, #3f0308 20%)); clip-path: polygon(0 64%, 15% 48%, 29% 58%, 45% 34%, 61% 53%, 76% 31%, 100% 44%, 100% 100%, 0 100%); }
+    .template-thumb[data-thumb-variant="left-title"] .template-thumb-heading { max-width: 100%; }
+    .template-thumb[data-thumb-variant="left-title"] .template-thumb-summary { max-width: 86%; }
+    .template-thumb[data-thumb-variant="center-card"] .template-thumb-cover { text-align: center; padding-left: 9%; padding-right: 9%; }
+    .template-thumb[data-thumb-variant="center-card"] .template-thumb-heading,
+    .template-thumb[data-thumb-variant="center-card"] .template-thumb-summary { max-width: 100%; }
+    .template-thumb[data-thumb-variant="center-card"] .template-thumb-tag { justify-self: center; }
+    .template-thumb[data-thumb-variant="banner-card"] .template-thumb-cover { align-content: start; padding-top: 6%; }
+    .template-thumb[data-thumb-variant="banner-card"] .template-thumb-heading { max-width: 100%; font-size: 17px; }
+    .template-thumb[data-thumb-variant="compact-card"] .template-thumb-cover { padding-left: 10%; padding-right: 10%; }
+    .template-thumb[data-thumb-variant="compact-card"] .template-thumb-heading { max-width: 100%; font-size: 17px; }
+    .template-thumb-content { display: contents; }
+    .template-thumb-title { display: none; }
+    .template-thumb-palette { position: absolute; z-index: 8; right: 8%; top: 8%; display: inline-flex; gap: 4px; }
+    .template-thumb-swatch { width: 8px; height: 18px; border-radius: 999px; border: 1px solid rgba(15,23,42,.12); }
+    .template-card-meta { display: none; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .primary-action { width: 100%; justify-content: center; min-height: 42px; }
     .preview-shell { min-height: calc(100vh - 108px); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
     .preview-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; border-bottom: 1px solid var(--line); }
     .preview-meta { color: var(--muted); font-size: 12px; }
-    .preview-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .preview-actions { display: flex; gap: 8px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
     .preview-actions button { min-height: 34px; padding: 8px 10px; }
-    .preview-stage { display: grid; min-height: 0; padding: 18px; background: #edf3fb; overflow: auto; }
+    .preview-stage { position: relative; display: grid; min-height: 0; padding: 18px; background: #edf3fb; overflow: auto; }
     .preview {
       min-height: 620px; background: #ffffff; color: var(--text); border-radius: 8px; padding: 18px; overflow: auto;
       box-shadow: inset 0 0 0 1px rgba(37,99,235,.08), 0 18px 42px rgba(23,32,51,.12);
@@ -1125,6 +1255,25 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .preview.is-deck-loaded { height: 100%; min-height: 0; padding: 0; background: #edf3fb; overflow: hidden; }
     .preview-frame { display: block; width: 100%; min-height: 620px; border: 0; border-radius: 8px; background: #edf3fb; }
     .preview.is-deck-loaded .preview-frame { height: 100%; min-height: 0; }
+    .preview-polish-loading { position: absolute; z-index: 20; inset: 18px; display: none; place-items: center; border-radius: 8px; background: rgba(237,243,251,.62); backdrop-filter: blur(2px); pointer-events: none; }
+    .preview-stage.is-polishing .preview-polish-loading { display: grid; }
+    .polish-loading-card { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 16px; border: 1px solid #bfdbfe; border-radius: 999px; background: rgba(255,255,255,.94); color: #1d4ed8; font-size: 13px; font-weight: 850; box-shadow: 0 14px 34px rgba(37,99,235,.18); }
+    .polish-spinner, .button-spinner { display: inline-block; width: 15px; height: 15px; border-radius: 999px; border: 2px solid rgba(37,99,235,.24); border-top-color: #2563eb; animation: spin .75s linear infinite; }
+    .button-spinner { width: 13px; height: 13px; margin-right: 6px; vertical-align: -2px; }
+    .structure-side-panel, .ai-polish-side-panel { display: none !important; }
+    .slide-edit-modal { position: absolute; z-index: 30; inset: 18px; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15,23,42,.20); backdrop-filter: blur(2px); }
+    .slide-edit-modal[aria-hidden="false"] { display: flex; }
+    .slide-edit-dialog { width: min(720px, 100%); max-height: min(760px, 92vh); overflow: auto; border: 1px solid #cfe0ff; border-radius: 8px; background: #fff; box-shadow: 0 26px 70px rgba(15,23,42,.24); }
+    .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .slide-edit-head h2 { font-size: 16px; margin: 0 0 5px; color: var(--text); }
+    .slide-edit-selected { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .slide-edit-close { width: 34px; height: 34px; padding: 0; border: 1px solid #d8e2f0; background: #fff; color: #475569; box-shadow: none; }
+    .slide-edit-body { display: grid; gap: 12px; padding: 16px 18px 18px; }
+    .slide-edit-body textarea { min-height: 116px; }
+    .slide-ai-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; }
+    .slide-ai-choice label { display: flex; align-items: center; gap: 8px; margin: 0; color: #1e3a8a; font-size: 13px; font-weight: 850; }
+    .slide-ai-choice input[type="checkbox"] { width: 16px; height: 16px; padding: 0; }
+    .slide-edit-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
     .empty-preview { min-height: 584px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 8px; background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 62%, #e8f1ff 100%); }
     .empty-slide { width: min(520px, 90%); aspect-ratio: 16 / 9; border-radius: 8px; background: #fff; border: 1px solid #d9e5f5; box-shadow: 0 24px 60px rgba(37,99,235,.12); padding: 46px 54px; }
     .empty-slide h3 { margin: 0 0 14px; font-size: 28px; line-height: 1.2; color: #1e3a8a; letter-spacing: 0; }
@@ -1152,12 +1301,18 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .outline-shell { min-height: calc(100vh - 108px); display: grid; grid-template-rows: auto auto 1fr; overflow: hidden; }
+    .outline-shell { position: relative; min-height: calc(100vh - 108px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 64px; }
     .outline-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px; border-bottom: 1px solid var(--line); }
     .outline-title-row { display: flex; align-items: center; gap: 10px; }
     .outline-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 12px; font-weight: 800; }
-    .outline-toolbar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .outline-toolbar button { min-height: 34px; padding: 8px 10px; }
+    .outline-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .outline-toolbar button { min-height: 40px; padding: 10px 14px; }
+    .outline-action-save { min-width: 148px; box-shadow: 0 12px 24px rgba(37,99,235,.22); }
+    .outline-action-save:hover { box-shadow: 0 14px 28px rgba(37,99,235,.26); }
+    button.outline-action-retry { background: #fff; color: #475569; border-color: #d8e2f0; }
+    button.outline-action-retry:hover { background: #f8fafc; color: #1f2937; border-color: #cbd5e1; }
+    .outline-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line); background: rgba(255,255,255,.98); }
+    .outline-header .outline-toolbar { position: absolute; left: 0; right: 0; bottom: 0; justify-content: flex-end; padding: 14px 16px; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.96), #fff); box-shadow: 0 -12px 28px rgba(15,23,42,.06); }
     .outline-summary { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .outline-stat { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .outline-stat span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; }
@@ -1196,13 +1351,38 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .download-button { width: 100%; min-height: 42px; }
     .selected-slide-box { padding: 10px 12px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 800; }
     .selected-slide-box span { display: block; margin-top: 3px; color: var(--muted); font-weight: 700; line-height: 1.45; }
-    .asset-list { display: grid; gap: 8px; margin-bottom: 0; }
+    .structure-editor { display: grid; gap: 10px; }
+    .structure-editor textarea { min-height: 118px; }
+    .structure-editor-actions { display: grid; gap: 8px; }
+    .structure-editor-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .asset-toolbar { display: grid; gap: 8px; margin-bottom: 12px; }
+    .asset-filter-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, 180px); gap: 8px; }
+    .asset-search { width: 100%; min-height: 38px; }
+    .asset-time-filter { width: 100%; min-height: 38px; }
+    .asset-list-summary { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .asset-list { display: grid; gap: 10px; margin-bottom: 0; }
     .asset-list:empty::before { content: "暂无历史 PPT"; color: var(--muted); font-size: 13px; }
-    .asset-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
-    .asset-title { font-weight: 800; font-size: 13px; }
-    .asset-meta { margin-top: 3px; font-size: 12px; color: var(--muted); }
-    .asset-actions { display: flex; gap: 6px; }
-    .asset-actions button { padding: 6px 8px; font-size: 12px; }
+    .asset-item { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; box-shadow: 0 12px 28px rgba(23,32,51,.06); }
+    .asset-item[aria-selected="true"] { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12), 0 12px 28px rgba(23,32,51,.08); }
+    .asset-head { display: grid; grid-template-columns: minmax(128px, 42%) minmax(0, 1fr); gap: 10px; align-items: start; }
+    .asset-thumb { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 1px solid #dbeafe; background: linear-gradient(135deg, #1e3a8a, #0f766e); box-shadow: inset 0 0 0 1px rgba(255,255,255,.20); }
+    .asset-thumb::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 82% 18%, rgba(255,255,255,.24), transparent 22%), linear-gradient(135deg, rgba(255,255,255,.12), transparent 48%); }
+    .asset-thumb::after { content: ""; position: absolute; z-index: 0; left: -4%; right: -4%; bottom: -2%; height: 24%; background: linear-gradient(135deg, rgba(255,255,255,.78), rgba(219,234,254,.64)); clip-path: polygon(0 58%, 20% 44%, 40% 60%, 62% 38%, 80% 52%, 100% 42%, 100% 100%, 0 100%); opacity: .72; pointer-events: none; }
+    .asset-thumb-content { position: relative; z-index: 2; display: grid; align-content: center; gap: 4px; height: 100%; padding: 12px 14px 18px; color: #fff; }
+    .asset-thumb-kicker { font-size: 9px; line-height: 1; font-weight: 850; color: rgba(255,255,255,.78); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .asset-thumb-title { min-height: 35px; max-height: 38px; font-size: 16px; line-height: 1.12; font-weight: 900; letter-spacing: 0; overflow: hidden; overflow-wrap: anywhere; word-break: break-word; text-shadow: 0 2px 8px rgba(15,23,42,.22); }
+    .asset-thumb-subtitle { max-width: 92%; font-size: 9px; line-height: 1.25; font-weight: 700; color: rgba(255,255,255,.86); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 5px rgba(15,23,42,.18); }
+    .asset-title { min-width: 0; color: #0f172a; font-weight: 850; font-size: 14px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .asset-meta { margin-top: 4px; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .asset-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .asset-fact { min-width: 0; padding: 8px; border: 1px solid #edf2f7; border-radius: 8px; background: #f8fafc; }
+    .asset-fact span { display: block; color: var(--muted); font-size: 11px; font-weight: 750; }
+    .asset-fact strong { display: block; margin-top: 3px; color: #172033; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .asset-actions { display: flex; gap: 7px; justify-content: flex-end; }
+    .asset-actions button { padding: 7px 9px; font-size: 12px; }
+    .asset-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+    .asset-page-info { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .asset-pagination button { min-height: 32px; padding: 6px 10px; font-size: 12px; }
     .balance-card { display: grid; gap: 10px; }
     .balance-main { display: grid; gap: 14px; padding: 14px; border: 1px solid #c7d2fe; border-radius: 8px; background: linear-gradient(135deg, #fff 0%, #eef4ff 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.72); }
     .balance-main-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
@@ -1221,18 +1401,41 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .balance-fact span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; }
     .balance-fact strong { display: block; margin-top: 4px; overflow-wrap: anywhere; color: var(--text); font-size: 13px; }
     .balance-message { padding: 10px 12px; border-radius: 8px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e; font-size: 12px; line-height: 1.5; }
+    .status-dashboard { display: grid; gap: 14px; }
+    .status-hero { position: relative; overflow: hidden; display: grid; gap: 14px; padding: 20px; border: 1px solid #cfe0ff; border-radius: 8px; background: linear-gradient(135deg, #ffffff 0%, #eef4ff 58%, #e8fbf8 100%); box-shadow: var(--shadow); }
+    .status-hero::after { content: ""; position: absolute; right: -52px; top: -78px; width: 220px; height: 220px; border-radius: 999px; background: rgba(37,99,235,.10); pointer-events: none; }
+    .status-hero-head { position: relative; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .status-hero-title { display: grid; gap: 6px; }
+    .status-hero-title h2 { font-size: 22px; color: #0f172a; }
+    .status-hero-title p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .status-live-badge { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid #bbf7d0; background: #f0fdf4; color: #166534; font-size: 12px; font-weight: 850; white-space: nowrap; }
+    .status-live-badge::before { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--success); box-shadow: 0 0 0 4px rgba(21,128,61,.10); }
+    .status-metrics { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .status-metric { min-width: 0; padding: 12px; border: 1px solid rgba(191,219,254,.92); border-radius: 8px; background: rgba(255,255,255,.82); }
+    .status-metric span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .status-metric strong { display: block; margin-top: 6px; color: #172033; font-size: 16px; line-height: 1.2; overflow-wrap: anywhere; }
+    .status-grid { display: grid; grid-template-columns: minmax(320px, .86fr) minmax(420px, 1.14fr); gap: 14px; align-items: start; }
+    .status-panel { min-height: 100%; border-radius: 8px; box-shadow: none; }
+    .status-panel .panel-head { align-items: flex-start; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; }
+    .status-panel-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .status-log-panel pre { max-height: 440px; min-height: 300px; background: #0f172a; border-color: #1e293b; color: #dbeafe; font-size: 12px; line-height: 1.6; }
+    .status-log-panel pre:empty::before { content: "暂无任务日志"; color: #94a3b8; }
     pre { white-space: pre-wrap; word-break: break-word; margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; border: 1px solid var(--line); color: #334155; font-size: 12px; line-height: 1.55; max-height: 240px; overflow: auto; }
     .outline-editor { min-height: 160px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
     .sidebar-panel { box-shadow: none; }
     body[data-workspace-page="assets"] .context { order: 1; }
     body[data-workspace-page="assets"] .preview-shell { order: 2; }
+    body[data-workspace-page="assets"][data-asset-preview-open="false"] main { grid-template-columns: minmax(0, 1fr); }
+    body[data-workspace-page="assets"][data-asset-preview-open="false"] .context { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); }
+    body[data-workspace-page="assets"][data-asset-preview-open="false"] .asset-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
     .is-hidden { display: none !important; }
-    @media (max-width: 1180px) { header { flex-wrap: wrap; } main { grid-template-columns: minmax(300px, 380px) 1fr; } .context { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } .preview-shell { min-height: 620px; } }
+    @media (max-width: 1180px) { header { flex-wrap: wrap; } main { grid-template-columns: minmax(300px, 380px) 1fr; } .context { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } .preview-shell { min-height: 620px; } .status-grid { grid-template-columns: 1fr; } }
     @media (min-width: 1021px) and (max-width: 1320px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(280px, 320px) minmax(520px, 1fr) minmax(280px, 320px); } }
     @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } }
     @media (max-width: 980px) { body[data-workspace-page="templates"] main { grid-template-columns: 1fr; } }
-    @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .top-status { justify-content: flex-start; } }
-    @media (max-width: 520px) { .template-category-grid { grid-template-columns: 1fr; } .balance-facts { grid-template-columns: 1fr; } .balance-main-head { align-items: stretch; flex-direction: column; } .balance-badge { width: max-content; } }
+    @media (max-width: 1180px) { .template-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"], body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] { padding: 20px; } body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .template-category-tabs { gap: 22px; } .top-status { justify-content: flex-start; } }
+    @media (max-width: 520px) { body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: 1fr; } .outline-toolbar { width: 100%; } .outline-toolbar button { flex: 1 1 100%; } .template-gallery { grid-template-columns: 1fr; } .template-category-grid { grid-template-columns: 1fr; } .balance-facts, .status-metrics { grid-template-columns: 1fr; } .balance-main-head, .status-hero-head { align-items: stretch; flex-direction: column; } .balance-badge { width: max-content; } }
   </style>
 </head>
 <body>
@@ -1256,8 +1459,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     </div>
   </header>
   <main>
-	    <section class="workflow" aria-label="生成流程" data-page-panel="create templates" data-flow-panel="input preview">
-		      <div class="panel" data-page-panel="create" data-flow-panel="input">
+	    <section class="workflow" aria-label="生成流程" data-page-panel="create templates" data-flow-panel="input outline preview">
+		      <div class="panel" data-page-panel="create" data-flow-panel="input outline">
 	        <div class="panel-head">
 	          <div class="panel-title"><span class="step-number">1</span><h2>生成流程</h2></div>
 	        </div>
@@ -1273,13 +1476,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="row">
         <div>
           <label for="slide-count">页数</label>
-          <input id="slide-count" type="number" min="1" max="20" value="6" />
+          <select id="slide-count">${slideCountOptions}</select>
         </div>
-        <div>
-          <label for="entitlement">entitlement_id</label>
-          <input id="entitlement" value="${escapeHtml(entitlementValue)}" />
-          ${entitlementValue ? "" : '<p class="hint warning">未识别到权益 ID。请确认魔灵入口 verify 返回 entitlement_id，或手动填写用户购买套餐后的 entitlement_id。</p>'}
-        </div>
+        <input id="entitlement" type="hidden" value="${escapeHtml(entitlementValue)}" />
       </div>
       <label for="document">上传文档内容</label>
       <textarea id="document" placeholder="可粘贴文档文本，生成大纲时会作为 source file 上传"></textarea>
@@ -1287,7 +1486,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         <button id="generate-outline" class="primary-action">生成大纲</button>
       </div>
       </div>
-	      <div class="panel" data-page-panel="create templates" data-flow-panel="preview">
+      <div class="panel" data-page-panel="create" data-flow-panel="preview">
         <div class="panel-head">
           <div class="panel-title"><span class="step-number">2</span><h2>模板与主题</h2></div>
         </div>
@@ -1308,20 +1507,23 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         </div>
         <div>
           <label for="template-scope">模板来源</label>
-          <input id="template-scope" value="官方 / 个人" disabled />
+          <input id="template-scope" class="is-hidden" value="官方模板" disabled aria-hidden="true" tabindex="-1" />
         </div>
       </div>
       <p class="panel-note">模板列表请前往“模板管理”按分类进行大图浏览，并选择当前模板。</p>
       </div>
-      <div class="panel" data-page-panel="templates">
-      <div class="panel-head">
-        <div class="panel-title"><span class="step-number">3</span><h2>模板库总览</h2></div>
+      <div id="selected-template-preview" class="selected-template-preview" data-page-panel="create" data-flow-panel="preview" aria-label="已选择模板样式展示">
+        <div class="selected-template-preview-empty">请选择模板后查看样式预览</div>
       </div>
-      <div class="template-gallery-toolbar">
-        <span class="template-gallery-title">模板列表</span>
+      <div class="panel" data-page-panel="templates">
+      <div class="template-browser-head">
+        <h2>从模板创作</h2>
         <span id="template-gallery-count" class="template-gallery-count">0 个可用模板</span>
       </div>
-      <p class="panel-note">按分类区块平铺展示全部模板，支持官方与个人模板快速切换。</p>
+      <div class="template-gallery-toolbar">
+        <div id="template-category-tabs" class="template-category-tabs" aria-label="模板分类导航"></div>
+        <button type="button" class="template-more-link" data-template-category-more>查看更多 ›</button>
+      </div>
       <div class="template-gallery-wrap">
         <div id="template-gallery" class="template-gallery" aria-label="模板内容样式预览"></div>
       </div>
@@ -1355,8 +1557,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <div class="preview-meta">逐页确认标题和要点。确认无误后保存大纲，进入模板预览和下载阶段。</div>
         </div>
         <div class="outline-toolbar">
-          <button id="save-outline" class="secondary">保存大纲</button>
-          <button id="retry-task" class="secondary">重试失败任务</button>
+          <button id="retry-task" class="secondary outline-action-retry">重试失败任务</button>
+          <button id="save-outline" class="outline-action-save">保存大纲</button>
         </div>
       </div>
       <div id="outline-board" class="outline-board">
@@ -1367,16 +1569,47 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         <textarea id="outline-editor" class="outline-editor" placeholder="生成大纲后会同步显示 slides JSON"></textarea>
       </details>
     </section>
-    <section class="preview-shell" aria-label="在线预览" data-page-panel="create assets" data-flow-panel="preview">
+    <section class="preview-shell" aria-label="在线预览" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
       <div class="preview-header">
         <div>
           <h2>在线预览</h2>
           <div class="preview-meta">保存大纲后才能生成并查看模板预览。</div>
         </div>
-        <button id="generate-deck">应用当前模板生成 PPT</button>
+        <div class="preview-actions">
+          <button id="back-to-outline" type="button" class="secondary">返回大纲内容</button>
+          <button id="generate-deck">应用当前模板生成 PPT</button>
+        </div>
       </div>
       <div class="preview-stage">
         <div id="preview" class="preview"><div class="empty-preview"><div class="empty-slide"><h3>等待生成 PPT</h3><p>先生成大纲，再应用当前模板。预览区会展示每页内容、配色和版式效果。</p><div class="empty-line"></div></div></div></div>
+        <div id="preview-polish-loading" class="preview-polish-loading" aria-live="polite"><div class="polish-loading-card"><span class="polish-spinner"></span><span>AI 正在润色本页...</span></div></div>
+        <div id="slide-edit-modal" class="slide-edit-modal" aria-hidden="true">
+          <div class="slide-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="slide-edit-title">
+            <div class="slide-edit-head">
+              <div>
+                <h2 id="slide-edit-title">编辑当前页面</h2>
+                <div id="slide-edit-selected" class="slide-edit-selected">请选择一页 PPT</div>
+              </div>
+              <button id="close-slide-edit-modal" class="slide-edit-close" type="button" aria-label="关闭">×</button>
+            </div>
+            <div class="slide-edit-body">
+              <label for="structure-slide-title">页面标题</label>
+              <input id="structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
+              <label for="structure-slide-layout">页面版式</label>
+              <select id="structure-slide-layout" disabled></select>
+              <label for="structure-slide-bullets">页面要点</label>
+              <textarea id="structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
+              <div class="slide-ai-choice">
+                <label for="single-page-ai-toggle"><input id="single-page-ai-toggle" type="checkbox" />需要 AI 单页优化</label>
+                <textarea id="slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
+              </div>
+              <div class="slide-edit-actions">
+                <button id="apply-structure-preview" type="button" class="secondary">仅更新预览</button>
+                <button id="regenerate-slide" type="button">AI 优化本页</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
     <aside class="context" aria-label="上下文信息" data-page-panel="create assets status" data-flow-panel="outline preview">
@@ -1389,7 +1622,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <div class="outline-stat"><span>可编辑要点</span><strong>0</strong></div>
         </div>
       </div>
-      <div class="panel sidebar-panel" data-page-panel="create" data-flow-panel="preview">
+      <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
         <div class="panel-head"><h2>下载文件</h2></div>
         <p class="panel-note">生成 PPT 预览后，可下载 PPTX 或 PDF 文件。</p>
         <div class="download-panel">
@@ -1397,60 +1630,145 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <button id="export-pdf" class="secondary download-button">下载 PDF</button>
         </div>
       </div>
-      <div class="panel sidebar-panel" data-page-panel="create" data-flow-panel="preview">
-        <div class="panel-head"><h2>AI 单页润色</h2></div>
-        <p class="panel-note">在中间预览中点击要优化的页面，再输入润色建议。</p>
-        <div id="selected-slide-label" class="selected-slide-box">未选择页面<span>请先在在线预览中点击一页 PPT。</span></div>
-        <label for="slide-instruction">润色建议</label>
-        <textarea id="slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
-        <div class="actions">
-          <button id="regenerate-slide" class="secondary">AI 润色本页</button>
+      <div class="panel sidebar-panel structure-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
+        <div class="panel-head"><h2>PPT 结构调整</h2></div>
+        <p class="panel-note">在中间预览中选择页面后，可调整标题、要点和版式角色，再按当前模板重新预览。</p>
+        <div class="structure-editor">
+          <label for="legacy-structure-slide-title">页面标题</label>
+          <input id="legacy-structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
+          <label for="legacy-structure-slide-layout">页面版式</label>
+          <select id="legacy-structure-slide-layout" disabled></select>
+          <label for="legacy-structure-slide-bullets">页面要点</label>
+          <textarea id="legacy-structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
+          <div class="structure-editor-note">调整会先同步到大纲结构，再重新生成在线预览。</div>
+          <div class="structure-editor-actions">
+            <button id="legacy-apply-structure-preview" type="button" class="secondary">应用结构并重新预览</button>
+          </div>
         </div>
       </div>
-      <div class="panel sidebar-panel" data-page-panel="create" data-flow-panel="preview">
+      <div class="panel sidebar-panel ai-polish-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
+        <div class="panel-head"><h2>AI 单页润色</h2></div>
+        <p class="panel-note">在中间预览中点击要优化的页面，再输入润色建议。</p>
+        <div id="legacy-selected-slide-label" class="selected-slide-box">未选择页面<span>请先在在线预览中点击一页 PPT。</span></div>
+        <label for="legacy-slide-instruction">润色建议</label>
+        <textarea id="legacy-slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
+        <div class="actions">
+          <button id="legacy-regenerate-slide" class="secondary">AI 润色本页</button>
+        </div>
+      </div>
+      <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
         <div class="panel-head"><h2>任务状态 / 日志</h2></div>
         <pre id="status">ready</pre>
       </div>
       <div class="panel sidebar-panel" data-page-panel="assets">
         <div class="panel-head"><h2>历史 PPT</h2></div>
+        <div class="asset-toolbar">
+          <div class="asset-filter-row">
+            <input id="asset-search" class="asset-search" placeholder="按标题搜索历史 PPT" />
+            <select id="asset-time-filter" class="asset-time-filter" aria-label="历史 PPT 时间范围">
+              <option value="all">全部时间</option>
+              <option value="today">今天</option>
+              <option value="7d">近 7 天</option>
+              <option value="30d">近 30 天</option>
+            </select>
+          </div>
+          <div id="asset-list-summary" class="asset-list-summary">每页显示 20 个历史 PPT</div>
+        </div>
         <div id="asset-list" class="asset-list">加载中...</div>
+        <div id="asset-pagination" class="asset-pagination"></div>
       </div>
-      <div class="panel sidebar-panel" data-page-panel="status">
-        <div class="panel-head"><h2>套餐余额</h2></div>
-        <div id="balance-status" class="balance-card"><div class="balance-message">正在读取套餐余额...</div></div>
-      </div>
-      <div class="panel sidebar-panel" data-page-panel="status">
-        <div class="panel-head"><h2>任务状态 / 日志</h2></div>
-        <pre id="status-readonly">ready</pre>
-      </div>
+      <section class="status-dashboard" data-page-panel="status" aria-label="状态中心总览">
+        <div class="status-hero">
+          <div class="status-hero-head">
+            <div class="status-hero-title">
+              <h2>状态中心</h2>
+              <p>集中查看套餐余额、生成任务、导出状态和最近运行日志。</p>
+            </div>
+            <span class="status-live-badge">服务在线</span>
+          </div>
+          <div class="status-metrics" aria-label="关键状态">
+            <div class="status-metric"><span>生成服务</span><strong>可用</strong></div>
+            <div class="status-metric"><span>预览渲染</span><strong>PPTX / HTML</strong></div>
+            <div class="status-metric"><span>导出格式</span><strong>PPTX / PDF</strong></div>
+            <div class="status-metric"><span>任务重试</span><strong>失败后可重试</strong></div>
+          </div>
+        </div>
+        <div class="status-grid">
+          <div class="panel status-panel">
+            <div class="panel-head"><div><h2>套餐余额</h2><p class="status-panel-subtitle">展示当前权益、可用点数和消耗进度。</p></div></div>
+            <div id="balance-status" class="balance-card"><div class="balance-message">正在读取套餐余额...</div></div>
+          </div>
+          <div class="panel status-panel status-log-panel">
+            <div class="panel-head"><div><h2>任务状态 / 日志</h2><p class="status-panel-subtitle">同步生成工作台中的最近任务状态，便于排查生成、预览和导出问题。</p></div></div>
+            <pre id="status-readonly">ready</pre>
+          </div>
+        </div>
+      </section>
     </aside>
   </main>
   <script>
-    const state = { outlineId: null, deckId: null, taskId: null, outlineSlides: [], selectedSlideId: null, selectedSlideNumber: null };
+    const state = { outlineId: null, deckId: null, taskId: null, outlineSlides: [], selectedSlideId: null, selectedSlideNumber: null, previewRevision: 0, assetPreviewOpen: false, currentAssetId: null };
     let taskPollTimeout;
     const statusEl = document.querySelector("#status");
+    const statusReadonlyEl = document.querySelector("#status-readonly");
     const balanceStatusEl = document.querySelector("#balance-status");
     const previewEl = document.querySelector("#preview");
+    const previewStageEl = document.querySelector(".preview-stage");
+    const previewPolishLoadingEl = document.querySelector("#preview-polish-loading");
+    const backToOutlineButton = document.querySelector("#back-to-outline");
     const outlineEditorEl = document.querySelector("#outline-editor");
     const outlineBoardEl = document.querySelector("#outline-board");
     const outlineSummaryEl = document.querySelector("#outline-summary");
     const selectedSlideLabelEl = document.querySelector("#selected-slide-label");
+    const slideEditModalEl = document.querySelector("#slide-edit-modal");
+    const slideEditSelectedEl = document.querySelector("#slide-edit-selected");
+    const singlePageAiToggleEl = document.querySelector("#single-page-ai-toggle");
+    const structureSlideTitleEl = document.querySelector("#structure-slide-title");
+    const structureSlideLayoutEl = document.querySelector("#structure-slide-layout");
+    const structureSlideBulletsEl = document.querySelector("#structure-slide-bullets");
+    const applyStructurePreviewButton = document.querySelector("#apply-structure-preview");
     const templateGalleryEl = document.querySelector("#template-gallery");
     const templateGalleryCountEl = document.querySelector("#template-gallery-count");
+    const templateCategoryTabsEl = document.querySelector("#template-category-tabs");
+    const selectedTemplatePreviewEl = document.querySelector("#selected-template-preview");
+    const assetSearchEl = document.querySelector("#asset-search");
+    const assetTimeFilterEl = document.querySelector("#asset-time-filter");
+    const assetListSummaryEl = document.querySelector("#asset-list-summary");
     const assetListEl = document.querySelector("#asset-list");
+    const assetPaginationEl = document.querySelector("#asset-pagination");
     const pageButtons = [...document.querySelectorAll("[data-page-target]")];
     const flowStepEls = [...document.querySelectorAll("[data-flow-step]")];
     const workspacePages = new Set(["create", "templates", "assets", "status"]);
     const OUTLINE_REVEAL_INTERVAL_MS = 620;
     const DECK_REVEAL_INTERVAL_MS = 700;
     const DECK_MIN_LOADING_MS = 2200;
+    const ASSET_PAGE_SIZE = 20;
     let flowStage = "input";
     let templateCategories = [{ id: "business", name: "Business" }];
     let templateCatalog = [{ id: "business", name: "Business", category: { id: "business", name: "Business" }, themes: [{ id: "modern", name: "Modern" }] }];
+    let assetCatalog = [];
+    let assetSearchQuery = "";
+    let assetTimeFilter = "all";
+    let assetPage = 1;
     let deckLoadingStartedAt = 0;
     let deckRevealTimer = null;
     let deckRevealTargetCount = 0;
     let deckRevealSlides = [];
+    const STRUCTURE_LAYOUT_OPTIONS = [
+      ["", "自动匹配"],
+      ["cover", "封面页"],
+      ["agenda", "目录页"],
+      ["section-divider", "章节页"],
+      ["image-report", "图文汇报"],
+      ["metrics", "数据指标"],
+      ["three-steps", "三步骤流程"],
+      ["four-steps", "四步骤流程"],
+      ["showcase", "成果展示"],
+      ["retrospective", "问题复盘"],
+      ["next-plan", "下一步计划"],
+      ["closing", "结束页"],
+      ["content", "普通内容"]
+    ];
     const json = (url, body, method = "POST") => fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -1486,6 +1804,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       return error.code
         ? error.code + ": " + (error.message || "请求失败")
         : JSON.stringify(payload);
+    }
+    if (statusEl && statusReadonlyEl) {
+      statusReadonlyEl.textContent = statusEl.textContent || "ready";
+      new MutationObserver(() => {
+        statusReadonlyEl.textContent = statusEl.textContent || "ready";
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
     }
     async function loadBalance() {
       try {
@@ -1543,6 +1867,42 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       categoryEl.innerHTML = '<option value="">全部分类</option>' + templateCategories.map((category) => (
         '<option value="' + escapeHtml(category.id) + '">' + escapeHtml(category.name) + '</option>'
       )).join("");
+      renderTemplateCategoryTabs();
+    }
+    function renderTemplateCategoryTabs() {
+      if (!templateCategoryTabsEl) return;
+      const tabs = preferredTemplateCategoryTabs();
+      const currentCategoryId = document.querySelector("#template-category")?.value || "";
+      let activeMatched = false;
+      templateCategoryTabsEl.innerHTML = tabs.map((tab) => {
+        const selected = !activeMatched && tab.categoryId === currentCategoryId;
+        if (selected) activeMatched = true;
+        return '<button type="button" class="template-category-tab" data-template-category-tab="' + escapeHtml(tab.categoryId) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' + escapeHtml(tab.label) + '</button>';
+      }).join("");
+      templateCategoryTabsEl.querySelectorAll("[data-template-category-tab]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const categoryEl = document.querySelector("#template-category");
+          categoryEl.value = button.dataset.templateCategoryTab || "";
+          loadTemplates();
+        });
+      });
+    }
+    function preferredTemplateCategoryTabs() {
+      const categoryIds = new Set((templateCategories || []).map((category) => category.id));
+      const findCategoryId = (ids) => ids.find((id) => categoryIds.has(id)) || "";
+      return [
+        { label: "精品推荐", categoryId: "" },
+        { label: "总结汇报", categoryId: findCategoryId(["business", "finance", "project-status"]) },
+        { label: "教育培训", categoryId: findCategoryId(["education"]) },
+        { label: "营销推广", categoryId: findCategoryId(["marketing", "sales"]) },
+        { label: "企业宣讲", categoryId: findCategoryId(["strategy", "business"]) },
+        { label: "高校专区", categoryId: findCategoryId(["education"]) },
+        { label: "党政民生", categoryId: findCategoryId(["data", "business"]) },
+        { label: "商业计划", categoryId: findCategoryId(["pitch", "strategy"]) },
+        { label: "人资行政", categoryId: findCategoryId(["business"]) },
+        { label: "医疗健康", categoryId: findCategoryId(["data"]) },
+        { label: "产品发布", categoryId: findCategoryId(["product", "marketing"]) }
+      ];
     }
     function renderThemeOptions(preferredThemeId) {
       const selected = templateCatalog.find((template) => template.id === document.querySelector("#template").value) || templateCatalog[0];
@@ -1553,7 +1913,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (preferredThemeId && [...themeEl.options].some((option) => option.value === preferredThemeId)) {
         themeEl.value = preferredThemeId;
       }
-      document.querySelector("#template-scope").value = selected ? (selected.scope === "user" ? "个人模板" : "官方模板") : "";
+      const templateScopeEl = document.querySelector("#template-scope");
+      if (templateScopeEl) templateScopeEl.value = selected ? "官方模板" : "";
+      renderSelectedTemplatePreview();
     }
     function resolveTemplateCategory(template) {
       const category = template.category || {};
@@ -1579,20 +1941,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const templates = categoryId
         ? templateCatalog.filter((template) => resolveTemplateCategory(template).id === categoryId)
         : templateCatalog;
-      const groupedTemplates = new Map();
-      for (const template of templates) {
-        const category = resolveTemplateCategory(template);
-        const key = category.id;
-        if (!groupedTemplates.has(key)) {
-          groupedTemplates.set(key, {
-            categoryId: key,
-            categoryName: category.name || "未分类",
-            templates: []
-          });
-        }
-        groupedTemplates.get(key).templates.push(template);
-      }
-      const groups = sortTemplateCategoryEntries(Array.from(groupedTemplates.values()).map((item) => [item.categoryId, item]));
+      renderTemplateCategoryTabs();
       if (templateGalleryCountEl) {
         templateGalleryCountEl.textContent = templates.length + " 个可用模板";
       }
@@ -1601,7 +1950,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         if (templateGalleryCountEl) templateGalleryCountEl.textContent = "当前分类暂无可用模板";
         return;
       }
-      templateGalleryEl.innerHTML = groups.map(([categoryId, group]) => templateCategoryBlockHtml(categoryId, group, selectedId)).join("");
+      templateGalleryEl.innerHTML = templates.map((template) => templateCardHtml(template, selectedId)).join("");
       templateGalleryEl.querySelectorAll("[data-template-card]").forEach((button) => {
         button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
       });
@@ -1620,6 +1969,35 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         + '</section>';
     }
     function templateCardHtml(template, selectedId) {
+      const display = resolveTemplateDisplay(template, selectedId);
+      const displayTheme = display.theme;
+      const displayVisual = display.visual;
+      const categoryName = template.category?.name || template.category || "未分类";
+      return ''
+        + '<button type="button" class="template-card" data-template-card="' + escapeHtml(template.id) + '" aria-selected="' + (template.id === selectedId ? 'true' : 'false') + '">'
+        + templateThumbHtml(display)
+        + '<span class="template-card-title">' + escapeHtml(template.name) + '</span>'
+        + '<span class="template-card-meta"><span>' + escapeHtml(categoryName) + '</span><span>' + escapeHtml(displayTheme.name || displayTheme.id || displayTheme) + '</span></span>'
+        + '</button>';
+    }
+    function renderSelectedTemplatePreview() {
+      if (!selectedTemplatePreviewEl) return;
+      const template = templateCatalog.find((item) => item.id === document.querySelector("#template").value) || templateCatalog[0];
+      if (!template) {
+        selectedTemplatePreviewEl.innerHTML = '<div class="selected-template-preview-empty">请选择模板后查看样式预览</div>';
+        return;
+      }
+      const display = resolveTemplateDisplay(template, template.id);
+      const categoryName = template.category?.name || template.category || "未分类";
+      const themeName = display.theme?.name || display.theme?.id || display.theme || "默认主题";
+      selectedTemplatePreviewEl.innerHTML = ''
+        + '<div class="selected-template-preview-head">'
+        + '<div class="selected-template-preview-title"><strong>' + escapeHtml(template.name) + '</strong><span>' + escapeHtml(categoryName) + ' · ' + escapeHtml(themeName) + '</span></div>'
+        + '<span class="selected-template-preview-badge">官方模板</span>'
+        + '</div>'
+        + templateThumbHtml(display);
+    }
+    function resolveTemplateDisplay(template, selectedId) {
       const visual = normalizedTemplateVisual(template.visual);
       const themes = Array.isArray(template.themes) ? template.themes : [];
       const selectedThemeId = document.querySelector("#theme").value;
@@ -1627,21 +2005,66 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const fallbackTheme = themes[0] || { id: "modern", name: "Modern" };
       const hasSelectedTemplate = template.id === selectedId;
       const displayTheme = (hasSelectedTemplate && selectedTheme) || fallbackTheme;
-      const displayVisual = resolveTemplateCardVisual(template.visual, hasSelectedTemplate ? selectedTheme : null, visual);
-      const categoryName = template.category?.name || template.category || "未分类";
+      return {
+        id: template.id || "",
+        style: template.style || "",
+        categoryId: resolveTemplateCategory(template).id,
+        theme: displayTheme,
+        visual: resolveTemplateCardVisual(template.visual, hasSelectedTemplate ? selectedTheme : null, visual),
+        thumbnailUrl: template.thumbnailUrl || ""
+      };
+    }
+    function templateThumbHtml(display) {
+      const displayVisual = display.visual;
       const displayLayout = displayVisual.layout;
       const hasDomeAsset = displayLayout === "red-gold";
-      const thumbnailUrl = template.thumbnailUrl ? "url('" + cssUrl(template.thumbnailUrl) + "')" : "";
-      const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
+      const copy = templateThumbCopy(display);
+      const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout);
+      const thumbnailUrl = display.thumbnailUrl ? "url('" + cssUrl(display.thumbnailUrl) + "')" : "";
+      const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
       return ''
-        + '<button type="button" class="template-card" data-template-card="' + escapeHtml(template.id) + '" aria-selected="' + (template.id === selectedId ? 'true' : 'false') + '">'
-        + '<span class="template-card-head"><span class="template-card-title">' + escapeHtml(template.name) + '</span><span class="template-card-scope">' + (template.scope === "user" ? '个人' : '官方') + '</span></span>'
-        + '<span class="template-thumb" data-layout="' + escapeHtml(displayLayout) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
-        + '<span class="template-thumb-band"></span><span class="template-thumb-content"><span class="template-thumb-title"></span><span class="template-thumb-line"></span><span class="template-thumb-line"></span></span><span class="template-thumb-accent"></span>'
+        + '<span class="template-thumb" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
+        + '<span class="template-thumb-back template-thumb-back-left"></span><span class="template-thumb-back template-thumb-back-right"></span>'
+        + '<span class="template-thumb-cover"><span class="template-thumb-date">' + escapeHtml(copy.date) + '</span><span class="template-thumb-kicker">' + escapeHtml(copy.kicker) + '</span><span class="template-thumb-heading">' + escapeHtml(copy.title) + '</span><span class="template-thumb-summary"><span class="template-thumb-line">' + escapeHtml(copy.lines[0]) + '</span><span class="template-thumb-line">' + escapeHtml(copy.lines[1]) + '</span></span><span class="template-thumb-tag">' + escapeHtml(copy.tag) + '</span></span>'
+        + '<span class="template-thumb-image"></span><span class="template-thumb-band"></span><span class="template-thumb-wave"></span><span class="template-thumb-accent"></span>'
         + '<span class="template-thumb-palette"><span class="template-thumb-swatch" style="background:#' + displayVisual.primary + ';"></span><span class="template-thumb-swatch" style="background:#' + displayVisual.accent + ';"></span><span class="template-thumb-swatch" style="background:#' + displayVisual.title + ';"></span></span>'
-        + '</span>'
-        + '<span class="template-card-meta"><span>' + escapeHtml(categoryName) + '</span><span>' + escapeHtml(displayTheme.name || displayTheme.id || displayTheme) + '</span></span>'
-        + '</button>';
+        + '</span>';
+    }
+    function templateThumbCopy(display) {
+      // 每个模板使用不同示例内容，但仍避免直接把模板名称写进缩略图正文。
+      const copies = {
+        business: { date: "2026/06/05", kicker: "PART 01", title: "季度概览", lines: ["核心指标达成分析", "重点项目进展复盘"], tag: "商务汇报" },
+        "strategy-consulting": { date: "2026/07/12", kicker: "ISSUE 01", title: "诊断框架", lines: ["关键问题拆解路径", "组织能力提升建议"], tag: "咨询方案" },
+        "financial-review": { date: "2026/08/06", kicker: "FINANCE 01", title: "经营复盘", lines: ["收入利润现金流追踪", "预算执行偏差分析"], tag: "财务分析" },
+        "sales-proposal": { date: "2026/05/18", kicker: "SOLUTION 01", title: "客户方案", lines: ["业务痛点与价值主张", "交付计划及合作路径"], tag: "销售提案" },
+        "product-roadmap": { date: "2026/09/22", kicker: "ROADMAP 01", title: "版本规划", lines: ["核心功能优先级排序", "里程碑节奏与风险"], tag: "产品规划" },
+        "marketing-campaign": { date: "2026/10/10", kicker: "CAMPAIGN 01", title: "活动复盘", lines: ["渠道触达与转化表现", "品牌声量增长洞察"], tag: "营销推广" },
+        "data-insight": { date: "2026/11/03", kicker: "DATA 01", title: "洞察结论", lines: ["指标异常与趋势变化", "行动建议优先级排序"], tag: "数据报告" },
+        education: { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
+        pitch: { date: "2026/09/10", kicker: "PITCH 01", title: "增长故事", lines: ["市场机会与产品优势", "融资计划及资金用途"], tag: "融资路演" },
+        "brand-story": { date: "2026/10/26", kicker: "BRAND 01", title: "品牌叙事", lines: ["核心主张与用户心智", "传播内容矩阵规划"], tag: "品牌传播" },
+        "project-status": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" }
+      };
+      const layoutCopies = {
+        "red-gold": { date: "2026/06/05", kicker: "PART 01", title: "季度概览", lines: ["核心指标达成分析", "重点项目进展复盘"], tag: "商务汇报" },
+        "academy": { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
+        "executive": { date: "2026/07/18", kicker: "REPORT 01", title: "年度复盘", lines: ["经营数据与增长趋势", "关键任务完成情况"], tag: "企业汇报" },
+        "venture": { date: "2026/09/10", kicker: "PLAN 01", title: "项目计划", lines: ["商业模式与市场机会", "阶段目标及执行节奏"], tag: "商业计划" },
+        "top-band": { date: "2026/05/20", kicker: "SECTION 01", title: "方案总览", lines: ["背景洞察与问题拆解", "策略路径与落地安排"], tag: "方案演示" },
+        "hero": { date: "2026/10/12", kicker: "IDEA 01", title: "主题发布", lines: ["核心亮点集中呈现", "视觉主张清晰传达"], tag: "产品发布" }
+      };
+      return copies[display.id] || copies[display.style] || copies[display.categoryId] || layoutCopies[display.visual?.layout] || { date: "2026/06/05", kicker: "PART 01", title: "内容概览", lines: ["核心信息结构展示", "重点内容层级清晰"], tag: "演示文稿" };
+    }
+    function templateThumbVariant(seed) {
+      const variants = [
+        { name: "wide-cover", coverLeft: 9, coverRight: 9, coverTop: 17, imageTop: 24, imageWidth: 24, waveHeight: 30 },
+        { name: "left-title", coverLeft: 8, coverRight: 11, coverTop: 19, imageTop: 20, imageWidth: 24, waveHeight: 24 },
+        { name: "center-card", coverLeft: 12, coverRight: 10, coverTop: 15, imageTop: 27, imageWidth: 22, waveHeight: 34 },
+        { name: "banner-card", coverLeft: 10, coverRight: 9, coverTop: 24, imageTop: 16, imageWidth: 20, waveHeight: 22 },
+        { name: "compact-card", coverLeft: 12, coverRight: 12, coverTop: 18, imageTop: 23, imageWidth: 22, waveHeight: 28 }
+      ];
+      const hash = String(seed || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      return variants[hash % variants.length];
     }
     function selectTemplateCard(templateId) {
       const templateEl = document.querySelector("#template");
@@ -1690,7 +2113,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
-        templateCategories = data.categories;
+        templateCategories = (data.categories || []).filter((category) => category.id !== "personal");
         renderCategoryOptions();
       } catch (error) {
         statusEl.textContent = error.message;
@@ -1705,23 +2128,38 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
-        templateCatalog = data.templates;
+        templateCatalog = (data.templates || []).filter((template) => template.scope !== "user");
         renderTemplateOptions();
       } catch (error) {
         statusEl.textContent = error.message;
       }
     }
 
-    function renderAssets(assets) {
-      if (!assets.length) {
-        assetListEl.textContent = "暂无历史 PPT";
+    function renderAssets(assets = assetCatalog) {
+      const sourceAssets = Array.isArray(assets) ? assets : [];
+      const keyword = assetSearchQuery.trim().toLowerCase();
+      const filteredAssets = sourceAssets.filter((asset) => {
+        const titleMatched = keyword ? String(asset.title || "").toLowerCase().includes(keyword) : true;
+        return titleMatched && assetMatchesTimeFilter(asset, assetTimeFilter);
+      });
+      const pageCount = Math.max(1, Math.ceil(filteredAssets.length / ASSET_PAGE_SIZE));
+      assetPage = Math.min(Math.max(assetPage, 1), pageCount);
+      const pageAssets = filteredAssets.slice((assetPage - 1) * ASSET_PAGE_SIZE, assetPage * ASSET_PAGE_SIZE);
+      renderAssetPagination({ total: filteredAssets.length, pageCount });
+      if (!pageAssets.length) {
+        assetListEl.textContent = keyword ? "没有匹配的历史 PPT" : "暂无历史 PPT";
         return;
       }
-      assetListEl.innerHTML = assets.map((asset) => (
-        '<div class="asset-item" data-asset-id="' + asset.id + '">'
-          + '<div><div class="asset-title">' + escapeHtml(asset.title || "Untitled") + '</div>'
-          + '<div class="asset-meta">' + escapeHtml(asset.templateName || asset.templateId || "") + ' · ' + escapeHtml(asset.theme || "") + ' · ' + Number(asset.slideCount || 0) + ' 页</div></div>'
-          + '<div class="asset-actions"><button type="button" data-open-asset="' + asset.id + '">打开</button><button type="button" class="secondary" data-delete-asset="' + asset.id + '">删除</button></div>'
+      assetListEl.innerHTML = pageAssets.map((asset) => (
+        '<div class="asset-item" data-asset-id="' + asset.id + '" aria-selected="' + (asset.id === state.currentAssetId ? 'true' : 'false') + '">'
+          + '<div class="asset-head">' + assetThumbHtml(asset) + '<div><div class="asset-title">' + escapeHtml(asset.title || "Untitled") + '</div>'
+          + '<div class="asset-meta">' + escapeHtml(formatAssetDate(asset.created_at || asset.createdAt)) + '</div></div></div>'
+          + '<div class="asset-facts">'
+          + '<div class="asset-fact"><span>模板</span><strong>' + escapeHtml(asset.templateName || asset.templateId || "未记录") + '</strong></div>'
+          + '<div class="asset-fact"><span>主题</span><strong>' + escapeHtml(asset.theme || "默认") + '</strong></div>'
+          + '<div class="asset-fact"><span>页数</span><strong>' + Number(asset.slideCount || 0) + ' 页</strong></div>'
+          + '</div>'
+          + '<div class="asset-actions"><button type="button" data-open-asset="' + asset.id + '">打开预览</button><button type="button" class="secondary" data-delete-asset="' + asset.id + '">删除</button></div>'
         + '</div>'
       )).join("");
       assetListEl.querySelectorAll("[data-open-asset]").forEach((button) => {
@@ -1732,6 +2170,54 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       });
     }
 
+    function assetMatchesTimeFilter(asset, filter) {
+      if (!filter || filter === "all") return true;
+      const rawValue = asset.created_at || asset.createdAt;
+      const createdAt = rawValue ? new Date(rawValue) : null;
+      if (!createdAt || Number.isNaN(createdAt.getTime())) return false;
+      const now = new Date();
+      if (filter === "today") {
+        return createdAt.toDateString() === now.toDateString();
+      }
+      const days = filter === "7d" ? 7 : filter === "30d" ? 30 : null;
+      if (!days) return true;
+      return now.getTime() - createdAt.getTime() <= days * 24 * 60 * 60 * 1000;
+    }
+
+    function assetThumbHtml(asset) {
+      const title = String(asset.title || "历史 PPT").trim();
+      const shortTitle = title.length > 18 ? title.slice(0, 18) + "..." : title;
+      const template = asset.templateName || asset.templateId || "PPT 文件";
+      const subtitle = template + " · " + Number(asset.slideCount || 0) + " 页";
+      return ''
+        + '<div class="asset-thumb" aria-hidden="true">'
+        + '<div class="asset-thumb-content">'
+        + '<div class="asset-thumb-kicker">HISTORY PPT</div>'
+        + '<div class="asset-thumb-title">' + escapeHtml(shortTitle) + '</div>'
+        + '<div class="asset-thumb-subtitle">' + escapeHtml(subtitle) + '</div>'
+        + '</div>'
+        + '</div>';
+    }
+
+    function renderAssetPagination({ total, pageCount }) {
+      if (assetListSummaryEl) {
+        const start = total ? (assetPage - 1) * ASSET_PAGE_SIZE + 1 : 0;
+        const end = Math.min(assetPage * ASSET_PAGE_SIZE, total);
+        assetListSummaryEl.textContent = "共 " + total + " 个历史 PPT，当前显示 " + start + "-" + end + "，每页 20 个";
+      }
+      if (!assetPaginationEl) return;
+      assetPaginationEl.innerHTML = ''
+        + '<button type="button" class="secondary" data-asset-page="prev" ' + (assetPage <= 1 ? "disabled" : "") + '>上一页</button>'
+        + '<span class="asset-page-info">第 ' + assetPage + ' / ' + pageCount + ' 页</span>'
+        + '<button type="button" class="secondary" data-asset-page="next" ' + (assetPage >= pageCount ? "disabled" : "") + '>下一页</button>';
+      assetPaginationEl.querySelectorAll("[data-asset-page]").forEach((button) => {
+        button.addEventListener("click", () => {
+          assetPage += button.dataset.assetPage === "next" ? 1 : -1;
+          renderAssets(assetCatalog);
+        });
+      });
+    }
+
     async function loadAssets() {
       try {
         const data = await fetch("/api/ppt/assets").then(async (res) => {
@@ -1739,7 +2225,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
-        renderAssets(data.assets || []);
+        assetCatalog = data.assets || [];
+        assetPage = Math.min(assetPage, Math.max(1, Math.ceil(assetCatalog.length / ASSET_PAGE_SIZE)));
+        renderAssets(assetCatalog);
       } catch (error) {
         assetListEl.textContent = error.message;
       }
@@ -1752,18 +2240,49 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (!res.ok) throw new Error(formatApiError(payload));
           return payload;
         });
-        state.deckId = data.asset.deckId;
-        renderDeckPreviewFrame(state.deckId);
+        const deck = data.deck || {};
+        state.assetPreviewOpen = true;
+        state.currentAssetId = data.asset?.id || assetId;
+        state.deckId = deck.id || data.asset.deckId;
+        state.outlineId = deck.outlineId || null;
+        state.taskId = null;
+        state.selectedSlideNumber = deck.slides?.length ? 1 : null;
+        state.selectedSlideId = slideIdForNumber(deck, state.selectedSlideNumber);
+        setTemplateSelectionFromDeck(deck);
+        renderOutlineBoard(deck.slides || []);
+        renderDeckPreviewFrame(state.deckId, { bustCache: true });
+        setWorkspacePage("assets");
         setFlowStage("preview");
-        statusEl.textContent = JSON.stringify(data.asset, null, 2);
+        renderAssets(assetCatalog);
+        statusEl.textContent = "已打开历史 PPT，可继续调整结构、AI 润色单页并重新下载。\\n" + JSON.stringify(data.asset, null, 2);
       } catch (error) {
         statusEl.textContent = error.message;
       }
     }
 
+    function setTemplateSelectionFromDeck(deck) {
+      const templateSelect = document.querySelector("#template");
+      const themeSelect = document.querySelector("#theme");
+      if (templateSelect && deck.templateId && [...templateSelect.options].some((option) => option.value === deck.templateId)) {
+        templateSelect.value = deck.templateId;
+      }
+      renderThemeOptions(deck.theme);
+      if (themeSelect && deck.theme && [...themeSelect.options].some((option) => option.value === deck.theme)) {
+        themeSelect.value = deck.theme;
+      }
+      renderTemplateGallery();
+    }
+
     async function deleteAsset(assetId) {
       try {
         const data = await json("/api/ppt/assets/" + assetId, {}, "DELETE");
+        if (state.currentAssetId === assetId) {
+          state.assetPreviewOpen = false;
+          state.currentAssetId = null;
+          state.deckId = null;
+          state.outlineId = null;
+          applyWorkspaceVisibility();
+        }
         statusEl.textContent = JSON.stringify(data.asset, null, 2);
         await loadAssets();
       } catch (error) {
@@ -1823,14 +2342,31 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         .replaceAll("'", "&#39;");
     }
 
-    function renderDeckPreviewFrame(deckId) {
+    function renderDeckPreviewFrame(deckId, options = {}) {
       stopDeckRevealTimer();
+      if (options.bustCache) state.previewRevision += 1;
       previewEl.classList.add("is-deck-loaded");
       previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览" src="/api/ppt/decks/'
         + encodeURIComponent(deckId)
-        + '/preview"></iframe>';
+        + '/preview?v=' + encodeURIComponent(state.previewRevision) + '"></iframe>';
       const frame = previewEl.querySelector(".preview-frame");
       frame.addEventListener("load", attachPreviewSlidePicker);
+    }
+
+    async function refreshDeckPreviewFrame(deckId) {
+      stopDeckRevealTimer();
+      state.previewRevision += 1;
+      const url = "/api/ppt/decks/" + encodeURIComponent(deckId) + "/preview?v=" + encodeURIComponent(state.previewRevision);
+      const html = await fetch(url, { cache: "no-store" }).then(async (res) => {
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || "预览刷新失败");
+        return text;
+      });
+      previewEl.classList.add("is-deck-loaded");
+      previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
+      const frame = previewEl.querySelector(".preview-frame");
+      frame.addEventListener("load", attachPreviewSlidePicker);
+      frame.srcdoc = html;
     }
 
     function attachPreviewSlidePicker() {
@@ -1849,7 +2385,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         page.dataset.slideNumber = String(slideNumber);
         page.setAttribute("role", "button");
         page.setAttribute("tabindex", "0");
-        page.setAttribute("title", "点击选择第 " + slideNumber + " 页进行 AI 润色");
+        page.setAttribute("title", "点击第 " + slideNumber + " 页，编辑内容或选择 AI 单页优化");
         page.onclick = () => selectPreviewSlide(slideNumber);
         page.onkeydown = (event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -1861,29 +2397,164 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const selected = state.selectedSlideNumber && pages[state.selectedSlideNumber - 1]
         ? state.selectedSlideNumber
         : (pages.length ? 1 : null);
-      if (selected) selectPreviewSlide(selected);
+      if (selected) selectPreviewSlide(selected, { openEditor: false });
       else renderSelectedSlideLabel();
     }
 
-    function selectPreviewSlide(slideNumber) {
+    function selectPreviewSlide(slideNumber, { openEditor = true } = {}) {
       const normalizedNumber = Number(slideNumber);
       state.selectedSlideNumber = Number.isInteger(normalizedNumber) && normalizedNumber > 0 ? normalizedNumber : null;
-      state.selectedSlideId = state.selectedSlideNumber ? String(state.selectedSlideNumber) : null;
+      state.selectedSlideId = slideIdForNumber({ slides: state.outlineSlides }, state.selectedSlideNumber);
       const frame = previewEl.querySelector(".preview-frame");
       const pages = frame?.contentDocument ? [...frame.contentDocument.querySelectorAll(".preview-page")] : [];
       pages.forEach((page) => {
         page.dataset.selected = page.dataset.slideNumber === String(state.selectedSlideNumber);
       });
       renderSelectedSlideLabel();
+      renderStructureEditor();
+      if (openEditor) openSlideEditModal();
+    }
+
+    function openSlideEditModal() {
+      if (!slideEditModalEl || !state.selectedSlideNumber) return;
+      slideEditModalEl.setAttribute("aria-hidden", "false");
+      renderSelectedSlideLabel();
+    }
+
+    function closeSlideEditModal() {
+      if (!slideEditModalEl) return;
+      slideEditModalEl.setAttribute("aria-hidden", "true");
+    }
+
+    function slideIdForNumber(deck, slideNumber) {
+      const index = Number(slideNumber) - 1;
+      const slide = Number.isInteger(index) && index >= 0 ? deck?.slides?.[index] : null;
+      return slide?.id ? String(slide.id) : (slideNumber ? String(slideNumber) : null);
+    }
+
+    function updateCurrentPreviewSlide(slide) {
+      const frame = previewEl.querySelector(".preview-frame");
+      const doc = frame?.contentDocument;
+      const page = doc?.querySelector('.preview-page[data-slide-number="' + state.selectedSlideNumber + '"]');
+      if (!page || !slide) return false;
+      const slideEl = page.querySelector(".slide");
+      if (slideEl && slide.layout) slideEl.dataset.domeRole = String(slide.layout);
+      const titleEl = page.querySelector(".slide-content h2");
+      if (titleEl) titleEl.textContent = slide.title || "";
+      const bullets = Array.isArray(slide.bullets) ? slide.bullets.map((bullet) => String(bullet)).filter(Boolean) : [];
+      const listEl = page.querySelector(".slide-content ul");
+      if (listEl) {
+        listEl.innerHTML = bullets.map((bullet) => '<li>' + escapeHtml(bullet) + '</li>').join("");
+      }
+      const showcaseCards = [...page.querySelectorAll(".dome-showcase-text")];
+      if (showcaseCards.length) {
+        showcaseCards.forEach((card, index) => {
+          card.textContent = bullets[index] || "";
+        });
+      }
+      const imageReportCards = [...page.querySelectorAll(".dome-image-report-card")];
+      if (imageReportCards.length) {
+        imageReportCards.forEach((card, index) => {
+          card.textContent = bullets[index] || "";
+        });
+      }
+      selectPreviewSlide(state.selectedSlideNumber);
+      return true;
     }
 
     function renderSelectedSlideLabel() {
+      if (slideEditSelectedEl) {
+        slideEditSelectedEl.textContent = state.selectedSlideNumber
+          ? "已选择第 " + state.selectedSlideNumber + " 页，可直接修改内容，或勾选 AI 单页优化。"
+          : "请选择一页 PPT";
+      }
       if (!selectedSlideLabelEl) return;
       if (!state.selectedSlideNumber) {
         selectedSlideLabelEl.innerHTML = '未选择页面<span>请先在在线预览中点击一页 PPT。</span>';
         return;
       }
       selectedSlideLabelEl.innerHTML = '已选择第 ' + state.selectedSlideNumber + ' 页<span>点击中间预览中的其他页面可切换。</span>';
+    }
+
+    function selectedOutlineSlideIndex() {
+      const index = Number(state.selectedSlideNumber) - 1;
+      return Number.isInteger(index) && index >= 0 && index < state.outlineSlides.length ? index : -1;
+    }
+
+    function renderStructureLayoutOptions(selectedLayout = "") {
+      if (!structureSlideLayoutEl) return;
+      structureSlideLayoutEl.innerHTML = STRUCTURE_LAYOUT_OPTIONS.map(([value, label]) => (
+        '<option value="' + escapeHtml(value) + '">' + escapeHtml(label) + '</option>'
+      )).join("");
+      structureSlideLayoutEl.value = STRUCTURE_LAYOUT_OPTIONS.some(([value]) => value === selectedLayout) ? selectedLayout : "";
+    }
+
+    function setStructureEditorDisabled(isDisabled) {
+      [structureSlideTitleEl, structureSlideLayoutEl, structureSlideBulletsEl, applyStructurePreviewButton].forEach((element) => {
+        if (element) element.disabled = isDisabled;
+      });
+    }
+
+    function syncSinglePageAiChoice() {
+      const instructionEl = document.querySelector("#slide-instruction");
+      const enabled = singlePageAiToggleEl?.checked === true;
+      if (instructionEl) instructionEl.disabled = !enabled;
+      const regenerateButton = document.querySelector("#regenerate-slide");
+      if (regenerateButton) regenerateButton.disabled = !enabled || !state.selectedSlideId;
+    }
+
+    function formatAssetDate(value) {
+      if (!value) return "历史文件";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleString("zh-CN", { hour12: false });
+    }
+
+    function renderStructureEditor() {
+      if (!structureSlideTitleEl || !structureSlideLayoutEl || !structureSlideBulletsEl) return;
+      const index = selectedOutlineSlideIndex();
+      renderStructureLayoutOptions(index >= 0 ? String(state.outlineSlides[index]?.layout || "") : "");
+      if (index < 0) {
+        structureSlideTitleEl.value = "";
+        structureSlideBulletsEl.value = "";
+        setStructureEditorDisabled(true);
+        syncSinglePageAiChoice();
+        return;
+      }
+      const slide = state.outlineSlides[index] || {};
+      structureSlideTitleEl.value = slide.title || "";
+      structureSlideBulletsEl.value = (slide.bullets || []).join("\\n");
+      setStructureEditorDisabled(false);
+      syncSinglePageAiChoice();
+    }
+
+    function applyStructureEditorToSelectedSlide() {
+      const index = selectedOutlineSlideIndex();
+      if (index < 0) throw new Error("请先在在线预览中选择要调整结构的页面");
+      const title = structureSlideTitleEl.value.trim();
+      const bullets = String(structureSlideBulletsEl.value || "")
+        .split(/\\r?\\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (!title) throw new Error("页面标题不能为空");
+      if (!bullets.length) throw new Error("页面至少需要一个要点");
+      const layout = structureSlideLayoutEl.value;
+      const nextSlide = {
+        ...state.outlineSlides[index],
+        title,
+        bullets,
+        ...(layout ? { layout } : {})
+      };
+      if (!layout) delete nextSlide.layout;
+      state.outlineSlides = state.outlineSlides.map((slide, slideIndex) => (
+        slideIndex === index ? nextSlide : slide
+      ));
+      renderOutlineBoard(state.outlineSlides);
+      state.selectedSlideNumber = index + 1;
+      state.selectedSlideId = slideIdForNumber({ slides: state.outlineSlides }, state.selectedSlideNumber);
+      renderStructureEditor();
+      renderSelectedSlideLabel();
+      return state.outlineSlides;
     }
 
     function renderDeckGeneratingPreview(slides = []) {
@@ -2056,8 +2727,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 
     function renderOutlineBoard(slides, options = {}) {
       state.outlineSlides = normalizeOutlineSlides(slides);
+      if (state.selectedSlideNumber && state.selectedSlideNumber > state.outlineSlides.length) {
+        state.selectedSlideNumber = state.outlineSlides.length || null;
+        state.selectedSlideId = state.selectedSlideNumber ? String(state.selectedSlideNumber) : null;
+      }
       outlineEditorEl.value = JSON.stringify(state.outlineSlides, null, 2);
       renderOutlineSummary(state.outlineSlides);
+      renderStructureEditor();
       if (!state.outlineSlides.length) {
         outlineBoardEl.innerHTML = '<div class="outline-empty"><div><strong>先生成大纲</strong><span>生成后会以每页卡片展示，直接修改标题和要点即可。</span></div></div>';
         return;
@@ -2132,7 +2808,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     function setSlideRegenerationBusy(isBusy) {
       const button = document.querySelector("#regenerate-slide");
       button.disabled = isBusy;
-      button.textContent = isBusy ? "AI 润色中..." : "AI 润色本页";
+      button.innerHTML = isBusy ? '<span class="button-spinner"></span>AI 优化中...' : "AI 优化本页";
+      if (!isBusy) syncSinglePageAiChoice();
+      if (previewStageEl) previewStageEl.classList.toggle("is-polishing", isBusy);
+      if (previewPolishLoadingEl) previewPolishLoadingEl.setAttribute("aria-hidden", isBusy ? "false" : "true");
     }
 
     async function pollTaskProgress(taskId) {
@@ -2161,7 +2840,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           state.deckId = task.deckId || state.deckId;
           if (state.deckId) {
             await waitForDeckLoadingRhythm(state.outlineSlides);
-            renderDeckPreviewFrame(state.deckId);
+            renderDeckPreviewFrame(state.deckId, { bustCache: true });
             setFlowStage("preview");
             setDeckGenerationBusy(false);
             await loadBalance();
@@ -2193,6 +2872,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 
     function applyWorkspaceVisibility() {
       const currentPage = document.body.dataset.workspacePage || "create";
+      document.body.dataset.assetPreviewOpen = state.assetPreviewOpen ? "true" : "false";
+      if (backToOutlineButton) {
+        backToOutlineButton.textContent = currentPage === "assets" && state.assetPreviewOpen ? "返回资产库" : "返回大纲内容";
+      }
       document.querySelectorAll("[data-page-panel]").forEach((element) => {
         const pages = String(element.dataset.pagePanel || "").split(/\\s+/);
         const flowPanels = String(element.dataset.flowPanel || "").split(/\\s+/);
@@ -2200,7 +2883,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         const stageVisible = currentPage !== "create"
           || !element.dataset.flowPanel
           || flowPanels.includes(flowStage);
-        element.classList.toggle("is-hidden", !pageVisible || !stageVisible);
+        const assetPreviewHidden = currentPage === "assets"
+          && element.dataset.assetPreviewPanel === "true"
+          && !state.assetPreviewOpen;
+        element.classList.toggle("is-hidden", !pageVisible || !stageVisible || assetPreviewHidden);
       });
     }
 
@@ -2210,16 +2896,34 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     pageButtons.forEach((button) => {
       button.addEventListener("click", () => setWorkspacePage(button.dataset.pageTarget));
     });
+    if (assetSearchEl) {
+      assetSearchEl.addEventListener("input", () => {
+        assetSearchQuery = assetSearchEl.value;
+        assetPage = 1;
+        renderAssets(assetCatalog);
+      });
+    }
+    if (assetTimeFilterEl) {
+      assetTimeFilterEl.addEventListener("change", () => {
+        assetTimeFilter = assetTimeFilterEl.value;
+        assetPage = 1;
+        renderAssets(assetCatalog);
+      });
+    }
     setWorkspacePage(location.hash.slice(1) || "create");
     setFlowStage("input");
+    renderStructureEditor();
     document.querySelector("#template").addEventListener("change", () => {
       renderThemeOptions();
       renderTemplateGallery();
     });
-    document.querySelector("#theme").addEventListener("change", renderTemplateGallery);
+    document.querySelector("#theme").addEventListener("change", () => {
+      renderSelectedTemplatePreview();
+      renderTemplateGallery();
+    });
     document.querySelector("#template-category").addEventListener("change", loadTemplates);
-    document.querySelector("#upload-personal-template").addEventListener("click", uploadPersonalTemplate);
-    document.querySelector("#delete-personal-template").addEventListener("click", deleteSelectedPersonalTemplate);
+    document.querySelector("#upload-personal-template")?.addEventListener("click", uploadPersonalTemplate);
+    document.querySelector("#delete-personal-template")?.addEventListener("click", deleteSelectedPersonalTemplate);
     outlineEditorEl.addEventListener("change", () => {
       try {
         renderOutlineBoard(JSON.parse(outlineEditorEl.value || "[]"));
@@ -2277,6 +2981,25 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = JSON.stringify(data.outline, null, 2);
       } catch (error) { statusEl.textContent = error.message; }
     });
+    document.querySelector("#back-to-outline").addEventListener("click", () => {
+      try {
+        if ((document.body.dataset.workspacePage || "create") === "assets" && state.assetPreviewOpen) {
+          // 资产库中的返回按钮只关闭在线预览，让用户回到历史 PPT 列表。
+          state.assetPreviewOpen = false;
+          state.currentAssetId = null;
+          setWorkspacePage("assets");
+          renderAssets(assetCatalog);
+          statusEl.textContent = "已返回资产库，可继续搜索或打开其他历史 PPT。";
+          return;
+        }
+        if (!state.outlineSlides.length) throw new Error("暂无可返回的大纲内容，请先生成大纲");
+        // 直接回到当前大纲编辑态，保留用户已经生成或润色后的内容。
+        setWorkspacePage("create");
+        setFlowStage("outline");
+        renderOutlineBoard(state.outlineSlides);
+        statusEl.textContent = "已返回大纲内容，可继续编辑标题和要点。";
+      } catch (error) { statusEl.textContent = error.message; }
+    });
     document.querySelector("#generate-deck").addEventListener("click", async () => {
       let shouldReleaseButton = true;
       try {
@@ -2301,7 +3024,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         pollTaskProgress(state.taskId);
         if (data.task.status === "succeeded" && state.deckId) {
           await waitForDeckLoadingRhythm(state.outlineSlides);
-          renderDeckPreviewFrame(state.deckId);
+          renderDeckPreviewFrame(state.deckId, { bustCache: true });
           setFlowStage("preview");
           await loadBalance();
           await loadAssets();
@@ -2332,7 +3055,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         showTaskStatus(data.task);
         pollTaskProgress(state.taskId);
         if (data.task.status === "succeeded" && state.deckId) {
-          renderDeckPreviewFrame(state.deckId);
+          renderDeckPreviewFrame(state.deckId, { bustCache: true });
           setFlowStage("preview");
           await loadBalance();
           await loadAssets();
@@ -2340,10 +3063,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         await loadBalance();
       } catch (error) { statusEl.textContent = error.message; }
     });
+    document.querySelector("#apply-structure-preview").addEventListener("click", async () => {
+      try {
+        if (!state.outlineId) throw new Error("请先生成大纲");
+        applyStructureEditorToSelectedSlide();
+        statusEl.textContent = "已更新第 " + state.selectedSlideNumber + " 页结构，正在重新生成在线预览...";
+        closeSlideEditModal();
+        document.querySelector("#generate-deck").click();
+      } catch (error) {
+        statusEl.textContent = error.message;
+      }
+    });
+    document.querySelector("#close-slide-edit-modal")?.addEventListener("click", closeSlideEditModal);
+    document.querySelector("#slide-edit-modal")?.addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeSlideEditModal();
+    });
+    singlePageAiToggleEl?.addEventListener("change", syncSinglePageAiChoice);
     document.querySelector("#regenerate-slide").addEventListener("click", async () => {
       try {
         if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 润色单页");
+        if (!singlePageAiToggleEl?.checked) throw new Error("请先勾选需要 AI 单页优化");
         setSlideRegenerationBusy(true);
+        applyStructureEditorToSelectedSlide();
         const entitlementValue = document.querySelector("#entitlement").value.trim();
         const slideId = state.selectedSlideId;
         const instruction = document.querySelector("#slide-instruction").value.trim();
@@ -2354,9 +3095,16 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           instruction,
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
         });
+        if (data.deck?.slides) {
+          state.outlineSlides = normalizeOutlineSlides(data.deck.slides);
+          renderOutlineBoard(state.outlineSlides);
+          state.selectedSlideId = slideIdForNumber({ slides: state.outlineSlides }, state.selectedSlideNumber);
+        }
+        updateCurrentPreviewSlide(data.slide);
         statusEl.textContent = JSON.stringify(data.slide, null, 2);
-        renderDeckPreviewFrame(state.deckId);
+        await refreshDeckPreviewFrame(state.deckId);
         await loadBalance();
+        closeSlideEditModal();
       } catch (error) {
         statusEl.textContent = error.message;
       } finally {

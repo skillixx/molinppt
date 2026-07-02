@@ -419,6 +419,47 @@ test("TemplateManager lists official active templates and the owner user templat
   );
 });
 
+test("TemplateManager hides open source sample templates from the catalog", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "open-source-templates-db.json"),
+    collections: ["templates", "template_categories"],
+  });
+  await database.initialize();
+  await database.insert("templates", {
+    id: "open-city-showcase",
+    slug: "city-showcase",
+    name: "开源城市展示模板",
+    categoryId: "business",
+    scope: "official",
+    status: "active",
+    source: { type: "open-source", repository: "https://example.test/open-source" },
+  });
+  await database.insert("templates", {
+    id: "open-general-demo",
+    slug: "general-demo",
+    name: "开源通用演示样例",
+    categoryId: "business",
+    scope: "official",
+    status: "active",
+    sourceLicense: "open source",
+  });
+  const templates = new TemplateManager({
+    database,
+    templates: [
+      { id: "business", name: "Business", categoryId: "business", status: "active", themes: ["modern"] },
+      { id: "opensource-built-in", name: "OpenSource Built In", categoryId: "business", status: "active", sourceType: "opensource" },
+    ],
+  });
+
+  const catalog = templates.listTemplates({ ownerUserId: 7, categoryId: "business" });
+
+  assert.deepEqual(catalog.map((template) => template.id), ["business"]);
+  assert.throws(
+    () => templates.getTemplate("open-city-showcase", { ownerUserId: 7 }),
+    { code: "TEMPLATE_NOT_FOUND" },
+  );
+});
+
 test("HttpAiProvider posts prompt requests to an external provider endpoint", async () => {
   const calls = [];
   const provider = new HttpAiProvider({
@@ -494,6 +535,8 @@ test("HttpAiProvider supports OpenAI-compatible chat-completion responses", asyn
   assert.equal(firstPayload.model, "deepseek-v4-flash");
   assert.equal(firstPayload.messages[0].role, "system");
   assert.equal(firstPayload.messages[1].role, "user");
+  assert.match(firstPayload.messages[0].content, /input\.designSkill/);
+  assert.match(firstPayload.messages[0].content, /repetitive three-bullet slides/);
   assert.equal(outline[0].title, "Chat outline");
   assert.equal(slides[0].title, "Chat slide");
   assert.equal(slide.title, "Chat regenerated");

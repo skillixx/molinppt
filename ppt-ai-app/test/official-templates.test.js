@@ -176,7 +176,7 @@ test("syncOfficialTemplates rejects invalid manifests before writing database re
   assert.deepEqual(await context.database.find("templates"), []);
 });
 
-test("repository official templates include usable open-source samples", async () => {
+test("repository official templates do not include removed open-source samples", async () => {
   const context = await createSyncContext();
 
   const result = await syncOfficialTemplates({
@@ -184,21 +184,13 @@ test("repository official templates include usable open-source samples", async (
     database: context.database,
     storage: context.storage,
   });
-  const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7, categoryId: "open-source-samples" });
-  const byId = Object.fromEntries(visible.map((item) => [item.id, item]));
+  const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7 });
 
-  assert.equal(result.active >= 2, true);
-  assert.deepEqual(visible.map((template) => template.id).sort(), ["open-city-template", "open-powerpoint-sample"]);
-  assert.equal(visible.every((template) => template.scope === "official"), true);
-  assert.equal(visible.every((template) => template.status === "active"), true);
-  assert.equal(visible.every((template) => template.sourceFileId), true);
-  assert.equal(visible.every((template) => template.thumbnailFileId), true);
-  assert.equal(byId["open-city-template"].visual.layout, "venture");
-  assert.equal(byId["open-city-template"].visual.primary, "0B4F6C");
-  assert.equal(byId["open-city-template"].visual.accent, "F59E0B");
-  assert.equal(byId["open-powerpoint-sample"].visual.layout, "executive");
-  assert.equal(byId["open-powerpoint-sample"].visual.primary, "1F4E79");
-  assert.equal(byId["open-powerpoint-sample"].visual.accent, "E76F51");
+  assert.equal(result.active >= 0, true);
+  assert.equal(visible.some((template) => template.id === "open-city-template"), false);
+  assert.equal(visible.some((template) => template.id === "open-powerpoint-sample"), false);
+  assert.equal((await context.database.findOne("templates", (template) => template.id === "open-city-template")), null);
+  assert.equal((await context.database.findOne("templates", (template) => template.id === "open-powerpoint-sample")), null);
 });
 
 async function createSyncContext() {

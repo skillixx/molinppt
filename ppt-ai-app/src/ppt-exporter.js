@@ -137,7 +137,7 @@ export class PptExportService {
       ...templateMediaFiles(visual),
     };
     return {
-      fileName: `${safeFileName(deck.title)}.pptx`,
+      fileName: exportFileName({ deck, format: "pptx" }),
       mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       content: createZip(files),
     };
@@ -163,7 +163,7 @@ export class PptExportService {
     ];
     const content = buildPdf(objects);
     return {
-      fileName: `${safeFileName(deck.title)}.pdf`,
+      fileName: exportFileName({ deck, format: "pdf" }),
       mimeType: "application/pdf",
       content: Buffer.from(content, "utf8"),
     };
@@ -457,8 +457,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + solidShapeXml({ id: 7, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: redGoldPalette.bottomGradientLow })
       + arcLineShapeXml({ id: 13, name: "Dome Gold Wave Arc", x: -533400, y: 3505200, cx: 4876800, cy: 1447800, stroke: redGoldPalette.titleGradientStart, width: 57150 })
       + arcLineShapeXml({ id: 14, name: "Dome Light Wave Arc", x: 2514600, y: 3333750, cx: 5486400, cy: 1629416, stroke: redGoldPalette.titleGradientEnd, width: 45720 });
-    const footer = rectShapeXml({ id: 15, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent })
-      + textShapeXml({ id: 16, name: "Dome Footer Decoration", x: 609600, y: isCover ? 4572000 : 4686300, cx: 3048000, cy: 365760, text: "商务办公系列 PPT 模板", size: 1200, bold: false, color: redGoldPalette.surfaceText });
+    // 页脚只保留装饰线，不写入模板名称，避免下载后的 PPTX 页面出现模板来源文字。
+    const footer = rectShapeXml({ id: 15, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent });
     const roleDecoration = domeRoleDecorationXml({ role, index, layout, visual, slide });
     return base
       + background
@@ -477,7 +477,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + rectShapeXml({ id: 5, name: "Secondary Accent", ...layout.secondaryAccent, fill: visual.accent })
       + rectShapeXml({ id: 6, name: "Top Rule", x: 685800, y: 342900, cx: 7772400, cy: 30480, fill: visual.accent })
       + rectShapeXml({ id: 9, name: "Fine Divider", x: 914400, y: index === 0 ? 2743200 : 1516380, cx: 4267200, cy: 15240, fill: visual.accent })
-      + textShapeXml({ id: 7, name: "Section Label", ...layout.label, text: index === 0 ? visual.name : `0${index + 1}`, size: 1200, bold: true, color: index === 0 ? visual.surface : visual.accent });
+      // 封面不再写模板名称；非封面仍保留页序标签。
+      + textShapeXml({ id: 7, name: "Section Label", ...layout.label, text: index === 0 ? "" : `0${index + 1}`, size: 1200, bold: true, color: index === 0 ? visual.surface : visual.accent });
   }
   if (visual.layout === "top-band") {
     const isCover = index === 0;
@@ -609,7 +610,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
         id: 7,
         name: "Section Label",
         ...layout.label,
-        text: index === 0 ? visual.name : `0${index + 1}`,
+        text: index === 0 ? "" : `0${index + 1}`,
         size: 1100,
         bold: true,
         color: index === 0 ? visual.surface : visual.accent,
@@ -1146,7 +1147,7 @@ function slideRelsXml(visual, role = "content") {
  * @returns {string}
  */
 function slideLayoutXml(visual) {
-  return `<?xml version="1.0" encoding="UTF-8"?><p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1"><p:cSld name="${escapeXml(visual.name)}"><p:spTree>${groupShapeXml()}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>`;
+  return `<?xml version="1.0" encoding="UTF-8"?><p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1"><p:cSld name="Blank"><p:spTree>${groupShapeXml()}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>`;
 }
 
 /**
@@ -1185,7 +1186,7 @@ function themeXml(visual) {
   const accent5 = redGoldPalette ? redGoldPalette.titleGradientStart : "7C3AED";
   const accent6 = redGoldPalette ? visual.body : "0891B2";
   const accent3 = redGoldPalette ? redGoldPalette.cardFill : "F59E0B";
-  return `<?xml version="1.0" encoding="UTF-8"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Moling ${escapeXml(visual.name)}"><a:themeElements><a:clrScheme name="Moling ${escapeXml(visual.name)}"><a:dk1><a:srgbClr val="${visual.title}"/></a:dk1><a:lt1><a:srgbClr val="${visual.surface}"/></a:lt1><a:dk2><a:srgbClr val="${visual.body}"/></a:dk2><a:lt2><a:srgbClr val="${visual.background}"/></a:lt2><a:accent1><a:srgbClr val="${visual.primary}"/></a:accent1><a:accent2><a:srgbClr val="${visual.accent}"/></a:accent2><a:accent3><a:srgbClr val="${accent3}"/></a:accent3><a:accent4><a:srgbClr val="${accent4}"/></a:accent4><a:accent5><a:srgbClr val="${accent5}"/></a:accent5><a:accent6><a:srgbClr val="${accent6}"/></a:accent6><a:hlink><a:srgbClr val="${visual.primary}"/></a:hlink><a:folHlink><a:srgbClr val="${visual.accent}"/></a:folHlink></a:clrScheme>${fontSchemeXml(visual)}<a:fmtScheme name="Moling"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"/><a:gradFill rotWithShape="1"/></a:fillStyleLst><a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="25400"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="38100"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>`;
+  return `<?xml version="1.0" encoding="UTF-8"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Moling Theme"><a:themeElements><a:clrScheme name="Moling Theme"><a:dk1><a:srgbClr val="${visual.title}"/></a:dk1><a:lt1><a:srgbClr val="${visual.surface}"/></a:lt1><a:dk2><a:srgbClr val="${visual.body}"/></a:dk2><a:lt2><a:srgbClr val="${visual.background}"/></a:lt2><a:accent1><a:srgbClr val="${visual.primary}"/></a:accent1><a:accent2><a:srgbClr val="${visual.accent}"/></a:accent2><a:accent3><a:srgbClr val="${accent3}"/></a:accent3><a:accent4><a:srgbClr val="${accent4}"/></a:accent4><a:accent5><a:srgbClr val="${accent5}"/></a:accent5><a:accent6><a:srgbClr val="${accent6}"/></a:accent6><a:hlink><a:srgbClr val="${visual.primary}"/></a:hlink><a:folHlink><a:srgbClr val="${visual.accent}"/></a:folHlink></a:clrScheme>${fontSchemeXml(visual)}<a:fmtScheme name="Moling"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"/><a:gradFill rotWithShape="1"/></a:fillStyleLst><a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="25400"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="38100"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>`;
 }
 
 /**
@@ -1435,10 +1436,64 @@ function pdfUnicodeText(value) {
 }
 
 /**
- * Produces a filesystem-safe export base name.
- * @param {string} value
+ * 构建用户下载文件名。
+ * 规则: PPT-标题-模板ID-页数p-生成时间-短ID.ext，既方便用户区分，也保持 HTTP 头和对象存储的 ASCII 安全。
+ * @param {{deck: object, format: string}} input
  * @returns {string}
  */
-function safeFileName(value) {
-  return String(value || "deck").replaceAll(/[^a-zA-Z0-9._-]/g, "_");
+function exportFileName({ deck, format }) {
+  const title = safeFileNameSegment(deck?.title || "deck", { maxLength: 48 });
+  const template = safeFileNameSegment(deck?.templateId || "template", { maxLength: 24 });
+  const slideCount = Array.isArray(deck?.slides) && deck.slides.length > 0 ? deck.slides.length : 0;
+  const timestamp = exportTimestamp(deck?.createdAt || deck?.updatedAt || deck?.created_at || deck?.updated_at);
+  const shortId = safeFileNameSegment(shortDeckId(deck?.id), { maxLength: 12 });
+  const parts = ["PPT", title, template, `${slideCount}p`, timestamp, shortId].filter(Boolean);
+  return `${parts.join("-")}.${format}`;
+}
+
+/**
+ * 生成文件名片段，移除中文、空格和特殊字符，避免 Content-Disposition 在部分浏览器中乱码。
+ * @param {string} value
+ * @param {{maxLength?: number}} options
+ * @returns {string}
+ */
+function safeFileNameSegment(value, { maxLength = 64 } = {}) {
+  const segment = String(value || "")
+    .trim()
+    .replaceAll(/[^a-zA-Z0-9]+/g, "-")
+    .replaceAll(/^-+|-+$/g, "")
+    .slice(0, maxLength)
+    .replaceAll(/-+$/g, "");
+  return segment || "untitled";
+}
+
+/**
+ * 将 deck 时间标准化为北京时间友好的紧凑格式。
+ * @param {string | number | Date | undefined} value
+ * @returns {string}
+ */
+function exportTimestamp(value) {
+  const date = value ? new Date(value) : new Date();
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date;
+  const formatter = new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = Object.fromEntries(formatter.formatToParts(safeDate).map((part) => [part.type, part.value]));
+  return `${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}`;
+}
+
+/**
+ * 从 deck ID 中提取短标识，便于定位记录且不让文件名过长。
+ * @param {string | undefined} id
+ * @returns {string}
+ */
+function shortDeckId(id) {
+  const compact = String(id || "").replaceAll(/[^a-zA-Z0-9]/g, "");
+  return compact ? compact.slice(-6) : "";
 }

@@ -4,15 +4,15 @@ import { AppError } from "./errors.js";
  * Built-in template categories used by the local template catalog.
  */
 export const DEFAULT_TEMPLATE_CATEGORIES = [
-  { id: "business", name: "Business", sortOrder: 10 },
-  { id: "strategy", name: "Strategy", sortOrder: 20 },
-  { id: "finance", name: "Finance", sortOrder: 30 },
-  { id: "sales", name: "Sales", sortOrder: 40 },
-  { id: "product", name: "Product", sortOrder: 50 },
-  { id: "marketing", name: "Marketing", sortOrder: 60 },
-  { id: "data", name: "Data", sortOrder: 70 },
-  { id: "education", name: "Education", sortOrder: 80 },
-  { id: "pitch", name: "Pitch", sortOrder: 90 },
+  { id: "business", name: "商业汇报", sortOrder: 10 },
+  { id: "strategy", name: "战略咨询", sortOrder: 20 },
+  { id: "finance", name: "财务经营", sortOrder: 30 },
+  { id: "sales", name: "销售方案", sortOrder: 40 },
+  { id: "product", name: "产品规划", sortOrder: 50 },
+  { id: "marketing", name: "市场营销", sortOrder: 60 },
+  { id: "data", name: "数据洞察", sortOrder: 70 },
+  { id: "education", name: "教育培训", sortOrder: 80 },
+  { id: "pitch", name: "融资路演", sortOrder: 90 },
 ];
 
 const EXECUTIVE_LAYOUT_SCHEMA = {
@@ -59,16 +59,16 @@ const DOME_LAYOUT_SCHEMA = {
 export const DEFAULT_TEMPLATES = [
   {
     id: "business",
-    name: "Executive Business",
+    name: "高管商务汇报",
     categoryId: "business",
     scope: "official",
     status: "active",
     style: "executive-report",
-    description: "Boardroom-ready operating review template with strong hierarchy and restrained corporate accents.",
+    description: "适合经营复盘、管理层汇报和董事会沟通的稳重商务模板。",
     themes: [
       {
         id: "minimal",
-        name: "Minimal",
+        name: "极简灰蓝",
         visual: {
           primary: "1E3A8A",
           accent: "6B7280",
@@ -81,7 +81,7 @@ export const DEFAULT_TEMPLATES = [
       },
       {
         id: "modern",
-        name: "Modern",
+        name: "现代红金",
         visual: {
           primary: "1F4E79",
           accent: "F4A261",
@@ -94,7 +94,7 @@ export const DEFAULT_TEMPLATES = [
       },
       {
         id: "classic",
-        name: "Classic",
+        name: "经典商务",
         visual: {
           primary: "243B53",
           accent: "9D8A60",
@@ -107,7 +107,7 @@ export const DEFAULT_TEMPLATES = [
       },
       {
         id: "executive",
-        name: "Executive",
+        name: "高管深蓝",
         visual: {
           primary: "18344E",
           accent: "CFAF70",
@@ -132,16 +132,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "strategy-consulting",
-    name: "Strategy Consulting",
+    name: "战略咨询方案",
     categoryId: "strategy",
     scope: "official",
     status: "active",
     style: "consulting-case",
-    description: "Consulting-style recommendation deck for diagnosis, options, and executive decisions.",
+    description: "适合问题诊断、方案对比和高层决策的咨询风格模板。",
     themes: [
-      { id: "board", name: "Board" },
-      { id: "matrix", name: "Matrix" },
-      { id: "workstream", name: "Workstream" },
+      { id: "board", name: "董事会汇报" },
+      { id: "matrix", name: "矩阵分析" },
+      { id: "workstream", name: "工作流推进" },
     ],
     visual: {
       primary: "1B365D",
@@ -156,16 +156,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "financial-review",
-    name: "Financial Review",
+    name: "财务经营复盘",
     categoryId: "finance",
     scope: "official",
     status: "active",
     style: "finance-report",
-    description: "Finance and operating review template with dense hierarchy, sober contrast, and KPI-ready pages.",
+    description: "适合财务分析、经营指标和预算预测的专业复盘模板。",
     themes: [
-      { id: "quarterly", name: "Quarterly" },
-      { id: "audit", name: "Audit" },
-      { id: "forecast", name: "Forecast" },
+      { id: "quarterly", name: "季度复盘" },
+      { id: "audit", name: "审计分析" },
+      { id: "forecast", name: "预测规划" },
     ],
     visual: {
       primary: "18344E",
@@ -180,16 +180,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "sales-proposal",
-    name: "Sales Proposal",
+    name: "销售提案方案",
     categoryId: "sales",
     scope: "official",
     status: "active",
     style: "proposal",
-    description: "Client-facing sales proposal template for value framing, solution narrative, and next steps.",
+    description: "适合客户提案、价值阐述、解决方案和下一步计划展示。",
     themes: [
-      { id: "enterprise", name: "Enterprise" },
-      { id: "solution", name: "Solution" },
-      { id: "renewal", name: "Renewal" },
+      { id: "enterprise", name: "企业客户" },
+      { id: "solution", name: "解决方案" },
+      { id: "renewal", name: "续约增长" },
     ],
     visual: {
       primary: "0E5A57",
@@ -204,16 +204,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "product-roadmap",
-    name: "Product Roadmap",
+    name: "产品路线规划",
     categoryId: "product",
     scope: "official",
     status: "active",
     style: "product-planning",
-    description: "Product strategy and roadmap template with clear planning rhythm and prioritization pages.",
+    description: "适合产品战略、版本规划、优先级和路线图沟通。",
     themes: [
-      { id: "roadmap", name: "Roadmap" },
-      { id: "release", name: "Release" },
-      { id: "product-review", name: "Product Review" },
+      { id: "roadmap", name: "路线图" },
+      { id: "release", name: "版本发布" },
+      { id: "product-review", name: "产品复盘" },
     ],
     visual: {
       primary: "245B68",
@@ -228,16 +228,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "marketing-campaign",
-    name: "Marketing Campaign",
+    name: "营销活动方案",
     categoryId: "marketing",
     scope: "official",
     status: "active",
     style: "campaign-story",
-    description: "Campaign planning template with bold contrast for positioning, channels, and launch plans.",
+    description: "适合品牌定位、渠道策略、活动节奏和增长计划展示。",
     themes: [
-      { id: "launch", name: "Launch" },
-      { id: "brand", name: "Brand" },
-      { id: "growth", name: "Growth" },
+      { id: "launch", name: "新品发布" },
+      { id: "brand", name: "品牌传播" },
+      { id: "growth", name: "增长营销" },
     ],
     visual: {
       primary: "27213F",
@@ -252,16 +252,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "data-insight",
-    name: "Data Insight",
+    name: "数据洞察报告",
     categoryId: "data",
     scope: "official",
     status: "active",
     style: "analytics-report",
-    description: "Insight report template for metrics, findings, and analytical recommendations.",
+    description: "适合指标解读、数据发现、分析结论和行动建议。",
     themes: [
-      { id: "insight", name: "Insight" },
-      { id: "dashboard", name: "Dashboard" },
-      { id: "research", name: "Research" },
+      { id: "insight", name: "洞察分析" },
+      { id: "dashboard", name: "仪表盘" },
+      { id: "research", name: "研究报告" },
     ],
     visual: {
       primary: "12324A",
@@ -276,16 +276,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "education",
-    name: "Academy Workshop",
+    name: "教育培训课件",
     categoryId: "education",
     scope: "official",
     status: "active",
     style: "learning-workshop",
-    description: "Clear learning and training template with calm panels, teaching rhythm, and readable hierarchy.",
+    description: "适合课程讲义、培训工作坊和知识分享的清晰课件模板。",
     themes: [
-      { id: "lecture", name: "Lecture" },
-      { id: "workshop", name: "Workshop" },
-      { id: "minimal", name: "Minimal" },
+      { id: "lecture", name: "课堂讲授" },
+      { id: "workshop", name: "互动工作坊" },
+      { id: "minimal", name: "简洁教学" },
     ],
     visual: {
       primary: "0B5A63",
@@ -300,16 +300,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "pitch",
-    name: "Venture Pitch",
+    name: "创业融资路演",
     categoryId: "pitch",
     scope: "official",
     status: "active",
     style: "venture-story",
-    description: "Investor-facing pitch template with bold contrast, narrative cover, and high-impact content pages.",
+    description: "适合投资人沟通、创业项目介绍和商业计划书展示。",
     themes: [
-      { id: "startup", name: "Startup" },
-      { id: "investor", name: "Investor" },
-      { id: "product", name: "Product" },
+      { id: "startup", name: "创业故事" },
+      { id: "investor", name: "投资人版" },
+      { id: "product", name: "产品亮点" },
     ],
     visual: {
       primary: "111827",
@@ -324,16 +324,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "brand-story",
-    name: "Brand Story",
+    name: "品牌故事叙事",
     categoryId: "marketing",
     scope: "official",
     status: "active",
     style: "brand-narrative",
-    description: "Brand narrative template for positioning, message architecture, and customer-facing stories.",
+    description: "适合品牌定位、信息架构、客户故事和传播叙事。",
     themes: [
-      { id: "editorial", name: "Editorial" },
-      { id: "premium", name: "Premium" },
-      { id: "identity", name: "Identity" },
+      { id: "editorial", name: "编辑叙事" },
+      { id: "premium", name: "高端质感" },
+      { id: "identity", name: "品牌识别" },
     ],
     visual: {
       primary: "202636",
@@ -348,16 +348,16 @@ export const DEFAULT_TEMPLATES = [
   },
   {
     id: "project-status",
-    name: "Project Status",
+    name: "项目状态汇报",
     categoryId: "business",
     scope: "official",
     status: "active",
     style: "status-update",
-    description: "Program and project status template for progress, risks, dependencies, and leadership updates.",
+    description: "适合项目进展、风险依赖、里程碑和管理层周报。",
     themes: [
-      { id: "weekly", name: "Weekly" },
-      { id: "steering", name: "Steering" },
-      { id: "delivery", name: "Delivery" },
+      { id: "weekly", name: "周报进展" },
+      { id: "steering", name: "例会汇报" },
+      { id: "delivery", name: "交付跟踪" },
     ],
     visual: {
       primary: "203F57",
@@ -431,6 +431,7 @@ export class TemplateManager {
       if (status !== "active") return false;
       if (scope === "user" && Number(template.ownerUserId ?? template.owner_user_id) !== Number(ownerUserId)) return false;
       if (scope !== "official" && scope !== "user") return false;
+      if (isOpenSourceTemplate(template)) return false;
       if (categoryId && resolveCategoryId(template) !== categoryId) return false;
       return true;
     });
@@ -551,6 +552,40 @@ function normalizeTemplate(template, categories) {
  */
 function resolveCategoryId(template) {
   return template.categoryId || template.category_id || template.category?.id || "business";
+}
+
+/**
+ * 判断模板是否属于历史开源样例模板，避免不好看的开源模板重新出现在前台。
+ * @param {object} template
+ * @returns {boolean}
+ */
+function isOpenSourceTemplate(template) {
+  const source = template?.source && typeof template.source === "object" ? template.source : {};
+  const values = [
+    template?.id,
+    template?.slug,
+    template?.name,
+    template?.description,
+    template?.sourceType,
+    template?.source_type,
+    template?.license,
+    template?.sourceLicense,
+    template?.source_license,
+    source.type,
+    source.repository,
+    source.license,
+    source.file,
+  ].map((value) => String(value || "").toLowerCase());
+  return values.some((value) => (
+    value.includes("开源")
+    || value.includes("open-source")
+    || value.includes("opensource")
+    || value.includes("open source")
+    || value.includes("城市展示")
+    || value.includes("通用演示")
+    || value.includes("city-showcase")
+    || value.includes("general-demo")
+  ));
 }
 
 /**
