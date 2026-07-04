@@ -354,15 +354,25 @@ test("resolveTemplateVisual applies business theme visual overrides", () => {
   const executiveVisual = resolveTemplateVisual({ templateId: "business", theme: "executive" });
   const minimalVisual = resolveTemplateVisual({ templateId: "business", theme: "minimal" });
 
-  assert.equal(defaultVisual.primary, "1F4E79");
-  assert.equal(classicVisual.accent, "9D8A60");
-  assert.equal(executiveVisual.accent, "CFAF70");
+  assert.equal(defaultVisual.primary, "B91C1C");
+  assert.equal(defaultVisual.accent, "D97706");
+  assert.equal(classicVisual.primary, "1F2A37");
+  assert.equal(classicVisual.accent, "B89B5E");
+  assert.equal(classicVisual.background, "E8ECEF");
+  assert.equal(classicVisual.title, "111827");
+  assert.equal(classicVisual.body, "374151");
+  assert.equal(executiveVisual.primary, "102A43");
+  assert.equal(executiveVisual.accent, "BFA46A");
+  assert.equal(executiveVisual.background, "E6EDF5");
+  assert.equal(executiveVisual.title, "0B1F33");
+  assert.equal(executiveVisual.body, "334155");
   assert.equal(minimalVisual.accent, "6B7280");
+  assert.equal(minimalVisual.background, "E9EEF5");
   assert.equal(minimalVisual.title, "0F172A");
   assert.equal(minimalVisual.layout, "top-band");
-  assert.equal(defaultVisual.layout, "red-gold");
-  assert.equal(classicVisual.layout, "executive");
-  assert.equal(executiveVisual.layout, "venture");
+  assert.equal(defaultVisual.layout, "top-band");
+  assert.equal(classicVisual.layout, "top-band");
+  assert.equal(executiveVisual.layout, "top-band");
 });
 
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {
@@ -372,6 +382,7 @@ test("TemplateManager lists official active templates and the owner user templat
   });
   await database.initialize();
   await database.insert("template_categories", { id: "sales", name: "Sales", sortOrder: 10 });
+  await database.insert("template_categories", { id: "empty", name: "Empty", sortOrder: 11 });
   await database.insert("templates", {
     id: "official-sales",
     name: "Official Sales",
@@ -409,8 +420,11 @@ test("TemplateManager lists official active templates and the owner user templat
   const templates = new TemplateManager({ database });
 
   const catalog = await templates.listTemplates({ ownerUserId: 7, categoryId: "sales" });
+  const categories = templates.listCategories({ ownerUserId: 7 });
 
   assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "official-sales", "user-sales"]);
+  assert.equal(categories.some((category) => category.id === "sales"), true);
+  assert.equal(categories.some((category) => category.id === "empty"), false);
   assert.equal(catalog[0].category.id, "sales");
   assert.equal((await templates.getTemplate("user-sales", { ownerUserId: 7 })).scope, "user");
   assert.throws(

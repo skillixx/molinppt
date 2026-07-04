@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+﻿import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -1066,7 +1066,7 @@ test("PptService normalizes generated slide layouts with the selected template s
   assert.equal(result.deck.slides[1].layout, "venture-story");
 });
 
-test("PptService assigns dome layout roles from outline structure when provider omits usable layouts", async () => {
+test("PptService keeps business modern on top-band-compatible roles when provider omits usable layouts", async () => {
   const outlineSlides = [
     { title: "年度工作汇报", bullets: ["2026 年度经营复盘"] },
     { title: "目录", bullets: ["工作汇报", "成果展示", "问题复盘", "下步计划"] },
@@ -1109,21 +1109,21 @@ test("PptService assigns dome layout roles from outline structure when provider 
 
   assert.deepEqual(result.deck.slides.map((slide) => slide.layout), [
     "cover",
-    "agenda",
-    "section-divider",
     "image-report",
-    "three-steps",
-    "four-steps",
-    "metrics",
-    "showcase",
-    "retrospective",
-    "next-plan",
-    "closing",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
+    "image-report",
   ]);
   assert.equal(result.deck.slides[7].sectionLabel, "PART 02");
 });
 
-test("PromptManager includes dome placeholder instructions for red-gold deck generation", () => {
+test("PromptManager keeps business modern on generic top-band instructions", () => {
   const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
   const prompt = new PromptManager().buildDeckPrompt({
     outline: {
@@ -1134,36 +1134,9 @@ test("PromptManager includes dome placeholder instructions for red-gold deck gen
     template,
   });
 
-  assert.equal(prompt.templateInstructions?.templateSystem, "dome-red-gold");
-  assert.deepEqual(prompt.templateInstructions?.layoutRoles, [
-    "cover",
-    "agenda",
-    "section-divider",
-    "image-report",
-    "three-steps",
-    "four-steps",
-    "metrics",
-    "showcase",
-    "retrospective",
-    "next-plan",
-    "closing",
-  ]);
-  assert.match(prompt.templateInstructions?.contentContract || "", /把 bullets 填入对应占位符/);
-  assert.match(prompt.templateInstructions?.roleHints?.cover || "", /必须使用副标题占位/);
-  assert.match(prompt.templateInstructions?.roleHints?.["section-divider"] || "", /必须是 PART 编号/);
-  assert.match(prompt.templateInstructions?.contentContract || "", /指标名: 指标值/);
-  assert.match(prompt.templateInstructions?.contentContract || "", /阶段: 动作/);
-  assert.match(prompt.templateInstructions?.contentContract || "", /风险、原因、措施/);
-  assert.match(prompt.templateInstructions?.roleHints?.agenda || "", /必须 4 项/);
-  assert.match(prompt.templateInstructions?.roleHints?.["image-report"] || "", /必须 3 条/);
-  assert.match(prompt.templateInstructions?.roleHints?.["three-steps"] || "", /必须 3 条/);
-  assert.match(prompt.templateInstructions?.roleHints?.["four-steps"] || "", /必须 4 条/);
-  assert.match(prompt.templateInstructions?.roleHints?.showcase || "", /必须 3 条/);
-  assert.match(prompt.templateInstructions?.roleHints?.metrics || "", /指标名: 指标值/);
-  assert.match(prompt.templateInstructions?.roleHints?.retrospective || "", /风险、原因、措施/);
-  assert.match(prompt.templateInstructions?.roleHints?.["next-plan"] || "", /阶段: 动作/);
-  assert.match(prompt.templateInstructions?.roleHints?.closing || "", /必须使用结束页副标题占位/);
-  assert.match(prompt.templateInstructions?.contentContract || "", /不要生成普通项目符号列表/);
+  assert.equal(prompt.templateInstructions?.templateSystem, "generic");
+  assert.equal(prompt.templateInstructions?.layoutRoles, undefined);
+  assert.equal(prompt.templateInstructions?.roleHints, undefined);
 });
 
 test("PromptManager auto-loads PPT design master skill for outline, deck, and slide polish", () => {
@@ -1635,16 +1608,14 @@ test("HTTP API preview exposes selected template visual styling", async () => {
 
     assert.equal(preview.status, 200);
     assert.match(html, /data-template="business"/);
-    assert.match(html, /--template-primary:#1F4E79/);
-    assert.match(html, /--template-accent:#F4A261/);
-    assert.match(html, /data-layout="red-gold"/);
+    assert.match(html, /--template-primary:#B91C1C/);
+    assert.match(html, /--template-accent:#D97706/);
+    assert.match(html, /--template-bg:#FFF1E6/);
+    assert.match(html, /data-layout="top-band"/);
     assert.match(html, /data-dome-role="cover"/);
-  assert.match(html, /--dome-cover-bg:url\("data:image\/jpeg;base64,/);
-  assert.match(html, /--dome-content-bg:url\("data:image\/jpeg;base64,/);
-  assert.match(html, /--dome-title-grad-start:#?[0-9A-Fa-f]{6}/);
-  assert.match(html, /--dome-card-fill:\#[0-9A-Fa-f]{6}/);
-  assert.match(html, /--dome-card-fill-strong:\#[0-9A-Fa-f]{6}/);
-  assert.match(html, /class="preview-page"/);
+    assert.match(html, /class="top-band-cover-frame"/);
+    assert.match(html, /class="top-band-cover-metrics"/);
+    assert.match(html, /class="preview-page"/);
     assert.match(html, /aspect-ratio:16\/9/);
     assert.match(html, /class="page-number">1 \/ 2/);
   } finally {

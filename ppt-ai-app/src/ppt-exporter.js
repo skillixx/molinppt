@@ -328,7 +328,8 @@ function slideFiles(deck, visual) {
       ? textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })
       : "";
     const titleName = domeTitleShapeName(visual, role);
-    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: titleName, ...layout.title, text: slide.title, size: layout.titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const titleSize = resolveTitleSize({ visual, index, title: slide.title, fallbackSize: layout.titleSize });
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${textShapeXml({ id: 20, name: titleName, ...layout.title, text: slide.title, size: titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
     files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
@@ -360,6 +361,21 @@ function topBandTitleFillStyle(visual) {
  * @param {string} role
  * @returns {string}
  */
+function resolveTitleSize({ visual, index, title, fallbackSize }) {
+  if (visual.layout !== "top-band") return fallbackSize;
+  const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (index === 0) {
+    if (textLength >= 28) return 3000;
+    if (textLength >= 20) return 3400;
+    if (textLength >= 14) return 3800;
+    return Math.min(fallbackSize, 4300);
+  }
+  if (textLength >= 28) return 2300;
+  if (textLength >= 22) return 2600;
+  if (textLength >= 16) return 3000;
+  return Math.min(fallbackSize, 3400);
+}
+
 function domeTitleShapeName(visual, role) {
   if (visual.layout !== "red-gold") return "Title 1";
   const mapping = {
@@ -527,6 +543,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
             stroke: palette.rule,
             width: 11430,
           })
+          + solidShapeXml({ id: 31, name: "Top Band Executive Visual Panel", geom: "roundRect", x: 6553200, y: 1295400, cx: 1549400, cy: 2019300, fill: palette.rail })
+          + lineFrameShapeXml({ id: 32, name: "Top Band Executive Visual Inner Frame", geom: "roundRect", x: 6667500, y: 1409700, cx: 1320800, cy: 1790700, stroke: palette.glass, width: 7620 })
+          + rectShapeXml({ id: 33, name: "Top Band Executive Visual Accent", x: 6858000, y: 3009900, cx: 952500, cy: 38100, fill: visual.accent })
+          + topBandMetricCardXml({ id: 37, x: 1282700, y: 3657600, number: "01", label: "战略", visual, palette })
+          + topBandMetricCardXml({ id: 40, x: 3200400, y: 3657600, number: "02", label: "复盘", visual, palette })
+          + topBandMetricCardXml({ id: 43, x: 5118100, y: 3657600, number: "03", label: "行动", visual, palette })
         )
       : (
           rectShapeXml({ id: 24, name: "Top Band Side Rail", x: 0, y: panelY + 685800, cx: 171450, cy: 3657600, fill: palette.glass })
@@ -542,16 +564,11 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
             stroke: palette.lightLine,
             width: 5715,
           })
-          + lineFrameShapeXml({
-            id: 28,
-            name: "Top Band Content Accent Band",
-            x: 1143000,
-            y: panelY + 3009900,
-            cx: 5829300,
-            cy: 914400,
-            stroke: palette.ruleLine,
-            width: 3810,
-          })
+          + solidShapeXml({ id: 31, name: "Top Band Content Visual Panel", geom: "roundRect", x: 6720840, y: 1543050, cx: 1270000, cy: 2133600, fill: palette.rail })
+          + solidShapeXml({ id: 32, name: "Top Band Insight Card", geom: "roundRect", x: 6416040, y: 1847850, cx: 1676400, cy: 1117600, fill: palette.glass })
+          + textShapeXml({ id: 33, name: "Top Band Insight Title", x: 6553200, y: 2076450, cx: 1219200, cy: 228600, text: "重点关注", size: 1050, bold: true, color: visual.title })
+          + textShapeXml({ id: 34, name: "Top Band Insight Caption", x: 6553200, y: 2350000, cx: 1219200, cy: 365760, text: "高管决策视图", size: 800, bold: false, color: visual.body })
+          + arcLineShapeXml({ id: 37, name: "Top Band Content Wave", x: 6248400, y: 3657600, cx: 2133600, cy: 762000, stroke: visual.accent, width: 19050 })
         );
     const contentPanelY = isCover ? panelY + 114300 : panelY + 152400;
     const contentPanelHeight = isCover ? panelHeight : panelHeight - 228600;
@@ -570,42 +587,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + solidShapeXml({ id: 17, name: "Top Band Accent Ribbon", geom: "parallelogram", x: 6553200, y: isCover ? 548640 : 365760, cx: 2311400, cy: 304800, fill: palette.ribbon })
       + rectShapeXml({ id: 18, name: "Top Band Side Cap", x: 114300, y: isCover ? 228600 : 152400, cx: 285750, cy: 685800, fill: palette.edge })
       + lineFrameShapeXml({ id: 36, name: "Top Band Panel Shadow", x: 628650, y: panelY - 120650, cx: 7886700, cy: panelHeight + 152400, stroke: palette.panelShadow, width: 5715 })
+      + topBandGridXml({ id: 52, visual, palette })
       + roleDecor
-      + solidShapeXml({ id: 15, name: "Top Band Index Dot", geom: "ellipse", x: 171450, y: panelBottom - 548640, cx: 685800, cy: 685800, fill: palette.indexTag })
-      + textShapeXml({
-        id: 16,
-        name: "Top Band Index Badge",
-        x: 685800,
-        y: panelBottom - 457200,
-        cx: 3657600,
-        cy: 304800,
-        text: isCover ? "EXECUTIVE BRIEFING" : `PAGE ${index + 1}`,
-        size: 900,
-        bold: true,
-        color: palette.surface,
-      })
-      + lineFrameShapeXml({
-        id: 19,
-        name: "Top Band Index Ring",
-        geom: "ellipse",
-        x: 685800,
-        y: panelBottom - 1270000,
-        cx: 431800,
-        cy: 431800,
-        stroke: palette.rule,
-      })
-      + textShapeXml({
-        id: 20,
-        name: "Top Band Ring Number",
-        x: 771525,
-        y: panelBottom - 1219200,
-        cx: 260000,
-        cy: 165100,
-        text: String(index + 1).padStart(2, "0"),
-        size: 1200,
-        bold: true,
-        color: visual.title,
-      })
       + textShapeXml({
         id: 7,
         name: "Section Label",
@@ -614,8 +597,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
         size: 1100,
         bold: true,
         color: index === 0 ? visual.surface : visual.accent,
-      })
-      + rectShapeXml({ id: 8, name: "Top Band Footer", x: 0, y: 4800600, cx: 9144000, cy: 342900, fill: visual.background });
+      });
   }
   return base + rectShapeXml({ id: 3, name: "Template Accent", ...layout.accent, fill: visual.primary });
 }
@@ -1090,10 +1072,10 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         accent: { x: 0, y: 0, cx: 9144000, cy: 514350 },
         secondaryAccent: { x: 914400, y: 3886200, cx: 7772400, cy: 365760 },
         label: { x: 685800, y: 685800, cx: 2438400, cy: 365760 },
-        title: { x: 1663700, y: 1295400, cx: 6464300, cy: 1047750 },
-        content: { x: 1663700, y: 2616200, cx: 6464300, cy: 1016000 },
-        titleSize: 5200,
-        bodySize: 2000,
+        title: { x: 1663700, y: 1270000, cx: 4267200, cy: 1219200 },
+        content: { x: 1663700, y: 2921000, cx: 4267200, cy: 838200 },
+        titleSize: 4300,
+        bodySize: 1500,
       };
     }
     return {
@@ -1101,10 +1083,10 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       accent: { x: 0, y: 0, cx: 9144000, cy: 457200 },
       secondaryAccent: { x: 914400, y: 4000500, cx: 7772400, cy: 304800 },
       label: { x: 685800, y: 685800, cx: 2209800, cy: 365760 },
-      title: { x: 1663700, y: 1270000, cx: 6400800, cy: 914400 },
-      content: { x: 1663700, y: 2387600, cx: 6515100, cy: 1097280 },
-      titleSize: 4080,
-      bodySize: 1860,
+      title: { x: 1663700, y: 1120000, cx: 4724400, cy: 1371600 },
+      content: { x: 1663700, y: 2819400, cx: 4419600, cy: 1447800 },
+      titleSize: 3400,
+      bodySize: 1450,
     };
   }
   if (visual.layout === "left-rail") {
@@ -1253,6 +1235,38 @@ function arcLineShapeXml({ id, name, x, y, cx, cy, stroke, width }) {
  * @param {{id: number, name: string, relId: string, x: number, y: number, cx: number, cy: number}} input
  * @returns {string}
  */
+/**
+ * 创建 top-band 封面的三枚指标卡，用来把极简灰蓝模板升级为高管汇报的商业化封面结构。
+ * @param {{id: number, x: number, y: number, number: string, label: string, visual: object, palette: object}} input
+ * @returns {string}
+ */
+function topBandMetricCardXml({ id, x, y, number, label, visual, palette }) {
+  return solidShapeXml({ id, name: `Top Band Metric Card ${number}`, geom: "roundRect", x, y, cx: 1485900, cy: 571500, fill: palette.glass })
+    + textShapeXml({ id: id + 1, name: `Top Band Metric Number ${number}`, x: x + 152400, y: y + 114300, cx: 365760, cy: 190500, text: number, size: 1500, bold: true, color: visual.title })
+    + textShapeXml({ id: id + 2, name: `Top Band Metric Label ${number}`, x: x + 152400, y: y + 312420, cx: 990600, cy: 190500, text: label, size: 900, bold: true, color: visual.body });
+}
+
+/**
+ * 创建 top-band 底部细网格，让页面有正式 PPT 模板常见的版心和工程感装饰。
+ * @param {{id: number, palette: object}} input
+ * @returns {string}
+ */
+function topBandGridXml({ id, palette }) {
+  const lines = [];
+  for (let offset = 0; offset < 8; offset += 1) {
+    lines.push(rectShapeXml({
+      id: id + offset,
+      name: `Top Band Bottom Grid ${offset + 1}`,
+      x: 1005840 + offset * 685800,
+      y: 4425950,
+      cx: 7620,
+      cy: 571500,
+      fill: palette.lightLine,
+    }));
+  }
+  return lines.join("");
+}
+
 function pictureXml({ id, name, relId, x, y, cx, cy }) {
   return `<p:pic><p:nvPicPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="${escapeXml(relId)}"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></p:spPr></p:pic>`;
 }

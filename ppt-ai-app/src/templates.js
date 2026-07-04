@@ -72,7 +72,7 @@ export const DEFAULT_TEMPLATES = [
         visual: {
           primary: "1E3A8A",
           accent: "6B7280",
-          background: "F8FAFC",
+          background: "E9EEF5",
           surface: "FFFFFF",
           title: "0F172A",
           body: "334155",
@@ -83,50 +83,50 @@ export const DEFAULT_TEMPLATES = [
         id: "modern",
         name: "现代红金",
         visual: {
-          primary: "1F4E79",
-          accent: "F4A261",
-          background: "F1F5F9",
+          primary: "B91C1C",
+          accent: "D97706",
+          background: "FFF1E6",
           surface: "FFFFFF",
-          title: "0F2945",
-          body: "334155",
-          layout: "red-gold",
+          title: "3B0A0A",
+          body: "5B3328",
+          layout: "top-band",
         },
       },
       {
         id: "classic",
         name: "经典商务",
         visual: {
-          primary: "243B53",
-          accent: "9D8A60",
-          background: "F5F7FA",
+          primary: "1F2A37",
+          accent: "B89B5E",
+          background: "E8ECEF",
           surface: "FFFFFF",
-          title: "1F2937",
-          body: "4B5563",
-          layout: "executive",
+          title: "111827",
+          body: "374151",
+          layout: "top-band",
         },
       },
       {
         id: "executive",
         name: "高管深蓝",
         visual: {
-          primary: "18344E",
-          accent: "CFAF70",
-          background: "F2F5F8",
+          primary: "102A43",
+          accent: "BFA46A",
+          background: "E6EDF5",
           surface: "FFFFFF",
-          title: "10263C",
-          body: "2F4255",
-          layout: "venture",
+          title: "0B1F33",
+          body: "334155",
+          layout: "top-band",
         },
       },
     ],
     visual: {
-      primary: "1F4E79",
-      accent: "F4A261",
-      background: "F1F5F9",
+      primary: "B91C1C",
+      accent: "D97706",
+      background: "FFF1E6",
       surface: "FFFFFF",
-      title: "0F2945",
-      body: "334155",
-      layout: "red-gold",
+      title: "3B0A0A",
+      body: "5B3328",
+      layout: "top-band",
     },
     layoutSchema: DOME_LAYOUT_SCHEMA,
   },
@@ -398,11 +398,16 @@ export class TemplateManager {
   }
 
   /**
-   * Lists all available template categories.
+   * Lists template categories that still have at least one visible template.
+   * @param {{ownerUserId?: number}} input
    * @returns {object[]}
    */
-  listCategories() {
-    return dedupeById([...this.categories, ...this.#databaseCategories()])
+  listCategories({ ownerUserId } = {}) {
+    const usedCategoryIds = new Set(
+      this.#rawVisibleTemplates({ ownerUserId }).map((template) => resolveCategoryId(template)),
+    );
+    return this.#allCategories()
+      .filter((category) => usedCategoryIds.has(category.id))
       .sort((left, right) => Number(left.sortOrder || 0) - Number(right.sortOrder || 0));
   }
 
@@ -424,8 +429,17 @@ export class TemplateManager {
    * @returns {object[]}
    */
   #visibleTemplates({ ownerUserId, categoryId } = {}) {
-    const categories = this.listCategories();
-    const templates = [...this.templates, ...this.#databaseTemplates()].filter((template) => {
+    const categories = this.#allCategories();
+    return dedupeById(this.#rawVisibleTemplates({ ownerUserId, categoryId })).map((template) => normalizeTemplate(template, categories));
+  }
+
+  /**
+   * Returns visible template records before API normalization.
+   * @param {{ownerUserId?: number, categoryId?: string}} input
+   * @returns {object[]}
+   */
+  #rawVisibleTemplates({ ownerUserId, categoryId } = {}) {
+    return [...this.templates, ...this.#databaseTemplates()].filter((template) => {
       const status = template.status || "active";
       const scope = template.scope || "official";
       if (status !== "active") return false;
@@ -435,7 +449,6 @@ export class TemplateManager {
       if (categoryId && resolveCategoryId(template) !== categoryId) return false;
       return true;
     });
-    return dedupeById(templates).map((template) => normalizeTemplate(template, categories));
   }
 
   /**
@@ -452,6 +465,14 @@ export class TemplateManager {
    */
   #databaseCategories() {
     return Array.isArray(this.database?.state?.template_categories) ? this.database.state.template_categories : [];
+  }
+
+  /**
+   * Returns all known category records before removing empty categories.
+   * @returns {object[]}
+   */
+  #allCategories() {
+    return dedupeById([...this.categories, ...this.#databaseCategories()]);
   }
 }
 

@@ -148,7 +148,7 @@ export function createApp(dependencies) {
       }
 
       if (request.method === "GET" && url.pathname === "/api/template-categories") {
-        sendJson(response, { categories: dependencies.templateManager.listCategories() });
+        sendJson(response, { categories: dependencies.templateManager.listCategories({ ownerUserId }) });
         return;
       }
 
@@ -2108,12 +2108,36 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     async function loadTemplateCategories() {
       try {
-        const data = await fetch("/api/template-categories").then(async (res) => {
-          const payload = await res.json();
-          if (!res.ok) throw new Error(formatApiError(payload));
-          return payload;
+        const [categoryData, templateData] = await Promise.all([
+          fetch("/api/template-categories").then(async (res) => {
+            const payload = await res.json();
+            if (!res.ok) throw new Error(formatApiError(payload));
+            return payload;
+          }),
+          fetch("/api/templates").then(async (res) => {
+            const payload = await res.json();
+            if (!res.ok) throw new Error(formatApiError(payload));
+            return payload;
+          })
+        ]);
+        const availableTemplates = (templateData.templates || []).filter((template) => template.scope !== "user");
+        const availableCategoryIds = new Set(availableTemplates.map((template) => resolveTemplateCategory(template).id));
+        const knownCategoryIds = new Set();
+        templateCategories = (categoryData.categories || []).filter((category) => {
+          if (category.id === "personal" || !availableCategoryIds.has(category.id)) return false;
+          knownCategoryIds.add(category.id);
+          return true;
         });
-        templateCategories = (data.categories || []).filter((category) => category.id !== "personal");
+        availableTemplates.forEach((template) => {
+          const category = resolveTemplateCategory(template);
+          if (!category.id || knownCategoryIds.has(category.id)) return;
+          knownCategoryIds.add(category.id);
+          templateCategories.push(category);
+        });
+        const categoryEl = document.querySelector("#template-category");
+        if (categoryEl && categoryEl.value && !availableCategoryIds.has(categoryEl.value)) {
+          categoryEl.value = "";
+        }
         renderCategoryOptions();
       } catch (error) {
         statusEl.textContent = error.message;

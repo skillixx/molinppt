@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+﻿import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { PptExportService } from "../src/ppt-exporter.js";
@@ -12,6 +12,16 @@ const deck = {
     { title: "Overview", bullets: ["Revenue grew", "Retention improved"] },
     { title: "Next Steps", bullets: ["Launch pilot"] },
   ],
+};
+
+const DOME_VISUAL = {
+  primary: "1F4E79",
+  accent: "F4A261",
+  background: "F1F5F9",
+  surface: "FFFFFF",
+  title: "0F2945",
+  body: "334155",
+  layout: "red-gold",
 };
 
 test("PptExportService creates a PPTX zip package with presentation parts", () => {
@@ -53,12 +63,10 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   const pitchText = pitch.content.toString("latin1");
 
   assert.match(businessText, /name="Moling Theme"/);
-  assert.match(businessText, /val="1F4E79"/);
-  assert.match(businessText, /name="Lower Gold Wave"/);
-  assert.match(businessText, /name="Dome Gold Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
-  assert.match(businessText, /name="Dome Light Wave Arc"[\s\S]*<a:prstGeom prst="arc"/);
-  assert.match(businessText, /name="Content Placement Card"/);
-  assert.match(businessText, /name="Right Golden Motif"/);
+  assert.match(businessText, /val="B91C1C"/);
+  assert.match(businessText, /name="Top Band Surface"/);
+  assert.match(businessText, /name="Top Band Accent Ribbon"/);
+  assert.match(businessText, /name="Top Band Cover Focus Frame"/);
   assert.match(pitchText, /name="Moling Theme"/);
   assert.match(pitchText, /val="111827"/);
   assert.notEqual(businessText, pitchText);
@@ -84,22 +92,18 @@ test("PptExportService uses dedicated top-band decorations for business minimal 
   assert.match(slide1, /name="Top Band Cover Detail Stripe"/);
   assert.match(slide1, /name="Top Band Accent Ribbon"/);
   assert.match(slide1, /name="Top Band Side Cap"/);
-  assert.match(slide1, /name="Top Band Index Ring"/);
-  assert.match(slide1, /name="Top Band Ring Number"/);
-  assert.match(slide1, /name="Top Band Footer"/);
   assert.match(slide1, /name="Section Label"/);
   assert.match(slide2, /name="Top Band Content Divider"/);
-  assert.match(slide2, /name="Top Band Content Accent Band"/);
-  assert.match(slide1, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="2000"/);
+  assert.match(slide1, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="1500"/);
   assert.match(slide1, /name="Content 2"[\s\S]*?<a:t>Revenue grew<\/a:t>/);
-  assert.match(slide2, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="1860"/);
+  assert.match(slide2, /name="Content 2"[\s\S]*?<a:rPr[^>]* sz="1450"/);
   assert.match(slide2, /name="Content 2"[\s\S]*?<a:t>Launch pilot<\/a:t>/);
   const coverTitleBlock = slide1.match(/name="Title 1"[\s\S]*?<\/p:txBody><\/p:sp>/)?.[0] || "";
   const contentTitleBlock = slide2.match(/name="Title 1"[\s\S]*?<\/p:txBody><\/p:sp>/)?.[0] || "";
   const coverTitleSize = Number((coverTitleBlock.match(/a:rPr[^>]* sz="(\d+)"/) || [])[1]);
   const contentTitleSize = Number((contentTitleBlock.match(/a:rPr[^>]* sz="(\d+)"/) || [])[1]);
   assert.equal(coverTitleSize > contentTitleSize, true);
-  assert.equal(coverTitleSize, 5200);
+  assert.equal(coverTitleSize, 4300);
 });
 
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {
@@ -109,6 +113,7 @@ test("PptExportService reuses dome visual assets and page layout roles for red-g
       title: "年度工作汇报",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "年度工作汇报", bullets: ["2026 年度经营复盘"] },
         { title: "目录", bullets: ["工作汇报", "成果展示"], layout: "agenda" },
@@ -161,6 +166,7 @@ test("PptExportService maps structured dome roles to business image and data pla
       title: "经营复盘",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "封面", bullets: ["年度汇报"], layout: "cover" },
         { title: "目录", bullets: ["工作汇报", "成果展示", "问题不足", "下步计划"], layout: "agenda" },
@@ -252,6 +258,7 @@ test("PptExportService fills dome placeholders from object structured bullets", 
       title: "对象结构内容",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "封面", bullets: ["年度汇报"], layout: "cover" },
         { title: "数据指标", bullets: [{ label: "复购率", value: "76%" }, { name: "交付周期", amount: "5d" }], layout: "metrics" },
@@ -280,6 +287,7 @@ test("PptExportService respects an explicit dome cover layout on any slide", () 
       title: "显式封面",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "工作汇报图文页", bullets: ["Progress"], layout: "image-report" },
         { title: "追加封面", bullets: ["Manual cover"], layout: "cover" },
@@ -300,6 +308,7 @@ test("PptExportService uses the sailboat background for dome closing slides", ()
       title: "结束页背景",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "工作汇报图文页", bullets: ["Progress"], layout: "image-report" },
         { title: "汇报结束", bullets: ["感谢观看"], layout: "closing" },
@@ -321,6 +330,7 @@ test("PptExportService fills a default dome section number when omitted", () => 
       title: "默认章节编号",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "封面", bullets: ["年度汇报"], layout: "cover" },
         { title: "第一章", bullets: [], layout: "section-divider" },
@@ -340,6 +350,7 @@ test("PptExportService infers image-report role from work summary titles", () =>
       title: "隐式工作概况",
       templateId: "business",
       theme: "modern",
+      templateVisual: DOME_VISUAL,
       slides: [
         { title: "封面", bullets: ["年度汇报"] },
         { title: "年度工作概况", bullets: ["业务进展", "团队投入", "关键成果"] },
@@ -360,7 +371,7 @@ test("PptExportService applies template-specific visual colors to PDF output", (
   const businessText = business.content.toString("latin1");
   const pitchText = pitch.content.toString("latin1");
 
-  assert.match(businessText, /0\.122 0\.306 0\.475 rg/);
+  assert.match(businessText, /0\.725 0\.110 0\.110 rg|0\.725 0\.11 0\.11 rg/);
   assert.match(pitchText, /0\.067 0\.094 0\.153 rg/);
   assert.notEqual(businessText, pitchText);
 });
