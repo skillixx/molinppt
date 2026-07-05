@@ -1,4 +1,4 @@
-﻿import assert from "node:assert/strict";
+import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { PptExportService } from "../src/ppt-exporter.js";
@@ -68,7 +68,7 @@ test("PptExportService applies template-specific visual colors to PPTX output", 
   assert.match(businessText, /name="Top Band Accent Ribbon"/);
   assert.match(businessText, /name="Top Band Cover Focus Frame"/);
   assert.match(pitchText, /name="Moling Theme"/);
-  assert.match(pitchText, /val="111827"/);
+  assert.match(pitchText, /val="16213E"/);
   assert.notEqual(businessText, pitchText);
 });
 
@@ -104,6 +104,516 @@ test("PptExportService uses dedicated top-band decorations for business minimal 
   const contentTitleSize = Number((contentTitleBlock.match(/a:rPr[^>]* sz="(\d+)"/) || [])[1]);
   assert.equal(coverTitleSize > contentTitleSize, true);
   assert.equal(coverTitleSize, 4300);
+});
+
+test("PptExportService uses commercial project status weekly decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "project-status", theme: "weekly" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const rels1 = pptPartText(text, "ppt/slides/_rels/slide1.xml.rels");
+
+  assert.match(slide1, /name="Status Report Surface"/);
+  assert.match(slide1, /name="Status Report Business Image"/);
+  assert.match(slide1, /name="Status Metric Card 1"/);
+  assert.match(slide1, /name="Status weekly Sticker"/);
+  assert.match(slide1, /name="Status Timeline Progress"/);
+  assert.match(slide1, /val="163D59"/);
+  assert.match(slide1, /val="2AA7A5"/);
+  assert.match(rels1, /status-report-weekly\.jpeg/);
+  assert.match(text, /ppt\/media\/status-report-weekly\.jpeg/);
+});
+
+test("PptExportService uses commercial project status steering decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "project-status", theme: "steering" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Status Report Surface"/);
+  assert.match(slide1, /name="Status Report Business Image"/);
+  assert.match(slide1, /name="Status Metric Card 1"/);
+  assert.match(slide1, /name="Status steering Sticker"/);
+  assert.match(slide1, /<a:t>4<\/a:t>/);
+  assert.match(slide1, /val="1F2F46"/);
+  assert.match(slide1, /val="D59E3D"/);
+  assert.match(text, /ppt\/media\/status-report-steering\.jpeg/);
+});
+
+test("PptExportService uses commercial project status delivery decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "project-status", theme: "delivery" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Status Report Surface"/);
+  assert.match(slide1, /name="Status Report Business Image"/);
+  assert.match(slide1, /name="Status Timeline Progress"/);
+  assert.match(slide1, /name="Status delivery Sticker"/);
+  assert.match(slide1, /<a:t>12<\/a:t>/);
+  assert.match(slide1, /val="12324A"/);
+  assert.match(slide1, /val="2BA6A0"/);
+  assert.match(text, /ppt\/media\/status-report-delivery\.jpeg/);
+});
+
+test("PptExportService uses commercial strategy consulting board decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "strategy-consulting", theme: "board" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Consulting Image"/);
+  assert.match(slide1, /name="Strategy board Chip"/);
+  assert.doesNotMatch(slide1, /name="Strategy Mark Card 1"/);
+  assert.match(slide1, /val="18253A"/);
+  assert.match(slide1, /val="C7A15A"/);
+  assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
+});
+
+test("PptExportService hides default page label for strategy consulting pages", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-consulting",
+      theme: "board",
+      slides: [
+        { title: "Cover", bullets: ["Intro"] },
+        { title: "Decision", bullets: ["Action"] },
+        { title: "Summary", bullets: ["Close"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide2, /name="Strategy Section Label"/);
+  assert.doesNotMatch(slide2, /name="Section Label"[\s\S]*<a:t>02<\/a:t>/);
+});
+
+test("PptExportService uses commercial strategy consulting matrix decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "strategy-consulting", theme: "matrix" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Consulting Image"/);
+  assert.match(slide1, /name="Strategy matrix Chip"/);
+  assert.match(slide1, /val="203A5C"/);
+  assert.match(slide1, /val="4C8F8A"/);
+  assert.match(text, /ppt\/media\/strategy-matrix\.jpeg/);
+});
+
+test("PptExportService uses commercial strategy consulting workstream decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "strategy-consulting", theme: "workstream" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Consulting Image"/);
+  assert.match(slide1, /name="Strategy workstream Chip"/);
+  assert.match(slide1, /val="27364A"/);
+  assert.match(slide1, /val="D29A45"/);
+  assert.match(text, /ppt\/media\/strategy-workstream\.jpeg/);
+});
+
+test("PptExportService uses commercial financial quarterly decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "financial-review", theme: "quarterly" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Financial Visual Panel"/);
+  assert.match(slide1, /name="Financial quarterly Chip"/);
+  assert.match(slide1, /name="Financial Bar 4"/);
+  assert.doesNotMatch(slide1, /name="Financial Point Card/);
+  assert.match(slide1, /val="18344E"/);
+  assert.match(slide1, /val="3B8C62"/);
+});
+
+test("PptExportService uses commercial financial audit decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "financial-review", theme: "audit" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Financial Visual Panel"/);
+  assert.match(slide1, /name="Financial audit Chip"/);
+  assert.match(slide1, /name="Financial Audit Dot 1"/);
+  assert.match(slide1, /val="243447"/);
+  assert.match(slide1, /val="A56A43"/);
+});
+
+test("PptExportService uses commercial financial forecast decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "financial-review", theme: "forecast" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Financial Visual Panel"/);
+  assert.match(slide1, /name="Financial forecast Chip"/);
+  assert.match(slide1, /name="Financial Forecast Dot 4"/);
+  assert.match(slide1, /val="123B4D"/);
+  assert.match(slide1, /val="2F9E9A"/);
+});
+
+test("PptExportService uses commercial sales enterprise decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "sales-proposal", theme: "enterprise" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Sales Cover Hero Band"/);
+  assert.match(slide1, /name="Sales Visual Panel"/);
+  assert.match(slide1, /name="Sales enterprise Chip"/);
+  assert.match(slide1, /name="Sales Account Card"/);
+  assert.match(slide2, /name="Sales Content Anchor"/);
+  assert.doesNotMatch(slide2, /name="Sales Cover Hero Band"/);
+  assert.match(slide1, /val="14565A"/);
+  assert.match(slide1, /val="D19A3E"/);
+});
+
+test("PptExportService uses commercial sales solution decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "sales-proposal", theme: "solution" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Sales Visual Panel"/);
+  assert.match(slide1, /name="Sales solution Chip"/);
+  assert.match(slide1, /name="Sales Solution Hub"/);
+  assert.doesNotMatch(slide1, /name="Secondary Accent"/);
+  assert.match(slide1, /val="1E4F76"/);
+  assert.match(slide1, /val="39A7A0"/);
+});
+
+test("PptExportService uses commercial sales renewal decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "sales-proposal", theme: "renewal" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Sales Visual Panel"/);
+  assert.match(slide1, /name="Sales renewal Chip"/);
+  assert.match(slide1, /name="Sales Renewal Trend Line 1"/);
+  assert.match(slide1, /name="Sales Renewal Dot 4"/);
+  assert.doesNotMatch(slide1, /name="Sales Renewal Segment/);
+  assert.match(slide1, /val="4B3F72"/);
+  assert.match(slide1, /val="E0A33C"/);
+});
+
+test("PptExportService uses commercial product roadmap decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-roadmap", theme: "roadmap" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Product Cover Strategy Field"/);
+  assert.match(slide1, /name="Product Visual Panel"/);
+  assert.match(slide1, /name="Product roadmap Chip"/);
+  assert.match(slide1, /name="Product Roadmap Node 4"/);
+  assert.match(slide2, /name="Product Content Anchor"/);
+  assert.doesNotMatch(slide2, /name="Product Cover Strategy Field"/);
+  assert.doesNotMatch(slide1, /name="Secondary Accent"/);
+  assert.match(slide1, /val="145A7A"/);
+  assert.match(slide1, /val="2FB7A3"/);
+});
+
+test("PptExportService uses commercial product release decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-roadmap", theme: "release" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Product Visual Panel"/);
+  assert.match(slide1, /name="Product release Chip"/);
+  assert.match(slide1, /name="Product Release Card 2"/);
+  assert.match(slide1, /name="Product Release Milestone 3"/);
+  assert.match(slide1, /val="3B4A8F"/);
+  assert.match(slide1, /val="F2A65A"/);
+});
+
+test("PptExportService uses commercial product review decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-roadmap", theme: "product-review" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Product Visual Panel"/);
+  assert.match(slide1, /name="Product product-review Chip"/);
+  assert.match(slide1, /name="Product Review Ring Outer"/);
+  assert.match(slide1, /name="Product Review Feedback Line 3"/);
+  assert.match(slide1, /val="263D4A"/);
+  assert.match(slide1, /val="E07A5F"/);
+});
+
+test("PptExportService uses commercial marketing launch decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "marketing-campaign", theme: "launch" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Marketing Cover Wash"/);
+  assert.match(slide1, /name="Marketing Visual Panel"/);
+  assert.match(slide1, /name="Marketing Launch Hero Card"/);
+  assert.match(slide1, /name="Marketing Metric Card 1"/);
+  assert.match(slide2, /name="Marketing Content Wash"/);
+  assert.match(slide2, /name="Marketing Channel Card 1"/);
+  assert.match(slide1, /val="E11D48"/);
+  assert.match(slide1, /val="F59E0B"/);
+});
+
+test("PptExportService uses commercial marketing brand decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "marketing-campaign", theme: "brand" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Marketing Visual Panel"/);
+  assert.match(slide1, /name="Marketing Brand Circle A"/);
+  assert.match(slide1, /name="Marketing Brand Circle B"/);
+  assert.match(slide1, /name="Marketing Brand Signal"/);
+  assert.match(slide1, /val="5B21B6"/);
+  assert.match(slide1, /val="06B6D4"/);
+});
+
+test("PptExportService uses commercial marketing growth decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "marketing-campaign", theme: "growth" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Marketing Visual Panel"/);
+  assert.match(slide1, /name="Marketing Growth Bar 1"/);
+  assert.match(slide1, /name="Marketing Growth Arc"/);
+  assert.match(slide1, /val="047857"/);
+  assert.match(slide1, /val="F97316"/);
+});
+
+test("PptExportService uses commercial pitch startup decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "pitch", theme: "startup" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Pitch Stage Canvas"/);
+  assert.match(slide1, /name="Pitch Founder Story Sheet"/);
+  assert.match(slide1, /name="Pitch Stage Spotlight"/);
+  assert.match(slide1, /name="Pitch Visual Panel"/);
+  assert.match(slide1, /name="Pitch Story Founder Card"/);
+  assert.match(slide1, /name="Pitch Metric Card 1"/);
+  assert.match(slide2, /name="Pitch Memo Board"/);
+  assert.match(slide2, /name="Pitch Investor Memo Sheet"/);
+  assert.match(slide2, /name="Pitch Memo Side Ledger"/);
+  assert.match(slide2, /name="Pitch Proof Card 1"/);
+  assert.match(slide1, /val="16213E"/);
+  assert.match(slide1, /val="F59E0B"/);
+});
+
+test("PptExportService uses commercial pitch investor decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "pitch", theme: "investor" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Pitch Stage Canvas"/);
+  assert.match(slide1, /name="Pitch Visual Panel"/);
+  assert.match(slide1, /name="Pitch Investor Bar 1"/);
+  assert.match(slide1, /name="Pitch Investor Market Dot"/);
+  assert.match(slide1, /val="0F2D3A"/);
+  assert.match(slide1, /val="19A0A5"/);
+});
+
+test("PptExportService uses commercial pitch product decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "pitch", theme: "product" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Pitch Stage Canvas"/);
+  assert.match(slide1, /name="Pitch Visual Panel"/);
+  assert.match(slide1, /name="Pitch Product Screen"/);
+  assert.match(slide1, /name="Pitch Product Glow"/);
+  assert.match(slide1, /val="3B1D5A"/);
+  assert.match(slide1, /val="E879F9"/);
+});
+
+test("PptExportService uses editorial brand story decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "brand-story", theme: "editorial" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Brand Story Cover Canvas"/);
+  assert.match(slide1, /name="Brand Story Image Panel"/);
+  assert.match(slide1, /name="Brand Story editorial Chip"/);
+  assert.match(slide1, /name="Brand Story Editorial Photo Tone"/);
+  assert.match(slide1, /name="Brand Story Point Card 1"/);
+  assert.match(slide2, /name="Brand Story Content Canvas"/);
+  assert.match(slide2, /name="Brand Story Index Card 1"/);
+  assert.match(slide1, /val="2A2F3F"/);
+  assert.match(slide1, /val="C7825A"/);
+});
+
+test("PptExportService uses premium brand story decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "brand-story", theme: "premium" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Brand Story Image Panel"/);
+  assert.match(slide1, /name="Brand Story premium Chip"/);
+  assert.match(slide1, /name="Brand Story Premium Texture Block"/);
+  assert.match(slide1, /name="Brand Story Premium Gold Slab"/);
+  assert.match(slide1, /val="181C24"/);
+  assert.match(slide1, /val="BFA06A"/);
+});
+
+test("PptExportService uses identity brand story decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "brand-story", theme: "identity" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Brand Story Image Panel"/);
+  assert.match(slide1, /name="Brand Story identity Chip"/);
+  assert.match(slide1, /name="Brand Story Identity Symbol Core"/);
+  assert.match(slide1, /name="Brand Story Identity Orbit"/);
+  assert.match(slide1, /val="123D4A"/);
+  assert.match(slide1, /val="E56F4F"/);
+});
+
+test("PptExportService uses dashboard data insight decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "data-insight", theme: "dashboard" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Data Insight Cover Dashboard Canvas"/);
+  assert.match(slide1, /name="Data Insight Visual Panel"/);
+  assert.match(slide1, /name="Data Insight dashboard Chip"/);
+  assert.match(slide1, /name="Data Insight Dashboard Bar 1"/);
+  assert.match(slide1, /name="Data Insight Metric Card 1"/);
+  assert.match(slide2, /name="Data Insight Content Analysis Canvas"/);
+  assert.match(slide2, /name="Data Insight Signal Card 1"/);
+  assert.match(slide1, /val="123B63"/);
+  assert.match(slide1, /val="18A0A6"/);
+});
+
+test("PptExportService uses insight analysis data insight decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "data-insight", theme: "insight" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Data Insight Visual Panel"/);
+  assert.match(slide1, /name="Data Insight insight Chip"/);
+  assert.match(slide1, /name="Data Insight Magnifier Ring"/);
+  assert.match(slide1, /name="Data Insight Finding Curve"/);
+  assert.match(slide1, /val="273C75"/);
+  assert.match(slide1, /val="F6A623"/);
+});
+
+test("PptExportService uses research report data insight decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "data-insight", theme: "research" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Data Insight Visual Panel"/);
+  assert.match(slide1, /name="Data Insight research Chip"/);
+  assert.match(slide1, /name="Data Insight Research Evidence Line 1"/);
+  assert.match(slide1, /name="Data Insight Research Quote Card"/);
+  assert.match(slide1, /val="2F3A4A"/);
+  assert.match(slide1, /val="7C9A92"/);
 });
 
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {
@@ -364,6 +874,51 @@ test("PptExportService infers image-report role from work summary titles", () =>
   assert.doesNotMatch(text, /ppt\/slides\/slide2\.xml[\s\S]*name="Dome Step 1"/);
 });
 
+test("PptExportService uses education lecture course decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "education", theme: "lecture" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Education Course Cover Canvas"/);
+  assert.match(slide1, /name="Education Course Board Surface"/);
+  assert.match(slide1, /name="Education Course Outcome Card 1"/);
+  assert.match(slide2, /name="Education Course Content Canvas"/);
+  assert.match(slide2, /name="Education Course Note Card 1"/);
+});
+
+test("PptExportService uses education workshop course decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "education", theme: "workshop" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Education Course Sticky Note 1"/);
+  assert.match(slide1, /name="Education Course Group B"/);
+  assert.match(slide1, /val="3F4A8A"/);
+});
+
+test("PptExportService uses education minimal course decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "education", theme: "minimal" },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Education Course Note Title Line"/);
+  assert.match(slide1, /name="Education Course Highlight"/);
+  assert.match(slide1, /val="2F5D73"/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });
@@ -372,7 +927,7 @@ test("PptExportService applies template-specific visual colors to PDF output", (
   const pitchText = pitch.content.toString("latin1");
 
   assert.match(businessText, /0\.725 0\.110 0\.110 rg|0\.725 0\.11 0\.11 rg/);
-  assert.match(pitchText, /0\.067 0\.094 0\.153 rg/);
+  assert.match(pitchText, /0\.086 0\.129 0\.243 rg/);
   assert.notEqual(businessText, pitchText);
 });
 

@@ -1904,7 +1904,7 @@ test("HTTP API generates a new deck from an existing outline with the currently 
     assert.equal(deckBody.deck.slides.length, outline.outline.slides.length);
     assert.match(deckBody.deck.slides[0].bullets[0], /Pitch angle:/);
     assert.match(html, /data-template="pitch"/);
-    assert.match(html, /--template-primary:#111827/);
+    assert.match(html, /--template-primary:#16213E/);
     assert.match(html, /data-layout="venture"/);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));

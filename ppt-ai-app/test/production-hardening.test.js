@@ -129,6 +129,41 @@ test("PptService rejects concurrent generation for the same outline before dupli
   assert.equal(reserveCalls, 1);
 });
 
+test("PptService releases stale running generation tasks for the same outline", async () => {
+  const context = await createContext({
+    aiProvider: {
+      generateOutline: async () => [{ title: "Outline", bullets: ["A"] }],
+      generateSlides: async () => [{ title: "Deck", bullets: ["A"] }],
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Stale generation",
+    slideCount: 1,
+    templateId: "business",
+    theme: "modern",
+  });
+  await context.database.insert("generation_tasks", {
+    id: "stale-task",
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+    status: "running",
+    progress: 10,
+    retryable: false,
+    created_at: new Date(Date.now() - 11 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 11 * 60 * 1000).toISOString(),
+  });
+
+  const result = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  const staleTask = await context.database.findOne("generation_tasks", (task) => task.id === "stale-task");
+
+  assert.equal(result.task.status, "succeeded");
+  assert.equal(staleTask.status, "failed");
+  assert.equal(staleTask.retryable, true);
+  assert.equal(staleTask.errorCode, "GENERATION_STALE");
+});
+
 async function createContext(options = {}) {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

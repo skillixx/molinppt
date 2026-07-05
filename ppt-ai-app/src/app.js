@@ -1197,18 +1197,66 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       clip-path: polygon(0 55%, 14% 42%, 27% 52%, 43% 30%, 58% 48%, 73% 28%, 88% 43%, 100% 33%, 100% 100%, 0 100%); opacity: .86; }
     .template-thumb[data-layout="top-band"] .template-thumb-band { top: 0; bottom: auto; height: 20%; background: linear-gradient(90deg, rgba(255,255,255,.96), color-mix(in srgb, var(--thumb-accent) 60%, var(--thumb-title) 40%)); }
     .template-thumb[data-layout="top-band"] .template-thumb-cover { top: 26%; bottom: 16%; }
+    .template-thumb[data-layout="status-report"] { background: linear-gradient(135deg, var(--thumb-bg), #ffffff 54%, color-mix(in srgb, var(--thumb-primary) 18%, var(--thumb-bg) 82%)); }
+    .template-thumb[data-layout="status-report"]::before { background:
+      repeating-linear-gradient(90deg, rgba(22,61,89,.035) 0 1px, transparent 1px 28px),
+      linear-gradient(135deg, rgba(255,255,255,.88), rgba(255,255,255,.22)); }
+    .template-thumb[data-layout="status-report"] .template-thumb-band { top: 0; bottom: auto; height: 19%; background: linear-gradient(90deg, var(--thumb-primary), color-mix(in srgb, var(--thumb-primary) 72%, var(--thumb-accent) 28%)); }
+    .template-thumb[data-layout="status-report"] .template-thumb-cover { left: 9%; right: 27%; top: 24%; bottom: 18%; border-left: 4px solid var(--thumb-accent); }
+    .template-thumb[data-layout="status-report"] .template-thumb-image { right: 8%; top: 28%; width: 20%; height: 35%; border-radius: 8px; background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 80%, #ffffff 20%), color-mix(in srgb, var(--thumb-accent) 55%, #ffffff 45%)); box-shadow: 0 12px 22px rgba(15,42,67,.18); }
+    .template-thumb[data-layout="status-report"] .template-thumb-wave { height: 13%; background: linear-gradient(90deg, var(--thumb-primary), var(--thumb-accent), rgba(255,255,255,.80)); clip-path: polygon(0 54%, 100% 54%, 100% 65%, 0 65%); }
     .template-thumb[data-layout="hero"] .template-thumb-cover { left: 9%; right: 9%; top: 19%; bottom: 18%; background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 88%, #111827 12%), color-mix(in srgb, var(--thumb-accent) 76%, var(--thumb-primary) 24%)); }
     .template-thumb[data-layout="hero"] .template-thumb-image { right: 6%; top: 20%; height: 52%; }
+    .template-thumb[data-layout="marketing"] { background: linear-gradient(135deg, var(--thumb-bg), #fff 50%, color-mix(in srgb, var(--thumb-primary) 16%, #fff 84%)); }
+    .template-thumb[data-layout="marketing"]::before { background:
+      radial-gradient(circle at 78% 24%, color-mix(in srgb, var(--thumb-accent) 34%, transparent), transparent 27%),
+      radial-gradient(circle at 18% 78%, color-mix(in srgb, var(--thumb-primary) 16%, transparent), transparent 30%),
+      repeating-linear-gradient(115deg, rgba(15,23,42,.035) 0 1px, transparent 1px 27px); }
+    .template-thumb[data-layout="marketing"] .template-thumb-cover { left: 10%; right: 28%; top: 22%; bottom: 20%; border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 88%, #111827 12%), color-mix(in srgb, var(--thumb-accent) 45%, var(--thumb-primary) 55%)); }
+    .template-thumb[data-layout="marketing"] .template-thumb-image { right: 9%; top: 25%; width: 23%; height: 42%; border-radius: 15px; background: linear-gradient(135deg,#fff,color-mix(in srgb,var(--thumb-bg) 70%,#fff 30%)); box-shadow: 0 14px 24px rgba(15,23,42,.16); }
+    .template-thumb[data-layout="marketing"] .template-thumb-wave { height: 22%; background: linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 80%, transparent), color-mix(in srgb, var(--thumb-accent) 72%, transparent)); clip-path: polygon(0 62%, 18% 48%, 35% 58%, 55% 40%, 76% 54%, 100% 38%, 100% 100%, 0 100%); }
+    .template-thumb[data-layout="marketing"] .template-thumb-tag { background: var(--thumb-accent); color: #fff; }
     .template-thumb[data-layout="executive"] .template-thumb-cover,
     .template-thumb[data-layout="academy"] .template-thumb-cover { right: 10%; }
     .template-thumb[data-layout="academy"] .template-thumb-cover { background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 84%, #064e3b 16%), color-mix(in srgb, var(--thumb-accent) 62%, var(--thumb-primary) 38%)); }
     .template-thumb[data-layout="academy"] .template-thumb-wave { background: linear-gradient(135deg, rgba(255,255,255,.86), color-mix(in srgb, var(--thumb-bg) 76%, #ffffff 24%) 44%, color-mix(in srgb, var(--thumb-primary) 58%, #ffffff 42%)); }
+    .template-thumb[data-layout="education-course"] { background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 92%, #0f172a 8%), color-mix(in srgb, var(--thumb-primary) 70%, var(--thumb-accent) 30%) 58%, var(--thumb-bg)); }
+    .template-thumb[data-layout="education-course"]::before { background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px),
+      radial-gradient(circle at 78% 22%, rgba(255,255,255,.18), transparent 25%); }
+    .template-thumb[data-layout="education-course"] .template-thumb-band { left: 8%; right: 8%; bottom: 14%; top: auto; height: 4%; background: var(--thumb-accent); }
+    .template-thumb[data-layout="education-course"] .template-thumb-cover { left: 8%; right: 8%; top: 17%; bottom: 15%; border-radius: 8px; background: linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 88%, #0f172a 12%), color-mix(in srgb, var(--thumb-primary) 72%, #000 28%)); box-shadow: inset 0 -8px 0 color-mix(in srgb, var(--thumb-accent) 72%, transparent); }
+    .template-thumb[data-layout="education-course"] .template-thumb-image { right: 13%; top: 34%; width: 17%; height: 30%; border-radius: 4px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); box-shadow: none; }
+    .template-thumb[data-layout="education-course"] .template-thumb-wave { height: 0; opacity: 0; }
+    .template-thumb[data-layout="education-course"] .template-thumb-tag { background: var(--thumb-accent); color: color-mix(in srgb, var(--thumb-primary) 88%, #000 12%); }
     .template-thumb[data-layout="venture"] { background: var(--thumb-bg); }
     .template-thumb[data-layout="venture"]::before { background:
       radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--thumb-accent) 26%, transparent), transparent 34%),
       linear-gradient(135deg, color-mix(in srgb, var(--thumb-primary) 94%, #ffffff 6%), color-mix(in srgb, var(--thumb-primary) 78%, var(--thumb-bg) 22%)); }
     .template-thumb[data-layout="venture"] .template-thumb-cover { background: linear-gradient(135deg, #151923, color-mix(in srgb, var(--thumb-primary) 76%, #111827 24%)); }
     .template-thumb[data-layout="venture"] .template-thumb-tag { color: #111827; background: color-mix(in srgb, var(--thumb-accent) 86%, #ffffff 14%); }
+    .template-thumb[data-layout="venture"] .template-thumb-image { right: 8%; border-radius: 16px; background:
+      linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.18)),
+      radial-gradient(circle at 68% 25%, color-mix(in srgb, var(--thumb-accent) 70%, #ffffff 30%), transparent 18%),
+      linear-gradient(145deg, color-mix(in srgb, var(--thumb-primary) 70%, #ffffff 30%), color-mix(in srgb, var(--thumb-accent) 38%, var(--thumb-primary) 62%)); }
+    .template-thumb[data-layout="venture"] .template-thumb-image::after { left: 15%; right: 18%; bottom: 15%; height: 5px; box-shadow: 0 -18px 0 rgba(255,255,255,.46), 0 -36px 0 rgba(255,255,255,.28); }
+    .template-thumb[data-layout="venture"] .template-thumb-wave { height: 18%; background: linear-gradient(90deg, color-mix(in srgb, var(--thumb-accent) 88%, #fff 12%), color-mix(in srgb, var(--thumb-primary) 70%, #fff 30%)); clip-path: polygon(0 72%, 18% 56%, 36% 68%, 56% 48%, 78% 64%, 100% 42%, 100% 100%, 0 100%); opacity: .9; }
+    .template-thumb[data-layout="venture"][data-thumb-variant="wide-cover"] .template-thumb-cover { border-radius: 10px 22px 10px 22px; }
+    .template-thumb[data-layout="venture"][data-thumb-variant="center-card"] .template-thumb-cover { border-radius: 22px; background: linear-gradient(145deg, color-mix(in srgb, var(--thumb-primary) 92%, #000 8%), color-mix(in srgb, var(--thumb-accent) 42%, var(--thumb-primary) 58%)); }
+    .template-thumb[data-layout="venture"][data-thumb-variant="left-title"] .template-thumb-cover { border-left: 5px solid var(--thumb-accent); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] { background: linear-gradient(120deg, color-mix(in srgb, var(--thumb-primary) 96%, #000 4%), var(--thumb-primary) 52%, color-mix(in srgb, var(--thumb-accent) 24%, var(--thumb-primary) 76%)); }
+    .template-thumb[data-template="pitch"][data-layout="venture"]::before { background:
+      linear-gradient(105deg, rgba(255,255,255,.06) 0 10%, transparent 10% 64%, rgba(255,255,255,.12) 64% 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 32px); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-cover { left: 9%; right: 33%; top: 23%; bottom: 20%; border-radius: 2px 18px 2px 18px; background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.80)); box-shadow: 0 18px 28px rgba(0,0,0,.20); border-left: 4px solid var(--thumb-accent); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-heading { color: var(--thumb-title); text-shadow: none; }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-date,
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-kicker,
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-summary { color: color-mix(in srgb, var(--thumb-body) 88%, transparent); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-tag { background: var(--thumb-accent); color: var(--thumb-primary); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-image { right: 8%; top: 27%; width: 24%; height: 36%; border-radius: 2px 16px 2px 16px; box-shadow: 0 18px 28px rgba(0,0,0,.22); opacity: .88; }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-band { height: 15%; background: color-mix(in srgb, var(--thumb-primary) 55%, #000 45%); clip-path: polygon(0 58%, 100% 20%, 100% 100%, 0 100%); }
+    .template-thumb[data-template="pitch"][data-layout="venture"] .template-thumb-wave { display: none; }
     .template-thumb[data-layout="red-gold"] { background: var(--thumb-primary); }
     .template-thumb[data-layout="red-gold"][data-has-dome-asset="true"] { background-image: var(--dome-template-thumb), linear-gradient(135deg, var(--thumb-primary), #7d0610); background-size: cover; background-position: center; }
     .template-thumb[data-layout="red-gold"]::before {
@@ -1775,7 +1823,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       body: JSON.stringify(body)
     }).then(async (res) => {
       const data = await res.json();
-      if (!res.ok) throw new Error(formatApiError(data));
+      if (!res.ok) {
+        const error = new Error(formatApiError(data));
+        error.payload = data;
+        throw error;
+      }
       return data;
     });
     function formatApiError(payload) {
@@ -2019,11 +2071,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const displayLayout = displayVisual.layout;
       const hasDomeAsset = displayLayout === "red-gold";
       const copy = templateThumbCopy(display);
-      const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout);
+      const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout, display);
       const thumbnailUrl = display.thumbnailUrl ? "url('" + cssUrl(display.thumbnailUrl) + "')" : "";
       const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
       return ''
-        + '<span class="template-thumb" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
+        + '<span class="template-thumb" data-template="' + escapeHtml(display.id || "") + '" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
         + '<span class="template-thumb-back template-thumb-back-left"></span><span class="template-thumb-back template-thumb-back-right"></span>'
         + '<span class="template-thumb-cover"><span class="template-thumb-date">' + escapeHtml(copy.date) + '</span><span class="template-thumb-kicker">' + escapeHtml(copy.kicker) + '</span><span class="template-thumb-heading">' + escapeHtml(copy.title) + '</span><span class="template-thumb-summary"><span class="template-thumb-line">' + escapeHtml(copy.lines[0]) + '</span><span class="template-thumb-line">' + escapeHtml(copy.lines[1]) + '</span></span><span class="template-thumb-tag">' + escapeHtml(copy.tag) + '</span></span>'
         + '<span class="template-thumb-image"></span><span class="template-thumb-band"></span><span class="template-thumb-wave"></span><span class="template-thumb-accent"></span>'
@@ -2032,6 +2084,27 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     function templateThumbCopy(display) {
       // 每个模板使用不同示例内容，但仍避免直接把模板名称写进缩略图正文。
+      const themeId = String(display.theme?.id || display.theme || "");
+      const themeCopies = {
+        "project-status:weekly": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" },
+        "project-status:steering": { date: "2026/07/29", kicker: "MEETING 01", title: "例会议题", lines: ["关键决策事项", "风险依赖与行动闭环"], tag: "管理例会" },
+        "project-status:delivery": { date: "2026/07/30", kicker: "DELIVERY 01", title: "交付看板", lines: ["验收节点与交付质量", "风险依赖及闭环进度"], tag: "交付跟踪" },
+        "strategy-consulting:board": { date: "2026/07/12", kicker: "BOARD 01", title: "董事会议题", lines: ["关键结论与决策建议", "战略议题优先级排序"], tag: "董事会汇报" },
+        "strategy-consulting:matrix": { date: "2026/07/13", kicker: "MATRIX 01", title: "分类矩阵", lines: ["业务象限与机会排序", "资源投入组合判断"], tag: "矩阵分类" },
+        "strategy-consulting:workstream": { date: "2026/07/14", kicker: "STREAM 01", title: "推进路径", lines: ["阶段任务与责任分工", "里程碑节奏和风险闭环"], tag: "流程推进" },
+        "financial-review:quarterly": { date: "2026/08/06", kicker: "FINANCE 01", title: "季度经营复盘", lines: ["收入利润现金流追踪", "预算执行偏差分析"], tag: "季度复盘" },
+        "financial-review:audit": { date: "2026/08/12", kicker: "AUDIT 01", title: "审计风险核验", lines: ["关键差异与凭证追溯", "整改闭环与风险评级"], tag: "审计分析" },
+        "financial-review:forecast": { date: "2026/08/18", kicker: "FORECAST 01", title: "预算预测规划", lines: ["滚动预测与情景假设", "资源配置和目标校准"], tag: "预测规划" },
+        "sales-proposal:enterprise": { date: "2026/05/18", kicker: "ACCOUNT 01", title: "企业客户画像", lines: ["采购角色与决策链路", "客户痛点和价值机会"], tag: "企业客户" },
+        "sales-proposal:solution": { date: "2026/05/22", kicker: "SOLUTION 01", title: "方案价值架构", lines: ["能力模块与交付路径", "业务场景和收益证明"], tag: "解决方案" },
+        "sales-proposal:renewal": { date: "2026/05/28", kicker: "GROWTH 01", title: "续约增长计划", lines: ["留存风险和增购机会", "续约节奏与客户成功"], tag: "续约增长" },
+        "pitch:startup": { date: "2026/09/10", kicker: "FOUNDER 01", title: "创业叙事路径", lines: ["用户痛点与创始洞察", "从验证到规模化增长"], tag: "创业故事" },
+        "pitch:investor": { date: "2026/09/18", kicker: "INVEST 01", title: "投资备忘录", lines: ["市场空间与商业模型", "融资计划和资金用途"], tag: "投资人版" },
+        "pitch:product": { date: "2026/09/26", kicker: "PRODUCT 01", title: "产品亮点展示", lines: ["核心功能和差异优势", "场景价值与增长证据"], tag: "产品亮点" },
+        "marketing-campaign:launch": { date: "2026/10/10", kicker: "LAUNCH 01", title: "新品首发节奏", lines: ["首发卖点与场景素材", "渠道预热和发布转化"], tag: "新品发布" },
+        "marketing-campaign:brand": { date: "2026/10/18", kicker: "BRAND 01", title: "品牌声量计划", lines: ["传播主张与内容矩阵", "核心触点和用户心智"], tag: "品牌传播" },
+        "marketing-campaign:growth": { date: "2026/10/26", kicker: "GROWTH 01", title: "增长转化路径", lines: ["渠道漏斗与转化节点", "复购闭环和投放复盘"], tag: "增长营销" },
+      };
       const copies = {
         business: { date: "2026/06/05", kicker: "PART 01", title: "季度概览", lines: ["核心指标达成分析", "重点项目进展复盘"], tag: "商务汇报" },
         "strategy-consulting": { date: "2026/07/12", kicker: "ISSUE 01", title: "诊断框架", lines: ["关键问题拆解路径", "组织能力提升建议"], tag: "咨询方案" },
@@ -2041,6 +2114,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "marketing-campaign": { date: "2026/10/10", kicker: "CAMPAIGN 01", title: "活动复盘", lines: ["渠道触达与转化表现", "品牌声量增长洞察"], tag: "营销推广" },
         "data-insight": { date: "2026/11/03", kicker: "DATA 01", title: "洞察结论", lines: ["指标异常与趋势变化", "行动建议优先级排序"], tag: "数据报告" },
         education: { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
+        "education-course": { date: "2026/08/22", kicker: "LESSON 01", title: "课程目标", lines: ["知识框架与重点概念", "课堂互动与练习路径"], tag: "教学课件" },
         pitch: { date: "2026/09/10", kicker: "PITCH 01", title: "增长故事", lines: ["市场机会与产品优势", "融资计划及资金用途"], tag: "融资路演" },
         "brand-story": { date: "2026/10/26", kicker: "BRAND 01", title: "品牌叙事", lines: ["核心主张与用户心智", "传播内容矩阵规划"], tag: "品牌传播" },
         "project-status": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" }
@@ -2050,12 +2124,37 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "academy": { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
         "executive": { date: "2026/07/18", kicker: "REPORT 01", title: "年度复盘", lines: ["经营数据与增长趋势", "关键任务完成情况"], tag: "企业汇报" },
         "venture": { date: "2026/09/10", kicker: "PLAN 01", title: "项目计划", lines: ["商业模式与市场机会", "阶段目标及执行节奏"], tag: "商业计划" },
+        "status-report": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" },
         "top-band": { date: "2026/05/20", kicker: "SECTION 01", title: "方案总览", lines: ["背景洞察与问题拆解", "策略路径与落地安排"], tag: "方案演示" },
         "hero": { date: "2026/10/12", kicker: "IDEA 01", title: "主题发布", lines: ["核心亮点集中呈现", "视觉主张清晰传达"], tag: "产品发布" }
       };
-      return copies[display.id] || copies[display.style] || copies[display.categoryId] || layoutCopies[display.visual?.layout] || { date: "2026/06/05", kicker: "PART 01", title: "内容概览", lines: ["核心信息结构展示", "重点内容层级清晰"], tag: "演示文稿" };
+      return themeCopies[String(display.id || "") + ":" + themeId] || copies[display.id] || copies[display.style] || copies[display.categoryId] || layoutCopies[display.visual?.layout] || { date: "2026/06/05", kicker: "PART 01", title: "内容概览", lines: ["核心信息结构展示", "重点内容层级清晰"], tag: "演示文稿" };
     }
-    function templateThumbVariant(seed) {
+    function templateThumbVariant(seed, display = {}) {
+      const statusVariant = display.visual?.layout === "status-report" ? display.visual?.variant : "";
+      if (statusVariant === "weekly") return { name: "wide-cover", coverLeft: 9, coverRight: 9, coverTop: 17, imageTop: 24, imageWidth: 24, waveHeight: 30 };
+      if (statusVariant === "steering") return { name: "center-card", coverLeft: 12, coverRight: 10, coverTop: 15, imageTop: 27, imageWidth: 22, waveHeight: 34 };
+      if (statusVariant === "delivery") return { name: "banner-card", coverLeft: 10, coverRight: 9, coverTop: 24, imageTop: 16, imageWidth: 20, waveHeight: 22 };
+      const strategyVariant = display.id === "strategy-consulting" ? display.visual?.variant : "";
+      if (strategyVariant === "board") return { name: "wide-cover", coverLeft: 9, coverRight: 11, coverTop: 18, imageTop: 23, imageWidth: 24, waveHeight: 24 };
+      if (strategyVariant === "matrix") return { name: "center-card", coverLeft: 13, coverRight: 13, coverTop: 16, imageTop: 29, imageWidth: 21, waveHeight: 31 };
+      if (strategyVariant === "workstream") return { name: "banner-card", coverLeft: 10, coverRight: 10, coverTop: 24, imageTop: 17, imageWidth: 23, waveHeight: 22 };
+      const financeVariant = display.id === "financial-review" ? display.visual?.variant : "";
+      if (financeVariant === "quarterly") return { name: "wide-cover", coverLeft: 9, coverRight: 10, coverTop: 17, imageTop: 25, imageWidth: 23, waveHeight: 24 };
+      if (financeVariant === "audit") return { name: "compact-card", coverLeft: 12, coverRight: 12, coverTop: 18, imageTop: 24, imageWidth: 22, waveHeight: 20 };
+      if (financeVariant === "forecast") return { name: "banner-card", coverLeft: 10, coverRight: 10, coverTop: 23, imageTop: 17, imageWidth: 24, waveHeight: 26 };
+      const salesVariant = display.id === "sales-proposal" ? display.visual?.variant : "";
+      if (salesVariant === "enterprise") return { name: "wide-cover", coverLeft: 9, coverRight: 10, coverTop: 18, imageTop: 25, imageWidth: 23, waveHeight: 24 };
+      if (salesVariant === "solution") return { name: "center-card", coverLeft: 12, coverRight: 12, coverTop: 16, imageTop: 26, imageWidth: 22, waveHeight: 30 };
+      if (salesVariant === "renewal") return { name: "banner-card", coverLeft: 10, coverRight: 10, coverTop: 23, imageTop: 17, imageWidth: 24, waveHeight: 26 };
+      const marketingVariant = display.id === "marketing-campaign" ? display.visual?.variant : "";
+      if (marketingVariant === "launch") return { name: "wide-cover", coverLeft: 10, coverRight: 28, coverTop: 22, imageTop: 25, imageWidth: 23, waveHeight: 22 };
+      if (marketingVariant === "brand") return { name: "center-card", coverLeft: 13, coverRight: 27, coverTop: 20, imageTop: 24, imageWidth: 24, waveHeight: 28 };
+      if (marketingVariant === "growth") return { name: "banner-card", coverLeft: 10, coverRight: 28, coverTop: 26, imageTop: 21, imageWidth: 22, waveHeight: 24 };
+      const pitchVariant = display.id === "pitch" ? display.visual?.variant : "";
+      if (pitchVariant === "startup") return { name: "left-title", coverLeft: 9, coverRight: 31, coverTop: 23, imageTop: 22, imageWidth: 25, waveHeight: 18 };
+      if (pitchVariant === "investor") return { name: "wide-cover", coverLeft: 10, coverRight: 30, coverTop: 20, imageTop: 26, imageWidth: 24, waveHeight: 20 };
+      if (pitchVariant === "product") return { name: "center-card", coverLeft: 14, coverRight: 29, coverTop: 21, imageTop: 24, imageWidth: 26, waveHeight: 24 };
       const variants = [
         { name: "wide-cover", coverLeft: 9, coverRight: 9, coverTop: 17, imageTop: 24, imageWidth: 24, waveHeight: 30 },
         { name: "left-title", coverLeft: 8, coverRight: 11, coverTop: 19, imageTop: 20, imageWidth: 24, waveHeight: 24 },
@@ -2080,7 +2179,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "red-gold"].includes(visual.layout) ? visual.layout : "top-band"
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course"].includes(visual.layout) ? visual.layout : "top-band",
+        variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
     function resolveTemplateCardVisual(baseVisual, theme, fallbackVisual) {
@@ -2093,9 +2193,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "red-gold"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
+        variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,
       };
       return merged;
     }
@@ -3057,10 +3158,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         }
         await loadBalance();
       } catch (error) {
-        try {
-          const parsed = JSON.parse(error.message);
-          state.taskId = parsed.error?.details?.task_id || state.taskId;
-        } catch {}
+        const apiError = error.payload?.error || {};
+        const runningTaskId = apiError.code === "GENERATION_ALREADY_RUNNING" ? apiError.details?.task_id : "";
+        if (runningTaskId) {
+          state.taskId = runningTaskId;
+          statusEl.textContent = "已有 PPT 生成任务正在运行，已继续等待当前任务完成。";
+          pollTaskProgress(state.taskId);
+          shouldReleaseButton = false;
+          return;
+        }
         previewEl.classList.remove("is-deck-loaded");
         previewEl.innerHTML = '<div class="empty-preview"><div class="empty-slide"><h3>生成 PPT 失败</h3><p>' + escapeHtml(error.message) + '</p><div class="empty-line"></div></div></div>';
         statusEl.textContent = error.message;
