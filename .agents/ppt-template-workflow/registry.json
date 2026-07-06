@@ -1,0 +1,92 @@
+{
+  "name": "ppt-template-workflow",
+  "displayName": "PPT 单模板设计开发发布工作流",
+  "description": "用于一个官方 PPT 模板从需求分析、联网参考、视觉设计、贴图生成、代码实现、验收到同步发布的本地 Agent 定义。",
+  "version": "1.0.0",
+  "recommendedOrder": [
+    "template-requirement-analyst",
+    "template-web-reference-researcher",
+    "template-visual-system-designer",
+    "template-asset-prompt-designer",
+    "template-image-asset-generator",
+    "template-structure-architect",
+    "template-implementation-engineer",
+    "template-preview-export-qa",
+    "template-sync-release-engineer"
+  ],
+  "agents": [
+    {
+      "id": "template-requirement-analyst",
+      "name": "模板需求分析 Agent",
+      "file": "01-requirement-analyst.md",
+      "canUseNetwork": false,
+      "canEditCode": false,
+      "primaryOutput": "模板需求说明"
+    },
+    {
+      "id": "template-web-reference-researcher",
+      "name": "网络参考分析 Agent",
+      "file": "02-web-reference-researcher.md",
+      "canUseNetwork": true,
+      "canEditCode": false,
+      "primaryOutput": "网络参考分析报告"
+    },
+    {
+      "id": "template-visual-system-designer",
+      "name": "视觉方案设计 Agent",
+      "file": "03-visual-system-designer.md",
+      "canUseNetwork": false,
+      "canEditCode": false,
+      "primaryOutput": "模板视觉方案"
+    },
+    {
+      "id": "template-asset-prompt-designer",
+      "name": "贴图资产规划 Agent",
+      "file": "04-asset-prompt-designer.md",
+      "canUseNetwork": false,
+      "canEditCode": false,
+      "primaryOutput": "贴图资产需求和提示词"
+    },
+    {
+      "id": "template-image-asset-generator",
+      "name": "贴图生成 Agent",
+      "file": "05-image-asset-generator.md",
+      "canUseNetwork": false,
+      "canEditCode": false,
+      "primaryOutput": "模板图片资产"
+    },
+    {
+      "id": "template-structure-architect",
+      "name": "模板结构架构 Agent",
+      "file": "06-template-structure-architect.md",
+      "canUseNetwork": false,
+      "canEditCode": true,
+      "primaryOutput": "模板目录和字段规划"
+    },
+    {
+      "id": "template-implementation-engineer",
+      "name": "模板开发 Agent",
+      "file": "07-template-implementation-engineer.md",
+      "canUseNetwork": false,
+      "canEditCode": true,
+      "primaryOutput": "可运行模板代码"
+    },
+    {
+      "id": "template-preview-export-qa",
+      "name": "预览导出校验 Agent",
+      "file": "08-preview-export-qa.md",
+      "canUseNetwork": false,
+      "canEditCode": true,
+      "primaryOutput": "预览导出验收报告"
+    },
+    {
+      "id": "template-sync-release-engineer",
+      "name": "同步发布 Agent",
+      "file": "09-sync-release-engineer.md",
+      "canUseNetwork": false,
+      "canEditCode": true,
+      "primaryOutput": "同步发布结果"
+    }
+  ]
+}
+
