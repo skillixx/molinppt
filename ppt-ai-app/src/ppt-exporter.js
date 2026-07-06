@@ -1902,6 +1902,7 @@ function quarterlyDashboardDecorationsXml({ visual, index, role, slide }) {
   const isClosing = role === "closing";
   if (isCover || isClosing) {
     return quarterlyDashboardDarkBackgroundXml({ visual, palette, isClosing })
+      + quarterlyDashboardHeroVisualXml({ palette, isClosing })
       + quarterlyDashboardHeroBarsXml({ palette })
       + (isCover
         ? textShapeXml({ id: 532, name: "Quarterly Dashboard Kicker", x: 731520, y: 914400, cx: 3962400, cy: 243840, text: scene.kicker, size: 900, bold: true, color: palette.softText })
@@ -1915,6 +1916,8 @@ function quarterlyDashboardDecorationsXml({ visual, index, role, slide }) {
   }
   return quarterlyDashboardContentBackgroundXml({ visual, palette })
     + quarterlyDashboardSectionLabelXml({ visual, text: scene.section })
+    + quarterlyDashboardCommandStripXml({ palette })
+    + quarterlyDashboardInsightLensXml({ palette })
     + quarterlyDashboardRingXml({ idBase: 545, x: 609600, y: 1524000, value: scene.metrics[0].value, label: scene.metrics[0].label, visual })
     + quarterlyDashboardRingXml({ idBase: 555, x: 1828800, y: 1524000, value: scene.metrics[1].value, label: scene.metrics[1].label, visual })
     + quarterlyDashboardProductBarsXml({ visual, title: scene.barTitle })
@@ -1936,17 +1939,35 @@ function quarterlyDashboardDarkBackgroundXml({ visual, palette }) {
 
 function quarterlyDashboardHeroBarsXml({ palette }) {
   const bars = [
-    [6096000, 2286000, 213360, 838200],
-    [6553200, 1973580, 213360, 1150620],
-    [7010400, 2385060, 213360, 739140],
-    [7467600, 1714500, 213360, 1417320],
-    [7924800, 2133600, 213360, 990600],
+    [6705600, 2796540, 167640, 502920],
+    [7071360, 2606040, 167640, 693420],
+    [7437120, 2857500, 167640, 441960],
+    [7802880, 2392680, 167640, 906780],
+    [8168640, 2697480, 167640, 601980],
   ];
-  return solidShapeXml({ id: 508, name: "Quarterly Dashboard Hero Glass Panel", geom: "roundRect", x: 5715000, y: 1219200, cx: 2819400, cy: 2590800, fill: "2A5A98" })
-    + lineFrameShapeXml({ id: 509, name: "Quarterly Dashboard Hero Panel Frame", geom: "roundRect", x: 5715000, y: 1219200, cx: 2819400, cy: 2590800, stroke: "C4D8EF", width: 9525 })
-    + rectShapeXml({ id: 518, name: "Quarterly Dashboard Hero Panel Header", x: 5943600, y: 1447800, cx: 2133600, cy: 91440, fill: "C4D8EF" })
-    + rectShapeXml({ id: 519, name: "Quarterly Dashboard Hero Axis", x: 5943600, y: 3124200, cx: 2209800, cy: 15240, fill: "8BB2DB" })
+  return solidShapeXml({ id: 508, name: "Quarterly Dashboard Hero Glass Panel", geom: "roundRect", x: 6400800, y: 2011680, cx: 2286000, cy: 1371600, fill: "2A5A98" })
+    + lineFrameShapeXml({ id: 509, name: "Quarterly Dashboard Hero Panel Frame", geom: "roundRect", x: 6400800, y: 2011680, cx: 2286000, cy: 1371600, stroke: "C4D8EF", width: 9525 })
+    + rectShapeXml({ id: 518, name: "Quarterly Dashboard Hero Panel Header", x: 6629400, y: 2164080, cx: 1676400, cy: 68580, fill: "C4D8EF" })
+    + rectShapeXml({ id: 519, name: "Quarterly Dashboard Hero Axis", x: 6629400, y: 3307080, cx: 1752600, cy: 15240, fill: "8BB2DB" })
     + bars.map(([x, y, cx, cy], index) => solidShapeXml({ id: 510 + index, name: `Quarterly Dashboard Hero Bar ${index + 1}`, geom: "roundRect", x, y, cx, cy, fill: palette.barBlue })).join("");
+}
+
+function quarterlyDashboardHeroVisualXml({ palette, isClosing }) {
+  const panelHeight = isClosing ? 2590800 : 2819400;
+  const shadowY = isClosing ? 3337560 : 3566160;
+  return solidShapeXml({ id: 650, name: "Quarterly Dashboard Business Illustration Panel", geom: "roundRect", x: 5486400, y: 792480, cx: 3352800, cy: panelHeight, fill: "D7E8F7" })
+    + lineFrameShapeXml({ id: 651, name: "Quarterly Dashboard Business Illustration Frame", geom: "roundRect", x: 5486400, y: 792480, cx: 3352800, cy: panelHeight, stroke: "FFFFFF", width: 11430 })
+    + solidShapeXml({ id: 652, name: "Quarterly Dashboard Executive Screen", geom: "roundRect", x: 5791200, y: 1127760, cx: 1676400, cy: 990600, fill: "FFFFFF" })
+    + rectShapeXml({ id: 653, name: "Quarterly Dashboard Screen Accent A", x: 5943600, y: 1310640, cx: 167640, cy: 106680, fill: "39D5E8" })
+    + rectShapeXml({ id: 654, name: "Quarterly Dashboard Screen Line A", x: 6195060, y: 1341120, cx: 640080, cy: 38100, fill: "C4D8EF" })
+    + rectShapeXml({ id: 655, name: "Quarterly Dashboard Screen Accent B", x: 5943600, y: 1584960, cx: 167640, cy: 106680, fill: "D7A650" })
+    + rectShapeXml({ id: 656, name: "Quarterly Dashboard Screen Line B", x: 6195060, y: 1615440, cx: 762000, cy: 38100, fill: "C4D8EF" })
+    + solidShapeXml({ id: 657, name: "Quarterly Dashboard Executive Portrait", geom: "roundRect", x: 7620000, y: 1158240, cx: 762000, cy: 929640, fill: "173861" })
+    + solidShapeXml({ id: 658, name: "Quarterly Dashboard Portrait Head", geom: "ellipse", x: 7856220, y: 1303020, cx: 289560, cy: 289560, fill: "D7A650" })
+    + solidShapeXml({ id: 659, name: "Quarterly Dashboard Portrait Body", geom: "roundRect", x: 7787640, y: 1623060, cx: 426720, cy: 335280, fill: palette.softText })
+    + arcLineShapeXml({ id: 660, name: "Quarterly Dashboard Insight Lens Ring", x: 7162800, y: 2286000, cx: 762000, cy: 762000, stroke: "FFFFFF", width: 38100 })
+    + rectShapeXml({ id: 661, name: "Quarterly Dashboard Insight Lens Handle", x: 7772400, y: 2941320, cx: 106680, cy: 457200, fill: "173861" })
+    + rectShapeXml({ id: 662, name: "Quarterly Dashboard Illustration Shadow", x: 5867400, y: shadowY, cx: 2438400, cy: 38100, fill: "8BB2DB" });
 }
 
 function quarterlyDashboardContentBackgroundXml({ visual, palette }) {
@@ -1960,6 +1981,18 @@ function quarterlyDashboardContentBackgroundXml({ visual, palette }) {
 function quarterlyDashboardSectionLabelXml({ visual, text }) {
   return solidShapeXml({ id: 524, name: "Quarterly Dashboard Section Label", geom: "roundRect", x: 548640, y: 944880, cx: 1447800, cy: 243840, fill: "173861" })
     + textShapeXml({ id: 526, name: "Quarterly Dashboard Section Text", x: 701040, y: 998220, cx: 1066800, cy: 121920, text, size: 600, bold: true, color: "FFFFFF" });
+}
+
+function quarterlyDashboardCommandStripXml({ palette }) {
+  return solidShapeXml({ id: 645, name: "Quarterly Dashboard Executive Command Strip", geom: "roundRect", x: 5943600, y: 944880, cx: 2590800, cy: 213360, fill: "173861" })
+    + rectShapeXml({ id: 646, name: "Quarterly Dashboard Command Signal A", x: 6172200, y: 1028700, cx: 457200, cy: 30480, fill: "FFFFFF" })
+    + rectShapeXml({ id: 647, name: "Quarterly Dashboard Command Signal B", x: 7010400, y: 1028700, cx: 457200, cy: 30480, fill: "D7A650" })
+    + rectShapeXml({ id: 648, name: "Quarterly Dashboard Command Signal C", x: 7848600, y: 1028700, cx: 457200, cy: 30480, fill: palette.softText });
+}
+
+function quarterlyDashboardInsightLensXml({ palette }) {
+  return arcLineShapeXml({ id: 649, name: "Quarterly Dashboard Content Insight Lens", x: 5791200, y: 2895600, cx: 944880, cy: 944880, stroke: palette.lightBlue, width: 45720 })
+    + rectShapeXml({ id: 663, name: "Quarterly Dashboard Content Lens Handle", x: 6537960, y: 3672840, cx: 91440, cy: 426720, fill: "8BB2DB" });
 }
 
 function quarterlyDashboardRingXml({ idBase, x, y, value, label, visual }) {

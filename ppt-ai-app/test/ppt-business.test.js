@@ -186,6 +186,9 @@ test("PptService applies a new template to an existing deck preview", async () =
   assert.equal(asset.templateId, "quarterly-business-review");
   assert.match(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-dashboard"/);
   assert.match(preview, /quarterly-dashboard-hero-bars/);
+  assert.match(preview, /quarterly-dashboard-hero-visual/);
+  assert.match(preview, /quarterly-dashboard-command-strip/);
+  assert.match(preview, /quarterly-dashboard-insight-lens/);
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 

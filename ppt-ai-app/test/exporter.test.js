@@ -504,6 +504,12 @@ test("PptExportService renders quarterly dashboard text from slide content", () 
   assert.match(slide2, new RegExp(sectionText));
   assert.match(slide2, new RegExp(metricText));
   assert.match(slide2, /37%/);
+  assert.match(slide2, /name="Quarterly Dashboard Executive Command Strip"/);
+  assert.match(slide2, /name="Quarterly Dashboard Content Insight Lens"/);
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  assert.match(slide1, /name="Quarterly Dashboard Business Illustration Panel"/);
+  assert.match(slide1, /name="Quarterly Dashboard Executive Screen"/);
+  assert.match(slide1, /name="Quarterly Dashboard Executive Portrait"/);
   const staleText = ["35\\.28%", "60\\.99%", "\\u9655\\u897f", "\\u4e0a\\u6d77", "\\u5317\\u4eac", "\\u6df1\\u5733", "\\u6570\\u636e\\u5206\\u6790PPT"].join("|");
   assert.doesNotMatch(slide2, new RegExp(staleText));
 });
