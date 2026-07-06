@@ -448,38 +448,6 @@ test("PptExportService uses commercial marketing growth decorations", () => {
   assert.match(slide1, /val="F97316"/);
 });
 
-test("PptExportService uses quarterly business review problem diagnosis decorations", () => {
-  const exporter = new PptExportService();
-  const result = exporter.exportDeck({
-    deck: {
-      ...deck,
-      templateId: "quarterly-business-review",
-      theme: "problem-diagnosis",
-      slides: [
-        { title: "季度业务复盘", bullets: ["目标偏差", "过程断点"] },
-        { title: "问题原因拆解", bullets: ["原因归因", "影响范围"] },
-        { title: "整改方向", bullets: ["整改动作", "跟踪机制"] },
-        { title: "改善闭环", bullets: ["责任到人", "下季追踪"] },
-      ],
-    },
-    format: "pptx",
-  });
-  const text = result.content.toString("latin1");
-  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
-
-  assert.match(slide1, /name="Quarterly Diagnosis Problem Triangle"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Method Triangle"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Center Pivot"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Problem Text A"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Method Text A"/);
-  assert.doesNotMatch(slide1, /瀛樺湪|鏀硅繘/);
-  assert.match(slide2, /name="Quarterly Diagnosis Problem Card 1"/);
-  assert.match(slide2, /name="Quarterly Diagnosis Method Card 1"/);
-  assert.match(slide2, /val="152E79"/);
-  assert.match(slide2, /val="4F7F55"/);
-});
-
 test("PptExportService keeps annual summary export text aligned with preview sizing", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

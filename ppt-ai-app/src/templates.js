@@ -59,21 +59,6 @@ const DOME_LAYOUT_SCHEMA = {
   ],
 };
 
-const QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA = {
-  defaultCoverLayout: "quarterly-diagnosis-cover",
-  defaultContentLayout: "quarterly-diagnosis-content",
-  allowedLayouts: [
-    "quarterly-diagnosis-cover",
-    "quarterly-diagnosis-overview",
-    "quarterly-diagnosis-content",
-    "quarterly-diagnosis-analysis",
-    "quarterly-diagnosis-closing",
-    "closing",
-    "title",
-    "content",
-  ],
-};
-
 /**
  * Built-in template catalog used when no external catalog is configured.
  */
@@ -276,46 +261,6 @@ export const DEFAULT_TEMPLATES = [
       layout: "executive",
     },
     layoutSchema: EXECUTIVE_LAYOUT_SCHEMA,
-  },
-  {
-    id: "quarterly-business-review",
-    name: "季度业务复盘",
-    categoryId: "business",
-    scope: "official",
-    status: "active",
-    style: "quarterly-business-review",
-    description: "适合季度经营复盘、销售数据汇报、区域业绩分析和管理层数据看板的高密度商务图表模板。",
-    themes: [
-      {
-        id: "problem-diagnosis",
-        name: "问题诊断",
-        visual: {
-          primary: "152E79",
-          accent: "4F7F55",
-          background: "F4F6F8",
-          surface: "FFFFFF",
-          title: "111827",
-          body: "4B5563",
-          layout: "quarterly-diagnosis",
-          variant: "problem-diagnosis",
-        },
-      },
-    ],
-    visual: {
-      primary: "152E79",
-      accent: "4F7F55",
-      background: "F4F6F8",
-      surface: "FFFFFF",
-      title: "111827",
-      body: "4B5563",
-      layout: "quarterly-diagnosis",
-      variant: "problem-diagnosis",
-    },
-    layoutSchema: {
-      defaultCoverLayout: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.defaultCoverLayout,
-      defaultContentLayout: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.defaultContentLayout,
-      allowedLayouts: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.allowedLayouts,
-    },
   },
   {
     id: "sales-proposal",

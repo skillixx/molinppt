@@ -139,27 +139,6 @@ test("PptService renders commercial template theme chips as decorative elements 
   assert.doesNotMatch(preview, /<div class="marketing-chip">/);
 });
 
-test("PptService renders quarterly business review problem diagnosis preview", async () => {
-  const pptPreviewRenderer = { render: async () => null };
-  const context = await createBusinessContext({ pptPreviewRenderer });
-  const outline = await context.pptService.generateOutline({
-    ownerUserId: 7,
-    topic: "季度业务复盘",
-    slideCount: 4,
-    templateId: "quarterly-business-review",
-    theme: "problem-diagnosis",
-  });
-  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
-
-  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
-
-  assert.match(preview, /data-layout="quarterly-diagnosis"/);
-  assert.match(preview, /quarterly-diagnosis-cover-model/);
-  assert.match(preview, /存在<br>问题/);
-  assert.match(preview, /改进<br>方法/);
-  assert.doesNotMatch(preview, /<div class="quarterly-dashboard-hero-bars"/);
-});
-
 test("PptService applies a new template to an existing deck preview", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -175,18 +154,17 @@ test("PptService applies a new template to an existing deck preview", async () =
   const updated = await context.pptService.applyTemplateToDeck({
     ownerUserId: 7,
     deckId: deck.id,
-    templateId: "quarterly-business-review",
-    theme: "problem-diagnosis",
+    templateId: "project-status",
+    theme: "weekly",
   });
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
   const asset = await context.database.findOne("ppt_assets", (item) => item.deckId === deck.id);
 
-  assert.equal(updated.templateId, "quarterly-business-review");
-  assert.equal(updated.theme, "problem-diagnosis");
-  assert.equal(asset.templateId, "quarterly-business-review");
-  assert.match(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-diagnosis"/);
-  assert.match(preview, /quarterly-diagnosis-cover-model/);
-  assert.doesNotMatch(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-dashboard"/);
+  assert.equal(updated.templateId, "project-status");
+  assert.equal(updated.theme, "weekly");
+  assert.equal(asset.templateId, "project-status");
+  assert.match(preview, /<body data-template="project-status" data-layout="status-report"/);
+  assert.match(preview, /status-report-photo/);
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 

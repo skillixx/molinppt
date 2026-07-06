@@ -342,8 +342,8 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   assert.equal(catalog.some((template) => template.id === "product-roadmap"), true);
   assert.equal(catalog.some((template) => template.id === "marketing-campaign"), true);
   assert.equal(catalog.some((template) => template.id === "data-insight"), true);
+  assert.equal(catalog.some((template) => template.id === "quarterly-business-review"), false);
   assert.equal(catalog.every((template) => template.themes.length >= 1), true);
-  assert.equal(catalog.find((template) => template.id === "quarterly-business-review")?.themes.some((theme) => theme.id === "dashboard"), false);
   assert.equal(catalog.every((template) => template.category?.id), true);
   assert.equal(catalog.every((template) => template.layoutSchema?.defaultContentLayout), true);
   assert.equal(templates.getTemplate("pitch").style, "venture-story");
@@ -454,16 +454,6 @@ test("resolveTemplateVisual applies financial review quarterly commercial visual
   assert.equal(visual.background, "EDF3F4");
   assert.equal(visual.layout, "executive");
   assert.equal(visual.variant, "quarterly");
-});
-
-test("resolveTemplateVisual applies quarterly business review problem diagnosis visual", () => {
-  const visual = resolveTemplateVisual({ templateId: "quarterly-business-review", theme: "problem-diagnosis" });
-
-  assert.equal(visual.primary, "152E79");
-  assert.equal(visual.accent, "4F7F55");
-  assert.equal(visual.background, "F4F6F8");
-  assert.equal(visual.layout, "quarterly-diagnosis");
-  assert.equal(visual.variant, "problem-diagnosis");
 });
 
 test("resolveTemplateVisual applies financial review audit commercial visual", () => {
