@@ -24,6 +24,7 @@ const result = await syncOfficialTemplates({
     },
     database,
   }),
+  pruneMissing: true,
 });
 console.log(JSON.stringify(result, null, 2));
 await database.close?.();

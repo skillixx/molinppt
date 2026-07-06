@@ -279,19 +279,33 @@ test("syncOfficialTemplates rejects invalid manifests before writing database re
 
 test("repository official templates do not include removed open-source samples", async () => {
   const context = await createSyncContext();
+  await context.database.insert("templates", {
+    id: "stale-quarterly-dashboard",
+    slug: "business-quarterly-review-dashboard",
+    name: "季度业务复盘 - 经营看板",
+    categoryId: "business",
+    scope: "official",
+    status: "active",
+    themes: [{ id: "dashboard", name: "经营看板" }],
+  });
 
   const result = await syncOfficialTemplates({
     rootDir: repoOfficialTemplatesRoot,
     database: context.database,
     storage: context.storage,
+    pruneMissing: true,
   });
   const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7 });
+  const stale = await context.database.findOne("templates", (template) => template.slug === "business-quarterly-review-dashboard");
 
   assert.equal(result.active >= 0, true);
+  assert.equal(result.staleDisabled, 1);
   assert.equal(visible.some((template) => template.id === "open-city-template"), false);
   assert.equal(visible.some((template) => template.id === "open-powerpoint-sample"), false);
+  assert.equal(visible.some((template) => template.slug === "business-quarterly-review-dashboard"), false);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-city-template")), null);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-powerpoint-sample")), null);
+  assert.equal(stale.status, "disabled");
 });
 
 async function createSyncContext() {

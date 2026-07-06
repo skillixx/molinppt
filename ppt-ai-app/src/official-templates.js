@@ -61,10 +61,10 @@ export async function syncOfficialTemplateCategories({ rootDir, database }) {
 
 /**
  * Syncs templates/official/{slug} manifests into the template catalog.
- * @param {{rootDir: string, database: import("./database.js").JsonFileDatabase, storage: import("./files.js").LocalFileStorage}} input
- * @returns {Promise<{checked: number, upserted: number, active: number, disabled: number}>}
+ * @param {{rootDir: string, database: import("./database.js").JsonFileDatabase, storage: import("./files.js").LocalFileStorage, pruneMissing?: boolean}} input
+ * @returns {Promise<{checked: number, upserted: number, active: number, disabled: number, staleDisabled?: number}>}
  */
-export async function syncOfficialTemplates({ rootDir, database, storage }) {
+export async function syncOfficialTemplates({ rootDir, database, storage, pruneMissing = false }) {
   const manifests = await findTemplateManifests(rootDir);
   const seenSlugs = new Set();
   let upserted = 0;
@@ -145,7 +145,22 @@ export async function syncOfficialTemplates({ rootDir, database, storage }) {
     if (manifest.status === DISABLED_STATUS) disabled += 1;
   }
 
-  return { checked: manifests.length, upserted, active, disabled };
+  if (!pruneMissing) return { checked: manifests.length, upserted, active, disabled };
+
+  const staleDisabled = await disableMissingOfficialTemplates({ database, seenSlugs });
+  return { checked: manifests.length, upserted, active, disabled, staleDisabled };
+}
+
+async function disableMissingOfficialTemplates({ database, seenSlugs }) {
+  let staleDisabled = 0;
+  const officialTemplates = await database.find("templates", (template) => template.scope === "official");
+  for (const template of officialTemplates) {
+    const slug = template.slug || template.id;
+    if (seenSlugs.has(slug) || template.status === DISABLED_STATUS) continue;
+    await database.update("templates", template.id, { status: DISABLED_STATUS });
+    staleDisabled += 1;
+  }
+  return staleDisabled;
 }
 
 async function findTemplateManifests(rootDir) {

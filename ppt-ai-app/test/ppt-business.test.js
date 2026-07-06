@@ -176,19 +176,17 @@ test("PptService applies a new template to an existing deck preview", async () =
     ownerUserId: 7,
     deckId: deck.id,
     templateId: "quarterly-business-review",
-    theme: "dashboard",
+    theme: "problem-diagnosis",
   });
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
   const asset = await context.database.findOne("ppt_assets", (item) => item.deckId === deck.id);
 
   assert.equal(updated.templateId, "quarterly-business-review");
-  assert.equal(updated.theme, "dashboard");
+  assert.equal(updated.theme, "problem-diagnosis");
   assert.equal(asset.templateId, "quarterly-business-review");
-  assert.match(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-dashboard"/);
-  assert.match(preview, /quarterly-dashboard-hero-bars/);
-  assert.match(preview, /quarterly-dashboard-hero-visual/);
-  assert.match(preview, /quarterly-dashboard-command-strip/);
-  assert.match(preview, /quarterly-dashboard-insight-lens/);
+  assert.match(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-diagnosis"/);
+  assert.match(preview, /quarterly-diagnosis-cover-model/);
+  assert.doesNotMatch(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-dashboard"/);
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 

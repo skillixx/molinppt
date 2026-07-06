@@ -59,21 +59,6 @@ const DOME_LAYOUT_SCHEMA = {
   ],
 };
 
-const QUARTERLY_DASHBOARD_LAYOUT_SCHEMA = {
-  defaultCoverLayout: "quarterly-dashboard-cover",
-  defaultContentLayout: "quarterly-dashboard-content",
-  allowedLayouts: [
-    "quarterly-dashboard-cover",
-    "quarterly-dashboard-overview",
-    "quarterly-dashboard-content",
-    "quarterly-dashboard-analysis",
-    "quarterly-dashboard-closing",
-    "closing",
-    "title",
-    "content",
-  ],
-};
-
 const QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA = {
   defaultCoverLayout: "quarterly-diagnosis-cover",
   defaultContentLayout: "quarterly-diagnosis-content",
@@ -302,20 +287,6 @@ export const DEFAULT_TEMPLATES = [
     description: "适合季度经营复盘、销售数据汇报、区域业绩分析和管理层数据看板的高密度商务图表模板。",
     themes: [
       {
-        id: "dashboard",
-        name: "经营看板",
-        visual: {
-          primary: "25508C",
-          accent: "B74D40",
-          background: "F4F7FB",
-          surface: "FFFFFF",
-          title: "1E2D41",
-          body: "46556C",
-          layout: "quarterly-dashboard",
-          variant: "dashboard",
-        },
-      },
-      {
         id: "problem-diagnosis",
         name: "问题诊断",
         visual: {
@@ -331,22 +302,19 @@ export const DEFAULT_TEMPLATES = [
       },
     ],
     visual: {
-      primary: "25508C",
-      accent: "B74D40",
-      background: "F4F7FB",
+      primary: "152E79",
+      accent: "4F7F55",
+      background: "F4F6F8",
       surface: "FFFFFF",
-      title: "1E2D41",
-      body: "46556C",
-      layout: "quarterly-dashboard",
-      variant: "dashboard",
+      title: "111827",
+      body: "4B5563",
+      layout: "quarterly-diagnosis",
+      variant: "problem-diagnosis",
     },
     layoutSchema: {
-      defaultCoverLayout: QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.defaultCoverLayout,
-      defaultContentLayout: QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.defaultContentLayout,
-      allowedLayouts: [
-        ...QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.allowedLayouts,
-        ...QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.allowedLayouts,
-      ],
+      defaultCoverLayout: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.defaultCoverLayout,
+      defaultContentLayout: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.defaultContentLayout,
+      allowedLayouts: QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.allowedLayouts,
     },
   },
   {

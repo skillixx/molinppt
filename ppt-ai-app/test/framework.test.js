@@ -342,7 +342,8 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   assert.equal(catalog.some((template) => template.id === "product-roadmap"), true);
   assert.equal(catalog.some((template) => template.id === "marketing-campaign"), true);
   assert.equal(catalog.some((template) => template.id === "data-insight"), true);
-  assert.equal(catalog.every((template) => template.themes.length >= 2), true);
+  assert.equal(catalog.every((template) => template.themes.length >= 1), true);
+  assert.equal(catalog.find((template) => template.id === "quarterly-business-review")?.themes.some((theme) => theme.id === "dashboard"), false);
   assert.equal(catalog.every((template) => template.category?.id), true);
   assert.equal(catalog.every((template) => template.layoutSchema?.defaultContentLayout), true);
   assert.equal(templates.getTemplate("pitch").style, "venture-story");

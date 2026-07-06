@@ -480,40 +480,6 @@ test("PptExportService uses quarterly business review problem diagnosis decorati
   assert.match(slide2, /val="4F7F55"/);
 });
 
-test("PptExportService renders quarterly dashboard text from slide content", () => {
-  const exporter = new PptExportService();
-  const result = exporter.exportDeck({
-    deck: {
-      ...deck,
-      templateId: "quarterly-business-review",
-      theme: "dashboard",
-      slides: [
-        { title: "经营总览", bullets: ["营收达成 72%", "客户续费 48%", "华东区域 91%", "渠道转化 63%"] },
-        { title: "渠道效率", bullets: ["线索转化 37%", "销售周期 21天", "线上渠道 58%", "伙伴渠道 42%"] },
-        { title: "行动重点", bullets: ["重点客户 16家", "项目推进 12项", "风险跟进 5项", "资源补位 3组"] },
-        { title: "复盘结论", bullets: ["下季度聚焦转化效率", "加强重点客户跟进"] },
-      ],
-    },
-    format: "pptx",
-  });
-  const text = result.content.toString("latin1");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
-
-  const sectionText = Buffer.from("\u6e20\u9053\u6548\u7387", "utf8").toString("latin1");
-  const metricText = Buffer.from("\u7ebf\u7d22\u8f6c\u5316", "utf8").toString("latin1");
-  assert.match(slide2, new RegExp(sectionText));
-  assert.match(slide2, new RegExp(metricText));
-  assert.match(slide2, /37%/);
-  assert.match(slide2, /name="Quarterly Dashboard Executive Command Strip"/);
-  assert.match(slide2, /name="Quarterly Dashboard Content Insight Lens"/);
-  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  assert.match(slide1, /name="Quarterly Dashboard Business Illustration Panel"/);
-  assert.match(slide1, /name="Quarterly Dashboard Executive Screen"/);
-  assert.match(slide1, /name="Quarterly Dashboard Executive Portrait"/);
-  const staleText = ["35\\.28%", "60\\.99%", "\\u9655\\u897f", "\\u4e0a\\u6d77", "\\u5317\\u4eac", "\\u6df1\\u5733", "\\u6570\\u636e\\u5206\\u6790PPT"].join("|");
-  assert.doesNotMatch(slide2, new RegExp(staleText));
-});
-
 test("PptExportService keeps annual summary export text aligned with preview sizing", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
