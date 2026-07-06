@@ -120,6 +120,147 @@ test("PptService falls back to HTML preview when PPTX renderer is unavailable", 
   assert.doesNotMatch(preview, /data-preview-source="rendered-pptx"/);
 });
 
+test("PptService renders commercial template theme chips as decorative elements in HTML preview", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Market launch plan",
+    slideCount: 2,
+    templateId: "marketing-campaign",
+    theme: "launch",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  // 主题风格名只保留在选择器里，预览页的角标只作为装饰图形存在。
+  assert.match(preview, /<div class="marketing-chip" aria-hidden="true"><\/div>/);
+  assert.doesNotMatch(preview, /<div class="marketing-chip">/);
+});
+
+test("PptService renders quarterly business review problem diagnosis preview", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度业务复盘",
+    slideCount: 4,
+    templateId: "quarterly-business-review",
+    theme: "problem-diagnosis",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /data-layout="quarterly-diagnosis"/);
+  assert.match(preview, /quarterly-diagnosis-cover-model/);
+  assert.match(preview, /存在<br>问题/);
+  assert.match(preview, /改进<br>方法/);
+  assert.doesNotMatch(preview, /<div class="quarterly-dashboard-hero-bars"/);
+});
+
+test("PptService applies a new template to an existing deck preview", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营复盘",
+    slideCount: 4,
+    templateId: "business",
+    theme: "modern",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const updated = await context.pptService.applyTemplateToDeck({
+    ownerUserId: 7,
+    deckId: deck.id,
+    templateId: "quarterly-business-review",
+    theme: "dashboard",
+  });
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+  const asset = await context.database.findOne("ppt_assets", (item) => item.deckId === deck.id);
+
+  assert.equal(updated.templateId, "quarterly-business-review");
+  assert.equal(updated.theme, "dashboard");
+  assert.equal(asset.templateId, "quarterly-business-review");
+  assert.match(preview, /<body data-template="quarterly-business-review" data-layout="quarterly-dashboard"/);
+  assert.match(preview, /quarterly-dashboard-hero-bars/);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+});
+
+test("PptService renders annual business summary preview with export-aligned layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertAnnualBusinessSummaryTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "年度经营总结",
+    slideCount: 3,
+    templateId: "annual-business-summary",
+    theme: "blue-gold",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  // 年度总结模板必须命中专用预览布局，避免退回普通文本流导致和导出 PPTX 差异过大。
+  assert.match(preview, /<body data-template="annual-business-summary" data-layout="annual-summary"/);
+  assert.match(preview, /annual-summary-doc/);
+  assert.match(preview, /annual-summary-metrics/);
+  assert.match(preview, /annual-summary-text/);
+  assert.match(preview, /--annual-title-size:/);
+  assert.match(preview, /body\[data-layout="annual-summary"\] \.slide-content\{display:none;\}/);
+  assert.match(preview, /body\[data-layout="annual-summary"\] \.slide-cover \.annual-summary-text\{left:8%;top:25\.8%;width:43\.33%;gap:16px;\}/);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+});
+
+test("PptService keeps annual business summary long text in the dedicated preview layer", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertAnnualBusinessSummaryTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "年度经营总结",
+    slideCount: 2,
+    templateId: "annual-business-summary",
+    theme: "blue-gold",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      {
+        title: "年度经营复盘：收入增速放缓、利润承压与核心项目交付质量持续提升",
+        bullets: [
+          "总收入同比增长但低于年度目标，核心客户续费稳定，新客获取效率需要进一步优化",
+          "净利率受到原材料和交付成本影响，后续需要通过产品组合调整和流程改善释放利润空间",
+          "重点项目按期交付率提升，客户满意度保持稳定，为下一年度增长目标提供基础支撑",
+        ],
+      },
+      {
+        title: "营收增速放缓与利润承压并存，客户结构和价格杠杆需要系统性优化",
+        bullets: [
+          "大客户贡献保持稳定，但中小客户转化周期拉长，需要提升线索筛选和销售协同效率",
+          "产品折扣率扩大压缩毛利空间，建议建立分层报价机制并同步优化成本科目",
+          "交付团队复用能力提升，但跨部门资源协调仍需加强，避免关键项目利润回收滞后",
+          "下一阶段重点围绕客户分层、价格体系和交付效率三个方向形成经营闭环",
+        ],
+      },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /annual-summary-text-title/);
+  assert.match(preview, /营收增速放缓与利润承压并存/);
+  assert.match(preview, /客户结构和价格杠杆需要系统性优化/);
+  assert.match(preview, /--annual-title-size:\d+(?:\.\d+)?px/);
+  assert.match(preview, /--annual-body-size:\d+(?:\.\d+)?px/);
+  assert.match(preview, /body\[data-layout="annual-summary"\] \.slide-content\{display:none;\}/);
+});
+
 test("PptService returns provider failure for outline generation as AI_PROVIDER_FAILED", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.generateOutline = async () => {
@@ -2384,6 +2525,7 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /frame\.srcdoc = html/);
     assert.match(html, /await refreshDeckPreviewFrame\(state\.deckId\)/);
     assert.match(html, /renderDeckPreviewFrame\(state\.deckId, \{ bustCache: true \}\)/);
+    assert.match(html, /}, 1500\);/);
     assert.match(html, /\/preview\?v=/);
     assert.match(html, /state\.outlineSlides = normalizeOutlineSlides\(data\.deck\.slides\)/);
     assert.match(html, /已打开历史 PPT，可继续调整结构、AI 润色单页并重新下载/);
@@ -3063,6 +3205,44 @@ async function createBusinessContext(options = {}) {
   });
 
   return { database, storage, taskCenter, templateManager, aiProvider, pptService, billingClient, billingCalls };
+}
+
+async function insertAnnualBusinessSummaryTemplate(context) {
+  // 测试数据库模拟官方模板同步后的年度总结模板，确保预览走 annual-summary 专用布局。
+  await context.database.insert("templates", {
+    id: "annual-business-summary",
+    name: "年度经营总结",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "blue-gold",
+        name: "蓝金年度版",
+        visual: {
+          primary: "3159F6",
+          accent: "39D5E8",
+          background: "F7FBFF",
+          surface: "FFFFFF",
+          title: "052E7A",
+          body: "1F4B83",
+          layout: "annual-summary",
+          variant: "blue-gold",
+        },
+      },
+    ],
+    visual: {
+      primary: "3159F6",
+      accent: "39D5E8",
+      background: "F7FBFF",
+      surface: "FFFFFF",
+      title: "052E7A",
+      body: "1F4B83",
+      layout: "annual-summary",
+      variant: "blue-gold",
+    },
+  });
 }
 
 async function postJson(url, cookie, body) {

@@ -1,0 +1,16 @@
+{
+  "slug": "business-annual-business-summary-blue-gold",
+  "name": "年度经营总结 - 蓝金年度版",
+  "description": "适合年度经营总结、集团经营汇报、年度成果复盘和来年目标规划的商业化蓝金商务模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "annual-summary",
+    "executive-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

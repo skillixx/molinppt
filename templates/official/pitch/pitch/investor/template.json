@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "pitch",
+  "themeId": "investor",
+  "style": "venture-story",
+  "themes": [
+    {
+      "id": "investor",
+      "name": "投资人版",
+      "visual": {
+        "primary": "0F2D3A",
+        "accent": "19A0A5",
+        "background": "EFF7F7",
+        "surface": "FFFFFF",
+        "title": "0B2530",
+        "body": "39515A",
+        "layout": "venture",
+        "variant": "investor"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0F2D3A",
+    "accent": "19A0A5",
+    "background": "EFF7F7",
+    "surface": "FFFFFF",
+    "title": "0B2530",
+    "body": "39515A",
+    "layout": "venture",
+    "variant": "investor"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

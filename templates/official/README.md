@@ -1,113 +1,131 @@
-# Official Templates
+# 官方模板目录规范
 
-官方模板不通过后台管理。每个模板以固定 `slug` 放在仓库目录中，然后执行同步脚本写入数据库并上传模板文件到对象存储索引。
+官方模板以代码和资产目录的方式维护，执行同步脚本后写入数据库，并把模板源文件、缩略图和模板定义上传到本地存储或 MinIO/S3。
 
-目录结构：
+## 推荐目录结构
 
 ```text
 templates/official/
   categories.json
-  {slug}/
-    manifest.json
-    source.pptx
-    thumbnail.png
-    template.json
+  _shared/
+    images/
+    textures/
+    icons/
+
+  business-report/
+    executive-business-report/
+      minimal-gray-blue/
+        manifest.json
+        template.json
+        renderer.js
+        thumbnail.png
+        source.pptx
+        assets/
+      modern-red-gold/
+        manifest.json
+        source.pptx
+        thumbnail.png
+        template.json
+        renderer.js
+        assets/
+
+  marketing/
+    campaign-plan/
+      growth-marketing/
+        manifest.json
+        source.pptx
+        thumbnail.png
+        template.json
+        renderer.js
+        assets/
 ```
 
-`manifest.json` 必填字段：
+目录含义：
+
+- 第一层是模板分类，例如 `business-report`、`marketing`、`finance-roadshow`。
+- 第二层是模板名称，例如 `executive-business-report`、`campaign-plan`。
+- 第三层是主题风格，例如 `minimal-gray-blue`、`growth-marketing`。
+- `_shared` 用于共享图片、纹理、图标等素材，不参与模板同步。
+
+当前同步逻辑仍兼容旧结构：
+
+```text
+templates/official/{slug}/manifest.json
+```
+
+## manifest.json
 
 ```json
 {
-  "slug": "business-blue",
-  "name": "Business Blue",
-  "description": "Blue business report template",
-  "category_slug": "business-report",
-  "category_name": "Business Report",
-  "category_sort_order": 10,
+  "slug": "marketing-campaign-plan-growth-marketing",
+  "name": "营销活动方案 - 增长营销",
+  "description": "适合增长复盘、投放策略和转化路径展示的营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
   "status": "active",
-  "tags": ["business", "report"],
-  "source_file": "source.pptx",
+  "tags": ["marketing", "growth"],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
   "thumbnail_file": "thumbnail.png",
-  "template_file": "template.json"
+  "source_file": "source.pptx"
 }
 ```
 
 规则：
 
-- `manifest.slug` 必须和目录名 `{slug}` 一致。
-- 只有包含 `manifest.json` 的一级子目录会被当作模板同步，纯素材目录会被跳过。
+- `slug` 必须全局唯一，只能使用小写字母、数字和连字符。
+- 新的多级目录中，`slug` 不需要等于目录名，但建议由分类、模板、主题拼接而成。
+- 旧的一层目录中，`slug` 仍需要和目录名一致，保证历史模板稳定。
 - `status` 只能是 `active` 或 `disabled`。
-- `source_file` 只能引用当前目录下的 `.pptx` 文件。
-- `thumbnail_file` 只能引用当前目录下的 `.png` 文件。
-- `template_file` 只能引用当前目录下的 `.json` 文件。
-- 同一个 `slug` 重复同步会更新原记录，保持模板 ID 稳定。
-- `disabled` 模板会同步进数据库，但不会展示给用户。
-- 官方模板使用 `scope: "official"`，不占用户个人模板配额。
+- `template_file` 只能引用当前主题目录下的 `.json` 文件。
+- `renderer_file` 建议引用当前主题目录下的 `.js` 文件，用于承载后续独立模板渲染代码。
+- `source_file` 可选；如果填写，只能引用当前主题目录下的 `.pptx` 文件。
+- `thumbnail_file` 可选；如果填写，只能引用当前主题目录下的 `.png` 文件。
+- 代码实现的模板可以只提供 `manifest.json`、`template.json`、`renderer.js` 和 `assets/`。
 
-分类种子 `categories.json` 可选，支持数组或 `{ "categories": [] }`：
+## template.json
 
 ```json
-[
-  { "id": "business-report", "name": "Business Report", "sortOrder": 10 }
-]
+{
+  "themes": [
+    { "id": "growth-marketing", "name": "增长营销" }
+  ],
+  "visual": {
+    "primary": "0F766E",
+    "accent": "F97316",
+    "background": "ECFDF5",
+    "surface": "FFFFFF",
+    "title": "102A43",
+    "body": "334155",
+    "layout": "campaign-content"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "campaign-cover",
+    "defaultContentLayout": "campaign-content",
+    "allowedLayouts": ["campaign-cover", "campaign-content", "hero", "story", "content"]
+  }
+}
 ```
 
-同步命令：
+## 同步命令
+
+从 `ppt-ai-app/` 目录执行：
 
 ```bash
-cd ppt-ai-app
-OFFICIAL_TEMPLATES_DIR='../templates/official'
-npm run seed:official-template-categories
-npm run seed:official-templates
+npm run migrate:official-template-dirs
 ```
 
-可选环境变量：
-
-- `DATABASE_URL`：默认 `json:./data/ppt-ai-db.json`，生产可配置 `mysql://user:password@host:3306/database`。
-- `STORAGE_DIR`：默认 `./data/storage`。
-- `STORAGE_ENDPOINT`、`STORAGE_BUCKET`、`STORAGE_ACCESS_KEY_ID`、`STORAGE_SECRET_ACCESS_KEY`：配置后模板文件上传到 MinIO/S3-compatible 对象存储。
-- `OFFICIAL_TEMPLATES_DIR`：默认仓库根目录下 `templates/official`。
-  - 从 `ppt-ai-app/` 目录运行命令时，建议显式传 `OFFICIAL_TEMPLATES_DIR='../templates/official'`。
-
-当前仓库内不再内置开源样例模板。新增官方模板时，请按上方目录结构补充 `manifest.json`、`template.json`、源 PPTX 和缩略图后再执行同步命令。
-  - `Journey1.pptx`
-  - `PowerPoint skill Test.pptx`
-  - `suparna.pptx`
-
-新增一个开源模板到系统的方法：
-
-1. 在 `templates/official/` 下新增目录（目录名即 `slug`）并放入：
-   - `manifest.json`
-   - `source.pptx`
-   - `thumbnail.png`
-   - `template.json`
-2. 按本文上方“manifest”规则填写元数据并确认许可协议允许商用/再分发。
-3. 跑同步：
+这个命令会把当前内置模板刷新到 `templates/official/分类/模板/主题/` 目录中。
 
 ```bash
-cd /home/pc-w1/ppt/ppt-ai-app
-DATABASE_URL='json:./data/ppt-ai-db.json'
-npm run seed:official-template-categories
-npm run seed:official-templates
+OFFICIAL_TEMPLATES_DIR="../templates/official" npm run seed:official-template-categories
+OFFICIAL_TEMPLATES_DIR="../templates/official" npm run seed:official-templates
 ```
 
-4. 验证：
+预览当前官方模板目录：
 
 ```bash
-# 看当前数据库中是否入库（本地 json 文件示例）
-node --input-type=module -e "import fs from 'node:fs'; const d=JSON.parse(fs.readFileSync('data/ppt-ai-db.json','utf8')); console.log((d.templates||[]).filter(t=>t.scope==='official').map(t=>t.slug));"
-```
-
-预检官方模板目录（不落库）：
-
-```bash
-cd /home/pc-w1/ppt/ppt-ai-app
-npm run list:official-templates
-```
-
-输出 JSON（适合脚本）：
-
-```bash
-cd /home/pc-w1/ppt/ppt-ai-app
-npm run list:official-templates -- --json
+OFFICIAL_TEMPLATES_DIR="../templates/official" npm run list:official-templates
+OFFICIAL_TEMPLATES_DIR="../templates/official" npm run list:official-templates -- --json
 ```

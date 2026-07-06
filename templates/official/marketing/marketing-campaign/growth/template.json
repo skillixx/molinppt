@@ -1,0 +1,42 @@
+{
+  "baseTemplateId": "marketing-campaign",
+  "themeId": "growth",
+  "style": "campaign-story",
+  "themes": [
+    {
+      "id": "growth",
+      "name": "增长营销",
+      "visual": {
+        "primary": "047857",
+        "accent": "F97316",
+        "background": "ECFDF5",
+        "surface": "FFFFFF",
+        "title": "063327",
+        "body": "36594F",
+        "layout": "marketing",
+        "variant": "growth"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "047857",
+    "accent": "F97316",
+    "background": "ECFDF5",
+    "surface": "FFFFFF",
+    "title": "063327",
+    "body": "36594F",
+    "layout": "marketing",
+    "variant": "growth"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "campaign-cover",
+    "defaultContentLayout": "campaign-content",
+    "allowedLayouts": [
+      "campaign-cover",
+      "campaign-content",
+      "hero",
+      "story",
+      "content"
+    ]
+  }
+}

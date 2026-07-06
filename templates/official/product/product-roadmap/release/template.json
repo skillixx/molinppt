@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "release",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "release",
+      "name": "版本发布",
+      "visual": {
+        "primary": "3B4A8F",
+        "accent": "F2A65A",
+        "background": "F2F4FB",
+        "surface": "FFFFFF",
+        "title": "202A55",
+        "body": "4B5678",
+        "layout": "academy",
+        "variant": "release"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "3B4A8F",
+    "accent": "F2A65A",
+    "background": "F2F4FB",
+    "surface": "FFFFFF",
+    "title": "202A55",
+    "body": "4B5678",
+    "layout": "academy",
+    "variant": "release"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

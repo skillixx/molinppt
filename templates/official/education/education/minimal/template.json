@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "education",
+  "themeId": "minimal",
+  "style": "learning-workshop",
+  "themes": [
+    {
+      "id": "minimal",
+      "name": "简洁教学",
+      "visual": {
+        "primary": "2F5D73",
+        "accent": "7BBE9A",
+        "background": "F1F6F7",
+        "surface": "FFFFFF",
+        "title": "183544",
+        "body": "4B626B",
+        "layout": "education-course",
+        "variant": "minimal"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "2F5D73",
+    "accent": "7BBE9A",
+    "background": "F1F6F7",
+    "surface": "FFFFFF",
+    "title": "183544",
+    "body": "4B626B",
+    "layout": "education-course",
+    "variant": "minimal"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

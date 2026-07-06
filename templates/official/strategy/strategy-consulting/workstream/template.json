@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "strategy-consulting",
+  "themeId": "workstream",
+  "style": "consulting-case",
+  "themes": [
+    {
+      "id": "workstream",
+      "name": "工作流程推进",
+      "visual": {
+        "primary": "27364A",
+        "accent": "D29A45",
+        "background": "F4F1EA",
+        "surface": "FFFFFF",
+        "title": "182334",
+        "body": "4B5563",
+        "layout": "executive",
+        "variant": "workstream"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "27364A",
+    "accent": "D29A45",
+    "background": "F4F1EA",
+    "surface": "FFFFFF",
+    "title": "182334",
+    "body": "4B5563",
+    "layout": "executive",
+    "variant": "workstream"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

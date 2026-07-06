@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "product-review",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "product-review",
+      "name": "产品复盘",
+      "visual": {
+        "primary": "263D4A",
+        "accent": "E07A5F",
+        "background": "F5F6F2",
+        "surface": "FFFFFF",
+        "title": "1E3038",
+        "body": "4A5960",
+        "layout": "academy",
+        "variant": "product-review"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "263D4A",
+    "accent": "E07A5F",
+    "background": "F5F6F2",
+    "surface": "FFFFFF",
+    "title": "1E3038",
+    "body": "4A5960",
+    "layout": "academy",
+    "variant": "product-review"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

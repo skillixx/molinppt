@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "sales-proposal",
+  "themeId": "solution",
+  "style": "proposal",
+  "themes": [
+    {
+      "id": "solution",
+      "name": "解决方案",
+      "visual": {
+        "primary": "1E4F76",
+        "accent": "39A7A0",
+        "background": "EFF6F8",
+        "surface": "FFFFFF",
+        "title": "153A56",
+        "body": "405A62",
+        "layout": "academy",
+        "variant": "solution"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E4F76",
+    "accent": "39A7A0",
+    "background": "EFF6F8",
+    "surface": "FFFFFF",
+    "title": "153A56",
+    "body": "405A62",
+    "layout": "academy",
+    "variant": "solution"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

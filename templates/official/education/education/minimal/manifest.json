@@ -1,0 +1,16 @@
+{
+  "slug": "education-education-minimal",
+  "name": "教育培训课件 - 简洁教学",
+  "description": "适合课程讲义、培训工作坊和知识分享的清晰课件模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "minimal",
+    "learning-workshop"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

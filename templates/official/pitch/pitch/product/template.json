@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "pitch",
+  "themeId": "product",
+  "style": "venture-story",
+  "themes": [
+    {
+      "id": "product",
+      "name": "产品亮点",
+      "visual": {
+        "primary": "3B1D5A",
+        "accent": "E879F9",
+        "background": "F6F0FF",
+        "surface": "FFFFFF",
+        "title": "25113A",
+        "body": "4E3B63",
+        "layout": "venture",
+        "variant": "product"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "3B1D5A",
+    "accent": "E879F9",
+    "background": "F6F0FF",
+    "surface": "FFFFFF",
+    "title": "25113A",
+    "body": "4E3B63",
+    "layout": "venture",
+    "variant": "product"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

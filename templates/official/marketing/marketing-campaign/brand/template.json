@@ -1,0 +1,42 @@
+{
+  "baseTemplateId": "marketing-campaign",
+  "themeId": "brand",
+  "style": "campaign-story",
+  "themes": [
+    {
+      "id": "brand",
+      "name": "品牌传播",
+      "visual": {
+        "primary": "5B21B6",
+        "accent": "06B6D4",
+        "background": "F2F0FF",
+        "surface": "FFFFFF",
+        "title": "20113D",
+        "body": "4B3D68",
+        "layout": "marketing",
+        "variant": "brand"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "5B21B6",
+    "accent": "06B6D4",
+    "background": "F2F0FF",
+    "surface": "FFFFFF",
+    "title": "20113D",
+    "body": "4B3D68",
+    "layout": "marketing",
+    "variant": "brand"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "campaign-cover",
+    "defaultContentLayout": "campaign-content",
+    "allowedLayouts": [
+      "campaign-cover",
+      "campaign-content",
+      "hero",
+      "story",
+      "content"
+    ]
+  }
+}

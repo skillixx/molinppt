@@ -6,7 +6,7 @@ import { AppError, normalizeError } from "./errors.js";
 import { MetricsRegistry } from "./metrics.js";
 
 // 工作台模板卡片直接复用 dome.pptx 提取出的封面图，让用户选模板时看到真实帆船红金视觉。
-const DOME_TEMPLATE_THUMBNAIL = readFileSync(new URL("../../templates/official/dome/assets/dome-cover.jpg", import.meta.url)).toString("base64");
+const DOME_TEMPLATE_THUMBNAIL = readFileSync(new URL("../../templates/official/business/business/modern/assets/dome-cover.jpg", import.meta.url)).toString("base64");
 const MAX_JSON_BODY_BYTES = 1024 * 1024;
 const MAX_TEMPLATE_UPLOAD_JSON_BODY_BYTES = 30 * 1024 * 1024;
 const DEFAULT_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -322,6 +322,19 @@ export function createApp(dependencies) {
         const html = await dependencies.pptService.previewDeck({ ownerUserId, deckId });
         response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
         response.end(html);
+        return;
+      }
+
+      if (request.method === "PATCH" && url.pathname.match(/^\/api\/ppt\/decks\/[^/]+\/template$/)) {
+        const deckId = url.pathname.split("/")[4];
+        const body = await readJson(request);
+        const deck = await dependencies.pptService.applyTemplateToDeck({
+          ownerUserId,
+          deckId,
+          templateId: body.template_id,
+          theme: body.theme,
+        });
+        sendJson(response, { deck });
         return;
       }
 
@@ -2119,6 +2132,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "brand-story": { date: "2026/10/26", kicker: "BRAND 01", title: "品牌叙事", lines: ["核心主张与用户心智", "传播内容矩阵规划"], tag: "品牌传播" },
         "project-status": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" }
       };
+      // 年度经营总结缩略图使用经营复盘语义，不直接展示主题风格名。
+      themeCopies["annual-business-summary:blue-gold"] = { date: "2026/12/31", kicker: "ANNUAL 01", title: "年度经营总结", lines: ["核心指标与成果沉淀", "来年目标和行动规划"], tag: "年度汇报" };
       const layoutCopies = {
         "red-gold": { date: "2026/06/05", kicker: "PART 01", title: "季度概览", lines: ["核心指标达成分析", "重点项目进展复盘"], tag: "商务汇报" },
         "academy": { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
@@ -2151,6 +2166,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (marketingVariant === "launch") return { name: "wide-cover", coverLeft: 10, coverRight: 28, coverTop: 22, imageTop: 25, imageWidth: 23, waveHeight: 22 };
       if (marketingVariant === "brand") return { name: "center-card", coverLeft: 13, coverRight: 27, coverTop: 20, imageTop: 24, imageWidth: 24, waveHeight: 28 };
       if (marketingVariant === "growth") return { name: "banner-card", coverLeft: 10, coverRight: 28, coverTop: 26, imageTop: 21, imageWidth: 22, waveHeight: 24 };
+      // 年度总结模板强调正式报告封面感，卡片区域更宽，右侧留出经营图表装饰。
+      if (display.id === "annual-business-summary") return { name: "wide-cover", coverLeft: 9, coverRight: 12, coverTop: 18, imageTop: 24, imageWidth: 25, waveHeight: 22 };
       const pitchVariant = display.id === "pitch" ? display.visual?.variant : "";
       if (pitchVariant === "startup") return { name: "left-title", coverLeft: 9, coverRight: 31, coverTop: 23, imageTop: 22, imageWidth: 25, waveHeight: 18 };
       if (pitchVariant === "investor") return { name: "wide-cover", coverLeft: 10, coverRight: 30, coverTop: 20, imageTop: 26, imageWidth: 24, waveHeight: 20 };
@@ -2179,7 +2196,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2193,7 +2210,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,
@@ -2564,9 +2581,20 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (!page || !slide) return false;
       const slideEl = page.querySelector(".slide");
       if (slideEl && slide.layout) slideEl.dataset.domeRole = String(slide.layout);
+      const bullets = normalizePreviewBullets(slide.bullets);
+      const annualTitleEl = page.querySelector(".annual-summary-text-title");
+      const annualListEl = page.querySelector(".annual-summary-text-list");
+      if (annualTitleEl) annualTitleEl.textContent = slide.title || "";
+      if (annualListEl) {
+        annualListEl.innerHTML = bullets.map((bullet) => '<li>' + escapeHtml(bullet) + '</li>').join("");
+      }
+      const annualTextEl = page.querySelector(".annual-summary-text");
+      if (annualTextEl) {
+        annualTextEl.style.setProperty("--annual-title-size", annualPreviewTitleSize(slide.title || "", state.selectedSlideNumber === 1) + "px");
+        annualTextEl.style.setProperty("--annual-body-size", annualPreviewBodySize(bullets, state.selectedSlideNumber === 1) + "px");
+      }
       const titleEl = page.querySelector(".slide-content h2");
       if (titleEl) titleEl.textContent = slide.title || "";
-      const bullets = Array.isArray(slide.bullets) ? slide.bullets.map((bullet) => String(bullet)).filter(Boolean) : [];
       const listEl = page.querySelector(".slide-content ul");
       if (listEl) {
         listEl.innerHTML = bullets.map((bullet) => '<li>' + escapeHtml(bullet) + '</li>').join("");
@@ -2585,6 +2613,48 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
       selectPreviewSlide(state.selectedSlideNumber);
       return true;
+    }
+
+    function normalizePreviewBullets(bullets) {
+      if (!Array.isArray(bullets)) return [];
+      return bullets.map((bullet) => {
+        if (bullet == null) return "";
+        if (typeof bullet === "string" || typeof bullet === "number" || typeof bullet === "boolean") return String(bullet).trim();
+        if (typeof bullet === "object") {
+          for (const key of ["text", "title", "label", "name", "value", "summary", "description"]) {
+            if (bullet[key] != null) return String(bullet[key]).trim();
+          }
+        }
+        return "";
+      }).filter(Boolean);
+    }
+
+    function estimatePreviewTextUnits(text) {
+      return Array.from(String(text || "")).reduce((sum, char) => sum + (char.charCodeAt(0) > 255 ? 2 : 1), 0);
+    }
+
+    function annualPreviewTitleSize(title, isCover) {
+      const units = estimatePreviewTextUnits(title);
+      if (isCover) {
+        if (units > 88) return 20;
+        if (units > 68) return 24;
+        if (units > 48) return 28;
+        return 38;
+      }
+      if (units > 82) return 13;
+      if (units > 62) return 16;
+      if (units > 42) return 19;
+      return 28;
+    }
+
+    function annualPreviewBodySize(bullets, isCover) {
+      const units = bullets.reduce((sum, item) => sum + estimatePreviewTextUnits(item), 0);
+      const base = isCover ? 14 : 13;
+      if (units > 180) return 8.5;
+      if (units > 140) return 9.5;
+      if (units > 100) return 10.5;
+      if (units > 70) return 11.5;
+      return base;
     }
 
     function renderSelectedSlideLabel() {
@@ -2648,7 +2718,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
       const slide = state.outlineSlides[index] || {};
       structureSlideTitleEl.value = slide.title || "";
-      structureSlideBulletsEl.value = (slide.bullets || []).join("\\n");
+      structureSlideBulletsEl.value = normalizePreviewBullets(slide.bullets).join("\\n");
       setStructureEditorDisabled(false);
       syncSinglePageAiChoice();
     }
@@ -2957,7 +3027,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         if (task.status === "running" || task.status === "pending") {
           taskPollTimeout = setTimeout(() => {
             pollTaskProgress(taskId);
-          }, 300);
+          }, 1500);
           return;
         }
 
@@ -3133,6 +3203,18 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         const edited = await json("/api/ppt/outlines/" + state.outlineId, { slides }, "PATCH");
         renderOutlineBoard(edited.outline.slides);
         setFlowStage("preview");
+        if (state.deckId) {
+          statusEl.textContent = "正在应用当前模板并刷新在线预览...";
+          const data = await json("/api/ppt/decks/" + state.deckId + "/template", {
+            template_id: document.querySelector("#template").value,
+            theme: document.querySelector("#theme").value
+          }, "PATCH");
+          setTemplateSelectionFromDeck(data.deck);
+          renderDeckPreviewFrame(state.deckId, { bustCache: true });
+          statusEl.textContent = JSON.stringify(data.deck, null, 2);
+          await loadAssets();
+          return;
+        }
         renderDeckGeneratingPreview(edited.outline.slides);
         statusEl.textContent = "正在应用当前模板生成 PPT...";
         const entitlementValue = document.querySelector("#entitlement").value.trim();

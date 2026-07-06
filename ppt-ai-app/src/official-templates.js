@@ -65,33 +65,43 @@ export async function syncOfficialTemplateCategories({ rootDir, database }) {
  * @returns {Promise<{checked: number, upserted: number, active: number, disabled: number}>}
  */
 export async function syncOfficialTemplates({ rootDir, database, storage }) {
-  const slugs = await findTemplateSlugs(rootDir);
+  const manifests = await findTemplateManifests(rootDir);
+  const seenSlugs = new Set();
   let upserted = 0;
   let active = 0;
   let disabled = 0;
 
-  for (const slug of slugs) {
-    const dir = path.join(rootDir, slug);
+  for (const item of manifests) {
+    const { dir, relativeDir } = item;
     const manifestPath = path.join(dir, MANIFEST_FILE);
     const manifest = await readJson(manifestPath, "OFFICIAL_TEMPLATE_MANIFEST_INVALID");
-    await validateManifest({ manifest, slug, dir });
+    await validateManifest({ manifest, relativeDir, dir });
+    if (seenSlugs.has(manifest.slug)) {
+      throw invalidManifest(`Duplicate official template slug: ${manifest.slug}`);
+    }
+    seenSlugs.add(manifest.slug);
+    const slug = manifest.slug;
     const templateDefinition = await readJson(path.join(dir, manifest.template_file), "OFFICIAL_TEMPLATE_MANIFEST_INVALID");
-    const source = await uploadOfficialFile({
-      storage,
-      dir,
-      slug,
-      fileName: manifest.source_file,
-      mimeType: SOURCE_MIME_TYPE,
-      fileRole: "official_template_source",
-    });
-    const thumbnail = await uploadOfficialFile({
-      storage,
-      dir,
-      slug,
-      fileName: manifest.thumbnail_file,
-      mimeType: THUMBNAIL_MIME_TYPE,
-      fileRole: "official_template_thumbnail",
-    });
+    const source = manifest.source_file
+      ? await uploadOfficialFile({
+        storage,
+        dir,
+        slug,
+        fileName: manifest.source_file,
+        mimeType: SOURCE_MIME_TYPE,
+        fileRole: "official_template_source",
+      })
+      : null;
+    const thumbnail = manifest.thumbnail_file
+      ? await uploadOfficialFile({
+        storage,
+        dir,
+        slug,
+        fileName: manifest.thumbnail_file,
+        mimeType: THUMBNAIL_MIME_TYPE,
+        fileRole: "official_template_thumbnail",
+      })
+      : null;
     const definition = await uploadOfficialFile({
       storage,
       dir,
@@ -121,11 +131,11 @@ export async function syncOfficialTemplates({ rootDir, database, storage }) {
       themes: normalizeThemes(templateDefinition.themes || manifest.themes),
       visual: { ...DEFAULT_VISUAL, ...(templateDefinition.visual || {}) },
       layoutSchema: { ...DEFAULT_LAYOUT_SCHEMA, ...(templateDefinition.layoutSchema || {}) },
-      sourceFileId: source.file.id,
-      thumbnailFileId: thumbnail.file.id,
+      sourceFileId: source?.file.id || null,
+      thumbnailFileId: thumbnail?.file.id || null,
       templateFileId: definition.file.id,
-      sourceMd5: source.md5,
-      thumbnailMd5: thumbnail.md5,
+      sourceMd5: source?.md5 || "",
+      thumbnailMd5: thumbnail?.md5 || "",
       templateMd5: definition.md5,
       official: true,
       ownerUserId: null,
@@ -135,7 +145,33 @@ export async function syncOfficialTemplates({ rootDir, database, storage }) {
     if (manifest.status === DISABLED_STATUS) disabled += 1;
   }
 
-  return { checked: slugs.length, upserted, active, disabled };
+  return { checked: manifests.length, upserted, active, disabled };
+}
+
+async function findTemplateManifests(rootDir) {
+  if (!(await exists(rootDir))) return [];
+  const manifests = [];
+
+  async function walk(currentDir, relativeParts) {
+    // 下划线目录作为共享素材目录保留，不参与官方模板同步。
+    if (relativeParts.some((part) => part.startsWith("_"))) return;
+    if (await exists(path.join(currentDir, MANIFEST_FILE))) {
+      manifests.push({
+        dir: currentDir,
+        relativeDir: relativeParts.join("/"),
+      });
+      return;
+    }
+
+    const entries = await readdir(currentDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      await walk(path.join(currentDir, entry.name), [...relativeParts, entry.name]);
+    }
+  }
+
+  await walk(rootDir, []);
+  return manifests.sort((a, b) => a.relativeDir.localeCompare(b.relativeDir));
 }
 
 async function findTemplateSlugs(rootDir) {
@@ -180,18 +216,28 @@ async function upsertById(database, collection, id, record) {
   return database.insert(collection, record);
 }
 
-async function validateManifest({ manifest, slug, dir }) {
-  for (const field of ["slug", "name", "category_slug", "status", "source_file", "thumbnail_file", "template_file"]) {
+async function validateManifest({ manifest, relativeDir, dir }) {
+  for (const field of ["slug", "name", "category_slug", "status", "template_file"]) {
     if (!manifest[field] || typeof manifest[field] !== "string") {
       throw invalidManifest(`manifest.${field} is required`);
     }
   }
-  if (manifest.slug !== slug) throw invalidManifest("manifest.slug must match its directory name");
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(manifest.slug)) {
+    throw invalidManifest("manifest.slug must use lower-case letters, numbers, and hyphens");
+  }
+  const isLegacyOneLevelTemplate = relativeDir && !relativeDir.includes("/");
+  if (isLegacyOneLevelTemplate && manifest.slug !== relativeDir) {
+    throw invalidManifest("manifest.slug must match its directory name for one-level official templates");
+  }
   if (![ACTIVE_STATUS, DISABLED_STATUS].includes(manifest.status)) {
     throw invalidManifest("manifest.status must be active or disabled");
   }
-  await validateManifestFile({ dir, fileName: manifest.source_file, extension: ".pptx", field: "source_file" });
-  await validateManifestFile({ dir, fileName: manifest.thumbnail_file, extension: ".png", field: "thumbnail_file" });
+  if (manifest.source_file) {
+    await validateManifestFile({ dir, fileName: manifest.source_file, extension: ".pptx", field: "source_file" });
+  }
+  if (manifest.thumbnail_file) {
+    await validateManifestFile({ dir, fileName: manifest.thumbnail_file, extension: ".png", field: "thumbnail_file" });
+  }
   await validateManifestFile({ dir, fileName: manifest.template_file, extension: ".json", field: "template_file" });
 }
 

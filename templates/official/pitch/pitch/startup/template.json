@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "pitch",
+  "themeId": "startup",
+  "style": "venture-story",
+  "themes": [
+    {
+      "id": "startup",
+      "name": "创业故事",
+      "visual": {
+        "primary": "16213E",
+        "accent": "F59E0B",
+        "background": "F7F1E8",
+        "surface": "FFFDF8",
+        "title": "121826",
+        "body": "3F4652",
+        "layout": "venture",
+        "variant": "startup"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "16213E",
+    "accent": "F59E0B",
+    "background": "F7F1E8",
+    "surface": "FFFDF8",
+    "title": "121826",
+    "body": "3F4652",
+    "layout": "venture",
+    "variant": "startup"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

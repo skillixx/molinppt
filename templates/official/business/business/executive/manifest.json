@@ -1,0 +1,16 @@
+{
+  "slug": "business-business-executive",
+  "name": "高管商务汇报 - 高管深蓝",
+  "description": "适合经营复盘、管理层汇报和董事会沟通的稳重商务模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "executive",
+    "executive-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

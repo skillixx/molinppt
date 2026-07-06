@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "sales-proposal",
+  "themeId": "renewal",
+  "style": "proposal",
+  "themes": [
+    {
+      "id": "renewal",
+      "name": "续约增长",
+      "visual": {
+        "primary": "4B3F72",
+        "accent": "E0A33C",
+        "background": "F4F1FA",
+        "surface": "FFFFFF",
+        "title": "302A4D",
+        "body": "514A65",
+        "layout": "academy",
+        "variant": "renewal"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "4B3F72",
+    "accent": "E0A33C",
+    "background": "F4F1FA",
+    "surface": "FFFFFF",
+    "title": "302A4D",
+    "body": "514A65",
+    "layout": "academy",
+    "variant": "renewal"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

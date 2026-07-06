@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "brand-story",
+  "themeId": "editorial",
+  "style": "brand-narrative",
+  "themes": [
+    {
+      "id": "editorial",
+      "name": "编辑叙事",
+      "visual": {
+        "primary": "2A2F3F",
+        "accent": "C7825A",
+        "background": "F6F1EA",
+        "surface": "FFFDFC",
+        "title": "171B26",
+        "body": "4A5160",
+        "layout": "brand-story",
+        "variant": "editorial"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "2A2F3F",
+    "accent": "C7825A",
+    "background": "F6F1EA",
+    "surface": "FFFDFC",
+    "title": "171B26",
+    "body": "4A5160",
+    "layout": "brand-story",
+    "variant": "editorial"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "brand-story",
+  "themeId": "identity",
+  "style": "brand-narrative",
+  "themes": [
+    {
+      "id": "identity",
+      "name": "品牌识别",
+      "visual": {
+        "primary": "123D4A",
+        "accent": "E56F4F",
+        "background": "EEF7F7",
+        "surface": "FFFFFF",
+        "title": "102C36",
+        "body": "405B63",
+        "layout": "brand-story",
+        "variant": "identity"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123D4A",
+    "accent": "E56F4F",
+    "background": "EEF7F7",
+    "surface": "FFFFFF",
+    "title": "102C36",
+    "body": "405B63",
+    "layout": "brand-story",
+    "variant": "identity"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

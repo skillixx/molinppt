@@ -155,6 +155,107 @@ test("syncOfficialTemplates updates an existing slug without changing the templa
   assert.deepEqual(visible.map((template) => template.id), []);
 });
 
+test("syncOfficialTemplates discovers nested category template theme directories", async () => {
+  const rootDir = path.join(tempDir, "templates", "official");
+  await writeOfficialTemplate(rootDir, path.join("business-report", "executive-business-report", "minimal-gray-blue"), {
+    manifest: {
+      slug: "business-report-executive-minimal-gray-blue",
+      name: "Executive Minimal Gray Blue",
+      description: "Nested official template",
+      category_slug: "business-report",
+      category_name: "Business Report",
+      status: "active",
+      tags: ["business", "executive"],
+      source_file: "source.pptx",
+      thumbnail_file: "thumbnail.png",
+      template_file: "template.json",
+    },
+    template: {
+      themes: [{ id: "minimal-gray-blue", name: "Minimal Gray Blue" }],
+      visual: { primary: "1E3A8A" },
+    },
+  });
+  await mkdir(path.join(rootDir, "_shared", "images"), { recursive: true });
+  await writeFile(path.join(rootDir, "_shared", "images", "manifest.json"), JSON.stringify({
+    slug: "shared-assets",
+    name: "Shared Assets",
+    category_slug: "shared",
+    status: "active",
+    source_file: "source.pptx",
+    thumbnail_file: "thumbnail.png",
+    template_file: "template.json",
+  }, null, 2));
+  const context = await createSyncContext();
+
+  const result = await syncOfficialTemplates({ rootDir, database: context.database, storage: context.storage });
+  const templates = await context.database.find("templates");
+  const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7, categoryId: "business-report" });
+
+  assert.deepEqual(result, { checked: 1, upserted: 1, active: 1, disabled: 0 });
+  assert.equal(templates.length, 1);
+  assert.equal(visible[0].id, "business-report-executive-minimal-gray-blue");
+  assert.equal(visible[0].visual.primary, "1E3A8A");
+});
+
+test("syncOfficialTemplates supports code-only nested official templates", async () => {
+  const rootDir = path.join(tempDir, "templates", "official");
+  const dir = path.join(rootDir, "marketing", "campaign-plan", "growth-marketing");
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, "manifest.json"), JSON.stringify({
+    slug: "marketing-campaign-growth",
+    name: "Marketing Campaign Growth",
+    description: "Code-only template",
+    category_slug: "marketing",
+    category_name: "Marketing",
+    status: "active",
+    tags: ["marketing"],
+    template_file: "template.json",
+  }, null, 2));
+  await writeFile(path.join(dir, "template.json"), JSON.stringify({
+    themes: [{ id: "growth", name: "Growth" }],
+    visual: { primary: "047857" },
+  }, null, 2));
+  const context = await createSyncContext();
+
+  const result = await syncOfficialTemplates({ rootDir, database: context.database, storage: context.storage });
+  const template = await context.database.findOne("templates", (item) => item.slug === "marketing-campaign-growth");
+  const objects = await context.database.find("storage_objects", (object) => object.visibility === "official");
+
+  assert.deepEqual(result, { checked: 1, upserted: 1, active: 1, disabled: 0 });
+  assert.equal(template.sourceFileId, null);
+  assert.equal(template.thumbnailFileId, null);
+  assert.equal(Boolean(template.templateFileId), true);
+  assert.equal(objects.length, 1);
+  assert.equal(objects[0].fileRole, "official_template_definition");
+});
+
+test("syncOfficialTemplates rejects duplicate nested official template slugs", async () => {
+  const rootDir = path.join(tempDir, "templates", "official");
+  const manifest = {
+    slug: "duplicate-template",
+    name: "Duplicate Template",
+    category_slug: "business-report",
+    status: "active",
+    source_file: "source.pptx",
+    thumbnail_file: "thumbnail.png",
+    template_file: "template.json",
+  };
+  await writeOfficialTemplate(rootDir, path.join("business-report", "one", "theme"), {
+    manifest,
+    template: { themes: [{ id: "one", name: "One" }] },
+  });
+  await writeOfficialTemplate(rootDir, path.join("business-report", "two", "theme"), {
+    manifest,
+    template: { themes: [{ id: "two", name: "Two" }] },
+  });
+  const context = await createSyncContext();
+
+  await assert.rejects(
+    () => syncOfficialTemplates({ rootDir, database: context.database, storage: context.storage }),
+    { code: "OFFICIAL_TEMPLATE_MANIFEST_INVALID" },
+  );
+});
+
 test("syncOfficialTemplates rejects invalid manifests before writing database records", async () => {
   const rootDir = path.join(tempDir, "templates", "official");
   await mkdir(path.join(rootDir, "bad-template"), { recursive: true });

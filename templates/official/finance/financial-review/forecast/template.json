@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "financial-review",
+  "themeId": "forecast",
+  "style": "finance-report",
+  "themes": [
+    {
+      "id": "forecast",
+      "name": "预测规划",
+      "visual": {
+        "primary": "123B4D",
+        "accent": "2F9E9A",
+        "background": "EEF6F7",
+        "surface": "FFFFFF",
+        "title": "0E2B3A",
+        "body": "3D5563",
+        "layout": "executive",
+        "variant": "forecast"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123B4D",
+    "accent": "2F9E9A",
+    "background": "EEF6F7",
+    "surface": "FFFFFF",
+    "title": "0E2B3A",
+    "body": "3D5563",
+    "layout": "executive",
+    "variant": "forecast"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

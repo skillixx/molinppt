@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "business",
+  "themeId": "executive",
+  "style": "executive-report",
+  "themes": [
+    {
+      "id": "executive",
+      "name": "高管深蓝",
+      "visual": {
+        "primary": "102A43",
+        "accent": "BFA46A",
+        "background": "E6EDF5",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "334155",
+        "layout": "top-band"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "BFA46A",
+    "background": "E6EDF5",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "334155",
+    "layout": "top-band"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cover",
+    "defaultContentLayout": "image-report",
+    "allowedLayouts": [
+      "cover",
+      "agenda",
+      "section-divider",
+      "image-report",
+      "three-steps",
+      "four-steps",
+      "metrics",
+      "showcase",
+      "retrospective",
+      "next-plan",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

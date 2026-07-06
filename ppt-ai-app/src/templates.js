@@ -59,6 +59,36 @@ const DOME_LAYOUT_SCHEMA = {
   ],
 };
 
+const QUARTERLY_DASHBOARD_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "quarterly-dashboard-cover",
+  defaultContentLayout: "quarterly-dashboard-content",
+  allowedLayouts: [
+    "quarterly-dashboard-cover",
+    "quarterly-dashboard-overview",
+    "quarterly-dashboard-content",
+    "quarterly-dashboard-analysis",
+    "quarterly-dashboard-closing",
+    "closing",
+    "title",
+    "content",
+  ],
+};
+
+const QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "quarterly-diagnosis-cover",
+  defaultContentLayout: "quarterly-diagnosis-content",
+  allowedLayouts: [
+    "quarterly-diagnosis-cover",
+    "quarterly-diagnosis-overview",
+    "quarterly-diagnosis-content",
+    "quarterly-diagnosis-analysis",
+    "quarterly-diagnosis-closing",
+    "closing",
+    "title",
+    "content",
+  ],
+};
+
 /**
  * Built-in template catalog used when no external catalog is configured.
  */
@@ -261,6 +291,63 @@ export const DEFAULT_TEMPLATES = [
       layout: "executive",
     },
     layoutSchema: EXECUTIVE_LAYOUT_SCHEMA,
+  },
+  {
+    id: "quarterly-business-review",
+    name: "季度业务复盘",
+    categoryId: "business",
+    scope: "official",
+    status: "active",
+    style: "quarterly-business-review",
+    description: "适合季度经营复盘、销售数据汇报、区域业绩分析和管理层数据看板的高密度商务图表模板。",
+    themes: [
+      {
+        id: "dashboard",
+        name: "经营看板",
+        visual: {
+          primary: "25508C",
+          accent: "B74D40",
+          background: "F4F7FB",
+          surface: "FFFFFF",
+          title: "1E2D41",
+          body: "46556C",
+          layout: "quarterly-dashboard",
+          variant: "dashboard",
+        },
+      },
+      {
+        id: "problem-diagnosis",
+        name: "问题诊断",
+        visual: {
+          primary: "152E79",
+          accent: "4F7F55",
+          background: "F4F6F8",
+          surface: "FFFFFF",
+          title: "111827",
+          body: "4B5563",
+          layout: "quarterly-diagnosis",
+          variant: "problem-diagnosis",
+        },
+      },
+    ],
+    visual: {
+      primary: "25508C",
+      accent: "B74D40",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "1E2D41",
+      body: "46556C",
+      layout: "quarterly-dashboard",
+      variant: "dashboard",
+    },
+    layoutSchema: {
+      defaultCoverLayout: QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.defaultCoverLayout,
+      defaultContentLayout: QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.defaultContentLayout,
+      allowedLayouts: [
+        ...QUARTERLY_DASHBOARD_LAYOUT_SCHEMA.allowedLayouts,
+        ...QUARTERLY_DIAGNOSIS_LAYOUT_SCHEMA.allowedLayouts,
+      ],
+    },
   },
   {
     id: "sales-proposal",
@@ -840,7 +927,18 @@ export class TemplateManager {
    * @returns {object[]}
    */
   #rawVisibleTemplates({ ownerUserId, categoryId } = {}) {
-    return [...this.templates, ...this.#databaseTemplates()].filter((template) => {
+    const databaseTemplates = this.#databaseTemplates();
+    const hasDatabaseOfficialTemplates = databaseTemplates.some((template) => (
+      (template.scope || "official") === "official"
+      && template.official === true
+      && (template.status || "active") === "active"
+      && !isOpenSourceTemplate(template)
+    ));
+    // 数据库已同步官方模板时，优先使用目录化模板，避免和内置 fallback 模板重复展示。
+    const fallbackTemplates = hasDatabaseOfficialTemplates
+      ? this.templates.filter((template) => (template.scope || "official") !== "official")
+      : this.templates;
+    return [...fallbackTemplates, ...databaseTemplates].filter((template) => {
       const status = template.status || "active";
       const scope = template.scope || "official";
       if (status !== "active") return false;
@@ -886,6 +984,9 @@ export function resolveTemplateVisual(input = {}) {
   const baseTemplate = DEFAULT_TEMPLATES.find((item) => item.id === input.templateId) || DEFAULT_TEMPLATES[0];
   const templateOverrides = input.template ? removeUndefinedValues(input.template) : null;
   const selectedTheme = String(input.theme || "").trim();
+  // 非 business 官方模板的主题风格是模板版式来源，必须优先于 deck 里可能过期的 visual 快照。
+  // business 下存在 red-gold 这类依赖 visual 快照的历史模板，不能被 modern/minimal 主题强行覆盖。
+  const officialThemeVisual = baseTemplate.id !== "business" ? resolveThemeVisual(baseTemplate.themes || [], selectedTheme) : null;
   const template = input.template
     ? {
       ...baseTemplate,
@@ -894,7 +995,7 @@ export function resolveTemplateVisual(input = {}) {
     }
     : (input.visual ? { ...baseTemplate, visual: { ...(baseTemplate.visual || {}), ...input.visual } } : baseTemplate);
   const hasVisualOverride = hasVisualOverrideAgainstBase(template.visual, baseTemplate.visual || {});
-  const themeVisual = !hasVisualOverride ? resolveThemeVisual(template.themes || baseTemplate.themes || [], selectedTheme) : null;
+  const themeVisual = officialThemeVisual || (!hasVisualOverride ? resolveThemeVisual(template.themes || baseTemplate.themes || [], selectedTheme) : null);
   const mergedVisual = { ...template.visual, ...(templateOverrides?.visual || {}), ...(themeVisual || {}) };
   const visual = { ...DEFAULT_VISUAL, ...(mergedVisual || {}) };
   return {

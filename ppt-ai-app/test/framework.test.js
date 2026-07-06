@@ -455,6 +455,16 @@ test("resolveTemplateVisual applies financial review quarterly commercial visual
   assert.equal(visual.variant, "quarterly");
 });
 
+test("resolveTemplateVisual applies quarterly business review problem diagnosis visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "quarterly-business-review", theme: "problem-diagnosis" });
+
+  assert.equal(visual.primary, "152E79");
+  assert.equal(visual.accent, "4F7F55");
+  assert.equal(visual.background, "F4F6F8");
+  assert.equal(visual.layout, "quarterly-diagnosis");
+  assert.equal(visual.variant, "problem-diagnosis");
+});
+
 test("resolveTemplateVisual applies financial review audit commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "audit" });
 
@@ -691,6 +701,52 @@ test("TemplateManager lists official active templates and the owner user templat
     () => templates.getTemplate("other-user-sales", { ownerUserId: 7 }),
     { code: "TEMPLATE_NOT_FOUND" },
   );
+});
+
+test("TemplateManager prefers synced official templates over built-in official fallbacks", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "synced-official-db.json"),
+    collections: ["templates", "template_categories"],
+  });
+  await database.initialize();
+  await database.insert("templates", {
+    id: "business-business-minimal",
+    slug: "business-business-minimal",
+    name: "高管商务汇报 - 极简灰蓝",
+    categoryId: "business",
+    scope: "official",
+    status: "active",
+    official: true,
+    themes: [{ id: "minimal", name: "极简灰蓝" }],
+  });
+  const templates = new TemplateManager({ database });
+
+  const catalog = templates.listTemplates({ ownerUserId: 7, categoryId: "business" });
+
+  assert.deepEqual(catalog.map((template) => template.id), ["business-business-minimal"]);
+});
+
+test("TemplateManager keeps built-in fallbacks when database only has hidden open-source official templates", async () => {
+  const database = new JsonFileDatabase({
+    filePath: path.join(tempDir, "hidden-open-source-db.json"),
+    collections: ["templates", "template_categories"],
+  });
+  await database.initialize();
+  await database.insert("templates", {
+    id: "open-city-template",
+    slug: "open-city-template",
+    name: "开源城市展示模板",
+    categoryId: "open-source-samples",
+    scope: "official",
+    status: "active",
+    official: true,
+    tags: ["open-source"],
+  });
+  const templates = new TemplateManager({ database });
+
+  const catalog = templates.listTemplates({ ownerUserId: 7, categoryId: "business" });
+
+  assert.equal(catalog.some((template) => template.id === "business"), true);
 });
 
 test("TemplateManager hides open source sample templates from the catalog", async () => {

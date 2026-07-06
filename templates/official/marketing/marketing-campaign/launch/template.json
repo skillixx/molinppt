@@ -1,0 +1,42 @@
+{
+  "baseTemplateId": "marketing-campaign",
+  "themeId": "launch",
+  "style": "campaign-story",
+  "themes": [
+    {
+      "id": "launch",
+      "name": "新品发布",
+      "visual": {
+        "primary": "E11D48",
+        "accent": "F59E0B",
+        "background": "FFF3F5",
+        "surface": "FFFFFF",
+        "title": "2A0F1B",
+        "body": "5B3441",
+        "layout": "marketing",
+        "variant": "launch"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "E11D48",
+    "accent": "F59E0B",
+    "background": "FFF3F5",
+    "surface": "FFFFFF",
+    "title": "2A0F1B",
+    "body": "5B3441",
+    "layout": "marketing",
+    "variant": "launch"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "campaign-cover",
+    "defaultContentLayout": "campaign-content",
+    "allowedLayouts": [
+      "campaign-cover",
+      "campaign-content",
+      "hero",
+      "story",
+      "content"
+    ]
+  }
+}

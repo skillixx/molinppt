@@ -1,9 +1,9 @@
-import { readFileSync } from "node:fs";
+﻿import { readFileSync } from "node:fs";
 
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
 
-const DOME_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
+const DOME_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const DOME_PREVIEW_ASSETS = {
   cover: readFileSync(new URL("dome-cover.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
   content: readFileSync(new URL("dome-content.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
@@ -164,6 +164,43 @@ export class PptService {
     });
     await this.#log({ ownerUserId, action: "outline_edited", resourceType: "outline", resourceId: outline.id });
     return updated;
+  }
+
+  /**
+   * Applies a different template to an existing ready deck without regenerating slide content.
+   * @param {{ownerUserId: number, deckId: string, templateId: string, theme?: string}} input
+   * @returns {Promise<object>}
+   */
+  async applyTemplateToDeck({ ownerUserId, deckId, templateId, theme = "modern" }) {
+    const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
+    assertDeckReady(deck);
+    const template = this.templateManager.getTemplate(templateId, { ownerUserId });
+    validateTemplateTheme({ template, theme });
+    const templateVisual = resolveTemplateVisual({
+      templateId,
+      theme,
+      template: { id: template.id, name: template.name, visual: template.visual, themes: template.themes },
+    });
+    const updatedDeck = await this.database.update("decks", deck.id, {
+      templateId,
+      templateName: template.name,
+      templateVisual,
+      templateLayoutSchema: template.layoutSchema,
+      theme,
+      status: "ready",
+    });
+    const activeAsset = await this.database.findOne("ppt_assets", (asset) => (
+      asset.deckId === deck.id && Number(asset.ownerUserId) === Number(ownerUserId) && asset.status === "active"
+    ));
+    if (activeAsset) {
+      await this.database.update("ppt_assets", activeAsset.id, {
+        templateId,
+        templateName: template.name,
+        theme,
+      });
+    }
+    await this.#log({ ownerUserId, action: "deck_template_applied", resourceType: "deck", resourceId: deck.id });
+    return updatedDeck;
   }
 
   /**
@@ -917,13 +954,13 @@ function renderDeckPreview({ deck, visual }) {
   const slides = deck.slides.map((slide, index) => {
     const isDomeLayout = visual.layout === "red-gold";
     const domeRole = resolvePreviewDomeRole(slide, index, deck.slides.length);
-    // dome 模板允许任意页显式声明封面/结束版式，预览 class 必须跟随角色才能套用帆船背景。
-    const slideKind = isDomeLayout && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "content";
-    const renderBodyList = shouldRenderDomePreviewBodyList(visual, domeRole);
+    // dome 妯℃澘鍏佽浠绘剰椤垫樉寮忓０鏄庡皝闈?缁撴潫鐗堝紡锛岄瑙?class 蹇呴』璺熼殢瑙掕壊鎵嶈兘濂楃敤甯嗚埞鑳屾櫙銆?
+    const slideKind = isDomeLayout && ["cover", "closing"].includes(domeRole) ? "cover" : index === 0 ? "cover" : "body";
+    const renderBodyList = shouldRenderTemplatePreviewBodyList(visual, domeRole);
     const bullets = renderBodyList
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    // dome 模板化页面的内容已经落入专用视觉层，不输出空 ul，避免预览层级和间距被普通列表干扰。
+    // dome 妯℃澘鍖栭〉闈㈢殑鍐呭宸茬粡钀藉叆涓撶敤瑙嗚灞傦紝涓嶈緭鍑虹┖ ul锛岄伩鍏嶉瑙堝眰绾у拰闂磋窛琚櫘閫氬垪琛ㄥ共鎵般€?
     const topBandTitleClass = visual.layout === "top-band"
       ? (index === 0 ? "top-band-cover-title" : "top-band-content-title")
       : "";
@@ -936,8 +973,8 @@ function renderDeckPreview({ deck, visual }) {
     const topBandMark = visual.layout === "top-band"
       ? (
           `${index === 0
-            ? '<div class="top-band-cover-glow"></div><div class="top-band-cover-kicker">高管汇报</div><div class="top-band-cover-frame"></div><div class="top-band-cover-sheen"></div><div class="top-band-cover-beacon"></div><div class="top-band-cover-metrics"><span><strong>01</strong>战略</span><span><strong>02</strong>复盘</span><span><strong>03</strong>行动</span></div>'
-            : '<div class="top-band-content-rail"></div><div class="top-band-content-wave"></div><div class="top-band-content-trace"></div><div class="top-band-insight-card"><strong>重点关注</strong><span>高管决策视图</span></div>'}`
+            ? '<div class="top-band-cover-glow"></div><div class="top-band-cover-kicker">楂樼姹囨姤</div><div class="top-band-cover-frame"></div><div class="top-band-cover-sheen"></div><div class="top-band-cover-beacon"></div><div class="top-band-cover-metrics"><span><strong>01</strong>鎴樼暐</span><span><strong>02</strong>澶嶇洏</span><span><strong>03</strong>琛屽姩</span></div>'
+            : '<div class="top-band-content-rail"></div><div class="top-band-content-wave"></div><div class="top-band-content-trace"></div><div class="top-band-insight-card"><strong>閲嶇偣鍏虫敞</strong><span>楂樼鍐崇瓥瑙嗗浘</span></div>'}`
           + '<div class="top-band-ribbon"></div><div class="top-band-edge"></div>'
           + `<span class="top-band-page-chip">${String(index + 1).padStart(2, "0")}</span>`
           + `${index === 0 ? '<span class="top-band-cover-label">Cover</span>' : '<div class="top-band-content-rule"></div>'}`
@@ -954,6 +991,10 @@ function renderDeckPreview({ deck, visual }) {
     const brandStoryScene = isBrandStoryVisual(visual) ? brandStoryPreviewScene(visual) : null;
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
+    const annualSummaryScene = isAnnualSummaryVisual(visual) ? annualSummaryPreviewScene(visual) : null;
+    const quarterlyDashboardScene = isQuarterlyDashboardVisual(visual) ? quarterlyDashboardPreviewScene({ visual, slide, index }) : null;
+    const quarterlyDiagnosisScene = isQuarterlyDiagnosisVisual(visual) ? quarterlyDiagnosisPreviewScene(visual) : null;
+    const quarterlyActionLoopScene = isQuarterlyActionLoopVisual(visual) ? quarterlyActionLoopPreviewScene(visual) : null;
     const statusReportMark = statusReportScene
       ? (
           `${index === 0
@@ -963,23 +1004,23 @@ function renderDeckPreview({ deck, visual }) {
         )
       : "";
     const strategyMark = strategyScene
-      ? `<div class="strategy-photo"></div><div class="strategy-photo-frame"></div><div class="strategy-label">${escapeHtml(strategyScene.label)}</div><div class="strategy-chip">${escapeHtml(strategyScene.chip)}</div>`
+      ? `<div class="strategy-photo"></div><div class="strategy-photo-frame"></div><div class="strategy-label">${escapeHtml(strategyScene.label)}</div><div class="strategy-chip" aria-hidden="true"></div>`
       : "";
     const financeMark = financeScene
-      ? `<div class="finance-label">${escapeHtml(financeScene.label)}</div><div class="finance-visual" data-finance-kind="${escapeHtml(financeScene.variant)}"><span></span><span></span><span></span><span></span></div><div class="finance-chip">${escapeHtml(financeScene.chip)}</div>`
+      ? `<div class="finance-label">${escapeHtml(financeScene.label)}</div><div class="finance-visual" data-finance-kind="${escapeHtml(financeScene.variant)}"><span></span><span></span><span></span><span></span></div><div class="finance-chip" aria-hidden="true"></div>`
       : "";
     const salesMark = salesScene
-      ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip">${escapeHtml(salesScene.chip)}</div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
+      ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip" aria-hidden="true"></div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
       : "";
     const productMark = productScene
-      ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip">${escapeHtml(productScene.chip)}</div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
+      ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
       : "";
     const pitchMark = pitchScene
       ? (
           `${index === 0
             ? `<div class="pitch-kicker">${escapeHtml(pitchScene.kicker)}</div><div class="pitch-metrics">${pitchScene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`
             : `<div class="pitch-kicker">${escapeHtml(pitchScene.section)}</div><div class="pitch-proof-row"><span></span><span></span><span></span></div>`}`
-          + `<div class="pitch-chip">${escapeHtml(pitchScene.chip)}</div><div class="pitch-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="pitch-caption">${escapeHtml(pitchScene.caption)}</div><div class="pitch-arc"></div>`
+          + `<div class="pitch-chip" aria-hidden="true"></div><div class="pitch-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="pitch-caption">${escapeHtml(pitchScene.caption)}</div><div class="pitch-arc"></div>`
         )
       : "";
     const marketingMark = marketingScene
@@ -987,7 +1028,7 @@ function renderDeckPreview({ deck, visual }) {
           `${index === 0
             ? `<div class="marketing-kicker">${escapeHtml(marketingScene.kicker)}</div><div class="marketing-hero-spotlight"></div><div class="marketing-metrics">${marketingScene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`
             : `<div class="marketing-kicker">${escapeHtml(marketingScene.section)}</div><div class="marketing-channel-row"><span></span><span></span><span></span></div>`}`
-          + `<div class="marketing-chip">${escapeHtml(marketingScene.chip)}</div><div class="marketing-visual"><span></span><span></span><span></span><span></span></div><div class="marketing-caption">${escapeHtml(marketingScene.caption)}</div><div class="marketing-orbit"></div>`
+          + `<div class="marketing-chip" aria-hidden="true"></div><div class="marketing-visual"><span></span><span></span><span></span><span></span></div><div class="marketing-caption">${escapeHtml(marketingScene.caption)}</div><div class="marketing-orbit"></div>`
         )
       : "";
     const brandStoryMark = brandStoryScene
@@ -995,7 +1036,7 @@ function renderDeckPreview({ deck, visual }) {
           `${index === 0
             ? `<div class="brand-story-kicker">${escapeHtml(brandStoryScene.kicker)}</div><div class="brand-story-editorial-rule"></div><div class="brand-story-points">${brandStoryScene.points.map((point) => `<span>${escapeHtml(point)}</span>`).join("")}</div>`
             : `<div class="brand-story-kicker">${escapeHtml(brandStoryScene.section)}</div><div class="brand-story-content-index"><span>01</span><span>02</span><span>03</span></div>`}`
-          + `<div class="brand-story-chip">${escapeHtml(brandStoryScene.chip)}</div><div class="brand-story-image"><span></span><span></span><span></span><span></span><span></span></div><div class="brand-story-caption">${escapeHtml(brandStoryScene.caption)}</div><div class="brand-story-monogram">${escapeHtml(brandStoryScene.mark)}</div>`
+          + `<div class="brand-story-chip" aria-hidden="true"></div><div class="brand-story-image"><span></span><span></span><span></span><span></span><span></span></div><div class="brand-story-caption">${escapeHtml(brandStoryScene.caption)}</div><div class="brand-story-monogram">${escapeHtml(brandStoryScene.mark)}</div>`
         )
       : "";
     const dataInsightMark = dataInsightScene
@@ -1003,7 +1044,7 @@ function renderDeckPreview({ deck, visual }) {
           `${index === 0
             ? `<div class="data-insight-kicker">${escapeHtml(dataInsightScene.kicker)}</div><div class="data-insight-hero-grid"><span><strong>${escapeHtml(dataInsightScene.metrics[0].value)}</strong>${escapeHtml(dataInsightScene.metrics[0].label)}</span><span><strong>${escapeHtml(dataInsightScene.metrics[1].value)}</strong>${escapeHtml(dataInsightScene.metrics[1].label)}</span><span><strong>${escapeHtml(dataInsightScene.metrics[2].value)}</strong>${escapeHtml(dataInsightScene.metrics[2].label)}</span></div>`
             : `<div class="data-insight-kicker">${escapeHtml(dataInsightScene.section)}</div><div class="data-insight-mini-row"><span></span><span></span><span></span></div>`}`
-          + `<div class="data-insight-chip">${escapeHtml(dataInsightScene.chip)}</div><div class="data-insight-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="data-insight-caption">${escapeHtml(dataInsightScene.caption)}</div><div class="data-insight-scanline"></div>`
+          + `<div class="data-insight-chip" aria-hidden="true"></div><div class="data-insight-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="data-insight-caption">${escapeHtml(dataInsightScene.caption)}</div><div class="data-insight-scanline"></div>`
         )
       : "";
     const educationMark = educationScene
@@ -1011,14 +1052,57 @@ function renderDeckPreview({ deck, visual }) {
           `${index === 0
             ? `<div class="education-kicker">${escapeHtml(educationScene.kicker)}</div><div class="education-outcomes">${educationScene.outcomes.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
             : `<div class="education-kicker">${escapeHtml(educationScene.section)}</div><div class="education-note-row"><span></span><span></span><span></span></div>`}`
-          + `<div class="education-chip">${escapeHtml(educationScene.chip)}</div><div class="education-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="education-caption">${escapeHtml(educationScene.caption)}</div>`
+          + `<div class="education-chip" aria-hidden="true"></div><div class="education-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="education-caption">${escapeHtml(educationScene.caption)}</div>`
+        )
+      : "";
+    const annualSummaryMark = annualSummaryScene
+      ? (
+          `${index === 0
+            ? `<div class="annual-summary-kicker">${escapeHtml(annualSummaryScene.kicker)}</div><div class="annual-summary-doc"><span></span><span></span><span></span><span></span><span></span></div><div class="annual-summary-metrics">${annualSummaryScene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`
+            : `<div class="annual-summary-kicker">${escapeHtml(annualSummaryScene.section)}</div><div class="annual-summary-diagnostic"><span></span><span></span><span></span></div>`}`
+          + `<div class="annual-summary-rail"><span>${escapeHtml(String(index + 1).padStart(2, "0"))}</span></div><div class="annual-summary-year">${escapeHtml(annualSummaryScene.year)}</div><div class="annual-summary-ribbon"></div><div class="annual-summary-dashboard"><span></span><span></span><span></span><span></span><span></span></div><div class="annual-summary-timeline"><span></span><span></span><span></span><span></span></div>`
+          + renderAnnualSummaryTextPreview(slide, index)
+        )
+      : "";
+    const quarterlyDashboardMark = quarterlyDashboardScene
+      ? (
+          `${index === 0
+            ? `<div class="quarterly-dashboard-kicker">${escapeHtml(quarterlyDashboardScene.kicker)}</div><div class="quarterly-dashboard-hero-bars"><span></span><span></span><span></span><span></span><span></span></div><div class="quarterly-dashboard-cover-card"><strong>${escapeHtml(quarterlyDashboardScene.reportYear)}</strong><span>${escapeHtml(quarterlyDashboardScene.coverCaption)}</span></div>`
+            : index === deck.slides.length - 1
+              ? `<div class="quarterly-dashboard-ending"><strong>${escapeHtml(quarterlyDashboardScene.endingTitle)}</strong><span>${escapeHtml(quarterlyDashboardScene.endingCaption)}</span></div><div class="quarterly-dashboard-hero-bars"><span></span><span></span><span></span><span></span><span></span></div>`
+              : `<div class="quarterly-dashboard-section">${escapeHtml(quarterlyDashboardScene.section)}</div><div class="quarterly-dashboard-content-frame"></div><div class="quarterly-dashboard-rings">${quarterlyDashboardScene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div><div class="quarterly-dashboard-bar-panel"><strong class="quarterly-dashboard-panel-title">${escapeHtml(quarterlyDashboardScene.barTitle)}</strong><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="quarterly-dashboard-client-panel"><strong class="quarterly-dashboard-panel-title">${escapeHtml(quarterlyDashboardScene.clientTitle)}</strong><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="quarterly-dashboard-region-cards">${quarterlyDashboardScene.regions.map((region) => `<span><strong>${escapeHtml(region.name)}</strong><em>${escapeHtml(region.rate)}</em></span>`).join("")}</div><div class="quarterly-dashboard-combo"><strong class="quarterly-dashboard-panel-title">${escapeHtml(quarterlyDashboardScene.comboTitle)}</strong><span></span><span></span><span></span><span></span><span></span><span></span><b></b></div><div class="quarterly-dashboard-pie"><strong>${escapeHtml(quarterlyDashboardScene.pieTitle)}</strong></div>`}`
+          + `<div class="quarterly-dashboard-footer-line"></div>`
+        )
+      : "";
+    const quarterlyDiagnosisMark = quarterlyDiagnosisScene
+      ? (
+          `${index === 0
+            ? `<div class="quarterly-diagnosis-kicker">${escapeHtml(quarterlyDiagnosisScene.kicker)}</div><div class="quarterly-diagnosis-cover-model"><span>存在<br>问题</span><b></b><span>改进<br>方法</span></div><div class="quarterly-diagnosis-cover-notes"><span>${escapeHtml(quarterlyDiagnosisScene.leftCards[0])}</span><span>${escapeHtml(quarterlyDiagnosisScene.rightCards[0])}</span></div>`
+            : index === deck.slides.length - 1
+              ? `<div class="quarterly-diagnosis-closing-model"><span></span><span></span><span></span></div><div class="quarterly-diagnosis-ending"><strong>${escapeHtml(quarterlyDiagnosisScene.endingTitle)}</strong><span>${escapeHtml(quarterlyDiagnosisScene.endingCaption)}</span></div>`
+              : `<div class="quarterly-diagnosis-section">${escapeHtml(quarterlyDiagnosisScene.section)}</div><div class="quarterly-diagnosis-main-model"><span></span><span></span><span></span><span></span></div><div class="quarterly-diagnosis-left-cards">${quarterlyDiagnosisScene.leftCards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="quarterly-diagnosis-right-cards">${quarterlyDiagnosisScene.rightCards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="quarterly-diagnosis-evidence"><span></span><span></span><span></span><span></span></div>`}`
+          + `<div class="quarterly-diagnosis-footer-line"></div>`
+        )
+      : "";
+    const quarterlyActionLoopMark = quarterlyActionLoopScene
+      ? (
+          `${index === 0
+            ? `<div class="quarterly-action-kicker">${escapeHtml(quarterlyActionLoopScene.kicker)}</div>${renderQuarterlyActionContentPreview(slide, "cover")}<div class="quarterly-action-cover-board">${quarterlyActionLoopScene.columns.map((column) => `<section><strong>${escapeHtml(column.title)}</strong>${column.items.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</section>`).join("")}<div class="quarterly-action-loop-core"><span></span><span></span><span></span></div></div>`
+            : index === deck.slides.length - 1
+              ? `<div class="quarterly-action-ending"><strong>${escapeHtml(quarterlyActionLoopScene.endingTitle)}</strong><span>${escapeHtml(quarterlyActionLoopScene.endingCaption)}</span></div>${renderQuarterlyActionContentPreview(slide, "closing")}<div class="quarterly-action-roadmap">${quarterlyActionLoopScene.steps.map((step) => `<span>${escapeHtml(step)}</span>`).join("")}</div>`
+              : `<div class="quarterly-action-section">${escapeHtml(quarterlyActionLoopScene.section)}</div>${renderQuarterlyActionContentPreview(slide, "content")}<div class="quarterly-action-plan">${quarterlyActionLoopScene.steps.map((step) => `<span>${escapeHtml(step)}</span>`).join("")}</div><div class="quarterly-action-matrix">${quarterlyActionLoopScene.owners.map((owner) => `<span>${escapeHtml(owner)}</span>`).join("")}</div><div class="quarterly-action-progress"><i></i><i></i><i></i><i></i><i></i></div>`}`
+          + `<div class="quarterly-action-footer-line"></div>`
         )
       : "";
     const topBandHeadingClass = topBandTitleClass ? ` class="${topBandTitleClass}"` : "";
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${domeChrome}<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div><div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    // 年度总结已经由 annual-summary-text 承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene
+      ? '<div class="slide-content"></div>'
+      : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1157,6 +1241,24 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual::after{content:"";position:absolute;left:12%;right:10%;top:30%;height:45%;border-top:4px solid var(--template-accent);border-right:4px solid var(--template-accent);border-radius:60% 40% 0 0;transform:skewX(-12deg);}
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span{width:10px;height:10px;border-radius:50%;bottom:auto;background:var(--template-primary);}
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(1){left:16%;top:58%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(2){left:38%;top:48%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(3){left:60%;top:37%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(4){left:78%;top:25%;}
+    body[data-template^="finance-operating-dashboard-"] h2{max-width:61%;font-size:32px;line-height:1.14;margin-bottom:4.4%;}
+    body[data-template^="finance-operating-dashboard-"] ul{max-width:56%;font-size:14.5px;line-height:1.48;}
+    body[data-template^="finance-operating-dashboard-"] .finance-label{position:absolute;left:9.2%;top:15.2%;z-index:3;color:var(--template-accent);font-size:12px;font-weight:900;letter-spacing:.12em;}
+    body[data-template^="finance-operating-dashboard-"] .finance-chip{position:absolute;right:10.4%;top:17%;z-index:4;min-width:84px;height:30px;display:grid;place-items:center;border-radius:999px;background:var(--template-primary);color:#fff;font-size:11px;font-weight:900;box-shadow:0 10px 20px rgba(16,38,57,.14);}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual{position:absolute;right:8.8%;top:28%;width:24%;height:31%;z-index:3;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.92),color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 16px 30px rgba(16,38,57,.14);overflow:hidden;}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual::before{content:"";position:absolute;left:9%;right:9%;bottom:17%;height:2px;background:color-mix(in srgb,var(--template-primary) 18%,transparent);}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual span{position:absolute;bottom:20%;width:12%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--template-accent),color-mix(in srgb,var(--template-accent) 52%,var(--template-primary) 48%));}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual span:nth-child(1){left:14%;height:31%;}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual span:nth-child(2){left:34%;height:48%;}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual span:nth-child(3){left:54%;height:38%;}
+    body[data-template^="finance-operating-dashboard-"] .finance-visual span:nth-child(4){left:74%;height:61%;}
+    body[data-template^="finance-operating-dashboard-"] .page-number{z-index:5;right:7.3%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 72%,transparent);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="control-room"] .finance-visual{background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 92%,#fff 8%),color-mix(in srgb,var(--template-primary) 72%,var(--template-accent) 28%));}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="control-room"] .finance-visual::after{content:"";position:absolute;left:16%;top:17%;width:30%;height:30%;border-radius:50%;border:4px solid var(--template-accent);box-shadow:0 0 0 16px color-mix(in srgb,var(--template-accent) 14%,transparent);}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="warning"] .finance-visual span{width:15px;height:15px;border-radius:50%;bottom:auto;left:14%;background:var(--template-accent);}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="warning"] .finance-visual span:nth-child(1){top:20%;}body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="warning"] .finance-visual span:nth-child(2){top:43%;background:#ef4444;}body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="warning"] .finance-visual span:nth-child(3){top:66%;}body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="warning"] .finance-visual span:nth-child(4){display:none;}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="monthly"] .finance-visual{border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 82%,var(--template-accent) 18%));}
+    body[data-template^="finance-operating-dashboard-"] .slide[data-template-variant="monthly"] .finance-visual::after{content:"";position:absolute;left:13%;right:13%;top:18%;height:18%;border-radius:8px;background:var(--template-primary);}
     body[data-template="sales-proposal"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 62%,color-mix(in srgb,var(--template-accent) 12%,var(--template-bg) 88%));}
     body[data-template="sales-proposal"] .slide::after{inset:11% 6% 10%;border-radius:16px;background:rgba(255,255,255,.92);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 20px 44px rgba(14,90,87,.12);}
     body[data-template="sales-proposal"] .slide-content{padding:1.8% 37% 0 0;}
@@ -1456,6 +1558,218 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row{position:absolute;left:10.3%;right:43%;bottom:17.2%;z-index:6;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row span{height:40px;border-radius:2px 12px 2px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 12%,#fff 88%),color-mix(in srgb,var(--template-accent) 18%,#fff 82%));border-top:3px solid var(--template-accent);box-shadow:0 10px 20px rgba(15,23,42,.08);}
     body[data-template="pitch"][data-layout="venture"] .page-number{z-index:7;right:7.4%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 68%,transparent);background:rgba(255,255,255,.74);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-layout="quarterly-dashboard"] .slide{background:#eef3f9;padding:7.2% 6.2% 5.4%;border:0;box-shadow:0 22px 54px rgba(15,35,65,.14);}
+    body[data-layout="quarterly-dashboard"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#173861 0 13.6%,#d7a650 13.6% 14.2%,#eef3f9 14.2% 100%);opacity:1;}
+    body[data-layout="quarterly-dashboard"] .slide::after{content:"";position:absolute;left:4%;right:4%;top:17%;bottom:6%;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #d8e2ef;box-shadow:0 18px 42px rgba(20,45,80,.1);}
+    body[data-layout="quarterly-dashboard"] .accent,body[data-layout="quarterly-dashboard"] .motif{display:none;}
+    body[data-layout="quarterly-dashboard"] .slide-content{z-index:10;height:auto;align-content:start;}
+    body[data-layout="quarterly-dashboard"] h2{font-size:22px;line-height:1.08;margin:0;color:#fff;max-width:62%;position:absolute;left:6%;top:3.1%;letter-spacing:0;font-weight:900;}
+    body[data-layout="quarterly-dashboard"] ul{display:none;}
+    body[data-layout="quarterly-dashboard"] .slide-cover,body[data-layout="quarterly-dashboard"] .slide:last-child{background:#173861;padding:18.4% 6.4% 7%;box-shadow:0 24px 60px rgba(15,35,65,.24);}
+    body[data-layout="quarterly-dashboard"] .slide-cover::before,body[data-layout="quarterly-dashboard"] .slide:last-child::before{background:radial-gradient(circle at 78% 32%,rgba(93,145,205,.42),transparent 30%),linear-gradient(135deg,#102b4c 0,#1f4d84 58%,#15345b 100%);}
+    body[data-layout="quarterly-dashboard"] .slide-cover::after,body[data-layout="quarterly-dashboard"] .slide:last-child::after{display:none;}
+    body[data-layout="quarterly-dashboard"] .slide-cover h2{font-size:50px;line-height:1.06;max-width:48%;color:#fff;left:6.4%;top:25.8%;text-shadow:0 12px 26px rgba(15,35,65,.24);}
+    body[data-layout="quarterly-dashboard"] .slide:last-child .slide-content{padding-top:4%;}
+    body[data-layout="quarterly-dashboard"] .slide:last-child h2{font-size:58px;color:#fff;max-width:47%;left:6.4%;top:25.2%;margin:0;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-kicker{position:absolute;left:6.4%;top:20.4%;z-index:8;color:#c4d8ef;font-size:16px;font-weight:900;letter-spacing:.06em;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars{position:absolute;right:6.8%;top:20%;width:35%;height:48%;z-index:4;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.08));border:1px solid rgba(196,216,239,.28);box-shadow:0 22px 40px rgba(8,22,40,.22);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span{position:absolute;bottom:13%;width:9%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#9fc2e8,#5d91cd);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span:nth-child(1){left:12%;height:46%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span:nth-child(2){left:27%;height:62%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span:nth-child(3){left:42%;height:38%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span:nth-child(4){left:57%;height:76%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars span:nth-child(5){left:72%;height:56%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars::before{content:"";position:absolute;left:8%;right:8%;top:13%;height:12px;border-radius:999px;background:rgba(255,255,255,.22);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-hero-bars::after{content:"";position:absolute;left:10%;right:10%;bottom:12%;height:2px;background:rgba(196,216,239,.44);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-cover-card{position:absolute;right:8%;bottom:18%;z-index:8;width:28%;border-radius:14px;background:rgba(244,247,251,.96);border:1px solid #b9d2ee;padding:16px 22px;color:var(--template-title);box-shadow:0 16px 32px rgba(8,22,40,.16);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-cover-card strong{display:block;font-size:18px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-cover-card span{display:block;font-size:18px;font-weight:900;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-section{position:absolute;left:5.4%;top:18.4%;z-index:8;width:17%;height:4.5%;background:#173861;color:#fff;font-size:12px;font-weight:900;padding:8px 16px;border-radius:999px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 8px 18px rgba(23,56,97,.16);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-content-frame{position:absolute;left:5%;right:5%;top:24%;bottom:10%;z-index:4;border:1px solid #dbe4ef;background:linear-gradient(180deg,rgba(248,251,255,.9),rgba(255,255,255,.78));}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-rings{position:absolute;left:6.2%;top:28%;z-index:8;display:flex;gap:16px;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-rings span{width:122px;height:72px;border-radius:12px;border:1px solid #d8e2ed;border-left:5px solid #d7a650;display:grid;align-content:center;text-align:left;color:#5c6f84;font-size:10px;font-weight:800;background:#fff;padding:10px 12px;box-shadow:0 12px 24px rgba(20,45,80,.08);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-rings strong{display:block;color:#173861;font-size:24px;line-height:1.05;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel{position:absolute;left:34%;top:24%;width:39.5%;height:31%;z-index:8;border:1px solid #d8e2ed;background:#fff;box-shadow:0 14px 28px rgba(20,45,80,.08);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-panel-title{position:absolute;left:16px;top:12px;right:16px;color:#1e2d41;font-size:12px;font-weight:900;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel::before{content:"";position:absolute;left:8%;right:8%;bottom:21%;height:1px;background:#d8e2ed;box-shadow:0 -36px 0 #eef3f9,0 -72px 0 #eef3f9;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span{position:absolute;bottom:22%;width:6%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#2f64a4,#173861);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(1){left:12%;height:42%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(2){left:25%;height:28%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(3){left:38%;height:58%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(4){left:51%;height:34%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(5){left:64%;height:58%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-bar-panel span:nth-child(6){left:77%;height:36%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel{position:absolute;left:6.2%;bottom:16%;width:26%;height:18%;z-index:8;border:1px solid #d8e2ed;background:#fff;box-shadow:0 12px 24px rgba(20,45,80,.07);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i{position:absolute;top:56%;width:8%;height:26%;border-radius:6px 6px 0 0;background:#2f64a4;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(n+4){top:72%;background:#b74d40;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(1),body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(4){left:24%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(2),body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(5){left:38%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(3),body[data-layout="quarterly-dashboard"] .quarterly-dashboard-client-panel i:nth-child(6){left:52%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-region-cards{position:absolute;right:6.2%;top:24%;z-index:8;display:grid;grid-template-columns:1fr;gap:10px;width:17.2%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-region-cards span{min-height:46px;border-radius:10px;background:#173861;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 13px;text-align:left;box-shadow:0 10px 20px rgba(20,45,80,.12);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-region-cards span:nth-child(n+3){background:#a95646;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-region-cards strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-region-cards em{font-style:normal;font-size:16px;font-weight:900;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo{position:absolute;left:34%;bottom:16%;width:29%;height:18%;z-index:8;border:1px solid #d8e2ed;background:#fff;box-shadow:0 12px 24px rgba(20,45,80,.07);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span{position:absolute;bottom:16%;width:5.2%;background:#1d3e6e;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(1){left:11%;height:38%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(2){left:24%;height:52%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(3){left:37%;height:18%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(4){left:50%;height:76%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(5){left:63%;height:40%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo span:nth-child(6){left:76%;height:58%;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-combo b{position:absolute;left:12%;right:12%;top:38%;height:4px;background:#b74d40;transform:skewY(-12deg);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-pie{position:absolute;right:6.2%;bottom:16%;width:28.4%;height:18%;z-index:8;border:1px solid #d8e2ed;background:radial-gradient(circle at 34% 55%,transparent 0 18%,#fff 19%),conic-gradient(#173861 0 58%,#a95646 58% 78%,#7fa5cf 78% 100%);box-shadow:0 12px 24px rgba(20,45,80,.07);}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-pie strong{position:absolute;left:50%;right:8%;top:38%;color:#1e2d41;font-size:12px;font-weight:900;line-height:1.2;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    body[data-layout="quarterly-dashboard"] .quarterly-dashboard-footer-line{position:absolute;left:5%;right:5%;bottom:6%;height:2px;background:rgba(139,178,219,.72);z-index:8;}
+    body[data-layout="quarterly-diagnosis"] .slide{background:#f4f6f8;padding:7.2% 6.2% 5.6%;border:0;box-shadow:0 20px 54px rgba(15,23,42,.12);}
+    body[data-layout="quarterly-diagnosis"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#fff 0 13.5%,#f4f6f8 13.5% 100%);}
+    body[data-layout="quarterly-diagnosis"] .slide::after{content:"";position:absolute;left:2.4%;right:2.4%;top:16%;height:2px;background:#111827;opacity:.82;}
+    body[data-layout="quarterly-diagnosis"] .accent,body[data-layout="quarterly-diagnosis"] .motif{display:none;}
+    body[data-layout="quarterly-diagnosis"] .slide-content{z-index:12;align-content:start;pointer-events:none;}
+    body[data-layout="quarterly-diagnosis"] h2{max-width:37%;font-size:24px;line-height:1.16;margin:0;color:var(--template-title);}
+    body[data-layout="quarterly-diagnosis"] ul{max-width:31%;margin-top:14px;background:rgba(255,255,255,.86);border:1px solid #dfe5ee;border-left:6px solid var(--template-primary);box-shadow:0 10px 24px rgba(15,23,42,.06);padding:12px 14px 12px 28px;font-size:12px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="quarterly-diagnosis"] .slide-cover h2{font-size:34px;max-width:36%;margin-top:2.5%;}
+    body[data-layout="quarterly-diagnosis"] .slide-cover ul{max-width:30%;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-kicker{position:absolute;left:4%;top:5.6%;z-index:13;font-size:14px;font-weight:900;color:#111827;letter-spacing:.06em;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-section{position:absolute;left:4%;top:5.8%;z-index:13;font-size:15px;font-weight:900;color:#111827;letter-spacing:.05em;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model{position:absolute;left:31%;top:31%;width:38%;height:34%;z-index:8;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 16px 22px rgba(15,23,42,.15));}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model span{width:42%;height:78%;display:grid;place-items:center;text-align:center;color:#fff;font-size:27px;font-weight:900;line-height:1.18;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model span:first-child{background:linear-gradient(135deg,#1c318a,#13266f);clip-path:polygon(0 0,100% 50%,0 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model span:last-child{background:linear-gradient(135deg,#5d9162,#3d7146);clip-path:polygon(100% 0,0 50%,100% 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model b{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 8px 22px rgba(15,23,42,.18);position:relative;margin:0 -10px;z-index:2;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-model b::after{content:"";position:absolute;left:16px;top:13px;width:13px;height:13px;border-right:4px solid #4f7f55;border-top:4px solid #4f7f55;transform:rotate(45deg);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-notes{position:absolute;left:4%;right:4%;top:24%;bottom:18%;z-index:7;display:flex;justify-content:space-between;pointer-events:none;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-notes span{width:24%;height:13%;background:#fff;border-left:8px solid var(--template-primary);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:10px 14px;font-size:13px;font-weight:900;color:#111827;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-cover-notes span:last-child{align-self:flex-end;border-left-color:var(--template-accent);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model{position:absolute;left:34%;top:28%;width:32%;height:36%;z-index:8;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model span{position:absolute;background:var(--template-primary);box-shadow:0 10px 22px rgba(15,23,42,.12);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model span:nth-child(1){left:0;top:18%;width:50%;height:56%;clip-path:polygon(0 0,100% 50%,0 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model span:nth-child(2){right:0;top:18%;width:50%;height:56%;background:var(--template-accent);clip-path:polygon(100% 0,0 50%,100% 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model span:nth-child(3){left:43%;top:0;width:14%;height:36%;background:linear-gradient(180deg,#5d9162,transparent);clip-path:polygon(50% 0,100% 45%,66% 45%,66% 100%,34% 100%,34% 45%,0 45%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-main-model span:nth-child(4){left:43%;bottom:0;width:14%;height:36%;background:linear-gradient(0deg,#1c318a,transparent);clip-path:polygon(34% 0,66% 0,66% 55%,100% 55%,50% 100%,0 55%,34% 55%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-left-cards,body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-right-cards{position:absolute;top:24%;z-index:8;display:grid;gap:12px;width:23%;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-left-cards{left:4%;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-right-cards{right:4%;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-left-cards span,body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-right-cards span{background:#fff;min-height:48px;border-left:8px solid var(--template-primary);box-shadow:0 8px 18px rgba(15,23,42,.07);padding:12px 14px;font-size:13px;font-weight:900;color:#111827;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-right-cards span{border-left-color:var(--template-accent);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-evidence{position:absolute;left:31%;right:31%;bottom:12%;z-index:8;display:flex;gap:10px;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-evidence span{height:28px;flex:1;border-radius:999px;background:#e5eaf0;border:1px solid #cfd8e3;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-closing-model{position:absolute;left:47%;top:24%;width:36%;height:44%;z-index:8;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-closing-model span{position:absolute;background:#fff;border:2px solid #dfe5ee;box-shadow:0 12px 26px rgba(15,23,42,.08);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-closing-model span:nth-child(1){left:0;top:18%;width:76%;height:20%;background:var(--template-primary);clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-closing-model span:nth-child(2){left:22%;top:42%;width:76%;height:20%;background:var(--template-accent);clip-path:polygon(0 0,86% 0,100% 50%,86% 100%,0 100%);}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-closing-model span:nth-child(3){left:44%;top:66%;width:42%;height:20%;background:#e7edf4;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-ending{position:absolute;left:6%;bottom:18%;z-index:8;width:36%;display:grid;gap:10px;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-ending strong{font-size:28px;color:#111827;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-ending span{font-size:16px;font-weight:800;color:#4b5563;}
+    body[data-layout="quarterly-diagnosis"] .quarterly-diagnosis-footer-line{position:absolute;left:4%;right:4%;bottom:7%;z-index:8;height:2px;background:#111827;opacity:.72;}
+    body[data-layout="quarterly-action-loop"] main{width:min(100%,1180px);}
+    body[data-layout="quarterly-action-loop"] .preview-page{justify-items:center;}
+    body[data-layout="quarterly-action-loop"] .slide{width:min(100%,1120px);background:#f3f7fe;padding:0;border:0;box-shadow:0 22px 58px rgba(31,95,191,.16);}
+    body[data-layout="quarterly-action-loop"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#fff 0 14.2%,#f3f7fe 14.2% 100%);}
+    body[data-layout="quarterly-action-loop"] .slide::after{content:"";position:absolute;left:3.3%;right:3.3%;top:17%;bottom:8.2%;border:1px solid rgba(31,95,191,.38);background:rgba(255,255,255,.7);box-shadow:0 14px 28px rgba(31,95,191,.08);}
+    body[data-layout="quarterly-action-loop"] .accent,body[data-layout="quarterly-action-loop"] .motif{display:none;}
+    body[data-layout="quarterly-action-loop"] .slide-content{z-index:16;align-content:start;pointer-events:none;}
+    body[data-layout="quarterly-action-loop"] .slide-content h2,body[data-layout="quarterly-action-loop"] .slide-content ul{display:none;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-content-card{position:absolute;left:6.2%;top:24.5%;z-index:18;width:35.5%;min-height:24%;display:grid;align-content:start;gap:7px;padding:14px 16px 14px 18px;border-radius:12px;background:rgba(255,255,255,.96);border:1px solid #c9ddfb;border-left:5px solid var(--template-primary);box-shadow:0 12px 26px rgba(31,95,191,.1);color:var(--template-body);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-content-card strong{display:block;margin-bottom:3px;font-size:15px;line-height:1.24;font-weight:900;color:var(--template-title);overflow-wrap:anywhere;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-content-card span{display:block;position:relative;padding-left:13px;font-size:11px;line-height:1.34;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-content-card span::before{content:"";position:absolute;left:0;top:.58em;width:5px;height:5px;border-radius:50%;background:var(--template-accent);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-content-card em{font-style:normal;color:var(--template-title);font-weight:900;}
+    body[data-layout="quarterly-action-loop"] .slide-cover .quarterly-action-content-card{top:24%;width:34%;min-height:20%;padding:13px 15px;}
+    body[data-layout="quarterly-action-loop"] .slide-cover .quarterly-action-content-card strong{font-size:14px;line-height:1.2;}
+    body[data-layout="quarterly-action-loop"] .slide-cover .quarterly-action-content-card span{font-size:10.5px;line-height:1.28;}
+    body[data-layout="quarterly-action-loop"] .slide:last-child .quarterly-action-content-card{left:7%;top:47%;width:34%;min-height:20%;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-kicker{position:absolute;left:6%;top:7.3%;z-index:15;color:var(--template-title);font-size:14px;font-weight:900;letter-spacing:.08em;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-cover-board{position:absolute;left:44%;right:6%;top:25%;bottom:18%;z-index:10;display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:18px;align-items:stretch;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-cover-board section{position:relative;background:rgba(255,255,255,.86);border:1px solid #d9e7f8;box-shadow:0 10px 26px rgba(31,95,191,.09);padding:34px 24px 18px;display:grid;align-content:start;gap:12px;text-align:center;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-cover-board strong{position:absolute;left:50%;top:-18px;transform:translateX(-50%);min-width:104px;border-radius:4px;background:linear-gradient(90deg,var(--template-primary),#174a9a);color:#fff;padding:8px 18px;font-size:13px;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-cover-board span{display:block;padding:9px 12px;border-bottom:4px solid #2d72d6;background:linear-gradient(180deg,#fff,#eef5ff);color:#41546f;font-size:12px;font-weight:800;box-shadow:0 7px 12px rgba(31,95,191,.08);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-loop-core{position:absolute;left:27%;top:12%;width:46%;height:74%;display:grid;place-items:center;pointer-events:none;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-loop-core span{position:absolute;border:4px solid var(--template-accent);border-radius:50%;opacity:.86;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-loop-core span:nth-child(1){width:58%;height:92%;transform:rotate(0deg);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-loop-core span:nth-child(2){width:72%;height:58%;transform:rotate(14deg);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-loop-core span:nth-child(3){width:42%;height:42%;background:rgba(31,95,191,.12);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-section{position:absolute;left:6%;top:7.3%;z-index:15;font-size:15px;font-weight:900;color:var(--template-title);letter-spacing:.06em;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-plan{position:absolute;left:5.5%;right:5.5%;bottom:12%;height:12%;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-plan span{position:relative;display:grid;place-items:center;background:linear-gradient(90deg,var(--template-primary),#2d72d6);color:#fff;font-size:12px;font-weight:900;clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%,10% 50%);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-plan span:first-child{clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-matrix{position:absolute;left:49%;top:25%;right:7%;height:28%;z-index:10;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-matrix span{background:#fff;border-top:5px solid var(--template-primary);box-shadow:0 10px 20px rgba(31,95,191,.08);padding:18px 10px;text-align:center;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress{position:absolute;left:7%;top:56%;width:35%;height:20%;z-index:10;border-radius:14px;background:#fff;border:1px solid #d8e7fb;box-shadow:0 10px 24px rgba(31,95,191,.08);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress::before{content:"杩涘害杩借釜";position:absolute;left:18px;top:14px;color:var(--template-title);font-size:13px;font-weight:900;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i{position:absolute;bottom:22%;width:8%;border-radius:6px 6px 0 0;background:var(--template-primary);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(1){left:14%;height:32%;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(2){left:29%;height:50%;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(3){left:44%;height:70%;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(4){left:59%;height:48%;background:var(--template-accent);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(5){left:74%;height:82%;background:var(--template-accent);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-ending{position:absolute;left:6%;top:30%;z-index:10;width:34%;display:grid;gap:12px;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-ending strong{font-size:30px;color:var(--template-title);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-ending span{font-size:16px;font-weight:800;color:var(--template-body);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-roadmap{position:absolute;right:7%;top:30%;width:46%;height:42%;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;gap:10px;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-roadmap span{height:68px;border-radius:12px;background:linear-gradient(180deg,#fff,#edf5ff);border:1px solid #d8e7fb;display:grid;place-items:center;text-align:center;font-size:12px;font-weight:900;color:var(--template-title);box-shadow:0 10px 22px rgba(31,95,191,.08);}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-footer-line{position:absolute;left:4%;right:4%;bottom:6.8%;height:3px;z-index:10;background:linear-gradient(90deg,var(--template-primary),#9ecbff,var(--template-accent));}
+    body[data-layout="annual-summary"] .slide{background:linear-gradient(135deg,#f7fbff 0%,#ffffff 54%,#eefcff 100%);padding:7.2% 8.4% 7%;border:0;box-shadow:0 22px 58px rgba(25,88,160,.14);}
+    body[data-layout="annual-summary"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(49,89,246,.035) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(57,213,232,.03) 0 1px,transparent 1px 38px);}
+    body[data-layout="annual-summary"] .slide::after{content:"";position:absolute;left:7.5%;right:7.5%;top:14%;bottom:13%;border-radius:0;background:rgba(255,255,255,.88);border-top:4px solid var(--template-accent);box-shadow:0 16px 36px rgba(30,96,180,.10);}
+    body[data-layout="annual-summary"] .accent{display:none;}
+    body[data-layout="annual-summary"] .motif{display:block;left:7.5%;top:14%;width:24%;height:4px;background:var(--template-primary);z-index:5;border-radius:999px;}
+    body[data-layout="annual-summary"] .slide-content{display:none;}
+    body[data-layout="annual-summary"] .annual-summary-text{position:absolute;z-index:9;display:grid;gap:14px;color:var(--template-body);pointer-events:none;min-width:0;}
+    body[data-layout="annual-summary"] .annual-summary-text-title{display:block;margin:0;color:var(--template-title);font-size:var(--annual-title-size,28px);line-height:1.14;font-weight:900;letter-spacing:0;overflow-wrap:anywhere;word-break:break-word;max-width:100%;}
+    body[data-layout="annual-summary"] .annual-summary-text-list{margin:0;padding-left:1.08em;font-size:var(--annual-body-size,13px);line-height:1.42;font-weight:650;overflow-wrap:anywhere;word-break:break-word;max-width:100%;}
+    body[data-layout="annual-summary"] .annual-summary-text-list li{margin:.16em 0;}
+    body[data-layout="annual-summary"] .slide:not(.slide-cover) .annual-summary-text{left:13.8%;top:20.2%;width:50.6%;grid-template-rows:auto 1fr;}
+    body[data-layout="annual-summary"] .slide-cover{background:linear-gradient(125deg,#2f43f3 0%,#246df0 42%,#31c6ee 78%,#7ce8ee 100%);padding:9% 8% 7%;}
+    body[data-layout="annual-summary"] .slide-cover::before{background:linear-gradient(135deg,transparent 0 58%,rgba(255,255,255,.18) 58% 64%,transparent 64%),linear-gradient(45deg,transparent 0 67%,rgba(255,255,255,.16) 67% 73%,transparent 73%),radial-gradient(circle at 86% 42%,rgba(255,255,255,.18),transparent 24%);}
+    body[data-layout="annual-summary"] .slide-cover::after{left:58%;right:-3%;top:0;bottom:0;border:0;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04));clip-path:polygon(34% 0,100% 0,100% 100%,0 100%,24% 48%);box-shadow:none;}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-text{left:8%;top:25.8%;width:43.33%;gap:16px;}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-text-title{color:#fff;font-size:var(--annual-title-size,38px);line-height:1.08;text-shadow:0 8px 22px rgba(16,42,107,.22);}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-text-list{color:#e9fbff;font-size:var(--annual-body-size,14px);line-height:1.48;}
+    body[data-layout="annual-summary"] .annual-summary-rail{display:none;}
+    body[data-layout="annual-summary"] .annual-summary-rail::before{content:"ANNUAL";position:absolute;left:50%;top:12%;transform:translateX(-50%) rotate(90deg);font-size:12px;font-weight:900;letter-spacing:.24em;color:rgba(255,255,255,.52);}
+    body[data-layout="annual-summary"] .annual-summary-rail span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.42);display:grid;place-items:center;font-size:18px;font-weight:900;color:var(--template-accent);}
+    body[data-layout="annual-summary"] .annual-summary-kicker{position:absolute;left:9.2%;top:16%;z-index:7;color:var(--template-accent);font-size:12px;font-weight:900;letter-spacing:.14em;}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-kicker{left:8%;top:18%;font-size:13px;color:#dffcff;}
+    body[data-layout="annual-summary"] .annual-summary-year{position:absolute;right:8.6%;top:13.4%;z-index:7;color:color-mix(in srgb,var(--template-primary) 72%,transparent);font-size:42px;font-weight:900;letter-spacing:.04em;}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-year{right:9%;top:14%;font-size:42px;color:rgba(255,255,255,.32);}
+    body[data-layout="annual-summary"] .annual-summary-ribbon{position:absolute;right:9%;top:14%;width:24%;height:7%;z-index:4;background:linear-gradient(90deg,color-mix(in srgb,var(--template-accent) 72%,#fff 28%),rgba(255,255,255,.12));clip-path:polygon(8% 0,100% 0,92% 100%,0 100%);opacity:.82;}
+    body[data-layout="annual-summary"] .annual-summary-doc{position:absolute;right:14%;top:28%;width:22%;height:31%;z-index:7;filter:drop-shadow(0 20px 30px rgba(16,42,107,.22));}
+    body[data-layout="annual-summary"] .annual-summary-doc::before{content:"";position:absolute;left:15%;top:4%;width:58%;height:74%;background:#fff;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(49,89,246,.12);}
+    body[data-layout="annual-summary"] .annual-summary-doc::after{content:"";position:absolute;right:4%;bottom:2%;width:38%;height:38%;border-radius:50%;border:8px solid rgba(255,255,255,.86);box-shadow:inset 0 0 0 3px rgba(49,89,246,.20);background:rgba(216,249,255,.42);}
+    body[data-layout="annual-summary"] .annual-summary-doc span{position:absolute;z-index:2;display:block;border-radius:2px;}
+    body[data-layout="annual-summary"] .annual-summary-doc span:nth-child(1){left:22%;top:18%;width:10%;height:8%;background:var(--template-accent);}
+    body[data-layout="annual-summary"] .annual-summary-doc span:nth-child(2){left:38%;top:19%;width:28%;height:5%;background:#9fd9e9;}
+    body[data-layout="annual-summary"] .annual-summary-doc span:nth-child(3){left:22%;top:39%;width:10%;height:8%;background:#9ae65b;}
+    body[data-layout="annual-summary"] .annual-summary-doc span:nth-child(4){left:38%;top:40%;width:34%;height:5%;background:#9fd9e9;}
+    body[data-layout="annual-summary"] .annual-summary-doc span:nth-child(5){right:7%;bottom:0;width:10%;height:32%;background:#5aa7c8;transform:rotate(-42deg);transform-origin:top center;border-radius:999px;}
+    body[data-layout="annual-summary"] .slide:not(.slide-cover) .annual-summary-doc{display:none;}
+    body[data-layout="annual-summary"] .annual-summary-ring{position:absolute;right:10.4%;top:29%;width:23%;height:40%;z-index:6;border-radius:50%;background:conic-gradient(var(--template-accent) 0 124deg,var(--template-primary) 124deg 242deg,color-mix(in srgb,var(--template-primary) 18%,#fff 82%) 242deg 360deg);box-shadow:0 22px 42px rgba(15,23,42,.18);}
+    body[data-layout="annual-summary"] .annual-summary-ring::before{content:"";position:absolute;inset:13%;border-radius:50%;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--template-primary) 10%,transparent);}
+    body[data-layout="annual-summary"] .annual-summary-ring span{position:absolute;display:block;border-radius:999px;background:var(--template-primary);z-index:2;}
+    body[data-layout="annual-summary"] .annual-summary-ring span:nth-child(1){left:33%;top:47%;width:34%;height:7px;}
+    body[data-layout="annual-summary"] .annual-summary-ring span:nth-child(2){left:47%;top:31%;width:7px;height:34%;background:var(--template-accent);}
+    body[data-layout="annual-summary"] .annual-summary-ring span:nth-child(3){left:42%;top:42%;width:18%;height:18%;border-radius:50%;background:#fff;border:6px solid var(--template-primary);}
+    body[data-layout="annual-summary"] .annual-summary-dashboard{position:absolute;right:8.7%;top:31%;width:24%;height:33%;z-index:6;border-radius:0;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 16px 32px rgba(15,23,42,.12);overflow:hidden;}
+    body[data-layout="annual-summary"] .slide-cover .annual-summary-dashboard{display:none;}
+    body[data-layout="annual-summary"] .annual-summary-dashboard::before{content:"";position:absolute;left:10%;right:10%;top:16%;height:8px;background:var(--template-primary);}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span{position:absolute;display:block;background:var(--template-accent);}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span:nth-child(1){left:13%;bottom:18%;width:10%;height:26%;border-radius:3px 3px 0 0;}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span:nth-child(2){left:29%;bottom:18%;width:10%;height:43%;border-radius:3px 3px 0 0;background:var(--template-primary);}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span:nth-child(3){left:45%;bottom:18%;width:10%;height:56%;border-radius:3px 3px 0 0;}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span:nth-child(4){left:67%;top:39%;width:21%;height:21%;border-radius:50%;background:color-mix(in srgb,var(--template-accent) 75%,#fff 25%);}
+    body[data-layout="annual-summary"] .annual-summary-dashboard span:nth-child(5){left:13%;right:13%;bottom:16%;height:2px;background:color-mix(in srgb,var(--template-primary) 45%,transparent);}
+    body[data-layout="annual-summary"] .annual-summary-metrics{position:absolute;left:10%;right:42.5%;bottom:15.5%;z-index:8;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="annual-summary"] .annual-summary-metrics span{min-height:62px;border-radius:0;background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--template-accent) 9%,#fff 91%));border-top:4px solid var(--template-accent);box-shadow:0 12px 24px rgba(15,23,42,.08);display:grid;align-content:center;gap:3px;padding:0 14px;color:var(--template-body);font-size:11px;font-weight:800;}
+    body[data-layout="annual-summary"] .annual-summary-metrics strong{font-size:19px;line-height:1;color:var(--template-title);}
+    body[data-layout="annual-summary"] .annual-summary-diagnostic{position:absolute;left:16.66%;right:42%;bottom:17.8%;z-index:6;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    body[data-layout="annual-summary"] .annual-summary-diagnostic span{height:44px;border-radius:0;background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--template-accent) 10%,#fff 90%));border-top:4px solid var(--template-accent);box-shadow:0 10px 20px rgba(15,23,42,.07);}
+    body[data-layout="annual-summary"] .annual-summary-timeline{position:absolute;left:17%;right:9%;bottom:11.8%;height:18px;z-index:7;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;}
+    body[data-layout="annual-summary"] .annual-summary-timeline::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),color-mix(in srgb,var(--template-primary) 28%,#fff 72%));}
+    body[data-layout="annual-summary"] .annual-summary-timeline span{position:relative;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--template-accent);}
+    body[data-layout="annual-summary"] .page-number{z-index:8;right:7.4%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 68%,transparent);background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
     body[data-layout="red-gold"] .slide{background-image:var(--dome-content-bg),linear-gradient(135deg,var(--template-primary),var(--dome-title-grad-end) 58%,var(--dome-title-grad-start));background-size:cover;background-position:center;border:0;padding:10.5% 12% 9%;box-shadow:0 22px 58px rgba(var(--dome-accent-rgb),.18);outline:1px solid rgba(var(--dome-frame-stroke-rgb),.24);}
     body[data-layout="red-gold"] .slide-cover{background-image:var(--dome-cover-bg),linear-gradient(135deg,var(--template-primary),var(--dome-title-grad-end) 58%,var(--dome-title-grad-start));}
     body[data-layout="red-gold"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 46%),repeating-linear-gradient(115deg,rgba(var(--dome-accent-rgb),.05) 0 1px,transparent 1px 42px);}
@@ -1480,7 +1794,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::before{content:"BUSINESS REPORT";left:15%;top:44.7%;bottom:auto;color:var(--template-accent);font-size:12px;font-weight:800;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::after{display:none;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) h2{position:absolute;left:15%;top:23.7%;width:47.5%;max-width:none;margin:0;font-size:42px;color:var(--template-title);text-shadow:none;}
-    /* 顶部卡片版式(image-report/showcase/retrospective)标题不再被内层块垂直居中压住卡片:置顶 + 浅色可读。 */
+    /* 椤堕儴鍗＄墖鐗堝紡(image-report/showcase/retrospective)鏍囬涓嶅啀琚唴灞傚潡鍨傜洿灞呬腑鍘嬩綇鍗＄墖:缃《 + 娴呰壊鍙銆?*/
     body[data-layout="red-gold"] .slide[data-dome-role="image-report"] .slide-content,
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .slide-content,
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .slide-content{align-content:start;}
@@ -1544,6 +1858,239 @@ function renderDeckPreview({ deck, visual }) {
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
 
+/**
+ * 渲染年度总结模板的专用文字层。
+ * 普通 h2/ul 在长文本下容易和装饰层叠加，因此年度模板用独立文本框承载动态标题和要点。
+ * @param {object} slide
+ * @param {number} index
+ * @returns {string}
+ */
+function renderAnnualSummaryTextPreview(slide, index) {
+  const isCover = index === 0;
+  const title = normalizeSlideText(slide?.title, `Slide ${index + 1}`);
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => annualSummaryPreviewText(bullet)).filter(Boolean)
+    : [];
+  const titleSize = annualSummaryPreviewTitleSize(title, isCover);
+  const bodySize = annualSummaryPreviewBodySize(bullets, isCover);
+  const list = bullets.length > 0
+    ? `<ul class="annual-summary-text-list">${bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}</ul>`
+    : "";
+  return `<div class="annual-summary-text" style="--annual-title-size:${titleSize}px;--annual-body-size:${bodySize}px"><strong class="annual-summary-text-title">${escapeHtml(title)}</strong>${list}</div>`;
+}
+
+/**
+ * 将结构化 bullet 转成预览文字，避免对象值在 HTML 里显示为 [object Object]。
+ * @param {unknown} value
+ * @returns {string}
+ */
+function annualSummaryPreviewText(value) {
+  if (value == null) return "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value).trim();
+  if (typeof value === "object") {
+    for (const key of ["text", "title", "label", "name", "value", "summary", "description"]) {
+      if (value[key] != null) return String(value[key]).trim();
+    }
+  }
+  return "";
+}
+
+/**
+ * 根据标题长度给年度预览标题降字号，优先保证文字完整显示。
+ * @param {string} title
+ * @param {boolean} isCover
+ * @returns {number}
+ */
+function annualSummaryPreviewTitleSize(title, isCover) {
+  const units = estimateTextUnits(title);
+  if (isCover) {
+    if (units > 88) return 20;
+    if (units > 68) return 24;
+    if (units > 48) return 28;
+    return 38;
+  }
+  if (units > 82) return 13;
+  if (units > 62) return 16;
+  if (units > 42) return 19;
+  return 28;
+}
+
+/**
+ * 根据要点总长度给年度预览正文降字号，减少长要点互相覆盖。
+ * @param {string[]} bullets
+ * @param {boolean} isCover
+ * @returns {number}
+ */
+function annualSummaryPreviewBodySize(bullets, isCover) {
+  const units = bullets.reduce((sum, item) => sum + estimateTextUnits(item), 0);
+  const base = isCover ? 14 : 13;
+  if (units > 180) return 8.5;
+  if (units > 140) return 9.5;
+  if (units > 100) return 10.5;
+  if (units > 70) return 11.5;
+  return base;
+}
+
+/**
+ * 估算中英文混排长度，中文按更宽的字符计算。
+ * @param {string} text
+ * @returns {number}
+ */
+function estimateTextUnits(text) {
+  return Array.from(String(text || "")).reduce((sum, char) => sum + (char.charCodeAt(0) > 255 ? 2 : 1), 0);
+}
+
+function annualSummaryPreviewScene(visual) {
+  const variant = annualSummaryVariant(visual);
+  const scenes = {
+    "blue-gold": {
+      variant: "blue-gold",
+      year: "2026",
+      kicker: "ANNUAL REVIEW",
+      section: "OPERATING INSIGHT",
+      metrics: [
+        { value: "128%", label: "骞村害鐩爣杈炬垚" },
+        { value: "36%", label: "鏍稿績涓氬姟澧為暱" },
+        { value: "12", label: "閲嶇偣椤圭洰钀藉湴" },
+      ],
+    },
+  };
+  return scenes[variant] || scenes["blue-gold"];
+}
+
+function annualSummaryVariant(visual) {
+  return ["blue-gold"].includes(visual?.variant) ? visual.variant : "blue-gold";
+}
+
+function isAnnualSummaryVisual(visual) {
+  return visual?.layout === "annual-summary";
+}
+
+function quarterlyDashboardPreviewScene({ visual, slide, index }) {
+  const bullets = quarterlyDashboardBulletTexts(slide);
+  const metrics = [0, 1].map((item) => quarterlyDashboardMetricFromText(bullets[item], item));
+  const regions = [2, 3, 4, 5].map((bulletIndex, itemIndex) => {
+    const metric = quarterlyDashboardMetricFromText(bullets[bulletIndex], itemIndex + 2);
+    return {
+      name: metric.label,
+      rate: metric.value,
+    };
+  });
+  const title = quarterlyDashboardCompactText(slide?.title, `Page ${index + 1}`, 16);
+  return {
+    variant: quarterlyDashboardVariant(visual),
+    // 装饰层文案从当前页内容派生，避免模板出现固定样例文本。
+    kicker: quarterlyDashboardCompactText(bullets[0], title, 30),
+    section: title,
+    reportYear: quarterlyDashboardCompactText(bullets[0], title, 24),
+    coverCaption: quarterlyDashboardCompactText(bullets.slice(1, 4).join(" / "), title, 28),
+    endingTitle: title,
+    endingCaption: quarterlyDashboardCompactText(bullets[0], title, 30),
+    metrics,
+    barTitle: quarterlyDashboardCompactText(bullets[0], title, 18),
+    clientTitle: quarterlyDashboardCompactText(bullets[1], title, 18),
+    comboTitle: quarterlyDashboardCompactText(bullets[2], title, 18),
+    pieTitle: quarterlyDashboardCompactText(bullets[3], title, 12),
+    regions,
+  };
+}
+
+function quarterlyDashboardBulletTexts(slide) {
+  return Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+}
+
+function quarterlyDashboardMetricFromText(text, index) {
+  const fallbackValue = String(index + 1).padStart(2, "0");
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValue, label: `Item ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*%?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValue;
+  const label = quarterlyDashboardCompactText(raw.replace(match?.[1] || "", "").replace(/[：:，,。]/g, " ").trim(), raw, 12);
+  return { value, label };
+}
+
+function quarterlyDashboardCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function renderQuarterlyActionContentPreview(slide, role) {
+  // 行动闭环页的可变内容集中放在独立卡片内，避免用户编辑文字和流程装饰层重叠。
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+  const title = quarterlyDashboardCompactText(slide?.title, "本页重点", role === "cover" ? 24 : 22);
+  const titleText = quarterlyDashboardCompactText(title, "本页重点", role === "cover" ? 42 : 48);
+  const items = bullets.slice(0, role === "cover" ? 2 : 3);
+  const body = items.map((item) => `<span>${escapeHtml(quarterlyDashboardCompactText(item, title, role === "cover" ? 36 : 42))}</span>`).join("");
+  return `<div class="quarterly-action-content-card"><strong>${escapeHtml(titleText)}</strong>${body}</div>`;
+}
+
+function quarterlyDashboardVariant(visual) {
+  return ["dashboard"].includes(visual?.variant) ? visual.variant : "dashboard";
+}
+
+function isQuarterlyDashboardVisual(visual) {
+  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-dashboard";
+}
+
+function quarterlyDiagnosisPreviewScene(visual) {
+  const variant = quarterlyDiagnosisVariant(visual);
+  const scenes = {
+    "problem-diagnosis": {
+      variant: "problem-diagnosis",
+      kicker: "DIAGNOSIS REVIEW",
+      section: "ISSUE ANALYSIS",
+      endingTitle: "诊断结论与改善方向",
+      endingCaption: "问题闭环 / 责任到人 / 下季追踪",
+      leftCards: ["目标偏差", "过程断点", "资源瓶颈", "协同低效"],
+      rightCards: ["原因归因", "优先级排序", "整改动作", "跟踪机制"],
+    },
+  };
+  return scenes[variant] || scenes["problem-diagnosis"];
+}
+
+function quarterlyDiagnosisVariant(visual) {
+  return ["problem-diagnosis"].includes(visual?.variant) ? visual.variant : "problem-diagnosis";
+}
+
+function isQuarterlyDiagnosisVisual(visual) {
+  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-diagnosis";
+}
+
+function quarterlyActionLoopPreviewScene(visual) {
+  const variant = quarterlyActionLoopVariant(visual);
+  const scenes = {
+    "action-loop": {
+      variant: "action-loop",
+      kicker: "ACTION LOOP REVIEW",
+      section: "EXECUTION CLOSED LOOP",
+      coverTitle: "2026-2025 季度重点工作行动闭环",
+      endingTitle: "复盘沉淀与下一步行动",
+      endingCaption: "目标拆解 / 执行追踪 / 结果复盘 / 持续优化",
+      columns: [
+        { title: "目标拆解", items: ["完成经营目标", "明确关键动作", "分解重点项目", "沉淀检查标准"] },
+        { title: "执行追踪", items: ["任务看板", "周度同步", "风险预警", "资源协调"] },
+        { title: "结果复盘", items: ["目标达成", "经验沉淀", "问题修复", "下季计划"] },
+      ],
+      steps: ["计划", "执行", "检查", "复盘"],
+      owners: ["负责人", "协同部门", "截止日期"],
+    },
+  };
+  return scenes[variant] || scenes["action-loop"];
+}
+
+function quarterlyActionLoopVariant(visual) {
+  return ["action-loop"].includes(visual?.variant) ? visual.variant : "action-loop";
+}
+
+function isQuarterlyActionLoopVisual(visual) {
+  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-action-loop";
+}
+
 function strategyConsultingPreviewVars(visual) {
   const scene = strategyConsultingPreviewScene(visual);
   return `--strategy-image:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS[scene.assetKey]}");`;
@@ -1591,31 +2138,50 @@ function financialReviewPreviewScene(visual) {
     quarterly: {
       variant: "quarterly",
       label: "FINANCE REVIEW",
-      chip: "复盘",
-      points: ["收入结构", "利润质量", "现金效率"],
+      chip: "澶嶇洏",
+      points: ["鏀跺叆缁撴瀯", "鍒╂鼎璐ㄩ噺", "鐜伴噾鏁堢巼"],
     },
     audit: {
       variant: "audit",
       label: "AUDIT CHECK",
-      chip: "审计",
-      points: ["差异核验", "风险底稿", "整改闭环"],
+      chip: "瀹¤",
+      points: ["宸紓鏍搁獙", "椋庨櫓搴曠", "鏁存敼闂幆"],
     },
     forecast: {
       variant: "forecast",
       label: "FORECAST PLAN",
-      chip: "预测",
-      points: ["滚动预测", "预算校准", "情景假设"],
+      chip: "棰勬祴",
+      points: ["婊氬姩棰勬祴", "棰勭畻鏍″噯", "鎯呮櫙鍋囪"],
+    },
+    "control-room": {
+      variant: "control-room",
+      label: "CONTROL PANEL",
+      chip: "鐩戞帶",
+      points: ["鏍稿績鎸囨爣", "瓒嬪娍鐩戞帶", "缁忚惀缁撹"],
+    },
+    warning: {
+      variant: "warning",
+      label: "RISK SIGNAL",
+      chip: "棰勮",
+      points: ["寮傚父鎸囨爣", "褰卞搷鑼冨洿", "澶勭疆鍔ㄤ綔"],
+    },
+    monthly: {
+      variant: "monthly",
+      label: "MONTHLY REVIEW",
+      chip: "鏈堟姤",
+      points: ["鏈堝害鎸囨爣", "閲嶇偣浜嬮」", "涓嬫湀鍔ㄤ綔"],
     },
   };
   return scenes[variant] || scenes.quarterly;
 }
 
 function financialReviewVariant(visual) {
-  return ["quarterly", "audit", "forecast"].includes(visual?.variant) ? visual.variant : "quarterly";
+  return ["quarterly", "audit", "forecast", "control-room", "warning", "monthly"].includes(visual?.variant) ? visual.variant : "quarterly";
 }
 
 function isFinancialReviewVisual(visual) {
-  return visual?.id === "financial-review" && visual?.layout === "executive";
+  const id = String(visual?.id || "");
+  return (id === "financial-review" || id === "operating-dashboard" || id.startsWith("finance-operating-dashboard-")) && visual?.layout === "executive";
 }
 
 function salesProposalPreviewScene(visual) {
@@ -1931,11 +2497,11 @@ function statusReportPreviewScene(visual) {
       assetKey: "business4",
       kicker: "PROJECT WEEKLY",
       section: "WEEKLY UPDATE",
-      sticker: "进度",
+      sticker: "杩涘害",
       metrics: [
-        { value: "95%", label: "进度达成" },
-        { value: "3", label: "关键风险" },
-        { value: "7", label: "本周事项" },
+        { value: "95%", label: "杩涘害杈炬垚" },
+        { value: "3", label: "鍏抽敭椋庨櫓" },
+        { value: "7", label: "鏈懆浜嬮」" },
       ],
     },
     steering: {
@@ -1943,11 +2509,11 @@ function statusReportPreviewScene(visual) {
       assetKey: "business2",
       kicker: "STEERING MEETING",
       section: "DECISION REVIEW",
-      sticker: "决策",
+      sticker: "鍐崇瓥",
       metrics: [
-        { value: "4", label: "核心议题" },
-        { value: "2", label: "待决事项" },
-        { value: "8", label: "行动责任" },
+        { value: "4", label: "鏍稿績璁" },
+        { value: "2", label: "寰呭喅浜嬮」" },
+        { value: "8", label: "琛屽姩璐ｄ换" },
       ],
     },
     delivery: {
@@ -1955,11 +2521,11 @@ function statusReportPreviewScene(visual) {
       assetKey: "business6",
       kicker: "DELIVERY TRACK",
       section: "MILESTONE CHECK",
-      sticker: "验收",
+      sticker: "楠屾敹",
       metrics: [
-        { value: "12", label: "交付节点" },
-        { value: "96%", label: "验收通过" },
-        { value: "5", label: "风险闭环" },
+        { value: "12", label: "浜や粯鑺傜偣" },
+        { value: "96%", label: "楠屾敹閫氳繃" },
+        { value: "5", label: "椋庨櫓闂幆" },
       ],
     },
   };
@@ -1983,8 +2549,8 @@ function redGoldPreviewVars(visual) {
 }
 
 /**
- * 判断 dome 预览页是否还需要普通正文列表。
- * 对已经有模板占位符承载 bullets 的版式，预览端隐藏普通列表，避免用户看到重复内容。
+ * 鍒ゆ柇 dome 棰勮椤垫槸鍚﹁繕闇€瑕佹櫘閫氭鏂囧垪琛ㄣ€?
+ * 瀵瑰凡缁忔湁妯℃澘鍗犱綅绗︽壙杞?bullets 鐨勭増寮忥紝棰勮绔殣钘忔櫘閫氬垪琛紝閬垮厤鐢ㄦ埛鐪嬪埌閲嶅鍐呭銆?
  * @param {object} visual
  * @param {string} role
  * @returns {boolean}
@@ -1995,8 +2561,17 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 }
 
 /**
- * 渲染与 PPTX 导出端 Content Placement Card 对齐的内容承载面。
- * 这些角色在导出文件里都有白色圆角大面板，预览端也必须输出同层级结构，避免用户看到的页面和下载 PPTX 不一致。
+ * 鍒ゆ柇妯℃澘棰勮椤垫槸鍚﹁繕闇€瑕佹櫘閫氭鏂囧垪琛ㄣ€? * 琛屽姩闂幆妯℃澘宸茬粡鐢ㄤ换鍔″崱銆佽矗浠荤煩闃靛拰璺嚎鍥炬壙杞界粨鏋勪俊鎭紝鏅€?bullets 浼氬拰鍥捐〃閲嶅彔锛屽洜姝ゅ湪棰勮绔叧闂€? * @param {object} visual
+ * @param {string} role
+ * @returns {boolean}
+ */
+function shouldRenderTemplatePreviewBodyList(visual, role) {
+  if (visual.layout === "quarterly-action-loop") return false;
+  return shouldRenderDomePreviewBodyList(visual, role);
+}
+
+/**
+ * 娓叉煋涓?PPTX 瀵煎嚭绔?Content Placement Card 瀵归綈鐨勫唴瀹规壙杞介潰銆? * 杩欎簺瑙掕壊鍦ㄥ鍑烘枃浠堕噷閮芥湁鐧借壊鍦嗚澶ч潰鏉匡紝棰勮绔篃蹇呴』杈撳嚭鍚屽眰绾х粨鏋勶紝閬垮厤鐢ㄦ埛鐪嬪埌鐨勯〉闈㈠拰涓嬭浇 PPTX 涓嶄竴鑷淬€?
  * @param {string} role
  * @returns {string}
  */
@@ -2006,8 +2581,8 @@ function renderDomePreviewContentSurface(role) {
 }
 
 /**
- * 渲染与 PPTX 导出端 Dome Content Frame 对齐的内容内框。
- * 导出端除封面/结束页外都会写入该框线，预览端同步输出，避免用户看到的边框层级和 WPS 打开的 PPTX 不一致。
+ * 娓叉煋涓?PPTX 瀵煎嚭绔?Dome Content Frame 瀵归綈鐨勫唴瀹瑰唴妗嗐€?
+ * 瀵煎嚭绔櫎灏侀潰/缁撴潫椤靛閮戒細鍐欏叆璇ユ绾匡紝棰勮绔悓姝ヨ緭鍑猴紝閬垮厤鐢ㄦ埛鐪嬪埌鐨勮竟妗嗗眰绾у拰 WPS 鎵撳紑鐨?PPTX 涓嶄竴鑷淬€?
  * @param {string} role
  * @returns {string}
  */
@@ -2017,8 +2592,8 @@ function renderDomePreviewContentFrame(role) {
 }
 
 /**
- * 渲染 dome 预览页脚装饰。
- * PPTX 导出每页都会生成 Dome Footer Decoration，预览端也显式输出同名视觉层，避免预览和导出不一致。
+ * 娓叉煋 dome 棰勮椤佃剼瑁呴グ銆?
+ * PPTX 瀵煎嚭姣忛〉閮戒細鐢熸垚 Dome Footer Decoration锛岄瑙堢涔熸樉寮忚緭鍑哄悓鍚嶈瑙夊眰锛岄伩鍏嶉瑙堝拰瀵煎嚭涓嶄竴鑷淬€?
  * @param {object} visual
  * @returns {string}
  */
@@ -2028,8 +2603,8 @@ function renderDomePreviewFooter(visual) {
 }
 
 /**
- * 渲染 dome 预览底部圆弧波浪。
- * 这两层 HTML 装饰对应 PPTX 导出的 Dome Gold/Light Wave Arc，保证预览和导出看到同一套底部波浪层级。
+ * 娓叉煋 dome 棰勮搴曢儴鍦嗗姬娉㈡氮銆?
+ * 杩欎袱灞?HTML 瑁呴グ瀵瑰簲 PPTX 瀵煎嚭鐨?Dome Gold/Light Wave Arc锛屼繚璇侀瑙堝拰瀵煎嚭鐪嬪埌鍚屼竴濂楀簳閮ㄦ尝娴眰绾с€?
  * @param {object} visual
  * @returns {string}
  */
@@ -2039,8 +2614,8 @@ function renderDomePreviewWaves(visual) {
 }
 
 /**
- * 预览端使用与 PPTX 导出一致的页面角色判断。
- * 这样用户看到的封面、目录、章节页和结束页，不会在导出时变成另一套布局。
+ * 棰勮绔娇鐢ㄤ笌 PPTX 瀵煎嚭涓€鑷寸殑椤甸潰瑙掕壊鍒ゆ柇銆?
+ * 杩欐牱鐢ㄦ埛鐪嬪埌鐨勫皝闈€佺洰褰曘€佺珷鑺傞〉鍜岀粨鏉熼〉锛屼笉浼氬湪瀵煎嚭鏃跺彉鎴愬彟涓€濂楀竷灞€銆?
  * @param {object} slide
  * @param {number} index
  * @param {number} total
@@ -2064,8 +2639,8 @@ function resolvePreviewDomeRole(slide, index, total) {
 }
 
 /**
- * 为 HTML 预览生成与 dome 角色匹配的视觉占位符。
- * PPTX 导出会生成真实 OOXML 形状；这里生成轻量 HTML 层，保证用户预览时能看到同样的版式意图。
+ * 涓?HTML 棰勮鐢熸垚涓?dome 瑙掕壊鍖归厤鐨勮瑙夊崰浣嶇銆?
+ * PPTX 瀵煎嚭浼氱敓鎴愮湡瀹?OOXML 褰㈢姸锛涜繖閲岀敓鎴愯交閲?HTML 灞傦紝淇濊瘉鐢ㄦ埛棰勮鏃惰兘鐪嬪埌鍚屾牱鐨勭増寮忔剰鍥俱€?
  * @param {string} role
  * @param {object} slide
  * @param {number} index
@@ -2073,25 +2648,25 @@ function resolvePreviewDomeRole(slide, index, total) {
  */
 function renderDomePreviewDecoration(role, slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  // 统一从结构化 bullet 中读取展示文本，避免不同页面角色各自直出对象导致预览出现 [object Object]。
+  // 缁熶竴浠庣粨鏋勫寲 bullet 涓鍙栧睍绀烘枃鏈紝閬垮厤涓嶅悓椤甸潰瑙掕壊鍚勮嚜鐩村嚭瀵硅薄瀵艰嚧棰勮鍑虹幇 [object Object]銆?
   const bulletText = (itemIndex) => domePreviewStructuredText(bullets[itemIndex], ["text", "title", "label", "name", "action", "task", "description", "value"]);
   if (role === "cover") {
-    // 封面页把第一条结构化内容放入副标题占位，预览时保持 dome.pptx 帆船封面的简洁留白。
+    // 灏侀潰椤垫妸绗竴鏉＄粨鏋勫寲鍐呭鏀惧叆鍓爣棰樺崰浣嶏紝棰勮鏃朵繚鎸?dome.pptx 甯嗚埞灏侀潰鐨勭畝娲佺暀鐧姐€?
     return `<div class="dome-role-decor dome-cover-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   if (role === "agenda") {
-    // 目录页固定保留 4 个卡片占位符，和 dome.pptx/PPTX 导出保持一致，避免少量目录项导致版式塌陷。
+    // 鐩綍椤靛浐瀹氫繚鐣?4 涓崱鐗囧崰浣嶇锛屽拰 dome.pptx/PPTX 瀵煎嚭淇濇寔涓€鑷达紝閬垮厤灏戦噺鐩綍椤瑰鑷寸増寮忓闄枫€?
     const cards = normalizeDomePreviewAgendaItems(slide).map((item, index) => `<div class="dome-agenda-card"><span class="dome-agenda-number">0${index + 1}</span><span class="dome-agenda-text">${escapeHtml(item)}</span></div>`).join("");
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
   if (role === "section-divider") {
-    // 章节分隔页同步 PPTX 里的 Dome Section Divider Line，让预览也保留章节编号下方的金色分割线层级。
+    // 绔犺妭鍒嗛殧椤靛悓姝?PPTX 閲岀殑 Dome Section Divider Line锛岃棰勮涔熶繚鐣欑珷鑺傜紪鍙蜂笅鏂圭殑閲戣壊鍒嗗壊绾垮眰绾с€?
     return `<div class="dome-role-decor dome-section-number">${escapeHtml(domePreviewSectionNumberText(slide, index))}</div><div class="dome-role-decor dome-section-divider-line"></div>`;
   }
   if (role === "three-steps" || role === "four-steps") {
     const count = role === "three-steps" ? 3 : 4;
     const cards = Array.from({ length: count }, (_, index) => renderDomePreviewCard("dome-step-card", index, bulletText(index))).join("");
-    // 三/四步骤流程页都显示商务图片层，让预览与 PPTX 导出的流程页视觉结构一致。
+    // 涓?鍥涙楠ゆ祦绋嬮〉閮芥樉绀哄晢鍔″浘鐗囧眰锛岃棰勮涓?PPTX 瀵煎嚭鐨勬祦绋嬮〉瑙嗚缁撴瀯涓€鑷淬€?
     const visual = `<div class="dome-role-visual"></div>`;
     return `${renderDomePreviewSectionLabel(slide, index)}${visual}<div class="dome-role-decor dome-step-connector"></div><div class="dome-role-decor dome-step-row" style="grid-template-columns:repeat(${count},minmax(0,1fr))">${cards}</div>`;
   }
@@ -2100,36 +2675,36 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase") {
-    // 成果展示页将编号和成果内容拆成两个视觉层，和 PPTX 的 Dome Showcase Number/Text 占位保持一致。
+    // 鎴愭灉灞曠ず椤靛皢缂栧彿鍜屾垚鏋滃唴瀹规媶鎴愪袱涓瑙夊眰锛屽拰 PPTX 鐨?Dome Showcase Number/Text 鍗犱綅淇濇寔涓€鑷淬€?
     const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card"><span class="dome-showcase-number">0${index + 1}</span><span class="dome-showcase-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
   if (role === "image-report") {
-    // 工作汇报图文页用三张固定卡片承载要点，保持图文模板的占位符结构。
+    // 宸ヤ綔姹囨姤鍥炬枃椤电敤涓夊紶鍥哄畾鍗＄墖鎵胯浇瑕佺偣锛屼繚鎸佸浘鏂囨ā鏉跨殑鍗犱綅绗︾粨鏋勩€?
     const cards = Array.from({ length: 3 }, (_, index) => renderDomePreviewCard("dome-image-report-card", index, bulletText(index))).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
-    // 问题复盘页固定输出“风险/原因/措施”语义标签，和 PPTX 端的独立标签占位保持一致。
+    // 闂澶嶇洏椤靛浐瀹氳緭鍑衡€滈闄?鍘熷洜/鎺柦鈥濊涔夋爣绛撅紝鍜?PPTX 绔殑鐙珛鏍囩鍗犱綅淇濇寔涓€鑷淬€?
     const labels = ["风险", "原因", "措施"];
     const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-retrospective-card"><span class="dome-retrospective-label">${labels[index]}</span><span class="dome-card-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bulletText(0) || "RISK")}</span></div>`;
   }
   if (role === "next-plan") {
-    // 下一步计划页支持“阶段: 动作”结构化输入，预览端拆成阶段和动作两个占位层。
+    // 涓嬩竴姝ヨ鍒掗〉鏀寔鈥滈樁娈? 鍔ㄤ綔鈥濈粨鏋勫寲杈撳叆锛岄瑙堢鎷嗘垚闃舵鍜屽姩浣滀袱涓崰浣嶅眰銆?
     const cards = normalizeDomePreviewPlanItems(slide, 4).map((item) => `<div class="dome-step-card"><span class="dome-next-plan-phase">${escapeHtml(item.phase)}</span><span class="dome-next-plan-action">${escapeHtml(item.action)}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
   }
   if (role === "closing") {
-    // 结束页把用户输入作为模板副标题输出，避免破坏 THANKS 结束版式。
+    // 缁撴潫椤垫妸鐢ㄦ埛杈撳叆浣滀负妯℃澘鍓爣棰樿緭鍑猴紝閬垮厤鐮村潖 THANKS 缁撴潫鐗堝紡銆?
     return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   return "";
 }
 
 /**
- * 生成 dome 预览目录页的 4 个卡片文案。
- * 用户少填目录项时使用模板默认四段补齐，让预览与导出的卡片式目录保持完整。
+ * 鐢熸垚 dome 棰勮鐩綍椤电殑 4 涓崱鐗囨枃妗堛€?
+ * 鐢ㄦ埛灏戝～鐩綍椤规椂浣跨敤妯℃澘榛樿鍥涙琛ラ綈锛岃棰勮涓庡鍑虹殑鍗＄墖寮忕洰褰曚繚鎸佸畬鏁淬€?
  * @param {object} slide
  * @returns {string[]}
  */
@@ -2139,8 +2714,8 @@ function normalizeDomePreviewAgendaItems(slide) {
 }
 
 /**
- * 解析 dome 预览指标页的结构化要点。
- * 支持“指标名: 指标值 / 指标名：指标值 / 指标名|指标值”，与 PPTX 导出保持一致。
+ * 瑙ｆ瀽 dome 棰勮鎸囨爣椤电殑缁撴瀯鍖栬鐐广€?
+ * 鏀寔鈥滄寚鏍囧悕: 鎸囨爣鍊?/ 鎸囨爣鍚嶏細鎸囨爣鍊?/ 鎸囨爣鍚峾鎸囨爣鍊尖€濓紝涓?PPTX 瀵煎嚭淇濇寔涓€鑷淬€?
  * @param {object} slide
  * @param {number} count
  * @returns {{label: string, value: string}[]}
@@ -2163,8 +2738,8 @@ function normalizeDomePreviewMetricItems(slide, count) {
 }
 
 /**
- * 解析 dome 下一步计划页的结构化要点。
- * 支持“阶段: 动作 / 阶段：动作 / 阶段|动作”，无分隔符时按旧编号兜底。
+ * 瑙ｆ瀽 dome 涓嬩竴姝ヨ鍒掗〉鐨勭粨鏋勫寲瑕佺偣銆?
+ * 鏀寔鈥滈樁娈? 鍔ㄤ綔 / 闃舵锛氬姩浣?/ 闃舵|鍔ㄤ綔鈥濓紝鏃犲垎闅旂鏃舵寜鏃х紪鍙峰厹搴曘€?
  * @param {object} slide
  * @param {number} count
  * @returns {{phase: string, action: string}[]}
@@ -2187,8 +2762,8 @@ function normalizeDomePreviewPlanItems(slide, count) {
 }
 
 /**
- * 从预览端结构化 bullet 中读取占位符文本。
- * 支持对象输入，避免 HTML 预览出现 [object Object]，并保持与 PPTX 导出一致。
+ * 浠庨瑙堢缁撴瀯鍖?bullet 涓鍙栧崰浣嶇鏂囨湰銆?
+ * 鏀寔瀵硅薄杈撳叆锛岄伩鍏?HTML 棰勮鍑虹幇 [object Object]锛屽苟淇濇寔涓?PPTX 瀵煎嚭涓€鑷淬€?
  * @param {unknown} value
  * @param {string[]} preferredKeys
  * @returns {string}
@@ -2203,7 +2778,7 @@ function domePreviewStructuredText(value, preferredKeys) {
 }
 
 /**
- * 判断值是否为普通结构化对象。
+ * 鍒ゆ柇鍊兼槸鍚︿负鏅€氱粨鏋勫寲瀵硅薄銆?
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -2212,8 +2787,8 @@ function isPlainObject(value) {
 }
 
 /**
- * 读取预览端章节分隔页的结构化编号。
- * 与 PPTX 导出一致，优先使用 bullets[0]；缺省时按页序生成稳定 PART 编号，避免预览出现 PART 00。
+ * 璇诲彇棰勮绔珷鑺傚垎闅旈〉鐨勭粨鏋勫寲缂栧彿銆?
+ * 涓?PPTX 瀵煎嚭涓€鑷达紝浼樺厛浣跨敤 bullets[0]锛涚己鐪佹椂鎸夐〉搴忕敓鎴愮ǔ瀹?PART 缂栧彿锛岄伩鍏嶉瑙堝嚭鐜?PART 00銆?
  * @param {object} slide
  * @param {number} index
  * @returns {string}
@@ -2224,8 +2799,8 @@ function domePreviewSectionNumberText(slide, index) {
 }
 
 /**
- * 渲染内容页预览右上角章节标签。
- * 与 PPTX 导出一致：优先使用 outline 结构化章节字段，缺省时按页序兜底，确保预览能看到导出中的章节标签。
+ * 娓叉煋鍐呭椤甸瑙堝彸涓婅绔犺妭鏍囩銆?
+ * 涓?PPTX 瀵煎嚭涓€鑷达細浼樺厛浣跨敤 outline 缁撴瀯鍖栫珷鑺傚瓧娈碉紝缂虹渷鏃舵寜椤靛簭鍏滃簳锛岀‘淇濋瑙堣兘鐪嬪埌瀵煎嚭涓殑绔犺妭鏍囩銆?
  * @param {object} slide
  * @param {number} index
  * @returns {string}
@@ -2236,8 +2811,8 @@ function renderDomePreviewSectionLabel(slide, index) {
 }
 
 /**
- * 渲染 dome 预览里的编号卡片。
- * 这里的结构与 PPTX 卡片文本层保持一致，便于用户预览结构化内容是否进入正确占位符。
+ * 娓叉煋 dome 棰勮閲岀殑缂栧彿鍗＄墖銆?
+ * 杩欓噷鐨勭粨鏋勪笌 PPTX 鍗＄墖鏂囨湰灞備繚鎸佷竴鑷达紝渚夸簬鐢ㄦ埛棰勮缁撴瀯鍖栧唴瀹规槸鍚﹁繘鍏ユ纭崰浣嶇銆?
  * @param {string} className
  * @param {number} index
  * @param {unknown} text
@@ -2380,8 +2955,8 @@ function buildFallbackSlides({ outline, template }) {
 }
 
 /**
- * 保留 outline 中会驱动模板占位符的结构化字段。
- * 只复制明确用于 dome 章节标签的字段，避免把 outline 的内部状态无意写入最终 deck。
+ * 淇濈暀 outline 涓細椹卞姩妯℃澘鍗犱綅绗︾殑缁撴瀯鍖栧瓧娈点€?
+ * 鍙鍒舵槑纭敤浜?dome 绔犺妭鏍囩鐨勫瓧娈碉紝閬垮厤鎶?outline 鐨勫唴閮ㄧ姸鎬佹棤鎰忓啓鍏ユ渶缁?deck銆?
  * @param {{outlineSlide: object, generatedSlide: object}} input
  * @returns {object}
  */
@@ -2457,7 +3032,7 @@ function normalizeSlideText(value, fallback) {
 
 /**
  * Normalizes a slide layout against the selected template schema.
- * dome 模板在 AI 未返回可用 layout 时，会根据 outline 结构自动推断页面角色，避免整份 deck 退化为同一种图文页。
+ * dome 妯℃澘鍦?AI 鏈繑鍥炲彲鐢?layout 鏃讹紝浼氭牴鎹?outline 缁撴瀯鑷姩鎺ㄦ柇椤甸潰瑙掕壊锛岄伩鍏嶆暣浠?deck 閫€鍖栦负鍚屼竴绉嶅浘鏂囬〉銆?
  * @param {{layout: unknown, template: object, index: number, total?: number, slide?: object}} input
  * @returns {string}
  */
@@ -2476,7 +3051,7 @@ function normalizeSlideLayout({ layout, template, index, total = 0, slide = {} }
 }
 
 /**
- * 判断模板是否使用 dome.pptx 的 red-gold 版式体系。
+ * 鍒ゆ柇妯℃澘鏄惁浣跨敤 dome.pptx 鐨?red-gold 鐗堝紡浣撶郴銆?
  * @param {object} template
  * @returns {boolean}
  */
@@ -2485,8 +3060,8 @@ function isDomeTemplate(template) {
 }
 
 /**
- * 根据已确认 outline 的页面结构推断 dome 版式角色。
- * 这里和预览/导出的角色语义保持一致，让用户无需手写 layout 也能进入对应占位符。
+ * 鏍规嵁宸茬‘璁?outline 鐨勯〉闈㈢粨鏋勬帹鏂?dome 鐗堝紡瑙掕壊銆?
+ * 杩欓噷鍜岄瑙?瀵煎嚭鐨勮鑹茶涔変繚鎸佷竴鑷达紝璁╃敤鎴锋棤闇€鎵嬪啓 layout 涔熻兘杩涘叆瀵瑰簲鍗犱綅绗︺€?
  * @param {{slide: object, index: number, total: number}} input
  * @returns {string}
  */
@@ -2534,7 +3109,7 @@ function resolveSlide(slides, requestedSlideId) {
 
 /**
  * Keeps persisted slide identity stable after AI regeneration.
- * 单页重生成只替换内容，不允许模型返回值破坏 dome 模板的版式角色和章节占位字段。
+ * 鍗曢〉閲嶇敓鎴愬彧鏇挎崲鍐呭锛屼笉鍏佽妯″瀷杩斿洖鍊肩牬鍧?dome 妯℃澘鐨勭増寮忚鑹插拰绔犺妭鍗犱綅瀛楁銆?
  * @param {{original: object, regenerated: object}} input
  * @returns {object}
  */
@@ -2577,3 +3152,4 @@ function normalizeLimit(value) {
   if (!Number.isInteger(parsed) || parsed <= 0) return 20;
   return Math.min(parsed, 100);
 }
+

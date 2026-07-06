@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" rx="34" fill="#071827"/>
+  <path d="M0 560 C220 500 330 620 520 560 C700 502 840 610 1280 505 L1280 720 L0 720 Z" fill="#0B1F3A"/>
+  <g opacity=".18" stroke="#2DD4BF">
+    <path d="M80 110H1200M80 190H1200M80 270H1200M80 350H1200M80 430H1200"/>
+    <path d="M170 70V620M320 70V620M470 70V620M620 70V620M770 70V620M920 70V620M1070 70V620"/>
+  </g>
+  <rect x="120" y="120" width="1040" height="470" rx="28" fill="#FFFFFF" opacity=".94"/>
+  <rect x="170" y="178" width="260" height="130" rx="22" fill="#EAF2F6"/>
+  <rect x="472" y="178" width="260" height="130" rx="22" fill="#EAF2F6"/>
+  <rect x="774" y="178" width="260" height="130" rx="22" fill="#EAF2F6"/>
+  <path d="M188 458 C300 380 398 432 510 360 C630 282 764 340 890 250 C960 205 1018 205 1098 178" fill="none" stroke="#2DD4BF" stroke-width="18" stroke-linecap="round"/>
+  <text x="170" y="395" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="54" font-weight="800" fill="#071827">经营数据看板</text>
+  <text x="170" y="458" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="26" font-weight="700" fill="#334155">核心指标 · 趋势监控 · 管理结论</text>
+</svg>

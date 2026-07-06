@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="template-specific-illustration">
+  <defs>
+    <linearGradient id="p2.324431872959755e+29bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <pattern id="p2.324431872959755e+29grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#8b5cf6" stroke-width="1" opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="720" rx="48" fill="url(#p2.324431872959755e+29bg)"/>
+  <rect width="1200" height="720" rx="48" fill="url(#p2.324431872959755e+29grid)"/>
+  <circle cx="1040" cy="126" r="116" fill="#f5f3ff" opacity=".14"/>
+  <circle cx="120" cy="610" r="148" fill="#111827" opacity=".12"/>
+  
+      <circle cx="930" cy="145" r="170" fill="#f5f3ff" opacity=".28"/>
+      <circle cx="172" cy="566" r="150" fill="#0ea5e9" opacity=".2"/>
+      <rect x="142" y="144" width="410" height="420" rx="34" fill="#ffffff" opacity=".92"/>
+      <rect x="634" y="186" width="360" height="250" rx="32" fill="#8b5cf6" stroke="#f5f3ff" stroke-width="4"/>
+      <path d="M682 380 C732 294 794 364 840 282 S910 214 952 260" fill="none" stroke="#22d3ee" stroke-width="12" stroke-linecap="round"/>
+      <rect x="190" y="210" width="230" height="34" rx="17" fill="#8b5cf6"/>
+      <rect x="190" y="286" width="290" height="20" rx="10" fill="#8b5cf6" opacity=".55"/>
+      <rect x="654" y="480" width="320" height="54" rx="27" fill="#111827"/>
+</svg>

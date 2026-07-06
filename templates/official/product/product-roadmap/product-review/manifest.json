@@ -1,0 +1,17 @@
+{
+  "slug": "product-product-roadmap-product-review",
+  "name": "产品路线规划 - 产品复盘",
+  "description": "适合产品战略、版本规划、优先级和路线图沟通。",
+  "category_slug": "product",
+  "category_name": "产品规划",
+  "category_sort_order": 50,
+  "status": "active",
+  "tags": [
+    "product",
+    "product-roadmap",
+    "product-review",
+    "product-planning"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

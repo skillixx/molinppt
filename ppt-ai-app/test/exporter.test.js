@@ -198,7 +198,7 @@ test("PptExportService hides default page label for strategy consulting pages", 
     format: "pptx",
   });
   const text = result.content.toString("latin1");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
 
   assert.match(slide2, /name="Strategy Section Label"/);
   assert.doesNotMatch(slide2, /name="Section Label"[\s\S]*<a:t>02<\/a:t>/);
@@ -446,6 +446,147 @@ test("PptExportService uses commercial marketing growth decorations", () => {
   assert.match(slide1, /name="Marketing Growth Arc"/);
   assert.match(slide1, /val="047857"/);
   assert.match(slide1, /val="F97316"/);
+});
+
+test("PptExportService uses quarterly business review problem diagnosis decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "quarterly-business-review",
+      theme: "problem-diagnosis",
+      slides: [
+        { title: "季度业务复盘", bullets: ["目标偏差", "过程断点"] },
+        { title: "问题原因拆解", bullets: ["原因归因", "影响范围"] },
+        { title: "整改方向", bullets: ["整改动作", "跟踪机制"] },
+        { title: "改善闭环", bullets: ["责任到人", "下季追踪"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Quarterly Diagnosis Problem Triangle"/);
+  assert.match(slide1, /name="Quarterly Diagnosis Method Triangle"/);
+  assert.match(slide1, /name="Quarterly Diagnosis Center Pivot"/);
+  assert.match(slide1, /name="Quarterly Diagnosis Problem Text A"/);
+  assert.match(slide1, /name="Quarterly Diagnosis Method Text A"/);
+  assert.doesNotMatch(slide1, /瀛樺湪|鏀硅繘/);
+  assert.match(slide2, /name="Quarterly Diagnosis Problem Card 1"/);
+  assert.match(slide2, /name="Quarterly Diagnosis Method Card 1"/);
+  assert.match(slide2, /val="152E79"/);
+  assert.match(slide2, /val="4F7F55"/);
+});
+
+test("PptExportService renders quarterly dashboard text from slide content", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "quarterly-business-review",
+      theme: "dashboard",
+      slides: [
+        { title: "经营总览", bullets: ["营收达成 72%", "客户续费 48%", "华东区域 91%", "渠道转化 63%"] },
+        { title: "渠道效率", bullets: ["线索转化 37%", "销售周期 21天", "线上渠道 58%", "伙伴渠道 42%"] },
+        { title: "行动重点", bullets: ["重点客户 16家", "项目推进 12项", "风险跟进 5项", "资源补位 3组"] },
+        { title: "复盘结论", bullets: ["下季度聚焦转化效率", "加强重点客户跟进"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  const sectionText = Buffer.from("\u6e20\u9053\u6548\u7387", "utf8").toString("latin1");
+  const metricText = Buffer.from("\u7ebf\u7d22\u8f6c\u5316", "utf8").toString("latin1");
+  assert.match(slide2, new RegExp(sectionText));
+  assert.match(slide2, new RegExp(metricText));
+  assert.match(slide2, /37%/);
+  const staleText = ["35\\.28%", "60\\.99%", "\\u9655\\u897f", "\\u4e0a\\u6d77", "\\u5317\\u4eac", "\\u6df1\\u5733", "\\u6570\\u636e\\u5206\\u6790PPT"].join("|");
+  assert.doesNotMatch(slide2, new RegExp(staleText));
+});
+
+test("PptExportService keeps annual summary export text aligned with preview sizing", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      id: "annual-long-text",
+      title: "年度经营总结",
+      templateId: "annual-business-summary",
+      templateName: "年度经营总结",
+      theme: "blue-gold",
+      templateVisual: {
+        primary: "3159F6",
+        accent: "39D5E8",
+        background: "F7FBFF",
+        surface: "FFFFFF",
+        title: "052E7A",
+        body: "1F4B83",
+        layout: "annual-summary",
+        variant: "blue-gold",
+      },
+      createdAt: "2026-07-02T10:20:00.000Z",
+      slides: [
+        {
+          title: "年度经营复盘：收入增速放缓、利润承压与核心项目交付质量持续提升",
+          bullets: [
+            "总收入同比增长但低于年度目标，核心客户续费稳定，新客获取效率需要进一步优化",
+            { text: "净利率受到原材料和交付成本影响，后续需要通过产品组合调整和流程改善释放利润空间" },
+            "重点项目按期交付率提升，客户满意度保持稳定，为下一年度增长目标提供基础支撑",
+          ],
+        },
+        {
+          title: "营收增速放缓与利润承压并存，客户结构和价格杠杆需要系统性优化",
+          bullets: [
+            "大客户贡献保持稳定，但中小客户转化周期拉长，需要提升线索筛选和销售协同效率",
+            "产品折扣率扩大压缩毛利空间，建议建立分层报价机制并同步优化成本科目",
+            "交付团队复用能力提升，但跨部门资源协调仍需加强，避免关键项目利润回收滞后",
+            "下一阶段重点围绕客户分层、价格体系和交付效率三个方向形成经营闭环",
+          ],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Annual Summary Metric Card 1"/);
+  assert.match(slide2, /name="Annual Summary Dashboard Header"/);
+  const objectBulletText = Buffer.from("净利率受到原材料和交付成本影响", "utf8").toString("latin1");
+  assert.match(slide1, new RegExp(objectBulletText));
+  assert.doesNotMatch(slide1, /\[object Object\]/);
+  assert.match(pptShapeByName(slide1, "Content 2"), /<a:rPr[^>]* sz="850"/);
+  assert.match(pptShapeByName(slide2, "Content 2"), /<a:rPr[^>]* sz="780"/);
+});
+
+test("PptExportService keeps commercial template theme chips decorative", () => {
+  const exporter = new PptExportService();
+  const cases = [
+    { templateId: "strategy-consulting", theme: "board", shapeName: "Strategy Chip Text" },
+    { templateId: "financial-review", theme: "quarterly", shapeName: "Financial Chip Text" },
+    { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
+    { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
+    { templateId: "marketing-campaign", theme: "launch", shapeName: "Marketing Chip Text" },
+    { templateId: "data-insight", theme: "dashboard", shapeName: "Data Insight Chip Text" },
+    { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },
+    { templateId: "pitch", theme: "startup", shapeName: "Pitch Chip Text" },
+  ];
+
+  for (const item of cases) {
+    const result = exporter.exportDeck({
+      deck: { ...deck, templateId: item.templateId, theme: item.theme },
+      format: "pptx",
+    });
+    const slide1 = pptPartText(result.content.toString("latin1"), "ppt/slides/slide1.xml");
+    const chipTextShape = pptShapeByName(slide1, item.shapeName);
+
+    // 主题风格只用于选择样式，不能作为页面上的可见角标文字写进 PPTX。
+    assert.match(chipTextShape, /<a:t><\/a:t>/, `${item.templateId}/${item.theme} should render an empty decorative chip`);
+  }
 });
 
 test("PptExportService uses commercial pitch startup decorations", () => {
@@ -1000,4 +1141,12 @@ function pptPartText(zipText, partPath) {
   if (start === -1) return "";
   const nextPart = zipText.indexOf(marker, start + partPath.length);
   return zipText.slice(start, nextPart === -1 ? undefined : nextPart);
+}
+
+function pptShapeByName(slideXml, shapeName) {
+  const nameStart = slideXml.indexOf(`name="${shapeName}"`);
+  if (nameStart === -1) return "";
+  const shapeStart = slideXml.lastIndexOf("<p:sp>", nameStart);
+  const shapeEnd = slideXml.indexOf("</p:sp>", nameStart);
+  return slideXml.slice(shapeStart, shapeEnd === -1 ? undefined : shapeEnd + "</p:sp>".length);
 }

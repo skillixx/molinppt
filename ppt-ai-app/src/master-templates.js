@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
  * 新官方模板只需注册自己的描述符(自己的 assets 目录 + 画布 + 调色)。
  */
 
-const DOME_ASSET_BASE_URL = new URL("../../templates/official/dome/assets/", import.meta.url);
+const DOME_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 
 /**
  * dome(red-gold)描述符:作为通用化后的第一个实例,保持与重构前完全一致的素材。

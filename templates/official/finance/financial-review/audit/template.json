@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "financial-review",
+  "themeId": "audit",
+  "style": "finance-report",
+  "themes": [
+    {
+      "id": "audit",
+      "name": "审计分析",
+      "visual": {
+        "primary": "243447",
+        "accent": "A56A43",
+        "background": "F3F0EC",
+        "surface": "FFFFFF",
+        "title": "1A2735",
+        "body": "4A5562",
+        "layout": "executive",
+        "variant": "audit"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "243447",
+    "accent": "A56A43",
+    "background": "F3F0EC",
+    "surface": "FFFFFF",
+    "title": "1A2735",
+    "body": "4A5562",
+    "layout": "executive",
+    "variant": "audit"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

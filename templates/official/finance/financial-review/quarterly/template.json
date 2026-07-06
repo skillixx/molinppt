@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "financial-review",
+  "themeId": "quarterly",
+  "style": "finance-report",
+  "themes": [
+    {
+      "id": "quarterly",
+      "name": "季度复盘",
+      "visual": {
+        "primary": "18344E",
+        "accent": "3B8C62",
+        "background": "EDF3F4",
+        "surface": "FFFFFF",
+        "title": "102639",
+        "body": "405163",
+        "layout": "executive",
+        "variant": "quarterly"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "18344E",
+    "accent": "3B8C62",
+    "background": "EDF3F4",
+    "surface": "FFFFFF",
+    "title": "102639",
+    "body": "405163",
+    "layout": "executive",
+    "variant": "quarterly"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

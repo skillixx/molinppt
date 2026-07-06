@@ -1,0 +1,18 @@
+{
+  "slug": "business-quarterly-review-problem-diagnosis",
+  "name": "季度业务复盘 - 问题诊断",
+  "description": "适合季度复盘中的问题识别、原因拆解、影响评估和改进方向汇报的咨询诊断型商务模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "quarterly-review",
+    "problem-diagnosis",
+    "consulting"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

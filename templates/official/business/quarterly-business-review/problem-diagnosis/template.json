@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "quarterly-business-review",
+  "themeId": "problem-diagnosis",
+  "style": "quarterly-business-review",
+  "themes": [
+    {
+      "id": "problem-diagnosis",
+      "name": "问题诊断",
+      "visual": {
+        "primary": "152E79",
+        "accent": "4F7F55",
+        "background": "F4F6F8",
+        "surface": "FFFFFF",
+        "title": "111827",
+        "body": "4B5563",
+        "layout": "quarterly-diagnosis",
+        "variant": "problem-diagnosis"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "152E79",
+    "accent": "4F7F55",
+    "background": "F4F6F8",
+    "surface": "FFFFFF",
+    "title": "111827",
+    "body": "4B5563",
+    "layout": "quarterly-diagnosis",
+    "variant": "problem-diagnosis"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "quarterly-diagnosis-cover",
+    "defaultContentLayout": "quarterly-diagnosis-content",
+    "allowedLayouts": [
+      "quarterly-diagnosis-cover",
+      "quarterly-diagnosis-overview",
+      "quarterly-diagnosis-content",
+      "quarterly-diagnosis-analysis",
+      "quarterly-diagnosis-closing",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

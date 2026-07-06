@@ -12,35 +12,36 @@ import {
 } from "./master-templates.js";
 
 const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scaleY: 1, type: "screen16x9" };
+const BUSINESS_MODERN_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const STATUS_REPORT_MEDIA = {
   weekly: {
     file: "status-report-weekly.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-4.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-4.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
   steering: {
     file: "status-report-steering.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-2.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-2.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
   delivery: {
     file: "status-report-delivery.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-6.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-6.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
 };
 const STRATEGY_CONSULTING_MEDIA = {
   board: {
     file: "strategy-board.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-1.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-1.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
   matrix: {
     file: "strategy-matrix.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-5.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-5.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
   workstream: {
     file: "strategy-workstream.jpeg",
-    content: readFileSync(new URL("../../templates/official/dome/assets/dome-business-6.jpeg", import.meta.url)),
+    content: readFileSync(new URL("dome-business-6.jpeg", BUSINESS_MODERN_ASSET_BASE_URL)),
   },
 };
-// "Dome" 命名形状在无显式字体时的兜底中文重字体(仅 master 渲染代码会产生这类命名)。
+// "Dome" 鍛藉悕褰㈢姸鍦ㄦ棤鏄惧紡瀛椾綋鏃剁殑鍏滃簳涓枃閲嶅瓧浣?浠?master 娓叉煋浠ｇ爜浼氫骇鐢熻繖绫诲懡鍚?銆?
 const DOME_TEXT_FONT = "Source Han Sans CN Heavy";
 const DOME_AGENDA_DEFAULT_ITEMS = ["工作汇报", "成果展示", "问题不足", "下步计划"];
 
@@ -124,11 +125,11 @@ function topBandColorPalette(visual) {
 }
 
 /**
- * 将生成后的 deck 导出为可下载文件。
+ * 灏嗙敓鎴愬悗鐨?deck 瀵煎嚭涓哄彲涓嬭浇鏂囦欢銆?
  */
 export class PptExportService {
   /**
-   * 按请求格式导出 deck。
+   * 鎸夎姹傛牸寮忓鍑?deck銆?
    * @param {{deck: object, format: string}} input
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -146,8 +147,8 @@ export class PptExportService {
   }
 
   /**
-   * 创建最小可打开的 Office Open XML PPTX 包。
-   * red-gold 模板会在这里注入 dome.pptx 的媒体资源、主题字体和版式装饰。
+   * 鍒涘缓鏈€灏忓彲鎵撳紑鐨?Office Open XML PPTX 鍖呫€?
+   * red-gold 妯℃澘浼氬湪杩欓噷娉ㄥ叆 dome.pptx 鐨勫獟浣撹祫婧愩€佷富棰樺瓧浣撳拰鐗堝紡瑁呴グ銆?
    * @param {object} deck
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -174,8 +175,8 @@ export class PptExportService {
   }
 
   /**
-   * 创建带 xref 和 trailer 的最小 PDF。
-   * PDF 导出是文本摘要，不承担 dome.pptx 视觉复刻职责。
+   * 鍒涘缓甯?xref 鍜?trailer 鐨勬渶灏?PDF銆?
+   * PDF 瀵煎嚭鏄枃鏈憳瑕侊紝涓嶆壙鎷?dome.pptx 瑙嗚澶嶅埢鑱岃矗銆?
    * @param {object} deck
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
@@ -201,7 +202,7 @@ export class PptExportService {
 }
 
 /**
- * 构建 PDF 文本流，每行内容对应一个绝对定位的文本操作。
+ * 鏋勫缓 PDF 鏂囨湰娴侊紝姣忚鍐呭瀵瑰簲涓€涓粷瀵瑰畾浣嶇殑鏂囨湰鎿嶄綔銆?
  * @param {object} deck
  * @returns {string}
  */
@@ -232,7 +233,7 @@ function buildPdfTextStream(deck, visual = resolveDeckVisual(deck)) {
 }
 
 /**
- * 解析 deck 使用的视觉配置，兼容用户模板保存下来的 visual 快照。
+ * 瑙ｆ瀽 deck 浣跨敤鐨勮瑙夐厤缃紝鍏煎鐢ㄦ埛妯℃澘淇濆瓨涓嬫潵鐨?visual 蹇収銆?
  * @param {object} deck
  * @returns {object}
  */
@@ -245,7 +246,7 @@ function resolveDeckVisual(deck) {
 }
 
 /**
- * 将六位十六进制颜色转换成 PDF 填充色操作。
+ * 灏嗗叚浣嶅崄鍏繘鍒堕鑹茶浆鎹㈡垚 PDF 濉厖鑹叉搷浣溿€?
  * @param {string} hex
  * @returns {string}
  */
@@ -258,7 +259,7 @@ function pdfColor(hex) {
 }
 
 /**
- * 格式化 PDF 颜色通道，避免输出冗余小数。
+ * 鏍煎紡鍖?PDF 棰滆壊閫氶亾锛岄伩鍏嶈緭鍑哄啑浣欏皬鏁般€?
  * @param {number} value
  * @returns {string}
  */
@@ -267,7 +268,7 @@ function formatPdfNumber(value) {
 }
 
 /**
- * 创建一条绝对定位的 PDF 文本操作。
+ * 鍒涘缓涓€鏉＄粷瀵瑰畾浣嶇殑 PDF 鏂囨湰鎿嶄綔銆?
  * @param {{text: unknown, size: number, x: number, y: number}} input
  * @returns {string}
  */
@@ -276,7 +277,7 @@ function pdfTextLine({ text, size, x, y }) {
 }
 
 /**
- * 将长文本切成较短的 PDF 行，避免一行撑出页面。
+ * 灏嗛暱鏂囨湰鍒囨垚杈冪煭鐨?PDF 琛岋紝閬垮厤涓€琛屾拺鍑洪〉闈€?
  * @param {unknown} value
  * @returns {string[]}
  */
@@ -290,7 +291,7 @@ function wrapPdfLine(value) {
 }
 
 /**
- * 创建 PPTX 内容类型清单。
+ * 鍒涘缓 PPTX 鍐呭绫诲瀷娓呭崟銆?
  * @param {object} deck
  * @returns {string}
  */
@@ -300,7 +301,7 @@ function contentTypesXml(deck) {
 }
 
 /**
- * 创建 PPTX 根 relationships 元数据。
+ * 鍒涘缓 PPTX 鏍?relationships 鍏冩暟鎹€?
  * @returns {string}
  */
 function packageRelsXml() {
@@ -308,8 +309,8 @@ function packageRelsXml() {
 }
 
 /**
- * 创建 presentation.xml。
- * red-gold 使用 dome.pptx 的真实画布尺寸，其他模板保持原 16:9 screen 尺寸。
+ * 鍒涘缓 presentation.xml銆?
+ * red-gold 浣跨敤 dome.pptx 鐨勭湡瀹炵敾甯冨昂瀵革紝鍏朵粬妯℃澘淇濇寔鍘?16:9 screen 灏哄銆?
  * @param {object} deck
  * @param {object} visual
  * @returns {string}
@@ -322,7 +323,7 @@ function presentationXml(deck, visual = resolveDeckVisual(deck)) {
 }
 
 /**
- * 创建 presentation.xml.rels，把每页 slide 和 slide master 连接起来。
+ * 鍒涘缓 presentation.xml.rels锛屾妸姣忛〉 slide 鍜?slide master 杩炴帴璧锋潵銆?
  * @param {object} deck
  * @returns {string}
  */
@@ -332,8 +333,8 @@ function presentationRelsXml(deck) {
 }
 
 /**
- * 创建每页 slide XML 和对应 relationships。
- * 这里负责把结构化 slides 映射到 dome 角色、插入装饰层、文本层和媒体关系。
+ * 鍒涘缓姣忛〉 slide XML 鍜屽搴?relationships銆?
+ * 杩欓噷璐熻矗鎶婄粨鏋勫寲 slides 鏄犲皠鍒?dome 瑙掕壊銆佹彃鍏ヨ楗板眰銆佹枃鏈眰鍜屽獟浣撳叧绯汇€?
  * @param {object} deck
  * @param {object} visual
  * @returns {Record<string, string>}
@@ -345,15 +346,15 @@ function slideFiles(deck, visual) {
     const layout = templateLayout(visual, index, role);
     const titleColor = layout.titleColor || visual.title;
     const bodyColor = layout.bodyColor || visual.body;
-    const bodySize = layout.bodySize || 2200;
+    const bodySize = resolveBodySize({ visual, index, slide, fallbackSize: layout.bodySize || 2200 });
     const masterDescriptor = resolveMasterDescriptor(visual);
     const fontFace = masterDescriptor ? masterFont(masterDescriptor) : "";
     const titleFillStyle = visual.layout === "top-band" ? topBandTitleFillStyle(visual) : domeTitleFillStyle(visual, role);
-    const renderBodyList = shouldRenderDomeBodyList(visual, role);
+    const renderBodyList = shouldRenderTemplateBodyList(visual, role);
     const bullets = renderBodyList
-      ? (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}">${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(bullet)}</a:t></a:r></a:p>`).join("")
+      ? (slide.bullets || []).map((bullet) => `<a:p><a:pPr marL="342900" indent="-171450"><a:buChar char="•"/></a:pPr><a:r><a:rPr lang="zh-CN" sz="${bodySize}">${fontFaceXml(fontFace)}<a:solidFill><a:srgbClr val="${bodyColor}"/></a:solidFill></a:rPr><a:t>${escapeXml(exportTextValue(bullet))}</a:t></a:r></a:p>`).join("")
       : "";
-    // dome 模板页的 bullets 已经进入专用卡片/副标题/指标等占位符，不再输出空的普通正文框。
+    // dome 妯℃澘椤电殑 bullets 宸茬粡杩涘叆涓撶敤鍗＄墖/鍓爣棰?鎸囨爣绛夊崰浣嶇锛屼笉鍐嶈緭鍑虹┖鐨勬櫘閫氭鏂囨銆?
     const bodyShape = renderBodyList
       ? textShapeXml({ id: 21, name: "Content 2", ...layout.content, body: bullets || paragraphXml("", bodySize, false, bodyColor, fontFace), size: bodySize, bold: false, color: bodyColor, fontFace })
       : "";
@@ -367,8 +368,8 @@ function slideFiles(deck, visual) {
 }
 
 /**
- * 判断 dome 标题是否需要使用封面同款金色渐变。
- * 内容页标题应使用深红实色；只有红底封面、目录、章节分隔和结束页使用金色渐变标题。
+ * 鍒ゆ柇 dome 鏍囬鏄惁闇€瑕佷娇鐢ㄥ皝闈㈠悓娆鹃噾鑹叉笎鍙樸€?
+ * 鍐呭椤垫爣棰樺簲浣跨敤娣辩孩瀹炶壊锛涘彧鏈夌孩搴曞皝闈€佺洰褰曘€佺珷鑺傚垎闅斿拰缁撴潫椤典娇鐢ㄩ噾鑹叉笎鍙樻爣棰樸€?
  * @param {object} visual
  * @param {string} role
  * @returns {string}
@@ -386,14 +387,27 @@ function topBandTitleFillStyle(visual) {
 }
 
 /**
- * 为 red-gold 标题对象设置可读名称，方便在 PPT 编辑器里识别 dome 页面层级。
+ * 涓?red-gold 鏍囬瀵硅薄璁剧疆鍙鍚嶇О锛屾柟渚垮湪 PPT 缂栬緫鍣ㄩ噷璇嗗埆 dome 椤甸潰灞傜骇銆?
  * @param {object} visual
  * @param {string} role
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "annual-summary") {
+    const textUnits = estimateTextUnits(title);
+    if (index === 0) {
+      if (textUnits > 88) return 2000;
+      if (textUnits > 68) return 2400;
+      if (textUnits > 48) return 2800;
+      return Math.min(fallbackSize, 3900);
+    }
+    if (textUnits > 82) return 1300;
+    if (textUnits > 62) return 1600;
+    if (textUnits > 42) return 1900;
+    return Math.min(fallbackSize, 3000);
+  }
   if (visual.layout === "status-report") {
     if (index === 0) {
       if (textLength >= 26) return 3000;
@@ -416,6 +430,55 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
   return Math.min(fallbackSize, 3400);
 }
 
+/**
+ * 根据正文内容动态调整 PPTX 正文字号。
+ * 年度总结模板的在线预览也会按内容长度降字号，这里保持同一方向，避免预览完整而下载溢出。
+ * @param {{visual: object, index: number, slide: object, fallbackSize: number}} input
+ * @returns {number}
+ */
+function resolveBodySize({ visual, index, slide, fallbackSize }) {
+  if (visual.layout !== "annual-summary") return fallbackSize;
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const units = bullets.reduce((sum, item) => sum + estimateTextUnits(item), 0);
+  if (index === 0) {
+    if (units > 180) return 850;
+    if (units > 140) return 950;
+    if (units > 100) return 1050;
+    if (units > 70) return 1150;
+    return Math.min(fallbackSize, 1240);
+  }
+  if (units > 180) return 780;
+  if (units > 140) return 860;
+  if (units > 100) return 980;
+  if (units > 70) return 1060;
+  return Math.min(fallbackSize, 1160);
+}
+
+/**
+ * 将导出文本统一归一化，避免结构化 bullet 写成 [object Object]。
+ * @param {unknown} value
+ * @returns {string}
+ */
+function exportTextValue(value) {
+  if (value == null) return "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value).trim();
+  if (typeof value === "object") {
+    for (const key of ["text", "title", "label", "name", "value", "summary", "description"]) {
+      if (value[key] != null) return String(value[key]).trim();
+    }
+  }
+  return "";
+}
+
+/**
+ * 估算中英文混排文本长度，中文按更宽字符处理。
+ * @param {string} text
+ * @returns {number}
+ */
+function estimateTextUnits(text) {
+  return Array.from(String(text || "")).reduce((sum, char) => sum + (char.charCodeAt(0) > 255 ? 2 : 1), 0);
+}
+
 function domeTitleShapeName(visual, role) {
   if (visual.layout !== "red-gold") return "Title 1";
   const mapping = {
@@ -428,8 +491,8 @@ function domeTitleShapeName(visual, role) {
 }
 
 /**
- * 判断当前 dome 页面是否还需要普通正文列表。
- * 封面、目录、步骤、指标、复盘和计划页已经把 bullets 填进专用占位符，不再重复显示一份普通列表。
+ * 鍒ゆ柇褰撳墠 dome 椤甸潰鏄惁杩橀渶瑕佹櫘閫氭鏂囧垪琛ㄣ€?
+ * 灏侀潰銆佺洰褰曘€佹楠ゃ€佹寚鏍囥€佸鐩樺拰璁″垝椤靛凡缁忔妸 bullets 濉繘涓撶敤鍗犱綅绗︼紝涓嶅啀閲嶅鏄剧ず涓€浠芥櫘閫氬垪琛ㄣ€?
  * @param {object} visual
  * @param {string} role
  * @returns {boolean}
@@ -440,8 +503,19 @@ function shouldRenderDomeBodyList(visual, role) {
 }
 
 /**
- * 根据模板选择 PPT 画布尺寸。
- * dome.pptx 原始文件是 12192000 x 6858000；其他模板继续使用现有 16:9 screen 尺寸，避免影响旧导出。
+ * 鍒ゆ柇 PPTX 瀵煎嚭鏃舵槸鍚﹁繕闇€瑕佹櫘閫氭鏂囧垪琛ㄣ€? * 琛屽姩闂幆妯℃澘鐨勬鏂囦俊鎭敱涓撶敤鐗堝紡鍥惧舰琛ㄨ揪锛岀户缁緭鍑烘櫘閫?bullets 浼氳鐩栧浘琛ㄥ拰鍗＄墖銆? * @param {object} visual
+ * @param {string} role
+ * @returns {boolean}
+ */
+function shouldRenderTemplateBodyList(visual, role) {
+  if (visual.layout === "quarterly-action-loop") return false;
+  if (visual.layout === "quarterly-dashboard") return false;
+  return shouldRenderDomeBodyList(visual, role);
+}
+
+/**
+ * 鏍规嵁妯℃澘閫夋嫨 PPT 鐢诲竷灏哄銆?
+ * dome.pptx 鍘熷鏂囦欢鏄?12192000 x 6858000锛涘叾浠栨ā鏉跨户缁娇鐢ㄧ幇鏈?16:9 screen 灏哄锛岄伩鍏嶅奖鍝嶆棫瀵煎嚭銆?
  * @param {object} visual
  * @returns {{width: number, height: number, scaleX: number, scaleY: number, type?: string}}
  */
@@ -451,8 +525,8 @@ function slideMetrics(visual) {
 }
 
 /**
- * 将 red-gold 页面坐标从旧的标准 16:9 基准等比放大到 dome.pptx 的真实画布。
- * 字号不在这里缩放，因为字号本身是 pt 值；这里只处理 OOXML 里的位置和尺寸。
+ * 灏?red-gold 椤甸潰鍧愭爣浠庢棫鐨勬爣鍑?16:9 鍩哄噯绛夋瘮鏀惧ぇ鍒?dome.pptx 鐨勭湡瀹炵敾甯冦€?
+ * 瀛楀彿涓嶅湪杩欓噷缂╂斁锛屽洜涓哄瓧鍙锋湰韬槸 pt 鍊硷紱杩欓噷鍙鐞?OOXML 閲岀殑浣嶇疆鍜屽昂瀵搞€?
  * @param {string} xml
  * @param {object} visual
  * @returns {string}
@@ -505,7 +579,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
           stroke: redGoldPalette.surfaceStroke,
           width: 15240,
         });
-    // dome.pptx 底部是多层金色弧线和色块叠出的波浪，不只是单块红色背景；这里保留色带并补充圆弧线条层。
+    // dome.pptx 搴曢儴鏄灞傞噾鑹插姬绾垮拰鑹插潡鍙犲嚭鐨勬尝娴紝涓嶅彧鏄崟鍧楃孩鑹茶儗鏅紱杩欓噷淇濈暀鑹插甫骞惰ˉ鍏呭渾寮х嚎鏉″眰銆?
     const topGuard = solidShapeXml({ id: 4, name: "Dome Top Guard", x: 0, y: 0, cx: 9144000, cy: 365760, fill: redGoldPalette.surfaceStroke })
       + solidShapeXml({ id: 12, name: "Dome Edge Accent", x: 685800, y: 114300, cx: 7772400, cy: 45720, fill: redGoldPalette.surfaceText });
     const waves = solidShapeXml({ id: 5, name: "Lower Gold Wave", geom: "parallelogram", x: -304800, y: 3921120, cx: 4876800, cy: 889540, fill: redGoldPalette.surfaceDecor })
@@ -513,7 +587,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + solidShapeXml({ id: 7, name: "Lower Red Wave", geom: "parallelogram", x: 0, y: 4495800, cx: 9144000, cy: 762000, fill: redGoldPalette.bottomGradientLow })
       + arcLineShapeXml({ id: 13, name: "Dome Gold Wave Arc", x: -533400, y: 3505200, cx: 4876800, cy: 1447800, stroke: redGoldPalette.titleGradientStart, width: 57150 })
       + arcLineShapeXml({ id: 14, name: "Dome Light Wave Arc", x: 2514600, y: 3333750, cx: 5486400, cy: 1629416, stroke: redGoldPalette.titleGradientEnd, width: 45720 });
-    // 页脚只保留装饰线，不写入模板名称，避免下载后的 PPTX 页面出现模板来源文字。
+    // 椤佃剼鍙繚鐣欒楗扮嚎锛屼笉鍐欏叆妯℃澘鍚嶇О锛岄伩鍏嶄笅杞藉悗鐨?PPTX 椤甸潰鍑虹幇妯℃澘鏉ユ簮鏂囧瓧銆?
     const footer = rectShapeXml({ id: 15, name: "Gold Hairline", x: 0, y: isCover ? 4572000 : 685800, cx: 9144000, cy: 30480, fill: visual.accent });
     const roleDecoration = domeRoleDecorationXml({ role, index, layout, visual, slide });
     return base
@@ -548,6 +622,18 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + sticker
       + metrics;
   }
+  if (visual.layout === "annual-summary") {
+    return base + annualSummaryDecorationsXml({ visual, index, layout });
+  }
+  if (visual.layout === "quarterly-dashboard") {
+    return base + quarterlyDashboardDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "quarterly-diagnosis") {
+    return base + quarterlyDiagnosisDecorationsXml({ visual, index, layout });
+  }
+  if (visual.layout === "quarterly-action-loop") {
+    return base + quarterlyActionLoopDecorationsXml({ visual, index, layout, slide });
+  }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
     const palette = marketingCampaignColorPalette(visual);
@@ -566,7 +652,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + lineFrameShapeXml({ id: 304, name: "Marketing Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
       + textShapeXml({ id: 305, name: "Marketing Section Label", ...layout.label, text: sectionLabel, size: 980, bold: true, color: visual.accent })
       + solidShapeXml({ id: 306, name: "Marketing Chip", geom: "roundRect", x: isCover ? 6934200 : 7002780, y: isCover ? 914400 : 914400, cx: isCover ? 1066800 : 914400, cy: 304800, fill: palette.chip })
-      + textShapeXml({ id: 307, name: "Marketing Chip Text", x: isCover ? 7086600 : 7132320, y: 975360, cx: isCover ? 762000 : 640080, cy: 152400, text: scene.chip, size: 780, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 307, name: "Marketing Chip Text", x: isCover ? 7086600 : 7132320, y: 975360, cx: isCover ? 762000 : 640080, cy: 152400, text: "", size: 780, bold: true, color: "FFFFFF" })
       + solidShapeXml({ id: 308, name: "Marketing Focus Line", x: 914400, y: isCover ? 3345180 : 1577340, cx: 3657600, cy: 22860, fill: visual.accent })
       + marketingCampaignVisualXml({ visual, palette, scene, isCover })
       + metrics
@@ -589,7 +675,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + lineFrameShapeXml({ id: 404, name: "Brand Story Editorial Frame", ...layout.surface, stroke: palette.frame, width: 15240 })
       + textShapeXml({ id: 405, name: "Brand Story Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 900, bold: true, color: visual.accent })
       + solidShapeXml({ id: 406, name: `Brand Story ${scene.variant} Chip`, x: isCover ? 6888480 : 6979920, y: isCover ? 876300 : 800100, cx: 1066800, cy: 304800, fill: palette.chip })
-      + textShapeXml({ id: 407, name: "Brand Story Chip Text", x: isCover ? 7040880 : 7132320, y: isCover ? 937260 : 861060, cx: 762000, cy: 152400, text: scene.chip, size: 760, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 407, name: "Brand Story Chip Text", x: isCover ? 7040880 : 7132320, y: isCover ? 937260 : 861060, cx: 762000, cy: 152400, text: "", size: 760, bold: true, color: "FFFFFF" })
       + textShapeXml({ id: 408, name: "Brand Story Monogram", x: 7040880, y: isCover ? 1173480 : 1066800, cx: 1066800, cy: 365760, text: scene.mark, size: isCover ? 2200 : 1700, bold: true, color: palette.monogram })
       + solidShapeXml({ id: 409, name: "Brand Story Focus Rule", x: 914400, y: isCover ? 3345180 : 1630680, cx: 3810000, cy: 22860, fill: visual.accent })
       + brandStoryVisualXml({ visual, palette, scene, isCover })
@@ -613,7 +699,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + lineFrameShapeXml({ id: 504, name: "Data Insight Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
       + textShapeXml({ id: 505, name: "Data Insight Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 880, bold: true, color: visual.accent })
       + solidShapeXml({ id: 506, name: `Data Insight ${scene.variant} Chip`, geom: "roundRect", x: isCover ? 6979920 : 7040880, y: isCover ? 899160 : 800100, cx: 944880, cy: 304800, fill: palette.chip })
-      + textShapeXml({ id: 507, name: "Data Insight Chip Text", x: isCover ? 7132320 : 7193280, y: isCover ? 960120 : 861060, cx: 640080, cy: 152400, text: scene.chip, size: 760, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 507, name: "Data Insight Chip Text", x: isCover ? 7132320 : 7193280, y: isCover ? 960120 : 861060, cx: 640080, cy: 152400, text: "", size: 760, bold: true, color: "FFFFFF" })
       + rectShapeXml({ id: 508, name: "Data Insight Scan Line", x: 914400, y: isCover ? 3337560 : 1577340, cx: 3657600, cy: 22860, fill: visual.accent })
       + dataInsightVisualXml({ visual, palette, scene, isCover })
       + lowerData
@@ -637,7 +723,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + rectShapeXml({ id: 603, name: "Education Course Lesson Rule", x: isCover ? 1097280 : 1097280, y: isCover ? 4038600 : 914400, cx: isCover ? 6705600 : 6096000, cy: 22860, fill: visual.accent })
       + textShapeXml({ id: 605, name: "Education Course Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 880, bold: true, color: isCover ? visual.accent : visual.primary })
       + solidShapeXml({ id: 606, name: `Education Course ${scene.variant} Chip`, x: isCover ? 6812280 : 6812280, y: isCover ? 1051560 : 822960, cx: 1066800, cy: 274320, fill: isCover ? visual.accent : palette.chip })
-      + textShapeXml({ id: 607, name: "Education Course Chip Text", x: isCover ? 6957060 : 6964680, y: isCover ? 1104900 : 876300, cx: 731520, cy: 137160, text: scene.chip, size: 720, bold: true, color: isCover ? visual.primary : "FFFFFF" })
+      + textShapeXml({ id: 607, name: "Education Course Chip Text", x: isCover ? 6957060 : 6964680, y: isCover ? 1104900 : 876300, cx: 731520, cy: 137160, text: "", size: 720, bold: true, color: isCover ? visual.primary : "FFFFFF" })
       + educationCourseVisualXml({ visual, palette, scene, isCover })
       + lowerItems
       + textShapeXml({ id: 650, name: "Education Course Caption", x: isCover ? 6126480 : 6126480, y: isCover ? 3474720 : 3657600, cx: 1828800, cy: 182880, text: scene.caption, size: isCover ? 740 : 720, bold: true, color: isCover ? palette.chalk : visual.body });
@@ -672,8 +758,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + financeDecorations
       + salesDecorations
       + productDecorations
-      // 封面不再写模板名称；非封面仍保留页序标签。
-      + textShapeXml({ id: 7, name: "Section Label", ...layout.label, text: isStrategyConsultingVisual(visual) || isFinancialReviewVisual(visual) || isSalesProposalVisual(visual) || isProductRoadmapVisual(visual) || index === 0 ? "" : `0${index + 1}`, size: 1200, bold: true, color: index === 0 ? visual.surface : visual.accent });
+      // 灏侀潰涓嶅啀鍐欐ā鏉垮悕绉帮紱闈炲皝闈粛淇濈暀椤靛簭鏍囩銆?      + textShapeXml({ id: 7, name: "Section Label", ...layout.label, text: isStrategyConsultingVisual(visual) || isFinancialReviewVisual(visual) || isSalesProposalVisual(visual) || isProductRoadmapVisual(visual) || index === 0 ? "" : `0${index + 1}`, size: 1200, bold: true, color: index === 0 ? visual.surface : visual.accent });
   }
   if (visual.layout === "top-band") {
     const isCover = index === 0;
@@ -725,9 +810,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
           + solidShapeXml({ id: 31, name: "Top Band Executive Visual Panel", geom: "roundRect", x: 6553200, y: 1295400, cx: 1549400, cy: 2019300, fill: palette.rail })
           + lineFrameShapeXml({ id: 32, name: "Top Band Executive Visual Inner Frame", geom: "roundRect", x: 6667500, y: 1409700, cx: 1320800, cy: 1790700, stroke: palette.glass, width: 7620 })
           + rectShapeXml({ id: 33, name: "Top Band Executive Visual Accent", x: 6858000, y: 3009900, cx: 952500, cy: 38100, fill: visual.accent })
-          + topBandMetricCardXml({ id: 37, x: 1282700, y: 3657600, number: "01", label: "战略", visual, palette })
-          + topBandMetricCardXml({ id: 40, x: 3200400, y: 3657600, number: "02", label: "复盘", visual, palette })
-          + topBandMetricCardXml({ id: 43, x: 5118100, y: 3657600, number: "03", label: "行动", visual, palette })
+          + topBandMetricCardXml({ id: 37, x: 1282700, y: 3657600, number: "01", label: "鎴樼暐", visual, palette })
+          + topBandMetricCardXml({ id: 40, x: 3200400, y: 3657600, number: "02", label: "澶嶇洏", visual, palette })
+          + topBandMetricCardXml({ id: 43, x: 5118100, y: 3657600, number: "03", label: "琛屽姩", visual, palette })
         )
       : (
           rectShapeXml({ id: 24, name: "Top Band Side Rail", x: 0, y: panelY + 685800, cx: 171450, cy: 3657600, fill: palette.glass })
@@ -745,8 +830,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
           })
           + solidShapeXml({ id: 31, name: "Top Band Content Visual Panel", geom: "roundRect", x: 6720840, y: 1543050, cx: 1270000, cy: 2133600, fill: palette.rail })
           + solidShapeXml({ id: 32, name: "Top Band Insight Card", geom: "roundRect", x: 6416040, y: 1847850, cx: 1676400, cy: 1117600, fill: palette.glass })
-          + textShapeXml({ id: 33, name: "Top Band Insight Title", x: 6553200, y: 2076450, cx: 1219200, cy: 228600, text: "重点关注", size: 1050, bold: true, color: visual.title })
-          + textShapeXml({ id: 34, name: "Top Band Insight Caption", x: 6553200, y: 2350000, cx: 1219200, cy: 365760, text: "高管决策视图", size: 800, bold: false, color: visual.body })
+          + textShapeXml({ id: 33, name: "Top Band Insight Title", x: 6553200, y: 2076450, cx: 1219200, cy: 228600, text: "閲嶇偣鍏虫敞", size: 1050, bold: true, color: visual.title })
+          + textShapeXml({ id: 34, name: "Top Band Insight Caption", x: 6553200, y: 2350000, cx: 1219200, cy: 365760, text: "楂樼鍐崇瓥瑙嗗浘", size: 800, bold: false, color: visual.body })
           + arcLineShapeXml({ id: 37, name: "Top Band Content Wave", x: 6248400, y: 3657600, cx: 2133600, cy: 762000, stroke: visual.accent, width: 19050 })
         );
     const contentPanelY = isCover ? panelY + 114300 : panelY + 152400;
@@ -782,8 +867,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
 }
 
 /**
- * 添加模板所需的媒体文件。
- * red-gold 会把从 dome.pptx 提取出的封面、内容背景和商务图片写入 ppt/media。
+ * 娣诲姞妯℃澘鎵€闇€鐨勫獟浣撴枃浠躲€?
+ * red-gold 浼氭妸浠?dome.pptx 鎻愬彇鍑虹殑灏侀潰銆佸唴瀹硅儗鏅拰鍟嗗姟鍥剧墖鍐欏叆 ppt/media銆?
  * @param {object} visual
  * @returns {Record<string, Buffer>}
  */
@@ -802,8 +887,8 @@ function templateMediaFiles(visual) {
 }
 
 /**
- * 将结构化页面映射到 dome 模板角色。
- * 这里优先尊重 AI 或前端传入的 slide.layout；没有显式布局时，再按页序和标题关键词兜底。
+ * 灏嗙粨鏋勫寲椤甸潰鏄犲皠鍒?dome 妯℃澘瑙掕壊銆?
+ * 杩欓噷浼樺厛灏婇噸 AI 鎴栧墠绔紶鍏ョ殑 slide.layout锛涙病鏈夋樉寮忓竷灞€鏃讹紝鍐嶆寜椤靛簭鍜屾爣棰樺叧閿瘝鍏滃簳銆?
  * @param {object} slide
  * @param {number} index
  * @param {number} total
@@ -829,8 +914,8 @@ function resolveSlideRole(slide, index, total) {
 }
 
 /**
- * 根据 dome 页面角色生成装饰层和占位符。
- * 这些形状的命名用于测试和后续维护，也让 PPT 编辑器里能看出每个层级的用途。
+ * 鏍规嵁 dome 椤甸潰瑙掕壊鐢熸垚瑁呴グ灞傚拰鍗犱綅绗︺€?
+ * 杩欎簺褰㈢姸鐨勫懡鍚嶇敤浜庢祴璇曞拰鍚庣画缁存姢锛屼篃璁?PPT 缂栬緫鍣ㄩ噷鑳界湅鍑烘瘡涓眰绾х殑鐢ㄩ€斻€?
  * @param {{role: string, index: number, layout: object, visual: object, slide: object}} input
  * @returns {string}
  */
@@ -838,14 +923,14 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   const palette = redGoldColorPalette(visual);
   if (role === "cover") {
     const [subtitle] = normalizeDomeBulletItems(slide, 1);
-    // 封面页用专用副标题承载用户输入，避免普通列表破坏 dome.pptx 的帆船封面留白。
+    // 灏侀潰椤电敤涓撶敤鍓爣棰樻壙杞界敤鎴疯緭鍏ワ紝閬垮厤鏅€氬垪琛ㄧ牬鍧?dome.pptx 鐨勫竼鑸瑰皝闈㈢暀鐧姐€?
     return rectShapeXml({ id: 8, name: "Dome Cover Halo", x: 0, y: 0, cx: 12192000, cy: 182880, fill: palette.surfaceStroke })
       + rectShapeXml({ id: 9, name: "Dome Cover Accent", x: 0, y: 6680200, cx: 12192000, cy: 120650, fill: palette.surfaceStroke })
       + textShapeXml({ id: 10, name: "Dome Cover Series Label", x: 609600, y: 4114800, cx: 3048000, cy: 365760, text: "BUSINESS REPORT", size: 1500, bold: true, color: palette.surfaceText })
       + textShapeXml({ id: 11, name: "Dome Cover Subtitle", x: 2971800, y: 3048000, cx: 3962400, cy: 365760, text: subtitle, size: 1500, bold: true, color: palette.surfaceText });
   }
   if (role === "agenda") {
-    // 目录页固定输出 4 个卡片槽位，保持 dome.pptx 的卡片式目录骨架不因用户少填内容而变化。
+    // 鐩綍椤靛浐瀹氳緭鍑?4 涓崱鐗囨Ы浣嶏紝淇濇寔 dome.pptx 鐨勫崱鐗囧紡鐩綍楠ㄦ灦涓嶅洜鐢ㄦ埛灏戝～鍐呭鑰屽彉鍖栥€?
     const agendaItems = normalizeDomeAgendaItems(slide);
     return agendaItems.map((item, itemIndex) => {
       const column = itemIndex % 2;
@@ -868,7 +953,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     const count = role === "three-steps" ? 3 : 4;
     const bulletItems = normalizeDomeBulletItems(slide, count);
     const planItems = role === "next-plan" ? normalizeDomePlanItems(slide, count) : [];
-    // 流程和计划页也需要 dome.pptx 的浅色内容承载面，否则卡片会直接漂在红金背景上。
+    // 娴佺▼鍜岃鍒掗〉涔熼渶瑕?dome.pptx 鐨勬祬鑹插唴瀹规壙杞介潰锛屽惁鍒欏崱鐗囦細鐩存帴婕傚湪绾㈤噾鑳屾櫙涓娿€?
     const contentSurface = solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel });
     const sectionLabel = textShapeXml({ id: 80, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent });
     const steps = Array.from({ length: count }, (_, stepIndex) => {
@@ -887,19 +972,19 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
         + textShapeXml({ id: 40 + stepIndex, name: `Dome Step Number ${stepIndex + 1}`, x: x + 228600, y: y + 152400, cx: 914400, cy: 304800, text: `0${stepIndex + 1}`, size: 2200, bold: true, color: visual.title })
         + textShapeXml({ id: 50 + stepIndex, name: `Dome Step Text ${stepIndex + 1}`, x: x + 182880, y: y + 487680, cx: count === 3 ? 1310640 : 1005840, cy: 304800, text: bulletItems[stepIndex], size: 1200, bold: true, color: visual.title });
     }).join("");
-    // 三/四步骤流程页增加横向连接线，让独立卡片形成清晰的流程关系。
+    // 涓?鍥涙楠ゆ祦绋嬮〉澧炲姞妯悜杩炴帴绾匡紝璁╃嫭绔嬪崱鐗囧舰鎴愭竻鏅扮殑娴佺▼鍏崇郴銆?
     const stepConnector = role === "next-plan"
       ? ""
       : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: palette.surfaceStroke });
-    // 三步骤流程页补齐商务图片层，保持流程类内容页也有 dome.pptx 的图文商务气质。
+    // 涓夋楠ゆ祦绋嬮〉琛ラ綈鍟嗗姟鍥剧墖灞傦紝淇濇寔娴佺▼绫诲唴瀹归〉涔熸湁 dome.pptx 鐨勫浘鏂囧晢鍔℃皵璐ㄣ€?
     const threeStepsImage = role === "three-steps"
       ? pictureXml({ id: 69, name: "Dome Three Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
-    // 四步骤流程页复用 dome.pptx 的第 4 张商务图，避免提取出的业务视觉资产闲置。
+    // 鍥涙楠ゆ祦绋嬮〉澶嶇敤 dome.pptx 鐨勭 4 寮犲晢鍔″浘锛岄伩鍏嶆彁鍙栧嚭鐨勪笟鍔¤瑙夎祫浜ч棽缃€?
     const fourStepsImage = role === "four-steps"
       ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
-    // 下一步计划页复用 dome.pptx 的第 6 张商务图，与预览端的 next-plan 视觉保持一致。
+    // 涓嬩竴姝ヨ鍒掗〉澶嶇敤 dome.pptx 鐨勭 6 寮犲晢鍔″浘锛屼笌棰勮绔殑 next-plan 瑙嗚淇濇寔涓€鑷淬€?
     const nextPlanImage = role === "next-plan"
       ? pictureXml({ id: 71, name: "Dome Next Plan Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
@@ -909,7 +994,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeMetricItems(slide, 3);
-    // 指标页保留浅色承载面和右上章节标签，使数据卡片与 dome.pptx 内容页层级一致。
+    // 鎸囨爣椤典繚鐣欐祬鑹叉壙杞介潰鍜屽彸涓婄珷鑺傛爣绛撅紝浣挎暟鎹崱鐗囦笌 dome.pptx 鍐呭椤靛眰绾т竴鑷淬€?
     return solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
@@ -926,7 +1011,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "showcase") {
     const showcaseItems = normalizeDomeBulletItems(slide, 3);
-    // 成果展示页拆成编号和正文两个占位符，贴近 dome.pptx 的成果卡层级，而不是整段文本列表。
+    // 鎴愭灉灞曠ず椤垫媶鎴愮紪鍙峰拰姝ｆ枃涓や釜鍗犱綅绗︼紝璐磋繎 dome.pptx 鐨勬垚鏋滃崱灞傜骇锛岃€屼笉鏄暣娈垫枃鏈垪琛ㄣ€?
     const showcaseCards = Array.from({ length: 3 }, (_, cardIndex) => {
       const y = 2438400 + cardIndex * 640080;
       return solidShapeXml({ id: 34 + cardIndex, name: `Dome Showcase Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
@@ -943,7 +1028,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   if (role === "retrospective") {
     const riskItems = normalizeDomeBulletItems(slide, 3);
     const retrospectiveLabels = ["风险", "原因", "措施"];
-    // 问题复盘页将复盘语义标签和正文拆成固定占位符，便于结构化内容稳定落位。
+    // 闂澶嶇洏椤靛皢澶嶇洏璇箟鏍囩鍜屾鏂囨媶鎴愬浐瀹氬崰浣嶇锛屼究浜庣粨鏋勫寲鍐呭绋冲畾钀戒綅銆?
     const retrospectiveCards = Array.from({ length: 3 }, (_, cardIndex) => {
       const y = 2438400 + cardIndex * 640080;
       return solidShapeXml({ id: 35 + cardIndex, name: `Dome Retrospective Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
@@ -961,12 +1046,12 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "closing") {
     const [subtitle] = normalizeDomeBulletItems(slide, 1);
-    // 结束页使用专用副标题承载用户输入，不再退回普通项目符号列表。
+    // 缁撴潫椤典娇鐢ㄤ笓鐢ㄥ壇鏍囬鎵胯浇鐢ㄦ埛杈撳叆锛屼笉鍐嶉€€鍥炴櫘閫氶」鐩鍙峰垪琛ㄣ€?
     return textShapeXml({ id: 30, name: "Dome Closing Mark", x: 3200400, y: 2438400, cx: 2743200, cy: 457200, text: "THANKS", size: 2200, bold: true, color: palette.surfaceText })
       + textShapeXml({ id: 31, name: "Dome Closing Subtitle", x: 3200400, y: 3048000, cx: 2743200, cy: 365760, text: subtitle, size: 1300, bold: true, color: palette.surfaceText });
   }
   const imageReportItems = normalizeDomeBulletItems(slide, 3);
-  // 工作汇报图文页使用三张汇报卡片承载结构化要点，右侧继续复用 dome.pptx 的商务配图。
+  // 宸ヤ綔姹囨姤鍥炬枃椤典娇鐢ㄤ笁寮犳眹鎶ュ崱鐗囨壙杞界粨鏋勫寲瑕佺偣锛屽彸渚х户缁鐢?dome.pptx 鐨勫晢鍔￠厤鍥俱€?
   const imageReportCards = Array.from({ length: 3 }, (_, cardIndex) => {
     const y = 2438400 + cardIndex * 640080;
     return solidShapeXml({ id: 35 + cardIndex, name: `Dome Image Report Card ${cardIndex + 1}`, geom: "roundRect", x: 1219200, y, cx: 3352800, cy: 457200, fill: cardIndex % 2 === 0 ? palette.cardFill : palette.cardFillStrong })
@@ -982,8 +1067,8 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
 }
 
 /**
- * 生成 dome 目录页的 4 个卡片文案。
- * 用户输入优先；不足 4 项时使用 dome.pptx 的四段目录默认文案补齐，避免卡片式目录出现空槽。
+ * 鐢熸垚 dome 鐩綍椤电殑 4 涓崱鐗囨枃妗堛€?
+ * 鐢ㄦ埛杈撳叆浼樺厛锛涗笉瓒?4 椤规椂浣跨敤 dome.pptx 鐨勫洓娈电洰褰曢粯璁ゆ枃妗堣ˉ榻愶紝閬垮厤鍗＄墖寮忕洰褰曞嚭鐜扮┖妲姐€?
  * @param {object} slide
  * @returns {string[]}
  */
@@ -993,8 +1078,8 @@ function normalizeDomeAgendaItems(slide) {
 }
 
 /**
- * 读取章节分隔页的结构化编号。
- * 用户传入 bullets[0] 时优先作为 PART 编号占位符；缺省时才按页序生成兜底文案。
+ * 璇诲彇绔犺妭鍒嗛殧椤电殑缁撴瀯鍖栫紪鍙枫€?
+ * 鐢ㄦ埛浼犲叆 bullets[0] 鏃朵紭鍏堜綔涓?PART 缂栧彿鍗犱綅绗︼紱缂虹渷鏃舵墠鎸夐〉搴忕敓鎴愬厹搴曟枃妗堛€?
  * @param {object} slide
  * @param {number} index
  * @returns {string}
@@ -1005,8 +1090,8 @@ function domeSectionNumberText(slide, index) {
 }
 
 /**
- * 读取内容页右上角章节标签。
- * 优先使用 outline 里的结构化章节字段，缺省时按页序兜底，保证旧数据仍能稳定导出。
+ * 璇诲彇鍐呭椤靛彸涓婅绔犺妭鏍囩銆?
+ * 浼樺厛浣跨敤 outline 閲岀殑缁撴瀯鍖栫珷鑺傚瓧娈碉紝缂虹渷鏃舵寜椤靛簭鍏滃簳锛屼繚璇佹棫鏁版嵁浠嶈兘绋冲畾瀵煎嚭銆?
  * @param {object} slide
  * @param {number} index
  * @returns {string}
@@ -1016,8 +1101,8 @@ function domeContentSectionLabelText(slide, index) {
 }
 
 /**
- * 从用户结构化 bullets 中取出当前版式需要的占位文案。
- * bullets 不足时使用空字符串，保证卡片数量和模板版式稳定。
+ * 浠庣敤鎴风粨鏋勫寲 bullets 涓彇鍑哄綋鍓嶇増寮忛渶瑕佺殑鍗犱綅鏂囨銆?
+ * bullets 涓嶈冻鏃朵娇鐢ㄧ┖瀛楃涓诧紝淇濊瘉鍗＄墖鏁伴噺鍜屾ā鏉跨増寮忕ǔ瀹氥€?
  * @param {object} slide
  * @param {number} count
  * @returns {string[]}
@@ -1028,8 +1113,8 @@ function normalizeDomeBulletItems(slide, count) {
 }
 
 /**
- * 解析下一步计划页的结构化要点。
- * 推荐输入为“阶段: 动作”；旧数据没有分隔符时，用序号作阶段、原文作动作。
+ * 瑙ｆ瀽涓嬩竴姝ヨ鍒掗〉鐨勭粨鏋勫寲瑕佺偣銆?
+ * 鎺ㄨ崘杈撳叆涓衡€滈樁娈? 鍔ㄤ綔鈥濓紱鏃ф暟鎹病鏈夊垎闅旂鏃讹紝鐢ㄥ簭鍙蜂綔闃舵銆佸師鏂囦綔鍔ㄤ綔銆?
  * @param {object} slide
  * @param {number} count
  * @returns {{phase: string, action: string}[]}
@@ -1052,8 +1137,8 @@ function normalizeDomePlanItems(slide, count) {
 }
 
 /**
- * 解析 dome 指标页的结构化要点。
- * 推荐输入为“指标名: 指标值”；旧数据没有分隔符时，用序号作数值、原文作标签，避免历史 deck 失去内容。
+ * 瑙ｆ瀽 dome 鎸囨爣椤电殑缁撴瀯鍖栬鐐广€?
+ * 鎺ㄨ崘杈撳叆涓衡€滄寚鏍囧悕: 鎸囨爣鍊尖€濓紱鏃ф暟鎹病鏈夊垎闅旂鏃讹紝鐢ㄥ簭鍙蜂綔鏁板€笺€佸師鏂囦綔鏍囩锛岄伩鍏嶅巻鍙?deck 澶卞幓鍐呭銆?
  * @param {object} slide
  * @param {number} count
  * @returns {{label: string, value: string}[]}
@@ -1076,8 +1161,8 @@ function normalizeDomeMetricItems(slide, count) {
 }
 
 /**
- * 从对象或普通字符串中读取 dome 占位符文本。
- * 支持模型直接返回结构化 bullet 对象，避免 PPTX 中出现 [object Object]。
+ * 浠庡璞℃垨鏅€氬瓧绗︿覆涓鍙?dome 鍗犱綅绗︽枃鏈€?
+ * 鏀寔妯″瀷鐩存帴杩斿洖缁撴瀯鍖?bullet 瀵硅薄锛岄伩鍏?PPTX 涓嚭鐜?[object Object]銆?
  * @param {unknown} value
  * @param {string[]} preferredKeys
  * @returns {string}
@@ -1092,7 +1177,7 @@ function domeStructuredText(value, preferredKeys) {
 }
 
 /**
- * 判断值是否为普通对象，数组和 null 不按结构化 bullet 处理。
+ * 鍒ゆ柇鍊兼槸鍚︿负鏅€氬璞★紝鏁扮粍鍜?null 涓嶆寜缁撴瀯鍖?bullet 澶勭悊銆?
  * @param {unknown} value
  * @returns {boolean}
  */
@@ -1101,7 +1186,7 @@ function isPlainObject(value) {
 }
 
 /**
- * 为不同内容角色挑选 dome.pptx 中的商务图片。
+ * 涓轰笉鍚屽唴瀹硅鑹叉寫閫?dome.pptx 涓殑鍟嗗姟鍥剧墖銆?
  * @param {string} role
  * @returns {string}
  */
@@ -1111,8 +1196,8 @@ function domeRoleBusinessMedia(visual, role) {
 }
 
 /**
- * 返回当前模板的页面几何布局。
- * red-gold 分支按 dome 角色拆出封面、目录、章节、内容、流程、指标和结束页的位置。
+ * 杩斿洖褰撳墠妯℃澘鐨勯〉闈㈠嚑浣曞竷灞€銆?
+ * red-gold 鍒嗘敮鎸?dome 瑙掕壊鎷嗗嚭灏侀潰銆佺洰褰曘€佺珷鑺傘€佸唴瀹广€佹祦绋嬨€佹寚鏍囧拰缁撴潫椤电殑浣嶇疆銆?
  * @param {object} visual
  * @param {number} index
  * @returns {{accent: object, title: object, content: object, titleSize: number}}
@@ -1126,7 +1211,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         accent: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
         secondaryAccent: { x: 6781800, y: 1600200, cx: 914400, cy: 2057400 },
         label: { x: 5943600, y: 914400, cx: 1524000, cy: 365760 },
-        // 封面标题原框窄(cx 3962400)且右缘伸进帆船区,长标题会从词中间断行;加宽并左移避开帆船,降字号让长标题在净区内均衡换行。
+        // 灏侀潰鏍囬鍘熸绐?cx 3962400)涓斿彸缂樹几杩涘竼鑸瑰尯,闀挎爣棰樹細浠庤瘝涓棿鏂;鍔犲骞跺乏绉婚伩寮€甯嗚埞,闄嶅瓧鍙疯闀挎爣棰樺湪鍑€鍖哄唴鍧囪　鎹㈣銆?
         title: role === "closing"
           ? { x: 3048000, y: 1371600, cx: 3962400, cy: 914400 }
           : { x: 609600, y: 1219200, cx: 5334000, cy: 1371600 },
@@ -1174,8 +1259,92 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 1524000, y: 2133600, cx: 4876800, cy: 1371600 },
       titleSize: 3600,
       bodySize: 2100,
-      // 顶部卡片版式的内容页标题压在红底上,深色标题几乎不可读,改用浅色(与预览一致)。
+      // 椤堕儴鍗＄墖鐗堝紡鐨勫唴瀹归〉鏍囬鍘嬪湪绾㈠簳涓?娣辫壊鏍囬鍑犱箮涓嶅彲璇?鏀圭敤娴呰壊(涓庨瑙堜竴鑷?銆?
       titleColor: ["image-report", "showcase", "retrospective"].includes(role) ? redGoldPalette.surfaceText : visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "annual-summary") {
+    if (index === 0) {
+      return {
+        surface: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
+        accent: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
+        secondaryAccent: { x: 914400, y: 3802380, cx: 2438400, cy: 30480 },
+        label: { x: 731520, y: 914400, cx: 2743200, cy: 304800 },
+        title: { x: 731520, y: 1325880, cx: 3962400, cy: 1219200 },
+        content: { x: 914400, y: 2827020, cx: 3657600, cy: 762000 },
+        titleSize: 3650,
+        bodySize: 1240,
+        titleColor: "FFFFFF",
+        bodyColor: "E9FBFF",
+      };
+    }
+    return {
+      surface: { x: 1371600, y: 609600, cx: 7239000, cy: 3962400 },
+      accent: { x: 0, y: 0, cx: 1170432, cy: 5143500 },
+      secondaryAccent: { x: 1524000, y: 1706880, cx: 3657600, cy: 22860 },
+      label: { x: 1524000, y: 731520, cx: 2438400, cy: 304800 },
+      title: { x: 1264920, y: 1036320, cx: 4622800, cy: 762000 },
+      content: { x: 1264920, y: 1981200, cx: 4622800, cy: 1371600 },
+      titleSize: 2750,
+      bodySize: 1160,
+    };
+  }
+  if (visual.layout === "quarterly-dashboard") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 109728, y: 777240, cx: 8924544, cy: 4213860 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 685800 },
+      secondaryAccent: { x: 685800, y: 822960, cx: 1828800, cy: 45720 },
+      label: { x: 274320, y: 914400, cx: 2133600, cy: 304800 },
+      title: isCover || isClosing
+        ? { x: 731520, y: 1325880, cx: 4114800, cy: 1219200 }
+        : { x: 548640, y: 167640, cx: 5638800, cy: 365760 },
+      content: isCover || isClosing
+        ? { x: 914400, y: 2827020, cx: 4267200, cy: 762000 }
+        : { x: 548640, y: 1219200, cx: 3048000, cy: 914400 },
+      titleSize: isCover || isClosing ? 3600 : 1450,
+      bodySize: isCover || isClosing ? 1500 : 850,
+      titleColor: isCover || isClosing ? "FFFFFF" : "FFFFFF",
+      bodyColor: isCover || isClosing ? "E8F2FF" : visual.body,
+    };
+  }
+  if (visual.layout === "quarterly-diagnosis") {
+    const isCover = index === 0;
+    return {
+      surface: { x: 219456, y: 822960, cx: 8705088, cy: 4114800 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 685800 },
+      secondaryAccent: { x: 365760, y: 777240, cx: 8412480, cy: 22860 },
+      label: { x: 365760, y: 304800, cx: 2133600, cy: 304800 },
+      title: isCover
+        ? { x: 731520, y: 1066800, cx: 3352800, cy: 1524000 }
+        : { x: 731520, y: 914400, cx: 3200400, cy: 609600 },
+      content: isCover
+        ? { x: 914400, y: 2895600, cx: 2590800, cy: 762000 }
+        : { x: 731520, y: 1600200, cx: 2590800, cy: 1066800 },
+      titleSize: isCover ? 2050 : 1850,
+      bodySize: isCover ? 820 : 900,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "quarterly-action-loop") {
+    const isCover = index === 0;
+    return {
+      surface: { x: 228600, y: 838200, cx: 8686800, cy: 4038600 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 685800 },
+      secondaryAccent: { x: 365760, y: 807720, cx: 8412480, cy: 22860 },
+      label: { x: 365760, y: 304800, cx: 2590800, cy: 304800 },
+      title: isCover
+        ? { x: 640080, y: 853440, cx: 4267200, cy: 457200 }
+        : { x: 640080, y: 914400, cx: 3657600, cy: 609600 },
+      content: isCover
+        ? { x: 762000, y: 3886200, cx: 2743200, cy: 365760 }
+        : { x: 731520, y: 1645920, cx: 2895600, cy: 914400 },
+      titleSize: isCover ? 1550 : 1720,
+      bodySize: isCover ? 560 : 760,
+      titleColor: visual.title,
       bodyColor: visual.body,
     };
   }
@@ -1536,8 +1705,8 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
 }
 
 /**
- * 创建 slide relationships。
- * red-gold 页面会把 rId2 绑定到 dome 背景图，部分角色再用 rId3 绑定商务配图。
+ * 鍒涘缓 slide relationships銆?
+ * red-gold 椤甸潰浼氭妸 rId2 缁戝畾鍒?dome 鑳屾櫙鍥撅紝閮ㄥ垎瑙掕壊鍐嶇敤 rId3 缁戝畾鍟嗗姟閰嶅浘銆?
  * @returns {string}
  */
 function slideRelsXml(visual, role = "content") {
@@ -1557,8 +1726,8 @@ function slideRelsXml(visual, role = "content") {
 }
 
 /**
- * 创建空白 slide layout。
- * 实际视觉内容都在每页 slide XML 中生成，layout 只提供 Office 所需结构。
+ * 鍒涘缓绌虹櫧 slide layout銆?
+ * 瀹為檯瑙嗚鍐呭閮藉湪姣忛〉 slide XML 涓敓鎴愶紝layout 鍙彁渚?Office 鎵€闇€缁撴瀯銆?
  * @returns {string}
  */
 function slideLayoutXml(visual) {
@@ -1566,7 +1735,7 @@ function slideLayoutXml(visual) {
 }
 
 /**
- * 创建 slide layout relationship XML。
+ * 鍒涘缓 slide layout relationship XML銆?
  * @returns {string}
  */
 function slideLayoutRelsXml() {
@@ -1574,8 +1743,8 @@ function slideLayoutRelsXml() {
 }
 
 /**
- * 创建最小 slide master。
- * 主题色从 visual 注入，具体 dome 装饰不放在 master，便于每页按角色差异化。
+ * 鍒涘缓鏈€灏?slide master銆?
+ * 涓婚鑹蹭粠 visual 娉ㄥ叆锛屽叿浣?dome 瑁呴グ涓嶆斁鍦?master锛屼究浜庢瘡椤垫寜瑙掕壊宸紓鍖栥€?
  * @returns {string}
  */
 function slideMasterXml(visual) {
@@ -1583,7 +1752,7 @@ function slideMasterXml(visual) {
 }
 
 /**
- * 创建 slide master relationship XML。
+ * 鍒涘缓 slide master relationship XML銆?
  * @returns {string}
  */
 function slideMasterRelsXml() {
@@ -1591,8 +1760,8 @@ function slideMasterRelsXml() {
 }
 
 /**
- * 创建最小 Office theme。
- * red-gold 在这里复用 dome.pptx 的 588ku 字体方案。
+ * 鍒涘缓鏈€灏?Office theme銆?
+ * red-gold 鍦ㄨ繖閲屽鐢?dome.pptx 鐨?588ku 瀛椾綋鏂规銆?
  * @returns {string}
  */
 function themeXml(visual) {
@@ -1605,20 +1774,20 @@ function themeXml(visual) {
 }
 
 /**
- * 生成主题字体配置。
- * red-gold 复用 dome.pptx 的 588ku 字体方案，其他模板保留原 Moling 字体方案。
+ * 鐢熸垚涓婚瀛椾綋閰嶇疆銆?
+ * red-gold 澶嶇敤 dome.pptx 鐨?588ku 瀛椾綋鏂规锛屽叾浠栨ā鏉夸繚鐣欏師 Moling 瀛椾綋鏂规銆?
  * @param {object} visual
  * @returns {string}
  */
 function fontSchemeXml(visual) {
   if (visual.layout === "red-gold") {
-    return `<a:fontScheme name="588ku"><a:majorFont><a:latin typeface="Arial Black"/><a:ea typeface="思源黑体 CN Bold"/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface="思源黑体 CN Regular"/><a:cs typeface=""/></a:minorFont></a:fontScheme>`;
+    return `<a:fontScheme name="588ku"><a:majorFont><a:latin typeface="Arial Black"/><a:ea typeface="鎬濇簮榛戜綋 CN Bold"/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface="鎬濇簮榛戜綋 CN Regular"/><a:cs typeface=""/></a:minorFont></a:fontScheme>`;
   }
   return `<a:fontScheme name="Moling"><a:majorFont><a:latin typeface="Arial"/><a:ea typeface="Microsoft YaHei"/><a:cs typeface="Arial"/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface="Microsoft YaHei"/><a:cs typeface="Arial"/></a:minorFont></a:fontScheme>`;
 }
 
 /**
- * 创建 PPTX slide 必需的根 group shape 元数据。
+ * 鍒涘缓 PPTX slide 蹇呴渶鐨勬牴 group shape 鍏冩暟鎹€?
  * @returns {string}
  */
 function groupShapeXml() {
@@ -1626,7 +1795,7 @@ function groupShapeXml() {
 }
 
 /**
- * 创建填充矩形形状。
+ * 鍒涘缓濉厖鐭╁舰褰㈢姸銆?
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, fill: string}} input
  * @returns {string}
  */
@@ -1635,8 +1804,8 @@ function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
 }
 
 /**
- * 创建填充的预设几何形状。
- * 用于金色波浪、红色底浪、卡片和右侧装饰块。
+ * 鍒涘缓濉厖鐨勯璁惧嚑浣曞舰鐘躲€?
+ * 鐢ㄤ簬閲戣壊娉㈡氮銆佺孩鑹插簳娴€佸崱鐗囧拰鍙充晶瑁呴グ鍧椼€?
  * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, fill: string}} input
  * @returns {string}
  */
@@ -1645,7 +1814,7 @@ function solidShapeXml({ id, name, geom = "rect", x, y, cx, cy, fill }) {
 }
 
 /**
- * 创建仅描边形状（用于卡片边框/外框）.
+ * 鍒涘缓浠呮弿杈瑰舰鐘讹紙鐢ㄤ簬鍗＄墖杈规/澶栨锛?
  * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, stroke: string, width?: number}} input
  * @returns {string}
  */
@@ -1654,8 +1823,8 @@ function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050
 }
 
 /**
- * 创建 dome 底部波浪用的圆弧线条。
- * 线条层叠在底部色带上，用来模拟 dome.pptx 里更柔和的金色波浪走势。
+ * 鍒涘缓 dome 搴曢儴娉㈡氮鐢ㄧ殑鍦嗗姬绾挎潯銆?
+ * 绾挎潯灞傚彔鍦ㄥ簳閮ㄨ壊甯︿笂锛岀敤鏉ユā鎷?dome.pptx 閲屾洿鏌斿拰鐨勯噾鑹叉尝娴蛋鍔裤€?
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, stroke: string, width: number}} input
  * @returns {string}
  */
@@ -1664,12 +1833,12 @@ function arcLineShapeXml({ id, name, x, y, cx, cy, stroke, width }) {
 }
 
 /**
- * 创建绑定到 slide relationship id 的 OOXML 图片形状。
+ * 鍒涘缓缁戝畾鍒?slide relationship id 鐨?OOXML 鍥剧墖褰㈢姸銆?
  * @param {{id: number, name: string, relId: string, x: number, y: number, cx: number, cy: number}} input
  * @returns {string}
  */
 /**
- * 创建 top-band 封面的三枚指标卡，用来把极简灰蓝模板升级为高管汇报的商业化封面结构。
+ * 鍒涘缓 top-band 灏侀潰鐨勪笁鏋氭寚鏍囧崱锛岀敤鏉ユ妸鏋佺畝鐏拌摑妯℃澘鍗囩骇涓洪珮绠℃眹鎶ョ殑鍟嗕笟鍖栧皝闈㈢粨鏋勩€?
  * @param {{id: number, x: number, y: number, number: string, label: string, visual: object, palette: object}} input
  * @returns {string}
  */
@@ -1705,6 +1874,319 @@ function statusReportTimelineXml({ visual, palette }) {
     + dots;
 }
 
+function annualSummaryDecorationsXml({ visual, index, layout }) {
+  const isCover = index === 0;
+  const palette = annualSummaryColorPalette(visual);
+  const scene = annualSummaryScene(visual);
+  // 灏侀潰閲囩敤鍙傝€冨浘鐨勮摑闈掓笎鍙樺ぇ搴曪紱鍐呭椤电户缁娇鐢ㄨ交閲忔姤鍛婄焊寮狅紝淇濊瘉涓嬭浇 PPT 鍙紪杈戙€?
+  const surface = isCover
+    ? annualSummaryCoverBackdropXml({ visual, palette })
+    : solidShapeXml({ id: 701, name: "Annual Summary Report Sheet", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: layout.surface.cy, fill: palette.coverWash });
+  const lowerItems = isCover
+    ? annualSummaryMetricCardsXml({ visual, palette, metrics: scene.metrics })
+    : annualSummaryDiagnosticCardsXml({ visual, palette });
+  return surface
+    + (isCover ? "" : rectShapeXml({ id: 702, name: "Annual Summary Module Rule", x: 685800, y: 723900, cx: 7772400, cy: 22860, fill: visual.accent }))
+    + (isCover ? "" : rectShapeXml({ id: 705, name: "Annual Summary Sheet Accent", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: 38100, fill: visual.accent }))
+    + textShapeXml({ id: 706, name: "Annual Summary Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 900, bold: true, color: isCover ? "E9FBFF" : visual.accent })
+    + textShapeXml({ id: 707, name: "Annual Summary Year Mark", x: isCover ? 7010400 : 7162800, y: isCover ? 731520 : 800100, cx: 1066800, cy: 365760, text: scene.year, size: isCover ? 2500 : 2300, bold: true, color: isCover ? palette.coverYear : palette.year })
+    + annualSummaryDashboardXml({ visual, palette, isCover })
+    + lowerItems
+    + (isCover ? "" : annualSummaryTimelineXml({ visual, palette }));
+}
+
+function quarterlyDashboardDecorationsXml({ visual, index, role, slide }) {
+  const palette = quarterlyDashboardColorPalette(visual);
+  const scene = quarterlyDashboardSceneFromSlide(slide, index);
+  const isCover = index === 0;
+  const isClosing = role === "closing";
+  if (isCover || isClosing) {
+    return quarterlyDashboardDarkBackgroundXml({ visual, palette, isClosing })
+      + quarterlyDashboardHeroBarsXml({ palette })
+      + (isCover
+        ? textShapeXml({ id: 532, name: "Quarterly Dashboard Kicker", x: 731520, y: 914400, cx: 3962400, cy: 243840, text: scene.kicker, size: 900, bold: true, color: palette.softText })
+          + solidShapeXml({ id: 533, name: "Quarterly Dashboard Cover Card", geom: "roundRect", x: 6400800, y: 3657600, cx: 2514600, cy: 640080, fill: "F4F7FB" })
+          + lineFrameShapeXml({ id: 534, name: "Quarterly Dashboard Cover Card Border", geom: "roundRect", x: 6400800, y: 3657600, cx: 2514600, cy: 640080, stroke: palette.lightBlue, width: 11430 })
+          + textShapeXml({ id: 535, name: "Quarterly Dashboard Report Year", x: 6629400, y: 3787140, cx: 914400, cy: 152400, text: scene.reportYear, size: 760, bold: true, color: visual.title })
+          + textShapeXml({ id: 536, name: "Quarterly Dashboard Report Scope", x: 6629400, y: 4053840, cx: 1905000, cy: 182880, text: scene.coverCaption, size: 880, bold: true, color: visual.title })
+        : textShapeXml({ id: 538, name: "Quarterly Dashboard Closing Caption", x: 914400, y: 2514600, cx: 3657600, cy: 304800, text: scene.endingCaption, size: 1260, bold: true, color: "E8F2FF" })
+          + solidShapeXml({ id: 539, name: "Quarterly Dashboard Closing Meta Card", geom: "roundRect", x: 914400, y: 3375660, cx: 2971800, cy: 457200, fill: "F4F7FB" })
+          + textShapeXml({ id: 540, name: "Quarterly Dashboard Closing Meta", x: 1143000, y: 3505200, cx: 2438400, cy: 182880, text: scene.closingMeta, size: 980, bold: true, color: visual.title }));
+  }
+  return quarterlyDashboardContentBackgroundXml({ visual, palette })
+    + quarterlyDashboardSectionLabelXml({ visual, text: scene.section })
+    + quarterlyDashboardRingXml({ idBase: 545, x: 609600, y: 1524000, value: scene.metrics[0].value, label: scene.metrics[0].label, visual })
+    + quarterlyDashboardRingXml({ idBase: 555, x: 1828800, y: 1524000, value: scene.metrics[1].value, label: scene.metrics[1].label, visual })
+    + quarterlyDashboardProductBarsXml({ visual, title: scene.barTitle })
+    + quarterlyDashboardClientPanelXml({ visual, title: scene.clientTitle })
+    + quarterlyDashboardRegionCardsXml({ visual, regions: scene.regions })
+    + quarterlyDashboardComboChartXml({ visual, title: scene.comboTitle })
+    + quarterlyDashboardPieXml({ visual, title: scene.pieTitle });
+}
+
+function quarterlyDashboardDarkBackgroundXml({ visual, palette }) {
+  return solidShapeXml({ id: 501, name: "Quarterly Dashboard Dark Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: "173861" })
+    + solidShapeXml({ id: 502, name: "Quarterly Dashboard Top Band", x: 0, y: 0, cx: 9144000, cy: 800100, fill: "102B4C" })
+    + solidShapeXml({ id: 503, name: "Quarterly Dashboard Footer Band", x: 0, y: 4686300, cx: 9144000, cy: 457200, fill: "0F2745" })
+    + arcLineShapeXml({ id: 504, name: "Quarterly Dashboard Data Ring A", x: 5989320, y: 1584960, cx: 1778000, cy: 1778000, stroke: "5D91CD", width: 38100 })
+    + arcLineShapeXml({ id: 505, name: "Quarterly Dashboard Data Ring B", x: 6705600, y: 2217420, cx: 1066800, cy: 1066800, stroke: "C4D8EF", width: 30480 })
+    + rectShapeXml({ id: 506, name: "Quarterly Dashboard Diagonal Line A", x: 609600, y: 4114800, cx: 914400, cy: 15240, fill: palette.lightBlue })
+    + rectShapeXml({ id: 507, name: "Quarterly Dashboard Diagonal Line B", x: 1600200, y: 3992880, cx: 1219200, cy: 15240, fill: palette.lightBlue });
+}
+
+function quarterlyDashboardHeroBarsXml({ palette }) {
+  const bars = [
+    [6096000, 2286000, 213360, 838200],
+    [6553200, 1973580, 213360, 1150620],
+    [7010400, 2385060, 213360, 739140],
+    [7467600, 1714500, 213360, 1417320],
+    [7924800, 2133600, 213360, 990600],
+  ];
+  return solidShapeXml({ id: 508, name: "Quarterly Dashboard Hero Glass Panel", geom: "roundRect", x: 5715000, y: 1219200, cx: 2819400, cy: 2590800, fill: "2A5A98" })
+    + lineFrameShapeXml({ id: 509, name: "Quarterly Dashboard Hero Panel Frame", geom: "roundRect", x: 5715000, y: 1219200, cx: 2819400, cy: 2590800, stroke: "C4D8EF", width: 9525 })
+    + rectShapeXml({ id: 518, name: "Quarterly Dashboard Hero Panel Header", x: 5943600, y: 1447800, cx: 2133600, cy: 91440, fill: "C4D8EF" })
+    + rectShapeXml({ id: 519, name: "Quarterly Dashboard Hero Axis", x: 5943600, y: 3124200, cx: 2209800, cy: 15240, fill: "8BB2DB" })
+    + bars.map(([x, y, cx, cy], index) => solidShapeXml({ id: 510 + index, name: `Quarterly Dashboard Hero Bar ${index + 1}`, geom: "roundRect", x, y, cx, cy, fill: palette.barBlue })).join("");
+}
+
+function quarterlyDashboardContentBackgroundXml({ visual, palette }) {
+  return solidShapeXml({ id: 520, name: "Quarterly Dashboard Light Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: "EEF3F9" })
+    + solidShapeXml({ id: 521, name: "Quarterly Dashboard Header", x: 0, y: 0, cx: 9144000, cy: 685800, fill: "173861" })
+    + rectShapeXml({ id: 527, name: "Quarterly Dashboard Header Accent", x: 0, y: 655320, cx: 9144000, cy: 30480, fill: "D7A650" })
+    + solidShapeXml({ id: 522, name: "Quarterly Dashboard Canvas", x: 365760, y: 853440, cx: 8412480, cy: 3962400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 523, name: "Quarterly Dashboard Canvas Frame", x: 365760, y: 853440, cx: 8412480, cy: 3962400, stroke: palette.frame, width: 9525 });
+}
+
+function quarterlyDashboardSectionLabelXml({ visual, text }) {
+  return solidShapeXml({ id: 524, name: "Quarterly Dashboard Section Label", geom: "roundRect", x: 548640, y: 944880, cx: 1447800, cy: 243840, fill: "173861" })
+    + textShapeXml({ id: 526, name: "Quarterly Dashboard Section Text", x: 701040, y: 998220, cx: 1066800, cy: 121920, text, size: 600, bold: true, color: "FFFFFF" });
+}
+
+function quarterlyDashboardRingXml({ idBase, x, y, value, label, visual }) {
+  return solidShapeXml({ id: idBase, name: `Quarterly Dashboard KPI Card ${value}`, geom: "roundRect", x, y, cx: 1066800, cy: 640080, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: idBase + 3, name: `Quarterly Dashboard KPI Card Frame ${value}`, geom: "roundRect", x, y, cx: 1066800, cy: 640080, stroke: "D8E2ED", width: 7620 })
+    + rectShapeXml({ id: idBase + 4, name: `Quarterly Dashboard KPI Accent ${value}`, x, y, cx: 53340, cy: 640080, fill: "D7A650" })
+    + textShapeXml({ id: idBase + 1, name: `Quarterly Dashboard KPI Value ${value}`, x: x + 152400, y: y + 152400, cx: 762000, cy: 182880, text: value, size: 1280, bold: true, color: "173861" })
+    + textShapeXml({ id: idBase + 2, name: `Quarterly Dashboard KPI Label ${value}`, x: x + 152400, y: y + 396240, cx: 762000, cy: 121920, text: label, size: 560, bold: true, color: visual.body });
+}
+
+function quarterlyDashboardProductBarsXml({ visual, title }) {
+  const bars = [0.42, 0.28, 0.58, 0.34, 0.58, 0.36];
+  const barXml = bars.map((ratio, index) => {
+    const x = 3718560 + index * 487680;
+    const cy = Math.round(883920 * ratio);
+    return solidShapeXml({ id: 570 + index, name: `Quarterly Dashboard Product Bar ${index + 1}`, geom: "roundRect", x, y: 2590800 - cy, cx: 213360, cy, fill: index === 3 ? "D7A650" : "173861" });
+  }).join("");
+  return solidShapeXml({ id: 569, name: "Quarterly Dashboard Product Panel", geom: "roundRect", x: 3352800, y: 1219200, cx: 3505200, cy: 1676400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 568, name: "Quarterly Dashboard Product Panel Frame", geom: "roundRect", x: 3352800, y: 1219200, cx: 3505200, cy: 1676400, stroke: "D8E2ED", width: 9525 })
+    + textShapeXml({ id: 567, name: "Quarterly Dashboard Product Panel Title", x: 3505200, y: 1371600, cx: 2133600, cy: 152400, text: title, size: 640, bold: true, color: visual.title })
+    + rectShapeXml({ id: 566, name: "Quarterly Dashboard Product Grid A", x: 3657600, y: 2133600, cx: 2743200, cy: 9525, fill: "EEF3F9" })
+    + rectShapeXml({ id: 565, name: "Quarterly Dashboard Product Grid B", x: 3657600, y: 2438400, cx: 2743200, cy: 9525, fill: "EEF3F9" })
+    + rectShapeXml({ id: 564, name: "Quarterly Dashboard Product Axis", x: 3657600, y: 2590800, cx: 2743200, cy: 15240, fill: "D8E2ED" })
+    + barXml;
+}
+
+function quarterlyDashboardClientPanelXml({ visual, title }) {
+  const icons = [0, 1, 2, 3, 4, 5].map((item, index) => {
+    const row = index < 3 ? 0 : 1;
+    const col = index % 3;
+    return solidShapeXml({ id: 590 + index, name: `Quarterly Dashboard Client Icon ${index + 1}`, x: 914400 + col * 243840, y: 3749040 + row * 243840, cx: 91440, cy: 198120, fill: row === 0 ? visual.primary : visual.accent });
+  }).join("");
+  return solidShapeXml({ id: 589, name: "Quarterly Dashboard Client Panel", geom: "roundRect", x: 548640, y: 3444240, cx: 2438400, cy: 914400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 588, name: "Quarterly Dashboard Client Panel Frame", geom: "roundRect", x: 548640, y: 3444240, cx: 2438400, cy: 914400, stroke: "D8E2ED", width: 9525 })
+    + textShapeXml({ id: 587, name: "Quarterly Dashboard Client Title", x: 701040, y: 3573780, cx: 1371600, cy: 152400, text: title, size: 600, bold: true, color: visual.title })
+    + icons;
+}
+
+function quarterlyDashboardRegionCardsXml({ visual, regions }) {
+  const fills = ["173861", "2F64A4", "A95646", "7FA5CF"];
+  const cards = regions.map((region, index) => [region.name, region.rate, fills[index] || visual.primary]);
+  return cards.map(([name, rate, fill], index) => {
+    const x = 7162800;
+    const y = 1219200 + index * 487680;
+    return solidShapeXml({ id: 610 + index * 3, name: `Quarterly Dashboard Region ${name}`, geom: "roundRect", x, y, cx: 1524000, cy: 365760, fill })
+      + textShapeXml({ id: 611 + index * 3, name: `Quarterly Dashboard Region Name ${name}`, x: x + 152400, y: y + 91440, cx: 792480, cy: 137160, text: name, size: 620, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 612 + index * 3, name: `Quarterly Dashboard Region Rate ${name}`, x: x + 990600, y: y + 76200, cx: 365760, cy: 182880, text: rate, size: 900, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function quarterlyDashboardComboChartXml({ visual, title }) {
+  const bars = [0.38, 0.52, 0.18, 0.76, 0.4, 0.58].map((ratio, index) => {
+    const cy = Math.round(853440 * ratio);
+    return solidShapeXml({ id: 630 + index, name: `Quarterly Dashboard Combo Bar ${index + 1}`, geom: "roundRect", x: 3505200 + index * 396240, y: 4236720 - cy, cx: 167640, cy, fill: "173861" });
+  }).join("");
+  return solidShapeXml({ id: 629, name: "Quarterly Dashboard Combo Panel", geom: "roundRect", x: 3200400, y: 3444240, cx: 2743200, cy: 914400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 628, name: "Quarterly Dashboard Combo Panel Frame", geom: "roundRect", x: 3200400, y: 3444240, cx: 2743200, cy: 914400, stroke: "D8E2ED", width: 9525 })
+    + textShapeXml({ id: 627, name: "Quarterly Dashboard Combo Title", x: 3352800, y: 3573780, cx: 1676400, cy: 152400, text: title, size: 600, bold: true, color: visual.title })
+    + bars
+    + rectShapeXml({ id: 637, name: "Quarterly Dashboard Trend Line", x: 3505200, y: 4053840, cx: 2133600, cy: 19050, fill: "D7A650" });
+}
+
+function quarterlyDashboardPieXml({ visual, title }) {
+  return solidShapeXml({ id: 640, name: "Quarterly Dashboard Pie Panel", geom: "roundRect", x: 6096000, y: 3444240, cx: 2438400, cy: 914400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 641, name: "Quarterly Dashboard Pie Panel Frame", geom: "roundRect", x: 6096000, y: 3444240, cx: 2438400, cy: 914400, stroke: "D8E2ED", width: 9525 })
+    + solidShapeXml({ id: 642, name: "Quarterly Dashboard Pie Blue", geom: "pie", x: 6324600, y: 3733800, cx: 609600, cy: 457200, fill: "173861" })
+    + solidShapeXml({ id: 644, name: "Quarterly Dashboard Pie Accent", geom: "pie", x: 6324600, y: 3733800, cx: 609600, cy: 457200, fill: "D7A650" })
+    + textShapeXml({ id: 643, name: "Quarterly Dashboard Pie Title", x: 7162800, y: 3802380, cx: 914400, cy: 182880, text: title, size: 600, bold: true, color: visual.title });
+}
+
+function quarterlyDashboardSceneFromSlide(slide, index) {
+  const bullets = quarterlyDashboardBulletTexts(slide);
+  const title = quarterlyDashboardCompactText(slide?.title, `Page ${index + 1}`, 16);
+  const metrics = [0, 1].map((item) => quarterlyDashboardMetricFromText(bullets[item], item));
+  const regions = [2, 3, 4, 5].map((bulletIndex, itemIndex) => {
+    const metric = quarterlyDashboardMetricFromText(bullets[bulletIndex], itemIndex + 2);
+    return { name: metric.label, rate: metric.value };
+  });
+  return {
+    // 装饰层全部从当前页内容派生，避免下载 PPTX 中出现固定示例文字。
+    kicker: quarterlyDashboardCompactText(bullets[0], title, 30),
+    section: title,
+    reportYear: quarterlyDashboardCompactText(bullets[0], title, 24),
+    coverCaption: quarterlyDashboardCompactText(bullets.slice(1, 4).join(" / "), title, 28),
+    endingTitle: title,
+    endingCaption: quarterlyDashboardCompactText(bullets[0], title, 30),
+    closingMeta: quarterlyDashboardCompactText(bullets.slice(0, 2).join(" / "), title, 30),
+    metrics,
+    barTitle: quarterlyDashboardCompactText(bullets[0], title, 18),
+    clientTitle: quarterlyDashboardCompactText(bullets[1], title, 18),
+    comboTitle: quarterlyDashboardCompactText(bullets[2], title, 18),
+    pieTitle: quarterlyDashboardCompactText(bullets[3], title, 12),
+    regions,
+  };
+}
+
+function quarterlyDashboardBulletTexts(slide) {
+  return Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+}
+
+function quarterlyDashboardMetricFromText(text, index) {
+  const fallbackValue = String(index + 1).padStart(2, "0");
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValue, label: `Item ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*%?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValue;
+  const label = quarterlyDashboardCompactText(raw.replace(match?.[1] || "", "").replace(/[：:，,。]/g, " ").trim(), raw, 12);
+  return { value, label };
+}
+
+function quarterlyDashboardCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function quarterlyDashboardColorPalette(visual) {
+  return {
+    header: blendHexColor(visual.primary, "FFFFFF", 0.05),
+    footer: blendHexColor(visual.primary, "0F172A", 0.34),
+    barBlue: blendHexColor(visual.primary, "FFFFFF", 0.20),
+    lightBlue: "8BB2DB",
+    softText: "C4D8EF",
+    frame: "D9E2EE",
+  };
+}
+
+function annualSummaryCoverBackdropXml({ visual, palette }) {
+  return solidShapeXml({ id: 701, name: "Annual Summary Cover Blue Base", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.primary })
+    + solidShapeXml({ id: 702, name: "Annual Summary Cover Cyan Plane", geom: "parallelogram", x: 5029200, y: 0, cx: 4114800, cy: 5143500, fill: visual.accent })
+    + solidShapeXml({ id: 703, name: "Annual Summary Cover Glass Plane One", geom: "parallelogram", x: 5791200, y: 571500, cx: 2514600, cy: 3657600, fill: palette.coverPlane })
+    + solidShapeXml({ id: 704, name: "Annual Summary Cover Glass Plane Two", geom: "parallelogram", x: 6903720, y: 0, cx: 1600200, cy: 5143500, fill: palette.coverPlaneSoft })
+    + rectShapeXml({ id: 705, name: "Annual Summary Cover White Rule", x: 731520, y: 3886200, cx: 2133600, cy: 30480, fill: "E9FBFF" });
+}
+
+function annualSummaryDashboardXml({ visual, palette, isCover }) {
+  if (isCover) {
+    return solidShapeXml({ id: 710, name: "Annual Summary Document Mockup", x: 6141720, y: 1447800, cx: 1295400, cy: 1676400, fill: "FFFFFF" })
+      + rectShapeXml({ id: 711, name: "Annual Summary Doc Item Cyan", x: 6324600, y: 1691640, cx: 182880, cy: 137160, fill: visual.accent })
+      + rectShapeXml({ id: 712, name: "Annual Summary Doc Line One", x: 6629400, y: 1722120, cx: 548640, cy: 60960, fill: "9FE6F0" })
+      + rectShapeXml({ id: 713, name: "Annual Summary Doc Item Green", x: 6324600, y: 2125980, cx: 182880, cy: 137160, fill: "A8F05A" })
+      + rectShapeXml({ id: 714, name: "Annual Summary Doc Line Two", x: 6629400, y: 2156460, cx: 609600, cy: 60960, fill: "9FE6F0" })
+      + lineFrameShapeXml({ id: 715, name: "Annual Summary Magnifier Lens", geom: "ellipse", x: 7132320, y: 2446020, cx: 822960, cy: 822960, stroke: "DDFBFF", width: 76200 })
+      + solidShapeXml({ id: 716, name: "Annual Summary Magnifier Handle", geom: "parallelogram", x: 7795260, y: 3063240, cx: 152400, cy: 548640, fill: "5AA7C8" });
+  }
+  return solidShapeXml({ id: 710, name: "Annual Summary Analysis Panel", x: 6324600, y: 1577340, cx: 1828800, cy: 1371600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 711, name: "Annual Summary Analysis Panel Stroke", x: 6324600, y: 1577340, cx: 1828800, cy: 1371600, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 712, name: "Annual Summary Dashboard Header", x: 6553200, y: 1828800, cx: 1066800, cy: 76200, fill: visual.primary })
+    + rectShapeXml({ id: 713, name: "Annual Summary Dashboard Axis", x: 6553200, y: 2636520, cx: 1066800, cy: 15240, fill: palette.rule })
+    + solidShapeXml({ id: 714, name: "Annual Summary Content Bar One", x: 6637020, y: 2415540, cx: 137160, cy: 220980, fill: visual.accent })
+    + solidShapeXml({ id: 715, name: "Annual Summary Content Bar Two", x: 6903720, y: 2286000, cx: 137160, cy: 350520, fill: visual.primary })
+    + solidShapeXml({ id: 716, name: "Annual Summary Content Bar Three", x: 7170420, y: 2141220, cx: 137160, cy: 495300, fill: visual.accent })
+    + solidShapeXml({ id: 717, name: "Annual Summary Content Dot", geom: "ellipse", x: 7650480, y: 2171700, cx: 335280, cy: 335280, fill: palette.softGold });
+}
+
+function annualSummaryMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.map((metric, itemIndex) => {
+    const x = 1524000 + itemIndex * 1371600;
+    return solidShapeXml({ id: 730 + itemIndex * 4, name: `Annual Summary Metric Card ${itemIndex + 1}`, x, y: 3596640, cx: 1219200, cy: 563880, fill: palette.cardFill })
+      + rectShapeXml({ id: 731 + itemIndex * 4, name: `Annual Summary Metric Gold Rule ${itemIndex + 1}`, x, y: 3596640, cx: 1219200, cy: 38100, fill: visual.accent })
+      + textShapeXml({ id: 732 + itemIndex * 4, name: `Annual Summary Metric Value ${itemIndex + 1}`, x: x + 121920, y: 3695700, cx: 975360, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 733 + itemIndex * 4, name: `Annual Summary Metric Label ${itemIndex + 1}`, x: x + 121920, y: 3901440, cx: 975360, cy: 137160, text: metric.label, size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function annualSummaryDiagnosticCardsXml({ visual, palette }) {
+  const labels = ["缁忚惀浜偣", "椋庨櫓璇婃柇", "鏉ュ勾琛屽姩"];
+  return labels.map((label, itemIndex) => {
+    const x = 1524000 + itemIndex * 1371600;
+    return solidShapeXml({ id: 750 + itemIndex * 3, name: `Annual Summary Diagnostic Card ${itemIndex + 1}`, x, y: 3543300, cx: 1219200, cy: 426720, fill: palette.cardFill })
+      + rectShapeXml({ id: 751 + itemIndex * 3, name: `Annual Summary Diagnostic Gold Rule ${itemIndex + 1}`, x, y: 3543300, cx: 1219200, cy: 38100, fill: visual.accent })
+      + textShapeXml({ id: 752 + itemIndex * 3, name: `Annual Summary Diagnostic Text ${itemIndex + 1}`, x: x + 121920, y: 3688080, cx: 975360, cy: 152400, text: label, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function annualSummaryTimelineXml({ visual, palette }) {
+  const dots = [1524000, 3657600, 5791200, 7924800].map((x, itemIndex) => (
+    solidShapeXml({ id: 780 + itemIndex, name: `Annual Summary Timeline Dot ${itemIndex + 1}`, geom: "ellipse", x, y: 4328160, cx: 121920, cy: 121920, fill: itemIndex === 0 ? visual.primary : visual.accent })
+  )).join("");
+  return rectShapeXml({ id: 779, name: "Annual Summary Timeline Rule", x: 1524000, y: 4389120, cx: 6400800, cy: 22860, fill: palette.rule }) + dots;
+}
+
+function annualSummaryScene(visual) {
+  const variant = annualSummaryVariant(visual);
+  const scenes = {
+    "blue-gold": {
+      variant: "blue-gold",
+      year: "2026",
+      kicker: "ANNUAL REVIEW",
+      section: "OPERATING INSIGHT",
+      metrics: [
+        { value: "128%", label: "鐩爣杈炬垚" },
+        { value: "36%", label: "涓氬姟澧為暱" },
+        { value: "12", label: "椤圭洰钀藉湴" },
+      ],
+    },
+  };
+  return scenes[variant] || scenes["blue-gold"];
+}
+
+function annualSummaryVariant(visual) {
+  return ["blue-gold"].includes(visual?.variant) ? visual.variant : "blue-gold";
+}
+
+function annualSummaryColorPalette(visual) {
+  return {
+    coverWash: blendHexColor(visual.surface, visual.background, 0.12),
+    sweep: blendHexColor(visual.accent, visual.surface, 0.35),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    glass: blendHexColor(visual.surface, visual.primary, 0.28),
+    glassStrong: blendHexColor(visual.surface, visual.primary, 0.42),
+    year: blendHexColor(visual.primary, visual.surface, 0.18),
+    rule: blendHexColor(visual.primary, visual.accent, 0.34),
+    softGold: blendHexColor(visual.accent, visual.surface, 0.22),
+    cardFill: blendHexColor(visual.surface, visual.accent, 0.08),
+    coverPlane: blendHexColor(visual.accent, visual.surface, 0.42),
+    coverPlaneSoft: blendHexColor(visual.accent, visual.surface, 0.66),
+    coverYear: blendHexColor(visual.surface, visual.primary, 0.58),
+  };
+}
+
+function isAnnualSummaryVisual(visual) {
+  return visual?.id === "annual-business-summary" && visual?.layout === "annual-summary";
+}
+
 function salesProposalDecorationsXml({ visual, index, layout }) {
   const scene = salesProposalScene(visual);
   const palette = salesProposalColorPalette(visual);
@@ -1730,7 +2212,7 @@ function salesProposalDecorationsXml({ visual, index, layout }) {
     + solidShapeXml({ id: 160, name: "Sales Visual Panel", geom: "roundRect", ...panel, fill: palette.panel })
     + lineFrameShapeXml({ id: 161, name: "Sales Visual Frame", geom: "roundRect", ...frame, stroke: visual.accent, width: 15240 })
     + solidShapeXml({ id: 162, name: `Sales ${scene.variant} Chip`, geom: isCover ? "roundRect" : scene.chipShape, ...chip, fill: palette.chip })
-    + textShapeXml({ id: 163, name: "Sales Chip Text", ...chipText, text: scene.chip, size: 800, bold: true, color: "FFFFFF" })
+    + textShapeXml({ id: 163, name: "Sales Chip Text", ...chipText, text: "", size: 800, bold: true, color: "FFFFFF" })
     + textShapeXml({ id: 164, name: "Sales Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 1000, bold: true, color: visual.accent })
     + solidShapeXml({ id: 165, name: "Sales Focus Line", x: 914400, y: isCover ? 3322320 : 1516380, cx: 3505200, cy: 22860, fill: visual.accent })
     + salesProposalVisualXml({ visual, palette, scene })
@@ -1841,7 +2323,7 @@ function productRoadmapDecorationsXml({ visual, index, layout }) {
     + solidShapeXml({ id: 222, name: "Product Visual Panel", geom: "roundRect", ...panel, fill: palette.panel })
     + lineFrameShapeXml({ id: 223, name: "Product Visual Frame", geom: "roundRect", ...frame, stroke: visual.accent, width: 15240 })
     + solidShapeXml({ id: 224, name: `Product ${scene.variant} Chip`, geom: isCover ? "roundRect" : scene.chipShape, ...chip, fill: palette.chip })
-    + textShapeXml({ id: 225, name: "Product Chip Text", ...chipText, text: scene.chip, size: 820, bold: true, color: "FFFFFF" })
+    + textShapeXml({ id: 225, name: "Product Chip Text", ...chipText, text: "", size: 820, bold: true, color: "FFFFFF" })
     + textShapeXml({ id: 226, name: "Product Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 1000, bold: true, color: visual.accent })
     + solidShapeXml({ id: 227, name: "Product Focus Line", x: 914400, y: isCover ? 3322320 : 1516380, cx: 3505200, cy: 22860, fill: visual.accent })
     + productRoadmapVisualXml({ visual, palette, scene, isCover })
@@ -1945,7 +2427,7 @@ function pitchDeckDecorationsXml({ visual, index, layout }) {
     + rectShapeXml({ id: 706, name: "Pitch Focus Rule", x: 914400, y: isCover ? 3345180 : 1577340, cx: 3657600, cy: 22860, fill: visual.accent })
     + textShapeXml({ id: 707, name: "Pitch Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 880, bold: true, color: visual.accent })
     + solidShapeXml({ id: 708, name: `Pitch ${scene.variant} Chip`, geom: "roundRect", x: isCover ? 6979920 : 7040880, y: isCover ? 899160 : 800100, cx: 1066800, cy: 304800, fill: palette.chip })
-    + textShapeXml({ id: 709, name: "Pitch Chip Text", x: isCover ? 7124700 : 7193280, y: isCover ? 960120 : 861060, cx: 731520, cy: 152400, text: scene.chip, size: 740, bold: true, color: palette.chipText })
+    + textShapeXml({ id: 709, name: "Pitch Chip Text", x: isCover ? 7124700 : 7193280, y: isCover ? 960120 : 861060, cx: 731520, cy: 152400, text: "", size: 740, bold: true, color: palette.chipText })
     + pitchDeckVisualXml({ visual, palette, scene, isCover })
     + lowerItems
     + textShapeXml({ id: 750, name: "Pitch Caption", x: isCover ? 6248400 : 6248400, y: isCover ? 3505200 : 3230880, cx: 2133600, cy: 182880, text: scene.caption, size: isCover ? 800 : 740, bold: true, color: visual.body });
@@ -2500,6 +2982,287 @@ function isBrandStoryVisual(visual) {
   return visual?.id === "brand-story" && visual?.layout === "brand-story";
 }
 
+function quarterlyDiagnosisDecorationsXml({ visual, index, layout }) {
+  const scene = quarterlyDiagnosisScene(visual);
+  const palette = quarterlyDiagnosisColorPalette(visual);
+  const isCover = index === 0;
+  const isClosing = index >= 3;
+  const model = isCover
+    ? quarterlyDiagnosisCoreModelXml({ visual, palette, x: 3749040, y: 1600200, cx: 2743200, cy: 1295400, idBase: 920, withText: true })
+    : isClosing
+      ? quarterlyDiagnosisActionPathXml({ visual, palette })
+      : quarterlyDiagnosisCoreModelXml({ visual, palette, x: 3505200, y: 1524000, cx: 2743200, cy: 1447800, idBase: 920, withText: false });
+  const sideCards = isCover
+    ? quarterlyDiagnosisCoverNoteXml({ visual, scene })
+    : isClosing
+      ? quarterlyDiagnosisClosingTextXml({ visual, scene })
+      : quarterlyDiagnosisSideCardsXml({ visual, scene, palette });
+  return solidShapeXml({ id: 900, name: "Quarterly Diagnosis Surface", ...layout.surface, fill: visual.background })
+    + rectShapeXml({ id: 901, name: "Quarterly Diagnosis Header", x: 0, y: 0, cx: 9144000, cy: 685800, fill: visual.surface })
+    + rectShapeXml({ id: 902, name: "Quarterly Diagnosis Header Rule", x: 365760, y: 777240, cx: 8412480, cy: 22860, fill: visual.title })
+    + textShapeXml({ id: 903, name: "Quarterly Diagnosis Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 850, bold: true, color: visual.title })
+    + model
+    + sideCards
+    + rectShapeXml({ id: 904, name: "Quarterly Diagnosis Footer Rule", x: 365760, y: 4724400, cx: 8412480, cy: 15240, fill: palette.rule });
+}
+
+function quarterlyDiagnosisCoreModelXml({ visual, palette, x, y, cx, cy, idBase, withText }) {
+  const leftWidth = Math.round(cx * 0.44);
+  const rightWidth = Math.round(cx * 0.44);
+  const centerX = x + Math.round(cx * 0.43);
+  const rightX = x + cx - rightWidth;
+  const labelXml = withText
+    // 中文标签拆成独立文本框，避免 PowerPoint 在较窄三角区域中自动竖排或重叠。
+    ? textShapeXml({ id: idBase + 10, name: "Quarterly Diagnosis Problem Text A", x: x + 289560, y: y + 472440, cx: 701040, cy: 182880, text: "存在", size: 1050, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+      + textShapeXml({ id: idBase + 11, name: "Quarterly Diagnosis Problem Text B", x: x + 289560, y: y + 716280, cx: 701040, cy: 182880, text: "问题", size: 1050, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+      + textShapeXml({ id: idBase + 12, name: "Quarterly Diagnosis Method Text A", x: rightX + 228600, y: y + 472440, cx: 701040, cy: 182880, text: "改进", size: 1050, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+      + textShapeXml({ id: idBase + 13, name: "Quarterly Diagnosis Method Text B", x: rightX + 228600, y: y + 716280, cx: 701040, cy: 182880, text: "方法", size: 1050, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+    : "";
+  return solidShapeXml({ id: idBase, name: "Quarterly Diagnosis Problem Triangle", geom: "triangle", x, y: y + 152400, cx: leftWidth, cy: cy - 304800, fill: visual.primary })
+    + solidShapeXml({ id: idBase + 1, name: "Quarterly Diagnosis Method Triangle", geom: "triangle", x: rightX, y: y + 152400, cx: rightWidth, cy: cy - 304800, fill: visual.accent })
+    + solidShapeXml({ id: idBase + 2, name: "Quarterly Diagnosis Center Pivot", geom: "ellipse", x: centerX, y: y + Math.round(cy * 0.41), cx: 365760, cy: 365760, fill: visual.surface })
+    + lineFrameShapeXml({ id: idBase + 3, name: "Quarterly Diagnosis Pivot Ring", geom: "ellipse", x: centerX, y: y + Math.round(cy * 0.41), cx: 365760, cy: 365760, stroke: palette.rule, width: 15240 })
+    + solidShapeXml({ id: idBase + 4, name: "Quarterly Diagnosis Up Arrow", geom: "upArrow", x: x + Math.round(cx * 0.46), y: y - 30480, cx: 304800, cy: 365760, fill: palette.softGreen })
+    + solidShapeXml({ id: idBase + 5, name: "Quarterly Diagnosis Down Arrow", geom: "downArrow", x: x + Math.round(cx * 0.46), y: y + cy - 335280, cx: 304800, cy: 365760, fill: palette.softBlue })
+    + labelXml;
+}
+
+function quarterlyDiagnosisCoverNoteXml({ visual, scene }) {
+  return solidShapeXml({ id: 950, name: "Quarterly Diagnosis Left Note", x: 731520, y: 1752600, cx: 2072640, cy: 396240, fill: visual.surface })
+    + rectShapeXml({ id: 951, name: "Quarterly Diagnosis Left Note Stripe", x: 731520, y: 1752600, cx: 76200, cy: 396240, fill: visual.primary })
+    + textShapeXml({ id: 952, name: "Quarterly Diagnosis Left Note Text", x: 883920, y: 1859280, cx: 1676400, cy: 152400, text: scene.leftCards[0], size: 760, bold: true, color: visual.title })
+    + solidShapeXml({ id: 953, name: "Quarterly Diagnosis Right Note", x: 6751320, y: 3048000, cx: 2072640, cy: 396240, fill: visual.surface })
+    + rectShapeXml({ id: 954, name: "Quarterly Diagnosis Right Note Stripe", x: 6751320, y: 3048000, cx: 76200, cy: 396240, fill: visual.accent })
+    + textShapeXml({ id: 955, name: "Quarterly Diagnosis Right Note Text", x: 6903720, y: 3154680, cx: 1676400, cy: 152400, text: scene.rightCards[0], size: 760, bold: true, color: visual.title });
+}
+
+function quarterlyDiagnosisSideCardsXml({ visual, scene, palette }) {
+  const leftCards = scene.leftCards.map((text, itemIndex) => {
+    const y = 1371600 + itemIndex * 502920;
+    return solidShapeXml({ id: 960 + itemIndex * 4, name: `Quarterly Diagnosis Problem Card ${itemIndex + 1}`, x: 518160, y, cx: 2133600, cy: 335280, fill: visual.surface })
+      + rectShapeXml({ id: 961 + itemIndex * 4, name: `Quarterly Diagnosis Problem Stripe ${itemIndex + 1}`, x: 518160, y, cx: 76200, cy: 335280, fill: visual.primary })
+      + textShapeXml({ id: 962 + itemIndex * 4, name: `Quarterly Diagnosis Problem Card Text ${itemIndex + 1}`, x: 670560, y: y + 91440, cx: 1676400, cy: 152400, text, size: 760, bold: true, color: visual.title });
+  }).join("");
+  const rightCards = scene.rightCards.map((text, itemIndex) => {
+    const y = 1371600 + itemIndex * 502920;
+    return solidShapeXml({ id: 980 + itemIndex * 4, name: `Quarterly Diagnosis Method Card ${itemIndex + 1}`, x: 6492240, y, cx: 2133600, cy: 335280, fill: visual.surface })
+      + rectShapeXml({ id: 981 + itemIndex * 4, name: `Quarterly Diagnosis Method Stripe ${itemIndex + 1}`, x: 6492240, y, cx: 76200, cy: 335280, fill: visual.accent })
+      + textShapeXml({ id: 982 + itemIndex * 4, name: `Quarterly Diagnosis Method Card Text ${itemIndex + 1}`, x: 6644640, y: y + 91440, cx: 1676400, cy: 152400, text, size: 760, bold: true, color: visual.title });
+  }).join("");
+  return leftCards + rightCards
+    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 1000 + itemIndex, name: `Quarterly Diagnosis Evidence Pill ${itemIndex + 1}`, geom: "roundRect", x: 3185160 + itemIndex * 670560, y: 3810000, cx: 518160, cy: 198120, fill: itemIndex % 2 ? visual.accent : palette.softBlue })).join("");
+}
+
+function quarterlyDiagnosisActionPathXml({ visual, palette }) {
+  return solidShapeXml({ id: 1040, name: "Quarterly Diagnosis Action Arrow 1", geom: "rightArrow", x: 4267200, y: 1524000, cx: 2133600, cy: 426720, fill: visual.primary })
+    + solidShapeXml({ id: 1041, name: "Quarterly Diagnosis Action Arrow 2", geom: "rightArrow", x: 5029200, y: 2179320, cx: 2133600, cy: 426720, fill: visual.accent })
+    + solidShapeXml({ id: 1042, name: "Quarterly Diagnosis Action Arrow 3", geom: "rightArrow", x: 5791200, y: 2834640, cx: 1524000, cy: 426720, fill: palette.softBlue });
+}
+
+function quarterlyDiagnosisClosingTextXml({ visual, scene }) {
+  return textShapeXml({ id: 1050, name: "Quarterly Diagnosis Closing Title", x: 731520, y: 3200400, cx: 3200400, cy: 304800, text: scene.endingTitle, size: 1500, bold: true, color: visual.title })
+    + textShapeXml({ id: 1051, name: "Quarterly Diagnosis Closing Caption", x: 731520, y: 3581400, cx: 3200400, cy: 243840, text: scene.endingCaption, size: 900, bold: true, color: visual.body });
+}
+
+function quarterlyDiagnosisColorPalette(visual) {
+  return {
+    rule: blendHexColor(visual.title, visual.background, 0.38),
+    softBlue: blendHexColor(visual.primary, visual.background, 0.58),
+    softGreen: blendHexColor(visual.accent, visual.background, 0.56),
+  };
+}
+
+function quarterlyDiagnosisScene(visual) {
+  const variant = quarterlyDiagnosisVariant(visual);
+  const scenes = {
+    "problem-diagnosis": {
+      variant: "problem-diagnosis",
+      kicker: "DIAGNOSIS REVIEW",
+      section: "ISSUE ANALYSIS",
+      endingTitle: "诊断结论与改善方向",
+      endingCaption: "问题闭环 / 责任到人 / 下季追踪",
+      leftCards: ["目标偏差", "过程断点", "资源瓶颈", "协同低效"],
+      rightCards: ["原因归因", "优先级排序", "整改动作", "跟踪机制"],
+    },
+  };
+  return scenes[variant] || scenes["problem-diagnosis"];
+}
+
+function quarterlyDiagnosisVariant(visual) {
+  return ["problem-diagnosis"].includes(visual?.variant) ? visual.variant : "problem-diagnosis";
+}
+
+function quarterlyActionLoopDecorationsXml({ visual, index, layout, slide }) {
+  const scene = quarterlyActionLoopScene(visual);
+  const palette = quarterlyActionLoopColorPalette(visual);
+  const isCover = index === 0;
+  const isClosing = index >= 3;
+  // 行动闭环模板参考用户提供的蓝白商务预览，主体全部用可编辑形状绘制。
+  const base = solidShapeXml({ id: 1100, name: "Quarterly Action Loop Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + rectShapeXml({ id: 1101, name: "Quarterly Action Loop Header", x: 0, y: 0, cx: 9144000, cy: 685800, fill: visual.surface })
+    + rectShapeXml({ id: 1102, name: "Quarterly Action Loop Header Rule", x: 365760, y: 777240, cx: 8412480, cy: 22860, fill: visual.primary })
+    + solidShapeXml({ id: 1103, name: "Quarterly Action Loop Canvas", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: layout.surface.cy, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1104, name: "Quarterly Action Loop Canvas Frame", geom: "rect", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: layout.surface.cy, stroke: palette.frame, width: 11430 })
+    + textShapeXml({ id: 1105, name: "Quarterly Action Loop Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 850, bold: true, color: visual.title })
+    + rectShapeXml({ id: 1106, name: "Quarterly Action Loop Footer Rule", x: 365760, y: 4724400, cx: 8412480, cy: 22860, fill: visual.accent });
+
+  if (isCover) {
+    return base
+      + solidShapeXml({ id: 1111, name: "Quarterly Action Loop Cover Pill", geom: "roundRect", x: 5265420, y: 1363980, cx: 2438400, cy: 228600, fill: visual.primary })
+      + textShapeXml({ id: 1112, name: "Quarterly Action Loop Cover Pill Text", x: 5501640, y: 1409700, cx: 1905000, cy: 106680, text: "建立弹性化流程，提升精细化管理水平", size: 620, bold: true, color: "FFFFFF" })
+      + quarterlyActionLoopContentCardXml({ visual, palette, slide, role: "cover" })
+      + quarterlyActionLoopThreeColumnXml({ visual, palette, scene })
+      + quarterlyActionLoopCoreXml({ visual, palette, x: 3505200, y: 2087880, cx: 2057400, cy: 1676400, idBase: 1160 });
+  }
+
+  if (isClosing) {
+    return base
+      + textShapeXml({ id: 1120, name: "Quarterly Action Loop Closing Title", x: 640080, y: 1600200, cx: 3505200, cy: 304800, text: scene.endingTitle, size: 1520, bold: true, color: visual.title })
+      + textShapeXml({ id: 1121, name: "Quarterly Action Loop Closing Caption", x: 640080, y: 2057400, cx: 3657600, cy: 243840, text: scene.endingCaption, size: 900, bold: true, color: visual.body })
+      + quarterlyActionLoopContentCardXml({ visual, palette, slide, role: "closing" })
+      + quarterlyActionLoopRoadmapXml({ visual, palette, x: 4572000, y: 1676400, idBase: 1130 });
+  }
+
+  return base
+    + quarterlyActionLoopContentCardXml({ visual, palette, slide, role: "content" })
+    + quarterlyActionLoopPlanArrowXml({ visual, palette })
+    + quarterlyActionLoopMatrixXml({ visual, palette, scene })
+    + quarterlyActionLoopProgressXml({ visual, palette });
+}
+
+function quarterlyActionLoopContentCardXml({ visual, palette, slide, role }) {
+  // 把用户编辑的标题和要点统一放进安全内容卡，避免默认标题/正文层和装饰图形互相覆盖。
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+  const fallback = quarterlyActionLoopCompactText(slide?.title, "本页重点", 22);
+  const title = quarterlyActionLoopCompactText(slide?.title, "本页重点", role === "cover" ? 42 : 48);
+  const items = [title, ...bullets].filter(Boolean).slice(0, role === "cover" ? 3 : 4);
+  const position = role === "cover"
+    ? { x: 640080, y: 1379220, cx: 3505200, cy: 640080 }
+    : role === "closing"
+      ? { x: 640080, y: 2438400, cx: 3352800, cy: 944880 }
+      : { x: 640080, y: 1714500, cx: 3505200, cy: 975360 };
+  const textXml = items.map((item, index) => {
+    const lineGap = role === "cover" ? 137160 : 167640;
+    const y = position.y + 106680 + index * lineGap;
+    const isTitle = index === 0;
+    const text = isTitle
+      ? quarterlyActionLoopCompactText(item, fallback, role === "cover" ? 38 : 44)
+      : quarterlyActionLoopCompactText(item, fallback, role === "cover" ? 34 : 40);
+    return textShapeXml({ id: 1322 + index, name: `Quarterly Action Loop Content Text ${index + 1}`, x: position.x + 198120, y, cx: position.cx - 396240, cy: isTitle ? 152400 : 121920, text, size: isTitle ? 680 : role === "cover" ? 520 : 560, bold: true, color: isTitle ? visual.title : visual.body })
+      + rectShapeXml({ id: 1328 + index, name: `Quarterly Action Loop Content Stripe ${index + 1}`, x: position.x + 106680, y: y + 15240, cx: 30480, cy: isTitle ? 106680 : 91440, fill: isTitle ? visual.primary : visual.accent });
+  }).join("");
+  return solidShapeXml({ id: 1320, name: "Quarterly Action Loop Content Card", geom: "roundRect", ...position, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1321, name: "Quarterly Action Loop Content Card Frame", geom: "roundRect", ...position, stroke: palette.frame, width: 9525 })
+    + textXml;
+}
+
+function quarterlyActionLoopThreeColumnXml({ visual, palette, scene }) {
+  const columns = scene.columns.map((column, columnIndex) => {
+    const x = 670560 + columnIndex * 2895600;
+    const headerX = x + 670560;
+    const cardXml = column.items.map((item, itemIndex) => {
+      const y = 2240280 + itemIndex * 335280;
+      return solidShapeXml({ id: 1200 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop Task Card ${columnIndex + 1}-${itemIndex + 1}`, x: x + 152400, y, cx: 1676400, cy: 228600, fill: palette.card })
+        + rectShapeXml({ id: 1201 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop Task Card Rule ${columnIndex + 1}-${itemIndex + 1}`, x: x + 152400, y: y + 198120, cx: 1676400, cy: 30480, fill: columnIndex === 1 ? visual.accent : visual.primary })
+        + textShapeXml({ id: 1202 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop Task Text ${columnIndex + 1}-${itemIndex + 1}`, x: x + 304800, y: y + 60960, cx: 1371600, cy: 106680, text: item, size: 650, bold: true, color: visual.body });
+    }).join("");
+    return solidShapeXml({ id: 1190 + columnIndex * 3, name: `Quarterly Action Loop Column ${columnIndex + 1}`, x, y: 1866900, cx: 1981200, cy: 1981200, fill: "F8FBFF" })
+      + lineFrameShapeXml({ id: 1191 + columnIndex * 3, name: `Quarterly Action Loop Column Frame ${columnIndex + 1}`, geom: "rect", x, y: 1866900, cx: 1981200, cy: 1981200, stroke: palette.frame, width: 9525 })
+      + solidShapeXml({ id: 1192 + columnIndex * 3, name: `Quarterly Action Loop Column Header ${columnIndex + 1}`, geom: "roundRect", x: headerX, y: 1752600, cx: 914400, cy: 243840, fill: columnIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1193 + columnIndex * 3, name: `Quarterly Action Loop Column Header Text ${columnIndex + 1}`, x: headerX + 121920, y: 1813560, cx: 670560, cy: 106680, text: column.title, size: 660, bold: true, color: "FFFFFF" })
+      + cardXml;
+  }).join("");
+  return columns;
+}
+
+function quarterlyActionLoopCoreXml({ visual, palette, x, y, cx, cy, idBase }) {
+  return arcLineShapeXml({ id: idBase, name: "Quarterly Action Loop Core Spiral A", x, y, cx, cy, stroke: visual.accent, width: 38100 })
+    + arcLineShapeXml({ id: idBase + 1, name: "Quarterly Action Loop Core Spiral B", x: x + 152400, y: y + 304800, cx: cx - 304800, cy: cy - 609600, stroke: visual.primary, width: 30480 })
+    + solidShapeXml({ id: idBase + 2, name: "Quarterly Action Loop Core Dot", geom: "ellipse", x: x + Math.round(cx * 0.44), y: y + Math.round(cy * 0.42), cx: 243840, cy: 243840, fill: palette.softBlue })
+    + textShapeXml({ id: idBase + 3, name: "Quarterly Action Loop Core Text", x: x + 426720, y: y + 731520, cx: 1219200, cy: 365760, text: "计划\n执行\n检查\n复盘", size: 780, bold: true, color: visual.title });
+}
+
+function quarterlyActionLoopPlanArrowXml({ visual, palette }) {
+  const labels = ["计划", "执行", "检查", "复盘"];
+  return labels.map((label, itemIndex) => {
+    const x = 685800 + itemIndex * 1981200;
+    return solidShapeXml({ id: 1260 + itemIndex * 3, name: `Quarterly Action Loop Roadmap Arrow ${itemIndex + 1}`, geom: "rightArrow", x, y: 3657600, cx: 1905000, cy: 365760, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1261 + itemIndex * 3, name: `Quarterly Action Loop Roadmap Text ${itemIndex + 1}`, x: x + 533400, y: 3764280, cx: 670560, cy: 121920, text: label, size: 760, bold: true, color: "FFFFFF" });
+  }).join("")
+    + rectShapeXml({ id: 1274, name: "Quarterly Action Loop Roadmap Baseline", x: 670560, y: 4267200, cx: 7772400, cy: 30480, fill: palette.softBlue });
+}
+
+function quarterlyActionLoopMatrixXml({ visual, palette, scene }) {
+  return scene.owners.map((owner, itemIndex) => {
+    const x = 4572000 + itemIndex * 1219200;
+    return solidShapeXml({ id: 1280 + itemIndex * 3, name: `Quarterly Action Loop Owner Matrix ${itemIndex + 1}`, geom: "roundRect", x, y: 1600200, cx: 1066800, cy: 731520, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1281 + itemIndex * 3, name: `Quarterly Action Loop Owner Matrix Rule ${itemIndex + 1}`, x, y: 1600200, cx: 1066800, cy: 60960, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1282 + itemIndex * 3, name: `Quarterly Action Loop Owner Matrix Text ${itemIndex + 1}`, x: x + 152400, y: 1905000, cx: 762000, cy: 152400, text: owner, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function quarterlyActionLoopProgressXml({ visual, palette }) {
+  const bars = [0.32, 0.5, 0.7, 0.48, 0.82].map((ratio, index) => {
+    const cy = Math.round(640080 * ratio);
+    return solidShapeXml({ id: 1300 + index, name: `Quarterly Action Loop Progress Bar ${index + 1}`, geom: "roundRect", x: 1066800 + index * 426720, y: 3406140 - cy, cx: 182880, cy, fill: index > 2 ? visual.accent : visual.primary });
+  }).join("");
+  return solidShapeXml({ id: 1290, name: "Quarterly Action Loop Progress Panel", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1291, name: "Quarterly Action Loop Progress Frame", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, stroke: palette.frame, width: 9525 })
+    + textShapeXml({ id: 1292, name: "Quarterly Action Loop Progress Title", x: 914400, y: 2743200, cx: 1371600, cy: 152400, text: "杩涘害杩借釜", size: 760, bold: true, color: visual.title })
+    + bars;
+}
+
+function quarterlyActionLoopRoadmapXml({ visual, palette, x, y, idBase }) {
+  const labels = ["鐩爣鎷嗚В", "鎵ц杩借釜", "缁撴灉澶嶇洏", "涓嬪浼樺寲"];
+  return labels.map((label, itemIndex) => {
+    const cardX = x + itemIndex * 990600;
+    return solidShapeXml({ id: idBase + itemIndex * 3, name: `Quarterly Action Loop Closing Card ${itemIndex + 1}`, geom: "roundRect", x: cardX, y, cx: 838200, cy: 609600, fill: itemIndex % 2 ? palette.card : "FFFFFF" })
+      + lineFrameShapeXml({ id: idBase + itemIndex * 3 + 1, name: `Quarterly Action Loop Closing Card Frame ${itemIndex + 1}`, geom: "roundRect", x: cardX, y, cx: 838200, cy: 609600, stroke: palette.frame, width: 9525 })
+      + textShapeXml({ id: idBase + itemIndex * 3 + 2, name: `Quarterly Action Loop Closing Card Text ${itemIndex + 1}`, x: cardX + 91440, y: y + 228600, cx: 655320, cy: 121920, text: label, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function quarterlyActionLoopColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.28),
+    frame: blendHexColor(visual.primary, visual.surface, 0.34),
+    softBlue: blendHexColor(visual.accent, visual.background, 0.58),
+  };
+}
+
+function quarterlyActionLoopCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function quarterlyActionLoopScene(visual) {
+  const variant = quarterlyActionLoopVariant(visual);
+  const scenes = {
+    "action-loop": {
+      variant: "action-loop",
+      kicker: "ACTION LOOP REVIEW",
+      section: "EXECUTION CLOSED LOOP",
+      coverTitle: "2026-2025 季度重点工作行动闭环",
+      endingTitle: "复盘沉淀与下一步行动",
+      endingCaption: "目标拆解 / 执行追踪 / 结果复盘 / 持续优化",
+      columns: [
+        { title: "目标拆解", items: ["完成经营目标", "明确关键动作", "分解重点项目", "沉淀检查标准"] },
+        { title: "执行追踪", items: ["任务看板", "周度同步", "风险预警", "资源协调"] },
+        { title: "结果复盘", items: ["目标达成", "经验沉淀", "问题修复", "下季计划"] },
+      ],
+      owners: ["负责人", "协同部门", "截止日期"],
+    },
+  };
+  return scenes[variant] || scenes["action-loop"];
+}
+
+function quarterlyActionLoopVariant(visual) {
+  return ["action-loop"].includes(visual?.variant) ? visual.variant : "action-loop";
+}
+
 function financialReviewDecorationsXml({ visual, index, layout }) {
   const scene = financialReviewScene(visual);
   const palette = financialReviewColorPalette(visual);
@@ -2507,13 +3270,31 @@ function financialReviewDecorationsXml({ visual, index, layout }) {
   return solidShapeXml({ id: 100, name: "Financial Visual Panel", geom: "roundRect", x: 6233160, y: 1394460, cx: 2011680, cy: 1463040, fill: palette.panel })
     + lineFrameShapeXml({ id: 101, name: "Financial Visual Frame", geom: "roundRect", x: 6141720, y: 1303020, cx: 2011680, cy: 1463040, stroke: visual.accent, width: 15240 })
     + solidShapeXml({ id: 102, name: `Financial ${scene.variant} Chip`, geom: scene.chipShape, x: 7040880, y: 914400, cx: 822960, cy: 274320, fill: palette.chip })
-    + textShapeXml({ id: 103, name: "Financial Chip Text", x: 7162800, y: 967740, cx: 548640, cy: 152400, text: scene.chip, size: 800, bold: true, color: "FFFFFF" })
+    + textShapeXml({ id: 103, name: "Financial Chip Text", x: 7162800, y: 967740, cx: 548640, cy: 152400, text: "", size: 800, bold: true, color: "FFFFFF" })
     + textShapeXml({ id: 104, name: "Financial Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 1000, bold: true, color: visual.accent })
     + solidShapeXml({ id: 105, name: "Financial Focus Line", x: 914400, y: isCover ? 3322320 : 1516380, cx: 3505200, cy: 22860, fill: visual.accent })
     + financialReviewVisualXml({ visual, palette, scene });
 }
 
 function financialReviewVisualXml({ visual, palette, scene }) {
+  if (scene.variant === "control-room") {
+    return solidShapeXml({ id: 110, name: "Operating Dashboard Radar", geom: "ellipse", x: 6477000, y: 1584960, cx: 548640, cy: 548640, fill: palette.soft })
+      + lineFrameShapeXml({ id: 111, name: "Operating Dashboard Ring", geom: "ellipse", x: 6385560, y: 1493520, cx: 731520, cy: 731520, stroke: visual.accent, width: 22860 })
+      + solidShapeXml({ id: 112, name: "Operating Dashboard Trend Base", x: 6423660, y: 2484120, cx: 1463040, cy: 22860, fill: palette.line })
+      + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 113 + itemIndex, name: `Operating Dashboard KPI ${itemIndex + 1}`, geom: "roundRect", x: 6926580, y: 1569720 + itemIndex * 304800, cx: 762000, cy: 152400, fill: itemIndex === 1 ? visual.accent : palette.soft })).join("");
+  }
+  if (scene.variant === "warning") {
+    return [0, 1, 2].map((itemIndex) => {
+      const y = 1615440 + itemIndex * 350520;
+      return solidShapeXml({ id: 110 + itemIndex * 4, name: `Operating Warning Light ${itemIndex + 1}`, geom: "ellipse", x: 6454140, y, cx: 182880, cy: 182880, fill: itemIndex === 1 ? "EF4444" : visual.accent })
+        + solidShapeXml({ id: 111 + itemIndex * 4, name: `Operating Warning Bar ${itemIndex + 1}`, geom: "roundRect", x: 6774180, y: y + 30480, cx: 1127760 - itemIndex * 152400, cy: 121920, fill: palette.soft });
+    }).join("");
+  }
+  if (scene.variant === "monthly") {
+    return solidShapeXml({ id: 110, name: "Operating Monthly Calendar", geom: "roundRect", x: 6454140, y: 1546860, cx: 1371600, cy: 990600, fill: palette.soft })
+      + rectShapeXml({ id: 111, name: "Operating Monthly Calendar Header", x: 6454140, y: 1546860, cx: 1371600, cy: 182880, fill: visual.primary })
+      + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 112 + itemIndex, name: `Operating Monthly Trend ${itemIndex + 1}`, geom: "roundRect", x: 6507480 + itemIndex * 274320, y: 2346960 - itemIndex * 121920, cx: 121920, cy: 121920 + itemIndex * 121920, fill: itemIndex === 3 ? visual.accent : blendHexColor(visual.accent, visual.surface, 0.32) })).join("");
+  }
   if (scene.variant === "audit") {
     return [0, 1, 2].map((itemIndex) => {
       const y = 1699260 + itemIndex * 304800;
@@ -2553,36 +3334,61 @@ function financialReviewScene(visual) {
       variant: "quarterly",
       kicker: "FINANCE REVIEW",
       section: "QUARTERLY RESULT",
-      chip: "复盘",
+      chip: "澶嶇洏",
       chipShape: "roundRect",
-      points: ["收入结构", "利润质量", "现金效率"],
+      points: ["鏀跺叆缁撴瀯", "鍒╂鼎璐ㄩ噺", "鐜伴噾鏁堢巼"],
     },
     audit: {
       variant: "audit",
       kicker: "AUDIT CHECK",
       section: "RISK REVIEW",
-      chip: "审计",
+      chip: "瀹¤",
       chipShape: "rect",
-      points: ["差异核验", "风险底稿", "整改闭环"],
+      points: ["宸紓鏍搁獙", "椋庨櫓搴曠", "鏁存敼闂幆"],
     },
     forecast: {
       variant: "forecast",
       kicker: "FORECAST PLAN",
       section: "BUDGET OUTLOOK",
-      chip: "预测",
+      chip: "棰勬祴",
       chipShape: "parallelogram",
-      points: ["滚动预测", "预算校准", "情景假设"],
+      points: ["婊氬姩棰勬祴", "棰勭畻鏍″噯", "鎯呮櫙鍋囪"],
+    },
+    "control-room": {
+      variant: "control-room",
+      kicker: "CONTROL PANEL",
+      section: "KPI OVERVIEW",
+      chip: "鐩戞帶",
+      chipShape: "roundRect",
+      points: ["鏍稿績鎸囨爣", "瓒嬪娍鐩戞帶", "缁忚惀缁撹"],
+    },
+    warning: {
+      variant: "warning",
+      kicker: "RISK SIGNAL",
+      section: "EXCEPTION REVIEW",
+      chip: "棰勮",
+      chipShape: "rect",
+      points: ["寮傚父鎸囨爣", "褰卞搷鑼冨洿", "澶勭疆鍔ㄤ綔"],
+    },
+    monthly: {
+      variant: "monthly",
+      kicker: "MONTHLY REVIEW",
+      section: "OPERATING RHYTHM",
+      chip: "鏈堟姤",
+      chipShape: "parallelogram",
+      points: ["鏈堝害鎸囨爣", "閲嶇偣浜嬮」", "涓嬫湀鍔ㄤ綔"],
     },
   };
   return scenes[variant] || scenes.quarterly;
 }
 
 function financialReviewVariant(visual) {
-  return ["quarterly", "audit", "forecast"].includes(visual?.variant) ? visual.variant : "quarterly";
+  return ["quarterly", "audit", "forecast", "control-room", "warning", "monthly"].includes(visual?.variant) ? visual.variant : "quarterly";
 }
 
 function isFinancialReviewVisual(visual) {
-  return visual?.id === "financial-review" && visual?.layout === "executive";
+  const id = String(visual?.id || "");
+  return (id === "financial-review" || id === "operating-dashboard" || id.startsWith("finance-operating-dashboard-")) && visual?.layout === "executive";
 }
 
 function strategyConsultingDecorationsXml({ visual, index, layout }) {
@@ -2592,7 +3398,7 @@ function strategyConsultingDecorationsXml({ visual, index, layout }) {
   return pictureXml({ id: 60, name: "Strategy Consulting Image", relId: "rId2", x: 6431280, y: 1470660, cx: 1828800, cy: 1280160 })
     + lineFrameShapeXml({ id: 61, name: "Strategy Consulting Image Frame", geom: "roundRect", x: 6339840, y: 1379220, cx: 1828800, cy: 1280160, stroke: visual.accent, width: 15240 })
     + solidShapeXml({ id: 62, name: `Strategy ${scene.variant} Chip`, geom: scene.chipShape, x: 7040880, y: 914400, cx: 822960, cy: 274320, fill: palette.chip })
-    + textShapeXml({ id: 63, name: "Strategy Chip Text", x: 7162800, y: 967740, cx: 548640, cy: 152400, text: scene.chip, size: 800, bold: true, color: "FFFFFF" })
+    + textShapeXml({ id: 63, name: "Strategy Chip Text", x: 7162800, y: 967740, cx: 548640, cy: 152400, text: "", size: 800, bold: true, color: "FFFFFF" })
     + textShapeXml({ id: 64, name: "Strategy Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 1000, bold: true, color: visual.accent })
     + solidShapeXml({ id: 65, name: "Strategy Consulting Focus Line", x: 914400, y: isCover ? 3322320 : 1516380, cx: 3505200, cy: 22860, fill: visual.accent });
 }
@@ -2669,33 +3475,33 @@ function statusReportScene(visual) {
       variant: "weekly",
       kicker: "PROJECT WEEKLY",
       section: "WEEKLY UPDATE",
-      sticker: "进度",
+      sticker: "杩涘害",
       metrics: [
-        { value: "95%", label: "进度达成" },
-        { value: "3", label: "关键风险" },
-        { value: "7", label: "本周事项" },
+        { value: "95%", label: "杩涘害杈炬垚" },
+        { value: "3", label: "鍏抽敭椋庨櫓" },
+        { value: "7", label: "鏈懆浜嬮」" },
       ],
     },
     steering: {
       variant: "steering",
       kicker: "STEERING MEETING",
       section: "DECISION REVIEW",
-      sticker: "决策",
+      sticker: "鍐崇瓥",
       metrics: [
-        { value: "4", label: "核心议题" },
-        { value: "2", label: "待决事项" },
-        { value: "8", label: "行动责任" },
+        { value: "4", label: "鏍稿績璁" },
+        { value: "2", label: "寰呭喅浜嬮」" },
+        { value: "8", label: "琛屽姩璐ｄ换" },
       ],
     },
     delivery: {
       variant: "delivery",
       kicker: "DELIVERY TRACK",
       section: "MILESTONE CHECK",
-      sticker: "验收",
+      sticker: "楠屾敹",
       metrics: [
-        { value: "12", label: "交付节点" },
-        { value: "96%", label: "验收通过" },
-        { value: "5", label: "风险闭环" },
+        { value: "12", label: "浜や粯鑺傜偣" },
+        { value: "96%", label: "楠屾敹閫氳繃" },
+        { value: "5", label: "椋庨櫓闂幆" },
       ],
     },
   };
@@ -2711,7 +3517,7 @@ function statusReportVariant(visual) {
 }
 
 /**
- * 创建 top-band 底部细网格，让页面有正式 PPT 模板常见的版心和工程感装饰。
+ * 鍒涘缓 top-band 搴曢儴缁嗙綉鏍硷紝璁╅〉闈㈡湁姝ｅ紡 PPT 妯℃澘甯歌鐨勭増蹇冨拰宸ョ▼鎰熻楗般€?
  * @param {{id: number, palette: object}} input
  * @returns {string}
  */
@@ -2736,9 +3542,9 @@ function pictureXml({ id, name, relId, x, y, cx, cy }) {
 }
 
 /**
- * 创建绝对定位文本框。
- * dome 相关文本框默认写入 Source Han Sans 字体声明，贴近原模板字形。
- * 主标题可传入 dome-gold-gradient，复用 dome.pptx 的金色渐变文字。
+ * 鍒涘缓缁濆瀹氫綅鏂囨湰妗嗐€?
+ * dome 鐩稿叧鏂囨湰妗嗛粯璁ゅ啓鍏?Source Han Sans 瀛椾綋澹版槑锛岃创杩戝師妯℃澘瀛楀舰銆?
+ * 涓绘爣棰樺彲浼犲叆 dome-gold-gradient锛屽鐢?dome.pptx 鐨勯噾鑹叉笎鍙樻枃瀛椼€?
  * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, text?: string, body?: string, size: number, bold: boolean, color?: string}} input
  * @returns {string}
  */
@@ -2748,7 +3554,7 @@ function textShapeXml({ id, name, x, y, cx, cy, text, body, size, bold, color = 
 }
 
 /**
- * 创建一个 DrawingML 段落。
+ * 鍒涘缓涓€涓?DrawingML 娈佃惤銆?
  * @param {unknown} value
  * @param {number} [size]
  * @param {boolean} [bold]
@@ -2760,7 +3566,7 @@ function paragraphXml(value, size = 2200, bold = false, color = "1F2937", fontFa
 }
 
 /**
- * 为文本 run 写入字体族。
+ * 涓烘枃鏈?run 鍐欏叆瀛椾綋鏃忋€?
  * @param {string} fontFace
  * @returns {string}
  */
@@ -2771,8 +3577,8 @@ function fontFaceXml(fontFace) {
 }
 
 /**
- * 生成文本 run 的填充效果。
- * dome-gold-gradient 使用当前 red-gold 色板参数生成过渡色，方向为 5400000。
+ * 鐢熸垚鏂囨湰 run 鐨勫～鍏呮晥鏋溿€?
+ * dome-gold-gradient 浣跨敤褰撳墠 red-gold 鑹叉澘鍙傛暟鐢熸垚杩囨浮鑹诧紝鏂瑰悜涓?5400000銆?
  * @param {string} color
  * @param {string} fillStyle
  * @returns {string}
@@ -2794,8 +3600,8 @@ function textFillXml(color, fillStyle = "") {
 }
 
 /**
- * 创建 store-only ZIP 包。
- * 这里不压缩文件内容，直接拼出 PPTX 需要的 ZIP 结构和 CRC。
+ * 鍒涘缓 store-only ZIP 鍖呫€?
+ * 杩欓噷涓嶅帇缂╂枃浠跺唴瀹癸紝鐩存帴鎷煎嚭 PPTX 闇€瑕佺殑 ZIP 缁撴瀯鍜?CRC銆?
  * @param {Record<string, string>} files
  * @returns {Buffer}
  */
@@ -2866,7 +3672,7 @@ function crc32(buffer) {
 }
 
 /**
- * 构建最小 PDF 文件。
+ * 鏋勫缓鏈€灏?PDF 鏂囦欢銆?
  * @param {string[]} objects
  * @returns {string}
  */
@@ -2914,8 +3720,8 @@ function pdfUnicodeText(value) {
 }
 
 /**
- * 构建用户下载文件名。
- * 规则: PPT-标题-模板ID-页数p-生成时间-短ID.ext，既方便用户区分，也保持 HTTP 头和对象存储的 ASCII 安全。
+ * 鏋勫缓鐢ㄦ埛涓嬭浇鏂囦欢鍚嶃€?
+ * 瑙勫垯: PPT-鏍囬-妯℃澘ID-椤垫暟p-鐢熸垚鏃堕棿-鐭璉D.ext锛屾棦鏂逛究鐢ㄦ埛鍖哄垎锛屼篃淇濇寔 HTTP 澶村拰瀵硅薄瀛樺偍鐨?ASCII 瀹夊叏銆?
  * @param {{deck: object, format: string}} input
  * @returns {string}
  */
@@ -2930,7 +3736,7 @@ function exportFileName({ deck, format }) {
 }
 
 /**
- * 生成文件名片段，移除中文、空格和特殊字符，避免 Content-Disposition 在部分浏览器中乱码。
+ * 鐢熸垚鏂囦欢鍚嶇墖娈碉紝绉婚櫎涓枃銆佺┖鏍煎拰鐗规畩瀛楃锛岄伩鍏?Content-Disposition 鍦ㄩ儴鍒嗘祻瑙堝櫒涓贡鐮併€?
  * @param {string} value
  * @param {{maxLength?: number}} options
  * @returns {string}
@@ -2946,7 +3752,7 @@ function safeFileNameSegment(value, { maxLength = 64 } = {}) {
 }
 
 /**
- * 将 deck 时间标准化为北京时间友好的紧凑格式。
+ * 灏?deck 鏃堕棿鏍囧噯鍖栦负鍖椾含鏃堕棿鍙嬪ソ鐨勭揣鍑戞牸寮忋€?
  * @param {string | number | Date | undefined} value
  * @returns {string}
  */
@@ -2967,7 +3773,7 @@ function exportTimestamp(value) {
 }
 
 /**
- * 从 deck ID 中提取短标识，便于定位记录且不让文件名过长。
+ * 浠?deck ID 涓彁鍙栫煭鏍囪瘑锛屼究浜庡畾浣嶈褰曚笖涓嶈鏂囦欢鍚嶈繃闀裤€?
  * @param {string | undefined} id
  * @returns {string}
  */
@@ -2975,3 +3781,4 @@ function shortDeckId(id) {
   const compact = String(id || "").replaceAll(/[^a-zA-Z0-9]/g, "");
   return compact ? compact.slice(-6) : "";
 }
+

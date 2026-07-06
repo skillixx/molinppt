@@ -1,0 +1,44 @@
+{
+  "baseTemplateId": "operating-dashboard",
+  "themeId": "warning",
+  "style": "operating-dashboard",
+  "themes": [
+    {
+      "id": "warning",
+      "name": "指标预警",
+      "visual": {
+        "primary": "1E293B",
+        "accent": "F59E0B",
+        "background": "F4F1EA",
+        "surface": "FFFFFF",
+        "title": "111827",
+        "body": "475569",
+        "layout": "executive",
+        "variant": "warning"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E293B",
+    "accent": "F59E0B",
+    "background": "F4F1EA",
+    "surface": "FFFFFF",
+    "title": "111827",
+    "body": "475569",
+    "layout": "executive",
+    "variant": "warning"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "metrics",
+      "retrospective",
+      "next-plan",
+      "title",
+      "content"
+    ]
+  }
+}

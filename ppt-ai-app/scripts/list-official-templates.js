@@ -9,31 +9,29 @@ const asJson = process.argv.includes("--json");
 let hasError = false;
 
 try {
-  const entries = await fs.readdir(rootDir, { withFileTypes: true });
+  const entries = await findTemplateManifestEntries(rootDir);
   const templates = [];
 
   for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const dir = path.join(rootDir, entry.name);
+    const dir = entry.dir;
     const manifestPath = path.join(dir, "manifest.json");
-    if (!(await safeExists(manifestPath))) continue;
 
     try {
       const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
-      const slug = manifest.slug || entry.name;
+      const slug = manifest.slug || entry.relativeDir;
       const status = manifest.status || "active";
       const templatePath = path.join(dir, manifest.template_file || "template.json");
-      const sourceFile = path.join(dir, manifest.source_file || "source.pptx");
-      const thumbFile = path.join(dir, manifest.thumbnail_file || "thumbnail.png");
+      const sourceFile = manifest.source_file ? path.join(dir, manifest.source_file) : "";
+      const thumbFile = manifest.thumbnail_file ? path.join(dir, manifest.thumbnail_file) : "";
 
       const [templateData, sourceExists, thumbExists] = await Promise.all([
         safeReadJson(templatePath),
-        safeExists(sourceFile),
-        safeExists(thumbFile),
+        sourceFile ? safeExists(sourceFile) : Promise.resolve(false),
+        thumbFile ? safeExists(thumbFile) : Promise.resolve(false),
       ]);
 
       const sourceInfo = templateData?.source || {};
-      const validFiles = sourceExists && thumbExists && Boolean(templateData);
+      const validFiles = Boolean(templateData) && (!manifest.source_file || sourceExists) && (!manifest.thumbnail_file || thumbExists);
       const isUsable = validFiles && manifest.status === "active";
 
       templates.push({
@@ -48,14 +46,14 @@ try {
         thumbnail_file_exists: thumbExists,
         usable: isUsable,
         source_repository: sourceInfo.repository || "N/A",
-        source_file: sourceInfo.file || manifest.source_file || "source.pptx",
+        source_file: sourceInfo.file || manifest.source_file || "N/A",
         source_license: sourceInfo.license || "N/A",
         source_commit: sourceInfo.commit || "N/A",
       });
     } catch (error) {
       hasError = true;
       templates.push({
-        slug: entry.name,
+        slug: entry.relativeDir,
         name: "INVALID",
         status: "invalid",
         category: "invalid",
@@ -96,6 +94,31 @@ async function safeExists(filePath) {
   } catch {
     return false;
   }
+}
+
+async function findTemplateManifestEntries(rootDir) {
+  const manifests = [];
+
+  async function walk(currentDir, relativeParts) {
+    // 下划线目录用于共享图片、纹理、图标等资产，不作为模板目录展示。
+    if (relativeParts.some((part) => part.startsWith("_"))) return;
+    if (await safeExists(path.join(currentDir, "manifest.json"))) {
+      manifests.push({
+        dir: currentDir,
+        relativeDir: relativeParts.join("/"),
+      });
+      return;
+    }
+
+    const children = await fs.readdir(currentDir, { withFileTypes: true });
+    for (const child of children) {
+      if (!child.isDirectory()) continue;
+      await walk(path.join(currentDir, child.name), [...relativeParts, child.name]);
+    }
+  }
+
+  await walk(rootDir, []);
+  return manifests.sort((a, b) => a.relativeDir.localeCompare(b.relativeDir));
 }
 
 function formatTemplates(templates) {

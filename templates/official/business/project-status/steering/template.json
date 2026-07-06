@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "project-status",
+  "themeId": "steering",
+  "style": "status-update",
+  "themes": [
+    {
+      "id": "steering",
+      "name": "例会汇报",
+      "visual": {
+        "primary": "1F2F46",
+        "accent": "D59E3D",
+        "background": "EEF2F6",
+        "surface": "FFFFFF",
+        "title": "111827",
+        "body": "3F4A5A",
+        "layout": "status-report",
+        "variant": "steering"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1F2F46",
+    "accent": "D59E3D",
+    "background": "EEF2F6",
+    "surface": "FFFFFF",
+    "title": "111827",
+    "body": "3F4A5A",
+    "layout": "status-report",
+    "variant": "steering"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

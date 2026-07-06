@@ -1,0 +1,17 @@
+{
+  "slug": "finance-operating-dashboard-control-room",
+  "name": "经营数据看板 - 管理驾驶舱",
+  "description": "适合高层经营总览、财务驾驶舱、核心指标监控和管理例会的商业化看板模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "operating-dashboard",
+    "control-room",
+    "dashboard"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

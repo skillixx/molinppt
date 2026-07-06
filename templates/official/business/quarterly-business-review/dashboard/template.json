@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "quarterly-business-review",
+  "themeId": "dashboard",
+  "style": "quarterly-business-review",
+  "themes": [
+    {
+      "id": "dashboard",
+      "name": "经营看板",
+      "visual": {
+        "primary": "25508C",
+        "accent": "B74D40",
+        "background": "F4F7FB",
+        "surface": "FFFFFF",
+        "title": "1E2D41",
+        "body": "46556C",
+        "layout": "quarterly-dashboard",
+        "variant": "dashboard"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "25508C",
+    "accent": "B74D40",
+    "background": "F4F7FB",
+    "surface": "FFFFFF",
+    "title": "1E2D41",
+    "body": "46556C",
+    "layout": "quarterly-dashboard",
+    "variant": "dashboard"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "quarterly-dashboard-cover",
+    "defaultContentLayout": "quarterly-dashboard-content",
+    "allowedLayouts": [
+      "quarterly-dashboard-cover",
+      "quarterly-dashboard-overview",
+      "quarterly-dashboard-content",
+      "quarterly-dashboard-analysis",
+      "quarterly-dashboard-closing",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

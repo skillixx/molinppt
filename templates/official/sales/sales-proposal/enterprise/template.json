@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "sales-proposal",
+  "themeId": "enterprise",
+  "style": "proposal",
+  "themes": [
+    {
+      "id": "enterprise",
+      "name": "企业客户",
+      "visual": {
+        "primary": "14565A",
+        "accent": "D19A3E",
+        "background": "EEF7F6",
+        "surface": "FFFFFF",
+        "title": "123E42",
+        "body": "3E5A58",
+        "layout": "academy",
+        "variant": "enterprise"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "14565A",
+    "accent": "D19A3E",
+    "background": "EEF7F6",
+    "surface": "FFFFFF",
+    "title": "123E42",
+    "body": "3E5A58",
+    "layout": "academy",
+    "variant": "enterprise"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

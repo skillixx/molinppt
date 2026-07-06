@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "project-status",
+  "themeId": "weekly",
+  "style": "status-update",
+  "themes": [
+    {
+      "id": "weekly",
+      "name": "周报进展",
+      "visual": {
+        "primary": "163D59",
+        "accent": "2AA7A5",
+        "background": "EEF2F6",
+        "surface": "FFFFFF",
+        "title": "102A43",
+        "body": "334155",
+        "layout": "status-report",
+        "variant": "weekly"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "163D59",
+    "accent": "2AA7A5",
+    "background": "EEF2F6",
+    "surface": "FFFFFF",
+    "title": "102A43",
+    "body": "334155",
+    "layout": "status-report",
+    "variant": "weekly"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

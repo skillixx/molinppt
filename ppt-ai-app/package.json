@@ -10,6 +10,7 @@
     "start": "node --env-file=.env src/server.js",
     "test": "node --test",
     "migrate": "node scripts/migrate.js",
+    "migrate:official-template-dirs": "node --env-file=.env scripts/migrate-default-templates-to-official-dir.js",
     "seed:official-template-categories": "node --env-file=.env scripts/seed-official-template-categories.js",
     "seed:official-templates": "node --env-file=.env scripts/seed-official-templates.js",
     "list:official-templates": "node --env-file=.env scripts/list-official-templates.js",

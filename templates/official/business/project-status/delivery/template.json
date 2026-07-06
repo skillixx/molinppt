@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "project-status",
+  "themeId": "delivery",
+  "style": "status-update",
+  "themes": [
+    {
+      "id": "delivery",
+      "name": "交付跟踪",
+      "visual": {
+        "primary": "12324A",
+        "accent": "2BA6A0",
+        "background": "EEF2F6",
+        "surface": "FFFFFF",
+        "title": "0F2637",
+        "body": "3D5563",
+        "layout": "status-report",
+        "variant": "delivery"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "12324A",
+    "accent": "2BA6A0",
+    "background": "EEF2F6",
+    "surface": "FFFFFF",
+    "title": "0F2637",
+    "body": "3D5563",
+    "layout": "status-report",
+    "variant": "delivery"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

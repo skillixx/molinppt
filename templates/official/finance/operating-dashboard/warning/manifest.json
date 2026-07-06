@@ -1,0 +1,17 @@
+{
+  "slug": "finance-operating-dashboard-warning",
+  "name": "经营数据看板 - 指标预警",
+  "description": "适合经营指标异常、预算偏差、现金流风险和管理处置建议的预警型财务模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "operating-dashboard",
+    "warning",
+    "risk"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

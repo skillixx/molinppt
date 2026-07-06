@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "roadmap",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "roadmap",
+      "name": "路线图",
+      "visual": {
+        "primary": "145A7A",
+        "accent": "2FB7A3",
+        "background": "EEF8FA",
+        "surface": "FFFFFF",
+        "title": "113746",
+        "body": "395966",
+        "layout": "academy",
+        "variant": "roadmap"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "145A7A",
+    "accent": "2FB7A3",
+    "background": "EEF8FA",
+    "surface": "FFFFFF",
+    "title": "113746",
+    "body": "395966",
+    "layout": "academy",
+    "variant": "roadmap"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

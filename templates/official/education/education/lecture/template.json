@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "education",
+  "themeId": "lecture",
+  "style": "learning-workshop",
+  "themes": [
+    {
+      "id": "lecture",
+      "name": "课题讲授",
+      "visual": {
+        "primary": "214E44",
+        "accent": "E6B84F",
+        "background": "EEF5F0",
+        "surface": "FFFEF7",
+        "title": "17352F",
+        "body": "415A53",
+        "layout": "education-course",
+        "variant": "lecture"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "214E44",
+    "accent": "E6B84F",
+    "background": "EEF5F0",
+    "surface": "FFFEF7",
+    "title": "17352F",
+    "body": "415A53",
+    "layout": "education-course",
+    "variant": "lecture"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

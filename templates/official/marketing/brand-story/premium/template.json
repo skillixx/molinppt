@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "brand-story",
+  "themeId": "premium",
+  "style": "brand-narrative",
+  "themes": [
+    {
+      "id": "premium",
+      "name": "高端质感",
+      "visual": {
+        "primary": "181C24",
+        "accent": "BFA06A",
+        "background": "F2EFE8",
+        "surface": "FFFEFA",
+        "title": "151922",
+        "body": "474B55",
+        "layout": "brand-story",
+        "variant": "premium"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "181C24",
+    "accent": "BFA06A",
+    "background": "F2EFE8",
+    "surface": "FFFEFA",
+    "title": "151922",
+    "body": "474B55",
+    "layout": "brand-story",
+    "variant": "premium"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "venture-cover",
+    "defaultContentLayout": "venture-story",
+    "allowedLayouts": [
+      "venture-cover",
+      "venture-story",
+      "hero",
+      "story"
+    ]
+  }
+}

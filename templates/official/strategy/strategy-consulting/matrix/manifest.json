@@ -1,0 +1,17 @@
+{
+  "slug": "strategy-strategy-consulting-matrix",
+  "name": "战略咨询方案 - 矩阵分类",
+  "description": "适合问题诊断、方案对比和高层决策的咨询风格模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "strategy-consulting",
+    "matrix",
+    "consulting-case"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

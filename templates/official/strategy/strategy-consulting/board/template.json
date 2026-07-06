@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "strategy-consulting",
+  "themeId": "board",
+  "style": "consulting-case",
+  "themes": [
+    {
+      "id": "board",
+      "name": "董事会汇报",
+      "visual": {
+        "primary": "18253A",
+        "accent": "C7A15A",
+        "background": "EEF1F5",
+        "surface": "FFFFFF",
+        "title": "111827",
+        "body": "334155",
+        "layout": "executive",
+        "variant": "board"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "18253A",
+    "accent": "C7A15A",
+    "background": "EEF1F5",
+    "surface": "FFFFFF",
+    "title": "111827",
+    "body": "334155",
+    "layout": "executive",
+    "variant": "board"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

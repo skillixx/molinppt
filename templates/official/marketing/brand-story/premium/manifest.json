@@ -1,0 +1,17 @@
+{
+  "slug": "marketing-brand-story-premium",
+  "name": "品牌故事叙事 - 高端质感",
+  "description": "适合品牌定位、信息架构、客户故事和传播叙事。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "brand-story",
+    "premium",
+    "brand-narrative"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}
