@@ -246,7 +246,7 @@ function resolveDeckVisual(deck) {
 }
 
 /**
- * 灏嗗叚浣嶅崄鍏繘鍒堕鑹茶浆鎹㈡垚 PDF 濉厖鑹叉搷浣溿€?
+ * 将六位十六进制颜色转换成 PDF 濉厖鑹叉搷浣溿€?
  * @param {string} hex
  * @returns {string}
  */
@@ -387,7 +387,7 @@ function topBandTitleFillStyle(visual) {
 }
 
 /**
- * 涓?red-gold 鏍囬瀵硅薄璁剧疆鍙鍚嶇О锛屾柟渚垮湪 PPT 缂栬緫鍣ㄩ噷璇嗗埆 dome 椤甸潰灞傜骇銆?
+ * 涓?red-gold 标题对象设置可读名称，方便在 PPT 缂栬緫鍣ㄩ噷璇嗗埆 dome 椤甸潰灞傜骇銆?
  * @param {object} visual
  * @param {string} role
  * @returns {string}
@@ -526,7 +526,7 @@ function slideMetrics(visual) {
 
 /**
  * 灏?red-gold 椤甸潰鍧愭爣浠庢棫鐨勬爣鍑?16:9 鍩哄噯绛夋瘮鏀惧ぇ鍒?dome.pptx 鐨勭湡瀹炵敾甯冦€?
- * 瀛楀彿涓嶅湪杩欓噷缂╂斁锛屽洜涓哄瓧鍙锋湰韬槸 pt 鍊硷紱杩欓噷鍙鐞?OOXML 閲岀殑浣嶇疆鍜屽昂瀵搞€?
+ * 字号不在这里缩放，因为字号本身是 pt 鍊硷紱杩欓噷鍙鐞?OOXML 閲岀殑浣嶇疆鍜屽昂瀵搞€?
  * @param {string} xml
  * @param {object} visual
  * @returns {string}
@@ -810,9 +810,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
           + solidShapeXml({ id: 31, name: "Top Band Executive Visual Panel", geom: "roundRect", x: 6553200, y: 1295400, cx: 1549400, cy: 2019300, fill: palette.rail })
           + lineFrameShapeXml({ id: 32, name: "Top Band Executive Visual Inner Frame", geom: "roundRect", x: 6667500, y: 1409700, cx: 1320800, cy: 1790700, stroke: palette.glass, width: 7620 })
           + rectShapeXml({ id: 33, name: "Top Band Executive Visual Accent", x: 6858000, y: 3009900, cx: 952500, cy: 38100, fill: visual.accent })
-          + topBandMetricCardXml({ id: 37, x: 1282700, y: 3657600, number: "01", label: "鎴樼暐", visual, palette })
-          + topBandMetricCardXml({ id: 40, x: 3200400, y: 3657600, number: "02", label: "澶嶇洏", visual, palette })
-          + topBandMetricCardXml({ id: 43, x: 5118100, y: 3657600, number: "03", label: "琛屽姩", visual, palette })
+          + topBandMetricCardXml({ id: 37, x: 1282700, y: 3657600, number: "01", label: "战略", visual, palette })
+          + topBandMetricCardXml({ id: 40, x: 3200400, y: 3657600, number: "02", label: "复盘", visual, palette })
+          + topBandMetricCardXml({ id: 43, x: 5118100, y: 3657600, number: "03", label: "行动", visual, palette })
         )
       : (
           rectShapeXml({ id: 24, name: "Top Band Side Rail", x: 0, y: panelY + 685800, cx: 171450, cy: 3657600, fill: palette.glass })
@@ -830,8 +830,8 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
           })
           + solidShapeXml({ id: 31, name: "Top Band Content Visual Panel", geom: "roundRect", x: 6720840, y: 1543050, cx: 1270000, cy: 2133600, fill: palette.rail })
           + solidShapeXml({ id: 32, name: "Top Band Insight Card", geom: "roundRect", x: 6416040, y: 1847850, cx: 1676400, cy: 1117600, fill: palette.glass })
-          + textShapeXml({ id: 33, name: "Top Band Insight Title", x: 6553200, y: 2076450, cx: 1219200, cy: 228600, text: "閲嶇偣鍏虫敞", size: 1050, bold: true, color: visual.title })
-          + textShapeXml({ id: 34, name: "Top Band Insight Caption", x: 6553200, y: 2350000, cx: 1219200, cy: 365760, text: "楂樼鍐崇瓥瑙嗗浘", size: 800, bold: false, color: visual.body })
+          + textShapeXml({ id: 33, name: "Top Band Insight Title", x: 6553200, y: 2076450, cx: 1219200, cy: 228600, text: "重点关注", size: 1050, bold: true, color: visual.title })
+          + textShapeXml({ id: 34, name: "Top Band Insight Caption", x: 6553200, y: 2350000, cx: 1219200, cy: 365760, text: "高管决策视图", size: 800, bold: false, color: visual.body })
           + arcLineShapeXml({ id: 37, name: "Top Band Content Wave", x: 6248400, y: 3657600, cx: 2133600, cy: 762000, stroke: visual.accent, width: 19050 })
         );
     const contentPanelY = isCover ? panelY + 114300 : panelY + 152400;
@@ -868,7 +868,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
 
 /**
  * 娣诲姞妯℃澘鎵€闇€鐨勫獟浣撴枃浠躲€?
- * red-gold 浼氭妸浠?dome.pptx 鎻愬彇鍑虹殑灏侀潰銆佸唴瀹硅儗鏅拰鍟嗗姟鍥剧墖鍐欏叆 ppt/media銆?
+ * red-gold 浼氭妸浠?dome.pptx 提取出的封面、内容背景和商务图片写入 ppt/media銆?
  * @param {object} visual
  * @returns {Record<string, Buffer>}
  */
@@ -888,7 +888,7 @@ function templateMediaFiles(visual) {
 
 /**
  * 灏嗙粨鏋勫寲椤甸潰鏄犲皠鍒?dome 妯℃澘瑙掕壊銆?
- * 杩欓噷浼樺厛灏婇噸 AI 鎴栧墠绔紶鍏ョ殑 slide.layout锛涙病鏈夋樉寮忓竷灞€鏃讹紝鍐嶆寜椤靛簭鍜屾爣棰樺叧閿瘝鍏滃簳銆?
+ * 杩欓噷浼樺厛灏婇噸 AI 或前端传入的 slide.layout锛涙病鏈夋樉寮忓竷灞€鏃讹紝鍐嶆寜椤靛簭鍜屾爣棰樺叧閿瘝鍏滃簳銆?
  * @param {object} slide
  * @param {number} index
  * @param {number} total
@@ -930,7 +930,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
       + textShapeXml({ id: 11, name: "Dome Cover Subtitle", x: 2971800, y: 3048000, cx: 3962400, cy: 365760, text: subtitle, size: 1500, bold: true, color: palette.surfaceText });
   }
   if (role === "agenda") {
-    // 鐩綍椤靛浐瀹氳緭鍑?4 涓崱鐗囨Ы浣嶏紝淇濇寔 dome.pptx 鐨勫崱鐗囧紡鐩綍楠ㄦ灦涓嶅洜鐢ㄦ埛灏戝～鍐呭鑰屽彉鍖栥€?
+    // 鐩綍椤靛浐瀹氳緭鍑?4 个卡片槽位，保持 dome.pptx 鐨勫崱鐗囧紡鐩綍楠ㄦ灦涓嶅洜鐢ㄦ埛灏戝～鍐呭鑰屽彉鍖栥€?
     const agendaItems = normalizeDomeAgendaItems(slide);
     return agendaItems.map((item, itemIndex) => {
       const column = itemIndex % 2;
@@ -976,15 +976,15 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
     const stepConnector = role === "next-plan"
       ? ""
       : rectShapeXml({ id: 72, name: `Dome Step Connector ${count}`, x: 1371600, y: 3352800, cx: count === 3 ? 5638800 : 6553200, cy: 30480, fill: palette.surfaceStroke });
-    // 涓夋楠ゆ祦绋嬮〉琛ラ綈鍟嗗姟鍥剧墖灞傦紝淇濇寔娴佺▼绫诲唴瀹归〉涔熸湁 dome.pptx 鐨勫浘鏂囧晢鍔℃皵璐ㄣ€?
+    // 三步骤流程页补齐商务图片层，保持流程类内容页也有 dome.pptx 鐨勫浘鏂囧晢鍔℃皵璐ㄣ€?
     const threeStepsImage = role === "three-steps"
       ? pictureXml({ id: 69, name: "Dome Three Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
-    // 鍥涙楠ゆ祦绋嬮〉澶嶇敤 dome.pptx 鐨勭 4 寮犲晢鍔″浘锛岄伩鍏嶆彁鍙栧嚭鐨勪笟鍔¤瑙夎祫浜ч棽缃€?
+    // 四步骤流程页复用 dome.pptx 的第 4 寮犲晢鍔″浘锛岄伩鍏嶆彁鍙栧嚭鐨勪笟鍔¤瑙夎祫浜ч棽缃€?
     const fourStepsImage = role === "four-steps"
       ? pictureXml({ id: 70, name: "Dome Four Steps Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
-    // 涓嬩竴姝ヨ鍒掗〉澶嶇敤 dome.pptx 鐨勭 6 寮犲晢鍔″浘锛屼笌棰勮绔殑 next-plan 瑙嗚淇濇寔涓€鑷淬€?
+    // 下一步计划页复用 dome.pptx 的第 6 张商务图，与预览端的 next-plan 瑙嗚淇濇寔涓€鑷淬€?
     const nextPlanImage = role === "next-plan"
       ? pictureXml({ id: 71, name: "Dome Next Plan Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
       : "";
@@ -994,7 +994,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
   }
   if (role === "metrics") {
     const metricItems = normalizeDomeMetricItems(slide, 3);
-    // 鎸囨爣椤典繚鐣欐祬鑹叉壙杞介潰鍜屽彸涓婄珷鑺傛爣绛撅紝浣挎暟鎹崱鐗囦笌 dome.pptx 鍐呭椤靛眰绾т竴鑷淬€?
+    // 指标页保留浅色承载面和右上章节标签，使数据卡片与 dome.pptx 鍐呭椤靛眰绾т竴鑷淬€?
     return solidShapeXml({ id: 28, name: "Content Placement Card", geom: "roundRect", ...layout.surface, fill: palette.contentPanel })
       + textShapeXml({ id: 33, name: "Section Label", ...layout.label, text: domeContentSectionLabelText(slide, index), size: 1500, bold: true, color: visual.accent })
       + pictureXml({ id: 29, name: "Dome Business Image", relId: "rId3", x: 5943600, y: 1371600, cx: 1828800, cy: 1219200 })
@@ -1067,7 +1067,7 @@ function domeRoleDecorationXml({ role, index, layout, visual, slide }) {
 }
 
 /**
- * 鐢熸垚 dome 鐩綍椤电殑 4 涓崱鐗囨枃妗堛€?
+ * 鐢熸垚 dome 目录页的 4 涓崱鐗囨枃妗堛€?
  * 鐢ㄦ埛杈撳叆浼樺厛锛涗笉瓒?4 椤规椂浣跨敤 dome.pptx 鐨勫洓娈电洰褰曢粯璁ゆ枃妗堣ˉ榻愶紝閬垮厤鍗＄墖寮忕洰褰曞嚭鐜扮┖妲姐€?
  * @param {object} slide
  * @returns {string[]}
@@ -1211,7 +1211,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         accent: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
         secondaryAccent: { x: 6781800, y: 1600200, cx: 914400, cy: 2057400 },
         label: { x: 5943600, y: 914400, cx: 1524000, cy: 365760 },
-        // 灏侀潰鏍囬鍘熸绐?cx 3962400)涓斿彸缂樹几杩涘竼鑸瑰尯,闀挎爣棰樹細浠庤瘝涓棿鏂;鍔犲骞跺乏绉婚伩寮€甯嗚埞,闄嶅瓧鍙疯闀挎爣棰樺湪鍑€鍖哄唴鍧囪　鎹㈣銆?
+        // 灏侀潰鏍囬鍘熸绐?cx 3962400)涓斿彸缂樹几杩涘竼鑸瑰尯,长标题会从词中间断行;鍔犲骞跺乏绉婚伩寮€甯嗚埞,闄嶅瓧鍙疯闀挎爣棰樺湪鍑€鍖哄唴鍧囪　鎹㈣銆?
         title: role === "closing"
           ? { x: 3048000, y: 1371600, cx: 3962400, cy: 914400 }
           : { x: 609600, y: 1219200, cx: 5334000, cy: 1371600 },
@@ -1727,7 +1727,7 @@ function slideRelsXml(visual, role = "content") {
 
 /**
  * 鍒涘缓绌虹櫧 slide layout銆?
- * 瀹為檯瑙嗚鍐呭閮藉湪姣忛〉 slide XML 涓敓鎴愶紝layout 鍙彁渚?Office 鎵€闇€缁撴瀯銆?
+ * 实际视觉内容都在每页 slide XML 中生成，layout 鍙彁渚?Office 鎵€闇€缁撴瀯銆?
  * @returns {string}
  */
 function slideLayoutXml(visual) {
@@ -1744,7 +1744,7 @@ function slideLayoutRelsXml() {
 
 /**
  * 鍒涘缓鏈€灏?slide master銆?
- * 涓婚鑹蹭粠 visual 娉ㄥ叆锛屽叿浣?dome 瑁呴グ涓嶆斁鍦?master锛屼究浜庢瘡椤垫寜瑙掕壊宸紓鍖栥€?
+ * 主题色从 visual 娉ㄥ叆锛屽叿浣?dome 瑁呴グ涓嶆斁鍦?master锛屼究浜庢瘡椤垫寜瑙掕壊宸紓鍖栥€?
  * @returns {string}
  */
 function slideMasterXml(visual) {
@@ -1775,7 +1775,7 @@ function themeXml(visual) {
 
 /**
  * 鐢熸垚涓婚瀛椾綋閰嶇疆銆?
- * red-gold 澶嶇敤 dome.pptx 鐨?588ku 瀛椾綋鏂规锛屽叾浠栨ā鏉夸繚鐣欏師 Moling 瀛椾綋鏂规銆?
+ * red-gold 澶嶇敤 dome.pptx 鐨?588ku 字体方案，其他模板保留原 Moling 瀛椾綋鏂规銆?
  * @param {object} visual
  * @returns {string}
  */
@@ -1814,7 +1814,7 @@ function solidShapeXml({ id, name, geom = "rect", x, y, cx, cy, fill }) {
 }
 
 /**
- * 鍒涘缓浠呮弿杈瑰舰鐘讹紙鐢ㄤ簬鍗＄墖杈规/澶栨锛?
+ * 创建仅描边形状（用于卡片边框/澶栨锛?
  * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, stroke: string, width?: number}} input
  * @returns {string}
  */
@@ -2128,7 +2128,7 @@ function annualSummaryMetricCardsXml({ visual, palette, metrics }) {
 }
 
 function annualSummaryDiagnosticCardsXml({ visual, palette }) {
-  const labels = ["缁忚惀浜偣", "椋庨櫓璇婃柇", "鏉ュ勾琛屽姩"];
+  const labels = ["经营亮点", "风险诊断", "来年行动"];
   return labels.map((label, itemIndex) => {
     const x = 1524000 + itemIndex * 1371600;
     return solidShapeXml({ id: 750 + itemIndex * 3, name: `Annual Summary Diagnostic Card ${itemIndex + 1}`, x, y: 3543300, cx: 1219200, cy: 426720, fill: palette.cardFill })
@@ -2153,9 +2153,9 @@ function annualSummaryScene(visual) {
       kicker: "ANNUAL REVIEW",
       section: "OPERATING INSIGHT",
       metrics: [
-        { value: "128%", label: "鐩爣杈炬垚" },
-        { value: "36%", label: "涓氬姟澧為暱" },
-        { value: "12", label: "椤圭洰钀藉湴" },
+        { value: "128%", label: "目标达成" },
+        { value: "36%", label: "业务增长" },
+        { value: "12", label: "项目落地" },
       ],
     },
   };
@@ -3210,12 +3210,12 @@ function quarterlyActionLoopProgressXml({ visual, palette }) {
   }).join("");
   return solidShapeXml({ id: 1290, name: "Quarterly Action Loop Progress Panel", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, fill: "FFFFFF" })
     + lineFrameShapeXml({ id: 1291, name: "Quarterly Action Loop Progress Frame", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, stroke: palette.frame, width: 9525 })
-    + textShapeXml({ id: 1292, name: "Quarterly Action Loop Progress Title", x: 914400, y: 2743200, cx: 1371600, cy: 152400, text: "杩涘害杩借釜", size: 760, bold: true, color: visual.title })
+    + textShapeXml({ id: 1292, name: "Quarterly Action Loop Progress Title", x: 914400, y: 2743200, cx: 1371600, cy: 152400, text: "执行进度", size: 760, bold: true, color: visual.title })
     + bars;
 }
 
 function quarterlyActionLoopRoadmapXml({ visual, palette, x, y, idBase }) {
-  const labels = ["鐩爣鎷嗚В", "鎵ц杩借釜", "缁撴灉澶嶇洏", "涓嬪浼樺寲"];
+  const labels = ["目标拆解", "执行追踪", "结果复盘", "下季优化"];
   return labels.map((label, itemIndex) => {
     const cardX = x + itemIndex * 990600;
     return solidShapeXml({ id: idBase + itemIndex * 3, name: `Quarterly Action Loop Closing Card ${itemIndex + 1}`, geom: "roundRect", x: cardX, y, cx: 838200, cy: 609600, fill: itemIndex % 2 ? palette.card : "FFFFFF" })
@@ -3334,49 +3334,49 @@ function financialReviewScene(visual) {
       variant: "quarterly",
       kicker: "FINANCE REVIEW",
       section: "QUARTERLY RESULT",
-      chip: "澶嶇洏",
+      chip: "复盘",
       chipShape: "roundRect",
-      points: ["鏀跺叆缁撴瀯", "鍒╂鼎璐ㄩ噺", "鐜伴噾鏁堢巼"],
+      points: ["收入结构", "利润质量", "现金效率"],
     },
     audit: {
       variant: "audit",
       kicker: "AUDIT CHECK",
       section: "RISK REVIEW",
-      chip: "瀹¤",
+      chip: "审计",
       chipShape: "rect",
-      points: ["宸紓鏍搁獙", "椋庨櫓搴曠", "鏁存敼闂幆"],
+      points: ["差异核验", "风险底稿", "整改闭环"],
     },
     forecast: {
       variant: "forecast",
       kicker: "FORECAST PLAN",
       section: "BUDGET OUTLOOK",
-      chip: "棰勬祴",
+      chip: "预测",
       chipShape: "parallelogram",
-      points: ["婊氬姩棰勬祴", "棰勭畻鏍″噯", "鎯呮櫙鍋囪"],
+      points: ["滚动预测", "预算校准", "情景假设"],
     },
     "control-room": {
       variant: "control-room",
       kicker: "CONTROL PANEL",
       section: "KPI OVERVIEW",
-      chip: "鐩戞帶",
+      chip: "监控",
       chipShape: "roundRect",
-      points: ["鏍稿績鎸囨爣", "瓒嬪娍鐩戞帶", "缁忚惀缁撹"],
+      points: ["核心指标", "趋势监控", "经营结论"],
     },
     warning: {
       variant: "warning",
       kicker: "RISK SIGNAL",
       section: "EXCEPTION REVIEW",
-      chip: "棰勮",
+      chip: "预警",
       chipShape: "rect",
-      points: ["寮傚父鎸囨爣", "褰卞搷鑼冨洿", "澶勭疆鍔ㄤ綔"],
+      points: ["异常指标", "影响范围", "处置动作"],
     },
     monthly: {
       variant: "monthly",
       kicker: "MONTHLY REVIEW",
       section: "OPERATING RHYTHM",
-      chip: "鏈堟姤",
+      chip: "月报",
       chipShape: "parallelogram",
-      points: ["鏈堝害鎸囨爣", "閲嶇偣浜嬮」", "涓嬫湀鍔ㄤ綔"],
+      points: ["月度指标", "重点事项", "下月动作"],
     },
   };
   return scenes[variant] || scenes.quarterly;
@@ -3475,33 +3475,33 @@ function statusReportScene(visual) {
       variant: "weekly",
       kicker: "PROJECT WEEKLY",
       section: "WEEKLY UPDATE",
-      sticker: "杩涘害",
+      sticker: "周报",
       metrics: [
-        { value: "95%", label: "杩涘害杈炬垚" },
-        { value: "3", label: "鍏抽敭椋庨櫓" },
-        { value: "7", label: "鏈懆浜嬮」" },
+        { value: "95%", label: "进度达成" },
+        { value: "3", label: "关键风险" },
+        { value: "7", label: "本周事项" },
       ],
     },
     steering: {
       variant: "steering",
       kicker: "STEERING MEETING",
       section: "DECISION REVIEW",
-      sticker: "鍐崇瓥",
+      sticker: "决策",
       metrics: [
-        { value: "4", label: "鏍稿績璁" },
-        { value: "2", label: "寰呭喅浜嬮」" },
-        { value: "8", label: "琛屽姩璐ｄ换" },
+        { value: "4", label: "核心议题" },
+        { value: "2", label: "待决事项" },
+        { value: "8", label: "行动责任" },
       ],
     },
     delivery: {
       variant: "delivery",
       kicker: "DELIVERY TRACK",
       section: "MILESTONE CHECK",
-      sticker: "楠屾敹",
+      sticker: "交付",
       metrics: [
-        { value: "12", label: "浜や粯鑺傜偣" },
-        { value: "96%", label: "楠屾敹閫氳繃" },
-        { value: "5", label: "椋庨櫓闂幆" },
+        { value: "12", label: "交付节点" },
+        { value: "96%", label: "验收通过" },
+        { value: "5", label: "风险闭环" },
       ],
     },
   };
@@ -3721,7 +3721,7 @@ function pdfUnicodeText(value) {
 
 /**
  * 鏋勫缓鐢ㄦ埛涓嬭浇鏂囦欢鍚嶃€?
- * 瑙勫垯: PPT-鏍囬-妯℃澘ID-椤垫暟p-鐢熸垚鏃堕棿-鐭璉D.ext锛屾棦鏂逛究鐢ㄦ埛鍖哄垎锛屼篃淇濇寔 HTTP 澶村拰瀵硅薄瀛樺偍鐨?ASCII 瀹夊叏銆?
+ * 瑙勫垯: PPT-标题-妯℃澘ID-椤垫暟p-鐢熸垚鏃堕棿-鐭璉D.ext锛屾棦鏂逛究鐢ㄦ埛鍖哄垎锛屼篃淇濇寔 HTTP 澶村拰瀵硅薄瀛樺偍鐨?ASCII 瀹夊叏銆?
  * @param {{deck: object, format: string}} input
  * @returns {string}
  */

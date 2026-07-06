@@ -960,7 +960,7 @@ function renderDeckPreview({ deck, visual }) {
     const bullets = renderBodyList
       ? (slide.bullets || []).map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")
       : "";
-    // dome 妯℃澘鍖栭〉闈㈢殑鍐呭宸茬粡钀藉叆涓撶敤瑙嗚灞傦紝涓嶈緭鍑虹┖ ul锛岄伩鍏嶉瑙堝眰绾у拰闂磋窛琚櫘閫氬垪琛ㄥ共鎵般€?
+    // dome 模板化页面的内容已经落入专用视觉层，不输出空 ul锛岄伩鍏嶉瑙堝眰绾у拰闂磋窛琚櫘閫氬垪琛ㄥ共鎵般€?
     const topBandTitleClass = visual.layout === "top-band"
       ? (index === 0 ? "top-band-cover-title" : "top-band-content-title")
       : "";
@@ -973,8 +973,8 @@ function renderDeckPreview({ deck, visual }) {
     const topBandMark = visual.layout === "top-band"
       ? (
           `${index === 0
-            ? '<div class="top-band-cover-glow"></div><div class="top-band-cover-kicker">楂樼姹囨姤</div><div class="top-band-cover-frame"></div><div class="top-band-cover-sheen"></div><div class="top-band-cover-beacon"></div><div class="top-band-cover-metrics"><span><strong>01</strong>鎴樼暐</span><span><strong>02</strong>澶嶇洏</span><span><strong>03</strong>琛屽姩</span></div>'
-            : '<div class="top-band-content-rail"></div><div class="top-band-content-wave"></div><div class="top-band-content-trace"></div><div class="top-band-insight-card"><strong>閲嶇偣鍏虫敞</strong><span>楂樼鍐崇瓥瑙嗗浘</span></div>'}`
+            ? '<div class="top-band-cover-glow"></div><div class="top-band-cover-kicker">高管汇报</div><div class="top-band-cover-frame"></div><div class="top-band-cover-sheen"></div><div class="top-band-cover-beacon"></div><div class="top-band-cover-metrics"><span><strong>01</strong>战略</span><span><strong>02</strong>复盘</span><span><strong>03</strong>行动</span></div>'
+            : '<div class="top-band-content-rail"></div><div class="top-band-content-wave"></div><div class="top-band-content-trace"></div><div class="top-band-insight-card"><strong>重点关注</strong><span>高管决策视图</span></div>'}`
           + '<div class="top-band-ribbon"></div><div class="top-band-edge"></div>'
           + `<span class="top-band-page-chip">${String(index + 1).padStart(2, "0")}</span>`
           + `${index === 0 ? '<span class="top-band-cover-label">Cover</span>' : '<div class="top-band-content-rule"></div>'}`
@@ -1794,7 +1794,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::before{content:"BUSINESS REPORT";left:15%;top:44.7%;bottom:auto;color:var(--template-accent);font-size:12px;font-weight:800;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) .slide-content::after{display:none;}
     body[data-layout="red-gold"] .slide:not(.slide-cover) h2{position:absolute;left:15%;top:23.7%;width:47.5%;max-width:none;margin:0;font-size:42px;color:var(--template-title);text-shadow:none;}
-    /* 椤堕儴鍗＄墖鐗堝紡(image-report/showcase/retrospective)鏍囬涓嶅啀琚唴灞傚潡鍨傜洿灞呬腑鍘嬩綇鍗＄墖:缃《 + 娴呰壊鍙銆?*/
+    /* 椤堕儴鍗＄墖鐗堝紡(image-report/showcase/retrospective)标题不再被内层块垂直居中压住卡片:置顶 + 娴呰壊鍙銆?*/
     body[data-layout="red-gold"] .slide[data-dome-role="image-report"] .slide-content,
     body[data-layout="red-gold"] .slide[data-dome-role="showcase"] .slide-content,
     body[data-layout="red-gold"] .slide[data-dome-role="retrospective"] .slide-content{align-content:start;}
@@ -1949,9 +1949,9 @@ function annualSummaryPreviewScene(visual) {
       kicker: "ANNUAL REVIEW",
       section: "OPERATING INSIGHT",
       metrics: [
-        { value: "128%", label: "骞村害鐩爣杈炬垚" },
-        { value: "36%", label: "鏍稿績涓氬姟澧為暱" },
-        { value: "12", label: "閲嶇偣椤圭洰钀藉湴" },
+        { value: "128%", label: "年度目标达成" },
+        { value: "36%", label: "核心业务增长" },
+        { value: "12", label: "重点项目落地" },
       ],
     },
   };
@@ -2138,38 +2138,38 @@ function financialReviewPreviewScene(visual) {
     quarterly: {
       variant: "quarterly",
       label: "FINANCE REVIEW",
-      chip: "澶嶇洏",
-      points: ["鏀跺叆缁撴瀯", "鍒╂鼎璐ㄩ噺", "鐜伴噾鏁堢巼"],
+      chip: "复盘",
+      points: ["收入结构", "利润质量", "现金效率"],
     },
     audit: {
       variant: "audit",
       label: "AUDIT CHECK",
-      chip: "瀹¤",
-      points: ["宸紓鏍搁獙", "椋庨櫓搴曠", "鏁存敼闂幆"],
+      chip: "审计",
+      points: ["差异核验", "风险底稿", "整改闭环"],
     },
     forecast: {
       variant: "forecast",
       label: "FORECAST PLAN",
-      chip: "棰勬祴",
-      points: ["婊氬姩棰勬祴", "棰勭畻鏍″噯", "鎯呮櫙鍋囪"],
+      chip: "预测",
+      points: ["滚动预测", "预算校准", "情景假设"],
     },
     "control-room": {
       variant: "control-room",
       label: "CONTROL PANEL",
-      chip: "鐩戞帶",
-      points: ["鏍稿績鎸囨爣", "瓒嬪娍鐩戞帶", "缁忚惀缁撹"],
+      chip: "监控",
+      points: ["核心指标", "趋势监控", "经营结论"],
     },
     warning: {
       variant: "warning",
       label: "RISK SIGNAL",
-      chip: "棰勮",
-      points: ["寮傚父鎸囨爣", "褰卞搷鑼冨洿", "澶勭疆鍔ㄤ綔"],
+      chip: "预警",
+      points: ["异常指标", "影响范围", "处置动作"],
     },
     monthly: {
       variant: "monthly",
       label: "MONTHLY REVIEW",
-      chip: "鏈堟姤",
-      points: ["鏈堝害鎸囨爣", "閲嶇偣浜嬮」", "涓嬫湀鍔ㄤ綔"],
+      chip: "月报",
+      points: ["月度指标", "重点事项", "下月动作"],
     },
   };
   return scenes[variant] || scenes.quarterly;
@@ -2494,38 +2494,35 @@ function statusReportPreviewScene(visual) {
   const scenes = {
     weekly: {
       variant: "weekly",
-      assetKey: "business4",
       kicker: "PROJECT WEEKLY",
       section: "WEEKLY UPDATE",
-      sticker: "杩涘害",
+      sticker: "周报",
       metrics: [
-        { value: "95%", label: "杩涘害杈炬垚" },
-        { value: "3", label: "鍏抽敭椋庨櫓" },
-        { value: "7", label: "鏈懆浜嬮」" },
+        { value: "95%", label: "进度达成" },
+        { value: "3", label: "关键风险" },
+        { value: "7", label: "本周事项" },
       ],
     },
     steering: {
       variant: "steering",
-      assetKey: "business2",
       kicker: "STEERING MEETING",
       section: "DECISION REVIEW",
-      sticker: "鍐崇瓥",
+      sticker: "决策",
       metrics: [
-        { value: "4", label: "鏍稿績璁" },
-        { value: "2", label: "寰呭喅浜嬮」" },
-        { value: "8", label: "琛屽姩璐ｄ换" },
+        { value: "4", label: "核心议题" },
+        { value: "2", label: "待决事项" },
+        { value: "8", label: "行动责任" },
       ],
     },
     delivery: {
       variant: "delivery",
-      assetKey: "business6",
       kicker: "DELIVERY TRACK",
       section: "MILESTONE CHECK",
-      sticker: "楠屾敹",
+      sticker: "交付",
       metrics: [
-        { value: "12", label: "浜や粯鑺傜偣" },
-        { value: "96%", label: "楠屾敹閫氳繃" },
-        { value: "5", label: "椋庨櫓闂幆" },
+        { value: "12", label: "交付节点" },
+        { value: "96%", label: "验收通过" },
+        { value: "5", label: "风险闭环" },
       ],
     },
   };
@@ -2561,7 +2558,7 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 }
 
 /**
- * 鍒ゆ柇妯℃澘棰勮椤垫槸鍚﹁繕闇€瑕佹櫘閫氭鏂囧垪琛ㄣ€? * 琛屽姩闂幆妯℃澘宸茬粡鐢ㄤ换鍔″崱銆佽矗浠荤煩闃靛拰璺嚎鍥炬壙杞界粨鏋勪俊鎭紝鏅€?bullets 浼氬拰鍥捐〃閲嶅彔锛屽洜姝ゅ湪棰勮绔叧闂€? * @param {object} visual
+ * 鍒ゆ柇妯℃澘棰勮椤垫槸鍚﹁繕闇€瑕佹櫘閫氭鏂囧垪琛ㄣ€? * 行动闂幆妯℃澘宸茬粡鐢ㄤ换鍔″崱銆佽矗浠荤煩闃靛拰璺嚎鍥炬壙杞界粨鏋勪俊鎭紝鏅€?bullets 浼氬拰鍥捐〃閲嶅彔锛屽洜姝ゅ湪棰勮绔叧闂€? * @param {object} visual
  * @param {string} role
  * @returns {boolean}
  */
@@ -2571,7 +2568,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
 }
 
 /**
- * 娓叉煋涓?PPTX 瀵煎嚭绔?Content Placement Card 瀵归綈鐨勫唴瀹规壙杞介潰銆? * 杩欎簺瑙掕壊鍦ㄥ鍑烘枃浠堕噷閮芥湁鐧借壊鍦嗚澶ч潰鏉匡紝棰勮绔篃蹇呴』杈撳嚭鍚屽眰绾х粨鏋勶紝閬垮厤鐢ㄦ埛鐪嬪埌鐨勯〉闈㈠拰涓嬭浇 PPTX 涓嶄竴鑷淬€?
+ * 娓叉煋涓?PPTX 瀵煎嚭绔?Content Placement Card 瀵归綈鐨勫唴瀹规壙杞介潰銆? * 这些角色在导出文件里都有白色圆角大面板，预览端也必须输出同层级结构，避免用户看到的页面和下载 PPTX 涓嶄竴鑷淬€?
  * @param {string} role
  * @returns {string}
  */
@@ -2582,7 +2579,7 @@ function renderDomePreviewContentSurface(role) {
 
 /**
  * 娓叉煋涓?PPTX 瀵煎嚭绔?Dome Content Frame 瀵归綈鐨勫唴瀹瑰唴妗嗐€?
- * 瀵煎嚭绔櫎灏侀潰/缁撴潫椤靛閮戒細鍐欏叆璇ユ绾匡紝棰勮绔悓姝ヨ緭鍑猴紝閬垮厤鐢ㄦ埛鐪嬪埌鐨勮竟妗嗗眰绾у拰 WPS 鎵撳紑鐨?PPTX 涓嶄竴鑷淬€?
+ * 导出端除封面/结束页外都会写入该框线，预览端同步输出，避免用户看到的边框层级和 WPS 鎵撳紑鐨?PPTX 涓嶄竴鑷淬€?
  * @param {string} role
  * @returns {string}
  */
@@ -2614,7 +2611,7 @@ function renderDomePreviewWaves(visual) {
 }
 
 /**
- * 棰勮绔娇鐢ㄤ笌 PPTX 瀵煎嚭涓€鑷寸殑椤甸潰瑙掕壊鍒ゆ柇銆?
+ * 预览端使用与 PPTX 瀵煎嚭涓€鑷寸殑椤甸潰瑙掕壊鍒ゆ柇銆?
  * 杩欐牱鐢ㄦ埛鐪嬪埌鐨勫皝闈€佺洰褰曘€佺珷鑺傞〉鍜岀粨鏉熼〉锛屼笉浼氬湪瀵煎嚭鏃跺彉鎴愬彟涓€濂楀竷灞€銆?
  * @param {object} slide
  * @param {number} index
@@ -2648,14 +2645,14 @@ function resolvePreviewDomeRole(slide, index, total) {
  */
 function renderDomePreviewDecoration(role, slide, index) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets : [];
-  // 缁熶竴浠庣粨鏋勫寲 bullet 涓鍙栧睍绀烘枃鏈紝閬垮厤涓嶅悓椤甸潰瑙掕壊鍚勮嚜鐩村嚭瀵硅薄瀵艰嚧棰勮鍑虹幇 [object Object]銆?
+  // 缁熶竴浠庣粨鏋勫寲 bullet 中读取展示文本，避免不同页面角色各自直出对象导致预览出现 [object Object]銆?
   const bulletText = (itemIndex) => domePreviewStructuredText(bullets[itemIndex], ["text", "title", "label", "name", "action", "task", "description", "value"]);
   if (role === "cover") {
     // 灏侀潰椤垫妸绗竴鏉＄粨鏋勫寲鍐呭鏀惧叆鍓爣棰樺崰浣嶏紝棰勮鏃朵繚鎸?dome.pptx 甯嗚埞灏侀潰鐨勭畝娲佺暀鐧姐€?
     return `<div class="dome-role-decor dome-cover-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   if (role === "agenda") {
-    // 鐩綍椤靛浐瀹氫繚鐣?4 涓崱鐗囧崰浣嶇锛屽拰 dome.pptx/PPTX 瀵煎嚭淇濇寔涓€鑷达紝閬垮厤灏戦噺鐩綍椤瑰鑷寸増寮忓闄枫€?
+    // 鐩綍椤靛浐瀹氫繚鐣?4 个卡片占位符，和 dome.pptx/PPTX 瀵煎嚭淇濇寔涓€鑷达紝閬垮厤灏戦噺鐩綍椤瑰鑷寸増寮忓闄枫€?
     const cards = normalizeDomePreviewAgendaItems(slide).map((item, index) => `<div class="dome-agenda-card"><span class="dome-agenda-number">0${index + 1}</span><span class="dome-agenda-text">${escapeHtml(item)}</span></div>`).join("");
     return `<div class="dome-role-decor dome-agenda-grid">${cards}</div>`;
   }
@@ -2675,7 +2672,7 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-metric-grid">${cards}</div>`;
   }
   if (role === "showcase") {
-    // 鎴愭灉灞曠ず椤靛皢缂栧彿鍜屾垚鏋滃唴瀹规媶鎴愪袱涓瑙夊眰锛屽拰 PPTX 鐨?Dome Showcase Number/Text 鍗犱綅淇濇寔涓€鑷淬€?
+    // 成果展示页将编号和成果内容拆成两个视觉层，和 PPTX 鐨?Dome Showcase Number/Text 鍗犱綅淇濇寔涓€鑷淬€?
     const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-showcase-card"><span class="dome-showcase-number">0${index + 1}</span><span class="dome-showcase-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-showcase-grid">${cards}</div>`;
   }
@@ -2685,7 +2682,7 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-image-report-grid">${cards}</div>`;
   }
   if (role === "retrospective") {
-    // 闂澶嶇洏椤靛浐瀹氳緭鍑衡€滈闄?鍘熷洜/鎺柦鈥濊涔夋爣绛撅紝鍜?PPTX 绔殑鐙珛鏍囩鍗犱綅淇濇寔涓€鑷淬€?
+    // 闂复盘椤靛浐瀹氳緭鍑衡€滈闄?鍘熷洜/鎺柦鈥濊涔夋爣绛撅紝鍜?PPTX 绔殑鐙珛鏍囩鍗犱綅淇濇寔涓€鑷淬€?
     const labels = ["风险", "原因", "措施"];
     const cards = Array.from({ length: 3 }, (_, index) => `<div class="dome-retrospective-card"><span class="dome-retrospective-label">${labels[index]}</span><span class="dome-card-text">${escapeHtml(bulletText(index))}</span></div>`).join("");
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-retrospective-grid">${cards}</div><div class="dome-role-decor dome-risk-card"><span class="dome-card-text">${escapeHtml(bulletText(0) || "RISK")}</span></div>`;
@@ -2696,14 +2693,14 @@ function renderDomePreviewDecoration(role, slide, index) {
     return `${renderDomePreviewSectionLabel(slide, index)}<div class="dome-role-visual"></div><div class="dome-role-decor dome-plan-timeline"></div><div class="dome-role-decor dome-step-row">${cards}</div>`;
   }
   if (role === "closing") {
-    // 缁撴潫椤垫妸鐢ㄦ埛杈撳叆浣滀负妯℃澘鍓爣棰樿緭鍑猴紝閬垮厤鐮村潖 THANKS 缁撴潫鐗堝紡銆?
+    // 结束页把用户输入作为模板副标题输出，避免破坏 THANKS 缁撴潫鐗堝紡銆?
     return `<div class="dome-role-decor dome-closing-subtitle">${escapeHtml(bulletText(0))}</div>`;
   }
   return "";
 }
 
 /**
- * 鐢熸垚 dome 棰勮鐩綍椤电殑 4 涓崱鐗囨枃妗堛€?
+ * 鐢熸垚 dome 预览目录页的 4 涓崱鐗囨枃妗堛€?
  * 鐢ㄦ埛灏戝～鐩綍椤规椂浣跨敤妯℃澘榛樿鍥涙琛ラ綈锛岃棰勮涓庡鍑虹殑鍗＄墖寮忕洰褰曚繚鎸佸畬鏁淬€?
  * @param {object} slide
  * @returns {string[]}
@@ -2715,7 +2712,7 @@ function normalizeDomePreviewAgendaItems(slide) {
 
 /**
  * 瑙ｆ瀽 dome 棰勮鎸囨爣椤电殑缁撴瀯鍖栬鐐广€?
- * 鏀寔鈥滄寚鏍囧悕: 鎸囨爣鍊?/ 鎸囨爣鍚嶏細鎸囨爣鍊?/ 鎸囨爣鍚峾鎸囨爣鍊尖€濓紝涓?PPTX 瀵煎嚭淇濇寔涓€鑷淬€?
+ * 支持“指标名: 鎸囨爣鍊?/ 鎸囨爣鍚嶏細鎸囨爣鍊?/ 鎸囨爣鍚峾鎸囨爣鍊尖€濓紝涓?PPTX 瀵煎嚭淇濇寔涓€鑷淬€?
  * @param {object} slide
  * @param {number} count
  * @returns {{label: string, value: string}[]}
@@ -2739,7 +2736,7 @@ function normalizeDomePreviewMetricItems(slide, count) {
 
 /**
  * 瑙ｆ瀽 dome 涓嬩竴姝ヨ鍒掗〉鐨勭粨鏋勫寲瑕佺偣銆?
- * 鏀寔鈥滈樁娈? 鍔ㄤ綔 / 闃舵锛氬姩浣?/ 闃舵|鍔ㄤ綔鈥濓紝鏃犲垎闅旂鏃舵寜鏃х紪鍙峰厹搴曘€?
+ * 鏀寔鈥滈樁娈? 鍔ㄤ綔 / 闃舵锛氬姩浣?/ 阶段|鍔ㄤ綔鈥濓紝鏃犲垎闅旂鏃舵寜鏃х紪鍙峰厹搴曘€?
  * @param {object} slide
  * @param {number} count
  * @returns {{phase: string, action: string}[]}
@@ -2763,7 +2760,7 @@ function normalizeDomePreviewPlanItems(slide, count) {
 
 /**
  * 浠庨瑙堢缁撴瀯鍖?bullet 涓鍙栧崰浣嶇鏂囨湰銆?
- * 鏀寔瀵硅薄杈撳叆锛岄伩鍏?HTML 棰勮鍑虹幇 [object Object]锛屽苟淇濇寔涓?PPTX 瀵煎嚭涓€鑷淬€?
+ * 鏀寔瀵硅薄杈撳叆锛岄伩鍏?HTML 预览出现 [object Object]锛屽苟淇濇寔涓?PPTX 瀵煎嚭涓€鑷淬€?
  * @param {unknown} value
  * @param {string[]} preferredKeys
  * @returns {string}
@@ -3051,7 +3048,7 @@ function normalizeSlideLayout({ layout, template, index, total = 0, slide = {} }
 }
 
 /**
- * 鍒ゆ柇妯℃澘鏄惁浣跨敤 dome.pptx 鐨?red-gold 鐗堝紡浣撶郴銆?
+ * 判断模板是否使用 dome.pptx 鐨?red-gold 鐗堝紡浣撶郴銆?
  * @param {object} template
  * @returns {boolean}
  */
@@ -3152,4 +3149,3 @@ function normalizeLimit(value) {
   if (!Number.isInteger(parsed) || parsed <= 0) return 20;
   return Math.min(parsed, 100);
 }
-
