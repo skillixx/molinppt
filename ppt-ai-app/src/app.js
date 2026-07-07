@@ -1089,6 +1089,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="create"][data-flow-stage="outline"] .context { display: none !important; }
     .template-browser-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
     .template-browser-head h2 { margin: 0; font-size: 20px; color: #0f172a; letter-spacing: 0; }
+    .template-search { flex: 1 1 360px; max-width: 480px; display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border: 1px solid #dbe5f2; border-radius: 8px; background: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.72); }
+    .template-search span { flex: 0 0 auto; color: #64748b; font-size: 14px; font-weight: 850; }
+    .template-search input { min-width: 0; width: 100%; height: 34px; border: 0; outline: 0; background: transparent; color: #0f172a; font-size: 13px; }
+    .template-search input::placeholder { color: #94a3b8; }
     .template-gallery-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 18px; border-bottom: 1px solid #edf2f7; }
     .template-gallery-title { font-size: 12px; color: var(--muted); }
     #template-scope,
@@ -1579,6 +1583,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="panel" data-page-panel="templates">
       <div class="template-browser-head">
         <h2>从模板创作</h2>
+        <label class="template-search" for="template-search"><span>&#25628;&#32034;</span><input id="template-search" type="search" placeholder="&#36755;&#20837;&#27169;&#26495;&#21517;&#31216;&#12289;&#20998;&#31867;&#25110;&#20027;&#39064;&#39118;&#26684;" autocomplete="off" /></label>
         <span id="template-gallery-count" class="template-gallery-count">0 个可用模板</span>
       </div>
       <div class="template-gallery-toolbar">
@@ -1791,6 +1796,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const templateGalleryEl = document.querySelector("#template-gallery");
     const templateGalleryCountEl = document.querySelector("#template-gallery-count");
     const templateCategoryTabsEl = document.querySelector("#template-category-tabs");
+    const templateSearchEl = document.querySelector("#template-search");
     const selectedTemplatePreviewEl = document.querySelector("#selected-template-preview");
     const assetSearchEl = document.querySelector("#asset-search");
     const assetTimeFilterEl = document.querySelector("#asset-time-filter");
@@ -1807,6 +1813,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     let flowStage = "input";
     let templateCategories = [{ id: "business", name: "Business" }];
     let templateCatalog = [{ id: "business", name: "Business", category: { id: "business", name: "Business" }, themes: [{ id: "modern", name: "Modern" }] }];
+    let templateSearchQuery = "";
     let assetCatalog = [];
     let assetSearchQuery = "";
     let assetTimeFilter = "all";
@@ -2003,22 +2010,45 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (!templateGalleryEl) return;
       const selectedId = document.querySelector("#template").value;
       const categoryId = document.querySelector("#template-category")?.value || "";
-      const templates = categoryId
+      const sourceTemplates = categoryId
         ? templateCatalog.filter((template) => resolveTemplateCategory(template).id === categoryId)
         : templateCatalog;
+      const keyword = normalizeTemplateSearchKeyword(templateSearchQuery);
+      const templates = keyword
+        ? sourceTemplates.filter((template) => templateMatchesSearch(template, keyword))
+        : sourceTemplates;
       renderTemplateCategoryTabs();
       if (templateGalleryCountEl) {
-        templateGalleryCountEl.textContent = templates.length + " 个可用模板";
+        templateGalleryCountEl.textContent = templates.length + " \u4e2a\u53ef\u7528\u6a21\u677f";
       }
       if (!templates.length) {
-        templateGalleryEl.innerHTML = '<div class="hint">当前分类暂无可用模板</div>';
-        if (templateGalleryCountEl) templateGalleryCountEl.textContent = "当前分类暂无可用模板";
+        templateGalleryEl.innerHTML = '<div class="hint">' + (keyword ? '\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f' : '\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f') + '</div>';
+        if (templateGalleryCountEl) templateGalleryCountEl.textContent = keyword ? "\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f" : "\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f";
         return;
       }
       templateGalleryEl.innerHTML = templates.map((template) => templateCardHtml(template, selectedId)).join("");
       templateGalleryEl.querySelectorAll("[data-template-card]").forEach((button) => {
         button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
       });
+    }
+    function normalizeTemplateSearchKeyword(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+    function templateMatchesSearch(template, keyword) {
+      const category = resolveTemplateCategory(template);
+      const themes = Array.isArray(template.themes) ? template.themes : [];
+      const fields = [
+        template.id,
+        template.slug,
+        template.name,
+        template.description,
+        template.style,
+        category.id,
+        category.name,
+        ...(Array.isArray(template.tags) ? template.tags : []),
+        ...themes.flatMap((theme) => [theme?.id || theme, theme?.name || "", theme?.description || ""]),
+      ];
+      return fields.some((field) => String(field || "").toLowerCase().includes(keyword));
     }
     function templateCategoryBlockHtml(categoryId, group, selectedId) {
       const cards = group.templates.map((template) => templateCardHtml(template, selectedId)).join("");
@@ -3114,6 +3144,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     });
     document.querySelector("#theme").addEventListener("change", () => {
       renderSelectedTemplatePreview();
+      renderTemplateGallery();
+    });
+    templateSearchEl?.addEventListener("input", () => {
+      templateSearchQuery = templateSearchEl.value;
       renderTemplateGallery();
     });
     document.querySelector("#template-category").addEventListener("change", loadTemplates);
