@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "industry-solution",
+  "themeId": "education-industry",
+  "style": "education-solution",
+  "themes": [
+    {
+      "id": "education-industry",
+      "name": "教育行业",
+      "visual": {
+        "primary": "155E75",
+        "accent": "22C55E",
+        "background": "EAF7F7",
+        "surface": "FFFFFF",
+        "title": "0F2F3A",
+        "body": "365A64",
+        "layout": "sales-education-solution",
+        "variant": "education-industry"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "155E75",
+    "accent": "22C55E",
+    "background": "EAF7F7",
+    "surface": "FFFFFF",
+    "title": "0F2F3A",
+    "body": "365A64",
+    "layout": "sales-education-solution",
+    "variant": "education-industry"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "sales-education-solution-cover",
+    "defaultContentLayout": "sales-education-solution-content",
+    "allowedLayouts": [
+      "sales-education-solution-cover",
+      "sales-education-solution-painpoints",
+      "sales-education-solution-platform",
+      "sales-education-solution-scenarios",
+      "sales-education-solution-data",
+      "sales-education-solution-roadmap",
+      "title",
+      "content"
+    ]
+  }
+}

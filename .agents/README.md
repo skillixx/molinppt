@@ -22,6 +22,18 @@
 .agents/ppt-template-workflow/registry.json
 ```
 
+Goal 创建模板案例说明：
+
+```text
+docs/goal-agent-template-example.md
+```
+
+最短使用方式：
+
+```md
+创建一个 goal：使用 PPT 模板开发 Agent 工作流，完整开发【分类 / 模板 / 主题风格】模板。
+```
+
 ## 调用示例
 
 ```md
@@ -38,4 +50,3 @@
 ```
 
 如果要完整做一个模板，按 `registry.json` 的 `recommendedOrder` 顺序执行。
-

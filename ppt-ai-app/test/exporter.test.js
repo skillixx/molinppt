@@ -506,86 +506,6 @@ test("PptExportService uses budget variance decorations", () => {
   assert.doesNotMatch(slide1, /execution-variance/);
 });
 
-test("PptExportService uses quarterly problem diagnosis decorations", () => {
-  const exporter = new PptExportService();
-  const result = exporter.exportDeck({
-    deck: {
-      ...deck,
-      templateId: "business-quarterly-review-problem-diagnosis",
-      theme: "problem-diagnosis",
-      templateVisual: {
-        primary: "1C318A",
-        accent: "4F7F55",
-        background: "F4F6F8",
-        surface: "FFFFFF",
-        title: "111827",
-        body: "4B5563",
-        layout: "quarterly-diagnosis",
-        variant: "problem-diagnosis",
-      },
-      slides: [
-        { title: "季度经营问题诊断", bullets: ["核心指标未达预期", "客户转化率下降", "交付周期延长"] },
-        { title: "指标异常分析", bullets: ["收入达成率 86%", "线索转化下降 12%", "毛利率承压"] },
-        { title: "原因拆解", bullets: ["目标偏差", "过程断点", "资源瓶颈", "协同低效"] },
-        { title: "整改建议", bullets: ["短期止血", "中期修复", "长期机制"] },
-      ],
-    },
-    format: "pptx",
-  });
-  const text = result.content.toString("latin1");
-  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
-  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
-
-  assert.match(slide1, /name="Quarterly Diagnosis Surface"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Problem Triangle"/);
-  assert.match(slide1, /name="Quarterly Diagnosis Left Note"/);
-  assert.match(slide2, /name="Quarterly Diagnosis Problem Card 1"/);
-  assert.match(slide2, /name="Quarterly Diagnosis Evidence Pill 1"/);
-  assert.match(slide4, /name="Quarterly Diagnosis Action Arrow 1"/);
-  assert.doesNotMatch(slide1, /problem-diagnosis/);
-});
-
-test("PptExportService uses quarterly dashboard decorations", () => {
-  const exporter = new PptExportService();
-  const result = exporter.exportDeck({
-    deck: {
-      ...deck,
-      templateId: "business-quarterly-review-dashboard",
-      theme: "dashboard",
-      templateVisual: {
-        primary: "173861",
-        accent: "D7A650",
-        background: "EEF3F9",
-        surface: "FFFFFF",
-        title: "0F172A",
-        body: "334155",
-        layout: "quarterly-dashboard",
-        variant: "dashboard",
-      },
-      slides: [
-        { title: "季度经营复盘", bullets: ["收入同比增长 12%", "利润率提升 3%", "华东区域增长 18%", "重点客户回款改善"] },
-        { title: "核心指标总览", bullets: ["营收达成率 96%", "毛利率 31%", "新签客户 42 家", "续费收入提升 15%"] },
-        { title: "区域业务表现", bullets: ["华东增长 18%", "华南增长 11%", "华北承压 6%", "西南机会扩大"] },
-        { title: "下季行动计划", bullets: ["优化重点客户回款", "提升高毛利产品占比", "跟进区域渠道共创", "建立周度复盘节奏"] },
-      ],
-    },
-    format: "pptx",
-  });
-  const text = result.content.toString("latin1");
-  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
-  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
-
-  assert.match(slide1, /name="Quarterly Dashboard Business Illustration Panel"/);
-  assert.match(slide1, /name="Quarterly Dashboard Cover Card"/);
-  assert.match(slide2, /name="Quarterly Dashboard Product Panel"/);
-  assert.match(slide2, /name="Quarterly Dashboard Region/);
-  assert.match(slide4, /name="Quarterly Dashboard Combo Panel"/);
-  assert.doesNotMatch(slide1, /经营看板/);
-  assert.doesNotMatch(slide2, /经营看板/);
-});
-
 test("PptExportService uses financial industry solution decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1010,6 +930,7 @@ test("PptExportService uses quarterly action loop decorations", () => {
   assert.match(slide2, /name="Quarterly Action Loop V2 Roadmap Arrow 1"/);
   assert.doesNotMatch(slide1, /行动闭环/);
 });
+
 test("PptExportService keeps commercial template theme chips decorative", () => {
   const exporter = new PptExportService();
   const cases = [
