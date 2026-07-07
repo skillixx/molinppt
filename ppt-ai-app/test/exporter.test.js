@@ -351,6 +351,45 @@ test("PptExportService uses budget planning decorations", () => {
   assert.doesNotMatch(slide1, /budget-planning/);
 });
 
+test("PptExportService uses financial industry solution decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-industry-solution-financial-industry",
+      theme: "financial-industry",
+      templateVisual: {
+        primary: "0B2A4A",
+        accent: "18A0A6",
+        background: "EAF3F7",
+        surface: "FFFFFF",
+        title: "071D33",
+        body: "385269",
+        layout: "sales-financial-solution",
+        variant: "financial-industry",
+      },
+      slides: [
+        { title: "金融客户数字化解决方案", bullets: ["合规安全能力建设", "核心业务系统升级", "数据风控体系完善"] },
+        { title: "金融客户场景痛点", bullets: ["监管要求持续提升", "业务系统割裂明显", "客户体验需要升级"] },
+        { title: "解决方案总体架构", bullets: ["客户触点统一", "业务中台支撑", "数据风控联动", "合规审计闭环"] },
+        { title: "合规安全价值", bullets: ["监管合规", "数据安全", "流程提效", "客户体验"] },
+        { title: "下一步合作计划", bullets: ["完成场景确认", "推进试点部署", "沉淀长期运营"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Financial Solution Workspace"/);
+  assert.match(slide1, /name="Financial Solution Security Shield"/);
+  assert.match(slide3, /name="Financial Solution Architecture Layer 1"/);
+  assert.match(slide4, /name="Financial Solution Value Panel"/);
+  assert.doesNotMatch(slide1, /financial-industry/);
+});
+
 test("PptExportService uses commercial sales enterprise decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

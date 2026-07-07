@@ -393,8 +393,18 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "sales-financial-solution"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "sales-financial-solution") {
+    if (index === 0) {
+      if (textLength >= 30) return 2100;
+      if (textLength >= 22) return 2350;
+      return Math.min(fallbackSize, 2700);
+    }
+    if (textLength >= 30) return 1450;
+    if (textLength >= 22) return 1650;
+    return Math.min(fallbackSize, 1900);
+  }
   if (visual.layout === "finance-budget-planning") {
     if (index === 0) {
       if (textLength >= 30) return 2100;
@@ -531,6 +541,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
+  if (visual.layout === "sales-financial-solution") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -660,6 +671,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "sales-financial-solution") {
+    return base + financialSolutionDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
@@ -1419,6 +1433,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 841248, y: 1828800, cx: 3474720, cy: 914400 },
       titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
       bodySize: isCover ? 960 : 780,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "sales-financial-solution") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 585216, y: 640080, cx: 7979664, cy: 4069080 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 335280 },
+      secondaryAccent: { x: 841248, y: isCover ? 2331720 : 2087880, cx: 3200400, cy: 22860 },
+      label: { x: 841248, y: 838200, cx: 2316480, cy: 274320 },
+      title: isClosing
+        ? { x: 841248, y: 1219200, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 841248, y: 1219200, cx: 4114800, cy: 1219200 }
+          : { x: 841248, y: 914400, cx: 4267200, cy: 731520 },
+      content: isClosing
+        ? { x: 841248, y: 2438400, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 841248, y: 2644140, cx: 3505200, cy: 762000 }
+          : { x: 841248, y: 1859280, cx: 3474720, cy: 914400 },
+      titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
+      bodySize: isCover ? 960 : 760,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -2204,6 +2242,11 @@ function quarterlyDashboardColorPalette(visual) {
 function budgetPlanningDecorationsXml({ visual, index, role, slide }) {
   const scene = budgetPlanningSceneFromSlide({ slide, index, role });
   const palette = budgetPlanningColorPalette(visual);
+  // 背景层和在线预览保持同一套浅青灰财务底色，避免导出后只剩白底。
+  const backdrop = rectShapeXml({ id: 550, name: "Budget Planning Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 551, name: "Budget Planning Left Tint Plane", geom: "parallelogram", x: -548640, y: 571500, cx: 2057400, cy: 4572000, fill: palette.tint })
+    + solidShapeXml({ id: 552, name: "Budget Planning Soft Accent Circle", geom: "ellipse", x: 7315200, y: 335280, cx: 1828800, cy: 1828800, fill: palette.softAccent })
+    + solidShapeXml({ id: 553, name: "Budget Planning Warm Balance Circle", geom: "ellipse", x: 7315200, y: 4038600, cx: 1676400, cy: 1219200, fill: palette.warmWash });
   const surface = solidShapeXml({ id: 560, name: "Budget Planning Workspace", geom: "roundRect", x: 621792, y: 627888, cx: 7900416, cy: 4069080, fill: visual.surface })
     + lineFrameShapeXml({ id: 561, name: "Budget Planning Workspace Border", geom: "roundRect", x: 621792, y: 627888, cx: 7900416, cy: 4069080, stroke: palette.frame, width: 15240 });
   const header = solidShapeXml({ id: 562, name: "Budget Planning Header", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
@@ -2211,11 +2254,11 @@ function budgetPlanningDecorationsXml({ visual, index, role, slide }) {
     + rectShapeXml({ id: 564, name: "Budget Planning Focus Rule", x: 841248, y: index === 0 ? 2316480 : 2057400, cx: 3291840, cy: 22860, fill: visual.accent })
     + textShapeXml({ id: 565, name: "Budget Planning Kicker", x: 841248, y: 822960, cx: 2133600, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent });
   const bullets = budgetPlanningBulletCardsXml({ visual, scene, isCover: index === 0 });
-  if (scene.role === "flow") return surface + header + bullets + budgetPlanningFlowXml({ visual, palette, steps: scene.flowSteps });
-  if (scene.role === "table") return surface + header + bullets + budgetPlanningTableXml({ visual, palette, rows: scene.tableRows });
-  if (scene.role === "allocation") return surface + header + bullets + budgetPlanningAllocationXml({ visual, palette, scene });
-  if (scene.role === "closing") return surface + header + bullets + budgetPlanningClosingCardsXml({ visual, palette, items: scene.bullets });
-  return surface + header + bullets + budgetPlanningDashboardXml({ visual, palette }) + budgetPlanningMetricCardsXml({ visual, metrics: scene.metrics });
+  if (scene.role === "flow") return backdrop + surface + header + bullets + budgetPlanningFlowXml({ visual, palette, steps: scene.flowSteps });
+  if (scene.role === "table") return backdrop + surface + header + bullets + budgetPlanningTableXml({ visual, palette, rows: scene.tableRows });
+  if (scene.role === "allocation") return backdrop + surface + header + bullets + budgetPlanningAllocationXml({ visual, palette, scene });
+  if (scene.role === "closing") return backdrop + surface + header + bullets + budgetPlanningClosingCardsXml({ visual, palette, items: scene.bullets });
+  return backdrop + surface + header + bullets + budgetPlanningDashboardXml({ visual, palette }) + budgetPlanningMetricCardsXml({ visual, metrics: scene.metrics });
 }
 
 function budgetPlanningDashboardXml({ visual, palette }) {
@@ -2351,6 +2394,10 @@ function budgetPlanningCompactText(text, fallback, maxLength) {
 
 function budgetPlanningColorPalette(visual) {
   return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.32),
+    tint: blendHexColor(visual.accent, visual.background, 0.86),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.76),
+    warmWash: blendHexColor("D6A84F", visual.background, 0.82),
     panel: blendHexColor(visual.background, visual.surface, 0.68),
     frame: blendHexColor(visual.primary, visual.surface, 0.78),
     gold: "D6A84F",
@@ -2360,6 +2407,148 @@ function budgetPlanningColorPalette(visual) {
 function isBudgetPlanningVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
+}
+
+function financialSolutionDecorationsXml({ visual, index, role, slide }) {
+  const scene = financialSolutionSceneFromSlide({ slide, index, role });
+  const palette = financialSolutionColorPalette(visual);
+  // 背景、卡片和装饰均用 DrawingML 绘制，保证下载 PPTX 后仍然可编辑。
+  const backdrop = rectShapeXml({ id: 800, name: "Financial Solution Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 801, name: "Financial Solution Left Security Plane", geom: "parallelogram", x: -548640, y: 533400, cx: 2011680, cy: 4602480, fill: palette.tint })
+    + solidShapeXml({ id: 802, name: "Financial Solution Compliance Glow", geom: "ellipse", x: 7315200, y: 304800, cx: 1828800, cy: 1828800, fill: palette.softAccent })
+    + solidShapeXml({ id: 803, name: "Financial Solution Value Glow", geom: "ellipse", x: 7246620, y: 4038600, cx: 1676400, cy: 1219200, fill: palette.warmWash });
+  const surface = solidShapeXml({ id: 804, name: "Financial Solution Workspace", geom: "roundRect", x: 585216, y: 640080, cx: 7979664, cy: 4069080, fill: visual.surface })
+    + lineFrameShapeXml({ id: 805, name: "Financial Solution Workspace Border", geom: "roundRect", x: 585216, y: 640080, cx: 7979664, cy: 4069080, stroke: palette.frame, width: 15240 });
+  const header = solidShapeXml({ id: 806, name: "Financial Solution Header", x: 0, y: 0, cx: 9144000, cy: 335280, fill: visual.primary })
+    + rectShapeXml({ id: 807, name: "Financial Solution Header Accent", x: 0, y: 335280, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 808, name: "Financial Solution Kicker", x: 841248, y: 838200, cx: 2316480, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 809, name: "Financial Solution Focus Rule", x: 841248, y: index === 0 ? 2331720 : 2087880, cx: 3200400, cy: 22860, fill: visual.accent });
+  const bullets = financialSolutionBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "architecture") return backdrop + surface + header + bullets + financialSolutionArchitectureXml({ visual, palette, items: scene.architecture });
+  if (scene.role === "compliance" || scene.role === "value") return backdrop + surface + header + bullets + financialSolutionValueXml({ visual, palette, items: scene.matrix });
+  if (scene.role === "closing") return backdrop + surface + header + bullets + financialSolutionClosingXml({ visual, palette, items: scene.matrix });
+  return backdrop + surface + header + bullets + financialSolutionShieldXml({ visual, palette }) + financialSolutionTagCardsXml({ visual, tags: scene.tags });
+}
+
+function financialSolutionShieldXml({ visual, palette }) {
+  return solidShapeXml({ id: 820, name: "Financial Solution Shield Panel", geom: "roundRect", x: 5780520, y: 1021080, cx: 2743200, cy: 2438400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 821, name: "Financial Solution Shield Panel Border", geom: "roundRect", x: 5780520, y: 1021080, cx: 2743200, cy: 2438400, stroke: palette.frame, width: 12700 })
+    + solidShapeXml({ id: 822, name: "Financial Solution Security Shield", geom: "pentagon", x: 6461760, y: 1272540, cx: 1219200, cy: 1447800, fill: palette.shield })
+    + lineFrameShapeXml({ id: 823, name: "Financial Solution Security Shield Border", geom: "pentagon", x: 6461760, y: 1272540, cx: 1219200, cy: 1447800, stroke: visual.primary, width: 25400 })
+    + rectShapeXml({ id: 824, name: "Financial Solution Shield Vertical Rule", x: 7063740, y: 1546860, cx: 30480, cy: 883920, fill: visual.accent })
+    + rectShapeXml({ id: 825, name: "Financial Solution Shield Cross Rule", x: 6781800, y: 1836420, cx: 640080, cy: 22860, fill: visual.primary })
+    + solidShapeXml({ id: 826, name: "Financial Solution Gold Node", geom: "ellipse", x: 6987540, y: 1386840, cx: 121920, cy: 121920, fill: palette.gold })
+    + solidShapeXml({ id: 827, name: "Financial Solution Security Node Left", geom: "ellipse", x: 6256020, y: 2514600, cx: 137160, cy: 137160, fill: visual.accent })
+    + solidShapeXml({ id: 828, name: "Financial Solution Security Node Right", geom: "ellipse", x: 7802880, y: 2514600, cx: 137160, cy: 137160, fill: visual.accent });
+}
+
+function financialSolutionTagCardsXml({ visual, tags }) {
+  return tags.slice(0, 3).map((tag, index) => {
+    const x = 841248 + index * 1257300;
+    return rectShapeXml({ id: 830 + index * 3, name: `Financial Solution Tag Rail ${index + 1}`, x, y: 3764280, cx: 60960, cy: 350520, fill: visual.accent })
+      + solidShapeXml({ id: 831 + index * 3, name: `Financial Solution Tag Card ${index + 1}`, geom: "roundRect", x: x + 91440, y: 3703320, cx: 914400, cy: 472440, fill: "FFFFFF" })
+      + textShapeXml({ id: 832 + index * 3, name: `Financial Solution Tag Text ${index + 1}`, x: x + 198120, y: 3817620, cx: 685800, cy: 182880, text: financialSolutionCompactText(tag, "", 8), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financialSolutionBulletCardsXml({ visual, scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2644140 : 1859280) + index * 243840;
+    return rectShapeXml({ id: 850 + index * 2, name: `Financial Solution Bullet Rule ${index + 1}`, x: 841248, y: y + 30480, cx: 45720, cy: 137160, fill: visual.accent })
+      + textShapeXml({ id: 851 + index * 2, name: `Financial Solution Bullet Text ${index + 1}`, x: 1013460, y, cx: 3444240, cy: 198120, text: financialSolutionCompactText(item, scene.title, 32), size: isCover ? 820 : 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function financialSolutionArchitectureXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const y = 1112520 + index * 548640;
+    return solidShapeXml({ id: 870 + index * 4, name: `Financial Solution Architecture Layer ${index + 1}`, geom: "roundRect", x: 5780520, y, cx: 2743200, cy: 396240, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 871 + index * 4, name: `Financial Solution Architecture Border ${index + 1}`, geom: "roundRect", x: 5780520, y, cx: 2743200, cy: 396240, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 872 + index * 4, name: `Financial Solution Architecture Node ${index + 1}`, geom: "ellipse", x: 5963400, y: y + 121920, cx: 121920, cy: 121920, fill: index === 2 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 873 + index * 4, name: `Financial Solution Architecture Text ${index + 1}`, x: 6217920, y: y + 91440, cx: 1828800, cy: 182880, text: financialSolutionCompactText(item, "", 12), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financialSolutionValueXml({ visual, palette, items }) {
+  const panel = solidShapeXml({ id: 900, name: "Financial Solution Value Panel", geom: "roundRect", x: 5943600, y: 1219200, cx: 2438400, cy: 2133600, fill: visual.primary })
+    + rectShapeXml({ id: 901, name: "Financial Solution Value Line 1", x: 6324600, y: 1691640, cx: 914400, cy: 60960, fill: "FFFFFF", transparency: 22000 })
+    + rectShapeXml({ id: 902, name: "Financial Solution Value Line 2", x: 6324600, y: 2057400, cx: 1219200, cy: 60960, fill: visual.accent, transparency: 12000 })
+    + rectShapeXml({ id: 903, name: "Financial Solution Value Line 3", x: 6324600, y: 2423160, cx: 762000, cy: 60960, fill: palette.gold, transparency: 8000 });
+  const cards = items.slice(0, 4).map((item, index) => {
+    const x = 841248 + index * 1828800;
+    return solidShapeXml({ id: 910 + index * 3, name: `Financial Solution Value Card ${index + 1}`, geom: "roundRect", x, y: 3611880, cx: 1524000, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 911 + index * 3, name: `Financial Solution Value Card Border ${index + 1}`, geom: "roundRect", x, y: 3611880, cx: 1524000, cy: 609600, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 912 + index * 3, name: `Financial Solution Value Card Text ${index + 1}`, x: x + 152400, y: 3794760, cx: 1219200, cy: 182880, text: financialSolutionCompactText(item, "", 10), size: 720, bold: true, color: visual.title });
+  }).join("");
+  return panel + cards;
+}
+
+function financialSolutionClosingXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const x = 975360 + index * 2286000;
+    return solidShapeXml({ id: 940 + index * 4, name: `Financial Solution Closing Card ${index + 1}`, geom: "roundRect", x, y: 2926080, cx: 1828800, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 941 + index * 4, name: `Financial Solution Closing Card Border ${index + 1}`, geom: "roundRect", x, y: 2926080, cx: 1828800, cy: 914400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 942 + index * 4, name: `Financial Solution Closing Card Accent ${index + 1}`, x: x + 182880, y: 3215640, cx: 365760, cy: 30480, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 943 + index * 4, name: `Financial Solution Closing Card Text ${index + 1}`, x: x + 182880, y: 3329940, cx: 1371600, cy: 243840, text: financialSolutionCompactText(item, "", 14), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financialSolutionSceneFromSlide({ slide, index, role }) {
+  const bullets = financialSolutionBulletTexts(slide);
+  const title = financialSolutionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const sceneRole = index === 0
+    ? "cover"
+    : role === "closing"
+      ? "closing"
+      : String(role || "").includes("architecture")
+        ? "architecture"
+        : String(role || "").includes("compliance")
+          ? "compliance"
+          : String(role || "").includes("value")
+            ? "value"
+            : ["painpoints", "architecture", "compliance", "value"][(index - 1) % 4];
+  const tags = ["合规安全", "架构升级", "价值增长"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 8));
+  const architecture = ["客户触点", "业务中台", "数据风控", "合规审计"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 12));
+  const matrix = ["监管合规", "数据安全", "流程提效", "客户体验"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 10));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "FINANCIAL SOLUTION" : sceneRole === "architecture" ? "SOLUTION ARCHITECTURE" : sceneRole === "compliance" ? "COMPLIANCE VALUE" : sceneRole === "value" ? "BUSINESS VALUE" : "CLIENT NEXT STEP",
+    title,
+    bullets,
+    tags,
+    architecture,
+    matrix,
+  };
+}
+
+function financialSolutionBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["金融客户场景痛点与合规要求", "安全可靠的数字化方案架构", "业务效率提升与客户体验增长"];
+}
+
+function financialSolutionCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function financialSolutionColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.28),
+    tint: blendHexColor(visual.accent, visual.background, 0.86),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.76),
+    warmWash: blendHexColor("D6A84F", visual.background, 0.84),
+    panel: blendHexColor(visual.background, visual.surface, 0.66),
+    shield: blendHexColor(visual.accent, visual.surface, 0.88),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    gold: "D6A84F",
+  };
+}
+
+function isFinancialSolutionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-financial-solution" && (id === "industry-solution" || id === "sales-industry-solution-financial-industry");
 }
 
 function annualSummaryCoverBackdropXml({ visual, palette }) {

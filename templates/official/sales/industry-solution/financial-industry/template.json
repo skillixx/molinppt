@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "industry-solution",
+  "themeId": "financial-industry",
+  "style": "financial-solution",
+  "themes": [
+    {
+      "id": "financial-industry",
+      "name": "金融行业",
+      "visual": {
+        "primary": "0B2A4A",
+        "accent": "18A0A6",
+        "background": "EAF3F7",
+        "surface": "FFFFFF",
+        "title": "071D33",
+        "body": "385269",
+        "layout": "sales-financial-solution",
+        "variant": "financial-industry"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B2A4A",
+    "accent": "18A0A6",
+    "background": "EAF3F7",
+    "surface": "FFFFFF",
+    "title": "071D33",
+    "body": "385269",
+    "layout": "sales-financial-solution",
+    "variant": "financial-industry"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "sales-financial-solution-cover",
+    "defaultContentLayout": "sales-financial-solution-content",
+    "allowedLayouts": [
+      "sales-financial-solution-cover",
+      "sales-financial-solution-painpoints",
+      "sales-financial-solution-architecture",
+      "sales-financial-solution-compliance",
+      "sales-financial-solution-value",
+      "sales-financial-solution-closing",
+      "title",
+      "content"
+    ]
+  }
+}

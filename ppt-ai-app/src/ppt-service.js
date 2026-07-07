@@ -985,6 +985,7 @@ function renderDeckPreview({ deck, visual }) {
     const strategyScene = isStrategyConsultingVisual(visual) ? strategyConsultingPreviewScene(visual) : null;
     const financeScene = isFinancialReviewVisual(visual) ? financialReviewPreviewScene(visual) : null;
     const salesScene = isSalesProposalVisual(visual) ? salesProposalPreviewScene(visual) : null;
+    const financialSolutionScene = isFinancialSolutionVisual(visual) ? financialSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
@@ -1013,6 +1014,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const salesMark = salesScene
       ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip" aria-hidden="true"></div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
+      : "";
+    const financialSolutionMark = financialSolutionScene
+      ? renderFinancialSolutionPreview(slide, financialSolutionScene)
       : "";
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
@@ -1106,11 +1110,11 @@ function renderDeckPreview({ deck, visual }) {
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    // 年度总结、行业研究和预算编制模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene
+    // 年度总结、行业研究、预算编制和金融解决方案模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene || financialSolutionScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1235,11 +1239,12 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="industry-research"] .industry-opportunity-grid span{border-radius:12px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 76%,#fff 24%));border:1px solid rgba(18,50,90,.12);}
     body[data-layout="industry-research"] .industry-closing-line{position:absolute;left:8%;right:8%;bottom:23%;height:2px;background:linear-gradient(90deg,var(--template-accent),transparent);}
     body[data-layout="industry-research"] .page-number{z-index:4;right:7.2%;bottom:6.4%;background:rgba(255,255,255,.78);border:1px solid rgba(18,50,90,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
-    body[data-layout="finance-budget-planning"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 100%);}
-    body[data-layout="finance-budget-planning"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,42,67,.055) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(42,157,143,.035) 0 1px,transparent 1px 40px);}
-    body[data-layout="finance-budget-planning"] .accent{height:6.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 72%,var(--template-accent) 28%));}
+    body[data-layout="finance-budget-planning"] .slide{padding:0;border:0;background:radial-gradient(circle at 86% 22%,rgba(42,157,143,.22) 0 18%,transparent 19% 42%),linear-gradient(135deg,#f6fbfa 0%,var(--template-bg) 48%,#d8ebe7 100%);}
+    body[data-layout="finance-budget-planning"] .slide::before{background:linear-gradient(110deg,rgba(16,42,67,.08) 0 13%,transparent 13% 100%),repeating-linear-gradient(90deg,rgba(16,42,67,.052) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(42,157,143,.04) 0 1px,transparent 1px 40px);}
+    body[data-layout="finance-budget-planning"] .slide::after{content:"";position:absolute;right:-8%;bottom:-16%;width:44%;height:46%;border-radius:999px;background:rgba(214,168,79,.16);filter:blur(1px);}
+    body[data-layout="finance-budget-planning"] .accent{height:6.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 56%,var(--template-accent) 44%));box-shadow:0 6px 20px rgba(16,42,67,.12);}
     body[data-layout="finance-budget-planning"] .budget-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
-    body[data-layout="finance-budget-planning"] .budget-surface{position:absolute;left:6.8%;right:6.8%;top:12.2%;bottom:8.8%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(16,42,67,.14);box-shadow:0 24px 52px rgba(16,42,67,.14);}
+    body[data-layout="finance-budget-planning"] .budget-surface{position:absolute;left:6.8%;right:6.8%;top:12.2%;bottom:8.8%;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(249,252,251,.88));border:1px solid rgba(16,42,67,.13);box-shadow:0 24px 52px rgba(16,42,67,.15),inset 0 0 0 1px rgba(255,255,255,.72);}
     body[data-layout="finance-budget-planning"] .budget-kicker{position:absolute;left:9.2%;top:16%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
     body[data-layout="finance-budget-planning"] .budget-title{position:absolute;left:9.2%;top:24%;width:45%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
     body[data-layout="finance-budget-planning"] .budget-rule{position:absolute;left:9.2%;top:45%;width:36%;height:3px;background:linear-gradient(90deg,var(--template-accent),transparent);}
@@ -1248,7 +1253,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="finance-budget-planning"] .budget-amount-cards{position:absolute;left:9.2%;right:46%;bottom:15%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     body[data-layout="finance-budget-planning"] .budget-amount-cards span{min-height:58px;border-radius:12px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 10px 22px rgba(16,42,67,.08);padding:12px 14px;display:grid;align-content:center;gap:3px;font-size:11px;font-weight:800;color:var(--template-body);}
     body[data-layout="finance-budget-planning"] .budget-amount-cards strong{font-size:19px;line-height:1;color:var(--template-primary);}
-    body[data-layout="finance-budget-planning"] .budget-dashboard{position:absolute;right:9.2%;top:20%;width:32%;height:45%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid rgba(16,42,67,.14);box-shadow:0 18px 34px rgba(16,42,67,.12);overflow:hidden;}
+    body[data-layout="finance-budget-planning"] .budget-dashboard{position:absolute;right:9.2%;top:20%;width:32%;height:45%;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.95),color-mix(in srgb,var(--template-bg) 82%,#fff 18%));border:1px solid rgba(16,42,67,.14);box-shadow:0 18px 34px rgba(16,42,67,.12);overflow:hidden;}
     body[data-layout="finance-budget-planning"] .budget-dashboard::before{content:"";position:absolute;left:10%;top:14%;width:36%;height:36%;border-radius:50%;background:conic-gradient(var(--template-accent) 0 46%,#d6a84f 46% 70%,rgba(16,42,67,.14) 70% 100%);box-shadow:0 0 0 16px rgba(42,157,143,.08);}
     body[data-layout="finance-budget-planning"] .budget-dashboard::after{content:"";position:absolute;right:12%;top:16%;bottom:14%;width:40%;background:linear-gradient(180deg,transparent 0 18%,rgba(16,42,67,.14) 18% 19%,transparent 19% 40%,rgba(42,157,143,.22) 40% 41%,transparent 41% 62%,rgba(16,42,67,.14) 62% 63%,transparent 63%),linear-gradient(90deg,var(--template-accent) 0 8px,transparent 8px 100%);}
     body[data-layout="finance-budget-planning"] .budget-table{position:absolute;left:9.2%;right:9.2%;top:50%;bottom:16%;border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(16,42,67,.08);overflow:hidden;}
@@ -1367,6 +1372,36 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual::after{left:18%;right:16%;top:43%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));transform:rotate(-16deg);}
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span{width:10px;height:10px;border-radius:50%;background:var(--template-primary);}
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(1){left:18%;top:60%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(2){left:39%;top:52%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(3){left:60%;top:41%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(4){left:79%;top:30%;background:var(--template-accent);}
+    body[data-layout="sales-financial-solution"] .slide{padding:0;border:0;background:radial-gradient(circle at 86% 20%,rgba(24,160,166,.18) 0 18%,transparent 19% 42%),linear-gradient(135deg,#f7fbfc 0%,var(--template-bg) 54%,#dbeaf0 100%);}
+    body[data-layout="sales-financial-solution"] .slide::before{background:linear-gradient(110deg,rgba(11,42,74,.12) 0 12%,transparent 12% 100%),repeating-linear-gradient(90deg,rgba(11,42,74,.045) 0 1px,transparent 1px 54px),repeating-linear-gradient(0deg,rgba(24,160,166,.04) 0 1px,transparent 1px 44px);}
+    body[data-layout="sales-financial-solution"] .slide::after{content:"";position:absolute;right:-10%;bottom:-18%;width:42%;height:48%;border-radius:50%;background:rgba(214,168,79,.14);}
+    body[data-layout="sales-financial-solution"] .accent{height:6.6%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 64%,var(--template-accent) 36%));box-shadow:0 7px 22px rgba(11,42,74,.16);}
+    body[data-layout="sales-financial-solution"] .financial-solution-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="sales-financial-solution"] .financial-solution-surface{position:absolute;left:6.4%;right:6.4%;top:12.4%;bottom:8.4%;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(248,252,253,.9));border:1px solid rgba(11,42,74,.14);box-shadow:0 24px 54px rgba(11,42,74,.14),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="sales-financial-solution"] .financial-solution-kicker{position:absolute;left:9.2%;top:16.3%;font-size:12px;font-weight:900;letter-spacing:.15em;color:var(--template-accent);}
+    body[data-layout="sales-financial-solution"] .financial-solution-title{position:absolute;left:9.2%;top:24%;width:43%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="sales-financial-solution"] .financial-solution-rule{position:absolute;left:9.2%;top:45.4%;width:35%;height:3px;background:linear-gradient(90deg,var(--template-accent),transparent);}
+    body[data-layout="sales-financial-solution"] .financial-solution-bullets{position:absolute;left:9.2%;top:51.5%;width:39%;margin:0;padding-left:1.05em;font-size:13.5px;line-height:1.45;color:var(--template-body);}
+    body[data-layout="sales-financial-solution"] .financial-solution-bullets li{margin:.12em 0;}
+    body[data-layout="sales-financial-solution"] .financial-solution-tags{position:absolute;left:9.2%;right:47%;bottom:14.6%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-financial-solution"] .financial-solution-tags span{min-height:58px;border-left:7px solid var(--template-accent);border-radius:10px;background:#fff;border-top:1px solid rgba(11,42,74,.1);border-right:1px solid rgba(11,42,74,.1);border-bottom:1px solid rgba(11,42,74,.1);box-shadow:0 10px 22px rgba(11,42,74,.08);padding:11px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-financial-solution"] .financial-solution-shield{position:absolute;right:9.2%;top:20%;width:30%;height:48%;border-radius:22px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 78%,#fff 22%));border:1px solid rgba(11,42,74,.14);box-shadow:0 18px 36px rgba(11,42,74,.12);overflow:hidden;}
+    body[data-layout="sales-financial-solution"] .financial-solution-shield::before{content:"";position:absolute;left:28%;top:13%;width:44%;height:62%;clip-path:polygon(50% 0,88% 18%,88% 55%,50% 100%,12% 55%,12% 18%);background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(24,160,166,.12));border:3px solid var(--template-primary);}
+    body[data-layout="sales-financial-solution"] .financial-solution-shield::after{content:"";position:absolute;left:42%;top:28%;width:16%;height:34%;border-left:4px solid var(--template-accent);border-bottom:3px solid var(--template-primary);box-shadow:0 -22px 0 -8px #d6a84f;}
+    body[data-layout="sales-financial-solution"] .financial-solution-shield i{position:absolute;width:13px;height:13px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 6px rgba(24,160,166,.12);}
+    body[data-layout="sales-financial-solution"] .financial-solution-shield i:nth-child(1){left:18%;top:68%;}body[data-layout="sales-financial-solution"] .financial-solution-shield i:nth-child(2){right:18%;top:68%;}body[data-layout="sales-financial-solution"] .financial-solution-shield i:nth-child(3){left:48%;top:20%;background:#d6a84f;}
+    body[data-layout="sales-financial-solution"] .financial-solution-architecture{position:absolute;right:9.2%;top:22%;width:36%;height:48%;display:grid;gap:10px;}
+    body[data-layout="sales-financial-solution"] .financial-solution-architecture span{border-radius:12px;background:#fff;border:1px solid rgba(11,42,74,.12);box-shadow:0 9px 18px rgba(11,42,74,.07);padding:10px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-financial-solution"] .financial-solution-architecture span::before{content:"";display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--template-accent);}
+    body[data-layout="sales-financial-solution"] .financial-solution-matrix{position:absolute;left:9.2%;right:9.2%;bottom:15%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-financial-solution"] .financial-solution-matrix span{min-height:86px;border-radius:14px;background:#fff;border:1px solid rgba(11,42,74,.12);box-shadow:0 10px 22px rgba(11,42,74,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-financial-solution"] .financial-solution-matrix span::after{content:"";display:block;width:36px;height:3px;margin-top:12px;background:var(--template-accent);}
+    body[data-layout="sales-financial-solution"] .financial-solution-value{position:absolute;right:9.2%;top:24%;width:32%;height:44%;border-radius:18px;background:linear-gradient(135deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 74%,var(--template-accent) 26%));box-shadow:0 18px 34px rgba(11,42,74,.18);}
+    body[data-layout="sales-financial-solution"] .financial-solution-value span{position:absolute;left:16%;right:16%;height:8px;border-radius:999px;background:rgba(255,255,255,.72);}
+    body[data-layout="sales-financial-solution"] .financial-solution-value span:nth-child(1){top:28%;width:58%;}body[data-layout="sales-financial-solution"] .financial-solution-value span:nth-child(2){top:45%;width:70%;}body[data-layout="sales-financial-solution"] .financial-solution-value span:nth-child(3){top:62%;width:46%;background:#d6a84f;}
+    body[data-layout="sales-financial-solution"] .financial-solution-closing{position:absolute;left:9.2%;right:9.2%;top:50%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
+    body[data-layout="sales-financial-solution"] .financial-solution-closing span{min-height:104px;border-radius:14px;background:#fff;border:1px solid rgba(11,42,74,.12);box-shadow:0 12px 24px rgba(11,42,74,.08);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-financial-solution"] .page-number{z-index:4;right:7.2%;bottom:5.4%;background:rgba(255,255,255,.82);border:1px solid rgba(11,42,74,.12);border-radius:999px;padding:5px 10px;color:rgba(7,29,51,.62);}
     body[data-template="product-roadmap"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 64%,color-mix(in srgb,var(--template-primary) 11%,var(--template-bg) 89%));padding:7.8% 8.2% 6.8%;border:0;}
     body[data-template="product-roadmap"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 44px),radial-gradient(circle at 78% 25%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 28%);pointer-events:none;}
     body[data-template="product-roadmap"] .slide::after{content:"";position:absolute;inset:11% 6.2% 10%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 22px 48px rgba(17,55,70,.12);}
@@ -2476,6 +2511,61 @@ function isSalesProposalVisual(visual) {
   return visual?.id === "sales-proposal" && visual?.layout === "academy";
 }
 
+function financialSolutionPreviewScene({ slide, index, total }) {
+  const bullets = financialSolutionBulletTexts(slide);
+  const title = financialSolutionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = index === 0
+    ? "cover"
+    : index === total - 1
+      ? "closing"
+      : ["painpoints", "architecture", "compliance", "value"][(index - 1) % 4];
+  const tags = ["合规安全", "架构升级", "价值增长"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 8));
+  const architecture = ["客户触点", "业务中台", "数据风控", "合规审计"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 12));
+  const matrix = ["监管合规", "数据安全", "流程提效", "客户体验"].map((fallback, itemIndex) => financialSolutionCompactText(bullets[itemIndex], fallback, 10));
+  return {
+    variant: "financial-industry",
+    role,
+    kicker: role === "cover" ? "FINANCIAL SOLUTION" : role === "architecture" ? "SOLUTION ARCHITECTURE" : role === "compliance" ? "COMPLIANCE VALUE" : role === "value" ? "BUSINESS VALUE" : "CLIENT NEXT STEP",
+    title,
+    bullets,
+    tags,
+    architecture,
+    matrix,
+  };
+}
+
+function renderFinancialSolutionPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(financialSolutionCompactText(item, scene.title, 42))}</li>`).join("");
+  const tags = scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const architecture = scene.architecture.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const matrix = scene.matrix.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const shield = '<div class="financial-solution-shield"><i></i><i></i><i></i></div>';
+  const visual = scene.role === "architecture"
+    ? `<div class="financial-solution-architecture">${architecture}</div>`
+    : scene.role === "compliance" || scene.role === "value"
+      ? `<div class="financial-solution-value"><span></span><span></span><span></span></div><div class="financial-solution-matrix">${matrix}</div>`
+      : scene.role === "closing"
+        ? `<div class="financial-solution-closing">${scene.matrix.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : `${shield}<div class="financial-solution-tags">${tags}</div>`;
+  return `<div class="financial-solution-layer"><div class="financial-solution-surface"></div><div class="financial-solution-kicker">${escapeHtml(scene.kicker)}</div><h2 class="financial-solution-title">${escapeHtml(scene.title)}</h2><div class="financial-solution-rule"></div><ul class="financial-solution-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function financialSolutionBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["金融客户场景痛点与合规要求", "安全可靠的数字化方案架构", "业务效率提升与客户体验增长"];
+}
+
+function financialSolutionCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isFinancialSolutionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-financial-solution" && (id === "industry-solution" || id === "sales-industry-solution-financial-industry");
+}
+
 function productRoadmapPreviewScene(visual) {
   const variant = productRoadmapVariant(visual);
   const scenes = {
@@ -2825,6 +2915,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "industry-research") return false;
   if (visual.layout === "finance-budget-planning") return false;
+  if (visual.layout === "sales-financial-solution") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
 

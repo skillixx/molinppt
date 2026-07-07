@@ -234,6 +234,28 @@ test("PptService renders synced budget planning preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders financial industry solution preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertFinancialSolutionTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "金融客户解决方案",
+    slideCount: 5,
+    templateId: "sales-industry-solution-financial-industry",
+    theme: "financial-industry",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-industry-solution-financial-industry" data-layout="sales-financial-solution"/);
+  assert.match(preview, /financial-solution-layer/);
+  assert.match(preview, /financial-solution-shield|financial-solution-architecture|financial-solution-value/);
+  assert.doesNotMatch(preview, />金融行业</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -2466,6 +2488,10 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /loadTemplates/);
     assert.match(html, /\/api\/templates/);
     assert.match(html, /id="template-gallery"/);
+    assert.match(html, /id="template-search"/);
+    assert.match(html, /type="search"/);
+    assert.match(html, /templateSearchQuery/);
+    assert.match(html, /templateMatchesSearch/);
     assert.match(html, /模板内容样式预览/);
     assert.match(html, /class="template-card"/);
     assert.match(html, /class="template-thumb"/);
@@ -3374,6 +3400,50 @@ async function insertBudgetPlanningTemplate(context) {
       defaultCoverLayout: "finance-budget-planning-cover",
       defaultContentLayout: "finance-budget-planning-content",
       allowedLayouts: ["finance-budget-planning-cover", "finance-budget-planning-overview", "finance-budget-planning-allocation", "finance-budget-planning-table", "finance-budget-planning-flow", "finance-budget-planning-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertFinancialSolutionTemplate(context) {
+  // 测试数据库模拟官方模板同步后的金融行业解决方案模板，确保生成、预览和导出都命中专用销售方案布局。
+  await context.database.insert("templates", {
+    id: "sales-industry-solution-financial-industry",
+    slug: "sales-industry-solution-financial-industry",
+    name: "行业解决方案 - 金融行业",
+    categoryId: "sales",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "financial-industry",
+        name: "金融行业",
+        visual: {
+          primary: "0B2A4A",
+          accent: "18A0A6",
+          background: "EAF3F7",
+          surface: "FFFFFF",
+          title: "071D33",
+          body: "385269",
+          layout: "sales-financial-solution",
+          variant: "financial-industry",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B2A4A",
+      accent: "18A0A6",
+      background: "EAF3F7",
+      surface: "FFFFFF",
+      title: "071D33",
+      body: "385269",
+      layout: "sales-financial-solution",
+      variant: "financial-industry",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "sales-financial-solution-cover",
+      defaultContentLayout: "sales-financial-solution-content",
+      allowedLayouts: ["sales-financial-solution-cover", "sales-financial-solution-painpoints", "sales-financial-solution-architecture", "sales-financial-solution-compliance", "sales-financial-solution-value", "sales-financial-solution-closing", "title", "content"],
     },
   });
 }
