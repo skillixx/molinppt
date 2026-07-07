@@ -396,6 +396,53 @@ test("PptExportService uses budget adjustment decorations", () => {
   assert.doesNotMatch(slide1, /budget-adjustment/);
 });
 
+test("PptExportService uses budget variance decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-budget-management-report-execution-variance",
+      theme: "execution-variance",
+      templateVisual: {
+        primary: "16213E",
+        accent: "E9574F",
+        background: "F3F6FA",
+        surface: "FFFFFF",
+        title: "172036",
+        body: "3D4B5F",
+        layout: "finance-budget-variance",
+        variant: "execution-variance",
+        warning: "F6B84B",
+        positive: "2FA879",
+      },
+      slides: [
+        { title: "预算执行偏差复盘", bullets: ["预算达成率 86%", "超支金额 1280 万", "纠偏进度 +24%"] },
+        { title: "预算与实际对比", bullets: ["营销费用超支 15%", "人员成本节约 6%", "项目投入延后 800 万"] },
+        { title: "偏差原因分析", bullets: ["业务量变化导致收入确认延后", "采购单价上浮带来成本压力", "重点项目排期提前"] },
+        { title: "纠偏建议安排", bullets: ["冻结低效费用", "重排项目优先级", "建立周度偏差复盘", "责任部门跟进"] },
+        { title: "闭环复盘机制", bullets: ["确认口径", "锁定责任", "调整节奏", "复盘闭环"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Budget Variance Workspace"/);
+  assert.match(slide1, /name="Budget Variance Ledger Panel"/);
+  assert.match(slide2, /name="Budget Variance Ledger Panel"/);
+  assert.match(slide3, /name="Budget Variance Waterfall Panel"/);
+  assert.match(slide4, /name="Budget Variance Reason Card 1"/);
+  assert.match(slide5, /name="Budget Variance Action Card 1"/);
+  assert.match(slide1, /val="16213E"/);
+  assert.match(slide1, /val="E9574F"/);
+  assert.doesNotMatch(slide1, /execution-variance/);
+});
+
 test("PptExportService uses financial industry solution decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

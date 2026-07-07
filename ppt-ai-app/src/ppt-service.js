@@ -2348,9 +2348,58 @@ function isBudgetPlanningVisual(visual) {
   return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
 }
 
-function isBudgetVarianceVisual(_visual) {
-  // 执行偏差模板目录已存在，但专用预览尚未完整实现；先回退通用预览，避免官方模板同步后触发未定义函数。
-  return false;
+function budgetVariancePreviewScene({ slide, index, total }) {
+  const bullets = budgetPlanningBulletTexts(slide);
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
+  const role = index === 0 ? "cover" : index === total - 1 ? "loop" : ["overview", "comparison", "analysis", "correction"][(index - 1) % 4];
+  const metrics = [0, 1, 2].map((itemIndex) => budgetVarianceMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    variant: "execution-variance",
+    role,
+    // 页面角标使用业务语义，不直接暴露主题风格名称。
+    kicker: role === "cover" ? "BUDGET REVIEW" : "VARIANCE BOARD",
+    title,
+    bullets: bullets.slice(0, role === "cover" ? 3 : 4),
+    metrics,
+    reasons: [
+      budgetPlanningCompactText(bullets[0], "关键洞察", 12),
+      budgetPlanningCompactText(bullets[1], "原因拆解", 12),
+      budgetPlanningCompactText(bullets[2], "策略判断", 12),
+    ],
+    actions: ["确认口径", "锁定责任", "调整节奏", "复盘闭环"],
+  };
+}
+
+function renderBudgetVariancePreview(slide, scene) {
+  const bulletItems = scene.bullets.map((item) => `<li>${escapeHtml(budgetPlanningCompactText(item, scene.title, 42))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const actions = scene.actions.map((step, index) => `<span data-step="${index + 1}">${escapeHtml(step)}</span>`).join("");
+  const visual = scene.role === "comparison"
+    ? '<div class="variance-waterfall"><span></span><span></span><span></span><span></span><span></span></div>'
+    : scene.role === "analysis"
+      ? `<div class="variance-analysis"><div class="variance-trend"></div><div class="variance-reasons">${scene.reasons.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`
+      : scene.role === "correction"
+        ? `<div class="variance-actions">${actions}</div>`
+        : scene.role === "loop"
+          ? `<div class="variance-loop"><span></span><span></span><span></span><span></span></div><div class="variance-actions">${actions}</div>`
+          : `<div class="variance-ledger"><span></span><span></span><span></span><span></span><i></i></div><div class="variance-metrics">${metrics}</div>`;
+  return `<div class="variance-layer"><div class="variance-surface"></div><div class="variance-kicker">${escapeHtml(scene.kicker)}</div><h2 class="variance-title">${escapeHtml(scene.title)}</h2><div class="variance-rule"></div><ul class="variance-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function budgetVarianceMetricFromText(text, index) {
+  const fallbackValues = ["86%", "12.8", "+24%"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["预算达成", "偏差金额", "纠偏进度"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  const label = budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10);
+  return { value, label };
+}
+
+function isBudgetVarianceVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-budget-variance" && (id === "budget-management-report" || id === "finance-budget-management-report-execution-variance");
 }
 
 function budgetAdjustmentPreviewScene({ slide, index, total }) {

@@ -256,6 +256,28 @@ test("PptService renders synced budget adjustment preview with dedicated layout"
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced budget variance preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBudgetVarianceTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "预算执行偏差复盘",
+    slideCount: 5,
+    templateId: "finance-budget-management-report-execution-variance",
+    theme: "execution-variance",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-budget-management-report-execution-variance" data-layout="finance-budget-variance"/);
+  assert.match(preview, /variance-ledger|variance-waterfall|variance-analysis|variance-actions/);
+  assert.match(preview, /variance-surface/);
+  assert.doesNotMatch(preview, />执行偏差</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders financial industry solution preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3536,6 +3558,54 @@ async function insertBudgetAdjustmentTemplate(context) {
       defaultCoverLayout: "finance-budget-adjustment-cover",
       defaultContentLayout: "finance-budget-adjustment-content",
       allowedLayouts: ["finance-budget-adjustment-cover", "finance-budget-adjustment-content", "finance-budget-adjustment-analysis", "finance-budget-adjustment-reallocation", "finance-budget-adjustment-approval", "finance-budget-adjustment-impact", "finance-budget-adjustment-summary", "title", "content"],
+    },
+  });
+}
+
+async function insertBudgetVarianceTemplate(context) {
+  // 测试数据库模拟官方模板同步后的执行偏差模板，确保预算复盘主题命中专用偏差分析布局。
+  await context.database.insert("templates", {
+    id: "finance-budget-management-report-execution-variance",
+    slug: "finance-budget-management-report-execution-variance",
+    name: "预算管理报告 - 执行偏差",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "execution-variance",
+        name: "执行偏差",
+        visual: {
+          primary: "16213E",
+          accent: "E9574F",
+          background: "F3F6FA",
+          surface: "FFFFFF",
+          title: "172036",
+          body: "3D4B5F",
+          layout: "finance-budget-variance",
+          variant: "execution-variance",
+          warning: "F6B84B",
+          positive: "2FA879",
+        },
+      },
+    ],
+    visual: {
+      primary: "16213E",
+      accent: "E9574F",
+      background: "F3F6FA",
+      surface: "FFFFFF",
+      title: "172036",
+      body: "3D4B5F",
+      layout: "finance-budget-variance",
+      variant: "execution-variance",
+      warning: "F6B84B",
+      positive: "2FA879",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-budget-variance-cover",
+      defaultContentLayout: "finance-budget-variance-content",
+      allowedLayouts: ["finance-budget-variance-cover", "finance-budget-variance-overview", "finance-budget-variance-comparison", "finance-budget-variance-analysis", "finance-budget-variance-correction", "finance-budget-variance-loop", "title", "content"],
     },
   });
 }

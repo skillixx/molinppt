@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "marketing-launch-rhythm") {
     if (index === 0) {
@@ -444,6 +444,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1450;
     if (textLength >= 22) return 1650;
     return Math.min(fallbackSize, 1900);
+  }
+  if (visual.layout === "finance-budget-variance") {
+    if (index === 0) {
+      if (textLength >= 30) return 2080;
+      if (textLength >= 22) return 2320;
+      return Math.min(fallbackSize, 2660);
+    }
+    if (textLength >= 30) return 1420;
+    if (textLength >= 22) return 1620;
+    return Math.min(fallbackSize, 1880);
   }
   if (visual.layout === "finance-budget-adjustment") {
     if (index === 0) {
@@ -581,6 +591,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
+  if (visual.layout === "finance-budget-variance") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
@@ -715,6 +726,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "finance-budget-variance") {
+    return base + budgetVarianceDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "finance-budget-adjustment") {
     return base + budgetAdjustmentDecorationsXml({ visual, index, layout, role, slide });
@@ -1489,6 +1503,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 841248, y: 1828800, cx: 3474720, cy: 914400 },
       titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
       bodySize: isCover ? 960 : 780,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-budget-variance") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 566928, y: 591312, cx: 8001000, cy: 4145280 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 804672, y: isCover ? 2232660 : 2011680, cx: 3108960, cy: 30480 },
+      label: { x: 804672, y: 792480, cx: 2286000, cy: 274320 },
+      title: isClosing
+        ? { x: 804672, y: 1173480, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 1173480, cx: 3931920, cy: 1219200 }
+          : { x: 804672, y: 883920, cx: 4114800, cy: 731520 },
+      content: isClosing
+        ? { x: 804672, y: 2407920, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 2560320, cx: 3413760, cy: 762000 }
+          : { x: 804672, y: 1767840, cx: 3352800, cy: 914400 },
+      titleSize: isCover ? 2660 : isClosing ? 2520 : 1880,
+      bodySize: isCover ? 940 : 760,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -2559,6 +2597,158 @@ function budgetPlanningColorPalette(visual) {
 function isBudgetPlanningVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
+}
+
+function budgetVarianceDecorationsXml({ visual, index, role, slide }) {
+  const scene = budgetVarianceSceneFromSlide({ slide, index, role });
+  const palette = budgetVarianceColorPalette(visual);
+  // 执行偏差模板用可编辑图形模拟预算表、偏差瀑布图和纠偏看板，不使用整页背景图。
+  const backdrop = rectShapeXml({ id: 880, name: "Budget Variance Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 881, name: "Budget Variance Warning Plane", geom: "parallelogram", x: -502920, y: 533400, cx: 2011680, cy: 4602480, fill: palette.tint })
+    + solidShapeXml({ id: 882, name: "Budget Variance Risk Glow", geom: "ellipse", x: 7246620, y: 365760, cx: 1828800, cy: 1676400, fill: palette.riskWash })
+    + solidShapeXml({ id: 883, name: "Budget Variance Positive Glow", geom: "ellipse", x: 7246620, y: 3977640, cx: 1676400, cy: 1219200, fill: palette.positiveWash });
+  const surface = solidShapeXml({ id: 884, name: "Budget Variance Workspace", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, fill: visual.surface })
+    + lineFrameShapeXml({ id: 885, name: "Budget Variance Workspace Border", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, stroke: palette.frame, width: 15240 });
+  const header = solidShapeXml({ id: 886, name: "Budget Variance Header", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 887, name: "Budget Variance Header Accent", x: 0, y: 320040, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 888, name: "Budget Variance Kicker", x: 804672, y: 792480, cx: 2286000, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 889, name: "Budget Variance Focus Rule", x: 804672, y: index === 0 ? 2232660 : 2011680, cx: 3108960, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 890, name: "Budget Variance Warning Rule", x: 804672, y: (index === 0 ? 2232660 : 2011680) + 45720, cx: 1676400, cy: 15240, fill: palette.warning });
+  const bullets = budgetVarianceBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "comparison") return backdrop + surface + header + bullets + budgetVarianceWaterfallXml({ visual, palette });
+  if (scene.role === "analysis") return backdrop + surface + header + bullets + budgetVarianceReasonCardsXml({ visual, palette, items: scene.reasons });
+  if (scene.role === "correction") return backdrop + surface + header + bullets + budgetVarianceActionCardsXml({ visual, palette, steps: scene.actions });
+  if (scene.role === "loop") return backdrop + surface + header + bullets + budgetVarianceLoopXml({ visual, palette, steps: scene.actions });
+  return backdrop + surface + header + bullets + budgetVarianceLedgerXml({ visual, palette }) + budgetVarianceMetricCardsXml({ visual, metrics: scene.metrics, palette });
+}
+
+function budgetVarianceLedgerXml({ visual, palette }) {
+  return solidShapeXml({ id: 900, name: "Budget Variance Ledger Panel", geom: "roundRect", x: 5638800, y: 975360, cx: 3169920, cy: 2514600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 901, name: "Budget Variance Ledger Panel Border", geom: "roundRect", x: 5638800, y: 975360, cx: 3169920, cy: 2514600, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 902, name: "Budget Variance Ledger Header", x: 5638800, y: 975360, cx: 3169920, cy: 381000, fill: visual.primary })
+    + rectShapeXml({ id: 903, name: "Budget Variance Budget Row", x: 5943600, y: 1623060, cx: 1981200, cy: 121920, fill: blendHexColor(visual.primary, visual.surface, 0.72) })
+    + rectShapeXml({ id: 904, name: "Budget Variance Actual Row", x: 5943600, y: 2026920, cx: 1432560, cy: 121920, fill: visual.accent })
+    + rectShapeXml({ id: 905, name: "Budget Variance Warning Row", x: 5943600, y: 2430780, cx: 1737360, cy: 121920, fill: palette.warning })
+    + rectShapeXml({ id: 906, name: "Budget Variance Saved Row", x: 5943600, y: 2834640, cx: 1219200, cy: 121920, fill: palette.positive })
+    + arcLineShapeXml({ id: 907, name: "Budget Variance Gauge Ring", x: 7528560, y: 2377440, cx: 792480, cy: 792480, stroke: visual.accent, width: 76200 });
+}
+
+function budgetVarianceMetricCardsXml({ visual, metrics, palette }) {
+  return metrics.map((metric, index) => {
+    const x = 804672 + index * 1257300;
+    const color = [visual.accent, palette.warning, palette.positive][index] || visual.accent;
+    return solidShapeXml({ id: 920 + index * 4, name: `Budget Variance Metric Card ${index + 1}`, geom: "roundRect", x, y: 3723648, cx: 1066800, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 921 + index * 4, name: `Budget Variance Metric Card Border ${index + 1}`, geom: "roundRect", x, y: 3723648, cx: 1066800, cy: 609600, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 922 + index * 4, name: `Budget Variance Metric Card Accent ${index + 1}`, x, y: 3723648, cx: 1066800, cy: 45720, fill: color })
+      + textShapeXml({ id: 923 + index * 4, name: `Budget Variance Metric Text ${index + 1}`, x: x + 137160, y: 3853188, cx: 792480, cy: 274320, text: `${metric.value}\n${metric.label}`, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function budgetVarianceBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, index) => {
+    const y = (isCover ? 2560320 : 1767840) + index * 259080;
+    const color = index === 1 ? "F6B84B" : index === 2 ? "2FA879" : visual.accent;
+    return rectShapeXml({ id: 940 + index * 2, name: `Budget Variance Bullet Rule ${index + 1}`, x: 804672, y: y + 30480, cx: 45720, cy: 152400, fill: color })
+      + textShapeXml({ id: 941 + index * 2, name: `Budget Variance Bullet Text ${index + 1}`, x: 972312, y, cx: 3352800, cy: 198120, text: budgetPlanningCompactText(item, scene.title, 32), size: isCover ? 820 : 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function budgetVarianceWaterfallXml({ visual, palette }) {
+  const bars = [
+    { x: 5943600, h: 426720, c: palette.positive, n: "Saved" },
+    { x: 6400800, h: 701040, c: palette.warning, n: "Warning" },
+    { x: 6858000, h: 335280, c: visual.accent, n: "Overrun" },
+    { x: 7315200, h: 853440, c: palette.warning, n: "Pending" },
+    { x: 7772400, h: 518160, c: visual.accent, n: "Risk" },
+  ].map((bar, index) => rectShapeXml({ id: 960 + index, name: `Budget Variance Waterfall ${bar.n}`, x: bar.x, y: 3048000 - bar.h, cx: 335280, cy: bar.h, fill: bar.c })).join("");
+  return solidShapeXml({ id: 955, name: "Budget Variance Waterfall Panel", geom: "roundRect", x: 5486400, y: 1066800, cx: 3352800, cy: 2743200, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 956, name: "Budget Variance Waterfall Border", geom: "roundRect", x: 5486400, y: 1066800, cx: 3352800, cy: 2743200, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 957, name: "Budget Variance Waterfall Axis", x: 5791200, y: 3048000, cx: 2590800, cy: 22860, fill: blendHexColor(visual.primary, visual.surface, 0.55) })
+    + bars;
+}
+
+function budgetVarianceReasonCardsXml({ visual, palette, items }) {
+  const trend = solidShapeXml({ id: 980, name: "Budget Variance Trend Panel", geom: "roundRect", x: 5486400, y: 1066800, cx: 1447800, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 981, name: "Budget Variance Trend Border", geom: "roundRect", x: 5486400, y: 1066800, cx: 1447800, cy: 2286000, stroke: palette.frame, width: 10160 })
+    + arcLineShapeXml({ id: 982, name: "Budget Variance Trend Curve", x: 5730240, y: 1661160, cx: 944880, cy: 944880, stroke: visual.accent, width: 76200 });
+  const cards = items.slice(0, 3).map((item, index) => {
+    const y = 1066800 + index * 731520;
+    const color = [visual.accent, palette.warning, palette.positive][index] || visual.accent;
+    return solidShapeXml({ id: 990 + index * 4, name: `Budget Variance Reason Card ${index + 1}`, geom: "roundRect", x: 7162800, y, cx: 1524000, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 991 + index * 4, name: `Budget Variance Reason Border ${index + 1}`, geom: "roundRect", x: 7162800, y, cx: 1524000, cy: 548640, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 992 + index * 4, name: `Budget Variance Reason Accent ${index + 1}`, x: 7162800, y, cx: 76200, cy: 548640, fill: color })
+      + textShapeXml({ id: 993 + index * 4, name: `Budget Variance Reason Text ${index + 1}`, x: 7330440, y: y + 182880, cx: 1066800, cy: 182880, text: budgetPlanningCompactText(item, "", 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+  return trend + cards;
+}
+
+function budgetVarianceActionCardsXml({ visual, palette, steps }) {
+  return steps.map((step, index) => {
+    const x = 804672 + index * 1905000;
+    return solidShapeXml({ id: 1020 + index * 4, name: `Budget Variance Action Card ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1524000, cy: 822960, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1021 + index * 4, name: `Budget Variance Action Border ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1524000, cy: 822960, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1022 + index * 4, name: `Budget Variance Action Dot ${index + 1}`, geom: "ellipse", x: x + 152400, y: 3352800, cx: 228600, cy: 228600, fill: index === 1 ? palette.warning : index === 2 ? palette.positive : visual.accent })
+      + textShapeXml({ id: 1023 + index * 4, name: `Budget Variance Action Text ${index + 1}`, x: x + 152400, y: 3695700, cx: 1066800, cy: 182880, text: step, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function budgetVarianceLoopXml({ visual, palette, steps }) {
+  const nodes = steps.map((step, index) => {
+    const x = 5486400 + index * 853440;
+    const color = [visual.accent, palette.warning, palette.positive, visual.primary][index] || visual.accent;
+    return solidShapeXml({ id: 1050 + index * 3, name: `Budget Variance Loop Node ${index + 1}`, geom: "ellipse", x, y: 1798320, cx: 365760, cy: 365760, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1051 + index * 3, name: `Budget Variance Loop Node Border ${index + 1}`, geom: "ellipse", x, y: 1798320, cx: 365760, cy: 365760, stroke: color, width: 60960 })
+      + textShapeXml({ id: 1052 + index * 3, name: `Budget Variance Loop Label ${index + 1}`, x: x - 152400, y: 2293620, cx: 670560, cy: 152400, text: budgetPlanningCompactText(step, "", 6), size: 620, bold: true, color: visual.title });
+  }).join("");
+  return rectShapeXml({ id: 1049, name: "Budget Variance Loop Rail", x: 5486400, y: 1981200, cx: 2926080, cy: 45720, fill: palette.warning }) + nodes + budgetVarianceActionCardsXml({ visual, palette, steps });
+}
+
+function budgetVarianceSceneFromSlide({ slide, index, role }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 24);
+  const resolvedRole = index === 0 ? "cover" : role === "closing" ? "loop" : ["overview", "comparison", "analysis", "correction"][(index - 1) % 4];
+  const metrics = [0, 1, 2].map((itemIndex) => budgetVarianceMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "BUDGET REVIEW" : "VARIANCE BOARD",
+    title,
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    reasons: [
+      budgetPlanningCompactText(bullets[0], "关键洞察", 12),
+      budgetPlanningCompactText(bullets[1], "原因拆解", 12),
+      budgetPlanningCompactText(bullets[2], "策略判断", 12),
+    ],
+    actions: ["确认口径", "锁定责任", "调整节奏", "复盘闭环"],
+  };
+}
+
+function budgetVarianceMetricFromText(text, index) {
+  const fallbackValues = ["86%", "12.8", "+24%"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["预算达成", "偏差金额", "纠偏进度"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function budgetVarianceColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.30),
+    tint: blendHexColor(visual.primary, visual.background, 0.90),
+    riskWash: blendHexColor(visual.accent, visual.background, 0.86),
+    positiveWash: blendHexColor(visual.positive || "2FA879", visual.background, 0.88),
+    panel: blendHexColor(visual.background, visual.surface, 0.64),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    warning: visual.warning || "F6B84B",
+    positive: visual.positive || "2FA879",
+  };
+}
+
+function isBudgetVarianceVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-budget-variance" && (id === "budget-management-report" || id === "finance-budget-management-report-execution-variance");
 }
 
 function budgetAdjustmentDecorationsXml({ visual, index, role, slide }) {

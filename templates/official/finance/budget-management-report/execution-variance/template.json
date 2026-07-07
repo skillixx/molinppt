@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "budget-management-report",
+  "themeId": "execution-variance",
+  "style": "finance-variance-review",
+  "themes": [
+    {
+      "id": "execution-variance",
+      "name": "执行偏差",
+      "visual": {
+        "primary": "16213E",
+        "accent": "E9574F",
+        "background": "F3F6FA",
+        "surface": "FFFFFF",
+        "title": "172036",
+        "body": "3D4B5F",
+        "layout": "finance-budget-variance",
+        "variant": "execution-variance",
+        "warning": "F6B84B",
+        "positive": "2FA879"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "16213E",
+    "accent": "E9574F",
+    "background": "F3F6FA",
+    "surface": "FFFFFF",
+    "title": "172036",
+    "body": "3D4B5F",
+    "layout": "finance-budget-variance",
+    "variant": "execution-variance",
+    "warning": "F6B84B",
+    "positive": "2FA879"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-budget-variance-cover",
+    "defaultContentLayout": "finance-budget-variance-content",
+    "allowedLayouts": [
+      "finance-budget-variance-cover",
+      "finance-budget-variance-overview",
+      "finance-budget-variance-comparison",
+      "finance-budget-variance-analysis",
+      "finance-budget-variance-correction",
+      "finance-budget-variance-loop",
+      "title",
+      "content"
+    ]
+  }
+}
