@@ -265,7 +265,7 @@ function validateManifestFile({ dir, fileName, extension, field }) {
   }
   const fullPath = path.join(dir, fileName);
   return stat(fullPath).catch(() => {
-    throw invalidManifest(`manifest.${field} file does not exist`);
+    throw invalidManifest(`manifest.${field} file does not exist: ${fullPath}`);
   });
 }
 

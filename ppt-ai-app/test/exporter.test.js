@@ -351,6 +351,51 @@ test("PptExportService uses budget planning decorations", () => {
   assert.doesNotMatch(slide1, /budget-planning/);
 });
 
+test("PptExportService uses budget adjustment decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-budget-management-report-budget-adjustment",
+      theme: "budget-adjustment",
+      templateVisual: {
+        primary: "18233F",
+        accent: "F59E0B",
+        background: "F4F7FB",
+        surface: "FFFFFF",
+        title: "111827",
+        body: "3B4658",
+        layout: "finance-budget-adjustment",
+        variant: "budget-adjustment",
+        secondary: "14B8A6",
+        risk: "B91C1C",
+      },
+      slides: [
+        { title: "预算调整方案", bullets: ["调增预算 1200 万", "冻结低效费用 300 万", "资源转投重点项目"] },
+        { title: "资源重配总览", bullets: ["研发项目调增 800 万", "渠道费用调减 300 万", "管理费用冻结 120 万"] },
+        { title: "偏差原因与调整建议", bullets: ["收入节奏延后", "关键项目资源不足", "调整后保障重点投入"] },
+        { title: "审批路径安排", bullets: ["业务部门提交", "财务复核口径", "管理层审批", "预算系统落账"] },
+        { title: "经营影响分析", bullets: ["收入影响可控", "成本结构优化", "现金流维持安全", "项目进度加快"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Budget Adjustment Workspace"/);
+  assert.match(slide1, /name="Budget Adjustment Decision Panel"/);
+  assert.match(slide2, /name="Budget Adjustment Reallocation Panel"/);
+  assert.match(slide4, /name="Budget Adjustment Approval Step 1"/);
+  assert.match(slide5, /name="Budget Adjustment Impact Card 1"/);
+  assert.match(slide1, /val="18233F"/);
+  assert.match(slide1, /val="F59E0B"/);
+  assert.doesNotMatch(slide1, /budget-adjustment/);
+});
+
 test("PptExportService uses financial industry solution decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -388,6 +433,98 @@ test("PptExportService uses financial industry solution decorations", () => {
   assert.match(slide3, /name="Financial Solution Architecture Layer 1"/);
   assert.match(slide4, /name="Financial Solution Value Panel"/);
   assert.doesNotMatch(slide1, /financial-industry/);
+});
+
+test("PptExportService uses manufacturing industry solution decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-industry-solution-manufacturing-industry",
+      theme: "manufacturing-industry",
+      templateVisual: {
+        primary: "123A5A",
+        accent: "17A7B8",
+        background: "E6ECF2",
+        surface: "FFFFFF",
+        title: "1F2933",
+        body: "4B5B68",
+        layout: "sales-manufacturing-solution",
+        variant: "manufacturing-industry",
+      },
+      slides: [
+        { title: "制造业数字化整体解决方案", bullets: ["产线设备数据统一采集", "工厂流程瓶颈持续优化", "交付效率和质量稳定提升"] },
+        { title: "制造现场流程与设备痛点", bullets: ["设备停机影响产能释放", "计划生产质检衔接不足", "现场数据难以形成闭环"] },
+        { title: "工厂数字化方案架构", bullets: ["设备接入", "数据采集", "过程分析", "管理看板"] },
+        { title: "生产流程优化路径", bullets: ["计划", "生产", "质检", "仓储", "交付"] },
+        { title: "设备数据看板价值", bullets: ["OEE提升", "故障预警", "质量追溯", "产能透明"] },
+        { title: "制造客户业务价值", bullets: ["降本", "提效", "稳质", "追溯"] },
+        { title: "制造客户实施路线", bullets: ["诊断", "试点", "集成", "推广", "运营"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+  const slide7 = pptPartText(text, "ppt/slides/slide7.xml");
+
+  assert.match(slide1, /name="Manufacturing Solution Workspace"/);
+  assert.match(slide1, /name="Manufacturing Solution Factory Panel"/);
+  assert.match(slide3, /name="Manufacturing Solution Process Step 1"/);
+  assert.match(slide4, /name="Manufacturing Solution Process Step 1"/);
+  assert.match(slide5, /name="Manufacturing Solution Dashboard Panel"/);
+  assert.match(slide6, /name="Manufacturing Solution Value Card 1"/);
+  assert.match(slide7, /name="Manufacturing Solution Roadmap Step 1"/);
+  assert.doesNotMatch(slide1, /manufacturing-industry/);
+});
+
+test("PptExportService uses education industry solution decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-industry-solution-education-industry",
+      theme: "education-industry",
+      templateVisual: {
+        primary: "155E75",
+        accent: "22C55E",
+        background: "EAF7F7",
+        surface: "FFFFFF",
+        title: "0F2F3A",
+        body: "365A64",
+        layout: "sales-education-solution",
+        variant: "education-industry",
+      },
+      slides: [
+        { title: "教育信息化整体解决方案", bullets: ["统一教学平台建设", "学习数据分析闭环", "教育客户服务体系"] },
+        { title: "教学与管理场景痛点", bullets: ["资源分散影响复用", "学习过程缺少洞察", "运营服务响应滞后"] },
+        { title: "教学平台总体架构", bullets: ["课程资源", "教学互动", "学情分析", "运营服务"] },
+        { title: "教学服务场景", bullets: ["教师备课", "学生学习", "管理决策"] },
+        { title: "学习数据分析价值", bullets: ["活跃度提升", "完课率跟踪", "风险学生预警"] },
+        { title: "项目实施路线", bullets: ["调研", "试点", "推广", "运营"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Education Solution Workspace"/);
+  assert.match(slide1, /name="Education Solution Platform Panel"/);
+  assert.match(slide3, /name="Education Solution Service Path 1"/);
+  assert.match(slide4, /name="Education Solution Scenario Card 1"/);
+  assert.match(slide5, /name="Education Solution Learning Data Panel"/);
+  assert.match(slide6, /SERVICE ROADMAP/);
+  assert.match(slide6, /name="Education Solution Platform Panel"/);
+  assert.doesNotMatch(slide1, /education-industry/);
 });
 
 test("PptExportService uses commercial sales enterprise decorations", () => {

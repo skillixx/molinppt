@@ -234,6 +234,28 @@ test("PptService renders synced budget planning preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced budget adjustment preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBudgetAdjustmentTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "预算调整与资源重配",
+    slideCount: 5,
+    templateId: "finance-budget-management-report-budget-adjustment",
+    theme: "budget-adjustment",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-budget-management-report-budget-adjustment" data-layout="finance-budget-adjustment"/);
+  assert.match(preview, /adjustment-dashboard|adjustment-reallocation|adjustment-approval|adjustment-impact/);
+  assert.match(preview, /adjustment-surface/);
+  assert.doesNotMatch(preview, />预算调整</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders financial industry solution preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -253,6 +275,50 @@ test("PptService renders financial industry solution preview with dedicated layo
   assert.match(preview, /financial-solution-layer/);
   assert.match(preview, /financial-solution-shield|financial-solution-architecture|financial-solution-value/);
   assert.doesNotMatch(preview, />金融行业</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders education industry solution preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertEducationSolutionTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "教育信息化解决方案",
+    slideCount: 5,
+    templateId: "sales-industry-solution-education-industry",
+    theme: "education-industry",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-industry-solution-education-industry" data-layout="sales-education-solution"/);
+  assert.match(preview, /education-solution-layer/);
+  assert.match(preview, /education-solution-platform|education-solution-path|education-solution-data/);
+  assert.doesNotMatch(preview, />教育行业</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders manufacturing industry solution preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertManufacturingSolutionTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "制造业数字化解决方案",
+    slideCount: 6,
+    templateId: "sales-industry-solution-manufacturing-industry",
+    theme: "manufacturing-industry",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-industry-solution-manufacturing-industry" data-layout="sales-manufacturing-solution"/);
+  assert.match(preview, /manufacturing-solution-layer/);
+  assert.match(preview, /manufacturing-solution-factory|manufacturing-solution-process|manufacturing-solution-dashboard/);
+  assert.doesNotMatch(preview, />制造行业</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -3426,6 +3492,54 @@ async function insertBudgetPlanningTemplate(context) {
   });
 }
 
+async function insertBudgetAdjustmentTemplate(context) {
+  // 测试数据库模拟官方模板同步后的预算调整模板，确保预览和导出都走专用预算决策布局。
+  await context.database.insert("templates", {
+    id: "finance-budget-management-report-budget-adjustment",
+    slug: "finance-budget-management-report-budget-adjustment",
+    name: "预算管理报告 - 预算调整",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "budget-adjustment",
+        name: "预算调整",
+        visual: {
+          primary: "18233F",
+          accent: "F59E0B",
+          background: "F4F7FB",
+          surface: "FFFFFF",
+          title: "111827",
+          body: "3B4658",
+          layout: "finance-budget-adjustment",
+          variant: "budget-adjustment",
+          secondary: "14B8A6",
+          risk: "B91C1C",
+        },
+      },
+    ],
+    visual: {
+      primary: "18233F",
+      accent: "F59E0B",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "111827",
+      body: "3B4658",
+      layout: "finance-budget-adjustment",
+      variant: "budget-adjustment",
+      secondary: "14B8A6",
+      risk: "B91C1C",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-budget-adjustment-cover",
+      defaultContentLayout: "finance-budget-adjustment-content",
+      allowedLayouts: ["finance-budget-adjustment-cover", "finance-budget-adjustment-content", "finance-budget-adjustment-analysis", "finance-budget-adjustment-reallocation", "finance-budget-adjustment-approval", "finance-budget-adjustment-impact", "finance-budget-adjustment-summary", "title", "content"],
+    },
+  });
+}
+
 async function insertFinancialSolutionTemplate(context) {
   // 测试数据库模拟官方模板同步后的金融行业解决方案模板，确保生成、预览和导出都命中专用销售方案布局。
   await context.database.insert("templates", {
@@ -3466,6 +3580,94 @@ async function insertFinancialSolutionTemplate(context) {
       defaultCoverLayout: "sales-financial-solution-cover",
       defaultContentLayout: "sales-financial-solution-content",
       allowedLayouts: ["sales-financial-solution-cover", "sales-financial-solution-painpoints", "sales-financial-solution-architecture", "sales-financial-solution-compliance", "sales-financial-solution-value", "sales-financial-solution-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertEducationSolutionTemplate(context) {
+  // 测试数据库模拟官方模板同步后的教育行业解决方案模板，确保教育客户提案使用独立的方案布局。
+  await context.database.insert("templates", {
+    id: "sales-industry-solution-education-industry",
+    slug: "sales-industry-solution-education-industry",
+    name: "行业解决方案 - 教育行业",
+    categoryId: "sales",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "education-industry",
+        name: "教育行业",
+        visual: {
+          primary: "155E75",
+          accent: "22C55E",
+          background: "EAF7F7",
+          surface: "FFFFFF",
+          title: "0F2F3A",
+          body: "365A64",
+          layout: "sales-education-solution",
+          variant: "education-industry",
+        },
+      },
+    ],
+    visual: {
+      primary: "155E75",
+      accent: "22C55E",
+      background: "EAF7F7",
+      surface: "FFFFFF",
+      title: "0F2F3A",
+      body: "365A64",
+      layout: "sales-education-solution",
+      variant: "education-industry",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "sales-education-solution-cover",
+      defaultContentLayout: "sales-education-solution-content",
+      allowedLayouts: ["sales-education-solution-cover", "sales-education-solution-painpoints", "sales-education-solution-platform", "sales-education-solution-scenarios", "sales-education-solution-data", "sales-education-solution-roadmap", "title", "content"],
+    },
+  });
+}
+
+async function insertManufacturingSolutionTemplate(context) {
+  // 测试数据库模拟官方模板同步后的制造行业解决方案模板，确保生成、预览和导出都命中工业流程专用布局。
+  await context.database.insert("templates", {
+    id: "sales-industry-solution-manufacturing-industry",
+    slug: "sales-industry-solution-manufacturing-industry",
+    name: "行业解决方案 - 制造行业",
+    categoryId: "sales",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "manufacturing-industry",
+        name: "制造行业",
+        visual: {
+          primary: "123A5A",
+          accent: "17A7B8",
+          background: "E6ECF2",
+          surface: "FFFFFF",
+          title: "1F2933",
+          body: "4B5B68",
+          layout: "sales-manufacturing-solution",
+          variant: "manufacturing-industry",
+        },
+      },
+    ],
+    visual: {
+      primary: "123A5A",
+      accent: "17A7B8",
+      background: "E6ECF2",
+      surface: "FFFFFF",
+      title: "1F2933",
+      body: "4B5B68",
+      layout: "sales-manufacturing-solution",
+      variant: "manufacturing-industry",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "sales-manufacturing-solution-cover",
+      defaultContentLayout: "sales-manufacturing-solution-content",
+      allowedLayouts: ["sales-manufacturing-solution-cover", "sales-manufacturing-solution-painpoints", "sales-manufacturing-solution-architecture", "sales-manufacturing-solution-process", "sales-manufacturing-solution-dashboard", "sales-manufacturing-solution-value", "sales-manufacturing-solution-roadmap", "sales-manufacturing-solution-closing", "title", "content"],
     },
   });
 }
