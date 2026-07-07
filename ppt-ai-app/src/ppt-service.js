@@ -2544,7 +2544,7 @@ function quarterlyDiagnosisVariant(visual) {
 }
 
 function isQuarterlyDiagnosisVisual(visual) {
-  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-diagnosis";
+  return ["quarterly-business-review", "business-quarterly-review-problem-diagnosis"].includes(visual?.id) && visual?.layout === "quarterly-diagnosis";
 }
 
 function quarterlyActionLoopPreviewScene(visual) {

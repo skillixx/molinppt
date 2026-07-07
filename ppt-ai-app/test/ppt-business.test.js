@@ -344,6 +344,27 @@ test("PptService renders manufacturing industry solution preview with dedicated 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced quarterly problem diagnosis preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertQuarterlyDiagnosisTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营问题诊断",
+    slideCount: 5,
+    templateId: "business-quarterly-review-problem-diagnosis",
+    theme: "problem-diagnosis",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="business-quarterly-review-problem-diagnosis" data-layout="quarterly-diagnosis"/);
+  assert.match(preview, /quarterly-diagnosis-cover-model|quarterly-diagnosis-main-model|quarterly-diagnosis-closing-model/);
+  assert.match(preview, /quarterly-diagnosis-footer-line/);
+  assert.doesNotMatch(preview, />问题诊断</);
+});
+
 test("PptService renders new product launch rhythm preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3738,6 +3759,50 @@ async function insertManufacturingSolutionTemplate(context) {
       defaultCoverLayout: "sales-manufacturing-solution-cover",
       defaultContentLayout: "sales-manufacturing-solution-content",
       allowedLayouts: ["sales-manufacturing-solution-cover", "sales-manufacturing-solution-painpoints", "sales-manufacturing-solution-architecture", "sales-manufacturing-solution-process", "sales-manufacturing-solution-dashboard", "sales-manufacturing-solution-value", "sales-manufacturing-solution-roadmap", "sales-manufacturing-solution-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertQuarterlyDiagnosisTemplate(context) {
+  // 测试数据库模拟官方模板同步后的季度业务复盘-问题诊断模板，确保同步 slug 也能命中诊断专用布局。
+  await context.database.insert("templates", {
+    id: "business-quarterly-review-problem-diagnosis",
+    slug: "business-quarterly-review-problem-diagnosis",
+    name: "季度业务复盘 - 问题诊断",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "problem-diagnosis",
+        name: "问题诊断",
+        visual: {
+          primary: "1C318A",
+          accent: "4F7F55",
+          background: "F4F6F8",
+          surface: "FFFFFF",
+          title: "111827",
+          body: "4B5563",
+          layout: "quarterly-diagnosis",
+          variant: "problem-diagnosis",
+        },
+      },
+    ],
+    visual: {
+      primary: "1C318A",
+      accent: "4F7F55",
+      background: "F4F6F8",
+      surface: "FFFFFF",
+      title: "111827",
+      body: "4B5563",
+      layout: "quarterly-diagnosis",
+      variant: "problem-diagnosis",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "quarterly-diagnosis-cover",
+      defaultContentLayout: "quarterly-diagnosis-analysis",
+      allowedLayouts: ["quarterly-diagnosis-cover", "quarterly-diagnosis-overview", "quarterly-diagnosis-root-cause", "quarterly-diagnosis-metric-anomaly", "quarterly-diagnosis-improvement", "quarterly-diagnosis-closing", "title", "content"],
     },
   });
 }
