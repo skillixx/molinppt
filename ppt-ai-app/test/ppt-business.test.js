@@ -168,6 +168,29 @@ test("PptService applies a new template to an existing deck preview", async () =
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 
+test("PptService renders industry research landscape preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "新能源汽车行业研究",
+    slideCount: 6,
+    templateId: "industry-research",
+    theme: "industry-landscape",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="industry-research" data-layout="industry-research"/);
+  assert.match(preview, /industry-map/);
+  assert.match(preview, /industry-chain/);
+  assert.match(preview, /industry-matrix/);
+  assert.match(preview, /industry-opportunity-grid/);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+  assert.doesNotMatch(preview, />行业格局</);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

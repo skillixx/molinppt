@@ -337,7 +337,7 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   const catalog = templates.listTemplates();
 
   assert.equal(catalog.length >= 10, true);
-  assert.deepEqual(catalog.slice(0, 3).map((template) => template.id), ["business", "strategy-consulting", "financial-review"]);
+  assert.deepEqual(catalog.slice(0, 4).map((template) => template.id), ["business", "strategy-consulting", "industry-research", "financial-review"]);
   assert.equal(catalog.some((template) => template.id === "sales-proposal"), true);
   assert.equal(catalog.some((template) => template.id === "product-roadmap"), true);
   assert.equal(catalog.some((template) => template.id === "marketing-campaign"), true);
@@ -444,6 +444,16 @@ test("resolveTemplateVisual applies strategy consulting workstream commercial vi
   assert.equal(visual.background, "F4F1EA");
   assert.equal(visual.layout, "executive");
   assert.equal(visual.variant, "workstream");
+});
+
+test("resolveTemplateVisual applies industry research landscape visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "industry-research", theme: "industry-landscape" });
+
+  assert.equal(visual.primary, "12325A");
+  assert.equal(visual.accent, "18A7A7");
+  assert.equal(visual.background, "F3F7FA");
+  assert.equal(visual.layout, "industry-research");
+  assert.equal(visual.variant, "industry-landscape");
 });
 
 test("resolveTemplateVisual applies financial review quarterly commercial visual", () => {

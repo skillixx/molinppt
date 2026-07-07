@@ -393,8 +393,18 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "industry-research") {
+    if (index === 0) {
+      if (textLength >= 30) return 2300;
+      if (textLength >= 22) return 2600;
+      return Math.min(fallbackSize, 3100);
+    }
+    if (textLength >= 30) return 1750;
+    if (textLength >= 22) return 2050;
+    return Math.min(fallbackSize, 2450);
+  }
   if (visual.layout === "annual-summary") {
     const textUnits = estimateTextUnits(title);
     if (index === 0) {
@@ -633,6 +643,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "quarterly-action-loop") {
     return base + quarterlyActionLoopDecorationsXml({ visual, index, layout, slide });
+  }
+  if (visual.layout === "industry-research") {
+    return base + industryResearchDecorationsXml({ visual, index, layout, role });
   }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
@@ -1344,6 +1357,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         : { x: 731520, y: 1645920, cx: 2895600, cy: 914400 },
       titleSize: isCover ? 1550 : 1720,
       bodySize: isCover ? 560 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "industry-research") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 457200, cx: 8193024, cy: 4267200 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 365760 },
+      secondaryAccent: { x: 731520, y: isCover ? 2514600 : 1600200, cx: 3048000, cy: 22860 },
+      label: { x: 731520, y: 670560, cx: 2286000, cy: 274320 },
+      title: isClosing
+        ? { x: 914400, y: 1371600, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 914400, y: 1097280, cx: 4114800, cy: 1219200 }
+          : { x: 914400, y: 914400, cx: 4267200, cy: 762000 },
+      content: isClosing
+        ? { x: 914400, y: 2438400, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 990600, y: 2705100, cx: 3962400, cy: 762000 }
+          : { x: 990600, y: 1905000, cx: 3810000, cy: 1219200 },
+      titleSize: isCover ? 3100 : isClosing ? 3300 : 2450,
+      bodySize: isCover ? 1200 : 980,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -3294,6 +3331,190 @@ function quarterlyActionLoopScene(visual) {
 
 function quarterlyActionLoopVariant(visual) {
   return ["action-loop"].includes(visual?.variant) ? visual.variant : "action-loop";
+}
+
+function industryResearchDecorationsXml({ visual, index, layout, role }) {
+  const scene = industryResearchScene({ index, role });
+  const palette = industryResearchColorPalette(visual);
+  const isCover = index === 0;
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1201, name: "Industry Research Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1202, name: "Industry Research Header Bar", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + rectShapeXml({ id: 1203, name: "Industry Research Accent Rule", x: 0, y: 342900, cx: 9144000, cy: 22860, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1204, name: "Industry Research Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1205, name: "Industry Research Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 1206, name: "Industry Research Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  if (isClosing) {
+    return surface
+      + header
+      + focusRule
+      + industryResearchActionCardsXml({ visual, palette, items: scene.chain })
+      + rectShapeXml({ id: 1260, name: "Industry Research Closing Rule", x: 914400, y: 3581400, cx: 6096000, cy: 22860, fill: visual.accent });
+  }
+  if (scene.kind === "chain") {
+    return surface + header + focusRule + industryResearchMapXml({ visual, palette, compact: true }) + industryResearchChainXml({ visual, palette, items: scene.chain });
+  }
+  if (scene.kind === "competition") {
+    return surface + header + focusRule + industryResearchMatrixXml({ visual, palette }) + industryResearchSideCardsXml({ visual, palette, items: scene.risks });
+  }
+  if (scene.kind === "risk") {
+    return surface + header + focusRule + industryResearchOpportunityGridXml({ visual, palette }) + industryResearchSideCardsXml({ visual, palette, items: scene.risks });
+  }
+  return surface + header + focusRule + industryResearchMapXml({ visual, palette, compact: false }) + industryResearchMetricCardsXml({ visual, palette, metrics: scene.metrics, isCover });
+}
+
+function industryResearchMapXml({ visual, palette, compact }) {
+  const x = compact ? 5638800 : 5486400;
+  const y = compact ? 1371600 : 990600;
+  const w = compact ? 2438400 : 2743200;
+  const h = compact ? 1828800 : 2514600;
+  return rectShapeXml({ id: 1211, name: "Industry Map Panel", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1212, name: "Industry Map Panel Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1213, name: "Industry Map Route A", x: x + 274320, y: y + Math.round(h * 0.45), cx: Math.round(w * 0.64), cy: 19050, fill: palette.line })
+    + rectShapeXml({ id: 1214, name: "Industry Map Route B", x: x + Math.round(w * 0.34), y: y + 365760, cx: 19050, cy: Math.round(h * 0.55), fill: palette.line })
+    + solidShapeXml({ id: 1215, name: "Industry Map Node 1", geom: "ellipse", x: x + 365760, y: y + Math.round(h * 0.58), cx: 137160, cy: 137160, fill: visual.accent })
+    + solidShapeXml({ id: 1216, name: "Industry Map Node 2", geom: "ellipse", x: x + Math.round(w * 0.52), y: y + 396240, cx: 114300, cy: 114300, fill: visual.primary })
+    + solidShapeXml({ id: 1217, name: "Industry Map Node 3", geom: "ellipse", x: x + Math.round(w * 0.75), y: y + Math.round(h * 0.62), cx: 137160, cy: 137160, fill: visual.accent });
+}
+
+function industryResearchMetricCardsXml({ visual, palette, metrics, isCover }) {
+  const x = 914400;
+  const y = isCover ? 3718560 : 3657600;
+  return metrics.slice(0, 3).map((metric, index) => {
+    const offsetX = x + index * 1371600;
+    return solidShapeXml({ id: 1220 + index * 4, name: `Industry Metric Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1143000, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1221 + index * 4, name: `Industry Metric Accent ${index + 1}`, x: offsetX, y, cx: 76200, cy: 518160, fill: visual.accent })
+      + textShapeXml({ id: 1222 + index * 4, name: `Industry Metric Text ${index + 1}`, x: offsetX + 152400, y: y + 121920, cx: 792480, cy: 228600, text: metric.value, size: 1180, bold: true, color: visual.primary })
+      + textShapeXml({ id: 1223 + index * 4, name: `Industry Metric Label ${index + 1}`, x: offsetX + 152400, y: y + 312420, cx: 792480, cy: 152400, text: metric.label, size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function industryResearchChainXml({ visual, palette, items }) {
+  const x = 914400;
+  const y = 3505200;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 2438400;
+    const arrow = index < 2 ? rectShapeXml({ id: 1240 + index, name: `Industry Chain Arrow ${index + 1}`, x: offsetX + 1981200, y: y + 243840, cx: 457200, cy: 22860, fill: visual.accent }) : "";
+    return solidShapeXml({ id: 1230 + index * 2, name: `Industry Chain Node ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1828800, cy: 640080, fill: palette.card })
+      + textShapeXml({ id: 1231 + index * 2, name: `Industry Chain Text ${index + 1}`, x: offsetX + 152400, y: y + 198120, cx: 1524000, cy: 243840, text: item, size: 960, bold: true, color: visual.title })
+      + arrow;
+  }).join("");
+}
+
+function industryResearchMatrixXml({ visual, palette }) {
+  const x = 5486400;
+  const y = 1127760;
+  const w = 2743200;
+  const h = 2362200;
+  return solidShapeXml({ id: 1250, name: "Industry Competition Matrix", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.card })
+    + lineFrameShapeXml({ id: 1251, name: "Industry Competition Matrix Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1252, name: "Industry Matrix Vertical Axis", x: x + Math.round(w / 2), y: y + 182880, cx: 15240, cy: h - 365760, fill: palette.line })
+    + rectShapeXml({ id: 1253, name: "Industry Matrix Horizontal Axis", x: x + 182880, y: y + Math.round(h / 2), cx: w - 365760, cy: 15240, fill: palette.line })
+    + solidShapeXml({ id: 1254, name: "Industry Player Node 1", geom: "ellipse", x: x + 548640, y: y + 1371600, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 1255, name: "Industry Player Node 2", geom: "ellipse", x: x + 1371600, y: y + 685800, cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1256, name: "Industry Player Node 3", geom: "ellipse", x: x + 1981200, y: y + 914400, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 1257, name: "Industry Player Node 4", geom: "ellipse", x: x + 1676400, y: y + 1600200, cx: 152400, cy: 152400, fill: blendHexColor(visual.primary, visual.accent, 0.45) });
+}
+
+function industryResearchSideCardsXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const y = 1219200 + index * 609600;
+    return solidShapeXml({ id: 1270 + index * 3, name: `Industry Insight Card ${index + 1}`, geom: "roundRect", x: 914400, y, cx: 3505200, cy: 426720, fill: palette.card })
+      + rectShapeXml({ id: 1271 + index * 3, name: `Industry Insight Card Accent ${index + 1}`, x: 914400, y, cx: 76200, cy: 426720, fill: visual.accent })
+      + textShapeXml({ id: 1272 + index * 3, name: `Industry Insight Text ${index + 1}`, x: 1066800, y: y + 121920, cx: 3048000, cy: 182880, text: item, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function industryResearchOpportunityGridXml({ visual, palette }) {
+  const x = 914400;
+  const y = 3002280;
+  const w = 3505200;
+  const h = 1066800;
+  return solidShapeXml({ id: 1280, name: "Industry Opportunity Matrix", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1281, name: "Industry Opportunity Matrix Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1282, name: "Industry Opportunity Vertical Split", x: x + Math.round(w / 2), y: y + 152400, cx: 15240, cy: h - 304800, fill: palette.line })
+    + rectShapeXml({ id: 1283, name: "Industry Opportunity Horizontal Split", x: x + 152400, y: y + Math.round(h / 2), cx: w - 304800, cy: 15240, fill: palette.line });
+}
+
+function industryResearchActionCardsXml({ visual, palette, items }) {
+  const x = 914400;
+  const y = 3505200;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 2209800;
+    return solidShapeXml({ id: 1290 + index * 2, name: `Industry Next Action ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1828800, cy: 518160, fill: palette.card })
+      + textShapeXml({ id: 1291 + index * 2, name: `Industry Next Action Text ${index + 1}`, x: offsetX + 152400, y: y + 167640, cx: 1524000, cy: 182880, text: item, size: 900, bold: true, color: visual.title });
+  }).join("");
+}
+
+function industryResearchColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.12),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.76),
+    line: blendHexColor(visual.primary, visual.background, 0.42),
+    mapFill: blendHexColor(visual.background, visual.surface, 0.46),
+  };
+}
+
+function industryResearchScene({ index, role }) {
+  if (role === "closing") {
+    return {
+      kind: "closing",
+      kicker: "NEXT STEPS",
+      metrics: [],
+      chain: ["补充研究", "策略判断", "落地路径"],
+      risks: ["下一步"],
+    };
+  }
+  const scenes = [
+    {
+      kind: "cover",
+      kicker: "MARKET STRUCTURE",
+      metrics: [
+        { value: "规模", label: "市场容量" },
+        { value: "增速", label: "增长变化" },
+        { value: "玩家", label: "核心竞争" },
+      ],
+      chain: ["上游资源", "核心环节", "下游客户"],
+      risks: ["结构变化", "竞争分层", "机会窗口"],
+    },
+    {
+      kind: "overview",
+      kicker: "MARKET OVERVIEW",
+      metrics: [
+        { value: "TAM", label: "总体市场" },
+        { value: "CAGR", label: "增长速度" },
+        { value: "TOP", label: "头部集中" },
+      ],
+      chain: ["规模", "增速", "结构"],
+      risks: ["市场边界", "增长驱动", "结构拆分"],
+    },
+    {
+      kind: "chain",
+      kicker: "VALUE CHAIN",
+      metrics: [],
+      chain: ["上游供给", "核心制造", "渠道客户"],
+      risks: ["价值迁移", "瓶颈环节", "利润分布"],
+    },
+    {
+      kind: "competition",
+      kicker: "COMPETITIVE MAP",
+      metrics: [],
+      chain: ["领先者", "挑战者", "利基者"],
+      risks: ["头部玩家", "差异定位", "能力边界"],
+    },
+    {
+      kind: "risk",
+      kicker: "OPPORTUNITY & RISK",
+      metrics: [],
+      chain: ["优先级", "资源", "节奏"],
+      risks: ["机会窗口", "关键风险", "建议动作"],
+    },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function isIndustryResearchVisual(visual) {
+  return visual?.id === "industry-research" && visual?.layout === "industry-research";
 }
 
 function financialReviewDecorationsXml({ visual, index, layout }) {

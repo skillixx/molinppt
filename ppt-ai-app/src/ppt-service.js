@@ -995,6 +995,7 @@ function renderDeckPreview({ deck, visual }) {
     const quarterlyDashboardScene = isQuarterlyDashboardVisual(visual) ? quarterlyDashboardPreviewScene({ visual, slide, index }) : null;
     const quarterlyDiagnosisScene = isQuarterlyDiagnosisVisual(visual) ? quarterlyDiagnosisPreviewScene(visual) : null;
     const quarterlyActionLoopScene = isQuarterlyActionLoopVisual(visual) ? quarterlyActionLoopPreviewScene(visual) : null;
+    const industryResearchScene = isIndustryResearchVisual(visual) ? industryResearchPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const statusReportMark = statusReportScene
       ? (
           `${index === 0
@@ -1094,15 +1095,18 @@ function renderDeckPreview({ deck, visual }) {
           + `<div class="quarterly-action-footer-line"></div>`
         )
       : "";
+    const industryResearchMark = industryResearchScene
+      ? renderIndustryResearchPreview(slide, industryResearchScene)
+      : "";
     const topBandHeadingClass = topBandTitleClass ? ` class="${topBandTitleClass}"` : "";
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    // 年度总结已经由 annual-summary-text 承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene
+    // 年度总结和行业研究模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene || industryResearchScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1196,6 +1200,37 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="status-report"] .status-report-checklist span:nth-child(2){width:78%;}
     body[data-layout="status-report"] .status-report-checklist span:nth-child(3){width:58%;}
     body[data-layout="status-report"] .page-number{z-index:4;color:color-mix(in srgb,var(--template-title) 62%,transparent);background:rgba(255,255,255,.72);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="industry-research"] .slide{background:linear-gradient(135deg,#ffffff 0%,var(--template-bg) 100%);padding:0;border:0;}
+    body[data-layout="industry-research"] .slide::before{background:repeating-linear-gradient(90deg,rgba(18,50,90,.045) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(24,167,167,.03) 0 1px,transparent 1px 38px);}
+    body[data-layout="industry-research"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8.8%;bottom:8.6%;z-index:1;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(18,50,90,.12);box-shadow:0 22px 50px rgba(15,23,42,.12);}
+    body[data-layout="industry-research"] .accent{height:5.8%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 62%,var(--template-accent) 38%));}
+    body[data-layout="industry-research"] .industry-layer{position:absolute;inset:0;z-index:3;pointer-events:none;color:var(--template-body);}
+    body[data-layout="industry-research"] .industry-kicker{position:absolute;left:8%;top:13%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="industry-research"] .industry-title{position:absolute;left:8%;top:21%;width:48%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="industry-research"] .industry-bullets{position:absolute;left:8.2%;top:51%;width:43%;margin:0;padding-left:1.05em;font-size:14px;line-height:1.52;color:var(--template-body);}
+    body[data-layout="industry-research"] .industry-bullets li{margin:.16em 0;}
+    body[data-layout="industry-research"] .industry-metric-row{position:absolute;left:8%;right:43%;bottom:15%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="industry-research"] .industry-metric-row span{min-height:58px;border-radius:10px;background:#fff;border:1px solid rgba(18,50,90,.12);box-shadow:0 10px 24px rgba(15,23,42,.08);padding:12px 14px;display:grid;align-content:center;gap:3px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="industry-research"] .industry-metric-row strong{font-size:19px;line-height:1;color:var(--template-primary);}
+    body[data-layout="industry-research"] .industry-map{position:absolute;right:7.6%;top:16%;width:34%;height:54%;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(230,244,248,.9));border:1px solid rgba(18,50,90,.12);overflow:hidden;box-shadow:0 16px 32px rgba(15,23,42,.10);}
+    body[data-layout="industry-research"] .industry-map::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 22% 66%,rgba(24,167,167,.32) 0 5px,transparent 6px),radial-gradient(circle at 54% 28%,rgba(18,50,90,.26) 0 4px,transparent 5px),radial-gradient(circle at 78% 62%,rgba(24,167,167,.28) 0 5px,transparent 6px),repeating-linear-gradient(90deg,rgba(18,50,90,.08) 0 1px,transparent 1px 34px),repeating-linear-gradient(0deg,rgba(18,50,90,.055) 0 1px,transparent 1px 30px);}
+    body[data-layout="industry-research"] .industry-map::after{content:"";position:absolute;left:16%;right:10%;top:34%;height:34%;border-top:2px dashed rgba(18,50,90,.36);border-right:2px dashed rgba(24,167,167,.45);border-radius:50%;transform:rotate(-8deg);}
+    body[data-layout="industry-research"] .industry-chain{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
+    body[data-layout="industry-research"] .industry-chain span,.industry-risk span{border-radius:12px;background:#fff;border:1px solid rgba(18,50,90,.12);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:14px 16px;font-size:13px;line-height:1.35;font-weight:800;color:var(--template-title);}
+    body[data-layout="industry-research"] .industry-chain span{position:relative;min-height:76px;}
+    body[data-layout="industry-research"] .industry-chain span::after{content:"";position:absolute;right:-23px;top:50%;width:28px;height:2px;background:var(--template-accent);}
+    body[data-layout="industry-research"] .industry-chain span:last-child::after{display:none;}
+    body[data-layout="industry-research"] .industry-matrix{position:absolute;right:8%;top:19%;width:37%;height:49%;border-radius:14px;background:#fff;border:1px solid rgba(18,50,90,.14);box-shadow:0 14px 30px rgba(15,23,42,.10);}
+    body[data-layout="industry-research"] .industry-matrix::before{content:"";position:absolute;left:50%;top:9%;bottom:10%;width:1px;background:rgba(18,50,90,.16);box-shadow:-128px 0 0 rgba(18,50,90,.035),128px 0 0 rgba(18,50,90,.035);}
+    body[data-layout="industry-research"] .industry-matrix::after{content:"";position:absolute;left:9%;right:9%;top:50%;height:1px;background:rgba(18,50,90,.16);box-shadow:0 -72px 0 rgba(18,50,90,.035),0 72px 0 rgba(18,50,90,.035);}
+    body[data-layout="industry-research"] .industry-matrix i{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(24,167,167,.12);}
+    body[data-layout="industry-research"] .industry-matrix i:nth-child(1){left:22%;top:60%;}body[data-layout="industry-research"] .industry-matrix i:nth-child(2){left:48%;top:34%;background:var(--template-primary);}body[data-layout="industry-research"] .industry-matrix i:nth-child(3){left:70%;top:42%;}body[data-layout="industry-research"] .industry-matrix i:nth-child(4){left:62%;top:70%;background:color-mix(in srgb,var(--template-primary) 55%,var(--template-accent) 45%);}
+    body[data-layout="industry-research"] .industry-risk{position:absolute;right:8%;top:22%;width:34%;display:grid;gap:12px;}
+    body[data-layout="industry-research"] .industry-risk span{min-height:56px;border-left:6px solid var(--template-accent);}
+    body[data-layout="industry-research"] .industry-opportunity-grid{position:absolute;left:8%;bottom:15%;width:43%;height:31%;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    body[data-layout="industry-research"] .industry-opportunity-grid span{border-radius:12px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 76%,#fff 24%));border:1px solid rgba(18,50,90,.12);}
+    body[data-layout="industry-research"] .industry-closing-line{position:absolute;left:8%;right:8%;bottom:23%;height:2px;background:linear-gradient(90deg,var(--template-accent),transparent);}
+    body[data-layout="industry-research"] .page-number{z-index:4;right:7.2%;bottom:6.4%;background:rgba(255,255,255,.78);border:1px solid rgba(18,50,90,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
     body[data-layout="executive"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 68%);padding:8.2% 10%;border:0;}
     body[data-layout="executive"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(15,23,42,.026) 0 1px,transparent 1px 38px);}
     body[data-layout="executive"] .slide::after{content:"";position:absolute;inset:12% 6% 10%;background:var(--template-surface);box-shadow:0 18px 46px rgba(15,42,67,.12);}
@@ -2109,6 +2144,107 @@ function isQuarterlyActionLoopVisual(visual) {
   return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-action-loop";
 }
 
+function renderIndustryResearchPreview(slide, scene) {
+  const items = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const bullets = items.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const metricValues = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const chain = scene.chain.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const risks = scene.risks.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const title = escapeHtml(slide?.title || scene.title);
+  const common = `<div class="industry-kicker">${escapeHtml(scene.kicker)}</div><h2 class="industry-title">${title}</h2>${bullets ? `<ul class="industry-bullets">${bullets}</ul>` : ""}`;
+  if (scene.kind === "cover") {
+    return `<div class="industry-layer">${common}<div class="industry-map"></div><div class="industry-metric-row">${metricValues}</div></div>`;
+  }
+  if (scene.kind === "chain") {
+    return `<div class="industry-layer">${common}<div class="industry-chain">${chain}</div><div class="industry-map"></div></div>`;
+  }
+  if (scene.kind === "competition") {
+    return `<div class="industry-layer">${common}<div class="industry-matrix"><i></i><i></i><i></i><i></i></div><div class="industry-risk">${risks}</div></div>`;
+  }
+  if (scene.kind === "risk") {
+    return `<div class="industry-layer">${common}<div class="industry-opportunity-grid"><span></span><span></span><span></span><span></span></div><div class="industry-risk">${risks}</div></div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="industry-layer">${common}<div class="industry-closing-line"></div><div class="industry-chain">${chain}</div></div>`;
+  }
+  return `<div class="industry-layer">${common}<div class="industry-map"></div><div class="industry-metric-row">${metricValues}</div></div>`;
+}
+
+function industryResearchPreviewScene({ slide, index, total }) {
+  const fallbackTitle = slide?.title || "关键判断";
+  const scenes = [
+    {
+      kind: "cover",
+      variant: "industry-landscape",
+      kicker: "MARKET STRUCTURE",
+      title: fallbackTitle,
+      metrics: [
+        { value: "规模", label: "市场容量" },
+        { value: "增速", label: "增长变化" },
+        { value: "玩家", label: "核心竞争" },
+      ],
+      chain: ["上游资源", "核心环节", "下游客户"],
+      risks: ["结构变化", "竞争分层", "机会窗口"],
+    },
+    {
+      kind: "overview",
+      variant: "industry-landscape",
+      kicker: "MARKET OVERVIEW",
+      title: fallbackTitle,
+      metrics: [
+        { value: "TAM", label: "总体市场" },
+        { value: "CAGR", label: "增长速度" },
+        { value: "TOP", label: "头部集中" },
+      ],
+      chain: ["规模", "增速", "结构"],
+      risks: ["市场边界", "增长驱动", "结构拆分"],
+    },
+    {
+      kind: "chain",
+      variant: "industry-landscape",
+      kicker: "VALUE CHAIN",
+      title: fallbackTitle,
+      metrics: [],
+      chain: ["上游供给", "核心制造", "渠道与客户"],
+      risks: ["价值迁移", "瓶颈环节", "利润分布"],
+    },
+    {
+      kind: "competition",
+      variant: "industry-landscape",
+      kicker: "COMPETITIVE MAP",
+      title: fallbackTitle,
+      metrics: [],
+      chain: ["领先者", "挑战者", "利基者"],
+      risks: ["头部玩家", "差异定位", "能力边界"],
+    },
+    {
+      kind: "risk",
+      variant: "industry-landscape",
+      kicker: "OPPORTUNITY & RISK",
+      title: fallbackTitle,
+      metrics: [],
+      chain: ["优先级", "资源", "节奏"],
+      risks: ["机会窗口", "关键风险", "建议动作"],
+    },
+  ];
+  if (index === total - 1) {
+    return {
+      kind: "closing",
+      variant: "industry-landscape",
+      kicker: "NEXT STEPS",
+      title: fallbackTitle,
+      metrics: [],
+      chain: ["补充研究", "策略判断", "落地路径"],
+      risks: ["下一步"],
+    };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function isIndustryResearchVisual(visual) {
+  return visual?.id === "industry-research" && visual?.layout === "industry-research";
+}
+
 function strategyConsultingPreviewVars(visual) {
   const scene = strategyConsultingPreviewScene(visual);
   return `--strategy-image:url("data:image/jpeg;base64,${DOME_PREVIEW_ASSETS[scene.assetKey]}");`;
@@ -2582,6 +2718,7 @@ function shouldRenderDomePreviewBodyList(visual, role) {
  */
 function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
+  if (visual.layout === "industry-research") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
 

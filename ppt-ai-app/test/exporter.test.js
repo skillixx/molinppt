@@ -236,6 +236,31 @@ test("PptExportService uses commercial strategy consulting workstream decoration
   assert.match(text, /ppt\/media\/strategy-workstream\.jpeg/);
 });
 
+test("PptExportService uses industry research landscape decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "industry-research",
+      theme: "industry-landscape",
+      slides: [
+        { title: "新能源行业规模与格局判断", bullets: ["市场容量持续扩张", "头部玩家分层明显"] },
+        { title: "产业链利润向核心环节集中", bullets: ["上游资源价格波动", "渠道与客户结构变化"] },
+        { title: "竞争格局呈现双轴分化", bullets: ["产品能力与市场覆盖决定位置"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Industry Research Consulting Canvas"/);
+  assert.match(slide1, /name="Industry Map Panel"/);
+  assert.match(slide3, /name="Industry Chain Node 1"|name="Industry Competition Matrix"/);
+  assert.doesNotMatch(slide1, /industry-landscape/);
+});
+
 test("PptExportService uses commercial financial quarterly decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
