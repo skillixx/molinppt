@@ -281,7 +281,7 @@ test("repository official templates do not include removed open-source samples",
   const context = await createSyncContext();
   await context.database.insert("templates", {
     id: "stale-quarterly-dashboard",
-    slug: "business-quarterly-review-dashboard",
+    slug: "removed-quarterly-dashboard-sample",
     name: "季度业务复盘 - 经营看板",
     categoryId: "business",
     scope: "official",
@@ -305,14 +305,14 @@ test("repository official templates do not include removed open-source samples",
     pruneMissing: true,
   });
   const visible = new TemplateManager({ database: context.database }).listTemplates({ ownerUserId: 7 });
-  const stale = await context.database.findOne("templates", (template) => template.slug === "business-quarterly-review-dashboard");
+  const stale = await context.database.findOne("templates", (template) => template.slug === "removed-quarterly-dashboard-sample");
   const staleProblemDiagnosis = await context.database.findOne("templates", (template) => template.slug === "business-quarterly-review-problem-diagnosis");
 
   assert.equal(result.active >= 0, true);
   assert.equal(result.staleDisabled, 2);
   assert.equal(visible.some((template) => template.id === "open-city-template"), false);
   assert.equal(visible.some((template) => template.id === "open-powerpoint-sample"), false);
-  assert.equal(visible.some((template) => template.slug === "business-quarterly-review-dashboard"), false);
+  assert.equal(visible.some((template) => template.slug === "removed-quarterly-dashboard-sample"), false);
   assert.equal(visible.some((template) => template.slug === "business-quarterly-review-problem-diagnosis"), false);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-city-template")), null);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-powerpoint-sample")), null);

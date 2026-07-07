@@ -2584,7 +2584,9 @@ function quarterlyDashboardVariant(visual) {
 }
 
 function isQuarterlyDashboardVisual(visual) {
-  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-dashboard";
+  const id = String(visual?.id || "");
+  return visual?.layout === "quarterly-dashboard"
+    && (id === "quarterly-business-review" || id === "business-quarterly-review-dashboard");
 }
 
 function quarterlyDiagnosisPreviewScene(visual) {

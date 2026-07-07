@@ -432,6 +432,27 @@ test("PptService renders synced quarterly problem diagnosis preview with dedicat
   assert.doesNotMatch(preview, />问题诊断</);
 });
 
+test("PptService renders synced quarterly dashboard preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertQuarterlyDashboardTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营复盘",
+    slideCount: 5,
+    templateId: "business-quarterly-review-dashboard",
+    theme: "dashboard",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="business-quarterly-review-dashboard" data-layout="quarterly-dashboard"/);
+  assert.match(preview, /quarterly-dashboard-hero-visual|quarterly-dashboard-bar-panel|quarterly-dashboard-region-cards/);
+  assert.match(preview, /quarterly-dashboard-footer-line/);
+  assert.doesNotMatch(preview, />经营看板</);
+});
+
 test("PptService renders new product launch rhythm preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3962,6 +3983,50 @@ async function insertQuarterlyDiagnosisTemplate(context) {
       defaultCoverLayout: "quarterly-diagnosis-cover",
       defaultContentLayout: "quarterly-diagnosis-analysis",
       allowedLayouts: ["quarterly-diagnosis-cover", "quarterly-diagnosis-overview", "quarterly-diagnosis-root-cause", "quarterly-diagnosis-metric-anomaly", "quarterly-diagnosis-improvement", "quarterly-diagnosis-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertQuarterlyDashboardTemplate(context) {
+  // 测试数据库模拟官方模板同步后的季度业务复盘-经营看板模板，确保同步 slug 也能命中看板专用布局。
+  await context.database.insert("templates", {
+    id: "business-quarterly-review-dashboard",
+    slug: "business-quarterly-review-dashboard",
+    name: "季度业务复盘 - 经营看板",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "dashboard",
+        name: "经营看板",
+        visual: {
+          primary: "173861",
+          accent: "D7A650",
+          background: "EEF3F9",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "quarterly-dashboard",
+          variant: "dashboard",
+        },
+      },
+    ],
+    visual: {
+      primary: "173861",
+      accent: "D7A650",
+      background: "EEF3F9",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "quarterly-dashboard",
+      variant: "dashboard",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "quarterly-dashboard-cover",
+      defaultContentLayout: "quarterly-dashboard-review",
+      allowedLayouts: ["quarterly-dashboard-cover", "quarterly-dashboard-overview", "quarterly-dashboard-review", "quarterly-dashboard-metrics", "quarterly-dashboard-region", "quarterly-dashboard-action", "quarterly-dashboard-closing", "title", "content", "closing"],
     },
   });
 }

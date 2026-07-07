@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "quarterly-business-review",
+  "themeId": "dashboard",
+  "style": "quarterly-business-dashboard",
+  "themes": [
+    {
+      "id": "dashboard",
+      "name": "经营看板",
+      "visual": {
+        "primary": "173861",
+        "accent": "D7A650",
+        "background": "EEF3F9",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "quarterly-dashboard",
+        "variant": "dashboard"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "173861",
+    "accent": "D7A650",
+    "background": "EEF3F9",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "quarterly-dashboard",
+    "variant": "dashboard"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "quarterly-dashboard-cover",
+    "defaultContentLayout": "quarterly-dashboard-review",
+    "allowedLayouts": [
+      "quarterly-dashboard-cover",
+      "quarterly-dashboard-overview",
+      "quarterly-dashboard-review",
+      "quarterly-dashboard-metrics",
+      "quarterly-dashboard-region",
+      "quarterly-dashboard-action",
+      "quarterly-dashboard-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  },
+  "assets": {
+    "illustration": "assets/template-specific-illustration.svg"
+  }
+}
