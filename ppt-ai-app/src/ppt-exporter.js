@@ -741,7 +741,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
     return base + quarterlyDiagnosisDecorationsXml({ visual, index, layout });
   }
   if (visual.layout === "quarterly-action-loop") {
-    return base + quarterlyActionLoopDecorationsXml({ visual, index, layout, slide });
+    return base + quarterlyActionLoopDecorationsXmlV2({ visual, index, layout, slide });
   }
   if (visual.layout === "industry-research") {
     return base + industryResearchDecorationsXml({ visual, index, layout, role });
@@ -4754,6 +4754,162 @@ function quarterlyActionLoopScene(visual) {
 
 function quarterlyActionLoopVariant(visual) {
   return ["action-loop"].includes(visual?.variant) ? visual.variant : "action-loop";
+}
+
+function quarterlyActionLoopDecorationsXmlV2({ visual, index, layout, slide }) {
+  const scene = quarterlyActionLoopSceneV2();
+  const palette = quarterlyActionLoopColorPalette(visual);
+  const isCover = index === 0;
+  const isClosing = index >= 3;
+  // 新版行动闭环模板采用“复盘作战室”布局，预览与 PPTX 共用同一套结构语义。
+  const base = solidShapeXml({ id: 2100, name: "Quarterly Action Loop V2 Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + rectShapeXml({ id: 2101, name: "Quarterly Action Loop V2 Top Bar", x: 0, y: 0, cx: 9144000, cy: 594360, fill: visual.surface })
+    + rectShapeXml({ id: 2102, name: "Quarterly Action Loop V2 Rule", x: 396240, y: 716280, cx: 8351520, cy: 24384, fill: visual.primary })
+    + solidShapeXml({ id: 2103, name: "Quarterly Action Loop V2 Canvas", geom: "roundRect", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: layout.surface.cy, fill: visual.surface })
+    + lineFrameShapeXml({ id: 2104, name: "Quarterly Action Loop V2 Canvas Frame", geom: "roundRect", x: layout.surface.x, y: layout.surface.y, cx: layout.surface.cx, cy: layout.surface.cy, stroke: palette.frame, width: 11430 })
+    + textShapeXml({ id: 2105, name: "Quarterly Action Loop V2 Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 850, bold: true, color: visual.title })
+    + rectShapeXml({ id: 2106, name: "Quarterly Action Loop V2 Footer Rule", x: 396240, y: 4724400, cx: 8351520, cy: 24384, fill: visual.accent })
+    + quarterlyActionLoopCornerMarksXmlV2({ visual, palette });
+
+  if (isCover) {
+    return base
+      + solidShapeXml({ id: 2110, name: "Quarterly Action Loop V2 Cover Pill", geom: "roundRect", x: 5265420, y: 1333500, cx: 2438400, cy: 243840, fill: visual.primary })
+      + textShapeXml({ id: 2111, name: "Quarterly Action Loop V2 Cover Pill Text", x: 5501640, y: 1394460, cx: 1905000, cy: 106680, text: "复盘结论转行动，责任节点可追踪", size: 620, bold: true, color: "FFFFFF" })
+      + quarterlyActionLoopContentCardXmlV2({ visual, palette, slide, role: "cover" })
+      + quarterlyActionLoopThreeColumnXmlV2({ visual, palette, scene })
+      + quarterlyActionLoopCoreXmlV2({ visual, palette, x: 3505200, y: 2087880, cx: 2057400, cy: 1676400, idBase: 2160 });
+  }
+
+  if (isClosing) {
+    return base
+      + textShapeXml({ id: 2120, name: "Quarterly Action Loop V2 Closing Title", x: 640080, y: 1600200, cx: 3505200, cy: 304800, text: scene.endingTitle, size: 1520, bold: true, color: visual.title })
+      + textShapeXml({ id: 2121, name: "Quarterly Action Loop V2 Closing Caption", x: 640080, y: 2057400, cx: 3657600, cy: 243840, text: scene.endingCaption, size: 900, bold: true, color: visual.body })
+      + quarterlyActionLoopContentCardXmlV2({ visual, palette, slide, role: "closing" })
+      + quarterlyActionLoopRoadmapXmlV2({ visual, palette, x: 4572000, y: 1676400, idBase: 2130 });
+  }
+
+  return base
+    + quarterlyActionLoopContentCardXmlV2({ visual, palette, slide, role: "content" })
+    + quarterlyActionLoopPlanArrowXmlV2({ visual })
+    + quarterlyActionLoopMatrixXmlV2({ visual, palette, scene })
+    + quarterlyActionLoopProgressXmlV2({ visual, palette });
+}
+
+function quarterlyActionLoopCornerMarksXmlV2({ visual, palette }) {
+  return solidShapeXml({ id: 2180, name: "Quarterly Action Loop V2 Left Rail", x: 274320, y: 396240, cx: 457200, cy: 1371600, fill: visual.primary })
+    + solidShapeXml({ id: 2181, name: "Quarterly Action Loop V2 Top Tab", x: 8382000, y: 350520, cx: 487680, cy: 320040, fill: visual.primary })
+    + solidShapeXml({ id: 2182, name: "Quarterly Action Loop V2 Soft Tab", x: 7924800, y: 426720, cx: 762000, cy: 259080, fill: palette.softBlue })
+    + solidShapeXml({ id: 2183, name: "Quarterly Action Loop V2 Accent Dot", geom: "ellipse", x: 823000, y: 4244340, cx: 152400, cy: 152400, fill: visual.accent });
+}
+
+function quarterlyActionLoopContentCardXmlV2({ visual, palette, slide, role }) {
+  // 用户输入标题与要点集中进入内容卡片，避免和任务矩阵、时间轴装饰层重叠。
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+  const fallback = quarterlyActionLoopCompactTextV2(slide?.title, "本页重点", 22);
+  const title = quarterlyActionLoopCompactTextV2(slide?.title, "本页重点", role === "cover" ? 42 : 48);
+  const items = [title, ...bullets].filter(Boolean).slice(0, role === "cover" ? 3 : 4);
+  const position = role === "cover"
+    ? { x: 640080, y: 1379220, cx: 3505200, cy: 640080 }
+    : role === "closing"
+      ? { x: 640080, y: 2438400, cx: 3352800, cy: 944880 }
+      : { x: 640080, y: 1714500, cx: 3505200, cy: 975360 };
+  const textXml = items.map((item, itemIndex) => {
+    const lineGap = role === "cover" ? 137160 : 167640;
+    const y = position.y + 106680 + itemIndex * lineGap;
+    const isTitle = itemIndex === 0;
+    const text = quarterlyActionLoopCompactTextV2(item, fallback, isTitle ? 38 : 40);
+    return textShapeXml({ id: 2322 + itemIndex, name: `Quarterly Action Loop V2 Content Text ${itemIndex + 1}`, x: position.x + 198120, y, cx: position.cx - 396240, cy: isTitle ? 152400 : 121920, text, size: isTitle ? 680 : role === "cover" ? 520 : 560, bold: true, color: isTitle ? visual.title : visual.body })
+      + rectShapeXml({ id: 2328 + itemIndex, name: `Quarterly Action Loop V2 Content Stripe ${itemIndex + 1}`, x: position.x + 106680, y: y + 15240, cx: 30480, cy: isTitle ? 106680 : 91440, fill: isTitle ? visual.primary : visual.accent });
+  }).join("");
+  return solidShapeXml({ id: 2320, name: "Quarterly Action Loop V2 Content Card", geom: "roundRect", ...position, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2321, name: "Quarterly Action Loop V2 Content Card Frame", geom: "roundRect", ...position, stroke: palette.frame, width: 9525 })
+    + textXml;
+}
+
+function quarterlyActionLoopThreeColumnXmlV2({ visual, palette, scene }) {
+  return scene.columns.map((column, columnIndex) => {
+    const x = 670560 + columnIndex * 2895600;
+    const headerX = x + 670560;
+    const cardXml = column.items.map((item, itemIndex) => {
+      const y = 2240280 + itemIndex * 335280;
+      return solidShapeXml({ id: 2200 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop V2 Task Card ${columnIndex + 1}-${itemIndex + 1}`, x: x + 152400, y, cx: 1676400, cy: 228600, fill: palette.card })
+        + rectShapeXml({ id: 2201 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop V2 Task Rule ${columnIndex + 1}-${itemIndex + 1}`, x: x + 152400, y: y + 198120, cx: 1676400, cy: 30480, fill: columnIndex === 1 ? visual.accent : visual.primary })
+        + textShapeXml({ id: 2202 + columnIndex * 30 + itemIndex * 3, name: `Quarterly Action Loop V2 Task Text ${columnIndex + 1}-${itemIndex + 1}`, x: x + 304800, y: y + 60960, cx: 1371600, cy: 106680, text: item, size: 650, bold: true, color: visual.body });
+    }).join("");
+    return solidShapeXml({ id: 2190 + columnIndex * 3, name: `Quarterly Action Loop V2 Column ${columnIndex + 1}`, x, y: 1866900, cx: 1981200, cy: 1981200, fill: "F8FBFF" })
+      + lineFrameShapeXml({ id: 2191 + columnIndex * 3, name: `Quarterly Action Loop V2 Column Frame ${columnIndex + 1}`, geom: "rect", x, y: 1866900, cx: 1981200, cy: 1981200, stroke: palette.frame, width: 9525 })
+      + solidShapeXml({ id: 2192 + columnIndex * 3, name: `Quarterly Action Loop V2 Column Header ${columnIndex + 1}`, geom: "roundRect", x: headerX, y: 1752600, cx: 914400, cy: 243840, fill: columnIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 2193 + columnIndex * 3, name: `Quarterly Action Loop V2 Column Header Text ${columnIndex + 1}`, x: headerX + 121920, y: 1813560, cx: 670560, cy: 106680, text: column.title, size: 660, bold: true, color: "FFFFFF" })
+      + cardXml;
+  }).join("");
+}
+
+function quarterlyActionLoopCoreXmlV2({ visual, palette, x, y, cx, cy, idBase }) {
+  return arcLineShapeXml({ id: idBase, name: "Quarterly Action Loop V2 Core Orbit A", x, y, cx, cy, stroke: visual.accent, width: 38100 })
+    + arcLineShapeXml({ id: idBase + 1, name: "Quarterly Action Loop V2 Core Orbit B", x: x + 152400, y: y + 304800, cx: cx - 304800, cy: cy - 609600, stroke: visual.primary, width: 30480 })
+    + solidShapeXml({ id: idBase + 2, name: "Quarterly Action Loop V2 Core Dot", geom: "ellipse", x: x + Math.round(cx * 0.44), y: y + Math.round(cy * 0.42), cx: 243840, cy: 243840, fill: palette.softBlue })
+    + textShapeXml({ id: idBase + 3, name: "Quarterly Action Loop V2 Core Text", x: x + 426720, y: y + 731520, cx: 1219200, cy: 365760, text: "计划\n执行\n检查\n复盘", size: 780, bold: true, color: visual.title });
+}
+
+function quarterlyActionLoopPlanArrowXmlV2({ visual }) {
+  return ["计划", "执行", "检查", "复盘"].map((label, itemIndex) => {
+    const x = 685800 + itemIndex * 1981200;
+    return solidShapeXml({ id: 2260 + itemIndex * 3, name: `Quarterly Action Loop V2 Roadmap Arrow ${itemIndex + 1}`, geom: "rightArrow", x, y: 3657600, cx: 1905000, cy: 365760, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 2261 + itemIndex * 3, name: `Quarterly Action Loop V2 Roadmap Text ${itemIndex + 1}`, x: x + 533400, y: 3764280, cx: 670560, cy: 121920, text: label, size: 760, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function quarterlyActionLoopMatrixXmlV2({ visual, palette, scene }) {
+  return scene.owners.map((owner, itemIndex) => {
+    const x = 4572000 + itemIndex * 1219200;
+    return solidShapeXml({ id: 2280 + itemIndex * 3, name: `Quarterly Action Loop V2 Owner Matrix ${itemIndex + 1}`, geom: "roundRect", x, y: 1600200, cx: 1066800, cy: 731520, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2281 + itemIndex * 3, name: `Quarterly Action Loop V2 Owner Matrix Rule ${itemIndex + 1}`, x, y: 1600200, cx: 1066800, cy: 60960, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 2282 + itemIndex * 3, name: `Quarterly Action Loop V2 Owner Matrix Text ${itemIndex + 1}`, x: x + 152400, y: 1905000, cx: 762000, cy: 152400, text: owner, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function quarterlyActionLoopProgressXmlV2({ visual, palette }) {
+  const bars = [0.32, 0.5, 0.7, 0.48, 0.82].map((ratio, index) => {
+    const cy = Math.round(640080 * ratio);
+    return solidShapeXml({ id: 2300 + index, name: `Quarterly Action Loop V2 Progress Bar ${index + 1}`, geom: "roundRect", x: 1066800 + index * 426720, y: 3406140 - cy, cx: 182880, cy, fill: index > 2 ? visual.accent : visual.primary });
+  }).join("");
+  return solidShapeXml({ id: 2290, name: "Quarterly Action Loop V2 Progress Panel", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2291, name: "Quarterly Action Loop V2 Progress Frame", geom: "roundRect", x: 731520, y: 2590800, cx: 3048000, cy: 990600, stroke: palette.frame, width: 9525 })
+    + textShapeXml({ id: 2292, name: "Quarterly Action Loop V2 Progress Title", x: 914400, y: 2743200, cx: 1371600, cy: 152400, text: "执行进度", size: 760, bold: true, color: visual.title })
+    + bars;
+}
+
+function quarterlyActionLoopRoadmapXmlV2({ visual, palette, x, y, idBase }) {
+  return ["目标拆解", "执行追踪", "结果复盘", "下季优化"].map((label, itemIndex) => {
+    const cardX = x + itemIndex * 990600;
+    return solidShapeXml({ id: idBase + itemIndex * 3, name: `Quarterly Action Loop V2 Closing Card ${itemIndex + 1}`, geom: "roundRect", x: cardX, y, cx: 838200, cy: 609600, fill: itemIndex % 2 ? palette.card : "FFFFFF" })
+      + lineFrameShapeXml({ id: idBase + itemIndex * 3 + 1, name: `Quarterly Action Loop V2 Closing Card Frame ${itemIndex + 1}`, geom: "roundRect", x: cardX, y, cx: 838200, cy: 609600, stroke: palette.frame, width: 9525 })
+      + textShapeXml({ id: idBase + itemIndex * 3 + 2, name: `Quarterly Action Loop V2 Closing Card Text ${itemIndex + 1}`, x: cardX + 91440, y: y + 228600, cx: 655320, cy: 121920, text: label, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function quarterlyActionLoopCompactTextV2(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function quarterlyActionLoopSceneV2() {
+  return {
+    variant: "action-loop",
+    kicker: "ACTION LOOP REVIEW",
+    section: "EXECUTION CLOSED LOOP",
+    endingTitle: "复盘沉淀与下一步行动",
+    endingCaption: "目标拆解 / 执行追踪 / 结果复盘 / 持续优化",
+    columns: [
+      { title: "目标拆解", items: ["锁定经营目标", "明确关键动作", "分解重点项目", "沉淀检查标准"] },
+      { title: "执行追踪", items: ["任务看板", "周度同步", "风险预警", "资源协调"] },
+      { title: "结果复盘", items: ["目标达成", "经验沉淀", "问题修复", "下季计划"] },
+    ],
+    owners: ["负责人", "协同部门", "截止日期"],
+  };
 }
 
 function industryTrendForecastDecorationsXml({ visual, index, layout, role, slide }) {

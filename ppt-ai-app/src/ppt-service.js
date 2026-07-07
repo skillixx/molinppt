@@ -1139,7 +1139,7 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || industryResearchScene || industryTrendScene || competitionMapScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
     return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${pitchMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
@@ -2074,7 +2074,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="quarterly-action-loop"] .quarterly-action-matrix{position:absolute;left:49%;top:25%;right:7%;height:28%;z-index:10;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
     body[data-layout="quarterly-action-loop"] .quarterly-action-matrix span{background:#fff;border-top:5px solid var(--template-primary);box-shadow:0 10px 20px rgba(31,95,191,.08);padding:18px 10px;text-align:center;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="quarterly-action-loop"] .quarterly-action-progress{position:absolute;left:7%;top:56%;width:35%;height:20%;z-index:10;border-radius:14px;background:#fff;border:1px solid #d8e7fb;box-shadow:0 10px 24px rgba(31,95,191,.08);}
-    body[data-layout="quarterly-action-loop"] .quarterly-action-progress::before{content:"杩涘害杩借釜";position:absolute;left:18px;top:14px;color:var(--template-title);font-size:13px;font-weight:900;}
+    body[data-layout="quarterly-action-loop"] .quarterly-action-progress::before{content:"执行进度";position:absolute;left:18px;top:14px;color:var(--template-title);font-size:13px;font-weight:900;}
     body[data-layout="quarterly-action-loop"] .quarterly-action-progress i{position:absolute;bottom:22%;width:8%;border-radius:6px 6px 0 0;background:var(--template-primary);}
     body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(1){left:14%;height:32%;}
     body[data-layout="quarterly-action-loop"] .quarterly-action-progress i:nth-child(2){left:29%;height:50%;}
@@ -2584,9 +2584,7 @@ function quarterlyDashboardVariant(visual) {
 }
 
 function isQuarterlyDashboardVisual(visual) {
-  const id = String(visual?.id || "");
-  return visual?.layout === "quarterly-dashboard"
-    && (id === "quarterly-business-review" || id === "business-quarterly-review-dashboard");
+  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-dashboard";
 }
 
 function quarterlyDiagnosisPreviewScene(visual) {
@@ -2610,7 +2608,7 @@ function quarterlyDiagnosisVariant(visual) {
 }
 
 function isQuarterlyDiagnosisVisual(visual) {
-  return ["quarterly-business-review", "business-quarterly-review-problem-diagnosis"].includes(visual?.id) && visual?.layout === "quarterly-diagnosis";
+  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-diagnosis";
 }
 
 function quarterlyActionLoopPreviewScene(visual) {
@@ -2640,7 +2638,8 @@ function quarterlyActionLoopVariant(visual) {
 }
 
 function isQuarterlyActionLoopVisual(visual) {
-  return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-action-loop";
+  const id = String(visual?.id || "");
+  return (id === "quarterly-business-review" || id === "business-quarterly-business-review-action-loop") && visual?.layout === "quarterly-action-loop";
 }
 
 function renderIndustryTrendForecastPreview(slide, scene) {

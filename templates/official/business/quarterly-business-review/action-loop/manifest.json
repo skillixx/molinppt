@@ -1,0 +1,18 @@
+{
+  "slug": "business-quarterly-business-review-action-loop",
+  "name": "季度业务复盘 - 行动闭环",
+  "description": "适合季度复盘后的行动计划、责任分工、进度追踪和闭环管理汇报的商业化模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "quarterly-review",
+    "action-plan",
+    "execution-tracking"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

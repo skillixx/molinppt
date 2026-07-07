@@ -974,6 +974,42 @@ test("PptExportService keeps annual summary export text aligned with preview siz
   assert.match(pptShapeByName(slide2, "Content 2"), /<a:rPr[^>]* sz="780"/);
 });
 
+test("PptExportService uses quarterly action loop decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "quarterly-business-review",
+      theme: "action-loop",
+      templateVisual: {
+        id: "quarterly-business-review",
+        primary: "1F5FBF",
+        accent: "1CC8A0",
+        background: "F3F7FE",
+        surface: "FFFFFF",
+        title: "10233F",
+        body: "40516C",
+        layout: "quarterly-action-loop",
+        variant: "action-loop",
+      },
+      slides: [
+        { title: "季度业务复盘", bullets: ["明确下季度行动计划", "责任到人并按周追踪"] },
+        { title: "重点行动拆解", bullets: ["行动项一：优化转化流程", "行动项二：补齐协同资源"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Quarterly Action Loop V2 Canvas"/);
+  assert.match(slide1, /name="Quarterly Action Loop V2 Core Orbit A"/);
+  assert.match(slide1, /name="Quarterly Action Loop V2 Task Card 1-1"/);
+  assert.match(slide2, /name="Quarterly Action Loop V2 Owner Matrix 1"/);
+  assert.match(slide2, /name="Quarterly Action Loop V2 Roadmap Arrow 1"/);
+  assert.doesNotMatch(slide1, /行动闭环/);
+});
 test("PptExportService keeps commercial template theme chips decorative", () => {
   const exporter = new PptExportService();
   const cases = [

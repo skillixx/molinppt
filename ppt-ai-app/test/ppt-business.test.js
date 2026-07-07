@@ -1,4 +1,4 @@
-﻿import assert from "node:assert/strict";
+import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -501,6 +501,29 @@ test("PptService renders annual business summary preview with export-aligned lay
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 
+test("PptService renders quarterly action loop preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertQuarterlyActionLoopTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度业务复盘",
+    slideCount: 4,
+    templateId: "business-quarterly-business-review-action-loop",
+    theme: "action-loop",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="business-quarterly-business-review-action-loop" data-layout="quarterly-action-loop"/);
+  assert.match(preview, /quarterly-action-cover-board/);
+  assert.match(preview, /quarterly-action-content-card/);
+  assert.match(preview, /quarterly-action-progress/);
+  assert.match(preview, /body\[data-layout="quarterly-action-loop"\] \.slide-content h2/);
+  assert.doesNotMatch(preview, />行动闭环</);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+});
 test("PptService keeps annual business summary long text in the dedicated preview layer", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3535,6 +3558,49 @@ async function insertAnnualBusinessSummaryTemplate(context) {
   });
 }
 
+async function insertQuarterlyActionLoopTemplate(context) {
+  // 测试数据库模拟官方模板同步后的季度业务复盘行动计划模板，确保预览走专用执行追踪布局。
+  await context.database.insert("templates", {
+    id: "business-quarterly-business-review-action-loop",
+    slug: "business-quarterly-business-review-action-loop",
+    name: "季度业务复盘",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "action-loop",
+        name: "行动闭环",
+        visual: {
+          primary: "1F5FBF",
+          accent: "1CC8A0",
+          background: "F3F7FE",
+          surface: "FFFFFF",
+          title: "10233F",
+          body: "40516C",
+          layout: "quarterly-action-loop",
+          variant: "action-loop",
+        },
+      },
+    ],
+    visual: {
+      primary: "1F5FBF",
+      accent: "1CC8A0",
+      background: "F3F7FE",
+      surface: "FFFFFF",
+      title: "10233F",
+      body: "40516C",
+      layout: "quarterly-action-loop",
+      variant: "action-loop",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "quarterly-action-cover",
+      defaultContentLayout: "quarterly-action-content",
+      allowedLayouts: ["quarterly-action-cover", "quarterly-action-summary", "quarterly-action-matrix", "quarterly-action-roadmap", "quarterly-action-closing", "title", "content", "closing"],
+    },
+  });
+}
 async function insertIndustryResearchSlugTemplate(context) {
   // 测试数据库模拟官方模板同步后的 slug 记录，避免在线预览退回普通标题层。
   await context.database.insert("templates", {
