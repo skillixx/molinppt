@@ -191,6 +191,49 @@ test("PptService renders industry research landscape preview with dedicated layo
   assert.doesNotMatch(preview, />行业格局</);
 });
 
+test("PptService renders synced industry research slug preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertIndustryResearchSlugTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营复盘",
+    slideCount: 3,
+    templateId: "strategy-industry-research-industry-landscape",
+    theme: "industry-landscape",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-industry-research-industry-landscape" data-layout="industry-research"/);
+  assert.match(preview, /<div class="industry-layer">/);
+  assert.match(preview, /industry-map/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced budget planning preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBudgetPlanningTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "年度预算规划",
+    slideCount: 5,
+    templateId: "finance-budget-management-report-budget-planning",
+    theme: "budget-planning",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-budget-management-report-budget-planning" data-layout="finance-budget-planning"/);
+  assert.match(preview, /budget-dashboard|budget-allocation|budget-table|budget-flow/);
+  assert.match(preview, /budget-surface/);
+  assert.doesNotMatch(preview, />预算编制</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3243,6 +3286,94 @@ async function insertAnnualBusinessSummaryTemplate(context) {
       body: "1F4B83",
       layout: "annual-summary",
       variant: "blue-gold",
+    },
+  });
+}
+
+async function insertIndustryResearchSlugTemplate(context) {
+  // 测试数据库模拟官方模板同步后的 slug 记录，避免在线预览退回普通标题层。
+  await context.database.insert("templates", {
+    id: "strategy-industry-research-industry-landscape",
+    slug: "strategy-industry-research-industry-landscape",
+    name: "行业研究报告 - 行业格局",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "industry-landscape",
+        name: "行业格局",
+        visual: {
+          primary: "12325A",
+          accent: "18A7A7",
+          background: "F3F7FA",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "industry-research",
+          variant: "industry-landscape",
+        },
+      },
+    ],
+    visual: {
+      primary: "12325A",
+      accent: "18A7A7",
+      background: "F3F7FA",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "industry-research",
+      variant: "industry-landscape",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "industry-research-cover",
+      defaultContentLayout: "industry-research-content",
+      allowedLayouts: ["industry-research-cover", "industry-overview", "industry-value-chain", "industry-competition", "industry-opportunity-risk", "industry-research-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertBudgetPlanningTemplate(context) {
+  // 测试数据库模拟官方模板同步后的预算编制模板，确保预览和导出都走专用财务计划布局。
+  await context.database.insert("templates", {
+    id: "finance-budget-management-report-budget-planning",
+    slug: "finance-budget-management-report-budget-planning",
+    name: "预算管理报告 - 预算编制",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "budget-planning",
+        name: "预算编制",
+        visual: {
+          primary: "102A43",
+          accent: "2A9D8F",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "405163",
+          layout: "finance-budget-planning",
+          variant: "budget-planning",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "2A9D8F",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "405163",
+      layout: "finance-budget-planning",
+      variant: "budget-planning",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-budget-planning-cover",
+      defaultContentLayout: "finance-budget-planning-content",
+      allowedLayouts: ["finance-budget-planning-cover", "finance-budget-planning-overview", "finance-budget-planning-allocation", "finance-budget-planning-table", "finance-budget-planning-flow", "finance-budget-planning-closing", "title", "content"],
     },
   });
 }

@@ -310,6 +310,47 @@ test("PptExportService uses commercial financial forecast decorations", () => {
   assert.match(slide1, /val="2F9E9A"/);
 });
 
+test("PptExportService uses budget planning decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-budget-management-report-budget-planning",
+      theme: "budget-planning",
+      templateVisual: {
+        primary: "102A43",
+        accent: "2A9D8F",
+        background: "EEF4F8",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "405163",
+        layout: "finance-budget-planning",
+        variant: "budget-planning",
+      },
+      slides: [
+        { title: "年度预算编制规划", bullets: ["总预算 1.2 亿", "研发投入 3200 万", "市场费用 1800 万"] },
+        { title: "部门预算分配", bullets: ["研发中心 3200 万", "市场中心 1800 万", "销售中心 2600 万"] },
+        { title: "预算科目明细", bullets: ["人员成本 5200 万", "营销费用 1800 万", "系统建设 900 万"] },
+        { title: "编制流程安排", bullets: ["需求提交", "部门初审", "财务复核", "管理审批"] },
+        { title: "预算审批节奏", bullets: ["完成业务需求确认", "进入财务复核", "提交管理层审批"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Budget Planning Workspace"/);
+  assert.match(slide1, /name="Budget Planning Dashboard Panel"/);
+  assert.match(slide3, /name="Budget Planning Allocation Panel"/);
+  assert.match(slide4, /name="Budget Planning Subject Table"/);
+  assert.match(slide5, /name="Budget Planning Approval Step 1"/);
+  assert.doesNotMatch(slide1, /budget-planning/);
+});
+
 test("PptExportService uses commercial sales enterprise decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

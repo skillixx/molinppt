@@ -996,6 +996,7 @@ function renderDeckPreview({ deck, visual }) {
     const quarterlyDiagnosisScene = isQuarterlyDiagnosisVisual(visual) ? quarterlyDiagnosisPreviewScene(visual) : null;
     const quarterlyActionLoopScene = isQuarterlyActionLoopVisual(visual) ? quarterlyActionLoopPreviewScene(visual) : null;
     const industryResearchScene = isIndustryResearchVisual(visual) ? industryResearchPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const budgetPlanningScene = isBudgetPlanningVisual(visual) ? budgetPlanningPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const statusReportMark = statusReportScene
       ? (
           `${index === 0
@@ -1098,15 +1099,18 @@ function renderDeckPreview({ deck, visual }) {
     const industryResearchMark = industryResearchScene
       ? renderIndustryResearchPreview(slide, industryResearchScene)
       : "";
+    const budgetPlanningMark = budgetPlanningScene
+      ? renderBudgetPlanningPreview(slide, budgetPlanningScene)
+      : "";
     const topBandHeadingClass = topBandTitleClass ? ` class="${topBandTitleClass}"` : "";
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    // 年度总结和行业研究模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || industryResearchScene
+    // 年度总结、行业研究和预算编制模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1231,6 +1235,36 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="industry-research"] .industry-opportunity-grid span{border-radius:12px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 76%,#fff 24%));border:1px solid rgba(18,50,90,.12);}
     body[data-layout="industry-research"] .industry-closing-line{position:absolute;left:8%;right:8%;bottom:23%;height:2px;background:linear-gradient(90deg,var(--template-accent),transparent);}
     body[data-layout="industry-research"] .page-number{z-index:4;right:7.2%;bottom:6.4%;background:rgba(255,255,255,.78);border:1px solid rgba(18,50,90,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
+    body[data-layout="finance-budget-planning"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 100%);}
+    body[data-layout="finance-budget-planning"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,42,67,.055) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(42,157,143,.035) 0 1px,transparent 1px 40px);}
+    body[data-layout="finance-budget-planning"] .accent{height:6.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 72%,var(--template-accent) 28%));}
+    body[data-layout="finance-budget-planning"] .budget-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="finance-budget-planning"] .budget-surface{position:absolute;left:6.8%;right:6.8%;top:12.2%;bottom:8.8%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(16,42,67,.14);box-shadow:0 24px 52px rgba(16,42,67,.14);}
+    body[data-layout="finance-budget-planning"] .budget-kicker{position:absolute;left:9.2%;top:16%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="finance-budget-planning"] .budget-title{position:absolute;left:9.2%;top:24%;width:45%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="finance-budget-planning"] .budget-rule{position:absolute;left:9.2%;top:45%;width:36%;height:3px;background:linear-gradient(90deg,var(--template-accent),transparent);}
+    body[data-layout="finance-budget-planning"] .budget-bullets{position:absolute;left:9.2%;top:51%;width:39%;margin:0;padding-left:1.05em;font-size:14px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="finance-budget-planning"] .budget-bullets li{margin:.16em 0;}
+    body[data-layout="finance-budget-planning"] .budget-amount-cards{position:absolute;left:9.2%;right:46%;bottom:15%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="finance-budget-planning"] .budget-amount-cards span{min-height:58px;border-radius:12px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 10px 22px rgba(16,42,67,.08);padding:12px 14px;display:grid;align-content:center;gap:3px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="finance-budget-planning"] .budget-amount-cards strong{font-size:19px;line-height:1;color:var(--template-primary);}
+    body[data-layout="finance-budget-planning"] .budget-dashboard{position:absolute;right:9.2%;top:20%;width:32%;height:45%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid rgba(16,42,67,.14);box-shadow:0 18px 34px rgba(16,42,67,.12);overflow:hidden;}
+    body[data-layout="finance-budget-planning"] .budget-dashboard::before{content:"";position:absolute;left:10%;top:14%;width:36%;height:36%;border-radius:50%;background:conic-gradient(var(--template-accent) 0 46%,#d6a84f 46% 70%,rgba(16,42,67,.14) 70% 100%);box-shadow:0 0 0 16px rgba(42,157,143,.08);}
+    body[data-layout="finance-budget-planning"] .budget-dashboard::after{content:"";position:absolute;right:12%;top:16%;bottom:14%;width:40%;background:linear-gradient(180deg,transparent 0 18%,rgba(16,42,67,.14) 18% 19%,transparent 19% 40%,rgba(42,157,143,.22) 40% 41%,transparent 41% 62%,rgba(16,42,67,.14) 62% 63%,transparent 63%),linear-gradient(90deg,var(--template-accent) 0 8px,transparent 8px 100%);}
+    body[data-layout="finance-budget-planning"] .budget-table{position:absolute;left:9.2%;right:9.2%;top:50%;bottom:16%;border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(16,42,67,.08);overflow:hidden;}
+    body[data-layout="finance-budget-planning"] .budget-table span{display:grid;grid-template-columns:1.2fr .8fr .8fr 1fr;align-items:center;height:25%;padding:0 18px;border-bottom:1px solid rgba(16,42,67,.08);font-size:12px;font-weight:800;color:var(--template-body);}
+    body[data-layout="finance-budget-planning"] .budget-table span:first-child{background:var(--template-primary);color:#fff;}
+    body[data-layout="finance-budget-planning"] .budget-flow{position:absolute;left:9.2%;right:9.2%;bottom:17%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;}
+    body[data-layout="finance-budget-planning"] .budget-flow span{position:relative;min-height:72px;border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 10px 22px rgba(16,42,67,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="finance-budget-planning"] .budget-flow span::before{content:attr(data-step);display:block;width:26px;height:26px;margin-bottom:6px;border-radius:50%;background:var(--template-accent);color:#fff;text-align:center;line-height:26px;font-size:11px;}
+    body[data-layout="finance-budget-planning"] .budget-flow span::after{content:"";position:absolute;right:-17px;top:50%;width:20px;height:2px;background:var(--template-accent);}
+    body[data-layout="finance-budget-planning"] .budget-flow span:last-child::after{display:none;}
+    body[data-layout="finance-budget-planning"] .budget-allocation{position:absolute;right:9.2%;top:22%;width:34%;height:45%;border-radius:16px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 14px 30px rgba(16,42,67,.10);}
+    body[data-layout="finance-budget-planning"] .budget-allocation i{position:absolute;left:12%;right:12%;height:22px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),rgba(42,157,143,.18));}
+    body[data-layout="finance-budget-planning"] .budget-allocation i:nth-child(1){top:18%;width:72%;}body[data-layout="finance-budget-planning"] .budget-allocation i:nth-child(2){top:34%;width:58%;}body[data-layout="finance-budget-planning"] .budget-allocation i:nth-child(3){top:50%;width:66%;}body[data-layout="finance-budget-planning"] .budget-allocation i:nth-child(4){top:66%;width:48%;}
+    body[data-layout="finance-budget-planning"] .budget-closing{position:absolute;left:9.2%;right:9.2%;top:49%;display:grid;grid-template-columns:1.2fr 1fr;gap:16px;}
+    body[data-layout="finance-budget-planning"] .budget-closing span{min-height:122px;border-radius:16px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(16,42,67,.08);padding:18px;font-size:14px;font-weight:800;color:var(--template-body);}
+    body[data-layout="finance-budget-planning"] .page-number{z-index:4;right:7.3%;bottom:5.6%;background:rgba(255,255,255,.78);border:1px solid rgba(16,42,67,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
     body[data-layout="executive"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 68%);padding:8.2% 10%;border:0;}
     body[data-layout="executive"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(15,23,42,.026) 0 1px,transparent 1px 38px);}
     body[data-layout="executive"] .slide::after{content:"";position:absolute;inset:12% 6% 10%;background:var(--template-surface);box-shadow:0 18px 46px rgba(15,42,67,.12);}
@@ -2019,6 +2053,76 @@ function isAnnualSummaryVisual(visual) {
   return visual?.layout === "annual-summary";
 }
 
+function budgetPlanningPreviewScene({ slide, index, total }) {
+  const bullets = budgetPlanningBulletTexts(slide);
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
+  const role = index === 0 ? "cover" : index === total - 1 ? "closing" : ["overview", "allocation", "table", "flow"][(index - 1) % 4];
+  const metrics = [0, 1, 2].map((itemIndex) => budgetPlanningMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    variant: "budget-planning",
+    role,
+    kicker: role === "cover" ? "FINANCIAL PLAN" : "BUDGET WORKBOOK",
+    title,
+    bullets: bullets.slice(0, role === "cover" ? 3 : 4),
+    metrics,
+    tableRows: [
+      ["科目", "预算值", "依据", "负责人"],
+      ...[0, 1, 2].map((rowIndex) => {
+        const text = budgetPlanningCompactText(bullets[rowIndex], title, 18);
+        return [text || `预算科目 ${rowIndex + 1}`, metrics[rowIndex].value, "业务计划", `部门 ${rowIndex + 1}`];
+      }),
+    ],
+    flowSteps: ["需求提交", "部门初审", "财务复核", "管理审批", "定稿发布"],
+  };
+}
+
+function renderBudgetPlanningPreview(slide, scene) {
+  const bulletItems = scene.bullets.map((item) => `<li>${escapeHtml(budgetPlanningCompactText(item, scene.title, 42))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const table = scene.tableRows.map((row) => `<span>${row.map((cell) => `<b>${escapeHtml(cell)}</b>`).join("")}</span>`).join("");
+  const flow = scene.flowSteps.map((step, index) => `<span data-step="${index + 1}">${escapeHtml(step)}</span>`).join("");
+  const allocation = '<div class="budget-allocation"><i></i><i></i><i></i><i></i></div>';
+  const closing = `<div class="budget-closing"><span>${escapeHtml(scene.bullets[0] || scene.title)}</span><span>${escapeHtml(scene.bullets[1] || "明确预算责任、审批节奏和后续跟踪机制")}</span></div>`;
+  const visual = scene.role === "flow"
+    ? `<div class="budget-flow">${flow}</div>`
+    : scene.role === "table"
+      ? `<div class="budget-table">${table}</div>`
+      : scene.role === "allocation"
+        ? allocation
+        : scene.role === "closing"
+          ? closing
+          : `<div class="budget-dashboard"></div><div class="budget-amount-cards">${metrics}</div>`;
+  return `<div class="budget-layer"><div class="budget-surface"></div><div class="budget-kicker">${escapeHtml(scene.kicker)}</div><h2 class="budget-title">${escapeHtml(scene.title)}</h2><div class="budget-rule"></div><ul class="budget-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function budgetPlanningBulletTexts(slide) {
+  return Array.isArray(slide?.bullets)
+    ? slide.bullets.map((bullet) => String(bullet || "").trim()).filter(Boolean)
+    : [];
+}
+
+function budgetPlanningMetricFromText(text, index) {
+  const fallbackValues = ["01", "02", "03"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: `预算项 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  const label = budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10);
+  return { value, label };
+}
+
+function budgetPlanningCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function isBudgetPlanningVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
+}
+
 function quarterlyDashboardPreviewScene({ visual, slide, index }) {
   const bullets = quarterlyDashboardBulletTexts(slide);
   const metrics = [0, 1].map((item) => quarterlyDashboardMetricFromText(bullets[item], item));
@@ -2242,7 +2346,8 @@ function industryResearchPreviewScene({ slide, index, total }) {
 }
 
 function isIndustryResearchVisual(visual) {
-  return visual?.id === "industry-research" && visual?.layout === "industry-research";
+  const id = String(visual?.id || "");
+  return visual?.layout === "industry-research" && (id === "industry-research" || id === "strategy-industry-research-industry-landscape");
 }
 
 function strategyConsultingPreviewVars(visual) {
@@ -2719,6 +2824,7 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "industry-research") return false;
+  if (visual.layout === "finance-budget-planning") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
 

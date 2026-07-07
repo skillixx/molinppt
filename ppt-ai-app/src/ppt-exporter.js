@@ -393,17 +393,27 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "finance-budget-planning") {
+    if (index === 0) {
+      if (textLength >= 30) return 2100;
+      if (textLength >= 22) return 2350;
+      return Math.min(fallbackSize, 2700);
+    }
+    if (textLength >= 30) return 1450;
+    if (textLength >= 22) return 1650;
+    return Math.min(fallbackSize, 1900);
+  }
   if (visual.layout === "industry-research") {
     if (index === 0) {
-      if (textLength >= 30) return 2300;
-      if (textLength >= 22) return 2600;
-      return Math.min(fallbackSize, 3100);
+      if (textLength >= 30) return 2050;
+      if (textLength >= 22) return 2250;
+      return Math.min(fallbackSize, 2500);
     }
-    if (textLength >= 30) return 1750;
-    if (textLength >= 22) return 2050;
-    return Math.min(fallbackSize, 2450);
+    if (textLength >= 30) return 1350;
+    if (textLength >= 22) return 1550;
+    return Math.min(fallbackSize, 1850);
   }
   if (visual.layout === "annual-summary") {
     const textUnits = estimateTextUnits(title);
@@ -520,6 +530,7 @@ function shouldRenderDomeBodyList(visual, role) {
 function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "quarterly-dashboard") return false;
+  if (visual.layout === "finance-budget-planning") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -646,6 +657,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "industry-research") {
     return base + industryResearchDecorationsXml({ visual, index, layout, role });
+  }
+  if (visual.layout === "finance-budget-planning") {
+    return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
@@ -1365,22 +1379,46 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
     const isCover = index === 0;
     const isClosing = role === "closing";
     return {
-      surface: { x: 475488, y: 457200, cx: 8193024, cy: 4267200 },
-      accent: { x: 0, y: 0, cx: 9144000, cy: 365760 },
-      secondaryAccent: { x: 731520, y: isCover ? 2514600 : 1600200, cx: 3048000, cy: 22860 },
-      label: { x: 731520, y: 670560, cx: 2286000, cy: 274320 },
+      surface: { x: 475488, y: 452628, cx: 8193024, cy: 4248531 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 298320 },
+      secondaryAccent: { x: 731520, y: isCover ? 2000250 : 1905000, cx: 3800040, cy: 22860 },
+      label: { x: 731520, y: 668655, cx: 2286000, cy: 274320 },
       title: isClosing
-        ? { x: 914400, y: 1371600, cx: 5486400, cy: 914400 }
+        ? { x: 731520, y: 1219200, cx: 5486400, cy: 914400 }
         : isCover
-          ? { x: 914400, y: 1097280, cx: 4114800, cy: 1219200 }
-          : { x: 914400, y: 914400, cx: 4267200, cy: 762000 },
+          ? { x: 731520, y: 1080135, cx: 4389120, cy: 1219200 }
+          : { x: 731520, y: 914400, cx: 4389120, cy: 914400 },
       content: isClosing
-        ? { x: 914400, y: 2438400, cx: 4267200, cy: 914400 }
+        ? { x: 749808, y: 2438400, cx: 4267200, cy: 914400 }
         : isCover
-          ? { x: 990600, y: 2705100, cx: 3962400, cy: 762000 }
-          : { x: 990600, y: 1905000, cx: 3810000, cy: 1219200 },
-      titleSize: isCover ? 3100 : isClosing ? 3300 : 2450,
-      bodySize: isCover ? 1200 : 980,
+          ? { x: 749808, y: 2623185, cx: 3931920, cy: 762000 }
+          : { x: 749808, y: 2133600, cx: 3931920, cy: 1219200 },
+      titleSize: isCover ? 2500 : isClosing ? 2600 : 1850,
+      bodySize: isCover ? 1050 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-budget-planning") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 621792, y: 627888, cx: 7900416, cy: 4069080 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 841248, y: isCover ? 2316480 : 2057400, cx: 3291840, cy: 22860 },
+      label: { x: 841248, y: 822960, cx: 2133600, cy: 274320 },
+      title: isClosing
+        ? { x: 841248, y: 1219200, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 841248, y: 1219200, cx: 4114800, cy: 1219200 }
+          : { x: 841248, y: 914400, cx: 4389120, cy: 731520 },
+      content: isClosing
+        ? { x: 841248, y: 2438400, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 841248, y: 2621280, cx: 3505200, cy: 762000 }
+          : { x: 841248, y: 1828800, cx: 3474720, cy: 914400 },
+      titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
+      bodySize: isCover ? 960 : 780,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -1833,11 +1871,12 @@ function groupShapeXml() {
 
 /**
  * 鍒涘缓濉厖鐭╁舰褰㈢姸銆?
- * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, fill: string}} input
+ * @param {{id: number, name: string, x: number, y: number, cx: number, cy: number, fill: string, transparency?: number}} input
  * @returns {string}
  */
-function rectShapeXml({ id, name, x, y, cx, cy, fill }) {
-  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${fill}"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>`;
+function rectShapeXml({ id, name, x, y, cx, cy, fill, transparency = 0 }) {
+  const alpha = transparency > 0 ? `<a:alpha val="${Math.max(0, Math.min(100000, 100000 - transparency))}"/>` : "";
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${fill}">${alpha}</a:srgbClr></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr></p:sp>`;
 }
 
 /**
@@ -1852,11 +1891,14 @@ function solidShapeXml({ id, name, geom = "rect", x, y, cx, cy, fill }) {
 
 /**
  * 创建仅描边形状（用于卡片边框/澶栨锛?
- * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, stroke: string, width?: number}} input
+ * @param {{id: number, name: string, geom: string, x: number, y: number, cx: number, cy: number, stroke: string, width?: number, dash?: string, transparency?: number, rotation?: number}} input
  * @returns {string}
  */
-function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050 }) {
-  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}"/></a:solidFill></a:ln></p:spPr></p:sp>`;
+function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050, dash = "", transparency = 0, rotation = 0 }) {
+  const alpha = transparency > 0 ? `<a:alpha val="${Math.max(0, Math.min(100000, 100000 - transparency))}"/>` : "";
+  const dashXml = dash ? `<a:prstDash val="${escapeXml(dash)}"/>` : "";
+  const rotationXml = rotation ? ` rot="${rotation}"` : "";
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm${rotationXml}><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}">${alpha}</a:srgbClr></a:solidFill>${dashXml}</a:ln></p:spPr></p:sp>`;
 }
 
 /**
@@ -2157,6 +2199,167 @@ function quarterlyDashboardColorPalette(visual) {
     softText: "C4D8EF",
     frame: "D9E2EE",
   };
+}
+
+function budgetPlanningDecorationsXml({ visual, index, role, slide }) {
+  const scene = budgetPlanningSceneFromSlide({ slide, index, role });
+  const palette = budgetPlanningColorPalette(visual);
+  const surface = solidShapeXml({ id: 560, name: "Budget Planning Workspace", geom: "roundRect", x: 621792, y: 627888, cx: 7900416, cy: 4069080, fill: visual.surface })
+    + lineFrameShapeXml({ id: 561, name: "Budget Planning Workspace Border", geom: "roundRect", x: 621792, y: 627888, cx: 7900416, cy: 4069080, stroke: palette.frame, width: 15240 });
+  const header = solidShapeXml({ id: 562, name: "Budget Planning Header", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 563, name: "Budget Planning Header Accent", x: 0, y: 320040, cx: 9144000, cy: 22860, fill: visual.accent })
+    + rectShapeXml({ id: 564, name: "Budget Planning Focus Rule", x: 841248, y: index === 0 ? 2316480 : 2057400, cx: 3291840, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 565, name: "Budget Planning Kicker", x: 841248, y: 822960, cx: 2133600, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent });
+  const bullets = budgetPlanningBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "flow") return surface + header + bullets + budgetPlanningFlowXml({ visual, palette, steps: scene.flowSteps });
+  if (scene.role === "table") return surface + header + bullets + budgetPlanningTableXml({ visual, palette, rows: scene.tableRows });
+  if (scene.role === "allocation") return surface + header + bullets + budgetPlanningAllocationXml({ visual, palette, scene });
+  if (scene.role === "closing") return surface + header + bullets + budgetPlanningClosingCardsXml({ visual, palette, items: scene.bullets });
+  return surface + header + bullets + budgetPlanningDashboardXml({ visual, palette }) + budgetPlanningMetricCardsXml({ visual, metrics: scene.metrics });
+}
+
+function budgetPlanningDashboardXml({ visual, palette }) {
+  return solidShapeXml({ id: 570, name: "Budget Planning Dashboard Panel", geom: "roundRect", x: 5780520, y: 1021080, cx: 2926080, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 571, name: "Budget Planning Dashboard Border", geom: "roundRect", x: 5780520, y: 1021080, cx: 2926080, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + arcLineShapeXml({ id: 572, name: "Budget Planning Allocation Ring Accent", x: 6096000, y: 1356360, cx: 914400, cy: 914400, stroke: visual.accent, width: 91440 })
+    + arcLineShapeXml({ id: 573, name: "Budget Planning Allocation Ring Gold", x: 6096000, y: 1356360, cx: 914400, cy: 914400, stroke: palette.gold, width: 60960 })
+    + rectShapeXml({ id: 574, name: "Budget Planning Table Line 1", x: 7306320, y: 1280160, cx: 914400, cy: 38100, fill: visual.primary, transparency: 23000 })
+    + rectShapeXml({ id: 575, name: "Budget Planning Table Line 2", x: 7306320, y: 1600200, cx: 1219200, cy: 38100, fill: visual.accent, transparency: 20000 })
+    + rectShapeXml({ id: 576, name: "Budget Planning Table Line 3", x: 7306320, y: 1920240, cx: 762000, cy: 38100, fill: palette.gold, transparency: 18000 })
+    + rectShapeXml({ id: 577, name: "Budget Planning Table Line 4", x: 7306320, y: 2240280, cx: 1066800, cy: 38100, fill: visual.primary, transparency: 38000 });
+}
+
+function budgetPlanningMetricCardsXml({ visual, metrics }) {
+  return metrics.map((metric, index) => {
+    const x = 841248 + index * 1257300;
+    return solidShapeXml({ id: 580 + index * 3, name: `Budget Planning Metric Card ${index + 1}`, geom: "roundRect", x, y: 3723648, cx: 1066800, cy: 579120, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 581 + index * 3, name: `Budget Planning Metric Card Border ${index + 1}`, geom: "roundRect", x, y: 3723648, cx: 1066800, cy: 579120, stroke: blendHexColor(visual.primary, visual.surface, 0.75), width: 10160 })
+      + textShapeXml({ id: 582 + index * 3, name: `Budget Planning Metric Text ${index + 1}`, x: x + 137160, y: 3837948, cx: 792480, cy: 274320, text: `${metric.value}\n${metric.label}`, size: 780, bold: true, color: visual.title });
+  }).join("");
+}
+
+function budgetPlanningBulletCardsXml({ visual, scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2621280 : 1828800) + index * 259080;
+    return rectShapeXml({ id: 600 + index * 2, name: `Budget Planning Bullet Rule ${index + 1}`, x: 841248, y: y + 30480, cx: 45720, cy: 152400, fill: visual.accent })
+      + textShapeXml({ id: 601 + index * 2, name: `Budget Planning Bullet Text ${index + 1}`, x: 1013460, y, cx: 3444240, cy: 198120, text: budgetPlanningCompactText(item, scene.title, 32), size: isCover ? 820 : 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function budgetPlanningTableXml({ visual, palette, rows }) {
+  const tableX = 853440;
+  const tableY = 2606040;
+  const rowH = 335280;
+  const tableW = 7437120;
+  const header = solidShapeXml({ id: 620, name: "Budget Planning Subject Table", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 621, name: "Budget Planning Subject Table Border", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 622, name: "Budget Planning Subject Table Header", x: tableX, y: tableY, cx: tableW, cy: rowH, fill: visual.primary });
+  const rowXml = rows.map((row, rowIndex) => {
+    const y = tableY + rowIndex * rowH;
+    const color = rowIndex === 0 ? "FFFFFF" : visual.body;
+    const cells = row.map((cell, cellIndex) => textShapeXml({
+      id: 630 + rowIndex * 8 + cellIndex,
+      name: `Budget Planning Table Cell ${rowIndex + 1}-${cellIndex + 1}`,
+      x: tableX + 182880 + cellIndex * 1752600,
+      y: y + 76200,
+      cx: 1524000,
+      cy: 152400,
+      text: budgetPlanningCompactText(cell, "", 12),
+      size: rowIndex === 0 ? 720 : 660,
+      bold: true,
+      color,
+    })).join("");
+    const rule = rowIndex > 0 ? rectShapeXml({ id: 670 + rowIndex, name: `Budget Planning Table Row Rule ${rowIndex}`, x: tableX, y, cx: tableW, cy: 7620, fill: blendHexColor(visual.primary, visual.surface, 0.82) }) : "";
+    return rule + cells;
+  }).join("");
+  return header + rowXml;
+}
+
+function budgetPlanningFlowXml({ visual, palette, steps }) {
+  return steps.map((step, index) => {
+    const x = 853440 + index * 1524000;
+    const arrow = index < steps.length - 1 ? rectShapeXml({ id: 710 + index, name: `Budget Planning Flow Connector ${index + 1}`, x: x + 990600, y: 3571248, cx: 365760, cy: 22860, fill: visual.accent }) : "";
+    return solidShapeXml({ id: 690 + index * 4, name: `Budget Planning Approval Step ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1066800, cy: 762000, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 691 + index * 4, name: `Budget Planning Approval Step Border ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1066800, cy: 762000, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 692 + index * 4, name: `Budget Planning Approval Step Dot ${index + 1}`, geom: "ellipse", x: x + 137160, y: 3342648, cx: 213360, cy: 213360, fill: visual.accent })
+      + textShapeXml({ id: 693 + index * 4, name: `Budget Planning Approval Step Text ${index + 1}`, x: x + 137160, y: 3655068, cx: 792480, cy: 182880, text: step, size: 700, bold: true, color: visual.title })
+      + arrow;
+  }).join("");
+}
+
+function budgetPlanningAllocationXml({ visual, palette, scene }) {
+  const bars = scene.metrics.map((metric, index) => {
+    const width = [1676400, 1280160, 1463040][index] || 1066800;
+    return rectShapeXml({ id: 730 + index, name: `Budget Planning Department Bar ${index + 1}`, x: 5699760, y: 1432560 + index * 441960, cx: width, cy: 152400, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 740 + index, name: `Budget Planning Department Label ${index + 1}`, x: 5699760, y: 1219200 + index * 441960, cx: 1828800, cy: 152400, text: metric.label, size: 700, bold: true, color: visual.title });
+  }).join("");
+  return solidShapeXml({ id: 725, name: "Budget Planning Allocation Panel", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2438400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 726, name: "Budget Planning Allocation Panel Border", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2438400, stroke: palette.frame, width: 12700 })
+    + bars;
+}
+
+function budgetPlanningClosingCardsXml({ visual, palette, items }) {
+  const values = [items[0] || "明确预算责任", items[1] || "完成审批节奏", items[2] || "建立滚动跟踪"];
+  return values.slice(0, 3).map((item, index) => {
+    const x = 853440 + index * 2438400;
+    return solidShapeXml({ id: 760 + index * 3, name: `Budget Planning Closing Card ${index + 1}`, geom: "roundRect", x, y: 2819400, cx: 2133600, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 761 + index * 3, name: `Budget Planning Closing Card Border ${index + 1}`, geom: "roundRect", x, y: 2819400, cx: 2133600, cy: 914400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 762 + index * 3, name: `Budget Planning Closing Card Accent ${index + 1}`, x: x + 152400, y: 2971800, cx: 45720, cy: 457200, fill: visual.accent })
+      + textShapeXml({ id: 763 + index * 3, name: `Budget Planning Closing Card Text ${index + 1}`, x: x + 289560, y: 3048000, cx: 1524000, cy: 304800, text: budgetPlanningCompactText(item, "", 24), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function budgetPlanningSceneFromSlide({ slide, index, role }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 24);
+  const resolvedRole = index === 0 ? "cover" : role === "closing" ? "closing" : ["overview", "allocation", "table", "flow"][(index - 1) % 4];
+  const metrics = [0, 1, 2].map((itemIndex) => budgetPlanningMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "FINANCIAL PLAN" : "BUDGET WORKBOOK",
+    title,
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    flowSteps: ["需求提交", "部门初审", "财务复核", "管理审批", "定稿发布"],
+    tableRows: [
+      ["科目", "预算值", "依据", "负责人"],
+      ...[0, 1, 2].map((rowIndex) => {
+        const metric = metrics[rowIndex];
+        return [metric.label || `预算科目 ${rowIndex + 1}`, metric.value, "业务计划", `部门 ${rowIndex + 1}`];
+      }),
+    ],
+  };
+}
+
+function budgetPlanningMetricFromText(text, index) {
+  const fallbackValues = ["01", "02", "03"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: `预算项 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  const label = budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10);
+  return { value, label };
+}
+
+function budgetPlanningCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function budgetPlanningColorPalette(visual) {
+  return {
+    panel: blendHexColor(visual.background, visual.surface, 0.68),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    gold: "D6A84F",
+  };
+}
+
+function isBudgetPlanningVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
 }
 
 function annualSummaryCoverBackdropXml({ visual, palette }) {
@@ -3339,8 +3542,8 @@ function industryResearchDecorationsXml({ visual, index, layout, role }) {
   const isCover = index === 0;
   const isClosing = role === "closing";
   const surface = solidShapeXml({ id: 1201, name: "Industry Research Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
-  const header = solidShapeXml({ id: 1202, name: "Industry Research Header Bar", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
-    + rectShapeXml({ id: 1203, name: "Industry Research Accent Rule", x: 0, y: 342900, cx: 9144000, cy: 22860, fill: visual.accent })
+  const header = solidShapeXml({ id: 1202, name: "Industry Research Header Bar", x: 0, y: 0, cx: 9144000, cy: 298320, fill: visual.primary })
+    + rectShapeXml({ id: 1203, name: "Industry Research Accent Rule", x: 0, y: 275460, cx: 9144000, cy: 22860, fill: visual.accent })
     + lineFrameShapeXml({ id: 1204, name: "Industry Research Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
     + textShapeXml({ id: 1205, name: "Industry Research Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
   const focusRule = rectShapeXml({ id: 1206, name: "Industry Research Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
@@ -3364,28 +3567,51 @@ function industryResearchDecorationsXml({ visual, index, layout, role }) {
 }
 
 function industryResearchMapXml({ visual, palette, compact }) {
-  const x = compact ? 5638800 : 5486400;
-  const y = compact ? 1371600 : 990600;
-  const w = compact ? 2438400 : 2743200;
-  const h = compact ? 1828800 : 2514600;
-  return rectShapeXml({ id: 1211, name: "Industry Map Panel", x, y, cx: w, cy: h, fill: palette.mapFill })
+  const x = compact ? 5638800 : 5339616;
+  const y = compact ? 1371600 : 822960;
+  const w = compact ? 2438400 : 3108960;
+  const h = compact ? 1828800 : 2777490;
+  // 导出端补齐预览中的网格质感，避免 PPTX 只剩简单坐标轴。
+  const gridLines = Array.from({ length: 5 }, (_, index) => {
+    const offsetX = x + Math.round((w / 6) * (index + 1));
+    const offsetY = y + Math.round((h / 6) * (index + 1));
+    return rectShapeXml({ id: 1300 + index * 2, name: `Industry Map Grid V ${index + 1}`, x: offsetX, y, cx: 7620, cy: h, fill: "DDEAF0", transparency: 55000 })
+      + rectShapeXml({ id: 1301 + index * 2, name: `Industry Map Grid H ${index + 1}`, x, y: offsetY, cx: w, cy: 7620, fill: "DDEAF0", transparency: 55000 });
+  }).join("");
+  const route = lineFrameShapeXml({
+    id: 1213,
+    name: "Industry Map Preview Route",
+    geom: "ellipse",
+    x: x + Math.round(w * 0.16),
+    y: y + Math.round(h * 0.32),
+    cx: Math.round(w * 0.66),
+    cy: Math.round(h * 0.35),
+    stroke: palette.line,
+    width: 19050,
+    dash: "dash",
+    transparency: 18000,
+    rotation: -480000,
+  });
+  return solidShapeXml({ id: 1211, name: "Industry Map Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + gridLines
+    + route
     + lineFrameShapeXml({ id: 1212, name: "Industry Map Panel Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
-    + rectShapeXml({ id: 1213, name: "Industry Map Route A", x: x + 274320, y: y + Math.round(h * 0.45), cx: Math.round(w * 0.64), cy: 19050, fill: palette.line })
-    + rectShapeXml({ id: 1214, name: "Industry Map Route B", x: x + Math.round(w * 0.34), y: y + 365760, cx: 19050, cy: Math.round(h * 0.55), fill: palette.line })
-    + solidShapeXml({ id: 1215, name: "Industry Map Node 1", geom: "ellipse", x: x + 365760, y: y + Math.round(h * 0.58), cx: 137160, cy: 137160, fill: visual.accent })
-    + solidShapeXml({ id: 1216, name: "Industry Map Node 2", geom: "ellipse", x: x + Math.round(w * 0.52), y: y + 396240, cx: 114300, cy: 114300, fill: visual.primary })
-    + solidShapeXml({ id: 1217, name: "Industry Map Node 3", geom: "ellipse", x: x + Math.round(w * 0.75), y: y + Math.round(h * 0.62), cx: 137160, cy: 137160, fill: visual.accent });
+    + solidShapeXml({ id: 1215, name: "Industry Map Node 1", geom: "ellipse", x: x + Math.round(w * 0.20), y: y + Math.round(h * 0.62), cx: 137160, cy: 137160, fill: visual.accent })
+    + solidShapeXml({ id: 1216, name: "Industry Map Node 2", geom: "ellipse", x: x + Math.round(w * 0.53), y: y + Math.round(h * 0.27), cx: 114300, cy: 114300, fill: visual.primary })
+    + solidShapeXml({ id: 1217, name: "Industry Map Node 3", geom: "ellipse", x: x + Math.round(w * 0.78), y: y + Math.round(h * 0.62), cx: 137160, cy: 137160, fill: visual.accent });
 }
 
 function industryResearchMetricCardsXml({ visual, palette, metrics, isCover }) {
-  const x = 914400;
-  const y = isCover ? 3718560 : 3657600;
+  const x = 731520;
+  const y = isCover ? 3825240 : 3657600;
+  const cardWidth = 1371600;
+  const gap = 121920;
   return metrics.slice(0, 3).map((metric, index) => {
-    const offsetX = x + index * 1371600;
-    return solidShapeXml({ id: 1220 + index * 4, name: `Industry Metric Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1143000, cy: 518160, fill: palette.card })
-      + rectShapeXml({ id: 1221 + index * 4, name: `Industry Metric Accent ${index + 1}`, x: offsetX, y, cx: 76200, cy: 518160, fill: visual.accent })
-      + textShapeXml({ id: 1222 + index * 4, name: `Industry Metric Text ${index + 1}`, x: offsetX + 152400, y: y + 121920, cx: 792480, cy: 228600, text: metric.value, size: 1180, bold: true, color: visual.primary })
-      + textShapeXml({ id: 1223 + index * 4, name: `Industry Metric Label ${index + 1}`, x: offsetX + 152400, y: y + 312420, cx: 792480, cy: 152400, text: metric.label, size: 700, bold: true, color: visual.body });
+    const offsetX = x + index * (cardWidth + gap);
+    return solidShapeXml({ id: 1220 + index * 4, name: `Industry Metric Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: cardWidth, cy: 548640, fill: palette.card })
+      + rectShapeXml({ id: 1221 + index * 4, name: `Industry Metric Accent ${index + 1}`, x: offsetX, y, cx: 76200, cy: 548640, fill: visual.accent })
+      + textShapeXml({ id: 1222 + index * 4, name: `Industry Metric Text ${index + 1}`, x: offsetX + 152400, y: y + 114300, cx: 975360, cy: 228600, text: metric.value, size: 1100, bold: true, color: visual.primary })
+      + textShapeXml({ id: 1223 + index * 4, name: `Industry Metric Label ${index + 1}`, x: offsetX + 152400, y: y + 304800, cx: 975360, cy: 152400, text: metric.label, size: 680, bold: true, color: visual.body });
   }).join("");
 }
 
@@ -3418,10 +3644,13 @@ function industryResearchMatrixXml({ visual, palette }) {
 
 function industryResearchSideCardsXml({ visual, palette, items }) {
   return items.slice(0, 3).map((item, index) => {
-    const y = 1219200 + index * 609600;
-    return solidShapeXml({ id: 1270 + index * 3, name: `Industry Insight Card ${index + 1}`, geom: "roundRect", x: 914400, y, cx: 3505200, cy: 426720, fill: palette.card })
-      + rectShapeXml({ id: 1271 + index * 3, name: `Industry Insight Card Accent ${index + 1}`, x: 914400, y, cx: 76200, cy: 426720, fill: visual.accent })
-      + textShapeXml({ id: 1272 + index * 3, name: `Industry Insight Text ${index + 1}`, x: 1066800, y: y + 121920, cx: 3048000, cy: 182880, text: item, size: 820, bold: true, color: visual.title });
+    const x = 5486400;
+    const y = 1219200 + index * 579120;
+    const width = 2743200;
+    const height = 396240;
+    return solidShapeXml({ id: 1270 + index * 3, name: `Industry Insight Card ${index + 1}`, geom: "roundRect", x, y, cx: width, cy: height, fill: palette.card })
+      + rectShapeXml({ id: 1271 + index * 3, name: `Industry Insight Card Accent ${index + 1}`, x, y, cx: 68580, cy: height, fill: visual.accent })
+      + textShapeXml({ id: 1272 + index * 3, name: `Industry Insight Text ${index + 1}`, x: x + 152400, y: y + 106680, cx: width - 304800, cy: 182880, text: item, size: 720, bold: true, color: visual.title });
   }).join("");
 }
 
@@ -3514,7 +3743,8 @@ function industryResearchScene({ index, role }) {
 }
 
 function isIndustryResearchVisual(visual) {
-  return visual?.id === "industry-research" && visual?.layout === "industry-research";
+  const id = String(visual?.id || "");
+  return visual?.layout === "industry-research" && (id === "industry-research" || id === "strategy-industry-research-industry-landscape");
 }
 
 function financialReviewDecorationsXml({ visual, index, layout }) {
