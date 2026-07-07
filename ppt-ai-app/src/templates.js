@@ -222,6 +222,22 @@ export const DEFAULT_TEMPLATES = [
           variant: "industry-landscape",
         },
       },
+      {
+        id: "trend-forecast",
+        name: "趋势判断",
+        visual: {
+          primary: "102A56",
+          accent: "16A3B8",
+          secondary: "22C55E",
+          warning: "F59E0B",
+          background: "F5F8FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "industry-trend-forecast",
+          variant: "trend-forecast",
+        },
+      },
     ],
     visual: {
       primary: "12325A",

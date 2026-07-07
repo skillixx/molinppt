@@ -191,6 +191,29 @@ test("PptService renders industry research landscape preview with dedicated layo
   assert.doesNotMatch(preview, />行业格局</);
 });
 
+test("PptService renders industry trend forecast preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "AI 应用行业趋势研判",
+    slideCount: 5,
+    templateId: "industry-research",
+    theme: "trend-forecast",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="industry-research" data-layout="industry-trend-forecast"/);
+  assert.match(preview, /trend-layer/);
+  assert.match(preview, /trend-curve/);
+  assert.match(preview, /trend-signal-grid/);
+  assert.match(preview, /trend-driver-wheel|trend-risk-grid|trend-roadmap/);
+  assert.doesNotMatch(preview, />趋势判断</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced industry research slug preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -209,6 +232,50 @@ test("PptService renders synced industry research slug preview with dedicated la
   assert.match(preview, /<body data-template="strategy-industry-research-industry-landscape" data-layout="industry-research"/);
   assert.match(preview, /<div class="industry-layer">/);
   assert.match(preview, /industry-map/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced industry trend forecast slug preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertIndustryTrendForecastTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "AI 应用行业趋势研判",
+    slideCount: 4,
+    templateId: "strategy-industry-research-trend-forecast",
+    theme: "trend-forecast",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-industry-research-trend-forecast" data-layout="industry-trend-forecast"/);
+  assert.match(preview, /<div class="trend-layer">/);
+  assert.match(preview, /trend-curve/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced competition map preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCompetitionMapTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能硬件竞品分析",
+    slideCount: 6,
+    templateId: "strategy-industry-research-competition-map",
+    theme: "competition-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-industry-research-competition-map" data-layout="strategy-competition-map"/);
+  assert.match(preview, /competition-layer/);
+  assert.match(preview, /competition-map/);
+  assert.match(preview, /competition-player-grid|competition-positioning|competition-segments/);
+  assert.doesNotMatch(preview, />竞争地图</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -3487,6 +3554,98 @@ async function insertIndustryResearchSlugTemplate(context) {
       defaultCoverLayout: "industry-research-cover",
       defaultContentLayout: "industry-research-content",
       allowedLayouts: ["industry-research-cover", "industry-overview", "industry-value-chain", "industry-competition", "industry-opportunity-risk", "industry-research-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertCompetitionMapTemplate(context) {
+  // 模拟官方模板同步后的竞争地图模板，验证生成工作台可以直接使用完整 slug。
+  await context.database.insert("templates", {
+    id: "strategy-industry-research-competition-map",
+    slug: "strategy-industry-research-competition-map",
+    name: "行业研究报告 - 竞争地图",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "competition-map",
+        name: "竞争地图",
+        visual: {
+          primary: "102A43",
+          accent: "12A5A6",
+          background: "F4F8FB",
+          surface: "FFFFFF",
+          title: "071A2D",
+          body: "3D5363",
+          layout: "strategy-competition-map",
+          variant: "competition-map",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "12A5A6",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "071A2D",
+      body: "3D5363",
+      layout: "strategy-competition-map",
+      variant: "competition-map",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "competition-map-cover",
+      defaultContentLayout: "competition-map-content",
+      allowedLayouts: ["competition-map-cover", "competition-map-overview", "competition-map-players", "competition-map-positioning", "competition-map-segments", "competition-map-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertIndustryTrendForecastTemplate(context) {
+  // 测试数据库模拟官方模板同步后的趋势判断主题，确保 slug 模板也能走独立趋势研判布局。
+  await context.database.insert("templates", {
+    id: "strategy-industry-research-trend-forecast",
+    slug: "strategy-industry-research-trend-forecast",
+    name: "行业研究报告 - 趋势判断",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "trend-forecast",
+        name: "趋势判断",
+        visual: {
+          primary: "102A56",
+          accent: "16A3B8",
+          secondary: "22C55E",
+          warning: "F59E0B",
+          background: "F5F8FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "industry-trend-forecast",
+          variant: "trend-forecast",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A56",
+      accent: "16A3B8",
+      secondary: "22C55E",
+      warning: "F59E0B",
+      background: "F5F8FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "industry-trend-forecast",
+      variant: "trend-forecast",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "industry-trend-cover",
+      defaultContentLayout: "industry-trend-content",
+      allowedLayouts: ["industry-trend-cover", "trend-overview", "trend-signal-matrix", "trend-driver-wheel", "trend-opportunity-risk", "trend-roadmap", "industry-trend-closing", "title", "content"],
     },
   });
 }

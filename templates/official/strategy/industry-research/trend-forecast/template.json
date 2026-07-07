@@ -1,0 +1,69 @@
+{
+  "baseTemplateId": "industry-research",
+  "themeId": "trend-forecast",
+  "style": "consulting-report",
+  "themes": [
+    {
+      "id": "trend-forecast",
+      "name": "趋势判断",
+      "visual": {
+        "primary": "102A56",
+        "accent": "16A3B8",
+        "secondary": "22C55E",
+        "warning": "F59E0B",
+        "background": "F5F8FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "industry-trend-forecast",
+        "variant": "trend-forecast"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A56",
+    "accent": "16A3B8",
+    "secondary": "22C55E",
+    "warning": "F59E0B",
+    "background": "F5F8FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "industry-trend-forecast",
+    "variant": "trend-forecast"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "industry-trend-cover",
+    "defaultContentLayout": "industry-trend-content",
+    "allowedLayouts": [
+      "industry-trend-cover",
+      "trend-overview",
+      "trend-signal-matrix",
+      "trend-driver-wheel",
+      "trend-opportunity-risk",
+      "trend-roadmap",
+      "industry-trend-closing",
+      "title",
+      "content"
+    ]
+  },
+  "contentSchema": {
+    "requiredFields": [
+      "趋势名称",
+      "趋势信号",
+      "驱动因素",
+      "证据数据",
+      "机会窗口",
+      "风险不确定性",
+      "战略判断",
+      "行动建议"
+    ],
+    "recommendedSlideTypes": [
+      "趋势总览",
+      "信号识别",
+      "驱动因素",
+      "机会风险",
+      "路线图"
+    ]
+  }
+}

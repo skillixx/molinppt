@@ -261,6 +261,69 @@ test("PptExportService uses industry research landscape decorations", () => {
   assert.doesNotMatch(slide1, /industry-landscape/);
 });
 
+test("PptExportService uses industry trend forecast decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "industry-research",
+      theme: "trend-forecast",
+      slides: [
+        { title: "AI 应用行业未来增长方向研判", bullets: ["需求侧预算向效率工具集中", "模型能力成熟带来新场景扩散", "渠道生态出现结构性机会"] },
+        { title: "趋势信号进入验证窗口", bullets: ["客户试点密度提升", "产品供给形态快速变化"] },
+        { title: "驱动因素决定机会优先级", bullets: ["客户需求", "供给能力", "资本投入"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Industry Trend Forecast Canvas"/);
+  assert.match(slide1, /name="Industry Trend Curve Panel"/);
+  assert.match(slide1, /name="Industry Trend Signal Card 1"/);
+  assert.match(slide3, /name="Industry Trend Driver Wheel Outer"/);
+  assert.doesNotMatch(slide1, /trend-forecast/);
+});
+
+test("PptExportService uses competition map decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-industry-research-competition-map",
+      theme: "competition-map",
+      templateVisual: {
+        primary: "102A43",
+        accent: "12A5A6",
+        background: "F4F8FB",
+        surface: "FFFFFF",
+        title: "071A2D",
+        body: "3D5363",
+        layout: "strategy-competition-map",
+        variant: "competition-map",
+      },
+      slides: [
+        { title: "竞品格局判断与差异化机会", bullets: ["头部玩家强化平台能力", "挑战者聚焦垂直场景", "价格带竞争逐步分化"] },
+        { title: "竞争象限呈现能力与覆盖分层", bullets: ["产品能力决定高端位置", "渠道覆盖影响市场纵深", "服务生态形成壁垒"] },
+        { title: "主要竞品能力卡片", bullets: ["竞品A覆盖广但成本高", "竞品B场景深但渠道弱", "竞品C价格敏感"] },
+        { title: "差异化定位建议", bullets: ["围绕行业场景建立证据", "强化交付服务能力", "形成价值主张"] },
+        { title: "市场区隔机会", bullets: ["中高端客户关注可靠性", "低线市场关注成本", "空白机会在服务闭环"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Competition Map Consulting Canvas"/);
+  assert.match(slide1, /name="Competition Position Matrix"/);
+  assert.match(slide3, /name="Competition Player Card 1"/);
+  assert.doesNotMatch(slide1, /competition-map/);
+});
+
 test("PptExportService uses commercial financial quarterly decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

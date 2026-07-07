@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "industry-research",
+  "themeId": "competition-map",
+  "style": "consulting-report",
+  "themes": [
+    {
+      "id": "competition-map",
+      "name": "竞争地图",
+      "visual": {
+        "primary": "102A43",
+        "accent": "12A5A6",
+        "background": "F4F8FB",
+        "surface": "FFFFFF",
+        "title": "071A2D",
+        "body": "3D5363",
+        "layout": "strategy-competition-map",
+        "variant": "competition-map"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "12A5A6",
+    "background": "F4F8FB",
+    "surface": "FFFFFF",
+    "title": "071A2D",
+    "body": "3D5363",
+    "layout": "strategy-competition-map",
+    "variant": "competition-map"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "competition-map-cover",
+    "defaultContentLayout": "competition-map-content",
+    "allowedLayouts": [
+      "competition-map-cover",
+      "competition-map-overview",
+      "competition-map-players",
+      "competition-map-positioning",
+      "competition-map-segments",
+      "competition-map-closing",
+      "title",
+      "content"
+    ]
+  }
+}

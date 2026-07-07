@@ -1000,6 +1000,8 @@ function renderDeckPreview({ deck, visual }) {
     const quarterlyDiagnosisScene = isQuarterlyDiagnosisVisual(visual) ? quarterlyDiagnosisPreviewScene(visual) : null;
     const quarterlyActionLoopScene = isQuarterlyActionLoopVisual(visual) ? quarterlyActionLoopPreviewScene(visual) : null;
     const industryResearchScene = isIndustryResearchVisual(visual) ? industryResearchPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const industryTrendScene = isIndustryTrendForecastVisual(visual) ? industryTrendForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const competitionMapScene = isCompetitionMapVisual(visual) ? competitionMapPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetPlanningScene = isBudgetPlanningVisual(visual) ? budgetPlanningPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetVarianceScene = isBudgetVarianceVisual(visual) ? budgetVariancePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetAdjustmentScene = isBudgetAdjustmentVisual(visual) ? budgetAdjustmentPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1117,6 +1119,12 @@ function renderDeckPreview({ deck, visual }) {
     const industryResearchMark = industryResearchScene
       ? renderIndustryResearchPreview(slide, industryResearchScene)
       : "";
+    const industryTrendMark = industryTrendScene
+      ? renderIndustryTrendForecastPreview(slide, industryTrendScene)
+      : "";
+    const competitionMapMark = competitionMapScene
+      ? renderCompetitionMapPreview(slide, competitionMapScene)
+      : "";
     const budgetPlanningMark = budgetPlanningScene
       ? renderBudgetPlanningPreview(slide, budgetPlanningScene)
       : "";
@@ -1130,11 +1138,11 @@ function renderDeckPreview({ deck, visual }) {
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    // 年度总结、行业研究、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene
+    // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene || industryResearchScene || industryTrendScene || competitionMapScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${pitchMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${pitchMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1259,6 +1267,62 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="industry-research"] .industry-opportunity-grid span{border-radius:12px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 76%,#fff 24%));border:1px solid rgba(18,50,90,.12);}
     body[data-layout="industry-research"] .industry-closing-line{position:absolute;left:8%;right:8%;bottom:23%;height:2px;background:linear-gradient(90deg,var(--template-accent),transparent);}
     body[data-layout="industry-research"] .page-number{z-index:4;right:7.2%;bottom:6.4%;background:rgba(255,255,255,.78);border:1px solid rgba(18,50,90,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
+    body[data-layout="industry-trend-forecast"] .slide{background:linear-gradient(135deg,#ffffff 0%,var(--template-bg) 100%);padding:0;border:0;}
+    body[data-layout="industry-trend-forecast"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,42,86,.04) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(22,163,184,.035) 0 1px,transparent 1px 36px),radial-gradient(circle at 84% 18%,rgba(22,163,184,.16),transparent 25%);}
+    body[data-layout="industry-trend-forecast"] .slide::after{content:"";position:absolute;left:5.4%;right:5.4%;top:8.4%;bottom:8.2%;z-index:1;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(16,42,86,.12);box-shadow:0 24px 54px rgba(15,23,42,.12);}
+    body[data-layout="industry-trend-forecast"] .accent{height:4.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#22C55E);}
+    body[data-layout="industry-trend-forecast"] .trend-layer{position:absolute;inset:0;z-index:3;pointer-events:none;color:var(--template-body);}
+    body[data-layout="industry-trend-forecast"] .trend-kicker{position:absolute;left:8%;top:12.4%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="industry-trend-forecast"] .trend-title{position:absolute;left:8%;top:20%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.13;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="industry-trend-forecast"] .trend-bullets{position:absolute;left:8.2%;top:49%;width:39%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.52;color:var(--template-body);}
+    body[data-layout="industry-trend-forecast"] .trend-bullets li{margin:.18em 0;}
+    body[data-layout="industry-trend-forecast"] .trend-curve{position:absolute;right:7.3%;top:16%;width:39%;height:41%;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(226,246,249,.86));border:1px solid rgba(16,42,86,.12);box-shadow:0 16px 34px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="industry-trend-forecast"] .trend-curve::before{content:"";position:absolute;left:8%;right:7%;bottom:18%;height:46%;background:linear-gradient(135deg,transparent 0 15%,rgba(22,163,184,.18) 16% 30%,transparent 31% 43%,rgba(34,197,94,.20) 44% 60%,transparent 61% 72%,rgba(245,158,11,.22) 73% 86%,transparent 87%);clip-path:polygon(0 78%,16% 56%,30% 64%,46% 30%,63% 43%,82% 12%,100% 0,100% 100%,0 100%);}
+    body[data-layout="industry-trend-forecast"] .trend-curve::after{content:"";position:absolute;left:11%;right:9%;top:19%;height:56%;border-bottom:5px solid var(--template-accent);border-right:5px solid #22C55E;border-radius:50%;transform:rotate(-13deg);}
+    body[data-layout="industry-trend-forecast"] .trend-curve i{position:absolute;width:14px;height:14px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 7px rgba(34,197,94,.14);}
+    body[data-layout="industry-trend-forecast"] .trend-curve i:nth-child(1){left:28%;top:56%;background:var(--template-primary);}body[data-layout="industry-trend-forecast"] .trend-curve i:nth-child(2){left:56%;top:38%;}body[data-layout="industry-trend-forecast"] .trend-curve i:nth-child(3){left:79%;top:21%;background:#F59E0B;}
+    body[data-layout="industry-trend-forecast"] .trend-signal-grid{position:absolute;right:8%;bottom:15%;width:38%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="industry-trend-forecast"] .trend-signal-grid span{min-height:66px;border-radius:12px;background:#fff;border:1px solid rgba(16,42,86,.12);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:12px 13px;font-size:11px;line-height:1.3;font-weight:800;color:var(--template-title);border-top:4px solid var(--template-accent);}
+    body[data-layout="industry-trend-forecast"] .trend-timeline{position:absolute;left:8%;right:8%;bottom:14%;height:90px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="industry-trend-forecast"] .trend-timeline span{position:relative;border-top:3px solid rgba(16,42,86,.18);padding-top:18px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="industry-trend-forecast"] .trend-timeline span::before{content:"";position:absolute;left:0;top:-8px;width:15px;height:15px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(22,163,184,.13);}
+    body[data-layout="industry-trend-forecast"] .trend-driver-wheel{position:absolute;right:9%;top:20%;width:34%;height:48%;border-radius:50%;background:conic-gradient(from -45deg,var(--template-primary),var(--template-accent),#22C55E,#F59E0B,var(--template-primary));box-shadow:0 18px 38px rgba(15,23,42,.13);}
+    body[data-layout="industry-trend-forecast"] .trend-driver-wheel::before{content:"";position:absolute;inset:17%;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 1px rgba(16,42,86,.12);}
+    body[data-layout="industry-trend-forecast"] .trend-driver-wheel::after{content:"DRIVERS";position:absolute;inset:38% 24%;display:grid;place-items:center;font-size:12px;font-weight:900;color:var(--template-primary);letter-spacing:.12em;}
+    body[data-layout="industry-trend-forecast"] .trend-risk-grid{position:absolute;right:8%;top:21%;width:36%;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    body[data-layout="industry-trend-forecast"] .trend-risk-grid span{min-height:90px;border-radius:14px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid rgba(16,42,86,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="industry-trend-forecast"] .trend-roadmap{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="industry-trend-forecast"] .trend-roadmap span{min-height:78px;border-radius:14px;background:#fff;border:1px solid rgba(16,42,86,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:14px 12px;font-size:12px;line-height:1.35;font-weight:900;color:var(--template-title);}
+    body[data-layout="industry-trend-forecast"] .trend-roadmap span::first-line{color:var(--template-accent);}
+    body[data-layout="industry-trend-forecast"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.82);border:1px solid rgba(16,42,86,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.58);}
+    body[data-layout="strategy-competition-map"] .slide{padding:0;border:0;background:linear-gradient(135deg,#ffffff 0%,var(--template-bg) 62%,#e8f3f6 100%);}
+    body[data-layout="strategy-competition-map"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,42,67,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(18,165,166,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 20%,rgba(18,165,166,.16),transparent 25%);}
+    body[data-layout="strategy-competition-map"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8.8%;bottom:8.5%;border-radius:20px;background:rgba(255,255,255,.92);border:1px solid rgba(16,42,67,.13);box-shadow:0 24px 54px rgba(15,23,42,.12);z-index:1;}
+    body[data-layout="strategy-competition-map"] .accent{height:6%;z-index:2;background:linear-gradient(90deg,var(--template-primary),color-mix(in srgb,var(--template-primary) 62%,var(--template-accent) 38%));box-shadow:inset 0 -3px 0 rgba(18,165,166,.58);}
+    body[data-layout="strategy-competition-map"] .competition-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="strategy-competition-map"] .competition-kicker{position:absolute;left:8%;top:14%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="strategy-competition-map"] .competition-title{position:absolute;left:8%;top:22%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.13;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="strategy-competition-map"] .competition-rule{position:absolute;left:8%;top:43%;width:34%;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),transparent);}
+    body[data-layout="strategy-competition-map"] .competition-bullets{position:absolute;left:8.2%;top:50%;width:38%;margin:0;padding-left:1.05em;font-size:13.2px;line-height:1.45;color:var(--template-body);}
+    body[data-layout="strategy-competition-map"] .competition-bullets li{margin:.12em 0;}
+    body[data-layout="strategy-competition-map"] .competition-map{position:absolute;right:7.8%;top:18%;width:38%;height:52%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(16,42,67,.14);box-shadow:0 18px 36px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="strategy-competition-map"] .competition-map::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(16,42,67,.07) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(16,42,67,.055) 0 1px,transparent 1px 34px);}
+    body[data-layout="strategy-competition-map"] .competition-map::after{content:"";position:absolute;left:12%;right:12%;top:50%;height:2px;background:rgba(16,42,67,.38);box-shadow:0 -1px 0 rgba(255,255,255,.7);}
+    body[data-layout="strategy-competition-map"] .competition-map b{position:absolute;left:50%;top:12%;bottom:12%;width:2px;background:rgba(16,42,67,.38);}
+    body[data-layout="strategy-competition-map"] .competition-map i{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(18,165,166,.12);}
+    body[data-layout="strategy-competition-map"] .competition-map i:nth-child(2){left:22%;top:62%;}body[data-layout="strategy-competition-map"] .competition-map i:nth-child(3){left:47%;top:28%;background:var(--template-primary);}body[data-layout="strategy-competition-map"] .competition-map i:nth-child(4){left:72%;top:42%;}body[data-layout="strategy-competition-map"] .competition-map i:nth-child(5){left:64%;top:70%;background:color-mix(in srgb,var(--template-primary) 62%,var(--template-accent) 38%);}
+    body[data-layout="strategy-competition-map"] .competition-tags{position:absolute;left:8%;right:48%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="strategy-competition-map"] .competition-tags span{min-height:58px;border-radius:12px;background:#fff;border:1px solid rgba(16,42,67,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-competition-map"] .competition-player-grid{position:absolute;left:8%;right:8%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="strategy-competition-map"] .competition-player-grid span{min-height:88px;border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-competition-map"] .competition-player-grid span::after{content:"";display:block;width:44px;height:4px;margin-top:12px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="strategy-competition-map"] .competition-positioning{position:absolute;right:8%;top:22%;width:38%;height:47%;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    body[data-layout="strategy-competition-map"] .competition-positioning span{border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 10px 20px rgba(15,23,42,.07);padding:13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-competition-map"] .competition-segments{position:absolute;left:8%;right:8%;bottom:15%;height:28%;display:grid;grid-template-columns:1.25fr .9fr 1fr;gap:14px;}
+    body[data-layout="strategy-competition-map"] .competition-segments span{border-radius:16px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 62%,#fff 38%));border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-competition-map"] .competition-segments span:nth-child(2){border-top:5px solid var(--template-accent);}body[data-layout="strategy-competition-map"] .competition-segments span:nth-child(3){border-top:5px solid var(--template-primary);}
+    body[data-layout="strategy-competition-map"] .competition-closing-line{position:absolute;left:8%;right:8%;bottom:24%;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),rgba(16,42,67,.18),transparent);}
+    body[data-layout="strategy-competition-map"] .page-number{z-index:4;right:7.1%;bottom:6.2%;background:rgba(255,255,255,.82);border:1px solid rgba(16,42,67,.12);border-radius:999px;padding:5px 10px;color:rgba(7,26,45,.62);}
     body[data-layout="finance-budget-planning"] .slide{padding:0;border:0;background:radial-gradient(circle at 86% 22%,rgba(42,157,143,.22) 0 18%,transparent 19% 42%),linear-gradient(135deg,#f6fbfa 0%,var(--template-bg) 48%,#d8ebe7 100%);}
     body[data-layout="finance-budget-planning"] .slide::before{background:linear-gradient(110deg,rgba(16,42,67,.08) 0 13%,transparent 13% 100%),repeating-linear-gradient(90deg,rgba(16,42,67,.052) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(42,157,143,.04) 0 1px,transparent 1px 40px);}
     body[data-layout="finance-budget-planning"] .slide::after{content:"";position:absolute;right:-8%;bottom:-16%;width:44%;height:46%;border-radius:999px;background:rgba(214,168,79,.16);filter:blur(1px);}
@@ -2577,6 +2641,92 @@ function isQuarterlyActionLoopVisual(visual) {
   return visual?.id === "quarterly-business-review" && visual?.layout === "quarterly-action-loop";
 }
 
+function renderIndustryTrendForecastPreview(slide, scene) {
+  const items = industryTrendForecastBulletTexts(slide);
+  const bullets = items.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const title = escapeHtml(slide?.title || scene.title);
+  const signals = scene.signals.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const timeline = scene.timeline.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const common = `<div class="trend-kicker">${escapeHtml(scene.kicker)}</div><h2 class="trend-title">${title}</h2>${bullets ? `<ul class="trend-bullets">${bullets}</ul>` : ""}`;
+  if (scene.kind === "driver") {
+    return `<div class="trend-layer">${common}<div class="trend-driver-wheel"></div><div class="trend-signal-grid">${signals}</div></div>`;
+  }
+  if (scene.kind === "risk") {
+    return `<div class="trend-layer">${common}<div class="trend-risk-grid">${signals}</div><div class="trend-timeline">${timeline}</div></div>`;
+  }
+  if (scene.kind === "roadmap" || scene.kind === "closing") {
+    return `<div class="trend-layer">${common}<div class="trend-roadmap">${timeline}</div></div>`;
+  }
+  return `<div class="trend-layer">${common}<div class="trend-curve"><i></i><i></i><i></i></div><div class="trend-signal-grid">${signals}</div><div class="trend-timeline">${timeline}</div></div>`;
+}
+
+function industryTrendForecastPreviewScene({ slide, index, total }) {
+  const fallbackTitle = slide?.title || "未来增长方向研判";
+  const scenes = [
+    {
+      kind: "cover",
+      variant: "trend-forecast",
+      kicker: "TREND SIGNALS",
+      title: fallbackTitle,
+      signals: ["弱信号识别", "增长曲线判断", "机会窗口"],
+      timeline: ["现在", "6个月", "12个月", "18个月"],
+    },
+    {
+      kind: "overview",
+      variant: "trend-forecast",
+      kicker: "TREND OVERVIEW",
+      title: fallbackTitle,
+      signals: ["需求变化", "技术成熟", "政策环境"],
+      timeline: ["萌芽", "验证", "放大", "扩散"],
+    },
+    {
+      kind: "driver",
+      variant: "trend-forecast",
+      kicker: "DRIVING FORCES",
+      title: fallbackTitle,
+      signals: ["客户需求", "供给能力", "资本投入"],
+      timeline: ["驱动识别", "因果拆解", "影响评估", "战略响应"],
+    },
+    {
+      kind: "risk",
+      variant: "trend-forecast",
+      kicker: "OPPORTUNITY & RISK",
+      title: fallbackTitle,
+      signals: ["高确定机会", "关键不确定性", "资源约束", "竞争反应"],
+      timeline: ["优先进入", "小步验证", "扩张投入", "持续观察"],
+    },
+    {
+      kind: "roadmap",
+      variant: "trend-forecast",
+      kicker: "STRATEGIC ROADMAP",
+      title: fallbackTitle,
+      signals: ["观察指标", "验证动作", "资源配置"],
+      timeline: ["01 信号跟踪", "02 试点验证", "03 能力建设", "04 规模推进"],
+    },
+  ];
+  if (index === total - 1) {
+    return {
+      kind: "closing",
+      variant: "trend-forecast",
+      kicker: "NEXT BETS",
+      title: fallbackTitle,
+      signals: ["持续观察", "快速验证", "战略下注"],
+      timeline: ["趋势监测", "机会筛选", "试点投入", "复盘迭代"],
+    };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function industryTrendForecastBulletTexts(slide) {
+  const items = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  return items.length ? items : ["识别早期趋势信号与关键变化", "拆解趋势背后的核心驱动因素", "判断市场机会窗口和不确定风险"];
+}
+
+function isIndustryTrendForecastVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "industry-trend-forecast" && (id === "industry-research" || id === "strategy-industry-research-trend-forecast");
+}
+
 function renderIndustryResearchPreview(slide, scene) {
   const items = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => String(item || "").trim()).filter(Boolean) : [];
   const bullets = items.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
@@ -2601,6 +2751,65 @@ function renderIndustryResearchPreview(slide, scene) {
     return `<div class="industry-layer">${common}<div class="industry-closing-line"></div><div class="industry-chain">${chain}</div></div>`;
   }
   return `<div class="industry-layer">${common}<div class="industry-map"></div><div class="industry-metric-row">${metricValues}</div></div>`;
+}
+
+function renderCompetitionMapPreview(slide, scene) {
+  // 竞争地图模板使用独立内容层，避免默认标题和 bullets 与象限图重叠。
+  const title = escapeHtml(scene.title || slide?.title || "竞争格局与差异化策略");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(competitionMapCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="competition-kicker">${escapeHtml(scene.kicker)}</div><h2 class="competition-title">${title}</h2><div class="competition-rule"></div><ul class="competition-bullets">${bulletItems}</ul>`;
+  const map = `<div class="competition-map"><b></b><i></i><i></i><i></i><i></i></div>`;
+  const tags = `<div class="competition-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover") {
+    return `<div class="competition-layer">${common}${map}${tags}</div>`;
+  }
+  if (scene.kind === "players") {
+    return `<div class="competition-layer">${common}${map}<div class="competition-player-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "positioning") {
+    return `<div class="competition-layer">${common}<div class="competition-positioning">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "segments") {
+    return `<div class="competition-layer">${common}${map}<div class="competition-segments">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="competition-layer">${common}<div class="competition-closing-line"></div><div class="competition-player-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="competition-layer">${common}${map}${tags}</div>`;
+}
+
+function competitionMapPreviewScene({ slide, index, total }) {
+  const bullets = competitionMapBulletTexts(slide);
+  const title = competitionMapCompactText(slide?.title, "竞争格局与差异化策略", index === 0 ? 30 : 28);
+  const tags = ["定位", "区隔", "差异"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["头部玩家", "挑战者", "利基玩家", "机会空白"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "competition-map", kicker: "COMPETITIVE LANDSCAPE", title, bullets, tags, cards },
+    { kind: "overview", variant: "competition-map", kicker: "POSITION MAP", title, bullets, tags, cards },
+    { kind: "players", variant: "competition-map", kicker: "PLAYER BENCHMARK", title, bullets, tags, cards },
+    { kind: "positioning", variant: "competition-map", kicker: "DIFFERENTIATION", title, bullets, tags, cards },
+    { kind: "segments", variant: "competition-map", kicker: "SEGMENT OPPORTUNITY", title, bullets, tags, cards },
+  ];
+  if (index === total - 1) {
+    const nextCards = ["明确目标区隔", "强化差异证据", "制定竞争动作", "跟踪格局变化"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 12));
+    return { kind: "closing", variant: "competition-map", kicker: "STRATEGIC NEXT STEPS", title, bullets, tags, cards: nextCards };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function competitionMapBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["竞品能力与市场覆盖呈现分层", "头部玩家强化生态和渠道壁垒", "差异化机会集中在细分场景"];
+}
+
+function competitionMapCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
 }
 
 function industryResearchPreviewScene({ slide, index, total }) {
@@ -2677,6 +2886,11 @@ function industryResearchPreviewScene({ slide, index, total }) {
 function isIndustryResearchVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "industry-research" && (id === "industry-research" || id === "strategy-industry-research-industry-landscape");
+}
+
+function isCompetitionMapVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "strategy-competition-map" && (id === "industry-research" || id === "strategy-industry-research-competition-map");
 }
 
 function strategyConsultingPreviewVars(visual) {
@@ -3379,6 +3593,8 @@ function shouldRenderDomePreviewBodyList(visual, role) {
 function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "industry-research") return false;
+  if (visual.layout === "industry-trend-forecast") return false;
+  if (visual.layout === "strategy-competition-map") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;

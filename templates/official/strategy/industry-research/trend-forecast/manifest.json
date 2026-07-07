@@ -1,0 +1,18 @@
+{
+  "slug": "strategy-industry-research-trend-forecast",
+  "name": "行业研究报告 - 趋势判断",
+  "description": "适合战略咨询、行业研究和企业战略部门进行趋势信号识别、驱动因素拆解、机会窗口判断和未来增长方向研判的前瞻研究型 PPT 模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "industry-research",
+    "trend-forecast",
+    "consulting-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

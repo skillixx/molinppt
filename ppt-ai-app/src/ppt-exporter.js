@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "marketing-launch-rhythm") {
     if (index === 0) {
@@ -474,6 +474,26 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1350;
     if (textLength >= 22) return 1550;
     return Math.min(fallbackSize, 1850);
+  }
+  if (visual.layout === "industry-trend-forecast") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2200;
+      return Math.min(fallbackSize, 2420);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1780);
+  }
+  if (visual.layout === "strategy-competition-map") {
+    if (index === 0) {
+      if (textLength >= 30) return 2000;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2460);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1820);
   }
   if (visual.layout === "annual-summary") {
     const textUnits = estimateTextUnits(title);
@@ -593,6 +613,8 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-budget-variance") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
+  if (visual.layout === "industry-trend-forecast") return false;
+  if (visual.layout === "strategy-competition-map") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -723,6 +745,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "industry-research") {
     return base + industryResearchDecorationsXml({ visual, index, layout, role });
+  }
+  if (visual.layout === "industry-trend-forecast") {
+    return base + industryTrendForecastDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "strategy-competition-map") {
+    return base + competitionMapDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
@@ -1479,6 +1507,50 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 749808, y: 2133600, cx: 3931920, cy: 1219200 },
       titleSize: isCover ? 2500 : isClosing ? 2600 : 1850,
       bodySize: isCover ? 1050 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "industry-trend-forecast") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 493776, y: 432816, cx: 8156448, cy: 4297680 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 731520, y: isCover ? 2155440 : 1905000, cx: 3200400, cy: 22860 },
+      label: { x: 731520, y: 640080, cx: 2286000, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 5334000, cy: 914400 }
+        : isCover
+          ? { x: 731520, y: 1036320, cx: 3962400, cy: 1219200 }
+          : { x: 731520, y: 914400, cx: 3901440, cy: 914400 },
+      content: { x: 749808, y: 2438400, cx: 3505200, cy: 914400 },
+      titleSize: isCover ? 2420 : isClosing ? 2500 : 1780,
+      bodySize: isCover ? 900 : 720,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "strategy-competition-map") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 452628, cx: 8193024, cy: 4248531 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1973580, cx: 3200400, cy: 22860 },
+      label: { x: 731520, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1135380, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2362200, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2545080, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2460 : isClosing ? 2480 : 1820,
+      bodySize: isCover ? 920 : 760,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4684,6 +4756,152 @@ function quarterlyActionLoopVariant(visual) {
   return ["action-loop"].includes(visual?.variant) ? visual.variant : "action-loop";
 }
 
+function industryTrendForecastDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = industryTrendForecastScene({ index, role, slide });
+  const palette = industryTrendForecastColorPalette(visual);
+  const surface = solidShapeXml({ id: 1401, name: "Industry Trend Forecast Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1402, name: "Industry Trend Header Bar", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 1403, name: "Industry Trend Accent Rule", x: 0, y: 297180, cx: 9144000, cy: 22860, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1404, name: "Industry Trend Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1405, name: "Industry Trend Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1406, name: "Industry Trend Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  // 趋势判断模板不输出普通 bullets，而是在专用卡片中承载真实内容，避免下载 PPTX 里出现文字重叠。
+  const contentCards = industryTrendForecastContentCardsXml({ visual, palette, items: scene.bullets });
+  if (scene.kind === "driver") {
+    return surface + header + contentCards + industryTrendForecastDriverWheelXml({ visual, palette }) + industryTrendForecastSignalCardsXml({ visual, palette, items: scene.signals, compact: true });
+  }
+  if (scene.kind === "risk") {
+    return surface + header + contentCards + industryTrendForecastRiskGridXml({ visual, palette, items: scene.signals }) + industryTrendForecastTimelineXml({ visual, palette, items: scene.timeline, y: 3825240 });
+  }
+  if (scene.kind === "roadmap" || scene.kind === "closing") {
+    return surface + header + contentCards + industryTrendForecastRoadmapXml({ visual, palette, items: scene.timeline });
+  }
+  return surface + header + contentCards + industryTrendForecastCurveXml({ visual, palette }) + industryTrendForecastSignalCardsXml({ visual, palette, items: scene.signals, compact: false }) + industryTrendForecastTimelineXml({ visual, palette, items: scene.timeline, y: 3916680 });
+}
+
+function industryTrendForecastCurveXml({ visual, palette }) {
+  const x = 5350000;
+  const y = 838200;
+  const w = 3032760;
+  const h = 2133600;
+  return solidShapeXml({ id: 1410, name: "Industry Trend Curve Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1411, name: "Industry Trend Curve Panel Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1412, name: "Industry Trend Curve Baseline", x: x + 304800, y: y + 1676400, cx: w - 609600, cy: 15240, fill: palette.line })
+    + rectShapeXml({ id: 1413, name: "Industry Trend Curve Segment 1", x: x + 365760, y: y + 1371600, cx: 640080, cy: 45720, fill: visual.primary })
+    + rectShapeXml({ id: 1414, name: "Industry Trend Curve Segment 2", x: x + 990600, y: y + 1066800, cx: 670560, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1415, name: "Industry Trend Curve Segment 3", x: x + 1600200, y: y + 670560, cx: 731520, cy: 45720, fill: palette.secondary })
+    + rectShapeXml({ id: 1416, name: "Industry Trend Curve Segment 4", x: x + 2255520, y: y + 396240, cx: 518160, cy: 45720, fill: palette.warning })
+    + solidShapeXml({ id: 1417, name: "Industry Trend Signal Node 1", geom: "ellipse", x: x + 914400, y: y + 990600, cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1418, name: "Industry Trend Signal Node 2", geom: "ellipse", x: x + 1569720, y: y + 609600, cx: 152400, cy: 152400, fill: palette.secondary })
+    + solidShapeXml({ id: 1419, name: "Industry Trend Signal Node 3", geom: "ellipse", x: x + 2514600, y: y + 304800, cx: 152400, cy: 152400, fill: palette.warning });
+}
+
+function industryTrendForecastContentCardsXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const y = 2446020 + index * 426720;
+    return solidShapeXml({ id: 1420 + index * 4, name: `Industry Trend Insight Card ${index + 1}`, geom: "roundRect", x: 731520, y, cx: 3657600, cy: 320040, fill: palette.card })
+      + rectShapeXml({ id: 1421 + index * 4, name: `Industry Trend Insight Accent ${index + 1}`, x: 731520, y, cx: 60960, cy: 320040, fill: index === 1 ? palette.secondary : visual.accent })
+      + textShapeXml({ id: 1422 + index * 4, name: `Industry Trend Insight Text ${index + 1}`, x: 853440, y: y + 76200, cx: 3200400, cy: 167640, text: item, size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function industryTrendForecastSignalCardsXml({ visual, palette, items, compact }) {
+  const x = compact ? 5646420 : 5486400;
+  const y = compact ? 3406140 : 3322320;
+  const cardWidth = compact ? 853440 : 914400;
+  const gap = 91440;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * (cardWidth + gap);
+    return solidShapeXml({ id: 1440 + index * 3, name: `Industry Trend Signal Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: cardWidth, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1441 + index * 3, name: `Industry Trend Signal Accent ${index + 1}`, x: offsetX, y, cx: cardWidth, cy: 45720, fill: index === 2 ? palette.warning : visual.accent })
+      + textShapeXml({ id: 1442 + index * 3, name: `Industry Trend Signal Text ${index + 1}`, x: offsetX + 91440, y: y + 137160, cx: cardWidth - 182880, cy: 198120, text: item, size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function industryTrendForecastDriverWheelXml({ visual, palette }) {
+  const x = 5943600;
+  const y = 1127760;
+  const size = 1828800;
+  return solidShapeXml({ id: 1460, name: "Industry Trend Driver Wheel Outer", geom: "ellipse", x, y, cx: size, cy: size, fill: visual.primary })
+    + solidShapeXml({ id: 1461, name: "Industry Trend Driver Wheel Arc 1", geom: "arc", x: x + 91440, y: y + 91440, cx: size - 182880, cy: size - 182880, fill: visual.accent })
+    + solidShapeXml({ id: 1462, name: "Industry Trend Driver Wheel Arc 2", geom: "pie", x: x + 228600, y: y + 228600, cx: size - 457200, cy: size - 457200, fill: palette.secondary })
+    + solidShapeXml({ id: 1463, name: "Industry Trend Driver Wheel Core", geom: "ellipse", x: x + 487680, y: y + 487680, cx: 853440, cy: 853440, fill: visual.surface })
+    + textShapeXml({ id: 1464, name: "Industry Trend Driver Wheel Label", x: x + 594360, y: y + 792480, cx: 640080, cy: 198120, text: "DRIVERS", size: 620, bold: true, color: visual.primary });
+}
+
+function industryTrendForecastRiskGridXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1371600;
+    const y = 1188720 + row * 792480;
+    return solidShapeXml({ id: 1470 + index * 3, name: `Industry Trend Risk Cell ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 609600, fill: palette.card })
+      + rectShapeXml({ id: 1471 + index * 3, name: `Industry Trend Risk Cell Accent ${index + 1}`, x, y, cx: 1219200, cy: 45720, fill: index % 2 === 0 ? visual.accent : palette.warning })
+      + textShapeXml({ id: 1472 + index * 3, name: `Industry Trend Risk Text ${index + 1}`, x: x + 121920, y: y + 198120, cx: 975360, cy: 198120, text: item, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function industryTrendForecastTimelineXml({ visual, palette, items, y }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 5486400 + index * 685800;
+    return rectShapeXml({ id: 1480 + index * 4, name: `Industry Trend Timeline Line ${index + 1}`, x, y, cx: 563880, cy: 22860, fill: index === 0 ? visual.primary : palette.line })
+      + solidShapeXml({ id: 1481 + index * 4, name: `Industry Trend Timeline Dot ${index + 1}`, geom: "ellipse", x: x - 38100, y: y - 60960, cx: 144780, cy: 144780, fill: index === 0 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1482 + index * 4, name: `Industry Trend Timeline Text ${index + 1}`, x: x - 76200, y: y + 121920, cx: 670560, cy: 152400, text: item, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function industryTrendForecastRoadmapXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 914400 + index * 1905000;
+    return solidShapeXml({ id: 1490 + index * 4, name: `Industry Trend Roadmap Step ${index + 1}`, geom: "roundRect", x, y: 3505200, cx: 1600200, cy: 609600, fill: palette.card })
+      + rectShapeXml({ id: 1491 + index * 4, name: `Industry Trend Roadmap Accent ${index + 1}`, x, y: 3505200, cx: 1600200, cy: 45720, fill: index === 2 ? palette.secondary : visual.accent })
+      + textShapeXml({ id: 1492 + index * 4, name: `Industry Trend Roadmap Text ${index + 1}`, x: x + 137160, y: 3672840, cx: 1295400, cy: 198120, text: item, size: 680, bold: true, color: visual.title })
+      + (index < 3 ? rectShapeXml({ id: 1493 + index * 4, name: `Industry Trend Roadmap Connector ${index + 1}`, x: x + 1600200, y: 3787140, cx: 304800, cy: 22860, fill: palette.line }) : "");
+  }).join("");
+}
+
+function industryTrendForecastScene({ index, role, slide }) {
+  const bullets = industryTrendForecastExportBullets(slide);
+  if (role === "closing") {
+    return {
+      kind: "closing",
+      kicker: "NEXT BETS",
+      bullets,
+      signals: ["持续观察", "快速验证", "战略下注"],
+      timeline: ["趋势监测", "机会筛选", "试点投入", "复盘迭代"],
+    };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "TREND SIGNALS", signals: ["弱信号识别", "增长曲线判断", "机会窗口"], timeline: ["现在", "6个月", "12个月", "18个月"] },
+    { kind: "overview", kicker: "TREND OVERVIEW", signals: ["需求变化", "技术成熟", "政策环境"], timeline: ["萌芽", "验证", "放大", "扩散"] },
+    { kind: "driver", kicker: "DRIVING FORCES", signals: ["客户需求", "供给能力", "资本投入"], timeline: ["驱动识别", "因果拆解", "影响评估", "战略响应"] },
+    { kind: "risk", kicker: "OPPORTUNITY & RISK", signals: ["高确定机会", "关键不确定性", "资源约束", "竞争反应"], timeline: ["优先进入", "小步验证", "扩张投入", "持续观察"] },
+    { kind: "roadmap", kicker: "STRATEGIC ROADMAP", signals: ["观察指标", "验证动作", "资源配置"], timeline: ["01 信号跟踪", "02 试点验证", "03 能力建设", "04 规模推进"] },
+  ];
+  return { ...scenes[Math.min(index, scenes.length - 1)], bullets };
+}
+
+function industryTrendForecastExportBullets(slide) {
+  const items = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return items.length ? items : ["识别早期趋势信号与关键变化", "拆解趋势背后的核心驱动因素", "判断市场机会窗口和不确定风险"];
+}
+
+function industryTrendForecastColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.14),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.78),
+    line: blendHexColor(visual.primary, visual.background, 0.48),
+    panel: blendHexColor(visual.background, visual.surface, 0.42),
+    secondary: visual.secondary || "22C55E",
+    warning: visual.warning || "F59E0B",
+  };
+}
+
+function isIndustryTrendForecastVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "industry-trend-forecast" && (id === "industry-research" || id === "strategy-industry-research-trend-forecast");
+}
+
 function industryResearchDecorationsXml({ visual, index, layout, role }) {
   const scene = industryResearchScene({ index, role });
   const palette = industryResearchColorPalette(visual);
@@ -4828,6 +5046,163 @@ function industryResearchColorPalette(visual) {
     card: blendHexColor(visual.surface, visual.background, 0.12),
     frame: blendHexColor(visual.primary, "FFFFFF", 0.76),
     line: blendHexColor(visual.primary, visual.background, 0.42),
+    mapFill: blendHexColor(visual.background, visual.surface, 0.46),
+  };
+}
+
+function competitionMapDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = competitionMapScene({ slide, index, role });
+  const palette = competitionMapColorPalette(visual);
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1321, name: "Competition Map Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1322, name: "Competition Map Header Bar", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 1323, name: "Competition Map Accent Rule", x: 0, y: 274320, cx: 9144000, cy: 30480, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1324, name: "Competition Map Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1325, name: "Competition Map Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 1326, name: "Competition Map Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const bulletCards = competitionMapBulletCardsXml({ visual, palette, items: scene.bullets, isClosing });
+  if (isClosing) {
+    return surface + header + focusRule + bulletCards + competitionMapActionCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "players") {
+    return surface + header + focusRule + bulletCards + competitionMapMatrixXml({ visual, palette, compact: true }) + competitionMapPlayerCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "positioning") {
+    return surface + header + focusRule + bulletCards + competitionMapPositionCardsXml({ visual, palette, items: scene.cards }) + competitionMapTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  if (scene.kind === "segments") {
+    return surface + header + focusRule + bulletCards + competitionMapMatrixXml({ visual, palette, compact: true }) + competitionMapSegmentCardsXml({ visual, palette, items: scene.cards });
+  }
+  return surface + header + focusRule + bulletCards + competitionMapMatrixXml({ visual, palette, compact: false }) + competitionMapTagCardsXml({ visual, palette, items: scene.tags });
+}
+
+function competitionMapMatrixXml({ visual, palette, compact }) {
+  const x = compact ? 5486400 : 5181600;
+  const y = compact ? 1066800 : 914400;
+  const w = compact ? 2827020 : 3200400;
+  const h = compact ? 2133600 : 2583180;
+  const gridLines = Array.from({ length: 4 }, (_, index) => {
+    const offsetX = x + Math.round((w / 5) * (index + 1));
+    const offsetY = y + Math.round((h / 5) * (index + 1));
+    return rectShapeXml({ id: 1340 + index * 2, name: `Competition Map Grid V ${index + 1}`, x: offsetX, y, cx: 7620, cy: h, fill: palette.grid, transparency: 45000 })
+      + rectShapeXml({ id: 1341 + index * 2, name: `Competition Map Grid H ${index + 1}`, x, y: offsetY, cx: w, cy: 7620, fill: palette.grid, transparency: 45000 });
+  }).join("");
+  return solidShapeXml({ id: 1330, name: "Competition Position Matrix", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + gridLines
+    + lineFrameShapeXml({ id: 1331, name: "Competition Position Matrix Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1332, name: "Competition Map Vertical Axis", x: x + Math.round(w / 2), y: y + 182880, cx: 15240, cy: h - 365760, fill: palette.axis })
+    + rectShapeXml({ id: 1333, name: "Competition Map Horizontal Axis", x: x + 182880, y: y + Math.round(h / 2), cx: w - 365760, cy: 15240, fill: palette.axis })
+    + solidShapeXml({ id: 1334, name: "Competition Player Node 1", geom: "ellipse", x: x + Math.round(w * 0.20), y: y + Math.round(h * 0.62), cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 1335, name: "Competition Player Node 2", geom: "ellipse", x: x + Math.round(w * 0.47), y: y + Math.round(h * 0.26), cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1336, name: "Competition Player Node 3", geom: "ellipse", x: x + Math.round(w * 0.72), y: y + Math.round(h * 0.42), cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 1337, name: "Competition Player Node 4", geom: "ellipse", x: x + Math.round(w * 0.64), y: y + Math.round(h * 0.70), cx: 152400, cy: 152400, fill: blendHexColor(visual.primary, visual.accent, 0.4) });
+}
+
+function competitionMapBulletCardsXml({ visual, palette, items, isClosing }) {
+  const x = 731520;
+  const y = isClosing ? 2217420 : 2438400;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 335280;
+    return rectShapeXml({ id: 1360 + index * 3, name: `Competition Insight Accent ${index + 1}`, x, y: offsetY + 38100, cx: 60960, cy: 198120, fill: visual.accent })
+      + textShapeXml({ id: 1361 + index * 3, name: `Competition Insight Text ${index + 1}`, x: x + 121920, y: offsetY, cx: 3444240, cy: 243840, text: competitionMapCompactText(item, "", 34), size: 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function competitionMapTagCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3825240;
+  const width = 1280160;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 1432560;
+    return solidShapeXml({ id: 1370 + index * 3, name: `Competition Differentiation Tag ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1371 + index * 3, name: `Competition Tag Accent ${index + 1}`, x: offsetX, y, cx: width, cy: 45720, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1372 + index * 3, name: `Competition Tag Text ${index + 1}`, x: offsetX + 121920, y: y + 167640, cx: width - 243840, cy: 182880, text: competitionMapCompactText(item, "", 8), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function competitionMapPlayerCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3634740;
+  const width = 1828800;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 2011680;
+    return solidShapeXml({ id: 1380 + index * 3, name: `Competition Player Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 670560, fill: palette.card })
+      + rectShapeXml({ id: 1381 + index * 3, name: `Competition Player Card Rule ${index + 1}`, x: offsetX + 152400, y: y + 487680, cx: 518160, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 1382 + index * 3, name: `Competition Player Card Text ${index + 1}`, x: offsetX + 152400, y: y + 152400, cx: width - 304800, cy: 243840, text: competitionMapCompactText(item, "", 12), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function competitionMapPositionCardsXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1219200;
+  const width = 1280160;
+  const height = 731520;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + (index % 2) * (width + 182880);
+    const offsetY = y + Math.floor(index / 2) * (height + 152400);
+    return solidShapeXml({ id: 1390 + index * 3, name: `Competition Position Card ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: width, cy: height, fill: palette.card })
+      + rectShapeXml({ id: 1391 + index * 3, name: `Competition Position Accent ${index + 1}`, x: offsetX, y: offsetY, cx: 60960, cy: height, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1392 + index * 3, name: `Competition Position Text ${index + 1}`, x: offsetX + 121920, y: offsetY + 213360, cx: width - 243840, cy: 243840, text: competitionMapCompactText(item, "", 12), size: 740, bold: true, color: visual.title });
+  }).join("");
+}
+
+function competitionMapSegmentCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3657600;
+  const widths = [2438400, 1828800, 2133600];
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + widths.slice(0, index).reduce((sum, value) => sum + value + 182880, 0);
+    return solidShapeXml({ id: 1410 + index * 3, name: `Competition Segment Zone ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: widths[index], cy: 670560, fill: palette.card })
+      + rectShapeXml({ id: 1411 + index * 3, name: `Competition Segment Zone Accent ${index + 1}`, x: offsetX, y, cx: widths[index], cy: 45720, fill: index === 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1412 + index * 3, name: `Competition Segment Text ${index + 1}`, x: offsetX + 152400, y: y + 190500, cx: widths[index] - 304800, cy: 243840, text: competitionMapCompactText(item, "", 12), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function competitionMapActionCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3543300;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 1981200;
+    return solidShapeXml({ id: 1420 + index * 3, name: `Competition Next Action ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1676400, cy: 609600, fill: palette.card })
+      + solidShapeXml({ id: 1421 + index * 3, name: `Competition Next Action Dot ${index + 1}`, geom: "ellipse", x: offsetX + 152400, y: y + 121920, cx: 167640, cy: 167640, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1422 + index * 3, name: `Competition Next Action Text ${index + 1}`, x: offsetX + 152400, y: y + 335280, cx: 1371600, cy: 182880, text: competitionMapCompactText(item, "", 12), size: 740, bold: true, color: visual.title });
+  }).join("");
+}
+
+function competitionMapScene({ slide, index, role }) {
+  const bullets = competitionMapBulletTexts(slide);
+  const tags = ["定位", "区隔", "差异"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["头部玩家", "挑战者", "利基玩家", "机会空白"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 12));
+  if (role === "closing") {
+    return { kind: "closing", kicker: "STRATEGIC NEXT STEPS", bullets, tags, cards: ["明确目标区隔", "强化差异证据", "制定竞争动作", "跟踪格局变化"].map((fallback, itemIndex) => competitionMapCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "COMPETITIVE LANDSCAPE", bullets, tags, cards },
+    { kind: "overview", kicker: "POSITION MAP", bullets, tags, cards },
+    { kind: "players", kicker: "PLAYER BENCHMARK", bullets, tags, cards },
+    { kind: "positioning", kicker: "DIFFERENTIATION", bullets, tags, cards },
+    { kind: "segments", kicker: "SEGMENT OPPORTUNITY", bullets, tags, cards },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function competitionMapBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["竞品能力与市场覆盖呈现分层", "头部玩家强化生态和渠道壁垒", "差异化机会集中在细分场景"];
+}
+
+function competitionMapCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function competitionMapColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.14),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
+    axis: blendHexColor(visual.primary, visual.background, 0.34),
+    grid: blendHexColor(visual.primary, visual.background, 0.62),
     mapFill: blendHexColor(visual.background, visual.surface, 0.46),
   };
 }
