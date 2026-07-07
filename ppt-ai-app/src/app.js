@@ -960,68 +960,80 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f7fb;
+      --bg: #eef3f8;
       --surface: #ffffff;
-      --surface-soft: #f8fafc;
-      --line: #dbe4ef;
-      --line-strong: #c8d4e3;
-      --text: #172033;
-      --muted: #64748b;
+      --surface-soft: #f7f9fc;
+      --line: #d8e2ee;
+      --line-strong: #bdcadb;
+      --text: #101828;
+      --muted: #667085;
       --subtle: #8a99ad;
-      --primary: #2563eb;
-      --primary-strong: #1d4ed8;
-      --teal: #0f766e;
+      --primary: #1f5eff;
+      --primary-strong: #1746c8;
+      --primary-soft: #eaf1ff;
+      --teal: #0f7f7a;
       --warning: #b45309;
       --success: #15803d;
-      --shadow: 0 18px 46px rgba(23, 32, 51, .08);
+      --shadow: 0 22px 58px rgba(16, 24, 40, .10);
+      --shadow-soft: 0 12px 30px rgba(16, 24, 40, .07);
       --dome-template-thumb:url("data:image/jpeg;base64,${DOME_TEMPLATE_THUMBNAIL}");
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); }
-    body::before { content: ""; position: fixed; inset: 0 0 auto; height: 280px; background: linear-gradient(180deg, #eef5ff 0%, rgba(244,247,251,0) 100%); pointer-events: none; }
+    body { margin: 0; min-height: 100vh; background:
+      linear-gradient(180deg, #f8fbff 0%, #eef3f8 42%, #eef3f8 100%);
+      color: var(--text);
+    }
+    body::before { content: ""; position: fixed; inset: 0 0 auto; height: 320px; background:
+      linear-gradient(115deg, rgba(31,94,255,.10) 0 28%, transparent 28% 100%),
+      linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(238,243,248,0) 100%);
+      pointer-events: none;
+    }
     header {
       position: sticky; top: 0; z-index: 10;
-      min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
-      padding: 14px 28px; background: rgba(255,255,255,.86); border-bottom: 1px solid rgba(219,228,239,.9);
-      backdrop-filter: blur(18px);
+      min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 22px;
+      padding: 14px 30px; background: rgba(255,255,255,.90); border-bottom: 1px solid rgba(216,226,238,.86);
+      backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(16,24,40,.05);
     }
-    h1 { font-size: 20px; line-height: 1.2; margin: 0; letter-spacing: 0; }
-    h2 { font-size: 14px; line-height: 1.25; margin: 0; letter-spacing: 0; }
-    label { display: block; font-size: 12px; font-weight: 700; color: #42526a; margin: 12px 0 6px; }
+    h1 { font-size: 22px; line-height: 1.15; margin: 0; letter-spacing: 0; }
+    h2 { font-size: 15px; line-height: 1.25; margin: 0; letter-spacing: 0; }
+    label { display: block; font-size: 12px; font-weight: 800; color: #344054; margin: 14px 0 7px; }
     input, textarea, select, button { font: inherit; box-sizing: border-box; }
     input, textarea, select {
-      width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 10px 11px;
-      background: #fff; color: var(--text); outline: none; transition: border-color .16s ease, box-shadow .16s ease;
+      width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px;
+      background: rgba(255,255,255,.96); color: var(--text); outline: none; transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
-    input:focus, textarea:focus, select:focus { border-color: rgba(37,99,235,.72); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    input:hover, textarea:hover, select:hover { background: #fff; border-color: #c6d3e3; }
+    input:focus, textarea:focus, select:focus { border-color: rgba(31,94,255,.72); box-shadow: 0 0 0 4px rgba(31,94,255,.12); background: #fff; }
     input[type="file"] { padding: 8px; color: var(--muted); font-size: 12px; }
     input[type="file"]::file-selector-button { border: 1px solid #cfe0ff; border-radius: 7px; background: #eef4ff; color: #1d4ed8; padding: 7px 10px; margin-right: 8px; font-weight: 700; cursor: pointer; }
     textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
     button {
-      border: 0; border-radius: 8px; padding: 10px 13px; background: var(--primary); color: white;
-      cursor: pointer; font-weight: 700; font-size: 13px; transition: transform .12s ease, background .16s ease, box-shadow .16s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 0; border-radius: 10px; padding: 11px 15px; background: linear-gradient(135deg, var(--primary), #3b82f6); color: white;
+      cursor: pointer; font-weight: 800; font-size: 13px; transition: transform .12s ease, background .16s ease, box-shadow .16s ease, border-color .16s ease;
+      box-shadow: 0 10px 22px rgba(31,94,255,.18);
     }
-    button:hover { background: var(--primary-strong); box-shadow: 0 10px 22px rgba(37,99,235,.18); transform: translateY(-1px); }
+    button:hover { background: linear-gradient(135deg, var(--primary-strong), #2563eb); box-shadow: 0 14px 28px rgba(31,94,255,.24); transform: translateY(-1px); }
     button:disabled { cursor: not-allowed; opacity: .62; transform: none; box-shadow: none; }
-    button.secondary { background: #eef4ff; color: #1d4ed8; border: 1px solid #cfe0ff; }
-    button.secondary:hover { background: #e2edff; box-shadow: none; }
+    button.secondary { background: #fff; color: #1d4ed8; border: 1px solid #c9d9f4; box-shadow: 0 8px 18px rgba(16,24,40,.05); }
+    button.secondary:hover { background: #f3f7ff; border-color: #b8ccf0; box-shadow: 0 10px 20px rgba(16,24,40,.07); }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: #172033; color: white; font-weight: 800; }
-    .brand-subtitle { margin-top: 4px; color: var(--muted); font-size: 12px; }
-    .page-nav { display: flex; align-items: center; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 8px; background: #f8fbff; }
-    .page-nav button { min-height: 34px; padding: 0 12px; border-radius: 7px; background: transparent; color: var(--muted); box-shadow: none; font-size: 13px; }
-    .page-nav button:hover { background: #eef4ff; color: var(--primary); box-shadow: none; transform: none; }
+    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #101828, #243b68); color: white; font-weight: 900; box-shadow: 0 12px 24px rgba(16,24,40,.18); }
+    .brand-subtitle { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .page-nav { display: flex; align-items: center; gap: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: rgba(248,251,255,.92); box-shadow: inset 0 1px 0 rgba(255,255,255,.8); }
+    .page-nav button { min-height: 38px; padding: 0 15px; border-radius: 9px; background: transparent; color: var(--muted); box-shadow: none; font-size: 13px; }
+    .page-nav button:hover { background: #edf4ff; color: var(--primary); box-shadow: none; transform: none; }
     body[data-workspace-page="create"] [data-page-target="create"],
     body[data-workspace-page="templates"] [data-page-target="templates"],
     body[data-workspace-page="assets"] [data-page-target="assets"],
     body[data-workspace-page="status"] [data-page-target="status"] {
-      background: var(--primary); color: #fff;
+      background: linear-gradient(135deg, var(--primary), #3b82f6); color: #fff; box-shadow: 0 10px 22px rgba(31,94,255,.22);
     }
     .top-status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .status-chip { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .status-chip { min-height: 36px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 750; box-shadow: 0 8px 18px rgba(16,24,40,.05); }
     .status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--success); }
-    main { position: relative; display: grid; grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr) minmax(300px, 360px); gap: 18px; padding: 18px; max-width: 1680px; margin: 0 auto; }
+    main { position: relative; display: grid; grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr) minmax(300px, 360px); gap: 22px; padding: 24px; max-width: 1720px; margin: 0 auto; }
     body[data-workspace-page="create"][data-flow-stage="input"] main { grid-template-columns: minmax(0, 760px); justify-content: center; align-items: start; padding-top: 34px; }
     body[data-workspace-page="create"][data-flow-stage="outline"] main { grid-template-columns: minmax(0, 1180px); justify-content: center; align-items: start; }
     body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(300px, 360px) minmax(640px, 1fr) minmax(280px, 340px); }
@@ -1031,38 +1043,40 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="templates"] .panel { box-shadow: none; }
     body[data-workspace-page="status"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="status"] .context { grid-template-columns: minmax(0, 1fr); }
-    .preview-shell, .outline-shell, .panel { background: rgba(255,255,255,.96); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
-    .workflow, .context { display: grid; gap: 14px; align-content: start; }
-    .panel { padding: 16px; }
-    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .preview-shell, .outline-shell, .panel { background: rgba(255,255,255,.96); border: 1px solid rgba(216,226,238,.96); border-radius: 14px; box-shadow: var(--shadow); }
+    .workflow, .context { display: grid; gap: 16px; align-content: start; }
+    .panel { padding: 18px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .panel-title { display: flex; align-items: center; gap: 8px; }
-    .step-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: #eaf2ff; color: var(--primary); font-size: 12px; font-weight: 800; }
-    .panel-note { color: var(--muted); font-size: 12px; line-height: 1.5; margin: -4px 0 10px; }
+    .step-number { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 9px; background: var(--primary-soft); color: var(--primary); font-size: 12px; font-weight: 900; }
+    .panel-note { color: var(--muted); font-size: 12px; line-height: 1.55; margin: -4px 0 12px; }
     .hint { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: #6b7280; }
     .hint.warning { color: var(--warning); }
     .flow-guide { display: grid; gap: 8px; margin-bottom: 14px; }
     .flow-step {
       display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: start;
-      padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+      padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff;
     }
     .flow-step strong { display: block; color: var(--text); font-size: 13px; }
     .flow-step span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.45; }
-    .flow-step.is-active { border-color: #bfdbfe; background: #f8fbff; }
-    .flow-dot { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: #eaf2ff; color: var(--primary); font-size: 12px; font-weight: 850; }
-    .stage-empty { min-height: 520px; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); background: #f8fbff; border: 1px dashed #bfd0e6; border-radius: 8px; }
+    .flow-step.is-active { border-color: #b8ccf0; background: linear-gradient(135deg, #fff, #f2f7ff); box-shadow: 0 12px 26px rgba(31,94,255,.08); }
+    .flow-dot { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 12px; font-weight: 900; }
+    .stage-empty { min-height: 520px; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); background: linear-gradient(135deg, #fff, #f4f8ff); border: 1px dashed #bfd0e6; border-radius: 14px; }
     .stage-empty strong { display: block; margin-bottom: 8px; color: #1e3a8a; font-size: 22px; }
     body[data-workspace-page="create"][data-flow-stage="input"] .workflow,
     body[data-workspace-page="create"][data-flow-stage="outline"] .workflow { width: 100%; }
     body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"],
     body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] {
-      position: relative; overflow: hidden; padding: 28px; border-color: #cfe0ff;
-      background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(239,246,255,.96));
-      box-shadow: 0 28px 70px rgba(37,99,235,.12);
+      position: relative; overflow: hidden; padding: 32px; border-color: #cfe0ff;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.98), rgba(242,247,255,.96)),
+        repeating-linear-gradient(90deg, rgba(31,94,255,.035) 0 1px, transparent 1px 36px);
+      box-shadow: 0 30px 78px rgba(31,94,255,.13);
     }
     body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"]::after,
     body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"]::after {
-      content: ""; position: absolute; right: -86px; top: -112px; width: 260px; height: 260px; border-radius: 999px;
-      background: rgba(37,99,235,.10); pointer-events: none;
+      content: ""; position: absolute; right: -30px; top: 0; width: 260px; height: 100%;
+      background: linear-gradient(115deg, transparent 0 38%, rgba(31,94,255,.08) 38% 58%, transparent 58% 100%); pointer-events: none;
     }
     body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"] > *,
     body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] > * { position: relative; z-index: 1; }
@@ -1083,13 +1097,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="create"][data-flow-stage="input"] #topic,
     body[data-workspace-page="create"][data-flow-stage="outline"] #topic { min-height: 122px; font-size: 16px; line-height: 1.65; }
     body[data-workspace-page="create"][data-flow-stage="input"] .primary-action,
-    body[data-workspace-page="create"][data-flow-stage="outline"] .primary-action { max-width: 260px; margin: 6px auto 0; min-height: 46px; }
+    body[data-workspace-page="create"][data-flow-stage="outline"] .primary-action { max-width: 286px; margin: 8px auto 0; min-height: 50px; font-size: 14px; }
     body[data-workspace-page="create"][data-flow-stage="input"] .outline-shell[data-flow-panel="input"] { display: none !important; }
     body[data-workspace-page="create"][data-flow-stage="outline"] .outline-shell { margin-top: 18px; }
     body[data-workspace-page="create"][data-flow-stage="outline"] .context { display: none !important; }
-    .template-browser-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-    .template-browser-head h2 { margin: 0; font-size: 20px; color: #0f172a; letter-spacing: 0; }
-    .template-search { flex: 1 1 360px; max-width: 480px; display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border: 1px solid #dbe5f2; border-radius: 8px; background: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.72); }
+    .template-browser-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; padding: 6px 0 2px; }
+    .template-browser-head h2 { margin: 0; font-size: 23px; color: #0f172a; letter-spacing: 0; }
+    .template-search { flex: 1 1 360px; max-width: 520px; display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border: 1px solid #dbe5f2; border-radius: 999px; background: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 18px rgba(16,24,40,.05); }
     .template-search span { flex: 0 0 auto; color: #64748b; font-size: 14px; font-weight: 850; }
     .template-search input { min-width: 0; width: 100%; height: 34px; border: 0; outline: 0; background: transparent; color: #0f172a; font-size: 13px; }
     .template-search input::placeholder { color: #94a3b8; }
@@ -1101,7 +1115,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-manage-split ~ .panel-head,
     .template-manage-split ~ .row,
     .template-manage-split ~ .actions { display: none !important; }
-    .template-gallery-count { font-size: 12px; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+    .template-gallery-count { font-size: 12px; color: #475569; background: #fff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 6px 11px; white-space: nowrap; box-shadow: 0 8px 18px rgba(16,24,40,.05); }
     .template-category-tabs { display: flex; align-items: center; gap: 30px; min-height: 38px; overflow-x: auto; scrollbar-width: thin; }
     .template-category-tab {
       position: relative; flex: 0 0 auto; min-height: 38px; padding: 0; border-radius: 0; background: transparent; color: #374151;
@@ -1118,35 +1132,35 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     .template-more-link:hover { background: transparent; color: #6d28d9; box-shadow: none; transform: none; }
     .template-gallery-wrap { border: 0; border-radius: 8px; padding: 0; background: transparent; }
-    .template-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 30px; margin-top: 0; }
-    .template-category-block { border: 1px solid var(--line); border-radius: 11px; background: #fff; padding: 12px; box-shadow: var(--shadow); }
+    .template-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; margin-top: 0; }
+    .template-category-block { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 14px; box-shadow: var(--shadow); }
     .template-category-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid #e8eef7; }
     .template-category-head h3 { margin: 0; font-size: 13px; letter-spacing: 0; color: #1e3a8a; font-weight: 800; }
     .template-category-subtle { font-size: 11px; color: var(--muted); }
     .template-category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
     .template-manage-split { height: 8px; }
     .template-card {
-      display: grid; gap: 12px; width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px;
-      background: #fff; color: var(--text); text-align: center; box-shadow: none; transform: none;
+      display: grid; gap: 13px; width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px;
+      background: #fff; color: var(--text); text-align: center; box-shadow: 0 12px 28px rgba(16,24,40,.05); transform: none;
     }
-    .template-card:hover { background: #fff; border-color: #d8b4fe; box-shadow: 0 16px 32px rgba(124,58,237,.12); transform: translateY(-1px); }
-    .template-card[aria-selected="true"] { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
+    .template-card:hover { background: #fff; border-color: #b8ccf0; box-shadow: 0 18px 38px rgba(31,94,255,.12); transform: translateY(-2px); }
+    .template-card[aria-selected="true"] { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(31,94,255,.12), 0 18px 38px rgba(31,94,255,.12); }
     .template-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .template-card-title { display: block; min-width: 0; padding: 0 6px 8px; font-size: 15px; font-weight: 650; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .template-card-scope { flex: 0 0 auto; min-height: 22px; display: inline-flex; align-items: center; padding: 0 7px; border-radius: 999px; background: #eef4ff; color: #1d4ed8; font-size: 11px; font-weight: 800; }
     .selected-template-preview {
-      display: grid; gap: 12px; align-content: start; min-height: 360px; padding: 14px; border: 1px solid var(--line);
-      border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: var(--shadow);
+      display: grid; gap: 14px; align-content: start; min-height: 360px; padding: 16px; border: 1px solid var(--line);
+      border-radius: 14px; background: rgba(255,255,255,.96); box-shadow: var(--shadow);
     }
     .selected-template-preview-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .selected-template-preview-title { display: grid; gap: 4px; min-width: 0; }
     .selected-template-preview-title strong { color: #0f172a; font-size: 15px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .selected-template-preview-title span { color: var(--muted); font-size: 12px; line-height: 1.45; }
     .selected-template-preview-badge { flex: 0 0 auto; border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 4px 9px; font-size: 12px; font-weight: 800; }
-    .selected-template-preview-empty { min-height: 280px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 8px; color: var(--muted); background: #f8fbff; font-size: 13px; }
+    .selected-template-preview-empty { min-height: 280px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 12px; color: var(--muted); background: linear-gradient(135deg, #fff, #f4f8ff); font-size: 13px; }
     .selected-template-preview .template-thumb { border-radius: 8px; box-shadow: 0 18px 42px rgba(15,23,42,.12); }
     .template-thumb {
-      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; border: 1px solid rgba(23,32,51,.08);
+      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; border: 1px solid rgba(23,32,51,.08);
       background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
     }
     .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
@@ -1304,21 +1318,21 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb-palette { position: absolute; z-index: 8; right: 8%; top: 8%; display: inline-flex; gap: 4px; }
     .template-thumb-swatch { width: 8px; height: 18px; border-radius: 999px; border: 1px solid rgba(15,23,42,.12); }
     .template-card-meta { display: none; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
     .primary-action { width: 100%; justify-content: center; min-height: 42px; }
-    .preview-shell { min-height: calc(100vh - 108px); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
-    .preview-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; border-bottom: 1px solid var(--line); }
-    .preview-meta { color: var(--muted); font-size: 12px; }
+    .preview-shell { min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+    .preview-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 18px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfdff); }
+    .preview-meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
     .preview-actions { display: flex; gap: 8px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
-    .preview-actions button { min-height: 34px; padding: 8px 10px; }
-    .preview-stage { position: relative; display: grid; min-height: 0; padding: 18px; background: #edf3fb; overflow: auto; }
+    .preview-actions button { min-height: 40px; padding: 9px 13px; }
+    .preview-stage { position: relative; display: grid; min-height: 0; padding: 20px; background: linear-gradient(135deg, #edf3fb 0%, #f5f8fc 100%); overflow: auto; }
     .preview {
-      min-height: 620px; background: #ffffff; color: var(--text); border-radius: 8px; padding: 18px; overflow: auto;
-      box-shadow: inset 0 0 0 1px rgba(37,99,235,.08), 0 18px 42px rgba(23,32,51,.12);
+      min-height: 620px; background: #ffffff; color: var(--text); border-radius: 14px; padding: 20px; overflow: auto;
+      box-shadow: inset 0 0 0 1px rgba(31,94,255,.08), 0 22px 52px rgba(16,24,40,.13);
     }
     .preview.is-deck-loaded { height: 100%; min-height: 0; padding: 0; background: #edf3fb; overflow: hidden; }
-    .preview-frame { display: block; width: 100%; min-height: 620px; border: 0; border-radius: 8px; background: #edf3fb; }
+    .preview-frame { display: block; width: 100%; min-height: 620px; border: 0; border-radius: 12px; background: #edf3fb; }
     .preview.is-deck-loaded .preview-frame { height: 100%; min-height: 0; }
     .preview-polish-loading { position: absolute; z-index: 20; inset: 18px; display: none; place-items: center; border-radius: 8px; background: rgba(237,243,251,.62); backdrop-filter: blur(2px); pointer-events: none; }
     .preview-stage.is-polishing .preview-polish-loading { display: grid; }
@@ -1328,7 +1342,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .structure-side-panel, .ai-polish-side-panel { display: none !important; }
     .slide-edit-modal { position: absolute; z-index: 30; inset: 18px; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15,23,42,.20); backdrop-filter: blur(2px); }
     .slide-edit-modal[aria-hidden="false"] { display: flex; }
-    .slide-edit-dialog { width: min(720px, 100%); max-height: min(760px, 92vh); overflow: auto; border: 1px solid #cfe0ff; border-radius: 8px; background: #fff; box-shadow: 0 26px 70px rgba(15,23,42,.24); }
+    .slide-edit-dialog { width: min(720px, 100%); max-height: min(760px, 92vh); overflow: auto; border: 1px solid #cfe0ff; border-radius: 14px; background: #fff; box-shadow: 0 26px 70px rgba(15,23,42,.24); }
     .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
     .slide-edit-head h2 { font-size: 16px; margin: 0 0 5px; color: var(--text); }
     .slide-edit-selected { color: var(--muted); font-size: 12px; font-weight: 800; }
@@ -1339,11 +1353,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .slide-ai-choice label { display: flex; align-items: center; gap: 8px; margin: 0; color: #1e3a8a; font-size: 13px; font-weight: 850; }
     .slide-ai-choice input[type="checkbox"] { width: 16px; height: 16px; padding: 0; }
     .slide-edit-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
-    .empty-preview { min-height: 584px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 8px; background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 62%, #e8f1ff 100%); }
-    .empty-slide { width: min(520px, 90%); aspect-ratio: 16 / 9; border-radius: 8px; background: #fff; border: 1px solid #d9e5f5; box-shadow: 0 24px 60px rgba(37,99,235,.12); padding: 46px 54px; }
-    .empty-slide h3 { margin: 0 0 14px; font-size: 28px; line-height: 1.2; color: #1e3a8a; letter-spacing: 0; }
+    .empty-preview { min-height: 584px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 14px; background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 62%, #e8f1ff 100%); }
+    .empty-slide { width: min(560px, 90%); aspect-ratio: 16 / 9; border-radius: 16px; background: linear-gradient(135deg, #fff 0%, #fff 58%, #f2f7ff 100%); border: 1px solid #d9e5f5; box-shadow: 0 26px 68px rgba(31,94,255,.13); padding: 48px 58px; }
+    .empty-slide h3 { margin: 0 0 14px; font-size: 30px; line-height: 1.16; color: #173b8f; letter-spacing: 0; }
     .empty-slide p { margin: 0; color: var(--muted); line-height: 1.7; }
-    .empty-line { width: 46px; height: 4px; margin: 28px 0 0; border-radius: 999px; background: var(--primary); }
+    .empty-line { width: 58px; height: 4px; margin: 28px 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--teal)); }
     .deck-loading { display: grid; gap: 18px; min-height: 584px; }
     .deck-loading-head {
       display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center;
@@ -1366,8 +1380,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .outline-shell { position: relative; min-height: calc(100vh - 108px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 64px; }
-    .outline-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px; border-bottom: 1px solid var(--line); }
+    .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 64px; }
+    .outline-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfdff); }
     .outline-title-row { display: flex; align-items: center; gap: 10px; }
     .outline-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 12px; font-weight: 800; }
     .outline-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
@@ -1379,15 +1393,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .outline-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line); background: rgba(255,255,255,.98); }
     .outline-header .outline-toolbar { position: absolute; left: 0; right: 0; bottom: 0; justify-content: flex-end; padding: 14px 16px; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.96), #fff); box-shadow: 0 -12px 28px rgba(15,23,42,.06); }
     .outline-summary { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .outline-stat { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .outline-stat { padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
     .outline-stat span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; }
     .outline-stat strong { display: block; margin-top: 4px; color: var(--text); font-size: 16px; }
     .outline-board { padding: 16px; overflow: auto; background: #edf3fb; }
-    .outline-empty { min-height: 520px; display: grid; place-items: center; text-align: center; border: 1px dashed #bfd0e6; border-radius: 8px; background: linear-gradient(135deg, #fff 0%, #f5f9ff 100%); color: var(--muted); }
+    .outline-empty { min-height: 520px; display: grid; place-items: center; text-align: center; border: 1px dashed #bfd0e6; border-radius: 14px; background: linear-gradient(135deg, #fff 0%, #f5f9ff 100%); color: var(--muted); }
     .outline-empty strong { display: block; margin-bottom: 8px; color: #1e3a8a; font-size: 22px; }
     .outline-loading {
       min-height: 520px; display: grid; place-items: center; padding: 24px; text-align: center;
-      border: 1px dashed #bfd0e6; border-radius: 8px; background: linear-gradient(135deg, #fff 0%, #f5f9ff 100%);
+      border: 1px dashed #bfd0e6; border-radius: 14px; background: linear-gradient(135deg, #fff 0%, #f5f9ff 100%);
     }
     .loading-spinner {
       width: 42px; height: 42px; margin: 0 auto 14px; border-radius: 999px;
@@ -1402,11 +1416,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .loading-step.is-active::before { background: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
     @keyframes spin { to { transform: rotate(360deg); } }
     .outline-card-list { display: grid; gap: 12px; }
-    .outline-card { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; box-shadow: 0 12px 32px rgba(23,32,51,.06); }
+    .outline-card { display: grid; gap: 11px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: var(--shadow-soft); }
     .outline-card.is-revealing { animation: outlineReveal .28s ease-out both; }
     @keyframes outlineReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .outline-card-head { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
-    .outline-index { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #172033; color: #fff; font-weight: 850; font-size: 13px; }
+    .outline-index { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #101828, #243b68); color: #fff; font-weight: 900; font-size: 13px; }
     .outline-title-input { font-size: 17px; font-weight: 800; color: var(--text); }
     .outline-bullets-input { min-height: 92px; font-size: 13px; line-height: 1.55; }
     .outline-card-meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; }
@@ -1509,7 +1523,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="brand-mark">P</div>
       <div>
         <h1>AI PPT 工作台</h1>
-        <div class="brand-subtitle">从想法到大纲、模板、预览和导出的一体化流程</div>
+        <div class="brand-subtitle">输入主题，选择模板，生成可编辑的专业演示文稿</div>
       </div>
     </div>
     <nav class="page-nav" aria-label="工作台页面">
@@ -1520,7 +1534,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     </nav>
     <div class="top-status">
       <div class="status-chip"><span class="status-dot"></span><span>服务在线</span></div>
-      <div class="status-chip">主题生成 / 文档生成 / 预览 / 导出</div>
+      <div class="status-chip">大纲生成 · 模板预览 · PPTX/PDF 导出</div>
     </div>
   </header>
   <main>
@@ -1530,13 +1544,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 	          <div class="panel-title"><span class="step-number">1</span><h2>生成流程</h2></div>
 	        </div>
 	        <div class="flow-guide" aria-label="PPT 生成步骤">
-	          <div class="flow-step is-active" data-flow-step="input"><div class="flow-dot">1</div><div><strong>填写主题或文档</strong><span>输入主题，或粘贴文档内容作为生成依据。</span></div></div>
-	          <div class="flow-step" data-flow-step="outline"><div class="flow-dot">2</div><div><strong>生成并确认大纲</strong><span>在中间主页面逐页修改标题和要点。</span></div></div>
-	          <div class="flow-step" data-flow-step="template"><div class="flow-dot">3</div><div><strong>选择模板并生成 PPT</strong><span>保存大纲后应用当前模板和主题生成完整 PPT。</span></div></div>
-	          <div class="flow-step" data-flow-step="download"><div class="flow-dot">4</div><div><strong>预览并下载</strong><span>右侧查看模板效果，下载 PPTX 或 PDF。</span></div></div>
+	          <div class="flow-step is-active" data-flow-step="input"><div class="flow-dot">1</div><div><strong>输入生成需求</strong><span>填写主题、页数，也可以粘贴已有文档作为参考。</span></div></div>
+	          <div class="flow-step" data-flow-step="outline"><div class="flow-dot">2</div><div><strong>确认内容大纲</strong><span>逐页检查标题和要点，必要时直接编辑。</span></div></div>
+	          <div class="flow-step" data-flow-step="template"><div class="flow-dot">3</div><div><strong>套用商业模板</strong><span>选择模板分类、模板和主题风格后生成 PPT。</span></div></div>
+	          <div class="flow-step" data-flow-step="download"><div class="flow-dot">4</div><div><strong>预览并导出</strong><span>在线查看完整效果，再下载 PPTX 或 PDF。</span></div></div>
 	        </div>
-	        <p class="panel-note">先描述主题，也可以粘贴文档内容。系统会先生成可编辑大纲，再按模板生成 PPT。</p>
-      <label for="topic">主题</label>
+	        <p class="panel-note">先把要讲清楚的事情写下来，系统会生成可编辑大纲，再根据所选模板输出完整 PPT。</p>
+      <label for="topic">PPT 主题</label>
       <textarea id="topic">季度经营复盘</textarea>
       <div class="row">
         <div>
@@ -1545,10 +1559,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         </div>
         <input id="entitlement" type="hidden" value="${escapeHtml(entitlementValue)}" />
       </div>
-      <label for="document">上传文档内容</label>
-      <textarea id="document" placeholder="可粘贴文档文本，生成大纲时会作为 source file 上传"></textarea>
+      <label for="document">参考资料</label>
+      <textarea id="document" placeholder="可粘贴会议纪要、项目资料、汇报素材等文本，系统会结合这些内容生成大纲"></textarea>
       <div class="actions">
-        <button id="generate-outline" class="primary-action">生成大纲</button>
+        <button id="generate-outline" class="primary-action">开始生成大纲</button>
       </div>
       </div>
       <div class="panel" data-page-panel="create" data-flow-panel="preview">
@@ -1575,16 +1589,16 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <input id="template-scope" class="is-hidden" value="官方模板" disabled aria-hidden="true" tabindex="-1" />
         </div>
       </div>
-      <p class="panel-note">模板列表请前往“模板管理”按分类进行大图浏览，并选择当前模板。</p>
+      <p class="panel-note">先在“模板管理”中浏览大图效果，选中模板后回到这里生成 PPT。</p>
       </div>
       <div id="selected-template-preview" class="selected-template-preview" data-page-panel="create" data-flow-panel="preview" aria-label="已选择模板样式展示">
         <div class="selected-template-preview-empty">请选择模板后查看样式预览</div>
       </div>
       <div class="panel" data-page-panel="templates">
       <div class="template-browser-head">
-        <h2>从模板创作</h2>
+        <h2>模板管理</h2>
         <label class="template-search" for="template-search"><span>&#25628;&#32034;</span><input id="template-search" type="search" placeholder="&#36755;&#20837;&#27169;&#26495;&#21517;&#31216;&#12289;&#20998;&#31867;&#25110;&#20027;&#39064;&#39118;&#26684;" autocomplete="off" /></label>
-        <span id="template-gallery-count" class="template-gallery-count">0 个可用模板</span>
+        <span id="template-gallery-count" class="template-gallery-count">0 个专业模板</span>
       </div>
       <div class="template-gallery-toolbar">
         <div id="template-category-tabs" class="template-category-tabs" aria-label="模板分类导航"></div>
@@ -1614,17 +1628,17 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       </div>
 	    </section>
     <section class="outline-shell" aria-label="流程引导" data-page-panel="create" data-flow-panel="input">
-      <div class="stage-empty"><div><strong>填写主题或文档内容</strong><span>完成左侧信息后点击“生成大纲”，系统会自动进入下一阶段。</span></div></div>
+      <div class="stage-empty"><div><strong>准备生成内容大纲</strong><span>填写左侧主题和参考资料后，点击“开始生成大纲”。</span></div></div>
     </section>
     <section class="outline-shell" aria-label="大纲确认" data-page-panel="create" data-flow-panel="outline">
       <div class="outline-header">
         <div>
           <div class="outline-title-row"><h2>大纲确认</h2><span class="outline-badge">可编辑</span></div>
-          <div class="preview-meta">逐页确认标题和要点。确认无误后保存大纲，进入模板预览和下载阶段。</div>
+          <div class="preview-meta">逐页确认标题和要点，保存后即可选择模板并生成完整 PPT。</div>
         </div>
         <div class="outline-toolbar">
           <button id="retry-task" class="secondary outline-action-retry">重试失败任务</button>
-          <button id="save-outline" class="outline-action-save">保存大纲</button>
+          <button id="save-outline" class="outline-action-save">保存并选择模板</button>
         </div>
       </div>
       <div id="outline-board" class="outline-board">
@@ -1639,15 +1653,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="preview-header">
         <div>
           <h2>在线预览</h2>
-          <div class="preview-meta">保存大纲后才能生成并查看模板预览。</div>
+          <div class="preview-meta">生成后可直接查看排版效果，并继续微调单页内容。</div>
         </div>
         <div class="preview-actions">
-          <button id="back-to-outline" type="button" class="secondary">返回大纲内容</button>
-          <button id="generate-deck">应用当前模板生成 PPT</button>
+          <button id="back-to-outline" type="button" class="secondary">返回大纲</button>
+          <button id="generate-deck">生成专业 PPT</button>
         </div>
       </div>
       <div class="preview-stage">
-        <div id="preview" class="preview"><div class="empty-preview"><div class="empty-slide"><h3>等待生成 PPT</h3><p>先生成大纲，再应用当前模板。预览区会展示每页内容、配色和版式效果。</p><div class="empty-line"></div></div></div></div>
+        <div id="preview" class="preview"><div class="empty-preview"><div class="empty-slide"><h3>等待生成预览</h3><p>保存大纲并选择模板后，这里会展示每一页 PPT 的真实排版、配色和导出效果。</p><div class="empty-line"></div></div></div></div>
         <div id="preview-polish-loading" class="preview-polish-loading" aria-live="polite"><div class="polish-loading-card"><span class="polish-spinner"></span><span>AI 正在润色本页...</span></div></div>
         <div id="slide-edit-modal" class="slide-edit-modal" aria-hidden="true">
           <div class="slide-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="slide-edit-title">
@@ -3027,7 +3041,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     function setDeckGenerationBusy(isBusy) {
       const button = document.querySelector("#generate-deck");
       button.disabled = isBusy;
-      button.textContent = isBusy ? "生成中..." : "应用当前模板生成 PPT";
+      button.textContent = isBusy ? "生成中..." : "生成专业 PPT";
     }
 
     function setSlideRegenerationBusy(isBusy) {
@@ -3196,7 +3210,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = error.message;
       } finally {
         generateButton.disabled = false;
-        generateButton.textContent = "生成大纲";
+        generateButton.textContent = "开始生成大纲";
       }
     });
     document.querySelector("#save-outline").addEventListener("click", async () => {

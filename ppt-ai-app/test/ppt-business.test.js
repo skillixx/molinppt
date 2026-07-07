@@ -2644,10 +2644,10 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /状态中心/);
     assert.match(html, /id="topic"/);
     assert.match(html, /PPT 生成步骤/);
-    assert.match(html, /填写主题或文档/);
-    assert.match(html, /生成并确认大纲/);
-    assert.match(html, /选择模板并生成 PPT/);
-    assert.match(html, /预览并下载/);
+    assert.match(html, /输入生成需求/);
+    assert.match(html, /确认内容大纲/);
+    assert.match(html, /套用商业模板/);
+    assert.match(html, /预览并导出/);
     assert.match(html, /data-flow-step="download"/);
     assert.match(html, /data-flow-panel="input outline preview"/);
     assert.match(html, /data-flow-panel="outline"/);
@@ -2715,7 +2715,7 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /\/api\/ppt\/outlines\/" \+ state\.outlineId/);
     assert.match(html, /id="preview"/);
     assert.match(html, /data-page-panel="create assets"/);
-    assert.match(html, /保存大纲后才能生成并查看模板预览/);
+    assert.match(html, /生成后可直接查看排版效果/);
     assert.match(html, /下载文件/);
     assert.match(html, /download-button/);
     assert.match(html, /PPT 结构调整/);
