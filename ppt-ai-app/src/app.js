@@ -2226,7 +2226,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2240,7 +2240,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

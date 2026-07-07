@@ -309,15 +309,15 @@ test("repository official templates do not include removed open-source samples",
   const staleProblemDiagnosis = await context.database.findOne("templates", (template) => template.slug === "business-quarterly-review-problem-diagnosis");
 
   assert.equal(result.active >= 0, true);
-  assert.equal(result.staleDisabled, 1);
+  assert.equal(result.staleDisabled, 2);
   assert.equal(visible.some((template) => template.id === "open-city-template"), false);
   assert.equal(visible.some((template) => template.id === "open-powerpoint-sample"), false);
   assert.equal(visible.some((template) => template.slug === "business-quarterly-review-dashboard"), false);
-  assert.equal(visible.some((template) => template.slug === "business-quarterly-review-problem-diagnosis"), true);
+  assert.equal(visible.some((template) => template.slug === "business-quarterly-review-problem-diagnosis"), false);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-city-template")), null);
   assert.equal((await context.database.findOne("templates", (template) => template.id === "open-powerpoint-sample")), null);
   assert.equal(stale.status, "disabled");
-  assert.equal(staleProblemDiagnosis.status, "active");
+  assert.equal(staleProblemDiagnosis.status, "disabled");
 });
 
 async function createSyncContext() {
