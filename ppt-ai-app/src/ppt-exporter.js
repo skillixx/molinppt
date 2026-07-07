@@ -393,8 +393,18 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "sales-financial-solution"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "finance-budget-planning", "sales-financial-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "marketing-launch-rhythm") {
+    if (index === 0) {
+      if (textLength >= 30) return 2050;
+      if (textLength >= 22) return 2350;
+      return Math.min(fallbackSize, 2850);
+    }
+    if (textLength >= 30) return 1400;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1900);
+  }
   if (visual.layout === "sales-financial-solution") {
     if (index === 0) {
       if (textLength >= 30) return 2100;
@@ -542,6 +552,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "sales-financial-solution") return false;
+  if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -674,6 +685,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "sales-financial-solution") {
     return base + financialSolutionDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "marketing-launch-rhythm") {
+    return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
@@ -1577,6 +1591,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 1066800, y: 1981200, cx: 3962400, cy: 1371600 },
       titleSize: 2800,
       bodySize: 1250,
+    };
+  }
+  if (visual.layout === "marketing-launch-rhythm") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 0, y: 0, cx: 9144000, cy: 5143500 },
+      accent: { x: 0, y: 0, cx: 0, cy: 0 },
+      secondaryAccent: { x: 804672, y: isCover ? 2230120 : 2057400, cx: 3200400, cy: 30480 },
+      label: { x: 804672, y: 701040, cx: 2133600, cy: 274320 },
+      title: isClosing
+        ? { x: 804672, y: 1097280, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 1097280, cx: 4114800, cy: 1219200 }
+          : { x: 804672, y: 914400, cx: 4267200, cy: 731520 },
+      content: isClosing
+        ? { x: 804672, y: 2438400, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 2545080, cx: 3505200, cy: 762000 }
+          : { x: 804672, y: 1828800, cx: 3474720, cy: 914400 },
+      titleSize: isCover ? 2850 : isClosing ? 2550 : 1900,
+      bodySize: isCover ? 900 : 720,
+      titleColor: "FFFFFF",
+      bodyColor: "D7DEE8",
     };
   }
   if (visual.layout === "brand-story") {
@@ -3122,6 +3160,148 @@ function marketingCampaignVariant(visual) {
 
 function isMarketingCampaignVisual(visual) {
   return visual?.id === "marketing-campaign" && visual?.layout === "marketing";
+}
+
+function launchRhythmDecorationsXml({ visual, index, role, slide }) {
+  const scene = launchRhythmSceneFromSlide({ slide, index, role });
+  const palette = launchRhythmColorPalette(visual);
+  // 深色发布会背景、光斑和网格全部用可编辑形状绘制，避免导出后退化成图片底图。
+  const backdrop = rectShapeXml({ id: 980, name: "Launch Rhythm Dark Stage Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 981, name: "Launch Rhythm Orange Spotlight", geom: "ellipse", x: 6553200, y: -365760, cx: 2057400, cy: 2057400, fill: palette.orangeGlow })
+    + solidShapeXml({ id: 982, name: "Launch Rhythm Purple Glow", geom: "ellipse", x: 365760, y: 3505200, cx: 1905000, cy: 1295400, fill: palette.purpleGlow })
+    + solidShapeXml({ id: 983, name: "Launch Rhythm Stage Beam", geom: "trapezoid", x: 5905500, y: 762000, cx: 2438400, cy: 3048000, fill: palette.beam });
+  const header = textShapeXml({ id: 984, name: "Launch Rhythm Kicker", x: 804672, y: 701040, cx: 2133600, cy: 274320, text: scene.kicker, size: 780, bold: true, color: palette.cyan })
+    + rectShapeXml({ id: 985, name: "Launch Rhythm Focus Rule", x: 804672, y: index === 0 ? 2230120 : 2057400, cx: 3200400, cy: 30480, fill: visual.accent });
+  const bullets = launchRhythmBulletCardsXml({ scene, isCover: index === 0 });
+  if (scene.role === "timeline") return backdrop + header + bullets + launchRhythmTimelineXml({ scene, palette });
+  if (scene.role === "channel" || scene.role === "selling-points") return backdrop + header + bullets + launchRhythmChannelGridXml({ scene, palette });
+  if (scene.role === "kpi") return backdrop + header + bullets + launchRhythmKpiXml({ scene, palette, visual });
+  if (scene.role === "closing") return backdrop + header + bullets + launchRhythmClosingXml({ scene, palette });
+  return backdrop + header + bullets + launchRhythmStageXml({ palette, visual }) + launchRhythmCoverTagsXml({ palette, visual });
+}
+
+function launchRhythmStageXml({ palette, visual }) {
+  return textShapeXml({ id: 990, name: "Launch Rhythm Countdown", x: 804672, y: 3467100, cx: 1066800, cy: 579120, text: "T-7", size: 3000, bold: true, color: visual.accent })
+    + lineFrameShapeXml({ id: 991, name: "Launch Rhythm Stage Platform", geom: "trapezoid", x: 5943600, y: 2514600, cx: 1828800, cy: 914400, stroke: palette.cyan, width: 25400 })
+    + solidShapeXml({ id: 992, name: "Launch Rhythm Product Mockup", geom: "roundRect", x: 6355080, y: 1371600, cx: 944880, cy: 640080, fill: palette.glass })
+    + lineFrameShapeXml({ id: 993, name: "Launch Rhythm Product Mockup Border", geom: "roundRect", x: 6355080, y: 1371600, cx: 944880, cy: 640080, stroke: "FFFFFF", width: 10160, transparency: 54000 })
+    + solidShapeXml({ id: 994, name: "Launch Rhythm Center Light", geom: "ellipse", x: 6804660, y: 838200, cx: 137160, cy: 137160, fill: visual.accent })
+    + rectShapeXml({ id: 995, name: "Launch Rhythm Light Stem", x: 6865620, y: 960120, cx: 30480, cy: 396240, fill: visual.accent })
+    + lineFrameShapeXml({ id: 996, name: "Launch Rhythm Purple Beam", geom: "line", x: 5334000, y: 1188720, cx: 1021080, cy: 670560, stroke: palette.purple, width: 30480 })
+    + lineFrameShapeXml({ id: 997, name: "Launch Rhythm Cyan Beam", geom: "line", x: 7277100, y: 1188720, cx: 1021080, cy: -670560, stroke: palette.cyan, width: 30480 });
+}
+
+function launchRhythmCoverTagsXml({ palette }) {
+  return ["预热", "首发", "转化"].map((item, index) => {
+    const x = 804672 + index * 914400;
+    return solidShapeXml({ id: 1000 + index * 3, name: `Launch Rhythm Tag Card ${index + 1}`, geom: "roundRect", x, y: 4130040, cx: 716280, cy: 320040, fill: palette.glass })
+      + lineFrameShapeXml({ id: 1001 + index * 3, name: `Launch Rhythm Tag Border ${index + 1}`, geom: "roundRect", x, y: 4130040, cx: 716280, cy: 320040, stroke: "FFFFFF", width: 10160, transparency: 66000 })
+      + textShapeXml({ id: 1002 + index * 3, name: `Launch Rhythm Tag Text ${index + 1}`, x: x + 137160, y: 4213860, cx: 441960, cy: 137160, text: item, size: 640, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function launchRhythmBulletCardsXml({ scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2545080 : 1828800) + index * 236220;
+    return rectShapeXml({ id: 1020 + index * 2, name: `Launch Rhythm Bullet Rule ${index + 1}`, x: 804672, y: y + 30480, cx: 45720, cy: 137160, fill: "FF5A3D" })
+      + textShapeXml({ id: 1021 + index * 2, name: `Launch Rhythm Bullet Text ${index + 1}`, x: 975360, y, cx: 3444240, cy: 198120, text: launchRhythmCompactText(item, scene.title, 32), size: isCover ? 780 : 700, bold: false, color: "D7DEE8" });
+  }).join("");
+}
+
+function launchRhythmTimelineXml({ scene, palette }) {
+  return scene.timeline.map((item, index) => {
+    const x = 804672 + index * 1280160;
+    return solidShapeXml({ id: 1040 + index * 3, name: `Launch Rhythm Timeline Card ${index + 1}`, geom: "roundRect", x, y: 3718560, cx: 1066800, cy: 701040, fill: palette.glass })
+      + lineFrameShapeXml({ id: 1041 + index * 3, name: `Launch Rhythm Timeline Border ${index + 1}`, geom: "roundRect", x, y: 3718560, cx: 1066800, cy: 701040, stroke: "FFFFFF", width: 10160, transparency: 68000 })
+      + textShapeXml({ id: 1042 + index * 3, name: `Launch Rhythm Timeline Text ${index + 1}`, x: x + 106680, y: 3848100, cx: 853440, cy: 274320, text: `${item.step}\n${launchRhythmCompactText(item.text, "", 10)}`, size: 660, bold: true, color: index === 4 ? "FF5A3D" : "FFFFFF" });
+  }).join("");
+}
+
+function launchRhythmChannelGridXml({ scene, palette }) {
+  return scene.cards.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5577840 + col * 1447800;
+    const y = 1257300 + row * 990600;
+    return solidShapeXml({ id: 1070 + index * 4, name: `Launch Rhythm Channel Card ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 792480, fill: palette.glass })
+      + lineFrameShapeXml({ id: 1071 + index * 4, name: `Launch Rhythm Channel Border ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 792480, stroke: "FFFFFF", width: 10160, transparency: 68000 })
+      + rectShapeXml({ id: 1072 + index * 4, name: `Launch Rhythm Channel Accent ${index + 1}`, x: x + 152400, y: y + 518160, cx: 365760, cy: 30480, fill: index === 1 ? palette.cyan : "FF5A3D" })
+      + textShapeXml({ id: 1073 + index * 4, name: `Launch Rhythm Channel Text ${index + 1}`, x: x + 152400, y: y + 213360, cx: 914400, cy: 182880, text: launchRhythmCompactText(item, "", 10), size: 720, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function launchRhythmKpiXml({ scene, palette, visual }) {
+  const panel = solidShapeXml({ id: 1100, name: "Launch Rhythm KPI Panel", geom: "roundRect", x: 5577840, y: 1188720, cx: 2743200, cy: 2286000, fill: palette.glass })
+    + lineFrameShapeXml({ id: 1101, name: "Launch Rhythm KPI Panel Border", geom: "roundRect", x: 5577840, y: 1188720, cx: 2743200, cy: 2286000, stroke: "FFFFFF", width: 10160, transparency: 68000 })
+    + rectShapeXml({ id: 1102, name: "Launch Rhythm KPI Bar 1", x: 5943600, y: 2827020, cx: 259080, cy: 518160, fill: visual.accent })
+    + rectShapeXml({ id: 1103, name: "Launch Rhythm KPI Bar 2", x: 6400800, y: 2514600, cx: 259080, cy: 830580, fill: palette.purple })
+    + rectShapeXml({ id: 1104, name: "Launch Rhythm KPI Bar 3", x: 6858000, y: 2179320, cx: 259080, cy: 1165860, fill: visual.accent })
+    + rectShapeXml({ id: 1105, name: "Launch Rhythm KPI Bar 4", x: 7315200, y: 2392680, cx: 259080, cy: 952500, fill: palette.cyan });
+  const cards = scene.cards.slice(0, 3).map((item, index) => {
+    const x = 804672 + index * 1280160;
+    return solidShapeXml({ id: 1110 + index * 3, name: `Launch Rhythm KPI Card ${index + 1}`, geom: "roundRect", x, y: 3764280, cx: 1066800, cy: 594360, fill: palette.glass })
+      + lineFrameShapeXml({ id: 1111 + index * 3, name: `Launch Rhythm KPI Card Border ${index + 1}`, geom: "roundRect", x, y: 3764280, cx: 1066800, cy: 594360, stroke: "FFFFFF", width: 10160, transparency: 68000 })
+      + textShapeXml({ id: 1112 + index * 3, name: `Launch Rhythm KPI Card Text ${index + 1}`, x: x + 121920, y: 3947160, cx: 822960, cy: 182880, text: launchRhythmCompactText(item, "", 10), size: 660, bold: true, color: "FFFFFF" });
+  }).join("");
+  return panel + cards;
+}
+
+function launchRhythmClosingXml({ scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const x = 975360 + index * 2286000;
+    return solidShapeXml({ id: 1140 + index * 4, name: `Launch Rhythm Closing Card ${index + 1}`, geom: "roundRect", x, y: 2926080, cx: 1828800, cy: 914400, fill: palette.glass })
+      + lineFrameShapeXml({ id: 1141 + index * 4, name: `Launch Rhythm Closing Border ${index + 1}`, geom: "roundRect", x, y: 2926080, cx: 1828800, cy: 914400, stroke: "FFFFFF", width: 10160, transparency: 68000 })
+      + rectShapeXml({ id: 1142 + index * 4, name: `Launch Rhythm Closing Accent ${index + 1}`, x: x + 182880, y: 3215640, cx: 365760, cy: 30480, fill: index === 1 ? palette.cyan : "FF5A3D" })
+      + textShapeXml({ id: 1143 + index * 4, name: `Launch Rhythm Closing Text ${index + 1}`, x: x + 182880, y: 3329940, cx: 1371600, cy: 243840, text: launchRhythmCompactText(item, "", 14), size: 760, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function launchRhythmSceneFromSlide({ slide, index, role }) {
+  const bullets = launchRhythmBulletTexts(slide);
+  const title = launchRhythmCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const sceneRole = index === 0 ? "cover" : role === "closing" ? "closing" : String(role || "").includes("timeline") ? "timeline" : String(role || "").includes("channel") ? "channel" : String(role || "").includes("kpi") ? "kpi" : String(role || "").includes("selling") ? "selling-points" : ["timeline", "channel", "kpi", "selling-points"][(index - 1) % 4];
+  const timeline = ["T-30", "T-14", "T-7", "T-1", "Launch", "T+7"].map((step, itemIndex) => ({
+    step,
+    text: launchRhythmCompactText(bullets[itemIndex], ["预热启动", "内容种草", "渠道蓄水", "发布准备", "首发上线", "复盘增长"][itemIndex], 10),
+  }));
+  const cards = ["产品卖点", "渠道动作", "转化目标", "复盘增长"].map((fallback, itemIndex) => launchRhythmCompactText(bullets[itemIndex], fallback, 10));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "LAUNCH RHYTHM" : sceneRole === "timeline" ? "T-MINUS TIMELINE" : sceneRole === "channel" ? "CHANNEL WARM-UP" : sceneRole === "kpi" ? "LAUNCH KPI" : "NEXT WAVE",
+    title,
+    bullets,
+    timeline,
+    cards,
+  };
+}
+
+function launchRhythmBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["新品核心卖点与上市目标", "发布前预热与渠道蓄水", "首发转化 KPI 与复盘动作"];
+}
+
+function launchRhythmCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function launchRhythmColorPalette(visual) {
+  return {
+    backdrop: visual.background,
+    orangeGlow: blendHexColor(visual.accent, visual.background, 0.66),
+    purpleGlow: blendHexColor("7C3AED", visual.background, 0.72),
+    beam: blendHexColor("FFFFFF", visual.background, 0.90),
+    glass: blendHexColor("FFFFFF", visual.background, 0.88),
+    cyan: "22D3EE",
+    purple: "7C3AED",
+  };
+}
+
+function isLaunchRhythmVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "marketing-launch-rhythm" && (id === "new-product-launch" || id === "marketing-new-product-launch-launch-rhythm");
 }
 
 function dataInsightVisualXml({ visual, palette, scene, isCover }) {

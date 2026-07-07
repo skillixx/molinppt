@@ -520,6 +520,45 @@ test("PptExportService uses commercial marketing launch decorations", () => {
   assert.match(slide1, /val="F59E0B"/);
 });
 
+test("PptExportService uses new product launch rhythm decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-new-product-launch-launch-rhythm",
+      theme: "launch-rhythm",
+      templateVisual: {
+        primary: "101828",
+        accent: "FF5A3D",
+        background: "111827",
+        surface: "FFFFFF",
+        title: "FFFFFF",
+        body: "D7DEE8",
+        layout: "marketing-launch-rhythm",
+        variant: "launch-rhythm",
+      },
+      slides: [
+        { title: "新品上市首发计划", bullets: ["核心卖点确认", "渠道预热排期", "上市 KPI 对齐"] },
+        { title: "上市节奏时间轴", bullets: ["T-30 预热启动", "T-14 内容种草", "T-7 渠道蓄水", "Launch 首发上线"] },
+        { title: "渠道预热铺排", bullets: ["内容渠道", "社媒渠道", "销售渠道", "私域渠道"] },
+        { title: "上市 KPI 看板", bullets: ["曝光目标", "预约目标", "转化目标", "成交目标"] },
+        { title: "复盘增长动作", bullets: ["首发复盘", "增长优化", "渠道加码"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Launch Rhythm Dark Stage Background"/);
+  assert.match(slide1, /name="Launch Rhythm Product Mockup"/);
+  assert.match(slide2, /name="Launch Rhythm Timeline Card 1"/);
+  assert.match(slide4, /name="Launch Rhythm KPI Panel"/);
+  assert.doesNotMatch(slide1, /launch-rhythm/);
+});
+
 test("PptExportService uses commercial marketing brand decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

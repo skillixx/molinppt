@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+  <rect width="640" height="360" rx="28" fill="#111827"/>
+  <path d="M70 270H570" stroke="#FF5A3D" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 270L182 194H458L520 270" fill="#FFFFFF" fill-opacity=".08" stroke="#22D3EE" stroke-width="3"/>
+  <rect x="226" y="128" width="188" height="68" rx="12" fill="#FFFFFF" fill-opacity=".14" stroke="#FFFFFF" stroke-opacity=".35"/>
+  <path d="M320 72V112" stroke="#FF5A3D" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="320" cy="56" r="18" fill="#FF5A3D" fill-opacity=".28" stroke="#FF5A3D" stroke-width="4"/>
+  <path d="M104 126L214 178" stroke="#7C3AED" stroke-width="4" stroke-linecap="round"/>
+  <path d="M536 126L426 178" stroke="#22D3EE" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="122" cy="132" r="10" fill="#7C3AED"/>
+  <circle cx="518" cy="132" r="10" fill="#22D3EE"/>
+  <circle cx="214" cy="178" r="8" fill="#FF5A3D"/>
+  <circle cx="426" cy="178" r="8" fill="#FF5A3D"/>
+  <path d="M152 304H488" stroke="#FFFFFF" stroke-opacity=".22" stroke-width="2" stroke-dasharray="12 10"/>
+</svg>

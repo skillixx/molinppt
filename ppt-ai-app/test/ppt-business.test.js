@@ -256,6 +256,28 @@ test("PptService renders financial industry solution preview with dedicated layo
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders new product launch rhythm preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertLaunchRhythmTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "新品上市计划",
+    slideCount: 5,
+    templateId: "marketing-new-product-launch-launch-rhythm",
+    theme: "launch-rhythm",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="marketing-new-product-launch-launch-rhythm" data-layout="marketing-launch-rhythm"/);
+  assert.match(preview, /launch-rhythm-layer/);
+  assert.match(preview, /launch-rhythm-stage|launch-rhythm-timeline|launch-rhythm-kpi/);
+  assert.doesNotMatch(preview, />首发节奏</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3444,6 +3466,50 @@ async function insertFinancialSolutionTemplate(context) {
       defaultCoverLayout: "sales-financial-solution-cover",
       defaultContentLayout: "sales-financial-solution-content",
       allowedLayouts: ["sales-financial-solution-cover", "sales-financial-solution-painpoints", "sales-financial-solution-architecture", "sales-financial-solution-compliance", "sales-financial-solution-value", "sales-financial-solution-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertLaunchRhythmTemplate(context) {
+  // 测试数据库模拟官方模板同步后的新品上市首发节奏模板，确保预览和导出都走专用发布节奏布局。
+  await context.database.insert("templates", {
+    id: "marketing-new-product-launch-launch-rhythm",
+    slug: "marketing-new-product-launch-launch-rhythm",
+    name: "新品上市方案 - 首发节奏",
+    categoryId: "marketing",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "launch-rhythm",
+        name: "首发节奏",
+        visual: {
+          primary: "101828",
+          accent: "FF5A3D",
+          background: "111827",
+          surface: "FFFFFF",
+          title: "FFFFFF",
+          body: "D7DEE8",
+          layout: "marketing-launch-rhythm",
+          variant: "launch-rhythm",
+        },
+      },
+    ],
+    visual: {
+      primary: "101828",
+      accent: "FF5A3D",
+      background: "111827",
+      surface: "FFFFFF",
+      title: "FFFFFF",
+      body: "D7DEE8",
+      layout: "marketing-launch-rhythm",
+      variant: "launch-rhythm",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "marketing-launch-rhythm-cover",
+      defaultContentLayout: "marketing-launch-rhythm-content",
+      allowedLayouts: ["marketing-launch-rhythm-cover", "marketing-launch-rhythm-timeline", "marketing-launch-rhythm-selling-points", "marketing-launch-rhythm-channel", "marketing-launch-rhythm-kpi", "marketing-launch-rhythm-closing", "title", "content"],
     },
   });
 }

@@ -989,6 +989,7 @@ function renderDeckPreview({ deck, visual }) {
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
+    const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const brandStoryScene = isBrandStoryVisual(visual) ? brandStoryPreviewScene(visual) : null;
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
@@ -1036,6 +1037,9 @@ function renderDeckPreview({ deck, visual }) {
             : `<div class="marketing-kicker">${escapeHtml(marketingScene.section)}</div><div class="marketing-channel-row"><span></span><span></span><span></span></div>`}`
           + `<div class="marketing-chip" aria-hidden="true"></div><div class="marketing-visual"><span></span><span></span><span></span><span></span></div><div class="marketing-caption">${escapeHtml(marketingScene.caption)}</div><div class="marketing-orbit"></div>`
         )
+      : "";
+    const launchRhythmMark = launchRhythmScene
+      ? renderLaunchRhythmPreview(slide, launchRhythmScene)
       : "";
     const brandStoryMark = brandStoryScene
       ? (
@@ -1110,11 +1114,11 @@ function renderDeckPreview({ deck, visual }) {
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
-    // 年度总结、行业研究、预算编制和金融解决方案模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene || financialSolutionScene
+    // 年度总结、行业研究、预算编制、金融解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
+    const defaultSlideContent = annualSummaryScene || industryResearchScene || budgetPlanningScene || financialSolutionScene || launchRhythmScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${productMark}${pitchMark}${marketingMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || budgetPlanningScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${productMark}${pitchMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${budgetPlanningMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1564,6 +1568,38 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="marketing"] .marketing-channel-row{position:absolute;left:9.2%;right:42%;bottom:16.8%;z-index:4;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
     body[data-layout="marketing"] .marketing-channel-row span{height:44px;border-radius:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 14%,#fff 86%),color-mix(in srgb,var(--template-accent) 18%,#fff 82%));border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);box-shadow:0 10px 20px rgba(15,23,42,.08);}
     body[data-layout="marketing"] .page-number{z-index:5;color:color-mix(in srgb,var(--template-title) 64%,transparent);background:rgba(255,255,255,.72);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="marketing-launch-rhythm"] .slide{padding:0;border:0;background:radial-gradient(circle at 84% 18%,rgba(255,90,61,.28) 0 17%,transparent 18% 42%),radial-gradient(circle at 18% 78%,rgba(124,58,237,.26) 0 18%,transparent 19% 42%),linear-gradient(135deg,#101828 0%,#161B2E 54%,#24122C 100%);}
+    body[data-layout="marketing-launch-rhythm"] .slide::before{background:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 54px),repeating-linear-gradient(0deg,rgba(34,211,238,.05) 0 1px,transparent 1px 44px);}
+    body[data-layout="marketing-launch-rhythm"] .slide::after{content:"";position:absolute;right:7%;top:15%;width:28%;height:54%;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);clip-path:polygon(28% 0,72% 0,100% 100%,0 100%);}
+    body[data-layout="marketing-launch-rhythm"] .accent{height:0;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-layer{position:absolute;inset:0;z-index:3;color:#d7dee8;pointer-events:none;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kicker{position:absolute;left:8.8%;top:13.8%;font-size:12px;font-weight:900;letter-spacing:.16em;color:#22d3ee;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-title{position:absolute;left:8.8%;top:22%;width:45%;margin:0;color:#fff;font-size:36px;line-height:1.08;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-rule{position:absolute;left:8.8%;top:43.5%;width:34%;height:4px;background:linear-gradient(90deg,var(--template-accent),#22d3ee,transparent);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-bullets{position:absolute;left:8.8%;top:50%;width:40%;margin:0;padding-left:1.05em;font-size:13.5px;line-height:1.48;color:#d7dee8;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-bullets li{margin:.12em 0;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-countdown{position:absolute;left:8.8%;bottom:13%;font-size:54px;line-height:1;font-weight:900;color:var(--template-accent);letter-spacing:0;text-shadow:0 18px 36px rgba(255,90,61,.22);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-tags{position:absolute;left:8.8%;bottom:12%;width:36%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-tags span{min-height:42px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.10);border-radius:10px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:900;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage{position:absolute;right:8.5%;top:24%;width:32%;height:43%;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage::before{content:"";position:absolute;left:18%;right:18%;top:14%;height:28%;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage::after{content:"";position:absolute;left:4%;right:4%;bottom:8%;height:36%;clip-path:polygon(22% 0,78% 0,100% 100%,0 100%);border:3px solid #22d3ee;background:rgba(34,211,238,.05);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage i{position:absolute;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(255,90,61,.12);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage i:nth-child(1){left:49%;top:-1%;width:18px;height:18px;}body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage i:nth-child(2){left:8%;top:18%;width:12px;height:12px;background:#7c3aed;}body[data-layout="marketing-launch-rhythm"] .launch-rhythm-stage i:nth-child(3){right:8%;top:18%;width:12px;height:12px;background:#22d3ee;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-timeline{position:absolute;left:8.8%;right:8.8%;bottom:13%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-timeline span{position:relative;min-height:74px;border-radius:14px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);padding:14px 10px 10px;color:#fff;font-size:11px;font-weight:900;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-timeline span::before{content:attr(data-step);display:block;margin-bottom:6px;color:var(--template-accent);font-size:15px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-channel-grid{position:absolute;right:8.8%;top:23%;width:35%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-channel-grid span{min-height:88px;border-radius:14px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);box-shadow:0 14px 28px rgba(0,0,0,.18);padding:15px;color:#fff;font-size:12px;font-weight:900;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-channel-grid span::after{content:"";display:block;width:42px;height:4px;margin-top:14px;background:#22d3ee;border-radius:999px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi{position:absolute;right:8.8%;top:23%;width:35%;height:46%;border-radius:18px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 36px rgba(0,0,0,.20);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi i{position:absolute;bottom:18%;width:12%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--template-accent),#7c3aed);}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi i:nth-child(1){left:15%;height:28%;}body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi i:nth-child(2){left:35%;height:44%;}body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi i:nth-child(3){left:55%;height:62%;}body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi i:nth-child(4){left:75%;height:50%;background:#22d3ee;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi-row{position:absolute;left:8.8%;right:48%;bottom:13%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-kpi-row span{min-height:62px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:12px;color:#fff;font-size:11px;font-weight:900;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-closing{position:absolute;left:8.8%;right:8.8%;top:52%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="marketing-launch-rhythm"] .launch-rhythm-closing span{min-height:104px;border-radius:14px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);padding:16px;color:#fff;font-size:13px;font-weight:900;}
+    body[data-layout="marketing-launch-rhythm"] .page-number{z-index:4;right:7.4%;bottom:5.4%;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 10px;color:rgba(255,255,255,.72);}
     body[data-layout="academy"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 72%);padding:8% 10%;border:0;}
     body[data-layout="academy"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(15,23,42,.022) 0 1px,transparent 1px 32px);}
     body[data-layout="academy"] .slide::after{content:"";position:absolute;inset:14% 7.5% 12%;background:var(--template-surface);box-shadow:0 16px 40px rgba(11,93,102,.10);}
@@ -2701,6 +2737,64 @@ function isMarketingCampaignVisual(visual) {
   return visual?.id === "marketing-campaign" && visual?.layout === "marketing";
 }
 
+function launchRhythmPreviewScene({ slide, index, total }) {
+  const bullets = launchRhythmBulletTexts(slide);
+  const title = launchRhythmCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = index === 0
+    ? "cover"
+    : index === total - 1
+      ? "closing"
+      : ["timeline", "channel", "kpi", "selling-points"][(index - 1) % 4];
+  const timeline = ["T-30", "T-14", "T-7", "T-1", "Launch", "T+7"].map((step, itemIndex) => ({
+    step,
+    text: launchRhythmCompactText(bullets[itemIndex], ["预热启动", "内容种草", "渠道蓄水", "发布准备", "首发上线", "复盘增长"][itemIndex], 10),
+  }));
+  const cards = ["产品卖点", "渠道动作", "转化目标", "复盘增长"].map((fallback, itemIndex) => launchRhythmCompactText(bullets[itemIndex], fallback, 10));
+  return {
+    variant: "launch-rhythm",
+    role,
+    kicker: role === "cover" ? "LAUNCH RHYTHM" : role === "timeline" ? "T-MINUS TIMELINE" : role === "channel" ? "CHANNEL WARM-UP" : role === "kpi" ? "LAUNCH KPI" : "NEXT WAVE",
+    title,
+    bullets,
+    timeline,
+    cards,
+  };
+}
+
+function renderLaunchRhythmPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(launchRhythmCompactText(item, scene.title, 42))}</li>`).join("");
+  const tags = ["预热", "首发", "转化"].map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const timeline = scene.timeline.map((item) => `<span data-step="${escapeHtml(item.step)}">${escapeHtml(item.text)}</span>`).join("");
+  const cards = scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const stage = '<div class="launch-rhythm-stage"><i></i><i></i><i></i></div>';
+  const visual = scene.role === "timeline"
+    ? `<div class="launch-rhythm-timeline">${timeline}</div>`
+    : scene.role === "channel" || scene.role === "selling-points"
+      ? `<div class="launch-rhythm-channel-grid">${cards}</div>`
+      : scene.role === "kpi"
+        ? `<div class="launch-rhythm-kpi"><i></i><i></i><i></i><i></i></div><div class="launch-rhythm-kpi-row">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : scene.role === "closing"
+          ? `<div class="launch-rhythm-closing">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+          : `<div class="launch-rhythm-countdown">T-7</div><div class="launch-rhythm-tags">${tags}</div>${stage}`;
+  return `<div class="launch-rhythm-layer"><div class="launch-rhythm-kicker">${escapeHtml(scene.kicker)}</div><h2 class="launch-rhythm-title">${escapeHtml(scene.title)}</h2><div class="launch-rhythm-rule"></div><ul class="launch-rhythm-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function launchRhythmBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["新品核心卖点与上市目标", "发布前预热与渠道蓄水", "首发转化 KPI 与复盘动作"];
+}
+
+function launchRhythmCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isLaunchRhythmVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "marketing-launch-rhythm" && (id === "new-product-launch" || id === "marketing-new-product-launch-launch-rhythm");
+}
+
 function brandStoryPreviewScene(visual) {
   const variant = brandStoryVariant(visual);
   const scenes = {
@@ -2916,6 +3010,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "industry-research") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "sales-financial-solution") return false;
+  if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
 
