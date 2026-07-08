@@ -1139,6 +1139,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-more-link:hover { background: transparent; color: #6d28d9; box-shadow: none; transform: none; }
     .template-gallery-wrap { border: 0; border-radius: 8px; padding: 0; background: transparent; }
     .template-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; margin-top: 0; }
+    .template-category-preview-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #e5edf7; border-radius: 12px; background: linear-gradient(135deg, #fff, #f6f9ff); }
+    .template-category-preview-head strong { display: block; color: #0f172a; font-size: 15px; }
+    .template-category-preview-head span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .template-category-preview-actions { grid-column: 1 / -1; display: flex; justify-content: center; padding: 2px 0 4px; }
+    .template-category-more-button { min-width: 220px; min-height: 42px; border-radius: 999px; background: #fff; color: #1d4ed8; border: 1px solid #c9d9f4; box-shadow: 0 10px 22px rgba(31,94,255,.08); }
+    .template-category-more-button:hover { background: #f3f7ff; border-color: #b8ccf0; box-shadow: 0 14px 28px rgba(31,94,255,.12); }
     .template-category-block { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 14px; box-shadow: var(--shadow); }
     .template-category-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid #e8eef7; }
     .template-category-head h3 { margin: 0; font-size: 13px; letter-spacing: 0; color: #1e3a8a; font-weight: 800; }
@@ -1165,6 +1171,18 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .selected-template-preview-badge { flex: 0 0 auto; border: 1px solid #bfdbfe; border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 4px 9px; font-size: 12px; font-weight: 800; }
     .selected-template-preview-empty { min-height: 280px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 12px; color: var(--muted); background: linear-gradient(135deg, #fff, #f4f8ff); font-size: 13px; }
     .selected-template-preview .template-thumb { border-radius: 8px; box-shadow: 0 18px 42px rgba(15,23,42,.12); }
+    .create-template-list-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding-top: 2px; border-top: 1px solid #edf2f7; }
+    .create-template-list-title { display: grid; gap: 3px; min-width: 0; }
+    .create-template-list-title strong { color: #0f172a; font-size: 14px; line-height: 1.35; }
+    .create-template-list-title span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .create-template-list-count { flex: 0 0 auto; border: 1px solid #dbeafe; border-radius: 999px; background: #f8fbff; color: #1d4ed8; padding: 4px 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .create-template-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .create-template-grid .template-card { gap: 10px; padding: 9px; text-align: left; border-radius: 12px; }
+    .create-template-grid .template-card-title { padding: 0 3px 2px; font-size: 13px; line-height: 1.35; }
+    .create-template-grid .template-card-meta { padding: 0 3px 1px; }
+    .create-template-grid .template-thumb { box-shadow: 0 12px 28px rgba(15,23,42,.10); }
+    .create-template-more { min-height: 38px; border-radius: 12px; border: 1px solid #c9d9f4; background: #f8fbff; color: #1d4ed8; font-size: 13px; font-weight: 800; }
+    .create-template-more:hover { background: #eef5ff; border-color: #b8ccf0; }
     .template-thumb {
       position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; border: 1px solid rgba(23,32,51,.08);
       background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
@@ -1613,10 +1631,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <input id="template-scope" class="is-hidden" value="官方模板" disabled aria-hidden="true" tabindex="-1" />
         </div>
       </div>
-      <p class="panel-note">先在“模板管理”中浏览大图效果，选中模板后回到这里生成 PPT。</p>
+      <p class="panel-note">选择模板分类后，下方会展示该分类的模板缩略图，点击卡片即可切换模板。</p>
       </div>
       <div id="selected-template-preview" class="selected-template-preview" data-page-panel="create" data-flow-panel="preview" aria-label="已选择模板样式展示">
-        <div class="selected-template-preview-empty">请选择模板后查看样式预览</div>
+        <div class="selected-template-preview-empty">选择分类后在这里浏览模板缩略图</div>
       </div>
       <div class="panel" data-page-panel="templates">
       <div class="template-browser-head">
@@ -1848,10 +1866,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const DECK_REVEAL_INTERVAL_MS = 700;
     const DECK_MIN_LOADING_MS = 2200;
     const ASSET_PAGE_SIZE = 20;
+    const TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10;
     let flowStage = "input";
     let templateCategories = [{ id: "business", name: "Business" }];
     let templateCatalog = [{ id: "business", name: "Business", category: { id: "business", name: "Business" }, themes: [{ id: "modern", name: "Modern" }] }];
     let templateSearchQuery = "";
+    let expandedTemplateCategoryId = "";
     let assetCatalog = [];
     let assetSearchQuery = "";
     let assetTimeFilter = "all";
@@ -1992,6 +2012,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       templateCategoryTabsEl.querySelectorAll("[data-template-category-tab]").forEach((button) => {
         button.addEventListener("click", () => {
           const categoryEl = document.querySelector("#template-category");
+          expandedTemplateCategoryId = "";
           categoryEl.value = button.dataset.templateCategoryTab || "";
           loadTemplates();
         });
@@ -2057,17 +2078,41 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         : sourceTemplates;
       renderTemplateCategoryTabs();
       if (templateGalleryCountEl) {
-        templateGalleryCountEl.textContent = templates.length + " \u4e2a\u53ef\u7528\u6a21\u677f";
+        const collapsed = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
+        templateGalleryCountEl.textContent = collapsed
+          ? "\u5f53\u524d\u663e\u793a " + TEMPLATE_CATEGORY_PREVIEW_LIMIT + " / " + templates.length + " \u4e2a\u6a21\u677f"
+          : templates.length + " \u4e2a\u53ef\u7528\u6a21\u677f";
       }
       if (!templates.length) {
         templateGalleryEl.innerHTML = '<div class="hint">' + (keyword ? '\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f' : '\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f') + '</div>';
         if (templateGalleryCountEl) templateGalleryCountEl.textContent = keyword ? "\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f" : "\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f";
         return;
       }
-      templateGalleryEl.innerHTML = templates.map((template) => templateCardHtml(template, selectedId)).join("");
+      // 分类模式默认只露出前 10 个模板，避免列表过长；用户点击后再展开完整分类。
+      const shouldLimitCategory = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
+      const visibleTemplates = shouldLimitCategory ? templates.slice(0, TEMPLATE_CATEGORY_PREVIEW_LIMIT) : templates;
+      const categoryName = categoryId ? selectedTemplateCategoryName(categoryId, templates) : "";
+      const categoryHeader = categoryId && !keyword
+        ? '<div class="template-category-preview-head"><div><strong>' + escapeHtml(categoryName) + '</strong><span>' + (shouldLimitCategory ? "\u5148\u5c55\u793a\u524d 10 \u4e2a\u6a21\u677f\uff0c\u70b9\u51fb\u4e0b\u65b9\u6309\u94ae\u53ef\u67e5\u770b\u5168\u90e8\u7f29\u7565\u56fe\u3002" : "\u5df2\u5c55\u793a\u8be5\u5206\u7c7b\u5168\u90e8\u6a21\u677f\u7f29\u7565\u56fe\u3002") + '</span></div><span class="template-gallery-count">' + visibleTemplates.length + " / " + templates.length + ' \u4e2a</span></div>'
+        : "";
+      const categoryMore = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT
+        ? '<div class="template-category-preview-actions"><button type="button" class="template-category-more-button" data-template-category-toggle="' + escapeHtml(categoryId) + '">' + (shouldLimitCategory ? "\u5c55\u5f00\u5168\u90e8\u6a21\u677f" : "\u6536\u8d77\uff0c\u4ec5\u663e\u793a\u524d 10 \u4e2a") + '</button></div>'
+        : "";
+      templateGalleryEl.innerHTML = categoryHeader + visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("") + categoryMore;
       templateGalleryEl.querySelectorAll("[data-template-card]").forEach((button) => {
         button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
       });
+      templateGalleryEl.querySelector("[data-template-category-toggle]")?.addEventListener("click", (event) => {
+        const toggleCategoryId = event.currentTarget.dataset.templateCategoryToggle || "";
+        expandedTemplateCategoryId = expandedTemplateCategoryId === toggleCategoryId ? "" : toggleCategoryId;
+        renderTemplateGallery();
+      });
+    }
+    function selectedTemplateCategoryName(categoryId, templates = []) {
+      const configured = (templateCategories || []).find((category) => category.id === categoryId);
+      if (configured?.name) return configured.name;
+      const matchedTemplate = templates.find((template) => resolveTemplateCategory(template).id === categoryId);
+      return matchedTemplate ? resolveTemplateCategory(matchedTemplate).name : categoryId;
     }
     function normalizeTemplateSearchKeyword(value) {
       return String(value || "").trim().toLowerCase();
@@ -2115,9 +2160,14 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     function renderSelectedTemplatePreview() {
       if (!selectedTemplatePreviewEl) return;
-      const template = templateCatalog.find((item) => item.id === document.querySelector("#template").value) || templateCatalog[0];
+      const selectedId = document.querySelector("#template").value;
+      const categoryId = document.querySelector("#template-category")?.value || "";
+      const categoryTemplates = categoryId
+        ? templateCatalog.filter((item) => resolveTemplateCategory(item).id === categoryId)
+        : templateCatalog;
+      const template = templateCatalog.find((item) => item.id === selectedId) || categoryTemplates[0] || templateCatalog[0];
       if (!template) {
-        selectedTemplatePreviewEl.innerHTML = '<div class="selected-template-preview-empty">请选择模板后查看样式预览</div>';
+        selectedTemplatePreviewEl.innerHTML = '<div class="selected-template-preview-empty">当前分类暂无可用模板</div>';
         return;
       }
       const display = resolveTemplateDisplay(template, template.id);
@@ -2128,7 +2178,37 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         + '<div class="selected-template-preview-title"><strong>' + escapeHtml(template.name) + '</strong><span>' + escapeHtml(categoryName) + ' · ' + escapeHtml(themeName) + '</span></div>'
         + '<span class="selected-template-preview-badge">官方模板</span>'
         + '</div>'
-        + templateThumbHtml(display);
+        + renderCreateTemplateCards(categoryTemplates, template.id, categoryId);
+      selectedTemplatePreviewEl.querySelectorAll("[data-template-card]").forEach((button) => {
+        button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
+      });
+      selectedTemplatePreviewEl.querySelector("[data-create-template-category-toggle]")?.addEventListener("click", (event) => {
+        const targetKey = event.currentTarget.dataset.createTemplateCategoryToggle || "__all__";
+        expandedTemplateCategoryId = expandedTemplateCategoryId === targetKey ? "" : targetKey;
+        renderSelectedTemplatePreview();
+        renderTemplateGallery();
+      });
+    }
+    function renderCreateTemplateCards(templates, selectedId, categoryId) {
+      if (!templates.length) {
+        return '<div class="selected-template-preview-empty">当前分类暂无可用模板</div>';
+      }
+      const categoryKey = categoryId || "__all__";
+      const collapsed = templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryKey;
+      const visibleTemplates = collapsed ? templates.slice(0, TEMPLATE_CATEGORY_PREVIEW_LIMIT) : templates;
+      const categoryName = categoryId ? selectedTemplateCategoryName(categoryId, templates) : "全部模板";
+      // 生成工作台空间较窄，这里只渲染单列缩略图，保证用户能直接点击切换模板。
+      const cards = visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("");
+      const moreButton = templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT
+        ? '<button type="button" class="create-template-more" data-create-template-category-toggle="' + escapeHtml(categoryKey) + '">' + (collapsed ? "展开全部模板" : "收起，仅显示前 10 个") + '</button>'
+        : "";
+      return ''
+        + '<div class="create-template-list-head" data-create-template-card-list>'
+        + '<div class="create-template-list-title"><strong>' + escapeHtml(categoryName) + '</strong><span>' + (collapsed ? "先展示前 10 个模板，展开后可查看全部缩略图。" : "已展示当前分类全部模板缩略图。") + '</span></div>'
+        + '<span class="create-template-list-count">' + visibleTemplates.length + ' / ' + templates.length + ' 个</span>'
+        + '</div>'
+        + '<div class="create-template-grid">' + cards + '</div>'
+        + moreButton;
     }
     function resolveTemplateDisplay(template, selectedId) {
       const visual = normalizedTemplateVisual(template.visual);
@@ -3194,9 +3274,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     });
     templateSearchEl?.addEventListener("input", () => {
       templateSearchQuery = templateSearchEl.value;
+      expandedTemplateCategoryId = "";
       renderTemplateGallery();
     });
-    document.querySelector("#template-category").addEventListener("change", loadTemplates);
+    document.querySelector("#template-category").addEventListener("change", () => {
+      expandedTemplateCategoryId = "";
+      loadTemplates();
+    });
     document.querySelector("#upload-personal-template")?.addEventListener("click", uploadPersonalTemplate);
     document.querySelector("#delete-personal-template")?.addEventListener("click", deleteSelectedPersonalTemplate);
     outlineEditorEl.addEventListener("change", () => {

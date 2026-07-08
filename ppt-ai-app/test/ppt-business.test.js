@@ -2693,6 +2693,15 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /type="search"/);
     assert.match(html, /templateSearchQuery/);
     assert.match(html, /templateMatchesSearch/);
+    assert.match(html, /TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10/);
+    assert.match(html, /expandedTemplateCategoryId/);
+    assert.match(html, /data-template-category-toggle/);
+    assert.match(html, /data-create-template-card-list/);
+    assert.match(html, /data-create-template-category-toggle/);
+    assert.match(html, /create-template-grid/);
+    assert.match(html, /选择模板分类后，下方会展示该分类的模板缩略图/);
+    assert.match(html, /selectedTemplateCategoryName/);
+    assert.match(html, /先展示前 10 个模板/);
     assert.match(html, /模板内容样式预览/);
     assert.match(html, /class="template-card"/);
     assert.match(html, /class="template-thumb"/);
