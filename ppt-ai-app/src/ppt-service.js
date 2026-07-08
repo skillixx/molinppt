@@ -991,6 +991,7 @@ function renderDeckPreview({ deck, visual }) {
     const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const onboardingScene = isOnboardingGuideVisual(visual) ? onboardingGuidePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const blackboardScene = typeof isKnowledgeBlackboardVisual === "function" && isKnowledgeBlackboardVisual(visual) ? knowledgeBlackboardPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const examReviewScene = isExamReviewKeypointsVisual(visual) ? examReviewKeypointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const releaseCadenceScene = isProductReleaseCadenceVisual(visual) ? productReleaseCadencePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1054,6 +1055,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const blackboardMark = blackboardScene
       ? renderKnowledgeBlackboardPreview(slide, blackboardScene)
+      : "";
+    const examReviewMark = examReviewScene
+      ? renderExamReviewKeypointsPreview(slide, examReviewScene)
       : "";
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
@@ -1199,10 +1203,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || priorityMatrixScene || experienceJourneyScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || onboardingScene || blackboardScene || launchRhythmScene || seedStoryScene || growthFundingScene || productFundingScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || priorityMatrixScene || experienceJourneyScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || onboardingScene || blackboardScene || examReviewScene || launchRhythmScene || seedStoryScene || growthFundingScene || productFundingScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || productFundingScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${productMark}${releaseCadenceMark}${painPointMark}${priorityMatrixMark}${experienceJourneyMark}${pitchMark}${seedStoryMark}${growthFundingMark}${productFundingMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || examReviewScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || productFundingScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${examReviewMark}${productMark}${releaseCadenceMark}${painPointMark}${priorityMatrixMark}${experienceJourneyMark}${pitchMark}${seedStoryMark}${growthFundingMark}${productFundingMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -2284,6 +2288,32 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="knowledge-blackboard"] .blackboard-summary{position:absolute;right:9%;top:18%;width:30%;height:44%;display:grid;gap:12px;}
     body[data-layout="knowledge-blackboard"] .blackboard-summary span{border-radius:12px;background:#fffdf5;color:#173b33;padding:13px 15px;font-size:12px;font-weight:900;box-shadow:6px 7px 0 rgba(0,0,0,.14);}
     body[data-layout="knowledge-blackboard"] .page-number{z-index:5;right:7.6%;bottom:6.1%;background:rgba(248,250,231,.14);border:1px solid rgba(248,250,231,.28);border-radius:999px;padding:5px 10px;color:#f8fae7;}
+    body[data-layout="exam-review-keypoints"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f4f7fb 0%,#fff 54%,#edf6ff 100%);box-shadow:0 22px 58px rgba(30,42,120,.16);}
+    body[data-layout="exam-review-keypoints"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(30,42,120,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(30,42,120,.04) 0 1px,transparent 1px 38px);}
+    body[data-layout="exam-review-keypoints"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8%;bottom:8%;z-index:1;border-radius:18px;background:rgba(255,255,255,.96);border:1px solid rgba(30,42,120,.12);box-shadow:0 24px 54px rgba(30,42,120,.12);}
+    body[data-layout="exam-review-keypoints"] .accent{height:8%;z-index:2;background:var(--template-primary);}
+    body[data-layout="exam-review-keypoints"] .slide-content{display:none;}
+    body[data-layout="exam-review-keypoints"] .exam-review-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="exam-review-keypoints"] .exam-review-kicker{position:absolute;left:8.6%;top:13.8%;font-size:11px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="exam-review-keypoints"] .exam-review-title{position:absolute;left:8.6%;top:20%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="exam-review-keypoints"] .exam-review-highlight{position:absolute;left:8.6%;top:42%;width:31%;height:8px;border-radius:999px;background:var(--template-accent);box-shadow:140px -26px 0 -2px rgba(6,182,212,.22);}
+    body[data-layout="exam-review-keypoints"] .exam-review-bullets{position:absolute;left:8.8%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.52;color:var(--template-body);}
+    body[data-layout="exam-review-keypoints"] .exam-review-bullets li{margin:.08em 0;}
+    body[data-layout="exam-review-keypoints"] .exam-review-card{position:absolute;right:8%;top:18%;width:34%;height:46%;border-radius:18px;background:#fff;border:1px solid rgba(30,42,120,.14);box-shadow:0 18px 38px rgba(30,42,120,.10);overflow:hidden;}
+    body[data-layout="exam-review-keypoints"] .exam-review-card::before{content:"";position:absolute;left:9%;right:9%;top:18%;height:9%;border-radius:999px;background:var(--template-primary);box-shadow:0 54px 0 rgba(245,158,11,.72),0 108px 0 rgba(6,182,212,.28);}
+    body[data-layout="exam-review-keypoints"] .exam-review-card::after{content:"";position:absolute;right:13%;bottom:13%;width:56px;height:56px;border-radius:50%;background:var(--template-secondary);box-shadow:-76px 0 0 -10px var(--template-warning);}
+    body[data-layout="exam-review-keypoints"] .exam-review-framework{position:absolute;right:8%;top:18%;width:36%;height:48%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="exam-review-keypoints"] .exam-review-framework span{border-radius:16px;background:#fff;border:1px solid rgba(30,42,120,.12);box-shadow:0 12px 24px rgba(30,42,120,.08);padding:15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="exam-review-keypoints"] .exam-review-framework span::before{content:"";display:block;width:34px;height:6px;margin-bottom:11px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="exam-review-keypoints"] .exam-review-mistakes{position:absolute;right:8%;top:18%;width:36%;height:48%;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="exam-review-keypoints"] .exam-review-mistakes span{border-radius:14px;background:#fff7ed;border:1px solid rgba(245,158,11,.26);padding:13px 14px 13px 44px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="exam-review-keypoints"] .exam-review-mistakes span::before{content:"";position:absolute;width:18px;height:18px;margin-left:-30px;margin-top:0;border-radius:50%;background:var(--template-warning);}
+    body[data-layout="exam-review-keypoints"] .exam-review-plan{position:absolute;left:8%;right:8%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="exam-review-keypoints"] .exam-review-plan span{position:relative;min-height:74px;border-radius:16px;background:#eef6ff;border:1px solid rgba(30,42,120,.10);padding:16px 13px 12px 45px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="exam-review-keypoints"] .exam-review-plan span::before{content:attr(data-step);position:absolute;left:13px;top:15px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--template-primary);color:#fff;font-size:10px;}
+    body[data-layout="exam-review-keypoints"] .exam-review-summary{position:absolute;right:8%;top:19%;width:34%;height:44%;display:grid;gap:12px;}
+    body[data-layout="exam-review-keypoints"] .exam-review-summary span{border-radius:14px;background:#fff;border-left:6px solid var(--template-accent);box-shadow:0 12px 24px rgba(30,42,120,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="exam-review-keypoints"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(30,42,120,.12);border-radius:999px;padding:5px 10px;color:rgba(23,37,84,.66);}
     body[data-layout="education-course"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 54%,color-mix(in srgb,var(--template-accent) 9%,var(--template-bg) 91%));padding:7% 8.5% 6.6%;border:0;}
     body[data-layout="education-course"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 30px),radial-gradient(circle at 12% 16%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 22%);pointer-events:none;}
     body[data-layout="education-course"] .slide::after{content:"";position:absolute;left:8.8%;right:8.2%;top:13.5%;bottom:11%;border-radius:2px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.90));border-left:8px solid color-mix(in srgb,var(--template-primary) 70%,var(--template-accent) 30%);box-shadow:0 18px 40px rgba(33,78,68,.12);}
@@ -3916,6 +3946,81 @@ function isKnowledgeBlackboardVisual(visual) {
   return visual?.layout === "knowledge-blackboard" && (id === "knowledge-handout" || id === "education-knowledge-handout-blackboard");
 }
 
+function examReviewKeypointsPreviewScene({ slide, index, total }) {
+  const bullets = examReviewKeypointTexts(slide);
+  const layout = String(slide?.layout || "");
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : index === total - 1 || layout.includes("summary") || layout === "closing"
+      ? "summary"
+      : layout.includes("roadmap")
+        ? "roadmap"
+        : layout.includes("framework")
+          ? "framework"
+          : layout.includes("mistake")
+            ? "mistakes"
+            : layout.includes("plan")
+              ? "plan"
+              : "keypoints";
+  const kickerMap = {
+    cover: "EXAM REVIEW",
+    roadmap: "REVIEW PATH",
+    framework: "KNOWLEDGE MAP",
+    mistakes: "ERROR ANALYSIS",
+    plan: "FINAL SPRINT",
+    summary: "REVIEW SUMMARY",
+    keypoints: "KEY TAKEAWAYS",
+  };
+  return {
+    variant: "key-points",
+    role,
+    kicker: kickerMap[role] || "KEY TAKEAWAYS",
+    title: examReviewCompactText(slide?.title, "考点框架", role === "cover" ? 28 : 24),
+    bullets,
+    cards: ["考点结构", "必背方法", "练习反馈"].map((fallback, itemIndex) => examReviewCompactText(bullets[itemIndex], fallback, 14)),
+    steps: ["框架", "考点", "错题", "计划"].map((fallback, itemIndex) => examReviewCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function renderExamReviewKeypointsPreview(slide, scene) {
+  // 考试复习模板使用答题卡、框架卡和错题夹来承载动态内容，避免默认正文层和复习组件互相遮挡。
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(examReviewCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="exam-review-kicker">${escapeHtml(scene.kicker)}</div><h2 class="exam-review-title">${escapeHtml(scene.title || slide?.title || "")}</h2><div class="exam-review-highlight"></div><ul class="exam-review-bullets">${bulletItems}</ul>`;
+  if (scene.role === "framework" || scene.role === "keypoints") {
+    return `<div class="exam-review-layer">${common}<div class="exam-review-framework">${scene.cards.concat(scene.steps.slice(0, 1)).slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="exam-review-plan">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "mistakes") {
+    return `<div class="exam-review-layer">${common}<div class="exam-review-mistakes">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="exam-review-plan">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "plan" || scene.role === "roadmap") {
+    return `<div class="exam-review-layer">${common}<div class="exam-review-card"></div><div class="exam-review-plan">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "summary") {
+    return `<div class="exam-review-layer">${common}<div class="exam-review-summary">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="exam-review-plan">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="exam-review-layer">${common}<div class="exam-review-card"></div><div class="exam-review-plan">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function examReviewKeypointTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["梳理高频考点和必背公式", "归因错题类型并建立修正方法", "安排冲刺练习和查漏补缺节奏"];
+}
+
+function examReviewCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isExamReviewKeypointsVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "exam-review-keypoints" && (id === "exam-review-courseware" || id === "education-exam-review-courseware-key-points");
+}
+
 function productRoadmapPreviewScene(visual) {
   const variant = productRoadmapVariant(visual);
   const scenes = {
@@ -5206,6 +5311,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
+  if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }

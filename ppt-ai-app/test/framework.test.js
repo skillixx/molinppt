@@ -854,6 +854,41 @@ test("resolveTemplateVisual applies market trend radar official visual", () => {
   assert.equal(visual.accent, "38BDF8");
 });
 
+test("resolveTemplateVisual applies customer segmentation layering official visual", () => {
+  const template = {
+    id: "data-customer-segmentation-persona-layering",
+    visual: {
+      primary: "111827",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      warning: "A855F7",
+      background: "F6FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "customer-segmentation-layering",
+      variant: "persona-layering",
+    },
+    themes: [
+      {
+        id: "persona-layering",
+        visual: {
+          layout: "customer-segmentation-layering",
+          variant: "persona-layering",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "persona-layering", template });
+
+  assert.equal(visual.id, "data-customer-segmentation-persona-layering");
+  assert.equal(visual.layout, "customer-segmentation-layering");
+  assert.equal(visual.variant, "persona-layering");
+  assert.equal(visual.primary, "111827");
+  assert.equal(visual.accent, "14B8A6");
+});
+
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),

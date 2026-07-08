@@ -1535,6 +1535,53 @@ test("PptExportService uses market trend radar decorations", () => {
   assert.doesNotMatch(slide1, /趋势雷达/);
 });
 
+test("PptExportService uses customer segmentation layering decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-customer-segmentation-persona-layering",
+      theme: "persona-layering",
+      templateVisual: {
+        id: "data-customer-segmentation-persona-layering",
+        primary: "111827",
+        accent: "14B8A6",
+        secondary: "F59E0B",
+        warning: "A855F7",
+        background: "F6FAFC",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "customer-segmentation-layering",
+        variant: "persona-layering",
+      },
+      slides: [
+        { title: "客户分群画像分析", layout: "customer-segmentation-layering-cover", bullets: ["高价值客户 24K", "核心客群 4 类", "复购提升 18%"] },
+        { title: "分层结构总览", layout: "customer-segmentation-layering-overview", bullets: ["高价值客户", "成长潜力客群", "价格敏感人群", "沉睡风险人群"] },
+        { title: "典型画像拆解", layout: "customer-segmentation-layering-persona", bullets: ["身份标签", "行为偏好", "消费频次", "触达策略"] },
+        { title: "RFM 价值矩阵", layout: "customer-segmentation-layering-analysis", bullets: ["高价值高频", "高潜低频", "价格敏感", "沉睡风险"] },
+        { title: "精准运营策略", layout: "customer-segmentation-layering-strategy", bullets: ["权益匹配", "渠道触达", "内容推荐", "转化目标"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Customer Segmentation Canvas"/);
+  assert.match(slide1, /name="Customer Segmentation Pyramid Panel"/);
+  assert.match(slide1, /name="Customer Segmentation KPI Card 1"/);
+  assert.match(slide3, /name="Customer Persona Card 1"/);
+  assert.match(slide4, /name="Customer Segmentation RFM Matrix"/);
+  assert.match(slide5, /name="Customer Segmentation Strategy Table"/);
+  assert.match(slide1, /val="F6FAFC"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /人群分层/);
+});
+
 test("PptExportService uses editorial brand story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

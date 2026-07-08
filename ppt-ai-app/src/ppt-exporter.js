@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "knowledge-blackboard") {
     if (index === 0) {
@@ -404,6 +404,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1280;
     if (textLength >= 22) return 1480;
     return Math.min(fallbackSize, 1760);
+  }
+  if (visual.layout === "exam-review-keypoints") {
+    if (index === 0) {
+      if (textLength >= 30) return 1900;
+      if (textLength >= 22) return 2180;
+      return Math.min(fallbackSize, 2520);
+    }
+    if (textLength >= 30) return 1300;
+    if (textLength >= 22) return 1500;
+    return Math.min(fallbackSize, 1780);
   }
   if (visual.layout === "growth-funding-flywheel") {
     if (index === 0) {
@@ -725,12 +735,14 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;
+  if (visual.layout === "customer-segmentation-layering") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
+  if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
@@ -886,6 +898,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "market-trend-radar") {
     return base + marketTrendRadarDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "customer-segmentation-layering") {
+    return base + customerSegmentationLayeringDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -912,6 +927,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "knowledge-blackboard") {
     return base + knowledgeBlackboardDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "exam-review-keypoints") {
+    return base + examReviewKeypointsDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
@@ -1946,6 +1964,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 841344, y: 1844040, cx: 3657600, cy: 1005840 },
       titleSize: isCover ? 2480 : isClosing ? 2280 : 1760,
       bodySize: isCover ? 820 : 700,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "exam-review-keypoints") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 530352, y: 411480, cx: 8083296, cy: 4312920 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 396240 },
+      secondaryAccent: { x: 786384, y: isCover ? 2159000 : 1905000, cx: 2834640, cy: 60960 },
+      label: { x: 786384, y: 670560, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 786384, y: 1127760, cx: 4572000, cy: 792480 }
+        : isCover
+          ? { x: 786384, y: 1036320, cx: 3962400, cy: 1036320 }
+          : { x: 786384, y: 884000, cx: 3962400, cy: 792480 },
+      content: isClosing
+        ? { x: 804672, y: 2186940, cx: 3657600, cy: 822960 }
+        : isCover
+          ? { x: 804672, y: 2385060, cx: 3505200, cy: 762000 }
+          : { x: 804672, y: 1798320, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2520 : isClosing ? 2380 : 1780,
+      bodySize: isCover ? 820 : 720,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4189,6 +4231,146 @@ function knowledgeBlackboardColorPalette(visual) {
 function isKnowledgeBlackboardVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "knowledge-blackboard" && (id === "knowledge-handout" || id === "education-knowledge-handout-blackboard");
+}
+
+function examReviewKeypointsDecorationsXml({ visual, index, role, slide }) {
+  const scene = examReviewKeypointsSceneFromSlide({ slide, index, role });
+  const palette = examReviewKeypointsColorPalette(visual);
+  // 考试复习模板使用可编辑图形模拟答题卡、错题夹和复习计划，避免下载后只有整页图片。
+  const base = rectShapeXml({ id: 2201, name: "Exam Review Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.background })
+    + examReviewGridXml({ palette })
+    + solidShapeXml({ id: 2208, name: "Exam Review Canvas", geom: "roundRect", x: 530352, y: 411480, cx: 8083296, cy: 4312920, fill: palette.surface })
+    + lineFrameShapeXml({ id: 2209, name: "Exam Review Canvas Frame", geom: "roundRect", x: 530352, y: 411480, cx: 8083296, cy: 4312920, stroke: palette.frame, width: 9525 })
+    + rectShapeXml({ id: 2210, name: "Exam Review Header Strip", x: 0, y: 0, cx: 9144000, cy: 396240, fill: visual.primary })
+    + textShapeXml({ id: 2211, name: "Exam Review Kicker", x: 786384, y: 670560, cx: 2743200, cy: 274320, text: scene.kicker, size: 820, bold: true, color: visual.accent })
+    + solidShapeXml({ id: 2212, name: "Exam Review Highlight Bar", geom: "roundRect", x: 786384, y: index === 0 ? 2225040 : 1950720, cx: 2895600, cy: 76200, fill: visual.accent });
+  const bullets = examReviewBulletXml({ visual, scene, index });
+  if (scene.role === "framework" || scene.role === "keypoints") return base + bullets + examReviewFrameworkXml({ visual, scene, palette }) + examReviewPlanXml({ visual, scene, palette });
+  if (scene.role === "mistakes") return base + bullets + examReviewMistakeXml({ visual, scene, palette }) + examReviewPlanXml({ visual, scene, palette });
+  if (scene.role === "plan" || scene.role === "roadmap") return base + bullets + examReviewAnswerCardXml({ visual, palette }) + examReviewPlanXml({ visual, scene, palette });
+  if (scene.role === "summary") return base + bullets + examReviewSummaryXml({ visual, scene, palette }) + examReviewPlanXml({ visual, scene, palette });
+  return base + bullets + examReviewAnswerCardXml({ visual, palette }) + examReviewPlanXml({ visual, scene, palette });
+}
+
+function examReviewGridXml({ palette }) {
+  const vertical = [914400, 1325880, 1737360, 2148840, 2560320, 2971800, 3383280, 3794760, 4206240, 4617720, 5029200, 5440680, 5852160, 6263640, 6675120, 7086600, 7498080, 7909560]
+    .map((x, index) => rectShapeXml({ id: 2220 + index, name: `Exam Review Grid V ${index + 1}`, x, y: 411480, cx: 7620, cy: 4312920, fill: palette.grid })).join("");
+  const horizontal = [792480, 1188720, 1584960, 1981200, 2377440, 2773680, 3169920, 3566160, 3962400, 4358640]
+    .map((y, index) => rectShapeXml({ id: 2245 + index, name: `Exam Review Grid H ${index + 1}`, x: 530352, y, cx: 8083296, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function examReviewBulletXml({ visual, scene, index }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = (index === 0 ? 2514600 : 1912620) + itemIndex * 243840;
+    return solidShapeXml({ id: 2260 + itemIndex * 3, name: `Exam Review Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 804672, y: y + 45720, cx: 68580, cy: 68580, fill: visual.accent })
+      + textShapeXml({ id: 2261 + itemIndex * 3, name: `Exam Review Bullet Text ${itemIndex + 1}`, x: 914400, y, cx: 3352800, cy: 198120, text: examReviewCompactText(item, scene.title, 34), size: index === 0 ? 760 : 680, bold: false, color: visual.body });
+  }).join("");
+}
+
+function examReviewAnswerCardXml({ visual, palette }) {
+  return solidShapeXml({ id: 2280, name: "Exam Review Answer Card", geom: "roundRect", x: 5638800, y: 914400, cx: 2590800, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2281, name: "Exam Review Answer Card Frame", geom: "roundRect", x: 5638800, y: 914400, cx: 2590800, cy: 2133600, stroke: palette.frame, width: 9525 })
+    + solidShapeXml({ id: 2282, name: "Exam Review Answer Line 1", geom: "roundRect", x: 5996940, y: 1341120, cx: 1219200, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 2283, name: "Exam Review Answer Line 2", geom: "roundRect", x: 5996940, y: 1905000, cx: 1066800, cy: 121920, fill: visual.accent })
+    + solidShapeXml({ id: 2284, name: "Exam Review Answer Circle", geom: "ellipse", x: 7353300, y: 2476500, cx: 472440, cy: 472440, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: 2285, name: "Exam Review Answer Mark", geom: "roundRect", x: 5996940, y: 2567940, cx: 548640, cy: 304800, fill: palette.warningSoft });
+}
+
+function examReviewFrameworkXml({ visual, scene, palette }) {
+  return scene.cards.concat(scene.steps.slice(0, 1)).slice(0, 4).map((item, index) => {
+    const x = 5638800 + (index % 2) * 1325880;
+    const y = 914400 + Math.floor(index / 2) * 1066800;
+    return solidShapeXml({ id: 2290 + index * 4, name: `Exam Review Framework Card ${index + 1}`, geom: "roundRect", x, y, cx: 1188720, cy: 899160, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2291 + index * 4, name: `Exam Review Framework Frame ${index + 1}`, geom: "roundRect", x, y, cx: 1188720, cy: 899160, stroke: palette.frame, width: 9525 })
+      + solidShapeXml({ id: 2292 + index * 4, name: `Exam Review Framework Rule ${index + 1}`, geom: "roundRect", x: x + 152400, y: y + 182880, cx: 396240, cy: 60960, fill: visual.accent })
+      + textShapeXml({ id: 2293 + index * 4, name: `Exam Review Framework Text ${index + 1}`, x: x + 152400, y: y + 365760, cx: 822960, cy: 243840, text: examReviewCompactText(item, "", 12), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function examReviewMistakeXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const y = 990600 + index * 670560;
+    return solidShapeXml({ id: 2320 + index * 4, name: `Exam Review Mistake Card ${index + 1}`, geom: "roundRect", x: 5638800, y, cx: 2590800, cy: 518160, fill: palette.warningBg })
+      + lineFrameShapeXml({ id: 2321 + index * 4, name: `Exam Review Mistake Frame ${index + 1}`, geom: "roundRect", x: 5638800, y, cx: 2590800, cy: 518160, stroke: palette.warningFrame, width: 9525 })
+      + solidShapeXml({ id: 2322 + index * 4, name: `Exam Review Mistake Dot ${index + 1}`, geom: "ellipse", x: 5867400, y: y + 167640, cx: 167640, cy: 167640, fill: visual.warning || "EF4444" })
+      + textShapeXml({ id: 2323 + index * 4, name: `Exam Review Mistake Text ${index + 1}`, x: 6156960, y: y + 137160, cx: 1676400, cy: 213360, text: examReviewCompactText(item, "", 14), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function examReviewPlanXml({ visual, scene, palette }) {
+  return scene.steps.slice(0, 4).map((item, index) => {
+    const x = 731520 + index * 2011680;
+    return solidShapeXml({ id: 2350 + index * 5, name: `Exam Review Plan Step ${index + 1}`, geom: "roundRect", x, y: 3924300, cx: 1767840, cy: 579120, fill: palette.plan })
+      + lineFrameShapeXml({ id: 2351 + index * 5, name: `Exam Review Plan Frame ${index + 1}`, geom: "roundRect", x, y: 3924300, cx: 1767840, cy: 579120, stroke: palette.frame, width: 7620 })
+      + solidShapeXml({ id: 2352 + index * 5, name: `Exam Review Plan Number ${index + 1}`, geom: "ellipse", x: x + 152400, y: 4084320, cx: 243840, cy: 243840, fill: visual.primary })
+      + textShapeXml({ id: 2353 + index * 5, name: `Exam Review Plan Number Text ${index + 1}`, x: x + 198120, y: 4122420, cx: 152400, cy: 121920, text: String(index + 1), size: 620, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 2354 + index * 5, name: `Exam Review Plan Text ${index + 1}`, x: x + 487680, y: 4053840, cx: 990600, cy: 228600, text: examReviewCompactText(item, "", 10), size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function examReviewSummaryXml({ visual, scene }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const y = 990600 + index * 655320;
+    return solidShapeXml({ id: 2380 + index * 3, name: `Exam Review Summary Card ${index + 1}`, geom: "roundRect", x: 5638800, y, cx: 2590800, cy: 502920, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2381 + index * 3, name: `Exam Review Summary Accent ${index + 1}`, x: 5638800, y, cx: 60960, cy: 502920, fill: visual.accent })
+      + textShapeXml({ id: 2382 + index * 3, name: `Exam Review Summary Text ${index + 1}`, x: 5867400, y: y + 137160, cx: 1676400, cy: 213360, text: examReviewCompactText(item, "", 14), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function examReviewKeypointsSceneFromSlide({ slide, index, role }) {
+  const bullets = examReviewKeypointTexts(slide);
+  const rawRole = String(slide?.layout || role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("roadmap")
+      ? "roadmap"
+      : rawRole.includes("framework")
+        ? "framework"
+        : rawRole.includes("mistake")
+          ? "mistakes"
+          : rawRole.includes("plan")
+            ? "plan"
+            : rawRole.includes("summary") || rawRole === "closing"
+              ? "summary"
+              : ["keypoints", "framework", "mistakes", "plan", "summary"][(index - 1) % 5];
+  const kickerMap = { cover: "EXAM REVIEW", roadmap: "REVIEW PATH", framework: "KNOWLEDGE MAP", mistakes: "ERROR ANALYSIS", plan: "FINAL SPRINT", summary: "REVIEW SUMMARY", keypoints: "KEY TAKEAWAYS" };
+  return {
+    role: sceneRole,
+    kicker: kickerMap[sceneRole] || "KEY TAKEAWAYS",
+    bullets,
+    cards: ["考点结构", "必背方法", "练习反馈"].map((fallback, itemIndex) => examReviewCompactText(bullets[itemIndex], fallback, 12)),
+    steps: ["框架", "考点", "错题", "计划"].map((fallback, itemIndex) => examReviewCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function examReviewKeypointTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["梳理高频考点和必背公式", "归因错题类型并建立修正方法", "安排冲刺练习和查漏补缺节奏"];
+}
+
+function examReviewCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function examReviewKeypointsColorPalette(visual) {
+  return {
+    background: normalizeHexColor(visual.background || "F4F7FB"),
+    surface: normalizeHexColor(visual.surface || "FFFFFF"),
+    frame: "C7D2FE",
+    grid: "E8EEF9",
+    plan: "EEF6FF",
+    warningBg: "FFF7ED",
+    warningFrame: "FED7AA",
+    warningSoft: normalizeHexColor(visual.warning || "EF4444"),
+  };
+}
+
+function isExamReviewKeypointsVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "exam-review-keypoints" && (id === "exam-review-courseware" || id === "education-exam-review-courseware-key-points");
 }
 
 function educationSolutionDecorationsXml({ visual, index, role, slide }) {
@@ -6794,6 +6976,191 @@ function marketTrendRadarColorPalette(visual) {
     panel: blendHexColor(visual.surface, visual.background, 0.08),
     violet: visual.secondary || "A78BFA",
     warningPanel: blendHexColor(visual.warning || "F59E0B", visual.surface, 0.84),
+  };
+}
+
+function customerSegmentationLayeringDecorationsXml({ visual, index, role, slide }) {
+  const scene = customerSegmentationLayeringScene({ slide, index, role });
+  const palette = customerSegmentationLayeringColorPalette(visual);
+  // 客户分群模板用可编辑图形绘制分层金字塔、画像卡和 RFM 矩阵，避免把用户画像做成不可编辑截图。
+  const shell = rectShapeXml({ id: 2100, name: "Customer Segmentation Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + customerSegmentationGridXml({ palette })
+    + solidShapeXml({ id: 2101, name: "Customer Segmentation Canvas", geom: "roundRect", x: 457200, y: 411480, cx: 8229600, cy: 4381500, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 2102, name: "Customer Segmentation Canvas Frame", geom: "roundRect", x: 457200, y: 411480, cx: 8229600, cy: 4381500, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2103, name: "Customer Segmentation Header Teal", x: 457200, y: 411480, cx: 5486400, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 2104, name: "Customer Segmentation Header Amber", x: 5943600, y: 411480, cx: 1524000, cy: 45720, fill: palette.amber })
+    + rectShapeXml({ id: 2105, name: "Customer Segmentation Header Violet", x: 7467600, y: 411480, cx: 1066800, cy: 45720, fill: palette.violet })
+    + textShapeXml({ id: 2106, name: "Customer Segmentation Section Kicker", x: 731520, y: 670560, cx: 3200400, cy: 198120, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const panel = scene.kind === "persona"
+    ? customerSegmentationPersonaCardsXml({ visual, palette, cards: scene.cards })
+    : scene.kind === "matrix"
+      ? customerSegmentationRfmMatrixXml({ visual, palette })
+      : scene.kind === "strategy"
+        ? customerSegmentationStrategyTableXml({ visual, palette, cards: scene.cards })
+        : scene.kind === "action"
+          ? customerSegmentationActionLoopXml({ visual, palette })
+          : customerSegmentationPyramidXml({ visual, palette, layers: scene.layers });
+  return shell
+    + panel
+    + (scene.kind !== "action" ? customerSegmentationMetricCardsXml({ visual, palette, metrics: scene.metrics }) : "")
+    + customerSegmentationInsightRowsXml({ visual, palette, bullets: scene.bullets })
+    + (scene.kind === "action" ? customerSegmentationStrategyCardsXml({ visual, palette, cards: scene.cards }) : "");
+}
+
+function customerSegmentationGridXml({ palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 2110 + itemIndex, name: `Customer Segmentation Vertical Grid ${itemIndex + 1}`, x: 914400 + itemIndex * 1219200, y: 609600, cx: 7620, cy: 3962400, fill: palette.grid })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 2120 + itemIndex, name: `Customer Segmentation Horizontal Grid ${itemIndex + 1}`, x: 609600, y: 1066800 + itemIndex * 762000, cx: 7924800, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal
+    + solidShapeXml({ id: 2128, name: "Customer Segmentation Teal Glow", geom: "ellipse", x: 6400800, y: 365760, cx: 1828800, cy: 1828800, fill: palette.glow })
+    + solidShapeXml({ id: 2129, name: "Customer Segmentation Violet Glow", geom: "ellipse", x: 274320, y: 3505200, cx: 1371600, cy: 1371600, fill: blendHexColor(palette.violet, visualColorFallback(palette.background, "F6FAFC"), 0.84) });
+}
+
+function customerSegmentationPyramidXml({ visual, palette, layers }) {
+  const widths = [1066800, 1524000, 1981200, 2438400];
+  const fills = [visual.primary, visual.accent, palette.amber, palette.violet];
+  return solidShapeXml({ id: 2130, name: "Customer Segmentation Pyramid Panel", geom: "roundRect", x: 5486400, y: 1036320, cx: 2895600, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2131, name: "Customer Segmentation Pyramid Frame", geom: "roundRect", x: 5486400, y: 1036320, cx: 2895600, cy: 2286000, stroke: palette.frame, width: 11430 })
+    + layers.slice(0, 4).map((layer, index) => {
+      const width = widths[index];
+      const x = 6934200 - Math.round(width / 2);
+      const y = 1280160 + index * 426720;
+      return solidShapeXml({ id: 2140 + index * 3, name: `Customer Segment Layer ${index + 1}`, geom: "roundRect", x, y, cx: width, cy: 304800, fill: fills[index] })
+        + textShapeXml({ id: 2141 + index * 3, name: `Customer Segment Layer Text ${index + 1}`, x: x + 121920, y: y + 76200, cx: width - 243840, cy: 137160, text: layer, size: 660, bold: true, color: "FFFFFF" });
+    }).join("");
+}
+
+function customerSegmentationPersonaCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1447800;
+    const y = 1219200 + row * 914400;
+    return solidShapeXml({ id: 2170 + index * 5, name: `Customer Persona Card ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 685800, fill: palette.panel })
+      + solidShapeXml({ id: 2171 + index * 5, name: `Customer Persona Avatar ${index + 1}`, geom: "ellipse", x: x + 152400, y: y + 121920, cx: 182880, cy: 182880, fill: index % 2 ? palette.amber : visual.accent })
+      + textShapeXml({ id: 2172 + index * 5, name: `Customer Persona Text ${index + 1}`, x: x + 152400, y: y + 365760, cx: 914400, cy: 152400, text: card, size: 700, bold: true, color: visual.title })
+      + rectShapeXml({ id: 2173 + index * 5, name: `Customer Persona Tag ${index + 1}`, x: x + 396240, y: y + 182880, cx: 548640, cy: 38100, fill: palette.tag })
+      + rectShapeXml({ id: 2174 + index * 5, name: `Customer Persona Rule ${index + 1}`, x: x + 152400, y: y + 579120, cx: 762000, cy: 30480, fill: index === 2 ? palette.violet : visual.accent });
+  }).join("");
+}
+
+function customerSegmentationRfmMatrixXml({ visual, palette }) {
+  return solidShapeXml({ id: 2200, name: "Customer Segmentation RFM Matrix", geom: "roundRect", x: 5486400, y: 1120140, cx: 2895600, cy: 2133600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2201, name: "Customer Segmentation RFM Frame", geom: "roundRect", x: 5486400, y: 1120140, cx: 2895600, cy: 2133600, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 2202, name: "Customer Segmentation RFM Axis X", x: 5791200, y: 2194560, cx: 2286000, cy: 15240, fill: palette.grid })
+    + rectShapeXml({ id: 2203, name: "Customer Segmentation RFM Axis Y", x: 6934200, y: 1325880, cx: 15240, cy: 1600200, fill: palette.grid })
+    + solidShapeXml({ id: 2204, name: "Customer Segmentation RFM High Value", geom: "ellipse", x: 7162800, y: 1470660, cx: 182880, cy: 182880, fill: visual.primary })
+    + solidShapeXml({ id: 2205, name: "Customer Segmentation RFM Growth", geom: "ellipse", x: 6248400, y: 1630680, cx: 167640, cy: 167640, fill: visual.accent })
+    + solidShapeXml({ id: 2206, name: "Customer Segmentation RFM Price Sensitive", geom: "ellipse", x: 7086600, y: 2522220, cx: 152400, cy: 152400, fill: palette.amber })
+    + solidShapeXml({ id: 2207, name: "Customer Segmentation RFM Dormant", geom: "ellipse", x: 6172200, y: 2598420, cx: 152400, cy: 152400, fill: palette.violet })
+    + textShapeXml({ id: 2208, name: "Customer Segmentation RFM Label", x: 5791200, y: 2926080, cx: 1981200, cy: 152400, text: "RFM Value Map", size: 700, bold: true, color: visual.title });
+}
+
+function customerSegmentationStrategyTableXml({ visual, palette, cards }) {
+  return solidShapeXml({ id: 2230, name: "Customer Segmentation Strategy Table", geom: "roundRect", x: 5181600, y: 1120140, cx: 3352800, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2231, name: "Customer Segmentation Strategy Frame", geom: "roundRect", x: 5181600, y: 1120140, cx: 3352800, cy: 2286000, stroke: palette.frame, width: 11430 })
+    + cards.slice(0, 4).map((card, index) => {
+      const y = 1325880 + index * 426720;
+      return solidShapeXml({ id: 2240 + index * 4, name: `Customer Strategy Row ${index + 1}`, geom: "roundRect", x: 5486400, y, cx: 2743200, cy: 304800, fill: index % 2 ? palette.rowAlt : palette.card })
+        + solidShapeXml({ id: 2241 + index * 4, name: `Customer Strategy Dot ${index + 1}`, geom: "ellipse", x: 5669280, y: y + 91440, cx: 121920, cy: 121920, fill: index === 1 ? palette.amber : visual.accent })
+        + textShapeXml({ id: 2242 + index * 4, name: `Customer Strategy Text ${index + 1}`, x: 5897880, y: y + 76200, cx: 1828800, cy: 137160, text: card, size: 700, bold: true, color: visual.title })
+        + rectShapeXml({ id: 2243 + index * 4, name: `Customer Strategy Progress ${index + 1}`, x: 7620000, y: y + 121920, cx: 365760 + index * 121920, cy: 38100, fill: index === 2 ? palette.violet : visual.accent });
+    }).join("");
+}
+
+function customerSegmentationActionLoopXml({ visual, palette }) {
+  return lineFrameShapeXml({ id: 2270, name: "Customer Segmentation Operation Loop", geom: "ellipse", x: 5791200, y: 1219200, cx: 2133600, cy: 2133600, stroke: visual.accent, width: 68580 })
+    + lineFrameShapeXml({ id: 2271, name: "Customer Segmentation Operation Loop Amber", geom: "ellipse", x: 6065520, y: 1493520, cx: 1584960, cy: 1584960, stroke: palette.amber, width: 38100 })
+    + solidShapeXml({ id: 2272, name: "Customer Segmentation Operation Core", geom: "roundRect", x: 6705600, y: 2072640, cx: 548640, cy: 548640, fill: visual.primary })
+    + textShapeXml({ id: 2273, name: "Customer Segmentation Operation Core Text", x: 6644640, y: 2263140, cx: 670560, cy: 137160, text: "CRM", size: 760, bold: true, color: "FFFFFF" });
+}
+
+function customerSegmentationStrategyCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const x = 731520 + index * 1981200;
+    return solidShapeXml({ id: 2290 + index * 3, name: `Customer Segmentation Action Card ${index + 1}`, geom: "roundRect", x, y: 3596640, cx: 1676400, cy: 609600, fill: palette.card })
+      + rectShapeXml({ id: 2291 + index * 3, name: `Customer Segmentation Action Rule ${index + 1}`, x: x + 137160, y: 3764280, cx: 579120, cy: 38100, fill: index === 1 ? palette.amber : visual.accent })
+      + textShapeXml({ id: 2292 + index * 3, name: `Customer Segmentation Action Text ${index + 1}`, x: x + 137160, y: 3985260, cx: 1219200, cy: 182880, text: card, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function customerSegmentationMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, index) => {
+    const x = 731520 + index * 1524000;
+    return solidShapeXml({ id: 2320 + index * 4, name: `Customer Segmentation KPI Card ${index + 1}`, geom: "roundRect", x, y: 3771900, cx: 1219200, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 2321 + index * 4, name: `Customer Segmentation KPI Value ${index + 1}`, x: x + 137160, y: 3886200, cx: 579120, cy: 182880, text: metric.value, size: 1080, bold: true, color: visual.title })
+      + textShapeXml({ id: 2322 + index * 4, name: `Customer Segmentation KPI Label ${index + 1}`, x: x + 137160, y: 4130040, cx: 853440, cy: 137160, text: metric.label, size: 640, bold: true, color: visual.body })
+      + rectShapeXml({ id: 2323 + index * 4, name: `Customer Segmentation KPI Pulse ${index + 1}`, x: x + 137160, y: 4328160, cx: 487680 + index * 91440, cy: 30480, fill: index === 2 ? palette.violet : visual.accent });
+  }).join("");
+}
+
+function customerSegmentationInsightRowsXml({ visual, palette, bullets }) {
+  return bullets.slice(0, 3).map((bullet, index) => {
+    const y = 2240280 + index * 365760;
+    return solidShapeXml({ id: 2350 + index * 3, name: `Customer Segmentation Insight Row ${index + 1}`, geom: "roundRect", x: 731520, y, cx: 3505200, cy: 243840, fill: palette.card })
+      + solidShapeXml({ id: 2351 + index * 3, name: `Customer Segmentation Insight Dot ${index + 1}`, geom: "ellipse", x: 883920, y: y + 76200, cx: 91440, cy: 91440, fill: index === 1 ? palette.amber : visual.accent })
+      + textShapeXml({ id: 2352 + index * 3, name: `Customer Segmentation Insight Text ${index + 1}`, x: 1066800, y: y + 60960, cx: 2895600, cy: 121920, text: customerSegmentationCompactText(bullet, "关键客户洞察", 30), size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function customerSegmentationLayeringScene({ slide, index, role }) {
+  const bullets = customerSegmentationBulletTexts(slide);
+  const values = customerSegmentationMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: customerSegmentationCompactText(bullets[0], "用户规模", 8) },
+    { value: values[1], label: customerSegmentationCompactText(bullets[1], "核心客群", 8) },
+    { value: values[2], label: customerSegmentationCompactText(bullets[2], "提升目标", 8) },
+  ];
+  const layers = ["高价值客户", "成长潜力客群", "价格敏感人群", "沉睡风险人群"].map((fallback, itemIndex) => customerSegmentationCompactText(bullets[itemIndex], fallback, 10));
+  const sceneKind = index === 0 ? "cover" : role === "closing" ? "action" : String(role || "").includes("persona") ? "persona" : String(role || "").includes("matrix") || String(role || "").includes("analysis") ? "matrix" : String(role || "").includes("strategy") ? "strategy" : String(role || "").includes("overview") ? "overview" : String(role || "").includes("action") ? "action" : ["overview", "persona", "matrix", "strategy"][(index - 1) % 4];
+  const cards = sceneKind === "strategy" || sceneKind === "action"
+    ? ["权益匹配", "渠道触达", "内容推荐", "转化目标"].map((fallback, itemIndex) => customerSegmentationCompactText(bullets[itemIndex], fallback, 12))
+    : ["身份标签", "行为偏好", "消费频次", "触达策略"].map((fallback, itemIndex) => customerSegmentationCompactText(bullets[itemIndex], fallback, 12));
+  return {
+    kind: sceneKind,
+    kicker: sceneKind === "cover" ? "CUSTOMER SEGMENT CANVAS" : sceneKind === "overview" ? "SEGMENT OVERVIEW" : sceneKind === "persona" ? "PERSONA PROFILE" : sceneKind === "matrix" ? "RFM VALUE MAP" : sceneKind === "strategy" ? "PRECISION OPERATION" : "NEXT OPERATION LOOP",
+    bullets,
+    metrics,
+    layers,
+    cards,
+  };
+}
+
+function customerSegmentationBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["识别高价值用户与成长潜力客群", "结合 RFM、偏好标签和消费频次建立分层", "匹配触达渠道、权益策略和转化目标"];
+}
+
+function customerSegmentationMetricValues(bullets) {
+  const fallback = ["24K", "4类", "+18%"];
+  return fallback.map((value, index) => {
+    const match = String(bullets[index] || "").match(/(\d+(?:\.\d+)?\s*(?:%|万|k|K|类|层|人)?)/);
+    return match ? match[1].replace(/\s+/g, "") : value;
+  });
+}
+
+function customerSegmentationCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function customerSegmentationLayeringColorPalette(visual) {
+  return {
+    background: visual.background,
+    canvas: blendHexColor(visual.surface, visual.background, 0.92),
+    panel: blendHexColor(visual.surface, visual.background, 0.88),
+    card: blendHexColor("FFFFFF", visual.background, 0.90),
+    rowAlt: blendHexColor(visual.accent, visual.background, 0.86),
+    frame: blendHexColor(visual.primary, visual.background, 0.72),
+    grid: blendHexColor(visual.primary, visual.background, 0.88),
+    glow: blendHexColor(visual.accent, visual.background, 0.82),
+    tag: blendHexColor(visual.accent, "FFFFFF", 0.72),
+    amber: visual.secondary || "F59E0B",
+    violet: visual.warning || "A855F7",
   };
 }
 

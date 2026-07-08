@@ -688,6 +688,29 @@ test("PptService renders market trend radar preview with dedicated layout", asyn
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders customer segmentation layering preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCustomerSegmentationLayeringTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "客户分群画像分析",
+    slideCount: 5,
+    templateId: "data-customer-segmentation-persona-layering",
+    theme: "persona-layering",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-customer-segmentation-persona-layering" data-layout="customer-segmentation-layering"/);
+  assert.match(preview, /segment-layer/);
+  assert.match(preview, /segment-pyramid|segment-persona|segment-matrix|segment-strategy|segment-action/);
+  assert.match(preview, /CUSTOMER SEGMENT CANVAS|SEGMENT OVERVIEW|PERSONA PROFILE|RFM VALUE MAP/);
+  assert.doesNotMatch(preview, />人群分层</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders corporate training preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -754,6 +777,29 @@ test("PptService renders knowledge handout blackboard preview with dedicated lay
   assert.match(preview, /blackboard-note|blackboard-formula|blackboard-steps|blackboard-summary/);
   assert.match(preview, /LESSON 01|CONCEPT MAP|CASE STUDY|STEP BY STEP/);
   assert.doesNotMatch(preview, />课堂板书</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders exam review courseware preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertExamReviewKeypointsTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "中考数学考点复习",
+    slideCount: 5,
+    templateId: "education-exam-review-courseware-key-points",
+    theme: "key-points",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="education-exam-review-courseware-key-points" data-layout="exam-review-keypoints"/);
+  assert.match(preview, /exam-review-layer/);
+  assert.match(preview, /exam-review-card|exam-review-framework|exam-review-mistakes|exam-review-plan/);
+  assert.match(preview, /EXAM REVIEW|KNOWLEDGE MAP|ERROR ANALYSIS|FINAL SPRINT/);
+  assert.doesNotMatch(preview, />重点梳理</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -4854,6 +4900,65 @@ async function insertMarketTrendRadarTemplate(context) {
       defaultCoverLayout: "trend-radar-cover",
       defaultContentLayout: "trend-radar-scan",
       allowedLayouts: ["trend-radar-cover", "trend-radar-scan", "trend-opportunity-map", "trend-competition-shift", "trend-risk-signal", "trend-action-roadmap", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertCustomerSegmentationLayeringTemplate(context) {
+  // 测试数据库模拟官方模板同步后的客户分群画像模板，覆盖人群分层预览和动态版式解析。
+  await context.database.insert("templates", {
+    id: "data-customer-segmentation-persona-layering",
+    slug: "data-customer-segmentation-persona-layering",
+    name: "客户分群画像 - 人群分层",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "persona-layering",
+        name: "人群分层",
+        visual: {
+          primary: "111827",
+          accent: "14B8A6",
+          secondary: "F59E0B",
+          warning: "A855F7",
+          background: "F6FAFC",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "customer-segmentation-layering",
+          variant: "persona-layering",
+        },
+      },
+    ],
+    visual: {
+      primary: "111827",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      warning: "A855F7",
+      background: "F6FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "customer-segmentation-layering",
+      variant: "persona-layering",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "customer-segmentation-layering-cover",
+      defaultContentLayout: "customer-segmentation-layering-persona",
+      allowedLayouts: [
+        "customer-segmentation-layering-cover",
+        "customer-segmentation-layering-overview",
+        "customer-segmentation-layering-persona",
+        "customer-segmentation-layering-matrix",
+        "customer-segmentation-layering-analysis",
+        "customer-segmentation-layering-strategy",
+        "customer-segmentation-layering-action",
+        "title",
+        "content",
+        "closing",
+      ],
     },
   });
 }
