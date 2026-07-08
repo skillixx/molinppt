@@ -687,6 +687,29 @@ test("PptService renders onboarding guide preview with dedicated layout", async 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders knowledge handout blackboard preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertKnowledgeBlackboardTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "函数概念讲义",
+    slideCount: 5,
+    templateId: "education-knowledge-handout-blackboard",
+    theme: "blackboard",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="education-knowledge-handout-blackboard" data-layout="knowledge-blackboard"/);
+  assert.match(preview, /blackboard-layer/);
+  assert.match(preview, /blackboard-note|blackboard-formula|blackboard-steps|blackboard-summary/);
+  assert.match(preview, /LESSON 01|CONCEPT MAP|CASE STUDY|STEP BY STEP/);
+  assert.doesNotMatch(preview, />课堂板书</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4800,6 +4823,65 @@ async function insertOnboardingGuideTemplate(context) {
         "onboarding-culture",
         "onboarding-checklist",
         "onboarding-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertKnowledgeBlackboardTemplate(context) {
+  // 测试数据库模拟官方模板同步后的课堂讲义模板，覆盖大纲、预览和动态版式解析。
+  await context.database.insert("templates", {
+    id: "education-knowledge-handout-blackboard",
+    slug: "education-knowledge-handout-blackboard",
+    name: "知识课程讲义 - 课堂板书",
+    categoryId: "education",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "blackboard",
+        name: "课堂板书",
+        visual: {
+          primary: "173B33",
+          accent: "FACC15",
+          secondary: "60A5FA",
+          warning: "F87171",
+          background: "F4F1E8",
+          surface: "FFFDF5",
+          title: "F8FAE7",
+          body: "E8F3DF",
+          layout: "knowledge-blackboard",
+          variant: "blackboard",
+        },
+      },
+    ],
+    visual: {
+      primary: "173B33",
+      accent: "FACC15",
+      secondary: "60A5FA",
+      warning: "F87171",
+      background: "F4F1E8",
+      surface: "FFFDF5",
+      title: "F8FAE7",
+      body: "E8F3DF",
+      layout: "knowledge-blackboard",
+      variant: "blackboard",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "blackboard-cover",
+      defaultContentLayout: "blackboard-note",
+      allowedLayouts: [
+        "blackboard-cover",
+        "blackboard-outline",
+        "blackboard-concept",
+        "blackboard-detail",
+        "blackboard-case",
+        "blackboard-steps",
+        "blackboard-summary",
         "title",
         "content",
         "closing",

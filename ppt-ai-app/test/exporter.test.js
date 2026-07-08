@@ -1940,6 +1940,52 @@ test("PptExportService uses onboarding guide decorations", () => {
   assert.doesNotMatch(slide1, /Onboarding Guide<\/a:t>/);
 });
 
+test("PptExportService uses knowledge handout blackboard decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-knowledge-handout-blackboard",
+      theme: "blackboard",
+      templateVisual: {
+        id: "education-knowledge-handout-blackboard",
+        primary: "173B33",
+        accent: "FACC15",
+        secondary: "60A5FA",
+        warning: "F87171",
+        background: "F4F1E8",
+        surface: "FFFDF5",
+        title: "F8FAE7",
+        body: "E8F3DF",
+        layout: "knowledge-blackboard",
+        variant: "blackboard",
+      },
+      slides: [
+        { title: "函数概念拆解", layout: "blackboard-cover", bullets: ["定义域和值域边界", "函数关系与图像表达", "课堂例题和练习安排"] },
+        { title: "核心定义推导", layout: "blackboard-concept", bullets: ["输入集合和输出集合", "对应关系保持唯一", "用图像辅助理解"] },
+        { title: "例题讲解过程", layout: "blackboard-case", bullets: ["识别题干条件", "列出关键变量", "验证结果合理性"] },
+        { title: "课后练习安排", layout: "blackboard-steps", bullets: ["观察题型", "拆解条件", "推导公式", "完成反馈"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Knowledge Blackboard Canvas"/);
+  assert.match(slide1, /name="Knowledge Blackboard Paper Note"/);
+  assert.match(slide1, /name="Knowledge Blackboard Concept Card 1"/);
+  assert.match(slide2, /name="Knowledge Blackboard Formula Panel"/);
+  assert.match(slide3, /name="Knowledge Blackboard Paper Note"/);
+  assert.match(slide4, /name="Knowledge Blackboard Step 1"/);
+  assert.match(slide1, /val="173B33"/);
+  assert.match(slide1, /val="FACC15"/);
+  assert.doesNotMatch(slide1, /课堂板书/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });

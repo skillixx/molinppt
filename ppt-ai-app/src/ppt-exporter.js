@@ -3971,6 +3971,150 @@ function isOnboardingGuideVisual(visual) {
   return visual?.layout === "onboarding-guide" && (id === "onboarding-training" || id === "education-onboarding-training-onboarding-guide");
 }
 
+function knowledgeBlackboardDecorationsXml({ visual, index, role, slide }) {
+  const scene = knowledgeBlackboardSceneFromSlide({ slide, index, role });
+  const palette = knowledgeBlackboardColorPalette(visual);
+  // 课堂讲义模板全部使用可编辑形状搭建黑板、粉笔和便签，避免导出 PPTX 变成不可编辑整页图片。
+  const board = rectShapeXml({ id: 1900, name: "Knowledge Blackboard Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + knowledgeBlackboardGridXml({ palette })
+    + solidShapeXml({ id: 1910, name: "Knowledge Blackboard Canvas", x: 475488, y: 365760, cx: 8193024, cy: 4427220, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1911, name: "Knowledge Blackboard Wood Frame", geom: "rect", x: 475488, y: 365760, cx: 8193024, cy: 4427220, stroke: palette.wood, width: 76200 })
+    + rectShapeXml({ id: 1912, name: "Knowledge Blackboard Chalk Tray", x: 914400, y: 4335780, cx: 7315200, cy: 60960, fill: palette.wood })
+    + rectShapeXml({ id: 1913, name: "Knowledge Blackboard Chalk Yellow", x: 6553200, y: 4450080, cx: 670560, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1914, name: "Knowledge Blackboard Chalk Blue", x: 7345680, y: 4450080, cx: 487680, cy: 45720, fill: visual.secondary || "60A5FA" });
+  const header = textShapeXml({ id: 1920, name: "Knowledge Blackboard Lesson Label", x: 823056, y: 685800, cx: 2438400, cy: 243840, text: scene.kicker, size: 760, bold: true, color: visual.secondary || "60A5FA" })
+    + rectShapeXml({ id: 1921, name: "Knowledge Blackboard Chalk Underline", x: 823056, y: index === 0 ? 2247900 : 1973580, cx: 1706880, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 1922, name: "Knowledge Blackboard Soft Smudge", x: 2331720, y: index === 0 ? 2194560 : 1920240, cx: 975360, cy: 38100, fill: visual.title, transparency: 43000 });
+  const bullets = knowledgeBlackboardBulletXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "concept") return board + header + bullets + knowledgeBlackboardFormulaXml({ visual, scene }) + knowledgeBlackboardCardsXml({ visual, scene, palette });
+  if (scene.role === "case") return board + header + bullets + knowledgeBlackboardPaperNoteXml({ visual, scene, palette }) + knowledgeBlackboardCardsXml({ visual, scene, palette });
+  if (scene.role === "steps") return board + header + bullets + knowledgeBlackboardFormulaXml({ visual, scene }) + knowledgeBlackboardStepsXml({ visual, scene });
+  if (scene.role === "summary") return board + header + bullets + knowledgeBlackboardSummaryXml({ visual, scene, palette }) + knowledgeBlackboardStepsXml({ visual, scene });
+  return board + header + bullets + knowledgeBlackboardPaperNoteXml({ visual, scene, palette }) + knowledgeBlackboardCardsXml({ visual, scene, palette });
+}
+
+function knowledgeBlackboardGridXml({ palette }) {
+  const vertical = [914400, 1676400, 2438400, 3200400, 3962400, 4724400, 5486400, 6248400, 7010400, 7772400].map((x, index) =>
+    rectShapeXml({ id: 1901 + index, name: `Knowledge Blackboard Grid Vertical ${index + 1}`, x, y: 548640, cx: 7620, cy: 3840480, fill: palette.grid, transparency: 69000 }),
+  ).join("");
+  const horizontal = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800].map((y, index) =>
+    rectShapeXml({ id: 1924 + index, name: `Knowledge Blackboard Grid Horizontal ${index + 1}`, x: 670560, y, cx: 7802880, cy: 7620, fill: palette.grid, transparency: 72000 }),
+  ).join("");
+  return vertical + horizontal;
+}
+
+function knowledgeBlackboardBulletXml({ visual, scene, isCover }) {
+  const yStart = isCover ? 2468880 : 1844040;
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = yStart + index * 259080;
+    return solidShapeXml({ id: 1940 + index * 3, name: `Knowledge Blackboard Bullet Dot ${index + 1}`, geom: "ellipse", x: 841344, y: y + 53340, cx: 83820, cy: 83820, fill: index % 2 === 0 ? visual.accent : visual.secondary || "60A5FA" })
+      + textShapeXml({ id: 1941 + index * 3, name: `Knowledge Blackboard Bullet Text ${index + 1}`, x: 990600, y, cx: 3352800, cy: 198120, text: knowledgeBlackboardCompactText(item, scene.title, 34), size: isCover ? 760 : 680, bold: false, color: visual.body });
+  }).join("");
+}
+
+function knowledgeBlackboardPaperNoteXml({ visual, scene, palette }) {
+  return solidShapeXml({ id: 1960, name: "Knowledge Blackboard Paper Note", geom: "roundRect", x: 5943600, y: 1043940, cx: 2133600, cy: 2072640, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1961, name: "Knowledge Blackboard Paper Note Border", geom: "roundRect", x: 5943600, y: 1043940, cx: 2133600, cy: 2072640, stroke: palette.paperFrame, width: 12700 })
+    + rectShapeXml({ id: 1962, name: "Knowledge Blackboard Paper Line 1", x: 6263640, y: 1432560, cx: 1402080, cy: 60960, fill: palette.paperInk })
+    + rectShapeXml({ id: 1963, name: "Knowledge Blackboard Paper Line 2", x: 6263640, y: 1805940, cx: 1158240, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 1964, name: "Knowledge Blackboard Paper Line 3", x: 6263640, y: 2179320, cx: 1280160, cy: 60960, fill: palette.paperInk })
+    + solidShapeXml({ id: 1965, name: "Knowledge Blackboard Paper Diagram", geom: "ellipse", x: 7284720, y: 2331720, cx: 381000, cy: 381000, fill: visual.secondary || "60A5FA" })
+    + textShapeXml({ id: 1966, name: "Knowledge Blackboard Paper Caption", x: 6156960, y: 2712720, cx: 1676400, cy: 243840, text: knowledgeBlackboardCompactText(scene.note, "课程内容拆解", 14), size: 660, bold: true, color: visual.primary });
+}
+
+function knowledgeBlackboardFormulaXml({ visual, scene }) {
+  return lineFrameShapeXml({ id: 1980, name: "Knowledge Blackboard Formula Panel", geom: "roundRect", x: 5844540, y: 1097280, cx: 2324100, cy: 1905000, stroke: visual.title, width: 22860, dash: "dash", transparency: 42000 })
+    + textShapeXml({ id: 1981, name: "Knowledge Blackboard Formula First", x: 6149340, y: 1394460, cx: 609600, cy: 274320, text: "A", size: 1500, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1982, name: "Knowledge Blackboard Formula Plus", x: 6858000, y: 1767840, cx: 609600, cy: 274320, text: "+", size: 1350, bold: true, color: visual.secondary || "60A5FA" })
+    + textShapeXml({ id: 1983, name: "Knowledge Blackboard Formula Result", x: 6377940, y: 2232660, cx: 914400, cy: 274320, text: "B", size: 1500, bold: true, color: visual.warning || "F87171" })
+    + textShapeXml({ id: 1984, name: "Knowledge Blackboard Formula Caption", x: 6096000, y: 2705100, cx: 1828800, cy: 243840, text: knowledgeBlackboardCompactText(scene.note, "概念推导和例题迁移", 16), size: 640, bold: true, color: visual.body });
+}
+
+function knowledgeBlackboardCardsXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const x = 823056 + index * 1524000;
+    return solidShapeXml({ id: 2000 + index * 4, name: `Knowledge Blackboard Concept Card ${index + 1}`, geom: "roundRect", x, y: 3596640, cx: 1219200, cy: 533400, fill: palette.card })
+      + lineFrameShapeXml({ id: 2001 + index * 4, name: `Knowledge Blackboard Concept Card Border ${index + 1}`, geom: "roundRect", x, y: 3596640, cx: 1219200, cy: 533400, stroke: visual.title, width: 7620, transparency: 52000 })
+      + rectShapeXml({ id: 2002 + index * 4, name: `Knowledge Blackboard Concept Card Rule ${index + 1}`, x: x + 137160, y: 3756660, cx: 548640, cy: 38100, fill: index === 1 ? visual.secondary || "60A5FA" : visual.accent })
+      + textShapeXml({ id: 2003 + index * 4, name: `Knowledge Blackboard Concept Card Text ${index + 1}`, x: x + 137160, y: 3870960, cx: 853440, cy: 152400, text: knowledgeBlackboardCompactText(item, "", 10), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function knowledgeBlackboardStepsXml({ visual, scene }) {
+  return scene.steps.slice(0, 4).map((item, index) => {
+    const x = 792576 + index * 1905000;
+    return solidShapeXml({ id: 2030 + index * 4, name: `Knowledge Blackboard Step ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1524000, cy: 609600, fill: index % 2 === 0 ? "234C42" : "21483F" })
+      + solidShapeXml({ id: 2031 + index * 4, name: `Knowledge Blackboard Step Number ${index + 1}`, geom: "ellipse", x: x + 152400, y: 3825240, cx: 243840, cy: 243840, fill: visual.accent })
+      + textShapeXml({ id: 2032 + index * 4, name: `Knowledge Blackboard Step Number Text ${index + 1}`, x: x + 201168, y: 3870960, cx: 152400, cy: 121920, text: String(index + 1).padStart(2, "0"), size: 520, bold: true, color: visual.primary })
+      + textShapeXml({ id: 2033 + index * 4, name: `Knowledge Blackboard Step Text ${index + 1}`, x: x + 487680, y: 3825240, cx: 853440, cy: 243840, text: knowledgeBlackboardCompactText(item, "", 10), size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function knowledgeBlackboardSummaryXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const y = 1127760 + index * 670560;
+    return solidShapeXml({ id: 2060 + index * 3, name: `Knowledge Blackboard Summary Note ${index + 1}`, geom: "roundRect", x: 5943600, y, cx: 2133600, cy: 457200, fill: visual.surface })
+      + rectShapeXml({ id: 2061 + index * 3, name: `Knowledge Blackboard Summary Pin ${index + 1}`, x: 6111240, y: y + 152400, cx: 121920, cy: 121920, fill: index === 1 ? visual.secondary || "60A5FA" : visual.accent })
+      + textShapeXml({ id: 2062 + index * 3, name: `Knowledge Blackboard Summary Text ${index + 1}`, x: 6340320, y: y + 121920, cx: 1371600, cy: 182880, text: knowledgeBlackboardCompactText(item, "", 12), size: 660, bold: true, color: visual.primary });
+  }).join("") + rectShapeXml({ id: 2075, name: "Knowledge Blackboard Summary Chalk", x: 6195060, y: 3154680, cx: 1447800, cy: 53340, fill: palette.wood });
+}
+
+function knowledgeBlackboardSceneFromSlide({ slide, index, role }) {
+  const bullets = knowledgeBlackboardBulletTexts(slide);
+  const rawRole = String(slide?.layout || role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("concept") || rawRole.includes("outline")
+      ? "concept"
+      : rawRole.includes("case")
+        ? "case"
+        : rawRole.includes("step")
+          ? "steps"
+          : rawRole.includes("summary") || rawRole === "closing"
+            ? "summary"
+            : ["concept", "detail", "case", "steps", "summary"][(index - 1) % 5];
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "LESSON 01" : sceneRole === "concept" ? "CONCEPT MAP" : sceneRole === "case" ? "CASE STUDY" : sceneRole === "steps" ? "STEP BY STEP" : sceneRole === "summary" ? "LESSON REVIEW" : "KEY POINT",
+    title: knowledgeBlackboardCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    note: knowledgeBlackboardCompactText(bullets[0], "课程内容拆解", 18),
+    cards: ["定义边界", "原理结构", "例题迁移"].map((fallback, itemIndex) => knowledgeBlackboardCompactText(bullets[itemIndex], fallback, 12)),
+    steps: ["观察", "拆解", "推导", "练习"].map((fallback, itemIndex) => knowledgeBlackboardCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function knowledgeBlackboardBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["拆解核心概念和定义边界", "补充原理结构和例题过程", "整理练习任务与课堂反馈"];
+}
+
+function knowledgeBlackboardCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function knowledgeBlackboardColorPalette(visual) {
+  return {
+    grid: blendHexColor(visual.primary, visual.background, 0.42),
+    wood: "C8B88F",
+    card: "234C42",
+    paperInk: "8A7B5D",
+    paperFrame: "D8CDAF",
+  };
+}
+
+function isKnowledgeBlackboardVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "knowledge-blackboard" && (id === "knowledge-handout" || id === "education-knowledge-handout-blackboard");
+}
+
 function educationSolutionDecorationsXml({ visual, index, role, slide }) {
   const scene = educationSolutionSceneFromSlide({ slide, index, role });
   const palette = educationSolutionColorPalette(visual);

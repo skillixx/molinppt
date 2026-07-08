@@ -645,6 +645,41 @@ test("resolveTemplateVisual applies onboarding guide official visual", () => {
   assert.equal(visual.variant, "onboarding-guide");
 });
 
+test("resolveTemplateVisual applies knowledge handout blackboard official visual", () => {
+  const template = {
+    id: "education-knowledge-handout-blackboard",
+    visual: {
+      primary: "173B33",
+      accent: "FACC15",
+      secondary: "60A5FA",
+      background: "F4F1E8",
+      surface: "FFFDF5",
+      title: "F8FAE7",
+      body: "E8F3DF",
+      layout: "knowledge-blackboard",
+      variant: "blackboard",
+    },
+    themes: [
+      {
+        id: "blackboard",
+        visual: {
+          layout: "knowledge-blackboard",
+          variant: "blackboard",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "blackboard", template });
+
+  assert.equal(visual.id, "education-knowledge-handout-blackboard");
+  assert.equal(visual.primary, "173B33");
+  assert.equal(visual.accent, "FACC15");
+  assert.equal(visual.background, "F4F1E8");
+  assert.equal(visual.layout, "knowledge-blackboard");
+  assert.equal(visual.variant, "blackboard");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
