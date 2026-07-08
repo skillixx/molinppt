@@ -2709,7 +2709,7 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /id="generate-outline"/);
     assert.match(html, /<select id="slide-count">/);
     assert.match(html, /<option value="32">32 页<\/option>/);
-    assert.match(html, /generateButton\.disabled = true/);
+    assert.match(html, /setButtonWaiting\(generateButton, true, "生成中\.\.\."\)/);
     assert.match(html, /id="save-outline"/);
     assert.match(html, /每行一个要点/);
     assert.match(html, /\/api\/ppt\/outlines\/" \+ state\.outlineId/);
@@ -2744,6 +2744,10 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /preview-polish-loading/);
     assert.match(html, /polish-spinner/);
     assert.match(html, /button-spinner/);
+    assert.match(html, /button-waiting-sheen/);
+    assert.match(html, /button-label/);
+    assert.match(html, /function setButtonWaiting/);
+    assert.match(html, /classList\.toggle\("is-waiting"/);
     assert.match(html, /is-polishing/);
     assert.match(html, /请先应用模板生成 PPT，再使用 AI 润色单页/);
     assert.match(html, /请先用鼠标在在线预览中选择要润色的页面/);

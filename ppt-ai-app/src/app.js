@@ -1016,6 +1016,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     button:hover { background: linear-gradient(135deg, var(--primary-strong), #2563eb); box-shadow: 0 14px 28px rgba(31,94,255,.24); transform: translateY(-1px); }
     button:disabled { cursor: not-allowed; opacity: .62; transform: none; box-shadow: none; }
+    button.is-waiting { position: relative; overflow: hidden; opacity: .92; box-shadow: 0 14px 30px rgba(31,94,255,.20); }
+    button.is-waiting::after {
+      content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+      background: linear-gradient(110deg, transparent 0 28%, rgba(255,255,255,.34) 48%, transparent 70% 100%);
+      animation: button-waiting-sheen 1.25s ease-in-out infinite; pointer-events: none;
+    }
     button.secondary { background: #fff; color: #1d4ed8; border: 1px solid #c9d9f4; box-shadow: 0 8px 18px rgba(16,24,40,.05); }
     button.secondary:hover { background: #f3f7ff; border-color: #b8ccf0; box-shadow: 0 10px 20px rgba(16,24,40,.07); }
     .brand { display: flex; align-items: center; gap: 12px; }
@@ -1338,7 +1344,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .preview-stage.is-polishing .preview-polish-loading { display: grid; }
     .polish-loading-card { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 16px; border: 1px solid #bfdbfe; border-radius: 999px; background: rgba(255,255,255,.94); color: #1d4ed8; font-size: 13px; font-weight: 850; box-shadow: 0 14px 34px rgba(37,99,235,.18); }
     .polish-spinner, .button-spinner { display: inline-block; width: 15px; height: 15px; border-radius: 999px; border: 2px solid rgba(37,99,235,.24); border-top-color: #2563eb; animation: spin .75s linear infinite; }
-    .button-spinner { width: 13px; height: 13px; margin-right: 6px; vertical-align: -2px; }
+    .button-spinner { position: relative; z-index: 1; flex: 0 0 auto; width: 13px; height: 13px; margin-right: 2px; border-color: rgba(255,255,255,.42); border-top-color: #fff; vertical-align: -2px; }
+    button.secondary .button-spinner { border-color: rgba(37,99,235,.24); border-top-color: #2563eb; }
+    .button-label { position: relative; z-index: 1; }
     .structure-side-panel, .ai-polish-side-panel { display: none !important; }
     .slide-edit-modal { position: absolute; z-index: 30; inset: 18px; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15,23,42,.20); backdrop-filter: blur(2px); }
     .slide-edit-modal[aria-hidden="false"] { display: flex; }
@@ -1380,18 +1388,33 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 64px; }
+    .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 92px; }
     .outline-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfdff); }
     .outline-title-row { display: flex; align-items: center; gap: 10px; }
     .outline-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 12px; font-weight: 800; }
-    .outline-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .outline-toolbar button { min-height: 40px; padding: 10px 14px; }
-    .outline-action-save { min-width: 148px; box-shadow: 0 12px 24px rgba(37,99,235,.22); }
-    .outline-action-save:hover { box-shadow: 0 14px 28px rgba(37,99,235,.26); }
-    button.outline-action-retry { background: #fff; color: #475569; border-color: #d8e2f0; }
-    button.outline-action-retry:hover { background: #f8fafc; color: #1f2937; border-color: #cbd5e1; }
+    .outline-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .outline-toolbar button { min-height: 44px; padding: 11px 16px; }
+    .outline-action-save {
+      min-width: 236px; min-height: 54px; border-radius: 14px; padding: 0 28px;
+      background: linear-gradient(135deg, #1f5eff 0%, #2563eb 48%, #0f7f7a 100%);
+      box-shadow: 0 18px 36px rgba(31,94,255,.25);
+      font-size: 14px; letter-spacing: 0;
+    }
+    .outline-action-save:hover { box-shadow: 0 22px 42px rgba(31,94,255,.30); transform: translateY(-1px); }
+    button.outline-action-retry {
+      min-width: 150px; min-height: 46px; border-radius: 12px;
+      background: #fff; color: #475569; border-color: #d8e2f0;
+      box-shadow: 0 10px 22px rgba(15,23,42,.06);
+    }
+    button.outline-action-retry:hover { background: #f8fafc; color: #1f2937; border-color: #cbd5e1; box-shadow: 0 12px 26px rgba(15,23,42,.08); }
     .outline-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line); background: rgba(255,255,255,.98); }
-    .outline-header .outline-toolbar { position: absolute; left: 0; right: 0; bottom: 0; justify-content: flex-end; padding: 14px 16px; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.96), #fff); box-shadow: 0 -12px 28px rgba(15,23,42,.06); }
+    .outline-header .outline-toolbar {
+      position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+      padding: 18px 22px; border-top: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.94), #fff);
+      box-shadow: 0 -18px 40px rgba(15,23,42,.08);
+    }
+    .outline-header .outline-action-retry { justify-self: start; }
+    .outline-header .outline-action-save { justify-self: end; }
     .outline-summary { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .outline-stat { padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
     .outline-stat span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; }
@@ -1415,6 +1438,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .loading-step.is-active { color: #1d4ed8; }
     .loading-step.is-active::before { background: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes button-waiting-sheen { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
     .outline-card-list { display: grid; gap: 12px; }
     .outline-card { display: grid; gap: 11px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: var(--shadow-soft); }
     .outline-card.is-revealing { animation: outlineReveal .28s ease-out both; }
@@ -1513,8 +1537,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } }
     @media (max-width: 980px) { body[data-workspace-page="templates"] main { grid-template-columns: 1fr; } }
     @media (max-width: 1180px) { .template-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-    @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"], body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] { padding: 20px; } body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .template-category-tabs { gap: 22px; } .top-status { justify-content: flex-start; } }
-    @media (max-width: 520px) { body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: 1fr; } .outline-toolbar { width: 100%; } .outline-toolbar button { flex: 1 1 100%; } .template-gallery { grid-template-columns: 1fr; } .template-category-grid { grid-template-columns: 1fr; } .balance-facts, .status-metrics { grid-template-columns: 1fr; } .balance-main-head, .status-hero-head { align-items: stretch; flex-direction: column; } .balance-badge { width: max-content; } }
+    @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"], body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] { padding: 20px; } body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-header .outline-toolbar { grid-template-columns: 1fr; gap: 10px; } .outline-header .outline-action-retry, .outline-header .outline-action-save { justify-self: stretch; width: 100%; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .template-category-tabs { gap: 22px; } .top-status { justify-content: flex-start; } }
+    @media (max-width: 520px) { body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: 1fr; } .outline-toolbar { width: 100%; } .outline-toolbar button { flex: 1 1 100%; } .outline-action-save, button.outline-action-retry { min-width: 0; } .template-gallery { grid-template-columns: 1fr; } .template-category-grid { grid-template-columns: 1fr; } .balance-facts, .status-metrics { grid-template-columns: 1fr; } .balance-main-head, .status-hero-head { align-items: stretch; flex-direction: column; } .balance-badge { width: max-content; } }
   </style>
 </head>
 <body>
@@ -3038,16 +3062,24 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
     }
 
+    function setButtonWaiting(button, isBusy, label) {
+      if (!button) return;
+      button.disabled = isBusy;
+      button.classList.toggle("is-waiting", isBusy);
+      button.setAttribute("aria-busy", isBusy ? "true" : "false");
+      button.innerHTML = isBusy
+        ? '<span class="button-spinner" aria-hidden="true"></span><span class="button-label">' + escapeHtml(label) + '</span>'
+        : escapeHtml(label);
+    }
+
     function setDeckGenerationBusy(isBusy) {
       const button = document.querySelector("#generate-deck");
-      button.disabled = isBusy;
-      button.textContent = isBusy ? "生成中..." : "生成专业 PPT";
+      setButtonWaiting(button, isBusy, isBusy ? "生成中..." : "生成专业 PPT");
     }
 
     function setSlideRegenerationBusy(isBusy) {
       const button = document.querySelector("#regenerate-slide");
-      button.disabled = isBusy;
-      button.innerHTML = isBusy ? '<span class="button-spinner"></span>AI 优化中...' : "AI 优化本页";
+      setButtonWaiting(button, isBusy, isBusy ? "AI 优化中..." : "AI 优化本页");
       if (!isBusy) syncSinglePageAiChoice();
       if (previewStageEl) previewStageEl.classList.toggle("is-polishing", isBusy);
       if (previewPolishLoadingEl) previewPolishLoadingEl.setAttribute("aria-hidden", isBusy ? "false" : "true");
@@ -3178,8 +3210,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     document.querySelector("#generate-outline").addEventListener("click", async () => {
       const generateButton = document.querySelector("#generate-outline");
       try {
-        generateButton.disabled = true;
-        generateButton.textContent = "生成中...";
+        setButtonWaiting(generateButton, true, "生成中...");
         setFlowStage("outline");
         renderOutlineLoading();
         statusEl.textContent = "正在生成大纲...";
@@ -3209,8 +3240,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         renderOutlineSummary([], "生成失败");
         statusEl.textContent = error.message;
       } finally {
-        generateButton.disabled = false;
-        generateButton.textContent = "开始生成大纲";
+        setButtonWaiting(generateButton, false, "开始生成大纲");
       }
     });
     document.querySelector("#save-outline").addEventListener("click", async () => {
@@ -3305,7 +3335,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
     });
     document.querySelector("#retry-task").addEventListener("click", async () => {
+      const retryButton = document.querySelector("#retry-task");
       try {
+        setButtonWaiting(retryButton, true, "重试中...");
         const entitlementValue = document.querySelector("#entitlement").value.trim();
         const data = await json("/api/ppt/tasks/" + state.taskId + "/retry", {
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
@@ -3322,6 +3354,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         }
         await loadBalance();
       } catch (error) { statusEl.textContent = error.message; }
+      finally { setButtonWaiting(retryButton, false, "重试失败任务"); }
     });
     document.querySelector("#apply-structure-preview").addEventListener("click", async () => {
       try {
@@ -3371,16 +3404,19 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         setSlideRegenerationBusy(false);
       }
     });
-    async function exportDeck(format) {
+    async function exportDeck(format, button) {
+      const idleLabel = format === "pptx" ? "下载 PPTX" : "下载 PDF";
       try {
+        setButtonWaiting(button, true, "准备下载...");
         if (!state.deckId) throw new Error("请先应用模板生成 PPT，再下载文件");
         const data = await json("/api/ppt/decks/" + state.deckId + "/exports", { format });
         statusEl.textContent = JSON.stringify(data.file, null, 2);
         window.location.href = "/api/files/" + data.file.id;
       } catch (error) { statusEl.textContent = error.message; }
+      finally { setButtonWaiting(button, false, idleLabel); }
     }
-    document.querySelector("#export-pptx").addEventListener("click", () => exportDeck("pptx"));
-    document.querySelector("#export-pdf").addEventListener("click", () => exportDeck("pdf"));
+    document.querySelector("#export-pptx").addEventListener("click", (event) => exportDeck("pptx", event.currentTarget));
+    document.querySelector("#export-pdf").addEventListener("click", (event) => exportDeck("pdf", event.currentTarget));
   </script>
 </body>
 </html>`;
