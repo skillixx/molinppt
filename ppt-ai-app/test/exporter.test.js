@@ -1245,6 +1245,51 @@ test("PptExportService uses BI executive cockpit decorations", () => {
   assert.doesNotMatch(slide1, /管理驾驶舱/);
 });
 
+test("PptExportService uses user behavior path funnel decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-user-behavior-analysis-path-funnel",
+      theme: "path-funnel",
+      templateVisual: {
+        id: "data-user-behavior-analysis-path-funnel",
+        primary: "172554",
+        accent: "06B6D4",
+        secondary: "22C55E",
+        warning: "F97316",
+        background: "F6FAFF",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "user-path-funnel",
+        variant: "path-funnel",
+      },
+      slides: [
+        { title: "用户转化路径复盘", bullets: ["访问用户 12.8K 进入核心功能", "关键转化率 38%", "实验提升 +12%"] },
+        { title: "路径节点总览", bullets: ["访问入口", "功能浏览", "提交试用", "留存回访"] },
+        { title: "流失断点诊断", bullets: ["激活步骤转化率下降 24%", "表单耗时偏长", "权益说明不清晰"] },
+        { title: "增长实验复盘", bullets: ["新手引导 A 版", "权益提示 B 版", "样本覆盖 5 千"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="User Path Analysis Canvas"/);
+  assert.match(slide1, /name="User Path Route Panel"/);
+  assert.match(slide1, /name="User Path Node 1"/);
+  assert.match(slide1, /name="User Path Metric Card 1"/);
+  assert.match(slide3, /name="User Path Funnel Step 1"/);
+  assert.match(slide4, /name="User Path Experiment Card 1"/);
+  assert.match(slide1, /val="F6FAFF"/);
+  assert.match(slide1, /val="06B6D4"/);
+  assert.doesNotMatch(slide1, /路径漏斗/);
+});
+
 test("PptExportService uses editorial brand story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1701,6 +1746,51 @@ test("PptExportService uses corporate training management decorations", () => {
   assert.match(slide1, /val="1F3A5F"/);
   assert.match(slide1, /val="20A39E"/);
   assert.doesNotMatch(slide1, /Management Training/);
+});
+
+test("PptExportService uses onboarding guide decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-onboarding-training-onboarding-guide",
+      theme: "onboarding-guide",
+      templateVisual: {
+        id: "education-onboarding-training-onboarding-guide",
+        primary: "1E3A5F",
+        accent: "14B8A6",
+        secondary: "F59E0B",
+        background: "F4F8FB",
+        surface: "FFFFFF",
+        title: "102033",
+        body: "41516A",
+        layout: "onboarding-guide",
+        variant: "onboarding-guide",
+      },
+      slides: [
+        { title: "新人入职全景", layout: "onboarding-cover", bullets: ["入职准备", "制度学习", "岗位融入", "成长反馈"] },
+        { title: "学习路径安排", layout: "onboarding-journey", bullets: ["公司介绍", "制度手册", "工具权限", "导师沟通"] },
+        { title: "团队文化融入", layout: "onboarding-culture", bullets: ["价值观共识", "协作方式", "沟通节奏", "反馈机制"] },
+        { title: "入职清单确认", layout: "onboarding-checklist", bullets: ["账号权限", "制度签收", "岗位目标", "试用期计划"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Onboarding Guide Canvas"/);
+  assert.match(slide1, /name="Onboarding Guide Badge Card"/);
+  assert.match(slide1, /name="Onboarding Guide Journey Step 1"/);
+  assert.match(slide2, /name="Onboarding Guide Journey Step 1"/);
+  assert.match(slide3, /name="Onboarding Guide Culture Card 1"/);
+  assert.match(slide4, /name="Onboarding Guide Checklist Card 1"/);
+  assert.match(slide1, /val="1E3A5F"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /Onboarding Guide<\/a:t>/);
 });
 
 test("PptExportService applies template-specific visual colors to PDF output", () => {

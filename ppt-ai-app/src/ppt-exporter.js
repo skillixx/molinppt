@@ -2278,6 +2278,20 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "user-path-funnel") {
+    return {
+      surface: { x: 530352, y: 462280, cx: 8083296, cy: 4213860 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 365760 },
+      secondaryAccent: { x: 768096, y: 2235200, cx: 3200400, cy: 30480 },
+      label: { x: 768096, y: 701040, cx: 2438400, cy: 243840 },
+      title: { x: 768096, y: 1066800, cx: 3810000, cy: 853440 },
+      content: { x: 853440, y: 2514600, cx: 3505200, cy: 914400 },
+      titleSize: index === 0 ? 2920 : 2440,
+      bodySize: 900,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "top-band") {
     if (index === 0) {
       return {
@@ -3679,6 +3693,150 @@ function corporateTrainingColorPalette(visual) {
 function isCorporateTrainingVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "corporate-training" && (id === "corporate-training" || id === "education-corporate-training-management");
+}
+
+function onboardingGuideDecorationsXml({ visual, index, role, slide }) {
+  const scene = onboardingGuideSceneFromSlide({ slide, index, role });
+  const palette = onboardingGuideColorPalette(visual);
+  // 入职模板用可编辑图形表达工牌、手册和路径，不使用整页模板截图作为背景。
+  const backdrop = rectShapeXml({ id: 1500, name: "Onboarding Guide Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1501, name: "Onboarding Guide Glow", geom: "ellipse", x: 6934200, y: 243840, cx: 1828800, cy: 1524000, fill: palette.softAccent })
+    + rectShapeXml({ id: 1502, name: "Onboarding Guide Header", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + rectShapeXml({ id: 1503, name: "Onboarding Guide Header Accent", x: 0, y: 365760, cx: 9144000, cy: 30480, fill: visual.accent });
+  const surface = solidShapeXml({ id: 1504, name: "Onboarding Guide Canvas", geom: "roundRect", x: 493776, y: 411480, cx: 8156448, cy: 4312920, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1505, name: "Onboarding Guide Canvas Border", geom: "roundRect", x: 493776, y: 411480, cx: 8156448, cy: 4312920, stroke: palette.frame, width: 12700 });
+  const header = textShapeXml({ id: 1506, name: "Onboarding Guide Kicker", x: 731520, y: 685800, cx: 2895600, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1507, name: "Onboarding Guide Focus Rule", x: 731520, y: index === 0 ? 2164080 : 1958340, cx: 2926080, cy: 30480, fill: palette.orange });
+  const bullets = onboardingGuideBulletCardsXml({ visual, palette, scene, isCover: index === 0 });
+  if (scene.role === "handbook" || scene.role === "policy" || scene.role === "role") return backdrop + surface + header + bullets + onboardingGuideHandbookXml({ visual, palette }) + onboardingGuideStepsXml({ visual, palette, items: scene.steps });
+  if (scene.role === "culture") return backdrop + surface + header + bullets + onboardingGuideCultureXml({ visual, palette, items: scene.cards });
+  if (scene.role === "checklist") return backdrop + surface + header + bullets + onboardingGuideChecklistXml({ visual, palette, items: scene.cards });
+  if (scene.role === "summary") return backdrop + surface + header + bullets + onboardingGuideSummaryXml({ visual, palette, items: scene.steps });
+  return backdrop + surface + header + bullets + onboardingGuideBadgeXml({ visual, palette }) + onboardingGuideStepsXml({ visual, palette, items: scene.steps });
+}
+
+function onboardingGuideBadgeXml({ visual, palette }) {
+  return solidShapeXml({ id: 1520, name: "Onboarding Guide Badge Card", geom: "roundRect", x: 5867400, y: 975360, cx: 2590800, cy: 2453640, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1521, name: "Onboarding Guide Badge Border", geom: "roundRect", x: 5867400, y: 975360, cx: 2590800, cy: 2453640, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1522, name: "Onboarding Guide Badge Header", x: 5867400, y: 975360, cx: 2590800, cy: 487680, fill: visual.primary })
+    + solidShapeXml({ id: 1523, name: "Onboarding Guide Avatar", geom: "ellipse", x: 6156960, y: 1767840, cx: 670560, cy: 670560, fill: palette.softAccent })
+    + rectShapeXml({ id: 1524, name: "Onboarding Guide Badge Name Line", x: 7063740, y: 1684020, cx: 944880, cy: 76200, fill: visual.primary })
+    + rectShapeXml({ id: 1525, name: "Onboarding Guide Badge Role Line", x: 7063740, y: 2034540, cx: 1219200, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 1526, name: "Onboarding Guide Badge Entry Line", x: 7063740, y: 2377440, cx: 822960, cy: 60960, fill: palette.orange });
+}
+
+function onboardingGuideHandbookXml({ visual, palette }) {
+  return solidShapeXml({ id: 1540, name: "Onboarding Guide Handbook", geom: "roundRect", x: 5867400, y: 1120140, cx: 2590800, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1541, name: "Onboarding Guide Handbook Border", geom: "roundRect", x: 5867400, y: 1120140, cx: 2590800, cy: 2133600, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1542, name: "Onboarding Guide Handbook Title Rule", x: 6172200, y: 1455420, cx: 1828800, cy: 91440, fill: visual.primary })
+    + rectShapeXml({ id: 1543, name: "Onboarding Guide Handbook Policy Line", x: 6172200, y: 1965960, cx: 1524000, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 1544, name: "Onboarding Guide Handbook Role Line", x: 6172200, y: 2346960, cx: 1828800, cy: 60960, fill: palette.orange })
+    + solidShapeXml({ id: 1545, name: "Onboarding Guide Handbook Stamp", geom: "roundRect", x: 7665720, y: 1805940, cx: 426720, cy: 914400, fill: palette.softAccent });
+}
+
+function onboardingGuideStepsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 853440 + index * 1973580;
+    return solidShapeXml({ id: 1560 + index * 4, name: `Onboarding Guide Journey Step ${index + 1}`, geom: "roundRect", x, y: 3474720, cx: 1524000, cy: 746760, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1561 + index * 4, name: `Onboarding Guide Journey Border ${index + 1}`, geom: "roundRect", x, y: 3474720, cx: 1524000, cy: 746760, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1562 + index * 4, name: `Onboarding Guide Step Marker ${index + 1}`, geom: "ellipse", x: x + 167640, y: 3642360, cx: 243840, cy: 243840, fill: index % 2 === 0 ? visual.accent : palette.orange })
+      + textShapeXml({ id: 1563 + index * 4, name: `Onboarding Guide Step Text ${index + 1}`, x: x + 487680, y: 3688080, cx: 822960, cy: 243840, text: onboardingGuideCompactText(item, "", 10), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function onboardingGuideCultureXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5943600 + col * 1219200;
+    const y = 1120140 + row * 914400;
+    return solidShapeXml({ id: 1590 + index * 4, name: `Onboarding Guide Culture Card ${index + 1}`, geom: "roundRect", x, y, cx: 1005840, cy: 670560, fill: index === 0 ? palette.tint : "FFFFFF" })
+      + lineFrameShapeXml({ id: 1591 + index * 4, name: `Onboarding Guide Culture Border ${index + 1}`, geom: "roundRect", x, y, cx: 1005840, cy: 670560, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1592 + index * 4, name: `Onboarding Guide Culture Rule ${index + 1}`, x: x + 121920, y: y + 152400, cx: 365760, cy: 38100, fill: index === 2 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1593 + index * 4, name: `Onboarding Guide Culture Text ${index + 1}`, x: x + 121920, y: y + 274320, cx: 731520, cy: 182880, text: onboardingGuideCompactText(item, "", 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function onboardingGuideChecklistXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const x = 914400 + index * 2316480;
+    return solidShapeXml({ id: 1620 + index * 4, name: `Onboarding Guide Checklist Card ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1828800, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1621 + index * 4, name: `Onboarding Guide Checklist Border ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1828800, cy: 609600, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1622 + index * 4, name: `Onboarding Guide Checklist Marker ${index + 1}`, geom: "roundRect", x: x + 152400, y: 3825240, cx: 152400, cy: 152400, fill: index === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1623 + index * 4, name: `Onboarding Guide Checklist Text ${index + 1}`, x: x + 381000, y: 3794760, cx: 1219200, cy: 243840, text: onboardingGuideCompactText(item, "", 14), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function onboardingGuideSummaryXml({ visual, palette, items }) {
+  const line = rectShapeXml({ id: 1650, name: "Onboarding Guide Summary Line", x: 731520, y: 3200400, cx: 6705600, cy: 38100, fill: visual.accent })
+    + rectShapeXml({ id: 1651, name: "Onboarding Guide Summary Warm Line", x: 4267200, y: 3200400, cx: 2286000, cy: 38100, fill: palette.orange });
+  return line + onboardingGuideStepsXml({ visual, palette, items });
+}
+
+function onboardingGuideBulletCardsXml({ visual, palette, scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2484120 : 1813560) + index * 243840;
+    return rectShapeXml({ id: 1670 + index * 2, name: `Onboarding Guide Bullet Rule ${index + 1}`, x: 749808, y: y + 30480, cx: 45720, cy: 137160, fill: index === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1671 + index * 2, name: `Onboarding Guide Bullet Text ${index + 1}`, x: 914400, y, cx: 3505200, cy: 198120, text: onboardingGuideCompactText(item, scene.title, 32), size: isCover ? 780 : 690, bold: false, color: visual.body });
+  }).join("");
+}
+
+function onboardingGuideSceneFromSlide({ slide, index, role }) {
+  const bullets = onboardingGuideBulletTexts(slide);
+  const rawRole = String(slide?.layout || role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("policy") || rawRole.includes("role") || rawRole.includes("handbook")
+      ? "handbook"
+      : rawRole.includes("culture")
+        ? "culture"
+        : rawRole.includes("checklist")
+          ? "checklist"
+          : rawRole.includes("summary") || rawRole === "closing"
+            ? "summary"
+            : rawRole.includes("journey") || rawRole.includes("steps")
+              ? "steps"
+              : ["handbook", "culture", "checklist", "steps"][(index - 1) % 4];
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "NEW HIRE GUIDE" : sceneRole === "handbook" ? "HANDBOOK MAP" : sceneRole === "culture" ? "CULTURE FIT" : sceneRole === "checklist" ? "ONBOARDING CHECKLIST" : sceneRole === "steps" ? "FIRST 30 DAYS" : "GROWTH NEXT STEP",
+    title: onboardingGuideCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    steps: ["入职准备", "制度熟悉", "业务融入", "成长反馈"].map((fallback, itemIndex) => onboardingGuideCompactText(bullets[itemIndex], fallback, 10)),
+    cards: ["组织介绍", "岗位职责", "工具权限", "导师机制"].map((fallback, itemIndex) => onboardingGuideCompactText(bullets[itemIndex], fallback, 12)),
+  };
+}
+
+function onboardingGuideBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["了解组织文化与关键制度", "完成岗位工具和权限配置", "建立导师沟通和试用期目标"];
+}
+
+function onboardingGuideCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function onboardingGuideColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.34),
+    panel: blendHexColor(visual.background, visual.surface, 0.68),
+    tint: blendHexColor(visual.accent, visual.surface, 0.84),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.76),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    orange: "F59E0B",
+  };
+}
+
+function isOnboardingGuideVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "onboarding-guide" && (id === "onboarding-training" || id === "education-onboarding-training-onboarding-guide");
 }
 
 function educationSolutionDecorationsXml({ visual, index, role, slide }) {
@@ -5243,6 +5401,169 @@ function biCockpitColorPalette(visual) {
     lime: visual.secondary || "A3E635",
     panel: blendHexColor(visual.surface, visual.background, 0.08),
     warningPanel: blendHexColor("F59E0B", visual.surface, 0.84),
+  };
+}
+
+function userPathFunnelDecorationsXml({ visual, index, role, slide }) {
+  const scene = userPathFunnelScene({ slide, index, role });
+  const palette = userPathFunnelColorPalette(visual);
+  // 路径漏斗模板用代码绘制节点、漏斗和实验卡，保证下载后每个元素都可以继续编辑。
+  const base = rectShapeXml({ id: 1500, name: "User Path Workbench Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + userPathGridXml({ palette })
+    + solidShapeXml({ id: 1501, name: "User Path Analysis Canvas", geom: "roundRect", x: 530352, y: 462280, cx: 8083296, cy: 4213860, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1502, name: "User Path Canvas Frame", geom: "roundRect", x: 530352, y: 462280, cx: 8083296, cy: 4213860, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1503, name: "User Path Header Band", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + rectShapeXml({ id: 1504, name: "User Path Header Accent", x: 0, y: 365760, cx: 9144000, cy: 30480, fill: visual.accent })
+    + textShapeXml({ id: 1505, name: "User Path Kicker", x: 768096, y: 701040, cx: 2438400, cy: 198120, text: scene.kicker, size: 720, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1506, name: "User Path Insight Rule", x: 768096, y: 2235200, cx: 3200400, cy: 30480, fill: visual.accent });
+  const mainVisual = scene.kind === "funnel"
+    ? userPathFunnelBarsXml({ visual, palette, steps: scene.steps })
+    : scene.kind === "experiment"
+      ? userPathExperimentCardsXml({ visual, palette, cards: scene.cards })
+      : scene.kind === "actions"
+        ? userPathActionCardsXml({ visual, palette, cards: scene.cards })
+        : userPathMapXml({ visual, palette });
+  return base
+    + mainVisual
+    + (scene.kind !== "actions" ? userPathMetricCardsXml({ visual, palette, metrics: scene.metrics }) : "")
+    + userPathBulletCardsXml({ visual, palette, bullets: scene.bullets });
+}
+
+function userPathGridXml({ palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 1510 + itemIndex, name: `User Path Vertical Grid ${itemIndex + 1}`, x: 762000 + itemIndex * 1371600, y: 609600, cx: 7620, cy: 3962400, fill: palette.grid })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 1520 + itemIndex, name: `User Path Horizontal Grid ${itemIndex + 1}`, x: 609600, y: 1066800 + itemIndex * 762000, cx: 7924800, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function userPathMapXml({ visual, palette }) {
+  const nodeXs = [5715000, 6256020, 6804660, 7353300];
+  const nodeYs = [2697480, 2301240, 2468880, 1973580];
+  const lines = nodeXs.slice(0, -1).map((x, index) => rectShapeXml({ id: 1530 + index, name: `User Path Connector ${index + 1}`, x: x + 182880, y: nodeYs[index] + 76200, cx: 426720, cy: 45720, fill: index === 1 ? visual.secondary || "22C55E" : visual.accent })).join("");
+  const nodes = nodeXs.map((x, index) => solidShapeXml({ id: 1540 + index * 3, name: `User Path Node ${index + 1}`, geom: "ellipse", x, y: nodeYs[index], cx: 304800, cy: 304800, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1541 + index * 3, name: `User Path Node Frame ${index + 1}`, geom: "ellipse", x, y: nodeYs[index], cx: 304800, cy: 304800, stroke: index === 3 ? palette.warning : visual.accent, width: 25400 })
+    + solidShapeXml({ id: 1542 + index * 3, name: `User Path Node Glow ${index + 1}`, geom: "ellipse", x: x - 45720, y: nodeYs[index] - 45720, cx: 396240, cy: 396240, fill: index === 3 ? palette.warningGlow : palette.glow })).join("");
+  return solidShapeXml({ id: 1528, name: "User Path Route Panel", geom: "roundRect", x: 5334000, y: 1165860, cx: 3200400, cy: 2057400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1529, name: "User Path Route Frame", geom: "roundRect", x: 5334000, y: 1165860, cx: 3200400, cy: 2057400, stroke: palette.frame, width: 11430 })
+    + lines
+    + nodes;
+}
+
+function userPathFunnelBarsXml({ visual, palette, steps }) {
+  const widths = [2438400, 2057400, 1600200, 1066800];
+  return steps.slice(0, 4).map((step, index) => {
+    const x = 5486400 + index * 152400;
+    const y = 1219200 + index * 426720;
+    const fill = index === 0 ? visual.primary : index === 1 ? visual.accent : index === 2 ? visual.secondary || "22C55E" : palette.warning;
+    return solidShapeXml({ id: 1570 + index * 4, name: `User Path Funnel Step ${index + 1}`, geom: "roundRect", x, y, cx: widths[index], cy: 304800, fill })
+      + textShapeXml({ id: 1571 + index * 4, name: `User Path Funnel Label ${index + 1}`, x: x + 152400, y: y + 76200, cx: 914400, cy: 137160, text: step.label, size: 700, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 1572 + index * 4, name: `User Path Funnel Value ${index + 1}`, x: x + widths[index] - 670560, y: y + 76200, cx: 457200, cy: 137160, text: step.value, size: 760, bold: true, color: "FFFFFF" })
+      + rectShapeXml({ id: 1573 + index * 4, name: `User Path Funnel Shine ${index + 1}`, x: x + 152400, y: y + 228600, cx: Math.max(304800, widths[index] - 609600), cy: 22860, fill: palette.shine });
+  }).join("");
+}
+
+function userPathExperimentCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1447800;
+    const y = 1219200 + row * 914400;
+    return solidShapeXml({ id: 1600 + index * 4, name: `User Path Experiment Card ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 685800, fill: index === 0 ? palette.cardAccent : "FFFFFF" })
+      + lineFrameShapeXml({ id: 1601 + index * 4, name: `User Path Experiment Frame ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 685800, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1602 + index * 4, name: `User Path Experiment Rule ${index + 1}`, x: x + 152400, y: y + 152400, cx: 609600, cy: 45720, fill: index === 2 ? visual.secondary || "22C55E" : visual.accent })
+      + textShapeXml({ id: 1603 + index * 4, name: `User Path Experiment Text ${index + 1}`, x: x + 152400, y: y + 350520, cx: 914400, cy: 152400, text: card, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function userPathActionCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const x = 914400 + index * 1905000;
+    return solidShapeXml({ id: 1630 + index * 3, name: `User Path Action Card ${index + 1}`, geom: "roundRect", x, y: 3352800, cx: 1676400, cy: 701040, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1631 + index * 3, name: `User Path Action Frame ${index + 1}`, geom: "roundRect", x, y: 3352800, cx: 1676400, cy: 701040, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 1632 + index * 3, name: `User Path Action Text ${index + 1}`, x: x + 152400, y: 3627120, cx: 1219200, cy: 167640, text: card, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function userPathMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, index) => {
+    const x = 768096 + index * 1219200;
+    return solidShapeXml({ id: 1660 + index * 4, name: `User Path Metric Card ${index + 1}`, geom: "roundRect", x, y: 3893820, cx: 1005840, cy: 548640, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1661 + index * 4, name: `User Path Metric Accent ${index + 1}`, x, y: 3893820, cx: 1005840, cy: 45720, fill: index === 2 ? palette.warning : visual.accent })
+      + textShapeXml({ id: 1662 + index * 4, name: `User Path Metric Value ${index + 1}`, x: x + 121920, y: 4015740, cx: 609600, cy: 167640, text: metric.value, size: 1040, bold: true, color: visual.title })
+      + textShapeXml({ id: 1663 + index * 4, name: `User Path Metric Label ${index + 1}`, x: x + 121920, y: 4236720, cx: 762000, cy: 121920, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function userPathBulletCardsXml({ visual, palette, bullets }) {
+  return bullets.slice(0, 3).map((bullet, index) => {
+    const y = 2514600 + index * 289560;
+    return solidShapeXml({ id: 1690 + index * 3, name: `User Path Insight Row ${index + 1}`, geom: "roundRect", x: 853440, y, cx: 3505200, cy: 213360, fill: palette.card })
+      + solidShapeXml({ id: 1691 + index * 3, name: `User Path Insight Dot ${index + 1}`, geom: "ellipse", x: 1005840, y: y + 68580, cx: 76200, cy: 76200, fill: index === 1 ? visual.secondary || "22C55E" : visual.accent })
+      + textShapeXml({ id: 1692 + index * 3, name: `User Path Insight Text ${index + 1}`, x: 1158240, y: y + 53340, cx: 2895600, cy: 121920, text: userPathCompactText(bullet, "关键路径洞察", 30), size: 660, bold: true, color: visual.body });
+  }).join("");
+}
+
+function userPathFunnelScene({ slide, index, role }) {
+  const bullets = userPathBulletTexts(slide);
+  const values = userPathMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: userPathCompactText(bullets[0], "访问用户", 8) },
+    { value: values[1], label: userPathCompactText(bullets[1], "关键转化", 8) },
+    { value: values[2], label: userPathCompactText(bullets[2], "实验提升", 8) },
+  ];
+  const steps = ["访问", "激活", "提交", "留存"].map((label, stepIndex) => ({
+    label: userPathCompactText(bullets[stepIndex], label, 8),
+    value: values[stepIndex] || `${Math.max(24, 92 - stepIndex * 18)}%`,
+  }));
+  const cards = ["断点假设", "实验方案", "样本观察", "下一步动作"].map((fallback, cardIndex) => userPathCompactText(bullets[cardIndex], fallback, 14));
+  const sceneKind = role === "closing" || index >= 5 ? "actions" : ["cover", "overview", "funnel", "experiment"][Math.min(index, 3)];
+  const kickerMap = {
+    cover: "USER JOURNEY LAB",
+    overview: "CONVERSION ROUTE",
+    funnel: "DROP-OFF DIAGNOSIS",
+    experiment: "GROWTH EXPERIMENT",
+    actions: "NEXT OPTIMIZATION",
+  };
+  return {
+    kind: sceneKind,
+    kicker: kickerMap[sceneKind],
+    bullets,
+    metrics,
+    steps,
+    cards: sceneKind === "actions" ? ["优化入口", "缩短路径", "验证假设", "复盘数据"].map((fallback, cardIndex) => userPathCompactText(bullets[cardIndex], fallback, 14)) : cards,
+  };
+}
+
+function userPathBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["访问用户进入核心功能路径", "关键步骤转化率出现明显下降", "增长实验带来留存和提交率提升"];
+}
+
+function userPathMetricValues(bullets) {
+  const matches = bullets.flatMap((item) => String(item).match(/\d+(?:\.\d+)?%|\d+(?:\.\d+)?[万千]?/g) || []);
+  return [matches[0] || "12.8K", matches[1] || "38%", matches[2] || "+12%", matches[3] || "24%"];
+}
+
+function userPathCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function userPathFunnelColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.background, "FFFFFF", 0.32),
+    cardAccent: blendHexColor(visual.accent, "FFFFFF", 0.84),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.78),
+    glow: blendHexColor(visual.accent, visual.background, 0.66),
+    grid: blendHexColor(visual.primary, visual.background, 0.86),
+    panel: blendHexColor(visual.background, "FFFFFF", 0.42),
+    shine: blendHexColor("FFFFFF", visual.accent, 0.78),
+    warning: visual.warning || "F97316",
+    warningGlow: blendHexColor(visual.warning || "F97316", visual.background, 0.74),
   };
 }
 

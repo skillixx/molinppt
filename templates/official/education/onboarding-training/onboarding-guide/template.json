@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "onboarding-training",
+  "themeId": "onboarding-guide",
+  "style": "employee-orientation",
+  "themes": [
+    {
+      "id": "onboarding-guide",
+      "name": "Onboarding 指南",
+      "visual": {
+        "primary": "1E3A5F",
+        "accent": "14B8A6",
+        "secondary": "F59E0B",
+        "background": "F4F8FB",
+        "surface": "FFFFFF",
+        "title": "102033",
+        "body": "41516A",
+        "layout": "onboarding-guide",
+        "variant": "onboarding-guide"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E3A5F",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "background": "F4F8FB",
+    "surface": "FFFFFF",
+    "title": "102033",
+    "body": "41516A",
+    "layout": "onboarding-guide",
+    "variant": "onboarding-guide"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "onboarding-cover",
+    "defaultContentLayout": "onboarding-content",
+    "allowedLayouts": [
+      "onboarding-cover",
+      "onboarding-journey",
+      "onboarding-policy",
+      "onboarding-role",
+      "onboarding-culture",
+      "onboarding-checklist",
+      "onboarding-summary",
+      "title",
+      "content"
+    ]
+  }
+}

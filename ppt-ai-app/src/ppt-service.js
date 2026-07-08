@@ -4456,6 +4456,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
   if (visual.layout === "corporate-training") return false;
+  if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }

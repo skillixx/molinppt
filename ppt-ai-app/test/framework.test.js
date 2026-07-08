@@ -610,6 +610,41 @@ test("resolveTemplateVisual applies corporate training official visual", () => {
   assert.equal(visual.variant, "management");
 });
 
+test("resolveTemplateVisual applies onboarding guide official visual", () => {
+  const template = {
+    id: "education-onboarding-training-onboarding-guide",
+    visual: {
+      primary: "1E3A5F",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "41516A",
+      layout: "onboarding-guide",
+      variant: "onboarding-guide",
+    },
+    themes: [
+      {
+        id: "onboarding-guide",
+        visual: {
+          layout: "onboarding-guide",
+          variant: "onboarding-guide",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "onboarding-guide", template });
+
+  assert.equal(visual.id, "education-onboarding-training-onboarding-guide");
+  assert.equal(visual.primary, "1E3A5F");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.background, "F4F8FB");
+  assert.equal(visual.layout, "onboarding-guide");
+  assert.equal(visual.variant, "onboarding-guide");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
@@ -712,6 +747,41 @@ test("resolveTemplateVisual applies BI executive cockpit official visual", () =>
   assert.equal(visual.variant, "executive-cockpit");
   assert.equal(visual.primary, "071A2F");
   assert.equal(visual.accent, "22D3EE");
+});
+
+test("resolveTemplateVisual applies user behavior path funnel official visual", () => {
+  const template = {
+    id: "data-user-behavior-analysis-path-funnel",
+    visual: {
+      primary: "172554",
+      accent: "06B6D4",
+      secondary: "22C55E",
+      warning: "F97316",
+      background: "F6FAFF",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "user-path-funnel",
+      variant: "path-funnel",
+    },
+    themes: [
+      {
+        id: "path-funnel",
+        visual: {
+          layout: "user-path-funnel",
+          variant: "path-funnel",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "path-funnel", template });
+
+  assert.equal(visual.id, "data-user-behavior-analysis-path-funnel");
+  assert.equal(visual.layout, "user-path-funnel");
+  assert.equal(visual.variant, "path-funnel");
+  assert.equal(visual.primary, "172554");
+  assert.equal(visual.accent, "06B6D4");
 });
 
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {

@@ -1290,6 +1290,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="corporate-training"] .template-thumb-band { left: 0; right: 0; top: 0; height: 14%; background: linear-gradient(90deg, var(--thumb-primary), var(--thumb-accent)); }
     .template-thumb[data-layout="corporate-training"] .template-thumb-image { right: 11%; top: 24%; width: 27%; height: 42%; border-radius: 12px; background: linear-gradient(135deg, #fff, color-mix(in srgb, var(--thumb-accent) 18%, #fff 82%)); border: 1px solid color-mix(in srgb, var(--thumb-primary) 10%, transparent); box-shadow: 0 12px 22px rgba(31,58,95,.12); }
     .template-thumb[data-layout="corporate-training"] .template-thumb-tag { background: #f3a712; color: #10233d; }
+    .template-thumb[data-layout="onboarding-guide"] { background: linear-gradient(135deg, #f4f8fb 0%, color-mix(in srgb, var(--thumb-accent) 11%, #fff 89%) 58%, #e9f7f4 100%); }
+    .template-thumb[data-layout="onboarding-guide"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 9%, transparent) 0 1px, transparent 1px 30px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-accent) 8%, transparent) 0 1px, transparent 1px 30px); }
+    .template-thumb[data-layout="onboarding-guide"] .template-thumb-cover { left: 8%; right: 8%; top: 17%; bottom: 14%; border-radius: 18px; background: rgba(255,255,255,.94); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 16px 32px rgba(16,32,51,.12); }
+    .template-thumb[data-layout="onboarding-guide"] .template-thumb-band { left: 8%; right: 8%; top: 17%; height: 16%; border-radius: 18px 18px 0 0; background: linear-gradient(90deg, var(--thumb-primary), var(--thumb-accent)); }
+    .template-thumb[data-layout="onboarding-guide"] .template-thumb-image { right: 11%; top: 31%; width: 26%; height: 39%; border-radius: 16px; background: linear-gradient(135deg, #fff, color-mix(in srgb, var(--thumb-accent) 14%, #fff 86%)); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 12px 22px rgba(16,32,51,.10); }
+    .template-thumb[data-layout="onboarding-guide"] .template-thumb-wave { left: 12%; right: 42%; bottom: 19%; height: 10%; background: linear-gradient(90deg, var(--thumb-accent), color-mix(in srgb, var(--thumb-primary) 42%, #fff 58%)); clip-path: polygon(0 45%, 18% 45%, 18% 30%, 30% 30%, 30% 45%, 50% 45%, 50% 30%, 62% 30%, 62% 45%, 82% 45%, 82% 30%, 94% 30%, 94% 45%, 100% 45%, 100% 58%, 0 58%); opacity: .85; }
+    .template-thumb[data-layout="onboarding-guide"] .template-thumb-tag { background: #f59e0b; color: #102033; }
     .template-thumb[data-layout="venture"] { background: var(--thumb-bg); }
     .template-thumb[data-layout="venture"]::before { background:
       radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--thumb-accent) 26%, transparent), transparent 34%),
@@ -2283,6 +2290,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         education: { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
         "education-course": { date: "2026/08/22", kicker: "LESSON 01", title: "课程目标", lines: ["知识框架与重点概念", "课堂互动与练习路径"], tag: "教学课件" },
         "corporate-training": { date: "2026/08/22", kicker: "LEARNING 01", title: "课程目标", lines: ["管理模型与案例研讨", "课堂练习与行动计划"], tag: "内训课程" },
+        "onboarding-guide": { date: "2026/09/01", kicker: "WELCOME 01", title: "入职路径", lines: ["公司认知与制度学习", "岗位职责和团队融入"], tag: "新人培训" },
         pitch: { date: "2026/09/10", kicker: "PITCH 01", title: "增长故事", lines: ["市场机会与产品优势", "融资计划及资金用途"], tag: "融资路演" },
         "brand-story": { date: "2026/10/26", kicker: "BRAND 01", title: "品牌叙事", lines: ["核心主张与用户心智", "传播内容矩阵规划"], tag: "品牌传播" },
         "project-status": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" }
@@ -2351,7 +2359,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2365,7 +2373,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

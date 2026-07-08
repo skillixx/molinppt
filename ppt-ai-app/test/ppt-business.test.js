@@ -548,6 +548,29 @@ test("PptService renders BI executive cockpit preview with dedicated layout", as
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders user behavior path funnel preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertUserPathFunnelTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "用户转化路径复盘",
+    slideCount: 5,
+    templateId: "data-user-behavior-analysis-path-funnel",
+    theme: "path-funnel",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-user-behavior-analysis-path-funnel" data-layout="user-path-funnel"/);
+  assert.match(preview, /path-layer/);
+  assert.match(preview, /path-map|path-funnel|path-experiment|path-actions/);
+  assert.match(preview, /USER JOURNEY LAB|CONVERSION ROUTE|DROP-OFF DIAGNOSIS|GROWTH EXPERIMENT/);
+  assert.doesNotMatch(preview, />路径漏斗</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders corporate training preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -568,6 +591,29 @@ test("PptService renders corporate training preview with dedicated layout", asyn
   assert.match(preview, /training-board|training-path|training-model|training-case|training-checklist/);
   assert.match(preview, /INTERNAL LEARNING PROGRAM|LEARNING MAP|MANAGEMENT MODEL|CASE WORKSHOP/);
   assert.doesNotMatch(preview, />管理培训</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders onboarding guide preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertOnboardingGuideTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "新员工入职计划",
+    slideCount: 5,
+    templateId: "education-onboarding-training-onboarding-guide",
+    theme: "onboarding-guide",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="education-onboarding-training-onboarding-guide" data-layout="onboarding-guide"/);
+  assert.match(preview, /onboarding-layer/);
+  assert.match(preview, /onboarding-badge|onboarding-handbook|onboarding-culture|onboarding-checklist/);
+  assert.match(preview, /NEW HIRE GUIDE|HANDBOOK MAP|CULTURE FIT|ONBOARDING CHECKLIST/);
+  assert.doesNotMatch(preview, />Onboarding 指南</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -4392,6 +4438,54 @@ async function insertBiExecutiveCockpitTemplate(context) {
   });
 }
 
+async function insertUserPathFunnelTemplate(context) {
+  // 测试数据库模拟官方模板同步后的用户行为分析模板，确保预览进入路径转化专属布局。
+  await context.database.insert("templates", {
+    id: "data-user-behavior-analysis-path-funnel",
+    slug: "data-user-behavior-analysis-path-funnel",
+    name: "用户行为分析 - 路径漏斗",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "path-funnel",
+        name: "路径漏斗",
+        visual: {
+          primary: "172554",
+          accent: "06B6D4",
+          secondary: "22C55E",
+          warning: "F97316",
+          background: "F6FAFF",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "user-path-funnel",
+          variant: "path-funnel",
+        },
+      },
+    ],
+    visual: {
+      primary: "172554",
+      accent: "06B6D4",
+      secondary: "22C55E",
+      warning: "F97316",
+      background: "F6FAFF",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "user-path-funnel",
+      variant: "path-funnel",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "path-cover",
+      defaultContentLayout: "path-analysis",
+      allowedLayouts: ["path-cover", "path-overview", "path-funnel", "path-experiment", "path-actions", "title", "content", "closing"],
+    },
+  });
+}
+
 async function insertCorporateTrainingTemplate(context) {
   // 测试数据库模拟官方模板同步后的企业内训课程模板，确保预览走内训课件专用布局。
   await context.database.insert("templates", {
@@ -4444,6 +4538,63 @@ async function insertCorporateTrainingTemplate(context) {
         "corporate-training-summary",
         "title",
         "content",
+      ],
+    },
+  });
+}
+
+async function insertOnboardingGuideTemplate(context) {
+  // 测试数据库模拟官方模板同步后的新员工入职模板，避免大纲阶段出现 TEMPLATE_NOT_FOUND。
+  await context.database.insert("templates", {
+    id: "education-onboarding-training-onboarding-guide",
+    slug: "education-onboarding-training-onboarding-guide",
+    name: "新员工入职培训 - Onboarding 指南",
+    categoryId: "education",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "onboarding-guide",
+        name: "Onboarding 指南",
+        visual: {
+          primary: "1E3A5F",
+          accent: "14B8A6",
+          secondary: "F59E0B",
+          background: "F4F8FB",
+          surface: "FFFFFF",
+          title: "102033",
+          body: "41516A",
+          layout: "onboarding-guide",
+          variant: "onboarding-guide",
+        },
+      },
+    ],
+    visual: {
+      primary: "1E3A5F",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "41516A",
+      layout: "onboarding-guide",
+      variant: "onboarding-guide",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "onboarding-cover",
+      defaultContentLayout: "onboarding-journey",
+      allowedLayouts: [
+        "onboarding-cover",
+        "onboarding-journey",
+        "onboarding-policy",
+        "onboarding-role",
+        "onboarding-culture",
+        "onboarding-checklist",
+        "onboarding-summary",
+        "title",
+        "content",
+        "closing",
       ],
     },
   });

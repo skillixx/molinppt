@@ -1,0 +1,18 @@
+{
+  "slug": "education-onboarding-training-onboarding-guide",
+  "name": "新员工入职培训 - Onboarding 指南",
+  "description": "适合新人入职介绍、公司制度培训、岗位职责说明和团队文化宣导的正式入职培训模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "onboarding",
+    "new-hire-training",
+    "employee-orientation"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
