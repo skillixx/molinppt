@@ -860,6 +860,57 @@ test("PptExportService uses feature priority value matrix decorations", () => {
   assert.doesNotMatch(slide1, /value-matrix/);
 });
 
+test("PptExportService uses experience journey redesign decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-user-experience-redesign-experience-journey",
+      theme: "experience-journey",
+      templateVisual: {
+        primary: "1E2A5A",
+        accent: "18B7A6",
+        secondary: "F9735B",
+        background: "EEF5FA",
+        surface: "FFFFFF",
+        title: "102033",
+        body: "405166",
+        layout: "experience-journey-map",
+        variant: "experience-journey",
+      },
+      slides: [
+        {
+          title: "用户体验改版方案与旅程诊断",
+          bullets: ["新用户进入路径存在信息断点", "核心操作流程步骤偏长", "关键转化前缺少信任说明"],
+        },
+        {
+          title: "关键触点旅程梳理",
+          bullets: ["首页认知触点不够清晰", "试用流程存在重复确认", "反馈入口位置不明显"],
+        },
+        {
+          title: "体验断点与问题诊断",
+          bullets: ["注册步骤导致流失", "权限说明理解成本高", "空状态缺少下一步引导", "反馈闭环不足"],
+        },
+        {
+          title: "改版方案与验证路径",
+          bullets: ["缩短关键路径", "强化信息层级", "补充原型验证", "灰度观察转化指标"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Experience Journey Canvas"/);
+  assert.match(slide1, /name="Experience Journey Map Panel"/);
+  assert.match(slide3, /name="Experience Journey Friction Card 1"/);
+  assert.match(slide4, /name="Experience Journey Redesign Card 1"|name="Experience Journey Next Action 1"/);
+  assert.doesNotMatch(slide1, /experience-journey/);
+});
+
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1300,6 +1351,53 @@ test("PptExportService uses growth funding flywheel decorations", () => {
   assert.match(slide4, /name="Growth Funding Proof Card 1"|name="Growth Funding Data Dashboard"/);
   assert.match(slide5, /name="Growth Funding Roadmap Node 1"/);
   assert.doesNotMatch(slide1, /growth-flywheel/);
+});
+
+test("PptExportService uses product funding highlights decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-product-funding-pitch-product-highlights",
+      theme: "product-highlights",
+      templateVisual: {
+        id: "pitch-product-funding-pitch-product-highlights",
+        primary: "0B1220",
+        accent: "06B6D4",
+        secondary: "22C55E",
+        warning: "F59E0B",
+        background: "EAF2F8",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "product-funding-highlights",
+        variant: "product-highlights",
+      },
+      slides: [
+        { title: "Product funding demo", bullets: ["Product console proves investor value", "Technical moat is visible", "User value can be measured"] },
+        { title: "Capability map", bullets: ["Workflow automation", "AI orchestration", "Data asset", "Open API"] },
+        { title: "Demo flow", bullets: ["Input goal", "Analyze context", "Recommend actions", "Export result"] },
+        { title: "Technical advantage", bullets: ["Data layer", "Model routing", "Workflow engine", "Integration layer"] },
+        { title: "User value journey", bullets: ["Pain point", "Product intervention", "Efficiency gain", "Business result"] },
+        { title: "Market validation", bullets: ["Retention", "Activation", "Conversion", "Case proof"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Product Funding Content Surface"/);
+  assert.match(slide1, /name="Product Funding Demo Console"/);
+  assert.match(slide1, /name="Product Funding Product Mockup"/);
+  assert.match(slide1, /name="Product Funding Planned Content"/);
+  assert.match(slide2, /name="Product Funding Capability Card 1"/);
+  assert.match(slide4, /name="Product Funding Technical Chain 1"/);
+  assert.match(slide5, /name="Product Funding Value Journey Node 1"/);
+  assert.doesNotMatch(slide1, /product-highlights/);
 });
 
 test("PptExportService uses BI executive cockpit decorations", () => {

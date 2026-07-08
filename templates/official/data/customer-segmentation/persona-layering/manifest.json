@@ -1,0 +1,19 @@
+{
+  "slug": "data-customer-segmentation-persona-layering",
+  "name": "客户分群画像 - 人群分层",
+  "description": "适合客户画像分析、用户分层运营和精准营销策略汇报的商业化数据洞悉模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 100,
+  "status": "active",
+  "tags": [
+    "data",
+    "customer-segmentation",
+    "persona-layering",
+    "customer-profile",
+    "precision-marketing"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

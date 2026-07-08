@@ -1,0 +1,39 @@
+{
+  "baseTemplateId": "product-funding-pitch",
+  "themeId": "product-highlights",
+  "style": "product-funding-highlights",
+  "themes": [
+    {
+      "id": "product-highlights",
+      "name": "产品亮点"
+    }
+  ],
+  "visual": {
+    "primary": "0B1220",
+    "accent": "06B6D4",
+    "secondary": "22C55E",
+    "warning": "F59E0B",
+    "background": "EAF2F8",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "product-funding-highlights",
+    "variant": "product-highlights"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-funding-cover",
+    "defaultContentLayout": "product-capability-map",
+    "allowedLayouts": [
+      "product-funding-cover",
+      "product-capability-map",
+      "product-demo-flow",
+      "technical-advantage",
+      "user-value-journey",
+      "validation-dashboard",
+      "funding-roadmap",
+      "product-funding-closing",
+      "title",
+      "content"
+    ]
+  }
+}

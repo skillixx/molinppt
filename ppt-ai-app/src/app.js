@@ -1291,6 +1291,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-image { right: 12%; top: 25%; width: 29%; height: 38%; border-radius: 12px; background: linear-gradient(90deg, transparent 49%, color-mix(in srgb, var(--thumb-primary) 34%, transparent) 49% 51%, transparent 51%), linear-gradient(0deg, transparent 49%, color-mix(in srgb, var(--thumb-primary) 34%, transparent) 49% 51%, transparent 51%), #f8fbfd; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: none; }
     .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-wave { left: 12%; right: 52%; bottom: 23%; height: 11%; background: linear-gradient(90deg, var(--thumb-accent) 0 9%, transparent 9% 34%, var(--thumb-primary) 34% 43%, transparent 43% 68%, #f97316 68% 77%, transparent 77%); clip-path: none; opacity: .95; }
     .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-tag { background: var(--thumb-accent); color: #073b2c; }
+    .template-thumb[data-layout="experience-journey-map"] { background: linear-gradient(135deg, #f8fcff 0%, var(--thumb-bg) 58%, #e1f6f3 100%); }
+    .template-thumb[data-layout="experience-journey-map"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 9%, transparent) 0 1px, transparent 1px 30px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-accent) 8%, transparent) 0 1px, transparent 1px 28px); }
+    .template-thumb[data-layout="experience-journey-map"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 18px; background: rgba(255,255,255,.94); border: 1px solid color-mix(in srgb, var(--thumb-primary) 14%, transparent); box-shadow: 0 16px 30px rgba(16,32,51,.12); }
+    .template-thumb[data-layout="experience-journey-map"] .template-thumb-band { left: 11%; right: 51%; top: 39%; height: 2%; border-radius: 999px; background: linear-gradient(90deg, var(--thumb-accent), transparent); }
+    .template-thumb[data-layout="experience-journey-map"] .template-thumb-image { right: 11%; top: 25%; width: 31%; height: 39%; border-radius: 14px; background: radial-gradient(circle at 16% 61%, var(--thumb-accent) 0 5%, transparent 6%), radial-gradient(circle at 38% 34%, var(--thumb-primary) 0 5%, transparent 6%), radial-gradient(circle at 60% 57%, #f9735b 0 5%, transparent 6%), radial-gradient(circle at 82% 32%, var(--thumb-primary) 0 5%, transparent 6%), linear-gradient(165deg, transparent 45%, color-mix(in srgb, var(--thumb-accent) 50%, transparent) 46% 49%, transparent 50%), #f8fbfd; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: none; }
+    .template-thumb[data-layout="experience-journey-map"] .template-thumb-wave { left: 12%; right: 13%; bottom: 22%; height: 10%; background: linear-gradient(90deg, var(--thumb-accent) 0 7%, transparent 7% 22%, var(--thumb-primary) 22% 29%, transparent 29% 45%, #f9735b 45% 52%, transparent 52% 70%, var(--thumb-accent) 70% 77%, transparent 77%); clip-path: none; opacity: .92; }
+    .template-thumb[data-layout="experience-journey-map"] .template-thumb-tag { background: var(--thumb-accent); color: #073b2c; }
     .template-thumb[data-layout="knowledge-blackboard"] { background: linear-gradient(135deg, #f4f1e8 0%, #efe7d1 100%); }
     .template-thumb[data-layout="knowledge-blackboard"]::before { background: repeating-linear-gradient(90deg, rgba(23,59,51,.08) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, rgba(23,59,51,.06) 0 1px, transparent 1px 28px); }
     .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 6px; background: linear-gradient(135deg, #173b33, #0d2a24); border: 5px solid #c8b88f; box-shadow: inset 0 -6px 0 #c8b88f, 0 16px 28px rgba(23,59,51,.18); }
@@ -1298,6 +1305,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-image { right: 13%; top: 28%; width: 24%; height: 37%; border-radius: 4px; background: #fffdf5; border: 2px solid #d8cdaf; box-shadow: none; }
     .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-wave { left: 13%; right: 48%; bottom: 29%; height: 12%; background: linear-gradient(90deg, #f8fae7 0 34%, transparent 34% 44%, #60a5fa 44% 68%, transparent 68% 76%, #f87171 76%); clip-path: polygon(0 35%, 100% 35%, 100% 48%, 0 48%); opacity: .9; }
     .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-tag { background: var(--thumb-accent); color: #173b33; }
+    .template-thumb[data-layout="exam-review-keypoints"] { background: linear-gradient(135deg, #f4f7fb 0%, #ffffff 58%, color-mix(in srgb, var(--thumb-accent) 10%, #ffffff 90%) 100%); }
+    .template-thumb[data-layout="exam-review-keypoints"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 9%, transparent) 0 1px, transparent 1px 30px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-primary) 7%, transparent) 0 1px, transparent 1px 26px); }
+    .template-thumb[data-layout="exam-review-keypoints"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 8px; background: #fff; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: 0 16px 30px rgba(30,42,120,.13); }
+    .template-thumb[data-layout="exam-review-keypoints"] .template-thumb-band { left: 8%; right: 8%; top: 15%; height: 16%; background: var(--thumb-primary); border-radius: 8px 8px 0 0; }
+    .template-thumb[data-layout="exam-review-keypoints"] .template-thumb-image { right: 12%; top: 31%; width: 29%; height: 35%; border-radius: 14px; background: radial-gradient(circle at 30% 42%, var(--thumb-secondary) 0 17%, transparent 18%), radial-gradient(circle at 66% 52%, #ef4444 0 12%, transparent 13%), linear-gradient(#fff,#fff); border: 1px solid color-mix(in srgb, var(--thumb-primary) 14%, transparent); box-shadow: none; }
+    .template-thumb[data-layout="exam-review-keypoints"] .template-thumb-wave { left: 13%; right: 51%; top: 42%; bottom: auto; height: 5%; border-radius: 999px; background: var(--thumb-accent); clip-path: none; opacity: .95; }
+    .template-thumb[data-layout="exam-review-keypoints"] .template-thumb-tag { background: var(--thumb-accent); color: #172554; }
     .template-thumb[data-layout="corporate-training"] { background: linear-gradient(135deg, #f6f9fc 0%, var(--thumb-bg) 58%, #e8f5f4 100%); }
     .template-thumb[data-layout="corporate-training"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 10%, transparent) 0 1px, transparent 1px 28px), radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--thumb-accent) 22%, transparent), transparent 24%); }
     .template-thumb[data-layout="corporate-training"] .template-thumb-cover { left: 8%; right: 8%; top: 16%; bottom: 14%; border-radius: 14px; background: rgba(255,255,255,.92); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 16px 30px rgba(31,58,95,.13); }
@@ -2300,6 +2314,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "sales-proposal": { date: "2026/05/18", kicker: "SOLUTION 01", title: "客户方案", lines: ["业务痛点与价值主张", "交付计划及合作路径"], tag: "销售提案" },
         "product-roadmap": { date: "2026/09/22", kicker: "ROADMAP 01", title: "版本规划", lines: ["核心功能优先级排序", "里程碑节奏与风险"], tag: "产品规划" },
         "feature-priority-matrix": { date: "2026/10/06", kicker: "PRIORITY 01", title: "优先级评审", lines: ["价值成本矩阵排序", "研发资源投入取舍"], tag: "产品决策" },
+        "experience-journey-map": { date: "2026/10/08", kicker: "UX JOURNEY", title: "体验改版", lines: ["旅程触点诊断", "改版路径评审"], tag: "体验旅程" },
         "marketing-campaign": { date: "2026/10/10", kicker: "CAMPAIGN 01", title: "活动复盘", lines: ["渠道触达与转化表现", "品牌声量增长洞察"], tag: "营销推广" },
         "data-insight": { date: "2026/11/03", kicker: "DATA 01", title: "洞察结论", lines: ["指标异常与趋势变化", "行动建议优先级排序"], tag: "数据报告" },
         "market-trend-insight": { date: "2026/11/18", kicker: "MARKET 01", title: "趋势信号扫描", lines: ["行业变化与机会窗口", "竞争格局和进入时机"], tag: "趋势洞察" },
@@ -2315,6 +2330,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       // 年度经营总结缩略图使用经营复盘语义，不直接展示主题风格名。
       themeCopies["annual-business-summary:blue-gold"] = { date: "2026/12/31", kicker: "ANNUAL 01", title: "年度经营总结", lines: ["核心指标与成果沉淀", "来年目标和行动规划"], tag: "年度汇报" };
       const layoutCopies = {
+        "exam-review-keypoints": { date: "2026/10/18", kicker: "EXAM REVIEW", title: "考点框架", lines: ["必背清单和易错归因", "冲刺计划与练习安排"], tag: "考前复习" },
         "red-gold": { date: "2026/06/05", kicker: "PART 01", title: "季度概览", lines: ["核心指标达成分析", "重点项目进展复盘"], tag: "商务汇报" },
         "academy": { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
         "executive": { date: "2026/07/18", kicker: "REPORT 01", title: "年度复盘", lines: ["经营数据与增长趋势", "关键任务完成情况"], tag: "企业汇报" },
@@ -2376,7 +2392,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "knowledge-blackboard", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "experience-journey-map", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2390,7 +2406,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "knowledge-blackboard", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "experience-journey-map", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

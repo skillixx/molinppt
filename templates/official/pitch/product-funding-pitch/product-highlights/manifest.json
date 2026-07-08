@@ -1,0 +1,21 @@
+{
+  "slug": "pitch-product-funding-pitch-product-highlights",
+  "name": "产品融资路演 - 产品亮点",
+  "description": "适合产品能力展示、技术优势说明、用户价值呈现和投资人产品演示的官方融资路演模板，突出产品控制台、能力矩阵、技术壁垒、用户价值与融资落地路径。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "product-funding",
+    "product-highlights",
+    "product-demo",
+    "technical-moat",
+    "user-value",
+    "investor-demo"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

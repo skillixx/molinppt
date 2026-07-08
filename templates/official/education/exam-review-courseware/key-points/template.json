@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "exam-review-courseware",
+  "themeId": "key-points",
+  "style": "exam-review-keypoints-system",
+  "themes": [
+    {
+      "id": "key-points",
+      "name": "重点梳理",
+      "visual": {
+        "primary": "1E2A78",
+        "accent": "F59E0B",
+        "secondary": "06B6D4",
+        "warning": "EF4444",
+        "background": "F4F7FB",
+        "surface": "FFFFFF",
+        "title": "172554",
+        "body": "334155",
+        "layout": "exam-review-keypoints",
+        "variant": "key-points"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E2A78",
+    "accent": "F59E0B",
+    "secondary": "06B6D4",
+    "warning": "EF4444",
+    "background": "F4F7FB",
+    "surface": "FFFFFF",
+    "title": "172554",
+    "body": "334155",
+    "layout": "exam-review-keypoints",
+    "variant": "key-points"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "exam-review-cover",
+    "defaultContentLayout": "exam-review-keypoints",
+    "allowedLayouts": [
+      "exam-review-cover",
+      "exam-review-roadmap",
+      "exam-review-framework",
+      "exam-review-keypoints",
+      "exam-review-mistakes",
+      "exam-review-plan",
+      "exam-review-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

@@ -348,6 +348,29 @@ test("PptService renders synced feature priority matrix preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced experience journey preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertExperienceJourneyTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "用户体验改版方案",
+    slideCount: 6,
+    templateId: "product-user-experience-redesign-experience-journey",
+    theme: "experience-journey",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-user-experience-redesign-experience-journey" data-layout="experience-journey-map"/);
+  assert.match(preview, /journey-layer/);
+  assert.match(preview, /journey-map/);
+  assert.match(preview, /journey-diagnosis|journey-redesign|journey-roadmap|journey-actions/);
+  assert.doesNotMatch(preview, />体验旅程</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -569,6 +592,30 @@ test("PptService renders growth funding flywheel preview with dedicated layout",
   assert.match(preview, /growth-funding-proof|growth-funding-roadmap|growth-funding-dashboard/);
   assert.match(preview, /GROWTH CAPITAL MEMO|GROWTH FLYWHEEL|COMMERCIAL PROOF|EXPANSION PLAN/);
   assert.doesNotMatch(preview, />增长飞轮</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders product funding highlights preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProductFundingHighlightsTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品能力投资人演示",
+    slideCount: 6,
+    templateId: "pitch-product-funding-pitch-product-highlights",
+    theme: "product-highlights",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-product-funding-pitch-product-highlights" data-layout="product-funding-highlights"/);
+  assert.match(preview, /product-funding-layer/);
+  assert.match(preview, /product-funding-console/);
+  assert.match(preview, /product-funding-capability|product-funding-architecture|product-funding-journey|product-funding-dashboard/);
+  assert.match(preview, /PRODUCT INVESTOR DEMO|CAPABILITY MAP|LIVE DEMO FLOW|TECH ADVANTAGE/);
+  assert.doesNotMatch(preview, />产品亮点</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -4077,6 +4124,52 @@ async function insertFeaturePriorityMatrixTemplate(context) {
   });
 }
 
+async function insertExperienceJourneyTemplate(context) {
+  // 测试数据库模拟官方模板同步后的体验旅程模板，确保预览使用独立旅程地图布局。
+  await context.database.insert("templates", {
+    id: "product-user-experience-redesign-experience-journey",
+    slug: "product-user-experience-redesign-experience-journey",
+    name: "用户体验改版方案 - 体验旅程",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "experience-journey",
+        name: "体验旅程",
+        visual: {
+          primary: "1E2A5A",
+          accent: "18B7A6",
+          secondary: "F9735B",
+          background: "EEF5FA",
+          surface: "FFFFFF",
+          title: "102033",
+          body: "405166",
+          layout: "experience-journey-map",
+          variant: "experience-journey",
+        },
+      },
+    ],
+    visual: {
+      primary: "1E2A5A",
+      accent: "18B7A6",
+      secondary: "F9735B",
+      background: "EEF5FA",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "405166",
+      layout: "experience-journey-map",
+      variant: "experience-journey",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "experience-journey-cover",
+      defaultContentLayout: "experience-journey-content",
+      allowedLayouts: ["experience-journey-cover", "experience-journey-content", "experience-journey-diagnosis", "experience-journey-redesign", "experience-journey-roadmap", "experience-journey-summary", "title", "content", "closing"],
+    },
+  });
+}
+
 async function insertIndustryTrendForecastTemplate(context) {
   // 测试数据库模拟官方模板同步后的趋势判断主题，确保 slug 模板也能走独立趋势研判布局。
   await context.database.insert("templates", {
@@ -4571,6 +4664,54 @@ async function insertGrowthFundingFlywheelTemplate(context) {
       defaultCoverLayout: "growth-funding-cover",
       defaultContentLayout: "growth-funding-content",
       allowedLayouts: ["growth-funding-cover", "growth-overview-dashboard", "growth-flywheel-model", "commercialization-progress", "growth-data-proof", "market-expansion-plan", "funding-use-milestones", "growth-funding-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertProductFundingHighlightsTemplate(context) {
+  // 测试数据库模拟官方模板同步后的产品融资路演模板，确保产品亮点主题只用于选择器，不直接写进 PPT 页面。
+  await context.database.insert("templates", {
+    id: "pitch-product-funding-pitch-product-highlights",
+    slug: "pitch-product-funding-pitch-product-highlights",
+    name: "产品融资路演 - 产品亮点",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "product-highlights",
+        name: "产品亮点",
+        visual: {
+          primary: "0B1220",
+          accent: "06B6D4",
+          secondary: "22C55E",
+          warning: "F59E0B",
+          background: "EAF2F8",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "product-funding-highlights",
+          variant: "product-highlights",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1220",
+      accent: "06B6D4",
+      secondary: "22C55E",
+      warning: "F59E0B",
+      background: "EAF2F8",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "product-funding-highlights",
+      variant: "product-highlights",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-funding-cover",
+      defaultContentLayout: "product-capability-map",
+      allowedLayouts: ["product-funding-cover", "product-capability-map", "product-demo-flow", "technical-advantage", "user-value-journey", "validation-dashboard", "funding-roadmap", "product-funding-closing", "title", "content"],
     },
   });
 }

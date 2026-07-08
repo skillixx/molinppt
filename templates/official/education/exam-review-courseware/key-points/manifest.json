@@ -1,0 +1,13 @@
+{
+  "slug": "education-exam-review-courseware-key-points",
+  "name": "考试复习课件 - 重点梳理",
+  "description": "适合考点复习、知识框架总结、错题分析和学习计划安排的考试复习课件模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": ["education", "exam-review", "key-points", "courseware"],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
