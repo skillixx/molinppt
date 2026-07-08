@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img" aria-label="转化漏斗装饰">
+  <defs>
+    <linearGradient id="funnelFill" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#172554"/>
+      <stop offset=".55" stop-color="#06B6D4"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <path d="M160 92h580l-64 82H224z" fill="url(#funnelFill)" opacity=".92"/>
+  <path d="M236 208h428l-58 76H294z" fill="url(#funnelFill)" opacity=".72"/>
+  <path d="M315 318h270l-52 70H367z" fill="url(#funnelFill)" opacity=".54"/>
+  <path d="M388 420h124l-28 48h-68z" fill="#F97316" opacity=".84"/>
+  <g stroke="#172554" stroke-width="3" opacity=".18">
+    <path d="M120 120h660"/>
+    <path d="M160 250h580"/>
+    <path d="M210 380h480"/>
+  </g>
+</svg>

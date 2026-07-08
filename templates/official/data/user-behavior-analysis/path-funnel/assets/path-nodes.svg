@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img" aria-label="用户路径节点装饰">
+  <defs>
+    <linearGradient id="pathLine" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#06B6D4"/>
+      <stop offset="0.58" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <path d="M90 300 C210 120 330 380 455 220 S680 130 810 250" fill="none" stroke="url(#pathLine)" stroke-width="22" stroke-linecap="round" opacity=".92"/>
+  <g fill="#fff" stroke="#172554" stroke-width="10">
+    <circle cx="90" cy="300" r="34"/>
+    <circle cx="270" cy="228" r="34"/>
+    <circle cx="455" cy="220" r="34"/>
+    <circle cx="630" cy="178" r="34"/>
+    <circle cx="810" cy="250" r="34"/>
+  </g>
+  <g fill="#06B6D4" opacity=".16">
+    <circle cx="150" cy="120" r="72"/>
+    <circle cx="730" cy="388" r="90"/>
+  </g>
+</svg>
