@@ -642,6 +642,30 @@ test("PptService renders product funding highlights preview with dedicated layou
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders investor update progress sync preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertInvestorUpdateProgressTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "月度投资人经营进展同步",
+    slideCount: 6,
+    templateId: "pitch-investor-update-report-progress-sync",
+    theme: "progress-sync",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-investor-update-report-progress-sync" data-layout="investor-update-progress-sync"/);
+  assert.match(preview, /investor-update-layer/);
+  assert.match(preview, /investor-update-dashboard/);
+  assert.match(preview, /investor-update-cards|investor-update-lanes|investor-update-risk|investor-update-roadmap/);
+  assert.match(preview, /INVESTOR MONTHLY UPDATE|PROGRESS BRIEFING|METRICS DISCLOSURE|OPERATING TIMELINE/);
+  assert.doesNotMatch(preview, />进展同步</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders BI executive cockpit preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4827,6 +4851,54 @@ async function insertProductFundingHighlightsTemplate(context) {
       defaultCoverLayout: "product-funding-cover",
       defaultContentLayout: "product-capability-map",
       allowedLayouts: ["product-funding-cover", "product-capability-map", "product-demo-flow", "technical-advantage", "user-value-journey", "validation-dashboard", "funding-roadmap", "product-funding-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertInvestorUpdateProgressTemplate(context) {
+  // 测试数据库模拟官方模板同步后的投资人更新报告，确保进展同步主题只用于选择器，不直接写进 PPT 页面。
+  await context.database.insert("templates", {
+    id: "pitch-investor-update-report-progress-sync",
+    slug: "pitch-investor-update-report-progress-sync",
+    name: "投资人更新报告 - 进展同步",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "progress-sync",
+        name: "进展同步",
+        visual: {
+          primary: "111827",
+          accent: "14B8A6",
+          secondary: "F59E0B",
+          warning: "EF4444",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "investor-update-progress-sync",
+          variant: "progress-sync",
+        },
+      },
+    ],
+    visual: {
+      primary: "111827",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      warning: "EF4444",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "investor-update-progress-sync",
+      variant: "progress-sync",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "investor-update-cover",
+      defaultContentLayout: "investor-progress-briefing",
+      allowedLayouts: ["investor-update-cover", "investor-progress-briefing", "investor-metrics-disclosure", "investor-operating-timeline", "investor-risk-asks", "investor-next-plan", "investor-update-closing", "title", "content"],
     },
   });
 }

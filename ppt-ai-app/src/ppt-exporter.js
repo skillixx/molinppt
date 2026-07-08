@@ -6063,6 +6063,176 @@ function isProductFundingHighlightsVisual(visual) {
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
 }
 
+function investorUpdateProgressDecorationsXml({ visual, index, role, slide }) {
+  const scene = investorUpdateProgressScene({ slide, index, role });
+  const palette = investorUpdateProgressPalette(visual);
+  const shell = rectShapeXml({ id: 1300, name: "Investor Update Soft Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 1301, name: "Investor Update Content Surface", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4239260, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1302, name: "Investor Update Surface Frame", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4239260, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1303, name: "Investor Update Top Guard", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 1304, name: "Investor Update Teal Accent", x: 2895600, y: 320040, cx: 3048000, cy: 38100, fill: visual.accent })
+    + rectShapeXml({ id: 1305, name: "Investor Update Amber Accent", x: 5943600, y: 320040, cx: 1219200, cy: 38100, fill: palette.amber })
+    + solidShapeXml({ id: 1306, name: "Investor Update Teal Glow", geom: "ellipse", x: 6858000, y: 579120, cx: 1447800, cy: 1447800, fill: palette.tealGlow })
+    + textShapeXml({ id: 1307, name: "Investor Update Kicker", x: 762000, y: 640080, cx: 3200400, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const content = investorUpdateProgressContentXml({ visual, palette, scene, slide });
+  if (scene.role === "cover" || scene.role === "metrics") {
+    return shell + content + investorUpdateDashboardXml({ visual, palette }) + investorUpdateMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.role === "progress") {
+    return shell + content + investorUpdateCardsXml({ visual, palette, slide, cards: scene.cards }) + investorUpdateMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.role === "timeline") {
+    return shell + content + investorUpdateLanesXml({ visual, palette, slide, cards: scene.cards }) + investorUpdateMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.role === "risk") {
+    return shell + content + investorUpdateRiskXml({ visual, palette, slide, cards: scene.cards }) + investorUpdateMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.role === "plan") {
+    return shell + content + investorUpdateRoadmapXml({ visual, palette, slide, cards: scene.cards });
+  }
+  return shell
+    + content
+    + solidShapeXml({ id: 1370, name: "Investor Update Closing Loop", geom: "ellipse", x: 5943600, y: 1371600, cx: 1752600, cy: 1752600, fill: palette.tealGlow })
+    + arcLineShapeXml({ id: 1371, name: "Investor Update Closing Arc", x: 5943600, y: 1371600, cx: 1752600, cy: 1752600, stroke: visual.primary, width: 45720 })
+    + investorUpdateRoadmapXml({ visual, palette, slide, cards: scene.cards });
+}
+
+function investorUpdateProgressContentXml({ visual, palette, scene, slide }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  const summary = investorUpdateCompactText(bullets[0], scene.summary, 38);
+  const bulletBody = bullets.slice(0, 3).map((item) => paragraphXml(investorUpdateCompactText(item, scene.summary, 28), 680, false, visual.body)).join("");
+  return rectShapeXml({ id: 1310, name: "Investor Update Summary Rule", x: 762000, y: scene.role === "cover" ? 2232660 : 1905000, cx: 3048000, cy: 38100, fill: visual.accent })
+    + textShapeXml({ id: 1311, name: "Investor Update Summary", x: 762000, y: scene.role === "cover" ? 2468880 : 1950720, cx: 3505200, cy: 335280, text: summary, size: scene.role === "cover" ? 820 : 740, bold: true, color: visual.body })
+    + textShapeXml({ id: 1312, name: "Investor Update Planned Content", x: 807720, y: scene.role === "cover" ? 3002280 : 2392680, cx: 3352800, cy: 762000, body: bulletBody || paragraphXml("", 680, false, visual.body), size: 680, bold: false, color: visual.body })
+    + rectShapeXml({ id: 1313, name: "Investor Update Content Hairline", x: 762000, y: 4213860, cx: 3505200, cy: 30480, fill: palette.lightTeal });
+}
+
+function investorUpdateDashboardXml({ visual, palette }) {
+  const bars = [
+    { x: 5943600, y: 3307080, h: 381000, fill: visual.accent },
+    { x: 6400800, y: 3124200, h: 563880, fill: visual.primary },
+    { x: 6858000, y: 3200400, h: 487680, fill: visual.accent },
+    { x: 7315200, y: 2941320, h: 746760, fill: palette.amber },
+  ].map((bar, itemIndex) => rectShapeXml({ id: 1335 + itemIndex, name: `Investor Update Dashboard Bar ${itemIndex + 1}`, x: bar.x, y: bar.y, cx: 259080, cy: bar.h, fill: bar.fill })).join("");
+  return solidShapeXml({ id: 1320, name: "Investor Update KPI Dashboard", geom: "roundRect", x: 5638800, y: 1066800, cx: 2514600, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1321, name: "Investor Update Dashboard Frame", geom: "roundRect", x: 5638800, y: 1066800, cx: 2514600, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1322, name: "Investor Update Dashboard Header", x: 5943600, y: 1280160, cx: 1905000, cy: 91440, fill: visual.primary })
+    + rectShapeXml({ id: 1323, name: "Investor Update Dashboard Teal Rule", x: 5943600, y: 1645920, cx: 975360, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 1324, name: "Investor Update Dashboard Amber Rule", x: 7010400, y: 1645920, cx: 838200, cy: 53340, fill: palette.amber })
+    + rectShapeXml({ id: 1325, name: "Investor Update Dashboard Axis", x: 5867400, y: 3695700, cx: 2057400, cy: 22860, fill: palette.frame })
+    + bars;
+}
+
+function investorUpdateMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 4).map((metric, itemIndex) => {
+    const x = 762000 + itemIndex * 1905000;
+    return solidShapeXml({ id: 1345 + itemIndex, name: `Investor Update Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3870960, cx: 1676400, cy: 609600, fill: itemIndex === 2 ? palette.lightAmber : visual.surface })
+      + lineFrameShapeXml({ id: 1350 + itemIndex, name: `Investor Update Metric Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3870960, cx: 1676400, cy: 609600, stroke: itemIndex === 2 ? palette.amber : palette.frame, width: 12700 })
+      + textShapeXml({ id: 1355 + itemIndex, name: `Investor Update Metric Value ${itemIndex + 1}`, x: x + 152400, y: 3992880, cx: 914400, cy: 198120, text: metric.value, size: 1280, bold: true, color: visual.title })
+      + textShapeXml({ id: 1360 + itemIndex, name: `Investor Update Metric Label ${itemIndex + 1}`, x: x + 152400, y: 4236720, cx: 1219200, cy: 152400, text: metric.label, size: 600, bold: true, color: visual.body });
+  }).join("");
+}
+
+function investorUpdateCardsXml({ visual, palette, slide, cards }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const column = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5638800 + column * 1371600;
+    const y = 1219200 + row * 914400;
+    return solidShapeXml({ id: 1380 + itemIndex, name: `Investor Update Progress Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 746760, fill: visual.surface })
+      + lineFrameShapeXml({ id: 1385 + itemIndex, name: `Investor Update Progress Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 746760, stroke: palette.frame, width: 12700 })
+      + rectShapeXml({ id: 1390 + itemIndex, name: `Investor Update Progress Bar ${itemIndex + 1}`, x: x + 152400, y: y + 152400, cx: 426720, cy: 45720, fill: itemIndex % 2 ? palette.amber : visual.accent })
+      + textShapeXml({ id: 1395 + itemIndex, name: `Investor Update Progress Text ${itemIndex + 1}`, x: x + 152400, y: y + 304800, cx: 914400, cy: 274320, text: investorUpdateCompactText(bullets[itemIndex] || card, card, 18), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function investorUpdateLanesXml({ visual, palette, slide, cards }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const y = 1143000 + itemIndex * 624840;
+    return solidShapeXml({ id: 1410 + itemIndex, name: `Investor Update Operating Lane ${itemIndex + 1}`, geom: "roundRect", x: 5638800, y, cx: 2514600, cy: 441960, fill: visual.surface })
+      + lineFrameShapeXml({ id: 1415 + itemIndex, name: `Investor Update Operating Lane Frame ${itemIndex + 1}`, geom: "roundRect", x: 5638800, y, cx: 2514600, cy: 441960, stroke: itemIndex % 2 ? palette.amber : visual.accent, width: 12700 })
+      + solidShapeXml({ id: 1420 + itemIndex, name: `Investor Update Lane Dot ${itemIndex + 1}`, geom: "ellipse", x: 5867400, y: y + 121920, cx: 152400, cy: 152400, fill: itemIndex % 2 ? palette.amber : visual.accent })
+      + textShapeXml({ id: 1425 + itemIndex, name: `Investor Update Lane Text ${itemIndex + 1}`, x: 6172200, y: y + 121920, cx: 1676400, cy: 182880, text: investorUpdateCompactText(bullets[itemIndex] || card, card, 20), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function investorUpdateRiskXml({ visual, palette, slide, cards }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const column = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5638800 + column * 1371600;
+    const y = 1219200 + row * 914400;
+    const isAsk = itemIndex > 1;
+    return solidShapeXml({ id: 1440 + itemIndex, name: `Investor Update Risk Ask Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 746760, fill: isAsk ? palette.lightTeal : palette.lightAmber })
+      + lineFrameShapeXml({ id: 1445 + itemIndex, name: `Investor Update Risk Ask Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 746760, stroke: isAsk ? visual.accent : palette.amber, width: 12700 })
+      + textShapeXml({ id: 1450 + itemIndex, name: `Investor Update Risk Ask Text ${itemIndex + 1}`, x: x + 152400, y: y + 213360, cx: 914400, cy: 304800, text: investorUpdateCompactText(bullets[itemIndex] || card, card, 18), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function investorUpdateRoadmapXml({ visual, palette, slide, cards }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  const connector = rectShapeXml({ id: 1460, name: "Investor Update Roadmap Connector", x: 1219200, y: 3657600, cx: 6553200, cy: 30480, fill: palette.frame });
+  const nodes = cards.slice(0, 3).map((card, itemIndex) => {
+    const x = 1219200 + itemIndex * 2286000;
+    return solidShapeXml({ id: 1465 + itemIndex, name: `Investor Update Roadmap Node ${itemIndex + 1}`, geom: "roundRect", x, y: 3048000, cx: 1905000, cy: 838200, fill: visual.surface })
+      + lineFrameShapeXml({ id: 1470 + itemIndex, name: `Investor Update Roadmap Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3048000, cx: 1905000, cy: 838200, stroke: itemIndex === 1 ? visual.accent : palette.frame, width: 12700 })
+      + textShapeXml({ id: 1475 + itemIndex, name: `Investor Update Roadmap Text ${itemIndex + 1}`, x: x + 182880, y: 3284220, cx: 1524000, cy: 304800, text: investorUpdateCompactText(bullets[itemIndex] || card, card, 20), size: 720, bold: true, color: visual.title })
+      + rectShapeXml({ id: 1480 + itemIndex, name: `Investor Update Roadmap Progress ${itemIndex + 1}`, x: x + 182880, y: 3710940, cx: 1219200, cy: 45720, fill: itemIndex === 1 ? visual.accent : palette.amber });
+  }).join("");
+  return connector + nodes;
+}
+
+function investorUpdateProgressPalette(visual) {
+  return {
+    frame: "CBD5E1",
+    panel: "F8FAFC",
+    amber: visual.secondary || "F59E0B",
+    lightTeal: "CCFBF1",
+    lightAmber: "FEF3C7",
+    tealGlow: "D5F5F0",
+  };
+}
+
+function investorUpdateProgressScene({ slide, index, role }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  const metrics = [
+    { value: "MRR", label: "收入进展" },
+    { value: "92%", label: "核心留存" },
+    { value: "14m", label: "现金 runway" },
+    { value: "3", label: "本月请求" },
+  ];
+  const cards = ["本月完成", "关键指标", "风险事项", "下月重点"].map((fallback, itemIndex) => investorUpdateCompactText(bullets[itemIndex], fallback, 18));
+  const scenes = [
+    { role: "cover", kicker: "INVESTOR MONTHLY UPDATE", summary: "用经营进展、关键数据、风险请求和下一阶段计划支持月度投资人沟通。", metrics, cards },
+    { role: "progress", kicker: "PROGRESS BRIEFING", summary: "把产品、销售、团队和财务进展整理成投资人能快速扫描的经营摘要。", metrics, cards },
+    { role: "metrics", kicker: "METRICS DISCLOSURE", summary: "披露收入、留存、转化、现金消耗和 pipeline，让经营质量可持续跟踪。", metrics, cards },
+    { role: "timeline", kicker: "OPERATING TIMELINE", summary: "用多泳道同步已完成、进行中和需要关注的经营事项。", metrics, cards: ["产品迭代", "销售推进", "团队建设", "财务节奏"] },
+    { role: "risk", kicker: "RISKS AND ASKS", summary: "把关键风险和需要投资人协助的事项放在同一页，便于会后行动。", metrics, cards: ["交付风险", "招聘缺口", "客户引荐", "融资准备"] },
+    { role: "plan", kicker: "30 / 60 / 90 PLAN", summary: "明确下一阶段目标、资源投入和投资人关注的决策节点。", metrics, cards: ["30 天修复关键风险", "60 天验证增长假设", "90 天形成融资材料"] },
+  ];
+  if (role === "closing") return { role: "closing", kicker: "NEXT INVESTOR ACTION", summary: "用明确请求和下一步计划推动投资人沟通持续向前。", metrics, cards: ["确认本月判断", "安排资源协助", "跟踪关键指标"] };
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function investorUpdateBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).map((item) => item.trim()).filter(Boolean) : [];
+  return values.length ? values : ["本月核心经营进展和关键指标变化", "需要向投资人披露的风险、请求和资源协同", "下一阶段 30/60/90 天计划与目标"];
+}
+
+function investorUpdateCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isInvestorUpdateProgressVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "investor-update-progress-sync" && (id === "investor-update-report" || id === "pitch-investor-update-report-progress-sync");
+}
+
 function seedRoundStoryDecorationsXml({ visual, index, layout, role, slide }) {
   const scene = seedRoundStoryScene({ slide, index, role });
   const palette = seedRoundStoryColorPalette(visual);

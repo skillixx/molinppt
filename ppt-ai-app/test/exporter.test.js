@@ -1451,6 +1451,53 @@ test("PptExportService uses product funding highlights decorations", () => {
   assert.doesNotMatch(slide1, /product-highlights/);
 });
 
+test("PptExportService uses investor update progress sync decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-investor-update-report-progress-sync",
+      theme: "progress-sync",
+      templateVisual: {
+        id: "pitch-investor-update-report-progress-sync",
+        primary: "111827",
+        accent: "14B8A6",
+        secondary: "F59E0B",
+        warning: "EF4444",
+        background: "EEF4F8",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "investor-update-progress-sync",
+        variant: "progress-sync",
+      },
+      slides: [
+        { title: "Investor monthly update", bullets: ["MRR continued to improve", "Retention remained stable", "Runway is fourteen months"] },
+        { title: "Progress briefing", bullets: ["Product shipped new workflow", "Sales pipeline expanded", "Team hiring is on track"] },
+        { title: "Metrics disclosure", bullets: ["Revenue growth", "Retention quality", "Cash burn", "Pipeline"] },
+        { title: "Operating timeline", bullets: ["Product iteration", "Sales progress", "Team building", "Finance cadence"] },
+        { title: "Risks and asks", bullets: ["Delivery risk", "Hiring gap", "Customer intro", "Financing preparation"] },
+        { title: "Next plan", bullets: ["30 day risk fix", "60 day growth validation", "90 day financing materials"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Investor Update Content Surface"/);
+  assert.match(slide1, /name="Investor Update KPI Dashboard"/);
+  assert.match(slide1, /name="Investor Update Metric Card 1"/);
+  assert.match(slide1, /name="Investor Update Planned Content"/);
+  assert.match(slide2, /name="Investor Update Progress Card 1"/);
+  assert.match(slide4, /name="Investor Update Operating Lane 1"/);
+  assert.match(slide5, /name="Investor Update Risk Ask Card 1"/);
+  assert.doesNotMatch(slide1, /progress-sync/);
+});
+
 test("PptExportService uses BI executive cockpit decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
