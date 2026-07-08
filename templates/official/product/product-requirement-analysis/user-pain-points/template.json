@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "product-requirement-analysis",
+  "themeId": "user-pain-points",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "user-pain-points",
+      "name": "用户痛点",
+      "visual": {
+        "primary": "1D4ED8",
+        "accent": "F97316",
+        "secondary": "14B8A6",
+        "background": "F4F7FB",
+        "surface": "FFFFFF",
+        "title": "10233F",
+        "body": "405166",
+        "layout": "product-pain-points",
+        "variant": "user-pain-points"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1D4ED8",
+    "accent": "F97316",
+    "secondary": "14B8A6",
+    "background": "F4F7FB",
+    "surface": "FFFFFF",
+    "title": "10233F",
+    "body": "405166",
+    "layout": "product-pain-points",
+    "variant": "user-pain-points"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-pain-points-cover",
+    "defaultContentLayout": "product-pain-points-content",
+    "allowedLayouts": [
+      "product-pain-points-cover",
+      "product-pain-points-scenario",
+      "product-pain-points-evidence",
+      "product-pain-points-distribution",
+      "product-pain-points-opportunity",
+      "product-pain-points-closing",
+      "title",
+      "content"
+    ]
+  }
+}

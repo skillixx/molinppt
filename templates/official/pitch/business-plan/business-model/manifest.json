@@ -1,0 +1,20 @@
+{
+  "slug": "pitch-business-plan-business-model",
+  "name": "商业计划书 - 商业模式",
+  "description": "适合创业融资、项目路演、投资人汇报和商业模式与增长逻辑展示的官方融资路演模板，突出商业画布、收入模型、成本结构、价值链和生态闭环。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "business-plan",
+    "business-model",
+    "revenue-model",
+    "business-canvas",
+    "investor-deck"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "business-plan",
+  "themeId": "business-model",
+  "style": "investor-business-canvas",
+  "themes": [
+    {
+      "id": "business-model",
+      "name": "商业模式",
+      "visual": {
+        "primary": "10213F",
+        "accent": "16A34A",
+        "secondary": "D6A84F",
+        "background": "F5F7FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "business-model-bp",
+        "variant": "business-model"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "10213F",
+    "accent": "16A34A",
+    "secondary": "D6A84F",
+    "background": "F5F7FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "business-model-bp",
+    "variant": "business-model"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "bp-cover",
+    "defaultContentLayout": "bp-canvas",
+    "allowedLayouts": [
+      "bp-cover",
+      "bp-canvas",
+      "bp-revenue",
+      "bp-cost",
+      "bp-value-chain",
+      "bp-ecosystem",
+      "bp-capital-plan",
+      "hero",
+      "content"
+    ]
+  }
+}

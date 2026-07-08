@@ -279,6 +279,29 @@ test("PptService renders synced competition map preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced product pain points preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProductPainPointsTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能协作产品需求分析",
+    slideCount: 6,
+    templateId: "product-product-requirement-analysis-user-pain-points",
+    theme: "user-pain-points",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-product-requirement-analysis-user-pain-points" data-layout="product-pain-points"/);
+  assert.match(preview, /pain-layer/);
+  assert.match(preview, /pain-persona/);
+  assert.match(preview, /pain-card-grid|pain-matrix|pain-notes/);
+  assert.doesNotMatch(preview, />用户痛点</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -430,6 +453,28 @@ test("PptService renders new product launch rhythm preview with dedicated layout
   assert.match(preview, /launch-rhythm-layer/);
   assert.match(preview, /launch-rhythm-stage|launch-rhythm-timeline|launch-rhythm-kpi/);
   assert.doesNotMatch(preview, />首发节奏</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders business plan model preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBusinessPlanModelTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "创业融资增长计划",
+    slideCount: 5,
+    templateId: "pitch-business-plan-business-model",
+    theme: "business-model",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-business-plan-business-model" data-layout="business-model-bp"/);
+  assert.match(preview, /bp-hero-mockup/);
+  assert.match(preview, /bp-canvas|bp-flow|bp-ecosystem/);
+  assert.match(preview, /INVESTOR BUSINESS CASE|BUSINESS CANVAS|REVENUE LOOP|CAPITAL &amp; ECOSYSTEM/);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -3662,6 +3707,52 @@ async function insertCompetitionMapTemplate(context) {
   });
 }
 
+async function insertProductPainPointsTemplate(context) {
+  // 测试数据库模拟官方模板同步后的产品需求用户痛点模板，确保预览使用专用产品洞察布局。
+  await context.database.insert("templates", {
+    id: "product-product-requirement-analysis-user-pain-points",
+    slug: "product-product-requirement-analysis-user-pain-points",
+    name: "产品需求分析 - 用户痛点",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "user-pain-points",
+        name: "用户痛点",
+        visual: {
+          primary: "1D4ED8",
+          accent: "F97316",
+          secondary: "14B8A6",
+          background: "F4F7FB",
+          surface: "FFFFFF",
+          title: "10233F",
+          body: "405166",
+          layout: "product-pain-points",
+          variant: "user-pain-points",
+        },
+      },
+    ],
+    visual: {
+      primary: "1D4ED8",
+      accent: "F97316",
+      secondary: "14B8A6",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "10233F",
+      body: "405166",
+      layout: "product-pain-points",
+      variant: "user-pain-points",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-pain-points-cover",
+      defaultContentLayout: "product-pain-points-content",
+      allowedLayouts: ["product-pain-points-cover", "product-pain-points-scenario", "product-pain-points-evidence", "product-pain-points-distribution", "product-pain-points-opportunity", "product-pain-points-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertIndustryTrendForecastTemplate(context) {
   // 测试数据库模拟官方模板同步后的趋势判断主题，确保 slug 模板也能走独立趋势研判布局。
   await context.database.insert("templates", {
@@ -4022,6 +4113,52 @@ async function insertLaunchRhythmTemplate(context) {
       defaultCoverLayout: "marketing-launch-rhythm-cover",
       defaultContentLayout: "marketing-launch-rhythm-content",
       allowedLayouts: ["marketing-launch-rhythm-cover", "marketing-launch-rhythm-timeline", "marketing-launch-rhythm-selling-points", "marketing-launch-rhythm-channel", "marketing-launch-rhythm-kpi", "marketing-launch-rhythm-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertBusinessPlanModelTemplate(context) {
+  // 测试数据库模拟官方模板同步后的商业计划书-商业模式模板，确保生成、预览和导出都走 BP 商业画布专用布局。
+  await context.database.insert("templates", {
+    id: "pitch-business-plan-business-model",
+    slug: "pitch-business-plan-business-model",
+    name: "商业计划书 - 商业模式",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "business-model",
+        name: "商业模式",
+        visual: {
+          primary: "10213F",
+          accent: "16A34A",
+          secondary: "D6A84F",
+          background: "F5F7FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "business-model-bp",
+          variant: "business-model",
+        },
+      },
+    ],
+    visual: {
+      primary: "10213F",
+      accent: "16A34A",
+      secondary: "D6A84F",
+      background: "F5F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "business-model-bp",
+      variant: "business-model",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "bp-cover",
+      defaultContentLayout: "bp-canvas",
+      allowedLayouts: ["bp-cover", "bp-canvas", "bp-revenue", "bp-cost", "bp-value-chain", "bp-ecosystem", "bp-capital-plan", "hero", "content"],
     },
   });
 }

@@ -713,6 +713,51 @@ test("PptExportService uses commercial product roadmap decorations", () => {
   assert.match(slide1, /val="2FB7A3"/);
 });
 
+test("PptExportService uses product pain points decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-requirement-analysis-user-pain-points",
+      theme: "user-pain-points",
+      templateVisual: {
+        primary: "1D4ED8",
+        accent: "F97316",
+        secondary: "14B8A6",
+        background: "F4F7FB",
+        surface: "FFFFFF",
+        title: "10233F",
+        body: "405166",
+        layout: "product-pain-points",
+        variant: "user-pain-points",
+      },
+      slides: [
+        {
+          title: "用户场景痛点与需求机会",
+          bullets: ["目标用户在关键流程中频繁中断", "反馈证据集中在效率和理解成本", "机会点需要进入原型验证"],
+        },
+        {
+          title: "核心用户场景路径",
+          bullets: ["触发需求", "使用过程", "遇到阻碍", "产生诉求"],
+        },
+        {
+          title: "痛点证据与影响",
+          bullets: ["访谈反馈显示流程复杂", "行为数据出现高流失", "客服工单集中在同一问题"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Product Pain Point Canvas"/);
+  assert.match(slide1, /name="Product Pain Persona Panel"/);
+  assert.match(slide3, /name="Product Pain Evidence Card 1"/);
+  assert.doesNotMatch(slide1, /user-pain-points/);
+});
+
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1013,6 +1058,49 @@ test("PptExportService uses commercial pitch product decorations", () => {
   assert.match(slide1, /name="Pitch Product Glow"/);
   assert.match(slide1, /val="3B1D5A"/);
   assert.match(slide1, /val="E879F9"/);
+});
+
+test("PptExportService uses business plan model decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-business-plan-business-model",
+      theme: "business-model",
+      templateVisual: {
+        id: "pitch-business-plan-business-model",
+        primary: "10213F",
+        accent: "16A34A",
+        secondary: "D6A84F",
+        background: "F5F7FB",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "business-model-bp",
+        variant: "business-model",
+      },
+      slides: [
+        { title: "融资增长计划", bullets: ["用一页讲清客户、价值、收入和增长闭环"] },
+        { title: "商业画布总览", bullets: ["客户群体", "价值主张", "渠道路径", "关键资源"] },
+        { title: "收入模型", bullets: ["获客", "转化", "付费", "复购"] },
+        { title: "生态网络", bullets: ["客户", "渠道", "数据", "伙伴"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Business Model BP Canvas"/);
+  assert.match(slide1, /name="Business Model Product Mockup"/);
+  assert.match(slide1, /name="Business Model Metric Card 1"/);
+  assert.match(slide2, /name="Business Canvas Cell 1"/);
+  assert.match(slide3, /name="Business Revenue Step 1"/);
+  assert.match(slide4, /name="Business Ecosystem Platform"/);
+  assert.doesNotMatch(slide1, /business-model/);
 });
 
 test("PptExportService uses editorial brand story decorations", () => {

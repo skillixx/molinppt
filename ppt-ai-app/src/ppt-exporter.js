@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-pain-points", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "marketing-launch-rhythm") {
     if (index === 0) {
@@ -490,6 +490,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
       if (textLength >= 30) return 2000;
       if (textLength >= 22) return 2220;
       return Math.min(fallbackSize, 2460);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1820);
+  }
+  if (visual.layout === "product-pain-points") {
+    if (index === 0) {
+      if (textLength >= 30) return 2000;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2480);
     }
     if (textLength >= 30) return 1320;
     if (textLength >= 22) return 1520;
@@ -615,6 +625,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -752,6 +763,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "strategy-competition-map") {
     return base + competitionMapDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "product-pain-points") {
+    return base + productPainPointsDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -866,6 +880,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
       + educationCourseVisualXml({ visual, palette, scene, isCover })
       + lowerItems
       + textShapeXml({ id: 650, name: "Education Course Caption", x: isCover ? 6126480 : 6126480, y: isCover ? 3474720 : 3657600, cx: 1828800, cy: 182880, text: scene.caption, size: isCover ? 740 : 720, bold: true, color: isCover ? palette.chalk : visual.body });
+  }
+  if (isBusinessModelBpVisual(visual)) {
+    return base + businessModelBpDecorationsXml({ visual, index, layout });
   }
   if (["executive", "academy", "venture"].includes(visual.layout)) {
     if (isPitchDeckVisual(visual)) {
@@ -1555,6 +1572,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "product-pain-points") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 493776, y: 452628, cx: 8156448, cy: 4248531 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1973580, cx: 3200400, cy: 22860 },
+      label: { x: 731520, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1135380, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2362200, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2545080, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2480 : isClosing ? 2480 : 1820,
+      bodySize: isCover ? 920 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "finance-budget-planning") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2037,6 +2078,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       title: { x: 685800, y: 914400, cx: 7772400, cy: 1219200 },
       content: { x: 914400, y: 2438400, cx: 7315200, cy: 2057400 },
       titleSize: 4300,
+    };
+  }
+  if (visual.layout === "business-model-bp") {
+    if (index === 0) {
+      return {
+        surface: { x: 411480, y: 365760, cx: 8321040, cy: 4411980 },
+        accent: { x: 411480, y: 365760, cx: 8321040, cy: 76200 },
+        secondaryAccent: { x: 914400, y: 3810000, cx: 7315200, cy: 30480 },
+        label: { x: 640080, y: 548640, cx: 2133600, cy: 274320 },
+        title: { x: 640080, y: 1043940, cx: 4267200, cy: 914400 },
+        content: { x: 731520, y: 2438400, cx: 3810000, cy: 685800 },
+        titleSize: 3000,
+        bodySize: 1120,
+      };
+    }
+    return {
+      surface: { x: 411480, y: 365760, cx: 8321040, cy: 4411980 },
+      accent: { x: 411480, y: 365760, cx: 8321040, cy: 76200 },
+      secondaryAccent: { x: 914400, y: 3810000, cx: 7315200, cy: 30480 },
+      label: { x: 640080, y: 548640, cx: 2133600, cy: 274320 },
+      title: { x: 640080, y: 838200, cx: 3962400, cy: 670560 },
+      content: { x: 685800, y: 3962400, cx: 7772400, cy: 457200 },
+      titleSize: 2300,
+      bodySize: 980,
     };
   }
   if (visual.layout === "top-band") {
@@ -3902,6 +3967,152 @@ function isPitchDeckVisual(visual) {
   return visual?.id === "pitch" && visual?.layout === "venture";
 }
 
+function businessModelBpDecorationsXml({ visual, index, layout }) {
+  const scene = businessModelBpScene(index);
+  const palette = businessModelBpColorPalette(visual);
+  const base = solidShapeXml({ id: 820, name: "Business Model BP Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 821, name: "Business Model BP Paper", x: 411480, y: 365760, cx: 8321040, cy: 4411980, fill: visual.surface })
+    + lineFrameShapeXml({ id: 822, name: "Business Model BP Paper Frame", x: 411480, y: 365760, cx: 8321040, cy: 4411980, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 823, name: "Business Model BP Accent Rule", x: 411480, y: 365760, cx: 8321040, cy: 76200, fill: visual.accent })
+    + rectShapeXml({ id: 824, name: "Business Model BP Gold Rule", x: 4267200, y: 365760, cx: 1600200, cy: 76200, fill: palette.gold })
+    + textShapeXml({ id: 825, name: "Business Model BP Kicker", ...layout.label, text: scene.kicker, size: 720, bold: true, color: visual.accent });
+  if (index === 0) {
+    return base
+      + businessModelBpMockupXml({ visual, palette })
+      + businessModelBpMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.role === "canvas") {
+    return base + businessModelBpCanvasGridXml({ visual, palette, labels: scene.canvas });
+  }
+  if (scene.role === "ecosystem") {
+    return base + businessModelBpEcosystemXml({ visual, palette, nodes: scene.nodes });
+  }
+  return base
+    + businessModelBpRevenueFlowXml({ visual, palette, flow: scene.flow })
+    + businessModelBpSideCardsXml({ visual, palette, cards: scene.cards });
+}
+
+function businessModelBpMockupXml({ visual, palette }) {
+  return solidShapeXml({ id: 830, name: "Business Model Product Mockup", geom: "roundRect", x: 5715000, y: 1143000, cx: 2743200, cy: 1828800, fill: palette.panel })
+    + lineFrameShapeXml({ id: 831, name: "Business Model Product Frame", geom: "roundRect", x: 5715000, y: 1143000, cx: 2743200, cy: 1828800, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 832, name: "Business Model Mockup Header", x: 5943600, y: 1371600, cx: 1828800, cy: 91440, fill: visual.primary })
+    + rectShapeXml({ id: 833, name: "Business Model Mockup Growth Line", x: 5943600, y: 2209800, cx: 2133600, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 834, name: "Business Model Mockup Revenue Block", geom: "roundRect", x: 6019800, y: 2468880, cx: 609600, cy: 457200, fill: palette.soft })
+    + solidShapeXml({ id: 835, name: "Business Model Mockup Cost Block", geom: "roundRect", x: 6781800, y: 2468880, cx: 609600, cy: 457200, fill: palette.goldSoft })
+    + solidShapeXml({ id: 836, name: "Business Model Mockup Profit Block", geom: "roundRect", x: 7543800, y: 2468880, cx: 609600, cy: 457200, fill: visual.accent });
+}
+
+function businessModelBpMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.map((metric, index) => {
+    const x = 731520 + index * 2590800;
+    return solidShapeXml({ id: 840 + index * 3, name: `Business Model Metric Card ${index + 1}`, geom: "roundRect", x, y: 3810000, cx: 2286000, cy: 640080, fill: index === 1 ? palette.soft : visual.surface })
+      + textShapeXml({ id: 841 + index * 3, name: `Business Model Metric Value ${index + 1}`, x: x + 182880, y: 3924300, cx: 914400, cy: 182880, text: metric.value, size: 1280, bold: true, color: visual.title })
+      + textShapeXml({ id: 842 + index * 3, name: `Business Model Metric Label ${index + 1}`, x: x + 182880, y: 4145280, cx: 1676400, cy: 152400, text: metric.label, size: 720, bold: true, color: visual.body });
+  }).join("");
+}
+
+function businessModelBpCanvasGridXml({ visual, palette, labels }) {
+  return labels.map((label, index) => {
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    const x = 731520 + col * 2560320;
+    const y = 1371600 + row * 822960;
+    const wide = index === 5;
+    return solidShapeXml({ id: 860 + index * 3, name: `Business Canvas Cell ${index + 1}`, geom: "roundRect", x, y, cx: wide ? 2438400 : 2286000, cy: 670560, fill: index === 1 ? palette.soft : visual.surface })
+      + rectShapeXml({ id: 861 + index * 3, name: `Business Canvas Rule ${index + 1}`, x: x + 152400, y: y + 487680, cx: 457200, cy: 38100, fill: index === 5 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 862 + index * 3, name: `Business Canvas Label ${index + 1}`, x: x + 152400, y: y + 121920, cx: 1828800, cy: 213360, text: label, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelBpRevenueFlowXml({ visual, palette, flow }) {
+  return flow.map((item, index) => {
+    const x = 792480 + index * 1600200;
+    const connector = index < flow.length - 1
+      ? rectShapeXml({ id: 901 + index * 4, name: `Business Revenue Connector ${index + 1}`, x: x + 1188720, y: 2004060, cx: 304800, cy: 30480, fill: visual.accent })
+      : "";
+    return solidShapeXml({ id: 900 + index * 4, name: `Business Revenue Step ${index + 1}`, geom: "roundRect", x, y: 1775460, cx: 1219200, cy: 548640, fill: index === 2 ? palette.soft : visual.surface })
+      + connector
+      + textShapeXml({ id: 902 + index * 4, name: `Business Revenue Step Text ${index + 1}`, x: x + 152400, y: 1943100, cx: 914400, cy: 152400, text: item, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelBpSideCardsXml({ visual, palette, cards }) {
+  return cards.map((card, index) => {
+    const x = 914400 + index * 2438400;
+    return solidShapeXml({ id: 930 + index * 3, name: `Business Model Side Card ${index + 1}`, geom: "roundRect", x, y: 3200400, cx: 2133600, cy: 685800, fill: visual.surface })
+      + rectShapeXml({ id: 931 + index * 3, name: `Business Model Side Card Rule ${index + 1}`, x: x + 152400, y: 3375660, cx: 609600, cy: 38100, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 932 + index * 3, name: `Business Model Side Card Text ${index + 1}`, x: x + 152400, y: 3573780, cx: 1828800, cy: 152400, text: card, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelBpEcosystemXml({ visual, palette, nodes }) {
+  const centerX = 6858000;
+  const centerY = 2438400;
+  const nodePositions = [
+    { x: 6446520, y: 1219200 },
+    { x: 7650480, y: 2133600 },
+    { x: 6446520, y: 3352800 },
+    { x: 5242560, y: 2133600 },
+  ];
+  return solidShapeXml({ id: 960, name: "Business Ecosystem Orbit", geom: "ellipse", x: 5334000, y: 1143000, cx: 3048000, cy: 2743200, fill: palette.orbit })
+    + solidShapeXml({ id: 961, name: "Business Ecosystem Platform", geom: "ellipse", x: centerX - 457200, y: centerY - 457200, cx: 914400, cy: 914400, fill: visual.primary })
+    + textShapeXml({ id: 962, name: "Business Ecosystem Platform Text", x: centerX - 304800, y: centerY - 91440, cx: 609600, cy: 182880, text: "平台", size: 800, bold: true, color: "FFFFFF" })
+    + nodes.map((node, index) => {
+      const pos = nodePositions[index];
+      return solidShapeXml({ id: 970 + index * 2, name: `Business Ecosystem Node ${index + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 822960, cy: 365760, fill: visual.surface })
+        + textShapeXml({ id: 971 + index * 2, name: `Business Ecosystem Node Text ${index + 1}`, x: pos.x + 91440, y: pos.y + 91440, cx: 640080, cy: 152400, text: node, size: 700, bold: true, color: visual.title });
+    }).join("");
+}
+
+function businessModelBpColorPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.background, 0.72),
+    gold: visual.secondary || "D6A84F",
+    goldSoft: blendHexColor(visual.secondary || "D6A84F", visual.surface, 0.70),
+    orbit: blendHexColor(visual.accent, visual.background, 0.78),
+    panel: blendHexColor(visual.surface, visual.background, 0.18),
+    soft: blendHexColor(visual.accent, visual.surface, 0.78),
+  };
+}
+
+function businessModelBpScene(index) {
+  if (index === 0) {
+    return {
+      role: "cover",
+      kicker: "INVESTOR BUSINESS CASE",
+      metrics: [
+        { value: "客户", label: "目标人群" },
+        { value: "收入", label: "变现路径" },
+        { value: "增长", label: "规模化逻辑" },
+      ],
+    };
+  }
+  if (index === 3 || index % 4 === 0) {
+    return {
+      role: "ecosystem",
+      kicker: "CAPITAL & ECOSYSTEM",
+      nodes: ["客户", "渠道", "数据", "伙伴"],
+    };
+  }
+  if (index % 3 === 1) {
+    return {
+      role: "canvas",
+      kicker: "BUSINESS CANVAS",
+      canvas: ["客户群体", "价值主张", "渠道路径", "关键资源", "收入来源", "成本结构", "合作伙伴"],
+    };
+  }
+  return {
+    role: "revenue",
+    kicker: "REVENUE LOOP",
+    flow: ["获客", "转化", "付费", "复购", "扩张"],
+    cards: ["收入结构", "成本结构", "利润机制"],
+  };
+}
+
+function isBusinessModelBpVisual(visual) {
+  return ["business-plan", "pitch-business-plan-business-model"].includes(visual?.id) && visual?.layout === "business-model-bp";
+}
+
 function marketingCampaignVisualXml({ visual, palette, scene, isCover }) {
   const panel = isCover
     ? { x: 6172200, y: 1447800, cx: 2133600, cy: 1676400 }
@@ -5360,6 +5571,184 @@ function competitionMapColorPalette(visual) {
     axis: blendHexColor(visual.primary, visual.background, 0.34),
     grid: blendHexColor(visual.primary, visual.background, 0.62),
     mapFill: blendHexColor(visual.background, visual.surface, 0.46),
+  };
+}
+
+function productPainPointsDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = productPainPointsScene({ slide, index, role });
+  const palette = productPainPointsColorPalette(visual);
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1521, name: "Product Pain Point Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1522, name: "Product Pain Header Bar", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 1523, name: "Product Pain Accent Rule", x: 0, y: 274320, cx: 9144000, cy: 30480, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1524, name: "Product Pain Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1525, name: "Product Pain Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 1526, name: "Product Pain Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const bulletCards = productPainPointBulletCardsXml({ visual, palette, items: scene.bullets, isClosing });
+
+  if (isClosing) {
+    return surface + header + focusRule + bulletCards + productPainPointActionCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "scenario") {
+    return surface + header + focusRule + bulletCards + productPainPointPersonaXml({ visual, palette }) + productPainPointJourneyXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "evidence") {
+    return surface + header + focusRule + bulletCards + productPainPointEvidenceCardsXml({ visual, palette, items: scene.cards }) + productPainPointTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  if (scene.kind === "distribution") {
+    return surface + header + focusRule + bulletCards + productPainPointMatrixXml({ visual, palette }) + productPainPointTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  if (scene.kind === "opportunity") {
+    return surface + header + focusRule + bulletCards + productPainPointNotesXml({ visual, palette, items: scene.cards });
+  }
+  return surface + header + focusRule + bulletCards + productPainPointPersonaXml({ visual, palette }) + productPainPointTagCardsXml({ visual, palette, items: scene.tags });
+}
+
+function productPainPointPersonaXml({ visual, palette }) {
+  const x = 5486400;
+  const y = 1005840;
+  const w = 2827020;
+  const h = 2133600;
+  // 右侧画像面板用可编辑图形表达用户、场景和触点，不依赖整页截图。
+  return solidShapeXml({ id: 1530, name: "Product Pain Persona Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1531, name: "Product Pain Persona Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 1532, name: "Product Pain Persona Avatar", geom: "ellipse", x: x + 243840, y: y + 289560, cx: 426720, cy: 426720, fill: blendHexColor(visual.primary, "FFFFFF", 0.22) })
+    + solidShapeXml({ id: 1533, name: "Product Pain Persona Head", geom: "ellipse", x: x + 381000, y: y + 350520, cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1534, name: "Product Pain Persona Body", geom: "roundRect", x: x + 335280, y: y + 510540, cx: 243840, cy: 182880, fill: visual.primary })
+    + rectShapeXml({ id: 1535, name: "Product Pain Persona Line 1", x: x + 883920, y: y + 350520, cx: 1127760, cy: 45720, fill: palette.line })
+    + rectShapeXml({ id: 1536, name: "Product Pain Persona Line 2", x: x + 883920, y: y + 518160, cx: 823000, cy: 45720, fill: palette.line })
+    + rectShapeXml({ id: 1537, name: "Product Pain Persona Journey Rule", x: x + 365760, y: y + 1158240, cx: 2011680, cy: 15240, fill: palette.axis })
+    + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 1538 + itemIndex, name: `Product Pain Touchpoint ${itemIndex + 1}`, geom: "ellipse", x: x + 487680 + itemIndex * 731520, y: y + 1082040 + (itemIndex === 1 ? -152400 : 152400), cx: 152400, cy: 152400, fill: itemIndex === 1 ? visual.primary : visual.accent })).join("");
+}
+
+function productPainPointBulletCardsXml({ visual, palette, items, isClosing }) {
+  const x = 731520;
+  const y = isClosing ? 2217420 : 2438400;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 335280;
+    return rectShapeXml({ id: 1560 + index * 3, name: `Product Pain Insight Accent ${index + 1}`, x, y: offsetY + 38100, cx: 60960, cy: 198120, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1561 + index * 3, name: `Product Pain Insight Text ${index + 1}`, x: x + 121920, y: offsetY, cx: 3444240, cy: 243840, text: productPainPointCompactText(item, "", 36), size: 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function productPainPointTagCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3825240;
+  const width = 1280160;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 1432560;
+    return solidShapeXml({ id: 1570 + index * 3, name: `Product Pain Tag ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1571 + index * 3, name: `Product Pain Tag Accent ${index + 1}`, x: offsetX, y, cx: 60960, cy: 518160, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1572 + index * 3, name: `Product Pain Tag Text ${index + 1}`, x: offsetX + 152400, y: y + 167640, cx: width - 274320, cy: 182880, text: productPainPointCompactText(item, "", 8), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPainPointJourneyXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 3429000;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 701040;
+    return solidShapeXml({ id: 1580 + index * 3, name: `Product Pain Journey Step ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 548640, cy: 579120, fill: palette.card })
+      + solidShapeXml({ id: 1581 + index * 3, name: `Product Pain Journey Dot ${index + 1}`, geom: "ellipse", x: offsetX + 198120, y: y + 121920, cx: 137160, cy: 137160, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1582 + index * 3, name: `Product Pain Journey Text ${index + 1}`, x: offsetX + 76200, y: y + 335280, cx: 396240, cy: 137160, text: productPainPointCompactText(item, "", 6), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPainPointEvidenceCardsXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1219200;
+  const width = 1280160;
+  const height = 731520;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + (index % 2) * (width + 182880);
+    const offsetY = y + Math.floor(index / 2) * (height + 152400);
+    return solidShapeXml({ id: 1590 + index * 4, name: `Product Pain Evidence Card ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: width, cy: height, fill: palette.card })
+      + solidShapeXml({ id: 1591 + index * 4, name: `Product Pain Evidence Dot ${index + 1}`, geom: "ellipse", x: offsetX + 152400, y: offsetY + 152400, cx: 152400, cy: 152400, fill: index % 2 ? visual.primary : visual.accent })
+      + rectShapeXml({ id: 1592 + index * 4, name: `Product Pain Evidence Rule ${index + 1}`, x: offsetX + 365760, y: offsetY + 205740, cx: 579120, cy: 30480, fill: palette.line })
+      + textShapeXml({ id: 1593 + index * 4, name: `Product Pain Evidence Text ${index + 1}`, x: offsetX + 152400, y: offsetY + 426720, cx: width - 304800, cy: 167640, text: productPainPointCompactText(item, "", 10), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPainPointMatrixXml({ visual, palette }) {
+  const x = 5486400;
+  const y = 1066800;
+  const w = 2827020;
+  const h = 2133600;
+  const gridLines = Array.from({ length: 4 }, (_, index) => {
+    const offsetX = x + Math.round((w / 5) * (index + 1));
+    const offsetY = y + Math.round((h / 5) * (index + 1));
+    return rectShapeXml({ id: 1600 + index * 2, name: `Product Pain Grid V ${index + 1}`, x: offsetX, y, cx: 7620, cy: h, fill: palette.grid, transparency: 45000 })
+      + rectShapeXml({ id: 1601 + index * 2, name: `Product Pain Grid H ${index + 1}`, x, y: offsetY, cx: w, cy: 7620, fill: palette.grid, transparency: 45000 });
+  }).join("");
+  return solidShapeXml({ id: 1598, name: "Product Pain Distribution Matrix", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.panel })
+    + gridLines
+    + lineFrameShapeXml({ id: 1599, name: "Product Pain Distribution Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1608, name: "Product Pain Matrix Axis X", x: x + 304800, y: y + Math.round(h / 2), cx: w - 609600, cy: 15240, fill: palette.axis })
+    + rectShapeXml({ id: 1609, name: "Product Pain Matrix Axis Y", x: x + Math.round(w / 2), y: y + 304800, cx: 15240, cy: h - 609600, fill: palette.axis })
+    + solidShapeXml({ id: 1610, name: "Product Pain High Frequency Node", geom: "ellipse", x: x + Math.round(w * 0.20), y: y + Math.round(h * 0.63), cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 1611, name: "Product Pain High Impact Node", geom: "ellipse", x: x + Math.round(w * 0.48), y: y + Math.round(h * 0.24), cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1612, name: "Product Pain Opportunity Node", geom: "ellipse", x: x + Math.round(w * 0.72), y: y + Math.round(h * 0.45), cx: 152400, cy: 152400, fill: visual.accent });
+}
+
+function productPainPointNotesXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1188720;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + (index % 2) * 1432560;
+    const offsetY = y + Math.floor(index / 2) * 914400;
+    return solidShapeXml({ id: 1620 + index * 3, name: `Product Pain Opportunity Note ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: 1249680, cy: 701040, fill: index % 2 ? palette.panel : palette.card })
+      + rectShapeXml({ id: 1621 + index * 3, name: `Product Pain Opportunity Note Rule ${index + 1}`, x: offsetX + 152400, y: offsetY + 152400, cx: 426720, cy: 30480, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1622 + index * 3, name: `Product Pain Opportunity Note Text ${index + 1}`, x: offsetX + 152400, y: offsetY + 304800, cx: 914400, cy: 182880, text: productPainPointCompactText(item, "", 12), size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPainPointActionCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3543300;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 1981200;
+    return solidShapeXml({ id: 1640 + index * 3, name: `Product Pain Next Action ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1676400, cy: 609600, fill: palette.card })
+      + solidShapeXml({ id: 1641 + index * 3, name: `Product Pain Next Action Dot ${index + 1}`, geom: "ellipse", x: offsetX + 152400, y: y + 121920, cx: 167640, cy: 167640, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1642 + index * 3, name: `Product Pain Next Action Text ${index + 1}`, x: offsetX + 152400, y: y + 335280, cx: 1371600, cy: 182880, text: productPainPointCompactText(item, "", 12), size: 740, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPainPointsScene({ slide, index, role }) {
+  const bullets = productPainPointBulletTexts(slide);
+  const tags = ["画像", "场景", "机会"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["触发", "阻碍", "影响", "诉求"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 12));
+  if (role === "closing") {
+    return { kind: "closing", kicker: "PRODUCT NEXT STEPS", bullets, tags, cards: ["验证假设", "收敛需求", "推进原型", "复盘指标"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "USER PAIN POINTS", bullets, tags, cards },
+    { kind: "scenario", kicker: "SCENARIO JOURNEY", bullets, tags, cards },
+    { kind: "evidence", kicker: "EVIDENCE SIGNALS", bullets, tags, cards },
+    { kind: "distribution", kicker: "PAIN DISTRIBUTION", bullets, tags, cards },
+    { kind: "opportunity", kicker: "REQUIREMENT OPPORTUNITY", bullets, tags, cards },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productPainPointBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["目标用户在关键流程中频繁中断", "反馈证据集中在效率和理解成本", "需求机会需要进入原型验证"];
+}
+
+function productPainPointCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function productPainPointsColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.12),
+    panel: blendHexColor(visual.background, visual.surface, 0.48),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
+    axis: blendHexColor(visual.primary, visual.background, 0.34),
+    grid: blendHexColor(visual.primary, visual.background, 0.64),
+    line: blendHexColor(visual.accent, visual.surface, 0.36),
   };
 }
 

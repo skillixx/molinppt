@@ -989,11 +989,14 @@ function renderDeckPreview({ deck, visual }) {
     const manufacturingSolutionScene = isManufacturingSolutionVisual(visual) ? manufacturingSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationSolutionScene = isEducationSolutionVisual(visual) ? educationSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
+    const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
+    const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const brandStoryScene = isBrandStoryVisual(visual) ? brandStoryPreviewScene(visual) : null;
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
+    const biCockpitScene = isBiExecutiveCockpitVisual(visual) ? biExecutiveCockpitPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
     const annualSummaryScene = isAnnualSummaryVisual(visual) ? annualSummaryPreviewScene(visual) : null;
     const quarterlyDashboardScene = isQuarterlyDashboardVisual(visual) ? quarterlyDashboardPreviewScene({ visual, slide, index }) : null;
@@ -1034,6 +1037,9 @@ function renderDeckPreview({ deck, visual }) {
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
       : "";
+    const painPointMark = painPointScene
+      ? renderProductPainPointsPreview(slide, painPointScene)
+      : "";
     const pitchMark = pitchScene
       ? (
           `${index === 0
@@ -1041,6 +1047,9 @@ function renderDeckPreview({ deck, visual }) {
             : `<div class="pitch-kicker">${escapeHtml(pitchScene.section)}</div><div class="pitch-proof-row"><span></span><span></span><span></span></div>`}`
           + `<div class="pitch-chip" aria-hidden="true"></div><div class="pitch-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="pitch-caption">${escapeHtml(pitchScene.caption)}</div><div class="pitch-arc"></div>`
         )
+      : "";
+    const businessModelMark = businessModelScene
+      ? renderBusinessModelBpPreview(slide, businessModelScene)
       : "";
     const marketingMark = marketingScene
       ? (
@@ -1068,6 +1077,9 @@ function renderDeckPreview({ deck, visual }) {
             : `<div class="data-insight-kicker">${escapeHtml(dataInsightScene.section)}</div><div class="data-insight-mini-row"><span></span><span></span><span></span></div>`}`
           + `<div class="data-insight-chip" aria-hidden="true"></div><div class="data-insight-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="data-insight-caption">${escapeHtml(dataInsightScene.caption)}</div><div class="data-insight-scanline"></div>`
         )
+      : "";
+    const biCockpitMark = biCockpitScene
+      ? renderBiExecutiveCockpitPreview(slide, biCockpitScene)
       : "";
     const educationMark = educationScene
       ? (
@@ -1139,10 +1151,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene || businessModelScene || biCockpitScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || pitchScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${pitchMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || painPointScene?.variant || pitchScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${painPointMark}${pitchMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1663,6 +1675,68 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="product-roadmap"] .slide[data-template-variant="product-review"] .product-visual span{height:3px;border-radius:999px;background:color-mix(in srgb,var(--template-primary) 26%,transparent);}
     body[data-template="product-roadmap"] .slide[data-template-variant="product-review"] .product-visual span:nth-child(1){left:18%;top:78%;width:58%;}body[data-template="product-roadmap"] .slide[data-template-variant="product-review"] .product-visual span:nth-child(2){left:18%;top:84%;width:44%;}body[data-template="product-roadmap"] .slide[data-template-variant="product-review"] .product-visual span:nth-child(3){display:none;}body[data-template="product-roadmap"] .slide[data-template-variant="product-review"] .product-visual span:nth-child(4){display:none;}
     body[data-template="product-roadmap"] .page-number{z-index:5;right:7.3%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 70%,transparent);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-layout="product-pain-points"] .slide{padding:0;border:0;background:linear-gradient(135deg,#ffffff 0%,var(--template-bg) 58%,#eaf2ff 100%);}
+    body[data-layout="product-pain-points"] .slide::before{background:repeating-linear-gradient(90deg,rgba(29,78,216,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(20,184,166,.035) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(249,115,22,.13),transparent 24%);}
+    body[data-layout="product-pain-points"] .slide::after{content:"";position:absolute;left:5.4%;right:5.4%;top:8.6%;bottom:8.4%;z-index:1;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(29,78,216,.12);box-shadow:0 24px 54px rgba(15,23,42,.12);}
+    body[data-layout="product-pain-points"] .accent{height:6%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#14B8A6 68%,var(--template-accent));box-shadow:inset 0 -3px 0 rgba(249,115,22,.45);}
+    body[data-layout="product-pain-points"] .pain-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="product-pain-points"] .pain-kicker{position:absolute;left:8%;top:13.8%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="product-pain-points"] .pain-title{position:absolute;left:8%;top:21.5%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.13;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="product-pain-points"] .pain-rule{position:absolute;left:8%;top:42.6%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#14B8A6,transparent);}
+    body[data-layout="product-pain-points"] .pain-bullets{position:absolute;left:8.2%;top:49.5%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="product-pain-points"] .pain-bullets li{margin:.12em 0;}
+    body[data-layout="product-pain-points"] .pain-persona{position:absolute;right:8%;top:17%;width:35%;height:45%;border-radius:20px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(29,78,216,.13);box-shadow:0 18px 36px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="product-pain-points"] .pain-persona::before{content:"";position:absolute;left:12%;top:16%;width:80px;height:80px;border-radius:50%;background:color-mix(in srgb,var(--template-primary) 16%,#fff 84%);}
+    body[data-layout="product-pain-points"] .pain-persona::after{content:"";position:absolute;left:11%;top:51%;width:116px;height:66px;border-radius:80px 80px 18px 18px;border:8px solid var(--template-primary);border-bottom:0;}
+    body[data-layout="product-pain-points"] .pain-persona i{position:absolute;display:block;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="product-pain-points"] .pain-persona i:nth-child(1){right:16%;top:22%;width:38%;height:8px;background:var(--template-primary);}body[data-layout="product-pain-points"] .pain-persona i:nth-child(2){right:16%;top:34%;width:46%;height:8px;background:#14B8A6;}body[data-layout="product-pain-points"] .pain-persona i:nth-child(3){right:16%;top:49%;width:34%;height:8px;}body[data-layout="product-pain-points"] .pain-persona i:nth-child(4){right:26%;bottom:20%;width:16px;height:16px;}
+    body[data-layout="product-pain-points"] .pain-tags{position:absolute;left:8%;right:48%;bottom:14.4%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-pain-points"] .pain-tags span{min-height:58px;border-radius:13px;background:#fff;border:1px solid rgba(29,78,216,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-pain-points"] .pain-journey{position:absolute;left:8%;right:8%;bottom:15%;height:28%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="product-pain-points"] .pain-journey span{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(29,78,216,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:16px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-pain-points"] .pain-journey span::before{content:"";display:block;width:24px;height:24px;margin-bottom:8px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(249,115,22,.12);}
+    body[data-layout="product-pain-points"] .pain-card-grid{position:absolute;right:8%;top:20%;width:37%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="product-pain-points"] .pain-card-grid span{min-height:96px;border-radius:16px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px solid rgba(249,115,22,.22);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-pain-points"] .pain-card-grid span::before{content:"!";display:grid;place-items:center;width:22px;height:22px;margin-bottom:8px;border-radius:50%;background:var(--template-accent);color:#fff;font-weight:900;}
+    body[data-layout="product-pain-points"] .pain-matrix{position:absolute;right:8%;top:20%;width:37%;height:45%;border-radius:18px;background:#fff;border:1px solid rgba(29,78,216,.13);box-shadow:0 16px 32px rgba(15,23,42,.09);overflow:hidden;}
+    body[data-layout="product-pain-points"] .pain-matrix::before{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:2px;background:rgba(29,78,216,.25);}
+    body[data-layout="product-pain-points"] .pain-matrix::after{content:"";position:absolute;left:12%;right:12%;top:50%;height:2px;background:rgba(29,78,216,.25);}
+    body[data-layout="product-pain-points"] .pain-matrix i{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(249,115,22,.14);}
+    body[data-layout="product-pain-points"] .pain-matrix i:nth-child(1){left:24%;top:60%;}body[data-layout="product-pain-points"] .pain-matrix i:nth-child(2){left:58%;top:26%;background:var(--template-primary);box-shadow:0 0 0 7px rgba(29,78,216,.12);}body[data-layout="product-pain-points"] .pain-matrix i:nth-child(3){left:73%;top:62%;background:#14B8A6;box-shadow:0 0 0 7px rgba(20,184,166,.12);}
+    body[data-layout="product-pain-points"] .pain-notes{position:absolute;left:8%;right:8%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-pain-points"] .pain-notes span{min-height:84px;border-radius:8px 18px 18px 18px;background:#ecfeff;border:1px solid rgba(20,184,166,.22);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-pain-points"] .pain-closing-line{position:absolute;left:8%;right:8%;bottom:25%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),#14B8A6,var(--template-accent),transparent);}
+    body[data-layout="product-pain-points"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.84);border:1px solid rgba(29,78,216,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,63,.62);}
+    body[data-layout="bi-executive-cockpit"] .slide{padding:0;border:0;background:#08111f;box-shadow:0 22px 58px rgba(3,8,18,.34);}
+    body[data-layout="bi-executive-cockpit"] .slide::before{background:radial-gradient(circle at 76% 18%,rgba(34,211,238,.22),transparent 23%),radial-gradient(circle at 18% 82%,rgba(163,230,53,.14),transparent 24%),repeating-linear-gradient(90deg,rgba(34,211,238,.08) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,211,238,.06) 0 1px,transparent 1px 38px);}
+    body[data-layout="bi-executive-cockpit"] .slide::after{content:"";position:absolute;left:4.8%;right:4.8%;top:8%;bottom:7.4%;border-radius:22px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(7,26,47,.82));border:1px solid rgba(34,211,238,.22);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 24px 56px rgba(0,0,0,.28);}
+    body[data-layout="bi-executive-cockpit"] .accent{left:4.8%;right:4.8%;top:8%;height:5px;z-index:3;background:linear-gradient(90deg,var(--template-accent),#a3e635,transparent);}
+    body[data-layout="bi-executive-cockpit"] .motif{display:block;right:6.8%;top:11%;width:12%;height:24%;border-radius:50%;border:1px solid rgba(34,211,238,.22);box-shadow:0 0 32px rgba(34,211,238,.14);background:radial-gradient(circle,rgba(34,211,238,.16),transparent 60%);z-index:2;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-kicker{position:absolute;left:8%;top:13.2%;font-size:11px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-title{position:absolute;left:8%;top:19.5%;width:44%;margin:0;color:var(--template-title);font-size:35px;line-height:1.08;font-weight:900;overflow-wrap:anywhere;text-shadow:0 0 18px rgba(34,211,238,.12);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-bullets{position:absolute;left:8.2%;top:47%;width:39%;margin:0;padding-left:1.1em;font-size:13px;line-height:1.5;color:var(--template-body);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-bullets li{margin:.08em 0;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-kpis{position:absolute;left:8%;right:8%;bottom:12.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-kpis span{min-height:72px;border-radius:15px;background:rgba(8,17,31,.78);border:1px solid rgba(34,211,238,.18);box-shadow:0 14px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.05);padding:13px 14px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-kpis strong{display:block;margin-bottom:7px;color:var(--template-title);font-size:20px;line-height:1;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-hero{position:absolute;right:8%;top:19%;width:36%;height:38%;border-radius:20px;background:linear-gradient(135deg,rgba(8,17,31,.96),rgba(14,34,56,.86));border:1px solid rgba(34,211,238,.22);box-shadow:0 0 34px rgba(34,211,238,.12),0 18px 34px rgba(0,0,0,.22);overflow:hidden;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-hero::before{content:"";position:absolute;left:10%;right:10%;bottom:20%;height:2px;background:rgba(168,199,216,.36);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-hero::after{content:"";position:absolute;left:13%;right:13%;top:18%;height:32%;border-radius:50% 50% 0 0;border:10px solid rgba(34,211,238,.28);border-bottom:0;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-hero i{position:absolute;display:block;border-radius:999px;background:var(--template-accent);box-shadow:0 0 18px rgba(34,211,238,.45);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-hero i:nth-child(1){left:18%;bottom:21%;width:9%;height:28%;}body[data-layout="bi-executive-cockpit"] .cockpit-hero i:nth-child(2){left:33%;bottom:21%;width:9%;height:45%;background:#a3e635;box-shadow:0 0 18px rgba(163,230,53,.36);}body[data-layout="bi-executive-cockpit"] .cockpit-hero i:nth-child(3){left:48%;bottom:21%;width:9%;height:34%;}body[data-layout="bi-executive-cockpit"] .cockpit-hero i:nth-child(4){left:63%;bottom:21%;width:9%;height:57%;background:#38bdf8;}body[data-layout="bi-executive-cockpit"] .cockpit-hero i:nth-child(5){right:13%;top:24%;width:20px;height:20px;background:#a3e635;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-trend{position:absolute;right:8%;top:21%;width:39%;height:38%;border-radius:18px;background:rgba(8,17,31,.76);border:1px solid rgba(34,211,238,.18);box-shadow:0 18px 34px rgba(0,0,0,.2);overflow:hidden;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-trend::before{content:"";position:absolute;left:9%;right:9%;bottom:23%;height:3px;background:rgba(168,199,216,.24);box-shadow:0 -48px 0 rgba(168,199,216,.12),0 -96px 0 rgba(168,199,216,.08);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-trend::after{content:"";position:absolute;left:10%;right:10%;top:48%;height:4px;border-radius:999px;background:linear-gradient(90deg,#22d3ee,#a3e635,#38bdf8);transform:skewY(-10deg);box-shadow:0 0 18px rgba(34,211,238,.28);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-rank{position:absolute;right:8%;top:21%;width:35%;display:grid;gap:10px;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-rank span{height:48px;border-radius:12px;background:rgba(8,17,31,.82);border:1px solid rgba(34,211,238,.16);padding:13px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-rank span::after{content:"";display:block;width:66%;height:4px;margin-top:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),transparent);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-alerts{position:absolute;right:8%;top:21%;width:36%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-alerts span{min-height:94px;border-radius:16px;background:rgba(30,41,59,.8);border:1px solid rgba(251,191,36,.22);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-alerts span::before{content:"";display:block;width:18px;height:18px;margin-bottom:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 7px rgba(245,158,11,.16);}
+    body[data-layout="bi-executive-cockpit"] .cockpit-actions{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;}
+    body[data-layout="bi-executive-cockpit"] .cockpit-actions span{min-height:90px;border-radius:16px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(8,17,31,.82));border:1px solid rgba(34,211,238,.2);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="bi-executive-cockpit"] .page-number{z-index:5;right:6.2%;bottom:5.4%;background:rgba(8,17,31,.72);border:1px solid rgba(34,211,238,.18);border-radius:999px;padding:5px 10px;color:rgba(230,247,255,.66);}
     body[data-layout="data-insight"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 58%,color-mix(in srgb,var(--template-accent) 12%,var(--template-bg) 88%));padding:7.4% 8.4% 6.8%;border:0;}
     body[data-layout="data-insight"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-accent) 4%,transparent) 0 1px,transparent 1px 34px),radial-gradient(circle at 78% 26%,color-mix(in srgb,var(--template-accent) 18%,transparent),transparent 27%);}
     body[data-layout="data-insight"] .slide::after{content:"";position:absolute;inset:10.8% 6.2% 9.6%;border-radius:18px;background:rgba(255,255,255,.90);border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);box-shadow:0 24px 52px rgba(16,42,67,.13);}
@@ -1916,6 +1990,38 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row{position:absolute;left:10.3%;right:43%;bottom:17.2%;z-index:6;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row span{height:40px;border-radius:2px 12px 2px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 12%,#fff 88%),color-mix(in srgb,var(--template-accent) 18%,#fff 82%));border-top:3px solid var(--template-accent);box-shadow:0 10px 20px rgba(15,23,42,.08);}
     body[data-template="pitch"][data-layout="venture"] .page-number{z-index:7;right:7.4%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 68%,transparent);background:rgba(255,255,255,.74);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-layout="business-model-bp"] .slide{background:linear-gradient(135deg,#f5f7fb 0,#ffffff 58%,#edf4f1 100%);padding:0;border:0;box-shadow:0 22px 58px rgba(15,23,42,.12);}
+    body[data-layout="business-model-bp"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(16,33,63,.035) 0 1px,transparent 1px 34px),repeating-linear-gradient(90deg,rgba(16,33,63,.026) 0 1px,transparent 1px 34px);}
+    body[data-layout="business-model-bp"] .slide::after{content:"";position:absolute;left:4.5%;right:4.5%;top:7%;bottom:7%;border:1px solid rgba(16,33,63,.12);background:rgba(255,255,255,.74);box-shadow:0 20px 48px rgba(15,23,42,.08);}
+    body[data-layout="business-model-bp"] .accent{display:block;left:4.5%;right:4.5%;top:7%;height:8px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#d6a84f);z-index:2;}
+    body[data-layout="business-model-bp"] .motif{display:block;right:5.5%;top:10.5%;width:15%;height:18%;border-radius:50%;border:18px solid color-mix(in srgb,var(--template-accent) 18%,transparent);background:transparent;box-shadow:none;z-index:2;}
+    body[data-layout="business-model-bp"] .slide-content{display:none;}
+    body[data-layout="business-model-bp"] .bp-kicker{position:absolute;left:7%;top:10.5%;z-index:4;color:var(--template-accent);font-size:11px;font-weight:900;letter-spacing:.16em;}
+    body[data-layout="business-model-bp"] .bp-title{position:absolute;left:7%;top:16%;z-index:4;max-width:48%;color:var(--template-title);font-size:34px;line-height:1.08;font-weight:900;letter-spacing:0;}
+    body[data-layout="business-model-bp"] .bp-subtitle{position:absolute;left:7%;top:34%;z-index:4;max-width:42%;color:var(--template-body);font-size:14px;line-height:1.55;font-weight:700;}
+    body[data-layout="business-model-bp"] .bp-hero-mockup{position:absolute;right:8%;top:20%;width:33%;height:34%;z-index:4;border-radius:18px;background:linear-gradient(135deg,#fff,#edf4f1);border:1px solid rgba(16,33,63,.12);box-shadow:0 18px 38px rgba(15,23,42,.12);}
+    body[data-layout="business-model-bp"] .bp-hero-mockup::before{content:"";position:absolute;left:8%;right:8%;top:13%;height:12%;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="business-model-bp"] .bp-hero-mockup::after{content:"";position:absolute;left:10%;right:10%;bottom:14%;height:42%;border-radius:14px;background:linear-gradient(135deg,rgba(22,163,74,.16),rgba(214,168,79,.18));}
+    body[data-layout="business-model-bp"] .bp-metrics{position:absolute;left:7%;right:8%;bottom:12%;z-index:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="business-model-bp"] .bp-metrics span{min-height:72px;border-radius:14px;background:#fff;border:1px solid rgba(16,33,63,.11);box-shadow:0 12px 26px rgba(15,23,42,.07);padding:14px 16px;color:var(--template-body);font-size:11px;font-weight:800;}
+    body[data-layout="business-model-bp"] .bp-metrics strong{display:block;margin-bottom:6px;color:var(--template-title);font-size:20px;line-height:1;}
+    body[data-layout="business-model-bp"] .bp-canvas{position:absolute;left:7%;right:7%;top:22%;bottom:13%;z-index:4;display:grid;grid-template-columns:1.05fr 1.25fr 1.05fr;grid-template-rows:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="business-model-bp"] .bp-canvas span{border-radius:12px;background:#fff;border:1px solid rgba(16,33,63,.12);box-shadow:0 10px 22px rgba(15,23,42,.06);padding:12px 14px;color:var(--template-title);font-size:12px;font-weight:900;}
+    body[data-layout="business-model-bp"] .bp-canvas span::after{content:"";display:block;width:44px;height:4px;margin-top:12px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="business-model-bp"] .bp-canvas span:nth-child(2){grid-row:span 2;background:linear-gradient(135deg,#fff,#f1f7f3);}
+    body[data-layout="business-model-bp"] .bp-canvas span:nth-child(5){grid-column:span 2;border-top:4px solid #d6a84f;}
+    body[data-layout="business-model-bp"] .bp-flow{position:absolute;left:9%;right:9%;top:37%;height:72px;z-index:4;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:center;}
+    body[data-layout="business-model-bp"] .bp-flow span{position:relative;height:58px;border-radius:999px;background:#fff;border:1px solid rgba(16,33,63,.12);display:grid;place-items:center;color:var(--template-title);font-size:12px;font-weight:900;box-shadow:0 12px 24px rgba(15,23,42,.06);}
+    body[data-layout="business-model-bp"] .bp-flow span:not(:last-child)::after{content:"";position:absolute;right:-16px;top:50%;width:20px;height:3px;background:var(--template-accent);}
+    body[data-layout="business-model-bp"] .bp-side-cards{position:absolute;left:9%;right:9%;bottom:14%;z-index:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="business-model-bp"] .bp-side-cards span{min-height:86px;border-radius:14px;background:#fff;border:1px solid rgba(16,33,63,.12);padding:14px;color:var(--template-body);font-size:12px;font-weight:800;box-shadow:0 12px 24px rgba(15,23,42,.06);}
+    body[data-layout="business-model-bp"] .bp-ecosystem{position:absolute;right:10%;top:25%;width:32%;height:43%;z-index:4;border-radius:50%;border:2px dashed rgba(16,33,63,.22);}
+    body[data-layout="business-model-bp"] .bp-ecosystem::before{content:"平台";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:var(--template-primary);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:900;box-shadow:0 16px 30px rgba(16,33,63,.22);}
+    body[data-layout="business-model-bp"] .bp-ecosystem span{position:absolute;width:72px;height:34px;border-radius:999px;background:#fff;border:1px solid rgba(16,33,63,.13);display:grid;place-items:center;color:var(--template-title);font-size:11px;font-weight:900;box-shadow:0 10px 20px rgba(15,23,42,.07);}
+    body[data-layout="business-model-bp"] .bp-ecosystem span:nth-child(1){left:50%;top:-5%;transform:translateX(-50%);}body[data-layout="business-model-bp"] .bp-ecosystem span:nth-child(2){right:-7%;top:35%;}body[data-layout="business-model-bp"] .bp-ecosystem span:nth-child(3){left:50%;bottom:-5%;transform:translateX(-50%);}body[data-layout="business-model-bp"] .bp-ecosystem span:nth-child(4){left:-7%;top:35%;}
+    body[data-layout="business-model-bp"] .bp-note{position:absolute;left:7%;top:22%;width:39%;z-index:4;color:var(--template-body);font-size:15px;line-height:1.6;font-weight:700;}
+    body[data-layout="business-model-bp"] .bp-note strong{display:block;color:var(--template-title);font-size:22px;margin-bottom:12px;}
+    body[data-layout="business-model-bp"] .page-number{z-index:5;right:6%;bottom:8.2%;background:#fff;border:1px solid rgba(16,33,63,.12);border-radius:999px;padding:4px 10px;color:rgba(15,23,42,.62);}
     body[data-layout="quarterly-dashboard"] .slide{background:#eef3f9;padding:7.2% 6.2% 5.4%;border:0;box-shadow:0 22px 54px rgba(15,35,65,.14);}
     body[data-layout="quarterly-dashboard"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#102b4c 0 13.6%,#d7a650 13.6% 14.2%,#eef3f9 14.2% 100%);opacity:1;}
     body[data-layout="quarterly-dashboard"] .slide::after{content:"";position:absolute;left:4%;right:4%;top:17%;bottom:6%;background:linear-gradient(180deg,#fff,#f8fbff 56%,#edf5ff);border:1px solid #d8e2ef;box-shadow:0 18px 42px rgba(20,45,80,.1);}
@@ -3221,6 +3327,77 @@ function isProductRoadmapVisual(visual) {
   return visual?.id === "product-roadmap" && visual?.layout === "academy";
 }
 
+function renderProductPainPointsPreview(slide, scene) {
+  // 用户痛点模板用专属图文层承载内容，普通标题层保持空白，避免需求长文本叠到图形上。
+  const title = escapeHtml(scene.title || slide?.title || "用户痛点与需求机会");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(productPainPointCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="pain-kicker">${escapeHtml(scene.kicker)}</div><h2 class="pain-title">${title}</h2><div class="pain-rule"></div><ul class="pain-bullets">${bulletItems}</ul>`;
+  const persona = `<div class="pain-persona"><i></i><i></i><i></i><i></i></div>`;
+  const tags = `<div class="pain-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover") {
+    return `<div class="pain-layer">${common}${persona}${tags}</div>`;
+  }
+  if (scene.kind === "scenario") {
+    return `<div class="pain-layer">${common}${persona}<div class="pain-journey">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "evidence") {
+    return `<div class="pain-layer">${common}<div class="pain-card-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "distribution") {
+    return `<div class="pain-layer">${common}<div class="pain-matrix"><i></i><i></i><i></i></div>${tags}</div>`;
+  }
+  if (scene.kind === "opportunity") {
+    return `<div class="pain-layer">${common}<div class="pain-notes">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="pain-layer">${common}<div class="pain-closing-line"></div><div class="pain-journey">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="pain-layer">${common}${persona}${tags}</div>`;
+}
+
+function productPainPointsPreviewScene({ slide, index, total }) {
+  const bullets = productPainPointBulletTexts(slide);
+  const title = productPainPointCompactText(slide?.title, "用户痛点与需求机会", index === 0 ? 30 : 28);
+  const tags = ["用户", "场景", "痛点"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["触发需求", "使用过程", "遇到阻碍", "产生诉求"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "user-pain-points", kicker: "USER PAIN INSIGHT", title, bullets, tags, cards },
+    { kind: "scenario", variant: "user-pain-points", kicker: "SCENARIO JOURNEY", title, bullets, tags, cards },
+    { kind: "evidence", variant: "user-pain-points", kicker: "PAIN EVIDENCE", title, bullets, tags, cards },
+    { kind: "distribution", variant: "user-pain-points", kicker: "IMPACT MATRIX", title, bullets, tags, cards },
+    { kind: "opportunity", variant: "user-pain-points", kicker: "REQUIREMENT OPPORTUNITY", title, bullets, tags, cards },
+  ];
+  if (index === total - 1) {
+    const nextCards = ["补充访谈", "数据验证", "原型验证", "排期评估"].map((fallback, itemIndex) => productPainPointCompactText(bullets[itemIndex], fallback, 12));
+    return { kind: "closing", variant: "user-pain-points", kicker: "NEXT VALIDATION", title, bullets, tags, cards: nextCards };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productPainPointBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["目标用户在关键场景中存在明显阻碍", "痛点证据来自访谈、反馈和行为数据", "需求机会需要结合价值与成本评估"];
+}
+
+function productPainPointCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isProductPainPointsVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-pain-points" && (id === "product-requirement-analysis" || id === "product-product-requirement-analysis-user-pain-points");
+}
+
+function isBiExecutiveCockpitVisual(visual) {
+  return false;
+}
+
 function pitchDeckPreviewScene(visual) {
   const variant = pitchDeckVariant(visual);
   const scenes = {
@@ -3270,6 +3447,72 @@ function pitchDeckVariant(visual) {
 
 function isPitchDeckVisual(visual) {
   return visual?.id === "pitch" && visual?.layout === "venture";
+}
+
+/**
+ * 渲染商业计划书商业模式主题的在线预览层，所有文字来自当前 slide，避免模板固定业务内容外露。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderBusinessModelBpPreview(slide, scene) {
+  const title = escapeHtml(slide.title || scene.title);
+  const bullets = (slide.bullets || []).slice(0, 5).map((bullet) => escapeHtml(bullet));
+  const summary = bullets[0] || scene.summary;
+  if (scene.role === "cover") {
+    return `<div class="bp-kicker">${escapeHtml(scene.kicker)}</div><div class="bp-title">${title}</div><div class="bp-subtitle">${escapeHtml(summary)}</div><div class="bp-hero-mockup"></div><div class="bp-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  }
+  if (scene.role === "canvas") {
+    return `<div class="bp-kicker">${escapeHtml(scene.kicker)}</div><div class="bp-title">${title}</div><div class="bp-canvas">${scene.canvas.map((item, index) => `<span>${escapeHtml(bullets[index] || item)}</span>`).join("")}</div>`;
+  }
+  if (scene.role === "ecosystem") {
+    return `<div class="bp-kicker">${escapeHtml(scene.kicker)}</div><div class="bp-title">${title}</div><div class="bp-note"><strong>${escapeHtml(summary)}</strong>${escapeHtml(bullets[1] || scene.caption)}</div><div class="bp-ecosystem">${scene.nodes.map((node) => `<span>${escapeHtml(node)}</span>`).join("")}</div>`;
+  }
+  return `<div class="bp-kicker">${escapeHtml(scene.kicker)}</div><div class="bp-title">${title}</div><div class="bp-flow">${scene.flow.map((item, index) => `<span>${escapeHtml(bullets[index] || item)}</span>`).join("")}</div><div class="bp-side-cards">${scene.cards.map((item, index) => `<span>${escapeHtml(bullets[index + 2] || item)}</span>`).join("")}</div>`;
+}
+
+function businessModelBpPreviewScene({ index, total }) {
+  if (index === 0) {
+    return {
+      variant: "business-model",
+      role: "cover",
+      kicker: "INVESTOR BUSINESS CASE",
+      summary: "用一页讲清客户、价值、收入和增长闭环",
+      metrics: [
+        { value: "客户", label: "目标人群" },
+        { value: "收入", label: "变现路径" },
+        { value: "增长", label: "规模化逻辑" },
+      ],
+    };
+  }
+  if (index === total - 1) {
+    return {
+      variant: "business-model",
+      role: "ecosystem",
+      kicker: "CAPITAL & ECOSYSTEM",
+      caption: "围绕产品平台、合作伙伴、渠道和数据资产构建可持续增长网络。",
+      nodes: ["客户", "渠道", "数据", "伙伴"],
+    };
+  }
+  if (index % 3 === 1) {
+    return {
+      variant: "business-model",
+      role: "canvas",
+      kicker: "BUSINESS CANVAS",
+      canvas: ["客户群体", "价值主张", "渠道路径", "关键资源", "收入来源", "成本结构", "合作伙伴"],
+    };
+  }
+  return {
+    variant: "business-model",
+    role: "revenue",
+    kicker: "REVENUE LOOP",
+    flow: ["获客", "转化", "付费", "复购", "扩张"],
+    cards: ["收入结构", "成本结构", "利润机制"],
+  };
+}
+
+function isBusinessModelBpVisual(visual) {
+  return ["business-plan", "pitch-business-plan-business-model"].includes(visual?.id) && visual?.layout === "business-model-bp";
 }
 
 function marketingCampaignPreviewScene(visual) {
@@ -3596,6 +3839,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "industry-research") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;
