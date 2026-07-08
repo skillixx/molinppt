@@ -302,6 +302,29 @@ test("PptService renders synced product pain points preview with dedicated layou
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced product release cadence preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProductReleaseCadenceTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品版本节奏规划",
+    slideCount: 6,
+    templateId: "product-product-roadmap-release-cadence",
+    theme: "release-cadence",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-product-roadmap-release-cadence" data-layout="product-release-cadence"/);
+  assert.match(preview, /cadence-layer/);
+  assert.match(preview, /cadence-wave/);
+  assert.match(preview, /cadence-timeline|cadence-lanes|cadence-risk/);
+  assert.doesNotMatch(preview, />版本节奏</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -3795,6 +3818,52 @@ async function insertProductPainPointsTemplate(context) {
       defaultCoverLayout: "product-pain-points-cover",
       defaultContentLayout: "product-pain-points-content",
       allowedLayouts: ["product-pain-points-cover", "product-pain-points-scenario", "product-pain-points-evidence", "product-pain-points-distribution", "product-pain-points-opportunity", "product-pain-points-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertProductReleaseCadenceTemplate(context) {
+  // 测试数据库模拟官方模板同步后的产品路线图版本节奏模板，确保完整 slug 命中专用发布节奏布局。
+  await context.database.insert("templates", {
+    id: "product-product-roadmap-release-cadence",
+    slug: "product-product-roadmap-release-cadence",
+    name: "产品路线图 - 版本节奏",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "release-cadence",
+        name: "版本节奏",
+        visual: {
+          primary: "0B1F3A",
+          accent: "22D3EE",
+          secondary: "F97316",
+          background: "EFF6FF",
+          surface: "FFFFFF",
+          title: "0A1730",
+          body: "405166",
+          layout: "product-release-cadence",
+          variant: "release-cadence",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1F3A",
+      accent: "22D3EE",
+      secondary: "F97316",
+      background: "EFF6FF",
+      surface: "FFFFFF",
+      title: "0A1730",
+      body: "405166",
+      layout: "product-release-cadence",
+      variant: "release-cadence",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-release-cadence-cover",
+      defaultContentLayout: "product-release-cadence-content",
+      allowedLayouts: ["product-release-cadence-cover", "product-release-cadence-content", "product-release-cadence-analysis", "product-release-cadence-lanes", "product-release-cadence-risk", "product-release-cadence-summary", "title", "content", "closing"],
     },
   });
 }

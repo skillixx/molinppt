@@ -990,8 +990,10 @@ function renderDeckPreview({ deck, visual }) {
     const educationSolutionScene = isEducationSolutionVisual(visual) ? educationSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
+    const releaseCadenceScene = isProductReleaseCadenceVisual(visual) ? productReleaseCadencePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
+    const seedStoryScene = isSeedRoundStoryVisual(visual) ? seedRoundStoryPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1041,6 +1043,9 @@ function renderDeckPreview({ deck, visual }) {
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
       : "";
+    const releaseCadenceMark = releaseCadenceScene
+      ? renderProductReleaseCadencePreview(slide, releaseCadenceScene)
+      : "";
     const painPointMark = painPointScene
       ? renderProductPainPointsPreview(slide, painPointScene)
       : "";
@@ -1051,6 +1056,9 @@ function renderDeckPreview({ deck, visual }) {
             : `<div class="pitch-kicker">${escapeHtml(pitchScene.section)}</div><div class="pitch-proof-row"><span></span><span></span><span></span></div>`}`
           + `<div class="pitch-chip" aria-hidden="true"></div><div class="pitch-visual"><span></span><span></span><span></span><span></span><span></span></div><div class="pitch-caption">${escapeHtml(pitchScene.caption)}</div><div class="pitch-arc"></div>`
         )
+      : "";
+    const seedStoryMark = seedStoryScene
+      ? renderSeedRoundStoryPreview(slide, seedStoryScene)
       : "";
     const businessModelMark = businessModelScene
       ? renderBusinessModelBpPreview(slide, businessModelScene)
@@ -1155,10 +1163,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || launchRhythmScene || businessModelScene || biCockpitScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || launchRhythmScene || seedStoryScene || businessModelScene || biCockpitScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || productScene?.variant || painPointScene?.variant || pitchScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${productMark}${painPointMark}${pitchMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pitchScene?.variant || seedStoryScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${productMark}${releaseCadenceMark}${painPointMark}${pitchMark}${seedStoryMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1640,6 +1648,36 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="sales-education-solution"] .education-solution-roadmap span{min-height:74px;border-radius:15px;background:#fff;border:1px solid rgba(21,94,117,.12);box-shadow:0 10px 22px rgba(21,94,117,.08);padding:13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="sales-education-solution"] .education-solution-roadmap span::before{content:"";display:block;width:24px;height:24px;margin-bottom:8px;border-radius:50%;background:color-mix(in srgb,var(--template-accent) 70%,#fff 30%);}
     body[data-layout="sales-education-solution"] .page-number{z-index:4;right:7.2%;bottom:5.4%;background:rgba(255,255,255,.82);border:1px solid rgba(21,94,117,.12);border-radius:999px;padding:5px 10px;color:rgba(15,47,58,.62);}
+    body[data-layout="product-release-cadence"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 58%,#dbeafe 100%);box-shadow:0 22px 56px rgba(11,31,58,.18);}
+    body[data-layout="product-release-cadence"] .slide::before{background:repeating-linear-gradient(90deg,rgba(11,31,58,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,211,238,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(34,211,238,.18),transparent 25%);}
+    body[data-layout="product-release-cadence"] .slide::after{content:"";position:absolute;left:5.6%;right:5.6%;top:9%;bottom:8.2%;z-index:1;border-radius:24px;background:rgba(255,255,255,.93);border:1px solid rgba(11,31,58,.12);box-shadow:0 24px 54px rgba(11,31,58,.13),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="product-release-cadence"] .accent{height:7%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#155e75 62%,var(--template-accent));box-shadow:inset 0 -3px 0 #f97316;}
+    body[data-layout="product-release-cadence"] .cadence-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="product-release-cadence"] .cadence-kicker{position:absolute;left:8.4%;top:14.5%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="product-release-cadence"] .cadence-title{position:absolute;left:8.4%;top:21.2%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="product-release-cadence"] .cadence-rule{position:absolute;left:8.4%;top:42.8%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f97316,transparent);}
+    body[data-layout="product-release-cadence"] .cadence-bullets{position:absolute;left:8.6%;top:49.2%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="product-release-cadence"] .cadence-bullets li{margin:.1em 0;}
+    body[data-layout="product-release-cadence"] .cadence-wave{position:absolute;right:8%;top:18%;width:38%;height:37%;border-radius:20px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(11,31,58,.12);box-shadow:0 18px 36px rgba(11,31,58,.12);overflow:hidden;}
+    body[data-layout="product-release-cadence"] .cadence-wave::before{content:"";position:absolute;left:10%;right:10%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f97316);transform:skewY(-10deg);box-shadow:0 0 22px rgba(34,211,238,.25);}
+    body[data-layout="product-release-cadence"] .cadence-wave::after{content:"";position:absolute;left:12%;right:12%;top:18%;height:36%;border-radius:50%;border-top:8px solid rgba(34,211,238,.24);}
+    body[data-layout="product-release-cadence"] .cadence-wave i{position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--template-accent);box-shadow:0 0 0 7px rgba(34,211,238,.11);}
+    body[data-layout="product-release-cadence"] .cadence-wave i:nth-child(1){left:17%;top:57%;}body[data-layout="product-release-cadence"] .cadence-wave i:nth-child(2){left:38%;top:45%;border-color:#f97316;box-shadow:0 0 0 7px rgba(249,115,22,.12);}body[data-layout="product-release-cadence"] .cadence-wave i:nth-child(3){left:59%;top:32%;}body[data-layout="product-release-cadence"] .cadence-wave i:nth-child(4){left:76%;top:23%;border-color:var(--template-primary);}
+    body[data-layout="product-release-cadence"] .cadence-tags{position:absolute;left:8.4%;right:48%;bottom:14.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-release-cadence"] .cadence-tags span{min-height:58px;border-radius:13px;background:#fff;border:1px solid rgba(11,31,58,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(11,31,58,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-cadence"] .cadence-timeline{position:absolute;left:8.4%;right:8.4%;bottom:16%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="product-release-cadence"] .cadence-timeline span{position:relative;min-height:82px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:17px 14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-cadence"] .cadence-timeline span::before{content:"";display:block;width:26px;height:26px;margin-bottom:9px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(34,211,238,.12);}
+    body[data-layout="product-release-cadence"] .cadence-lanes{position:absolute;right:8%;top:19%;width:39%;display:grid;gap:10px;}
+    body[data-layout="product-release-cadence"] .cadence-lanes span{height:48px;border-radius:14px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 10px 20px rgba(11,31,58,.07);padding:14px 16px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-cadence"] .cadence-lanes span::after{content:"";display:block;width:58%;height:4px;margin-top:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f97316,transparent);}
+    body[data-layout="product-release-cadence"] .cadence-risk{position:absolute;right:8%;top:20%;width:38%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="product-release-cadence"] .cadence-risk span{min-height:96px;border-radius:16px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px solid rgba(249,115,22,.22);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-cadence"] .cadence-risk span::before{content:"";display:block;width:20px;height:20px;margin-bottom:8px;border-radius:50%;background:#f97316;box-shadow:0 0 0 7px rgba(249,115,22,.13);}
+    body[data-layout="product-release-cadence"] .cadence-actions{position:absolute;left:8.4%;right:8.4%;bottom:15.5%;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;}
+    body[data-layout="product-release-cadence"] .cadence-actions span{min-height:86px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-cadence"] .cadence-actions span::before{content:"";display:block;width:28px;height:6px;margin-bottom:12px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="product-release-cadence"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.82);border:1px solid rgba(11,31,58,.12);border-radius:999px;padding:5px 10px;color:rgba(10,23,48,.62);}
     body[data-template="product-roadmap"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 64%,color-mix(in srgb,var(--template-primary) 11%,var(--template-bg) 89%));padding:7.8% 8.2% 6.8%;border:0;}
     body[data-template="product-roadmap"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 44px),radial-gradient(circle at 78% 25%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 28%);pointer-events:none;}
     body[data-template="product-roadmap"] .slide::after{content:"";position:absolute;inset:11% 6.2% 10%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 22px 48px rgba(17,55,70,.12);}
@@ -2026,6 +2064,47 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row{position:absolute;left:10.3%;right:43%;bottom:17.2%;z-index:6;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     body[data-template="pitch"][data-layout="venture"] .pitch-proof-row span{height:40px;border-radius:2px 12px 2px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 12%,#fff 88%),color-mix(in srgb,var(--template-accent) 18%,#fff 82%));border-top:3px solid var(--template-accent);box-shadow:0 10px 20px rgba(15,23,42,.08);}
     body[data-template="pitch"][data-layout="venture"] .page-number{z-index:7;right:7.4%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 68%,transparent);background:rgba(255,255,255,.74);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-layout="seed-round-story"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f6f4ef 0,#fff 58%,#f2f6fb 100%);box-shadow:0 22px 58px rgba(23,32,51,.13);}
+    body[data-layout="seed-round-story"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(23,32,51,.035) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(23,32,51,.028) 0 1px,transparent 1px 38px),radial-gradient(circle at 85% 12%,rgba(249,115,22,.18),transparent 24%),radial-gradient(circle at 8% 88%,rgba(37,99,235,.11),transparent 24%);}
+    body[data-layout="seed-round-story"] .slide::after{content:"";position:absolute;left:5.6%;right:5.6%;top:8%;bottom:8%;z-index:1;border-radius:22px;background:rgba(255,255,255,.88);border:1px solid rgba(23,32,51,.10);box-shadow:0 22px 46px rgba(23,32,51,.09);}
+    body[data-layout="seed-round-story"] .accent{z-index:2;left:5.6%;right:5.6%;top:8%;height:9px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#16a34a);}
+    body[data-layout="seed-round-story"] .slide-content{display:none;}
+    body[data-layout="seed-round-story"] .seed-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="seed-round-story"] .seed-kicker{position:absolute;left:8.4%;top:13%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="seed-round-story"] .seed-title{position:absolute;left:8.4%;top:19.2%;width:43%;margin:0;color:var(--template-title);font-size:35px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="seed-round-story"] .seed-summary{position:absolute;left:8.5%;top:36.2%;width:38%;font-size:14px;line-height:1.5;font-weight:700;color:var(--template-body);}
+    body[data-layout="seed-round-story"] .seed-bullets{position:absolute;left:8.7%;top:47%;width:39%;margin:0;padding-left:1.15em;font-size:12.5px;line-height:1.48;font-weight:700;}
+    body[data-layout="seed-round-story"] .seed-bullets li{margin:.12em 0;}
+    body[data-layout="seed-round-story"] .seed-storyline{position:absolute;left:8.5%;right:8.5%;bottom:16%;height:95px;}
+    body[data-layout="seed-round-story"] .seed-storyline::before{content:"";position:absolute;left:2%;right:2%;top:42%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#fdba74,#16a34a);}
+    body[data-layout="seed-round-story"] .seed-storyline span{position:absolute;top:18%;width:28px;height:28px;border-radius:50%;background:#fff;border:6px solid var(--template-accent);box-shadow:0 10px 20px rgba(23,32,51,.10);}
+    body[data-layout="seed-round-story"] .seed-storyline span:nth-child(1){left:2%;}body[data-layout="seed-round-story"] .seed-storyline span:nth-child(2){left:25%;}body[data-layout="seed-round-story"] .seed-storyline span:nth-child(3){left:48%;}body[data-layout="seed-round-story"] .seed-storyline span:nth-child(4){left:71%;border-color:#16a34a;}body[data-layout="seed-round-story"] .seed-storyline span:nth-child(5){right:2%;border-color:var(--template-primary);}
+    body[data-layout="seed-round-story"] .seed-mockup{position:absolute;right:8.6%;top:19%;width:34%;height:35%;border-radius:20px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px solid rgba(23,32,51,.12);box-shadow:0 18px 38px rgba(23,32,51,.12);overflow:hidden;}
+    body[data-layout="seed-round-story"] .seed-mockup::before{content:"";position:absolute;left:8%;right:8%;top:12%;height:12%;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="seed-round-story"] .seed-mockup::after{content:"";position:absolute;left:10%;right:10%;bottom:14%;height:43%;border-radius:16px;background:linear-gradient(135deg,rgba(249,115,22,.15),rgba(37,99,235,.12));box-shadow:inset 0 0 0 1px rgba(23,32,51,.08);}
+    body[data-layout="seed-round-story"] .seed-metrics{position:absolute;left:8.5%;right:8.5%;bottom:13%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="seed-round-story"] .seed-metrics span{min-height:70px;border-radius:16px;background:#fff;border:1px solid rgba(23,32,51,.11);box-shadow:0 12px 24px rgba(23,32,51,.07);padding:13px 16px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="seed-round-story"] .seed-metrics strong{display:block;margin-bottom:6px;font-size:22px;line-height:1;color:var(--template-title);}
+    body[data-layout="seed-round-story"] .seed-pain-wall{position:absolute;right:8%;top:18%;width:39%;height:49%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="seed-round-story"] .seed-pain-wall span{border-radius:15px;background:#fff7ed;border:1px solid rgba(249,115,22,.22);box-shadow:0 12px 22px rgba(23,32,51,.07);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="seed-round-story"] .seed-pain-wall span:nth-child(2),body[data-layout="seed-round-story"] .seed-pain-wall span:nth-child(4){background:#eff6ff;border-color:rgba(37,99,235,.16);}
+    body[data-layout="seed-round-story"] .seed-pain-wall span::before{content:"";display:block;width:34px;height:5px;margin-bottom:10px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="seed-round-story"] .seed-validation-board{position:absolute;right:8.2%;top:18%;width:38%;height:48%;border-radius:22px;background:#fff;border:1px solid rgba(23,32,51,.12);box-shadow:0 16px 34px rgba(23,32,51,.10);overflow:hidden;}
+    body[data-layout="seed-round-story"] .seed-validation-board::before{content:"";position:absolute;left:9%;right:9%;top:14%;height:13%;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="seed-round-story"] .seed-validation-board::after{content:"";position:absolute;left:12%;right:12%;bottom:14%;height:45%;border-radius:15px;background:linear-gradient(135deg,rgba(249,115,22,.14),rgba(22,163,74,.16));}
+    body[data-layout="seed-round-story"] .seed-growth-chart{position:absolute;right:8%;top:20%;width:39%;height:43%;border-radius:22px;background:#fff;border:1px solid rgba(23,32,51,.12);box-shadow:0 16px 34px rgba(23,32,51,.09);}
+    body[data-layout="seed-round-story"] .seed-growth-chart::before{content:"";position:absolute;left:12%;right:10%;bottom:22%;height:3px;background:rgba(23,32,51,.16);}
+    body[data-layout="seed-round-story"] .seed-growth-chart span{position:absolute;bottom:22%;width:12%;border-radius:9px 9px 0 0;background:#fdba74;}
+    body[data-layout="seed-round-story"] .seed-growth-chart span:nth-child(1){left:16%;height:23%;}body[data-layout="seed-round-story"] .seed-growth-chart span:nth-child(2){left:35%;height:36%;}body[data-layout="seed-round-story"] .seed-growth-chart span:nth-child(3){left:54%;height:49%;background:var(--template-accent);}
+    body[data-layout="seed-round-story"] .seed-growth-chart span:nth-child(4){left:18%;bottom:54%;width:60%;height:5px;border-radius:999px;background:#16a34a;transform:rotate(-17deg);transform-origin:left center;}
+    body[data-layout="seed-round-story"] .seed-team-cards{position:absolute;right:8%;top:18%;width:39%;height:48%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="seed-round-story"] .seed-team-cards span{border-radius:18px;background:#fff;border:1px solid rgba(23,32,51,.12);box-shadow:0 12px 24px rgba(23,32,51,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="seed-round-story"] .seed-team-cards span::before{content:"";display:block;width:44px;height:44px;margin-bottom:12px;border-radius:50%;background:linear-gradient(135deg,var(--template-accent),#fdba74);}
+    body[data-layout="seed-round-story"] .seed-funding-road{position:absolute;left:8.5%;right:8.5%;bottom:15%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="seed-round-story"] .seed-funding-road span{position:relative;min-height:88px;border-radius:16px;background:#fff;border:1px solid rgba(23,32,51,.12);box-shadow:0 12px 24px rgba(23,32,51,.07);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="seed-round-story"] .seed-funding-road span::before{content:"";display:block;width:25px;height:25px;margin-bottom:9px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(249,115,22,.13);}
+    body[data-layout="seed-round-story"] .seed-closing-line{position:absolute;left:8.5%;right:8.5%;bottom:31%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#16a34a,transparent);}
+    body[data-layout="seed-round-story"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.82);border:1px solid rgba(23,32,51,.11);border-radius:999px;padding:5px 10px;color:rgba(23,32,51,.62);}
     body[data-layout="business-model-bp"] .slide{background:linear-gradient(135deg,#f5f7fb 0,#ffffff 58%,#edf4f1 100%);padding:0;border:0;box-shadow:0 22px 58px rgba(15,23,42,.12);}
     body[data-layout="business-model-bp"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(16,33,63,.035) 0 1px,transparent 1px 34px),repeating-linear-gradient(90deg,rgba(16,33,63,.026) 0 1px,transparent 1px 34px);}
     body[data-layout="business-model-bp"] .slide::after{content:"";position:absolute;left:4.5%;right:4.5%;top:7%;bottom:7%;border:1px solid rgba(16,33,63,.12);background:rgba(255,255,255,.74);box-shadow:0 20px 48px rgba(15,23,42,.08);}
@@ -3431,6 +3510,68 @@ function isProductRoadmapVisual(visual) {
   return visual?.id === "product-roadmap" && visual?.layout === "academy";
 }
 
+function renderProductReleaseCadencePreview(slide, scene) {
+  // 版本节奏模板把标题、要点和版本节点统一放在专用层里，避免普通正文层和节奏图形叠加。
+  const title = escapeHtml(scene.title || slide?.title || "产品版本节奏规划");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(productReleaseCadenceCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="cadence-kicker">${escapeHtml(scene.kicker)}</div><h2 class="cadence-title">${title}</h2><div class="cadence-rule"></div><ul class="cadence-bullets">${bulletItems}</ul>`;
+  const wave = `<div class="cadence-wave"><i></i><i></i><i></i><i></i></div>`;
+  const tags = `<div class="cadence-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover") {
+    return `<div class="cadence-layer">${common}${wave}${tags}</div>`;
+  }
+  if (scene.kind === "timeline") {
+    return `<div class="cadence-layer">${common}${wave}<div class="cadence-timeline">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "lanes") {
+    return `<div class="cadence-layer">${common}<div class="cadence-lanes">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "risk") {
+    return `<div class="cadence-layer">${common}<div class="cadence-risk">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="cadence-layer">${common}<div class="cadence-actions">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="cadence-layer">${common}${wave}${tags}</div>`;
+}
+
+function productReleaseCadencePreviewScene({ slide, index, total }) {
+  const bullets = productReleaseCadenceBulletTexts(slide);
+  const title = productReleaseCadenceCompactText(slide?.title, "产品版本节奏规划", index === 0 ? 30 : 28);
+  const tags = ["范围", "节奏", "协同"].map((fallback, itemIndex) => productReleaseCadenceCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["范围冻结", "研发联调", "发布验证", "复盘迭代"].map((fallback, itemIndex) => productReleaseCadenceCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "release-cadence", kicker: "PRODUCT CADENCE", title, bullets, tags, cards },
+    { kind: "timeline", variant: "release-cadence", kicker: "RELEASE WAVES", title, bullets, tags, cards },
+    { kind: "lanes", variant: "release-cadence", kicker: "TEAM LANES", title, bullets, tags, cards: ["产品范围", "研发交付", "设计验收", "运营发布"].map((fallback, itemIndex) => productReleaseCadenceCompactText(bullets[itemIndex], fallback, 12)) },
+    { kind: "risk", variant: "release-cadence", kicker: "DEPENDENCY RISK", title, bullets, tags, cards: ["范围变化", "联调阻塞", "发布风险", "资源冲突"].map((fallback, itemIndex) => productReleaseCadenceCompactText(bullets[itemIndex], fallback, 12)) },
+  ];
+  if (index === total - 1) {
+    return { kind: "closing", variant: "release-cadence", kicker: "NEXT RELEASE ACTIONS", title, bullets, tags, cards };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productReleaseCadenceBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["明确版本范围和关键功能包", "按季度节奏推进研发联调与验收", "跨团队同步发布窗口和风险依赖"];
+}
+
+function productReleaseCadenceCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isProductReleaseCadenceVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-release-cadence" && (id === "product-roadmap" || id === "product-product-roadmap-release-cadence");
+}
+
 function renderProductPainPointsPreview(slide, scene) {
   // 用户痛点模板用专属图文层承载内容，普通标题层保持空白，避免需求长文本叠到图形上。
   const title = escapeHtml(scene.title || slide?.title || "用户痛点与需求机会");
@@ -3552,6 +3693,90 @@ function pitchDeckVariant(visual) {
 
 function isPitchDeckVisual(visual) {
   return visual?.id === "pitch" && visual?.layout === "venture";
+}
+
+/**
+ * 渲染种子轮融资路演的故事型在线预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderSeedRoundStoryPreview(slide, scene) {
+  // 种子轮故事模板把标题、痛点、MVP 和增长信号放在专属层，避免和默认正文层重叠。
+  const title = escapeHtml(seedRoundStoryCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 28));
+  const bullets = seedRoundStoryBulletTexts(slide);
+  const bulletItems = bullets.slice(0, 4).map((item) => `<li>${escapeHtml(seedRoundStoryCompactText(item, scene.title, 38))}</li>`).join("");
+  const common = `<div class="seed-kicker">${escapeHtml(scene.kicker)}</div><h2 class="seed-title">${title}</h2><div class="seed-summary">${escapeHtml(seedRoundStoryCompactText(bullets[0], scene.summary, 54))}</div><ul class="seed-bullets">${bulletItems}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="seed-layer">${common}<div class="seed-mockup"></div><div class="seed-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "pain") {
+    return `<div class="seed-layer">${common}<div class="seed-pain-wall">${scene.cards.map((item, index) => `<span>${escapeHtml(seedRoundStoryCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "mvp") {
+    return `<div class="seed-layer">${common}<div class="seed-validation-board"></div><div class="seed-metrics">${scene.metrics.map((metric, index) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(seedRoundStoryCompactText(bullets[index + 1], metric.label, 16))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "traction") {
+    return `<div class="seed-layer">${common}<div class="seed-growth-chart"><span></span><span></span><span></span><span></span></div><div class="seed-metrics">${scene.metrics.map((metric, index) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(seedRoundStoryCompactText(bullets[index], metric.label, 16))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "team") {
+    return `<div class="seed-layer">${common}<div class="seed-team-cards">${scene.cards.map((item, index) => `<span>${escapeHtml(seedRoundStoryCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "funding") {
+    return `<div class="seed-layer">${common}<div class="seed-funding-road">${scene.cards.map((item, index) => `<span>${escapeHtml(seedRoundStoryCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="seed-layer">${common}<div class="seed-closing-line"></div><div class="seed-funding-road">${scene.cards.map((item, index) => `<span>${escapeHtml(seedRoundStoryCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+}
+
+function seedRoundStoryPreviewScene({ slide, index, total }) {
+  const bullets = seedRoundStoryBulletTexts(slide);
+  const title = seedRoundStoryCompactText(slide?.title, "从真实痛点出发", index === 0 ? 30 : 28);
+  const metrics = [
+    { value: "37", label: "用户访谈" },
+    { value: "MVP", label: "原型验证" },
+    { value: "12%", label: "周留存" },
+  ];
+  const cards = ["发现痛点", "访谈验证", "MVP 反馈", "增长信号"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14));
+  const scenes = [
+    { role: "cover", variant: "startup-story", kicker: "SEED ROUND NARRATIVE", title, summary: "用真实用户问题、MVP 验证和早期信号建立投资人信任。", metrics, cards },
+    { role: "pain", variant: "startup-story", kicker: "PAIN DISCOVERY", title, summary: "把创始团队看到的问题转成可验证的用户证据。", metrics, cards },
+    { role: "mvp", variant: "startup-story", kicker: "MVP VALIDATION", title, summary: "用最小可行产品证明关键假设已经被用户理解。", metrics: [
+      { value: "01", label: "核心功能" },
+      { value: "48h", label: "反馈周期" },
+      { value: "3轮", label: "原型迭代" },
+    ], cards },
+    { role: "traction", variant: "startup-story", kicker: "EARLY TRACTION", title, summary: "展示早期用户、留存、转介绍和复购意向等可信信号。", metrics: [
+      { value: "用户", label: "早期种子用户" },
+      { value: "留存", label: "持续使用信号" },
+      { value: "推荐", label: "自然传播迹象" },
+    ], cards },
+    { role: "team", variant: "startup-story", kicker: "WHY THIS TEAM", title, summary: "说明团队为什么适合解决这个问题，而不只是罗列履历。", metrics, cards: ["创始动机", "行业经验", "产品能力"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14)) },
+    { role: "funding", variant: "startup-story", kicker: "SEED CAPITAL PLAN", title, summary: "把融资金额、资金用途和下一阶段验证目标放在同一条路径上。", metrics, cards: ["产品验证", "关键招聘", "获客实验", "下一轮指标"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14)) },
+  ];
+  if (index === total - 1) {
+    return { role: "closing", variant: "startup-story", kicker: "NEXT INVESTOR CONVERSATION", title, summary: "用清晰下一步推动投资人沟通，而不是停留在愿景表达。", metrics, cards: ["补充材料", "产品演示", "数据复核", "投资沟通"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14)) };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function seedRoundStoryBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["目标用户在高频场景里存在未被满足的问题", "MVP 已完成核心流程验证并收集真实反馈", "早期用户出现持续使用和主动推荐信号"];
+}
+
+function seedRoundStoryCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isSeedRoundStoryVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "seed-round-story" && (id === "seed-round-pitch" || id === "pitch-seed-round-pitch-startup-story");
 }
 
 /**
@@ -4014,6 +4239,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "industry-research") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "finance-budget-planning") return false;

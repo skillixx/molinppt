@@ -758,6 +758,57 @@ test("PptExportService uses product pain points decorations", () => {
   assert.doesNotMatch(slide1, /user-pain-points/);
 });
 
+test("PptExportService uses product release cadence decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-roadmap-release-cadence",
+      theme: "release-cadence",
+      templateVisual: {
+        primary: "0B1F3A",
+        accent: "22D3EE",
+        secondary: "F97316",
+        background: "EFF6FF",
+        surface: "FFFFFF",
+        title: "0A1730",
+        body: "405166",
+        layout: "product-release-cadence",
+        variant: "release-cadence",
+      },
+      slides: [
+        {
+          title: "季度产品版本节奏规划",
+          bullets: ["明确版本范围和关键功能包", "按季度节奏推进研发联调与验收", "跨团队同步发布窗口和风险依赖"],
+        },
+        {
+          title: "Q2 到 Q4 版本发布波次",
+          bullets: ["V1 完成基础能力", "V2 进入联调", "V3 发布增长能力", "V4 复盘迭代"],
+        },
+        {
+          title: "跨团队协同泳道",
+          bullets: ["产品范围冻结", "研发交付排期", "设计验收节点", "运营发布准备"],
+        },
+        {
+          title: "版本风险与依赖",
+          bullets: ["范围变更影响节奏", "联调依赖需要提前锁定", "发布窗口需统一确认", "资源冲突进入周会处理"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Product Cadence Canvas"/);
+  assert.match(slide1, /name="Product Cadence Release Wave Panel"/);
+  assert.match(slide3, /name="Product Cadence Team Lane 1"/);
+  assert.match(slide4, /name="Product Cadence Risk Card 1"/);
+  assert.doesNotMatch(slide1, /release-cadence/);
+});
+
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
