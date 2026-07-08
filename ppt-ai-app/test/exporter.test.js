@@ -911,6 +911,57 @@ test("PptExportService uses experience journey redesign decorations", () => {
   assert.doesNotMatch(slide1, /experience-journey/);
 });
 
+test("PptExportService uses capability radar comparison decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-competitive-feature-comparison-capability-radar",
+      theme: "capability-radar",
+      templateVisual: {
+        primary: "17233F",
+        accent: "16B8A6",
+        secondary: "FF8A3D",
+        background: "EEF4F8",
+        surface: "FFFFFF",
+        title: "0D1B2A",
+        body: "3D4B5C",
+        layout: "capability-radar-map",
+        variant: "capability-radar",
+      },
+      slides: [
+        {
+          title: "竞品功能对比与能力差距判断",
+          bullets: ["围绕核心场景拆解竞品功能能力", "比较我方与竞品在体验、效率和生态上的差异", "输出可进入路线规划的优先级建议"],
+        },
+        {
+          title: "核心功能矩阵对比",
+          bullets: ["我方基础能力覆盖完整", "竞品A在自动化效率上领先", "竞品B在生态连接上更成熟"],
+        },
+        {
+          title: "能力雷达评分",
+          bullets: ["体验完整度差距较小", "协同效率仍需补齐", "数据能力可形成差异化"],
+        },
+        {
+          title: "差距诊断和路线输入",
+          bullets: ["功能差距集中在智能化辅助", "用户影响体现在高频操作成本", "优先补齐影响转化的基础能力", "验证长期差异化机会点"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Capability Radar Canvas"/);
+  assert.match(slide1, /name="Capability Radar Panel"/);
+  assert.match(slide2, /name="Capability Radar Matrix Card 1"/);
+  assert.match(slide4, /name="Capability Radar Gap Node 1"|name="Capability Radar Next Action 1"/);
+  assert.doesNotMatch(slide1, /capability-radar/);
+});
+
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

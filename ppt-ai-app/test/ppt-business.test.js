@@ -371,6 +371,29 @@ test("PptService renders synced experience journey preview with dedicated layout
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced capability radar preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCapabilityRadarTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "竞品功能对比",
+    slideCount: 6,
+    templateId: "product-competitive-feature-comparison-capability-radar",
+    theme: "capability-radar",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-competitive-feature-comparison-capability-radar" data-layout="capability-radar-map"/);
+  assert.match(preview, /radar-layer/);
+  assert.match(preview, /radar-panel/);
+  assert.match(preview, /radar-matrix|radar-gap|radar-roadmap|radar-actions/);
+  assert.doesNotMatch(preview, />能力雷达</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4212,6 +4235,52 @@ async function insertExperienceJourneyTemplate(context) {
       defaultCoverLayout: "experience-journey-cover",
       defaultContentLayout: "experience-journey-content",
       allowedLayouts: ["experience-journey-cover", "experience-journey-content", "experience-journey-diagnosis", "experience-journey-redesign", "experience-journey-roadmap", "experience-journey-summary", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertCapabilityRadarTemplate(context) {
+  // 测试数据库模拟官方模板同步后的竞品能力雷达模板，确保预览使用独立竞品对比布局。
+  await context.database.insert("templates", {
+    id: "product-competitive-feature-comparison-capability-radar",
+    slug: "product-competitive-feature-comparison-capability-radar",
+    name: "竞品功能对比 - 能力雷达",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "capability-radar",
+        name: "能力雷达",
+        visual: {
+          primary: "17233F",
+          accent: "16B8A6",
+          secondary: "FF8A3D",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0D1B2A",
+          body: "3D4B5C",
+          layout: "capability-radar-map",
+          variant: "capability-radar",
+        },
+      },
+    ],
+    visual: {
+      primary: "17233F",
+      accent: "16B8A6",
+      secondary: "FF8A3D",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0D1B2A",
+      body: "3D4B5C",
+      layout: "capability-radar-map",
+      variant: "capability-radar",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "capability-radar-cover",
+      defaultContentLayout: "capability-radar-content",
+      allowedLayouts: ["capability-radar-cover", "capability-radar-comparison", "capability-radar-analysis", "capability-radar-gap", "capability-radar-roadmap", "capability-radar-summary", "title", "content", "closing"],
     },
   });
 }

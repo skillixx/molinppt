@@ -1,0 +1,38 @@
+{
+  "baseTemplateId": "investor-update-report",
+  "themeId": "progress-sync",
+  "style": "investor-update-progress-sync",
+  "themes": [
+    {
+      "id": "progress-sync",
+      "name": "进展同步"
+    }
+  ],
+  "visual": {
+    "primary": "111827",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "warning": "EF4444",
+    "background": "EEF4F8",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "investor-update-progress-sync",
+    "variant": "progress-sync"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "investor-update-cover",
+    "defaultContentLayout": "investor-progress-briefing",
+    "allowedLayouts": [
+      "investor-update-cover",
+      "investor-progress-briefing",
+      "investor-metrics-disclosure",
+      "investor-operating-timeline",
+      "investor-risk-asks",
+      "investor-next-plan",
+      "investor-update-closing",
+      "title",
+      "content"
+    ]
+  }
+}

@@ -997,10 +997,12 @@ function renderDeckPreview({ deck, visual }) {
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const priorityMatrixScene = typeof isFeaturePriorityMatrixVisual === "function" && isFeaturePriorityMatrixVisual(visual) ? featurePriorityMatrixPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const experienceJourneyScene = isExperienceJourneyVisual(visual) ? experienceJourneyPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const capabilityRadarScene = isCapabilityRadarVisual(visual) ? capabilityRadarPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
     const seedStoryScene = isSeedRoundStoryVisual(visual) ? seedRoundStoryPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const growthFundingScene = isGrowthFundingFlywheelVisual(visual) ? growthFundingFlywheelPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productFundingScene = isProductFundingHighlightsVisual(visual) ? productFundingHighlightsPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const investorUpdateScene = typeof isInvestorUpdateProgressVisual === "function" && isInvestorUpdateProgressVisual(visual) ? investorUpdateProgressPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1074,6 +1076,9 @@ function renderDeckPreview({ deck, visual }) {
     const experienceJourneyMark = experienceJourneyScene
       ? renderExperienceJourneyPreview(slide, experienceJourneyScene)
       : "";
+    const capabilityRadarMark = capabilityRadarScene
+      ? renderCapabilityRadarPreview(slide, capabilityRadarScene)
+      : "";
     const pitchMark = pitchScene
       ? (
           `${index === 0
@@ -1090,6 +1095,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const productFundingMark = productFundingScene
       ? renderProductFundingHighlightsPreview(slide, productFundingScene)
+      : "";
+    const investorUpdateMark = investorUpdateScene
+      ? renderInvestorUpdateProgressPreview(slide, investorUpdateScene)
       : "";
     const businessModelMark = businessModelScene
       ? renderBusinessModelBpPreview(slide, businessModelScene)
@@ -1203,10 +1211,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || priorityMatrixScene || experienceJourneyScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || onboardingScene || blackboardScene || examReviewScene || launchRhythmScene || seedStoryScene || growthFundingScene || productFundingScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || onboardingScene || blackboardScene || examReviewScene || launchRhythmScene || seedStoryScene || growthFundingScene || productFundingScene || investorUpdateScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || examReviewScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || productFundingScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${examReviewMark}${productMark}${releaseCadenceMark}${painPointMark}${priorityMatrixMark}${experienceJourneyMark}${pitchMark}${seedStoryMark}${growthFundingMark}${productFundingMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || examReviewScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${examReviewMark}${productMark}${releaseCadenceMark}${painPointMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${productFundingMark}${investorUpdateMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1925,6 +1933,74 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="experience-journey-map"] .journey-actions span{min-height:70px;border-radius:14px;background:#fff;border:1px solid rgba(24,183,166,.18);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="experience-journey-map"] .journey-actions span::before{content:"";display:block;width:22px;height:22px;margin-bottom:8px;border-radius:8px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent));}
     body[data-layout="experience-journey-map"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(30,42,90,.12);border-radius:999px;padding:5px 10px;color:rgba(16,32,51,.62);}
+    body[data-layout="capability-radar-map"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 56%,#e9f7f4 100%);}
+    body[data-layout="capability-radar-map"] .slide::before{background:repeating-linear-gradient(90deg,rgba(23,35,63,.05) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(22,184,166,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(22,184,166,.18),transparent 26%);}
+    body[data-layout="capability-radar-map"] .slide::after{content:"";position:absolute;left:6.4%;right:6.4%;top:9.5%;bottom:9.2%;z-index:1;border-radius:26px;background:rgba(255,255,255,.95);border:1px solid rgba(23,35,63,.13);box-shadow:0 24px 54px rgba(13,27,42,.13);}
+    body[data-layout="capability-radar-map"] .accent{height:5.8%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#144D5C 68%,var(--template-accent));box-shadow:inset 0 -3px 0 rgba(22,184,166,.55);}
+    body[data-layout="capability-radar-map"] .radar-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="capability-radar-map"] .radar-kicker{position:absolute;left:9%;top:14.5%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="capability-radar-map"] .radar-title{position:absolute;left:9%;top:21%;width:43%;margin:0;color:var(--template-title);font-size:30px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="capability-radar-map"] .radar-rule{position:absolute;left:9%;top:42.7%;width:38%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#A7F3D0,transparent);}
+    body[data-layout="capability-radar-map"] .radar-bullets{position:absolute;left:9.2%;top:48.5%;width:37.5%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.46;color:var(--template-body);}
+    body[data-layout="capability-radar-map"] .radar-bullets li{margin:.12em 0;}
+    body[data-layout="capability-radar-map"] .radar-panel{position:absolute;right:8.8%;top:18.5%;width:35.5%;height:43%;border-radius:22px;background:linear-gradient(135deg,#fff,#f4fbfd);border:1px solid rgba(23,35,63,.13);box-shadow:0 18px 34px rgba(13,27,42,.10);overflow:hidden;}
+    body[data-layout="capability-radar-map"] .radar-panel::before{content:"";position:absolute;left:50%;top:50%;width:72%;height:72%;border-radius:50%;border:2px solid rgba(23,35,63,.18);transform:translate(-50%,-50%);box-shadow:0 0 0 34px rgba(23,35,63,.045),0 0 0 68px rgba(23,35,63,.028);}
+    body[data-layout="capability-radar-map"] .radar-panel::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:80%;background:rgba(23,35,63,.18);transform:translate(-50%,-50%);box-shadow:0 0 0 transparent;}
+    body[data-layout="capability-radar-map"] .radar-axis{position:absolute;left:50%;top:50%;width:78%;height:2px;background:rgba(23,35,63,.18);transform:translate(-50%,-50%);}
+    body[data-layout="capability-radar-map"] .radar-shape{position:absolute;left:50%;top:50%;width:54%;height:54%;transform:translate(-50%,-50%);clip-path:polygon(50% 2%,86% 28%,78% 79%,34% 91%,8% 45%);background:rgba(22,184,166,.24);border:4px solid var(--template-accent);}
+    body[data-layout="capability-radar-map"] .radar-shape.alt{width:41%;height:41%;clip-path:polygon(50% 8%,78% 34%,68% 77%,36% 82%,18% 46%);background:rgba(255,138,61,.18);}
+    body[data-layout="capability-radar-map"] .radar-panel i{position:absolute;z-index:2;width:14px;height:14px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 8px rgba(22,184,166,.13);}
+    body[data-layout="capability-radar-map"] .radar-panel i:nth-child(5){left:48%;top:10%;background:var(--template-primary);}body[data-layout="capability-radar-map"] .radar-panel i:nth-child(6){left:78%;top:29%;}body[data-layout="capability-radar-map"] .radar-panel i:nth-child(7){left:70%;top:72%;background:var(--template-secondary);}body[data-layout="capability-radar-map"] .radar-panel i:nth-child(8){left:29%;top:78%;}body[data-layout="capability-radar-map"] .radar-panel i:nth-child(9){left:13%;top:43%;background:var(--template-primary);}
+    body[data-layout="capability-radar-map"] .radar-tags{position:absolute;left:9%;right:9%;bottom:14.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="capability-radar-map"] .radar-tags span{min-height:64px;border-radius:14px;background:#fff;border:1px solid rgba(23,35,63,.12);box-shadow:0 10px 22px rgba(13,27,42,.08);padding:12px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="capability-radar-map"] .radar-tags span::before{content:"";display:block;width:24px;height:5px;margin-bottom:9px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="capability-radar-map"] .radar-matrix{position:absolute;right:8.8%;top:18.5%;width:35.5%;height:43%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    body[data-layout="capability-radar-map"] .radar-matrix span{border-radius:15px;background:#fff;border:1px solid rgba(23,35,63,.12);box-shadow:0 12px 24px rgba(13,27,42,.08);padding:13px 11px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="capability-radar-map"] .radar-matrix span::after{content:"";display:block;height:7px;margin-top:13px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent) 0 68%,rgba(23,35,63,.12) 68%);}
+    body[data-layout="capability-radar-map"] .radar-gap{position:absolute;right:8.8%;top:18.5%;width:35.5%;height:43%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="capability-radar-map"] .radar-gap span{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(255,138,61,.23);box-shadow:0 12px 24px rgba(13,27,42,.08);padding:14px 14px 14px 45px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="capability-radar-map"] .radar-gap span::before{content:"";position:absolute;left:14px;top:15px;width:18px;height:18px;border-radius:7px;background:linear-gradient(135deg,var(--template-secondary),#FFD29A);}
+    body[data-layout="capability-radar-map"] .radar-roadmap{position:absolute;right:9%;top:22%;width:34.5%;height:36%;border-radius:22px;border:1px solid rgba(23,35,63,.12);background:#fff;box-shadow:0 16px 32px rgba(13,27,42,.09);padding:24px 22px;}
+    body[data-layout="capability-radar-map"] .radar-roadmap span{display:block;position:relative;margin:0 0 17px 28px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="capability-radar-map"] .radar-roadmap span::before{content:"";position:absolute;left:-28px;top:1px;width:15px;height:15px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 6px rgba(22,184,166,.12);}
+    body[data-layout="capability-radar-map"] .radar-roadmap::before{content:"";position:absolute;left:29px;top:34px;bottom:32px;width:2px;background:rgba(23,35,63,.16);}
+    body[data-layout="capability-radar-map"] .radar-closing{position:absolute;right:11%;top:22%;width:30%;height:38%;border-radius:50%;border:15px solid rgba(22,184,166,.18);border-left-color:var(--template-primary);border-bottom-color:var(--template-accent);}
+    body[data-layout="capability-radar-map"] .radar-actions{position:absolute;left:9%;right:9%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="capability-radar-map"] .radar-actions span{min-height:70px;border-radius:14px;background:#fff;border:1px solid rgba(22,184,166,.18);box-shadow:0 12px 24px rgba(13,27,42,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="capability-radar-map"] .radar-actions span::before{content:"";display:block;width:22px;height:22px;margin-bottom:8px;border-radius:8px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="capability-radar-map"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(23,35,63,.12);border-radius:999px;padding:5px 10px;color:rgba(13,27,42,.62);}
+    body[data-layout="investor-update-progress-sync"] .slide{padding:0;border:0;background:linear-gradient(135deg,#eef4f8 0%,#fbfdff 58%,#e4f7f4 100%);}
+    body[data-layout="investor-update-progress-sync"] .slide::before{background:repeating-linear-gradient(90deg,rgba(17,24,39,.045) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(20,184,166,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(20,184,166,.16),transparent 26%);}
+    body[data-layout="investor-update-progress-sync"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8.8%;bottom:8.8%;z-index:1;border-radius:24px;background:rgba(255,255,255,.96);border:1px solid rgba(17,24,39,.12);box-shadow:0 24px 56px rgba(15,23,42,.13);}
+    body[data-layout="investor-update-progress-sync"] .accent{height:5.8%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#164e63 55%,var(--template-accent));box-shadow:inset 0 -3px 0 rgba(245,158,11,.48);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-kicker{position:absolute;left:8.2%;top:13.5%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-title{position:absolute;left:8.2%;top:20.5%;width:42%;margin:0;color:var(--template-title);font-size:31px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-summary{position:absolute;left:8.3%;top:42.8%;width:38%;font-size:13px;line-height:1.45;font-weight:800;color:var(--template-body);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-bullets{position:absolute;left:8.4%;top:51%;width:37%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.46;color:var(--template-body);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-bullets li{margin:.08em 0;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-metrics{position:absolute;left:8.2%;right:8.2%;bottom:13.8%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-metrics span{min-height:68px;border-radius:14px;background:#fff;border:1px solid rgba(17,24,39,.11);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:12px 13px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-metrics strong{display:block;margin-bottom:7px;color:var(--template-title);font-size:20px;line-height:1;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-dashboard{position:absolute;right:8.2%;top:17.8%;width:37%;height:42%;border-radius:20px;background:linear-gradient(135deg,#fff,#f4fbfd);border:1px solid rgba(17,24,39,.13);box-shadow:0 18px 36px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-dashboard::before{content:"";position:absolute;left:10%;right:10%;top:18%;height:12px;border-radius:999px;background:var(--template-primary);box-shadow:0 70px 0 rgba(20,184,166,.18),0 136px 0 rgba(245,158,11,.18);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-dashboard::after{content:"";position:absolute;left:12%;right:12%;bottom:17%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent) 0 24%,transparent 24% 32%,var(--template-primary) 32% 56%,transparent 56% 64%,var(--template-secondary) 64% 82%,transparent 82%);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-dashboard i{position:absolute;bottom:28%;width:11%;border-radius:10px 10px 0 0;background:var(--template-accent);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-dashboard i:nth-child(1){left:16%;height:22%;}body[data-layout="investor-update-progress-sync"] .investor-update-dashboard i:nth-child(2){left:32%;height:35%;background:var(--template-primary);}body[data-layout="investor-update-progress-sync"] .investor-update-dashboard i:nth-child(3){left:48%;height:29%;}body[data-layout="investor-update-progress-sync"] .investor-update-dashboard i:nth-child(4){left:64%;height:43%;background:var(--template-secondary);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-cards{position:absolute;right:8.2%;top:18.2%;width:37%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-cards span{min-height:92px;border-radius:16px;background:#fff;border:1px solid rgba(17,24,39,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-cards span::before{content:"";display:block;width:24px;height:6px;margin-bottom:10px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-lanes{position:absolute;right:8.2%;top:18%;width:37%;height:43%;display:grid;grid-template-rows:repeat(4,1fr);gap:10px;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-lanes span{position:relative;border-radius:14px;background:#fff;border:1px solid rgba(20,184,166,.18);box-shadow:0 10px 20px rgba(15,23,42,.07);padding:13px 13px 13px 42px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-lanes span::before{content:"";position:absolute;left:14px;top:14px;width:17px;height:17px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 6px rgba(20,184,166,.12);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-risk{position:absolute;right:8.2%;top:19%;width:37%;height:41%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-risk span{border-radius:16px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px solid rgba(245,158,11,.24);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-risk span:nth-child(3),body[data-layout="investor-update-progress-sync"] .investor-update-risk span:nth-child(4){border-color:rgba(20,184,166,.24);background:linear-gradient(135deg,#fff,#ecfeff);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-roadmap{position:absolute;left:8.2%;right:8.2%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="investor-update-progress-sync"] .investor-update-roadmap span{min-height:78px;border-radius:16px;background:#fff;border:1px solid rgba(17,24,39,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="investor-update-progress-sync"] .investor-update-roadmap span::before{content:"";display:block;width:32px;height:6px;margin-bottom:11px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="investor-update-progress-sync"] .investor-update-closing{position:absolute;right:11%;top:22%;width:30%;height:38%;border-radius:50%;border:15px solid rgba(20,184,166,.18);border-left-color:var(--template-primary);border-bottom-color:var(--template-accent);}
+    body[data-layout="investor-update-progress-sync"] .page-number{z-index:4;right:7.2%;bottom:6.1%;background:rgba(255,255,255,.86);border:1px solid rgba(17,24,39,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.62);}
     body[data-layout="bi-executive-cockpit"] .slide{padding:0;border:0;background:#08111f;box-shadow:0 22px 58px rgba(3,8,18,.34);}
     body[data-layout="bi-executive-cockpit"] .slide::before{background:radial-gradient(circle at 76% 18%,rgba(34,211,238,.22),transparent 23%),radial-gradient(circle at 18% 82%,rgba(163,230,53,.14),transparent 24%),repeating-linear-gradient(90deg,rgba(34,211,238,.08) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,211,238,.06) 0 1px,transparent 1px 38px);}
     body[data-layout="bi-executive-cockpit"] .slide::after{content:"";position:absolute;left:4.8%;right:4.8%;top:8%;bottom:7.4%;border-radius:22px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(7,26,47,.82));border:1px solid rgba(34,211,238,.22);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 24px 56px rgba(0,0,0,.28);}
@@ -4239,6 +4315,69 @@ function isExperienceJourneyVisual(visual) {
   return visual?.layout === "experience-journey-map" && (id === "user-experience-redesign" || id === "product-user-experience-redesign-experience-journey");
 }
 
+function renderCapabilityRadarPreview(slide, scene) {
+  // 能力雷达模板用独立图层承载动态标题、要点、雷达和矩阵，避免默认正文层与图形叠加。
+  const title = escapeHtml(scene.title || slide?.title || "竞品功能对比");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(capabilityRadarCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="radar-kicker">${escapeHtml(scene.kicker)}</div><h2 class="radar-title">${title}</h2><div class="radar-rule"></div><ul class="radar-bullets">${bulletItems}</ul>`;
+  const radar = `<div class="radar-panel"><span class="radar-axis"></span><span class="radar-shape"></span><span class="radar-shape alt"></span><i></i><i></i><i></i><i></i><i></i></div>`;
+  const tags = `<div class="radar-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover" || scene.kind === "radar") {
+    return `<div class="radar-layer">${common}${radar}${tags}</div>`;
+  }
+  if (scene.kind === "matrix") {
+    return `<div class="radar-layer">${common}<div class="radar-matrix">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "gap") {
+    return `<div class="radar-layer">${common}<div class="radar-gap">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "roadmap") {
+    return `<div class="radar-layer">${common}<div class="radar-roadmap">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="radar-layer">${common}<div class="radar-closing"></div><div class="radar-actions">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="radar-layer">${common}${radar}${tags}</div>`;
+}
+
+function capabilityRadarPreviewScene({ slide, index, total }) {
+  const bullets = capabilityRadarBulletTexts(slide);
+  const title = capabilityRadarCompactText(slide?.title, "竞品功能对比", index === 0 ? 30 : 28);
+  const tags = ["核心能力", "差异机会", "路线输入"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["我方能力", "竞品A", "竞品B", "领先项", "短板项", "机会点"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex % bullets.length], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "capability-radar", kicker: "COMPETITIVE RADAR", title, bullets, tags, cards },
+    { kind: "matrix", variant: "capability-radar", kicker: "FEATURE MATRIX", title, bullets, tags, cards },
+    { kind: "radar", variant: "capability-radar", kicker: "CAPABILITY SCORE", title, bullets, tags, cards },
+    { kind: "gap", variant: "capability-radar", kicker: "GAP DIAGNOSIS", title, bullets, tags, cards: ["功能差距", "用户影响", "定位风险", "机会切入"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) },
+    { kind: "roadmap", variant: "capability-radar", kicker: "ROADMAP INPUT", title, bullets, tags, cards: ["补齐基础项", "强化差异点", "验证机会点", "沉淀壁垒"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) },
+  ];
+  if (index === total - 1) {
+    return { kind: "closing", variant: "capability-radar", kicker: "NEXT PRODUCT MOVES", title, bullets, tags, cards: ["确认维度", "评审差距", "转入需求池", "跟踪竞品"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function capabilityRadarBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["围绕核心场景拆解竞品功能能力", "比较我方与竞品在体验、效率和生态上的差异", "输出可进入路线规划的优先级建议"];
+}
+
+function capabilityRadarCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isCapabilityRadarVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "capability-radar-map" && (id === "competitive-feature-comparison" || id === "product-competitive-feature-comparison-capability-radar");
+}
+
 function renderProductPainPointsPreview(slide, scene) {
   // 用户痛点模板用专属图文层承载内容，普通标题层保持空白，避免需求长文本叠到图形上。
   const title = escapeHtml(scene.title || slide?.title || "用户痛点与需求机会");
@@ -4748,6 +4887,82 @@ function productFundingCompactText(text, fallback, maxLength) {
 function isProductFundingHighlightsVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
+}
+
+/**
+ * 渲染投资人更新报告的月度同步型在线预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderInvestorUpdateProgressPreview(slide, scene) {
+  // 投资人更新模板用一层承载标题、指标、风险和路线图，避免默认正文层重复出现造成遮挡。
+  const title = escapeHtml(investorUpdateCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 28));
+  const bullets = investorUpdateBulletTexts(slide);
+  const summary = escapeHtml(investorUpdateCompactText(bullets[0], scene.summary, 42));
+  const bulletItems = bullets.slice(0, 3).map((item) => `<li>${escapeHtml(investorUpdateCompactText(item, scene.summary, 28))}</li>`).join("");
+  const common = `<div class="investor-update-kicker">${escapeHtml(scene.kicker)}</div><h2 class="investor-update-title">${title}</h2><div class="investor-update-summary">${summary}</div><ul class="investor-update-bullets">${bulletItems}</ul>`;
+  const metrics = `<div class="investor-update-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.role === "cover" || scene.role === "metrics") {
+    return `<div class="investor-update-layer">${common}<div class="investor-update-dashboard"><i></i><i></i><i></i><i></i></div>${metrics}</div>`;
+  }
+  if (scene.role === "progress") {
+    return `<div class="investor-update-layer">${common}<div class="investor-update-cards">${scene.cards.map((item, index) => `<span>${escapeHtml(investorUpdateCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.role === "timeline") {
+    return `<div class="investor-update-layer">${common}<div class="investor-update-lanes">${scene.cards.map((item, index) => `<span>${escapeHtml(investorUpdateCompactText(bullets[index] || item, item, 20))}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.role === "risk") {
+    return `<div class="investor-update-layer">${common}<div class="investor-update-risk">${scene.cards.map((item, index) => `<span>${escapeHtml(investorUpdateCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.role === "plan") {
+    return `<div class="investor-update-layer">${common}<div class="investor-update-roadmap">${scene.cards.map((item, index) => `<span>${escapeHtml(investorUpdateCompactText(bullets[index] || item, item, 20))}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="investor-update-layer">${common}<div class="investor-update-closing"></div><div class="investor-update-roadmap">${scene.cards.map((item, index) => `<span>${escapeHtml(investorUpdateCompactText(bullets[index] || item, item, 20))}</span>`).join("")}</div></div>`;
+}
+
+function investorUpdateProgressPreviewScene({ slide, index, total }) {
+  const bullets = investorUpdateBulletTexts(slide);
+  const title = investorUpdateCompactText(slide?.title, "投资人月度经营更新", index === 0 ? 30 : 28);
+  const metrics = [
+    { value: "MRR", label: "收入进展" },
+    { value: "92%", label: "核心留存" },
+    { value: "14m", label: "现金 runway" },
+    { value: "3", label: "本月请求" },
+  ];
+  const cards = ["本月完成", "关键指标", "风险事项", "下月重点"].map((fallback, itemIndex) => investorUpdateCompactText(bullets[itemIndex], fallback, 18));
+  const scenes = [
+    { role: "cover", variant: "progress-sync", kicker: "INVESTOR MONTHLY UPDATE", title, summary: "用一页说明经营进展、关键数据、风险请求和下一阶段计划。", metrics, cards },
+    { role: "progress", variant: "progress-sync", kicker: "PROGRESS BRIEFING", title, summary: "把产品、销售、团队和财务进展整理成投资人能快速扫描的经营摘要。", metrics, cards },
+    { role: "metrics", variant: "progress-sync", kicker: "METRICS DISCLOSURE", title, summary: "披露收入、留存、转化、现金消耗和 pipeline，让经营质量可被持续跟踪。", metrics, cards },
+    { role: "timeline", variant: "progress-sync", kicker: "OPERATING TIMELINE", title, summary: "用多泳道同步已完成、进行中和需要关注的经营事项。", metrics, cards: ["产品迭代", "销售推进", "团队建设", "财务节奏"] },
+    { role: "risk", variant: "progress-sync", kicker: "RISKS AND ASKS", title, summary: "把关键风险和需要投资人协助的事项放在同一页，便于会后行动。", metrics, cards: ["交付风险", "招聘缺口", "客户引荐", "融资准备"] },
+    { role: "plan", variant: "progress-sync", kicker: "30 / 60 / 90 PLAN", title, summary: "明确下一阶段目标、资源投入和投资人关注的决策节点。", metrics, cards: ["30 天修复关键风险", "60 天验证增长假设", "90 天形成融资材料"] },
+  ];
+  if (index === total - 1) {
+    return { role: "closing", variant: "progress-sync", kicker: "NEXT INVESTOR ACTION", title, summary: "用明确请求和下一步计划推动投资人沟通持续向前。", metrics, cards: ["确认本月判断", "安排资源协助", "跟踪关键指标"] };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function investorUpdateBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["本月核心经营进展和关键指标变化", "需要向投资人披露的风险、请求和资源协同", "下一阶段 30/60/90 天计划与目标"];
+}
+
+function investorUpdateCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isInvestorUpdateProgressVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "investor-update-progress-sync" && (id === "investor-update-report" || id === "pitch-investor-update-report-progress-sync");
 }
 
 /**
@@ -5300,6 +5515,8 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "feature-priority-matrix") return false;
   if (visual.layout === "experience-journey-map") return false;
+  if (visual.layout === "capability-radar-map") return false;
+  if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;

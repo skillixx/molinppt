@@ -1,0 +1,21 @@
+{
+  "slug": "pitch-investor-update-report-progress-sync",
+  "name": "投资人更新报告 - 进展同步",
+  "description": "适合月度投资人沟通、经营进展同步、关键数据披露和下一阶段计划说明的官方融资路演模板，突出经营月报、核心指标、风险请求和 30/60/90 天计划。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "investor-update",
+    "progress-sync",
+    "monthly-report",
+    "metrics-disclosure",
+    "board-update",
+    "next-plan"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

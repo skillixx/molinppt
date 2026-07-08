@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "knowledge-blackboard") {
     if (index === 0) {
@@ -434,6 +434,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1360;
     if (textLength >= 22) return 1540;
     return Math.min(fallbackSize, 1800);
+  }
+  if (visual.layout === "investor-update-progress-sync") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2500);
+    }
+    if (textLength >= 30) return 1340;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1780);
   }
   if (visual.layout === "seed-round-story") {
     if (index === 0) {
@@ -566,6 +576,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     return Math.min(fallbackSize, 1820);
   }
   if (visual.layout === "experience-journey-map") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2480);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1820);
+  }
+  if (visual.layout === "capability-radar-map") {
     if (index === 0) {
       if (textLength >= 30) return 1980;
       if (textLength >= 22) return 2220;
@@ -720,6 +740,7 @@ function shouldRenderDomeBodyList(visual, role) {
 function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "product-funding-highlights") return false;
+  if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "seed-round-story") return false;
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "quarterly-dashboard") return false;
@@ -732,6 +753,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "feature-priority-matrix") return false;
   if (visual.layout === "experience-journey-map") return false;
+  if (visual.layout === "capability-radar-map") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;
@@ -889,6 +911,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "experience-journey-map") {
     return base + experienceJourneyDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "capability-radar-map") {
+    return base + capabilityRadarDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "bi-executive-cockpit") {
     return base + biExecutiveCockpitDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -939,6 +964,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (isProductFundingHighlightsVisual(visual)) {
     return base + productFundingHighlightsDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (isInvestorUpdateProgressVisual(visual)) {
+    return base + investorUpdateProgressDecorationsXml({ visual, index, layout, role, slide });
   }
   if (isSeedRoundStoryVisual(visual)) {
     return base + seedRoundStoryDecorationsXml({ visual, index, layout, role, slide });
@@ -1824,6 +1852,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "capability-radar-map") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 585216, y: 488204, cx: 7973568, cy: 4127856 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 335280 },
+      secondaryAccent: { x: 823056, y: isCover ? 2209800 : 2057400, cx: 3474720, cy: 30480 },
+      label: { x: 823056, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 823056, y: 1112520, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 823056, y: 1066800, cx: 3931920, cy: 1066800 }
+          : { x: 823056, y: 884000, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 823056, y: 2286000, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 841344, y: 2514600, cx: 3505200, cy: 853440 }
+          : { x: 841344, y: 1943100, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2480 : isClosing ? 2480 : 1820,
+      bodySize: isCover ? 920 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "seed-round-story") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -1892,6 +1944,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 777240, y: 1783080, cx: 3352800, cy: 914400 },
       titleSize: isCover ? 2520 : isClosing ? 2320 : 1800,
       bodySize: isCover ? 820 : 700,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "investor-update-progress-sync") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 530352, y: 452120, cx: 8083296, cy: 4239260 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 762000, y: isCover ? 2164080 : 1943100, cx: 3048000, cy: 38100 },
+      label: { x: 762000, y: 640080, cx: 3200400, cy: 274320 },
+      title: isClosing
+        ? { x: 762000, y: 1112520, cx: 4572000, cy: 762000 }
+        : isCover
+          ? { x: 762000, y: 1051560, cx: 3886200, cy: 975360 }
+          : { x: 762000, y: 899160, cx: 3886200, cy: 792480 },
+      content: isClosing
+        ? { x: 762000, y: 2103120, cx: 3657600, cy: 762000 }
+        : isCover
+          ? { x: 777240, y: 2385060, cx: 3352800, cy: 701040 }
+          : { x: 777240, y: 1783080, cx: 3352800, cy: 914400 },
+      titleSize: isCover ? 2500 : isClosing ? 2280 : 1780,
+      bodySize: isCover ? 800 : 680,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -5304,6 +5380,179 @@ function experienceJourneyCompactText(text, fallback, maxLength) {
 }
 
 function experienceJourneyColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.10),
+    panel: blendHexColor(visual.background, visual.surface, 0.50),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.76),
+    axis: blendHexColor(visual.primary, visual.background, 0.50),
+    loop: blendHexColor(visual.accent, visual.surface, 0.18),
+  };
+}
+
+function capabilityRadarDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = capabilityRadarScene({ slide, index, role });
+  const palette = capabilityRadarColorPalette(visual);
+  const isClosing = role === "closing";
+  // 能力雷达模板主体全部使用可编辑 DrawingML 图形绘制，保证下载后的 PPTX 和在线预览保持同一套结构。
+  const surface = solidShapeXml({ id: 2010, name: "Capability Radar Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 2011, name: "Capability Radar Header Bar", x: 0, y: 0, cx: 9144000, cy: 335280, fill: visual.primary })
+    + rectShapeXml({ id: 2012, name: "Capability Radar Teal Rule", x: 0, y: 304800, cx: 9144000, cy: 30480, fill: visual.accent })
+    + lineFrameShapeXml({ id: 2013, name: "Capability Radar Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 2014, name: "Capability Radar Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 2015, name: "Capability Radar Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const bulletCards = capabilityRadarBulletCardsXml({ visual, items: scene.bullets, isClosing });
+
+  if (isClosing) {
+    return surface + header + focusRule + bulletCards + capabilityRadarLoopXml({ visual, palette }) + capabilityRadarActionCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "matrix") {
+    return surface + header + focusRule + bulletCards + capabilityRadarMatrixXml({ visual, palette, items: scene.cards }) + capabilityRadarTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  if (scene.kind === "gap") {
+    return surface + header + focusRule + bulletCards + capabilityRadarGapXml({ visual, palette, items: scene.cards }) + capabilityRadarTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  if (scene.kind === "roadmap") {
+    return surface + header + focusRule + bulletCards + capabilityRadarRoadmapXml({ visual, palette, items: scene.cards }) + capabilityRadarTagCardsXml({ visual, palette, items: scene.tags });
+  }
+  return surface + header + focusRule + bulletCards + capabilityRadarPanelXml({ visual, palette }) + capabilityRadarTagCardsXml({ visual, palette, items: scene.tags });
+}
+
+function capabilityRadarPanelXml({ visual, palette }) {
+  const x = 5486400;
+  const y = 1051560;
+  const w = 2895600;
+  const h = 1965960;
+  const cx = x + 1447800;
+  const cy = y + 982980;
+  return solidShapeXml({ id: 2020, name: "Capability Radar Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2021, name: "Capability Radar Panel Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + lineFrameShapeXml({ id: 2022, name: "Capability Radar Outer Ring", geom: "ellipse", x: cx - 685800, y: cy - 685800, cx: 1371600, cy: 1371600, stroke: palette.axis, width: 11430 })
+    + lineFrameShapeXml({ id: 2023, name: "Capability Radar Middle Ring", geom: "ellipse", x: cx - 487680, y: cy - 487680, cx: 975360, cy: 975360, stroke: palette.axis, width: 9525 })
+    + lineFrameShapeXml({ id: 2024, name: "Capability Radar Inner Ring", geom: "ellipse", x: cx - 289560, y: cy - 289560, cx: 579120, cy: 579120, stroke: palette.axis, width: 7620 })
+    + rectShapeXml({ id: 2025, name: "Capability Radar Axis Vertical", x: cx - 7620, y: cy - 746760, cx: 15240, cy: 1493520, fill: palette.axis })
+    + rectShapeXml({ id: 2026, name: "Capability Radar Axis Horizontal", x: cx - 746760, y: cy - 7620, cx: 1493520, cy: 15240, fill: palette.axis })
+    + rectShapeXml({ id: 2027, name: "Capability Radar Our Capability Bar 1", x: cx - 38100, y: cy - 655320, cx: 76200, cy: 655320, fill: visual.accent })
+    + rectShapeXml({ id: 2028, name: "Capability Radar Our Capability Bar 2", x: cx, y: cy - 38100, cx: 640080, cy: 76200, fill: visual.accent, rotation: 28 })
+    + rectShapeXml({ id: 2029, name: "Capability Radar Competitor Bar", x: cx - 609600, y: cy + 228600, cx: 914400, cy: 60960, fill: visual.secondary || "FF8A3D", rotation: -20 })
+    + solidShapeXml({ id: 2030, name: "Capability Radar Point 1", geom: "ellipse", x: cx - 76200, y: cy - 716280, cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 2031, name: "Capability Radar Point 2", geom: "ellipse", x: cx + 548640, y: cy - 274320, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 2032, name: "Capability Radar Point 3", geom: "ellipse", x: cx + 426720, y: cy + 487680, cx: 152400, cy: 152400, fill: visual.secondary || "FF8A3D" })
+    + solidShapeXml({ id: 2033, name: "Capability Radar Point 4", geom: "ellipse", x: cx - 548640, y: cy + 548640, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 2034, name: "Capability Radar Point 5", geom: "ellipse", x: cx - 792480, y: cy - 152400, cx: 152400, cy: 152400, fill: visual.primary });
+}
+
+function capabilityRadarBulletCardsXml({ visual, items, isClosing }) {
+  const x = 823056;
+  const y = isClosing ? 2156460 : 2453640;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 312420;
+    return rectShapeXml({ id: 2040 + index * 3, name: `Capability Radar Insight Accent ${index + 1}`, x, y: offsetY + 38100, cx: 60960, cy: 190500, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2041 + index * 3, name: `Capability Radar Insight Text ${index + 1}`, x: x + 121920, y: offsetY, cx: 3444240, cy: 228600, text: capabilityRadarCompactText(item, "", 36), size: 700, bold: false, color: visual.body });
+  }).join("");
+}
+
+function capabilityRadarTagCardsXml({ visual, palette, items }) {
+  const x = 823056;
+  const y = 3832860;
+  const width = 2217420;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 2667000;
+    return solidShapeXml({ id: 2050 + index * 3, name: `Capability Radar Tag Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 2051 + index * 3, name: `Capability Radar Tag Rule ${index + 1}`, x: offsetX, y, cx: 60960, cy: 518160, fill: index === 2 ? visual.secondary || "FF8A3D" : visual.accent })
+      + textShapeXml({ id: 2052 + index * 3, name: `Capability Radar Tag Text ${index + 1}`, x: offsetX + 137160, y: y + 167640, cx: width - 228600, cy: 182880, text: capabilityRadarCompactText(item, "", 8), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function capabilityRadarMatrixXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1051560;
+  const cellW = 853440;
+  const cellH = 655320;
+  return items.slice(0, 6).map((item, index) => {
+    const offsetX = x + (index % 3) * 960120;
+    const offsetY = y + Math.floor(index / 3) * 792480;
+    const fill = index % 3 === 0 ? visual.accent : index % 3 === 1 ? visual.primary : visual.secondary || "FF8A3D";
+    return solidShapeXml({ id: 2060 + index * 4, name: `Capability Radar Matrix Card ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: cellW, cy: cellH, fill: palette.card })
+      + textShapeXml({ id: 2061 + index * 4, name: `Capability Radar Matrix Text ${index + 1}`, x: offsetX + 91440, y: offsetY + 106680, cx: cellW - 182880, cy: 213360, text: capabilityRadarCompactText(item, "", 12), size: 660, bold: true, color: visual.title })
+      + rectShapeXml({ id: 2062 + index * 4, name: `Capability Radar Score Track ${index + 1}`, x: offsetX + 91440, y: offsetY + 426720, cx: cellW - 182880, cy: 60960, fill: palette.axis })
+      + rectShapeXml({ id: 2063 + index * 4, name: `Capability Radar Score Fill ${index + 1}`, x: offsetX + 91440, y: offsetY + 426720, cx: Math.round((cellW - 182880) * (0.52 + (index % 3) * 0.14)), cy: 60960, fill });
+  }).join("");
+}
+
+function capabilityRadarGapXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1051560;
+  return solidShapeXml({ id: 2090, name: "Capability Radar Gap Chain Panel", geom: "roundRect", x, y, cx: 2895600, cy: 1965960, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2091, name: "Capability Radar Gap Chain Frame", geom: "roundRect", x, y, cx: 2895600, cy: 1965960, stroke: palette.frame, width: 15240 })
+    + items.slice(0, 4).map((item, index) => {
+      const offsetY = y + 243840 + index * 381000;
+      return solidShapeXml({ id: 2092 + index * 3, name: `Capability Radar Gap Node ${index + 1}`, geom: "roundRect", x: x + 213360, y: offsetY, cx: 243840, cy: 243840, fill: index === 0 ? visual.secondary || "FF8A3D" : visual.accent })
+        + textShapeXml({ id: 2093 + index * 3, name: `Capability Radar Gap Text ${index + 1}`, x: x + 579120, y: offsetY + 30480, cx: 1828800, cy: 182880, text: capabilityRadarCompactText(item, "", 12), size: 700, bold: true, color: visual.title })
+        + (index < 3 ? rectShapeXml({ id: 2094 + index * 3, name: `Capability Radar Gap Connector ${index + 1}`, x: x + 327660, y: offsetY + 243840, cx: 15240, cy: 137160, fill: palette.axis }) : "");
+    }).join("");
+}
+
+function capabilityRadarRoadmapXml({ visual, palette, items }) {
+  const x = 5638800;
+  const y = 1188720;
+  return solidShapeXml({ id: 2110, name: "Capability Radar Roadmap Panel", geom: "roundRect", x, y, cx: 2590800, cy: 1676400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2111, name: "Capability Radar Roadmap Frame", geom: "roundRect", x, y, cx: 2590800, cy: 1676400, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2112, name: "Capability Radar Roadmap Axis", x: x + 335280, y: y + 274320, cx: 22860, cy: 1127760, fill: palette.axis })
+    + items.slice(0, 4).map((item, index) => {
+      const offsetY = y + 243840 + index * 304800;
+      return solidShapeXml({ id: 2113 + index * 3, name: `Capability Radar Roadmap Node ${index + 1}`, geom: "ellipse", x: x + 274320, y: offsetY, cx: 152400, cy: 152400, fill: index === 2 ? visual.secondary || "FF8A3D" : visual.accent })
+        + textShapeXml({ id: 2114 + index * 3, name: `Capability Radar Roadmap Text ${index + 1}`, x: x + 548640, y: offsetY - 22860, cx: 1524000, cy: 182880, text: capabilityRadarCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+    }).join("");
+}
+
+function capabilityRadarLoopXml({ visual, palette }) {
+  const x = 5791200;
+  const y = 1219200;
+  return solidShapeXml({ id: 2130, name: "Capability Radar Decision Loop", geom: "ellipse", x, y, cx: 1828800, cy: 1828800, fill: palette.loop })
+    + solidShapeXml({ id: 2131, name: "Capability Radar Loop Core", geom: "ellipse", x: x + 579120, y: y + 579120, cx: 670560, cy: 670560, fill: visual.surface })
+    + solidShapeXml({ id: 2132, name: "Capability Radar Loop Node", geom: "ellipse", x: x + 1371600, y: y + 365760, cx: 152400, cy: 152400, fill: visual.accent });
+}
+
+function capabilityRadarActionCardsXml({ visual, palette, items }) {
+  const x = 823056;
+  const y = 3764280;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 1905000;
+    return solidShapeXml({ id: 2140 + index * 3, name: `Capability Radar Next Action ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1600200, cy: 609600, fill: palette.card })
+      + solidShapeXml({ id: 2141 + index * 3, name: `Capability Radar Next Action Icon ${index + 1}`, geom: "roundRect", x: offsetX + 152400, y: y + 137160, cx: 167640, cy: 167640, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2142 + index * 3, name: `Capability Radar Next Action Text ${index + 1}`, x: offsetX + 152400, y: y + 365760, cx: 1295400, cy: 167640, text: capabilityRadarCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function capabilityRadarScene({ slide, index, role }) {
+  const bullets = capabilityRadarBulletTexts(slide);
+  const tags = ["核心能力", "差异机会", "路线输入"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["我方能力", "竞品A", "竞品B", "领先项", "短板项", "机会点"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex % bullets.length], fallback, 12));
+  if (role === "closing") {
+    return { kind: "closing", kicker: "NEXT PRODUCT MOVES", bullets, tags, cards: ["确认维度", "评审差距", "转入需求池", "跟踪竞品"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "COMPETITIVE RADAR", bullets, tags, cards },
+    { kind: "matrix", kicker: "FEATURE MATRIX", bullets, tags, cards },
+    { kind: "radar", kicker: "CAPABILITY SCORE", bullets, tags, cards },
+    { kind: "gap", kicker: "GAP DIAGNOSIS", bullets, tags, cards: ["功能差距", "用户影响", "定位风险", "机会切入"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) },
+    { kind: "roadmap", kicker: "ROADMAP INPUT", bullets, tags, cards: ["补齐基础项", "强化差异点", "验证机会点", "沉淀壁垒"].map((fallback, itemIndex) => capabilityRadarCompactText(bullets[itemIndex], fallback, 12)) },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function capabilityRadarBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["围绕核心场景拆解竞品功能能力", "比较我方与竞品在体验、效率和生态上的差异", "输出可进入路线规划的优先级建议"];
+}
+
+function capabilityRadarCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function capabilityRadarColorPalette(visual) {
   return {
     card: blendHexColor(visual.surface, visual.background, 0.10),
     panel: blendHexColor(visual.background, visual.surface, 0.50),
