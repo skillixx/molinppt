@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="120" viewBox="0 0 220 120">
+  <path d="M20 72c30-44 58-44 86 0s56 44 94 0" fill="none" stroke="#60A5FA" stroke-width="8" stroke-linecap="round"/>
+  <text x="34" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#F8FAE7">f(x)</text>
+  <text x="124" y="94" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#FACC15">= ax+b</text>
+</svg>

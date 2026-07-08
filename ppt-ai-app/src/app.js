@@ -1284,6 +1284,20 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="education-course"] .template-thumb-image { right: 13%; top: 34%; width: 17%; height: 30%; border-radius: 4px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); box-shadow: none; }
     .template-thumb[data-layout="education-course"] .template-thumb-wave { height: 0; opacity: 0; }
     .template-thumb[data-layout="education-course"] .template-thumb-tag { background: var(--thumb-accent); color: color-mix(in srgb, var(--thumb-primary) 88%, #000 12%); }
+    .template-thumb[data-layout="feature-priority-matrix"] { background: linear-gradient(135deg, #f7fbfd 0%, var(--thumb-bg) 58%, #e8f8f4 100%); }
+    .template-thumb[data-layout="feature-priority-matrix"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 9%, transparent) 0 1px, transparent 1px 30px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-accent) 8%, transparent) 0 1px, transparent 1px 28px); }
+    .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 16px; background: rgba(255,255,255,.94); border: 1px solid color-mix(in srgb, var(--thumb-primary) 14%, transparent); box-shadow: 0 16px 30px rgba(15,23,42,.12); }
+    .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-band { left: 11%; right: 55%; top: 39%; height: 2%; border-radius: 999px; background: var(--thumb-accent); }
+    .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-image { right: 12%; top: 25%; width: 29%; height: 38%; border-radius: 12px; background: linear-gradient(90deg, transparent 49%, color-mix(in srgb, var(--thumb-primary) 34%, transparent) 49% 51%, transparent 51%), linear-gradient(0deg, transparent 49%, color-mix(in srgb, var(--thumb-primary) 34%, transparent) 49% 51%, transparent 51%), #f8fbfd; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: none; }
+    .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-wave { left: 12%; right: 52%; bottom: 23%; height: 11%; background: linear-gradient(90deg, var(--thumb-accent) 0 9%, transparent 9% 34%, var(--thumb-primary) 34% 43%, transparent 43% 68%, #f97316 68% 77%, transparent 77%); clip-path: none; opacity: .95; }
+    .template-thumb[data-layout="feature-priority-matrix"] .template-thumb-tag { background: var(--thumb-accent); color: #073b2c; }
+    .template-thumb[data-layout="knowledge-blackboard"] { background: linear-gradient(135deg, #f4f1e8 0%, #efe7d1 100%); }
+    .template-thumb[data-layout="knowledge-blackboard"]::before { background: repeating-linear-gradient(90deg, rgba(23,59,51,.08) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, rgba(23,59,51,.06) 0 1px, transparent 1px 28px); }
+    .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 6px; background: linear-gradient(135deg, #173b33, #0d2a24); border: 5px solid #c8b88f; box-shadow: inset 0 -6px 0 #c8b88f, 0 16px 28px rgba(23,59,51,.18); }
+    .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-band { left: 12%; right: 18%; bottom: 20%; top: auto; height: 3%; border-radius: 999px; background: var(--thumb-accent); }
+    .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-image { right: 13%; top: 28%; width: 24%; height: 37%; border-radius: 4px; background: #fffdf5; border: 2px solid #d8cdaf; box-shadow: none; }
+    .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-wave { left: 13%; right: 48%; bottom: 29%; height: 12%; background: linear-gradient(90deg, #f8fae7 0 34%, transparent 34% 44%, #60a5fa 44% 68%, transparent 68% 76%, #f87171 76%); clip-path: polygon(0 35%, 100% 35%, 100% 48%, 0 48%); opacity: .9; }
+    .template-thumb[data-layout="knowledge-blackboard"] .template-thumb-tag { background: var(--thumb-accent); color: #173b33; }
     .template-thumb[data-layout="corporate-training"] { background: linear-gradient(135deg, #f6f9fc 0%, var(--thumb-bg) 58%, #e8f5f4 100%); }
     .template-thumb[data-layout="corporate-training"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 10%, transparent) 0 1px, transparent 1px 28px), radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--thumb-accent) 22%, transparent), transparent 24%); }
     .template-thumb[data-layout="corporate-training"] .template-thumb-cover { left: 8%; right: 8%; top: 16%; bottom: 14%; border-radius: 14px; background: rgba(255,255,255,.92); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 16px 30px rgba(31,58,95,.13); }
@@ -2285,10 +2299,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "financial-review": { date: "2026/08/06", kicker: "FINANCE 01", title: "经营复盘", lines: ["收入利润现金流追踪", "预算执行偏差分析"], tag: "财务分析" },
         "sales-proposal": { date: "2026/05/18", kicker: "SOLUTION 01", title: "客户方案", lines: ["业务痛点与价值主张", "交付计划及合作路径"], tag: "销售提案" },
         "product-roadmap": { date: "2026/09/22", kicker: "ROADMAP 01", title: "版本规划", lines: ["核心功能优先级排序", "里程碑节奏与风险"], tag: "产品规划" },
+        "feature-priority-matrix": { date: "2026/10/06", kicker: "PRIORITY 01", title: "优先级评审", lines: ["价值成本矩阵排序", "研发资源投入取舍"], tag: "产品决策" },
         "marketing-campaign": { date: "2026/10/10", kicker: "CAMPAIGN 01", title: "活动复盘", lines: ["渠道触达与转化表现", "品牌声量增长洞察"], tag: "营销推广" },
         "data-insight": { date: "2026/11/03", kicker: "DATA 01", title: "洞察结论", lines: ["指标异常与趋势变化", "行动建议优先级排序"], tag: "数据报告" },
+        "market-trend-insight": { date: "2026/11/18", kicker: "MARKET 01", title: "趋势信号扫描", lines: ["行业变化与机会窗口", "竞争格局和进入时机"], tag: "趋势洞察" },
         education: { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
         "education-course": { date: "2026/08/22", kicker: "LESSON 01", title: "课程目标", lines: ["知识框架与重点概念", "课堂互动与练习路径"], tag: "教学课件" },
+        "knowledge-blackboard": { date: "2026/09/12", kicker: "LESSON 01", title: "知识点拆解", lines: ["定义原理和例题讲解", "重点批注与课后练习"], tag: "课程讲义" },
         "corporate-training": { date: "2026/08/22", kicker: "LEARNING 01", title: "课程目标", lines: ["管理模型与案例研讨", "课堂练习与行动计划"], tag: "内训课程" },
         "onboarding-guide": { date: "2026/09/01", kicker: "WELCOME 01", title: "入职路径", lines: ["公司认知与制度学习", "岗位职责和团队融入"], tag: "新人培训" },
         pitch: { date: "2026/09/10", kicker: "PITCH 01", title: "增长故事", lines: ["市场机会与产品优势", "融资计划及资金用途"], tag: "融资路演" },
@@ -2359,7 +2376,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "knowledge-blackboard", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2373,7 +2390,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "feature-priority-matrix", "knowledge-blackboard", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "knowledge-handout",
+  "themeId": "blackboard",
+  "style": "knowledge-blackboard-system",
+  "themes": [
+    {
+      "id": "blackboard",
+      "name": "课堂板书",
+      "visual": {
+        "primary": "173B33",
+        "accent": "FACC15",
+        "secondary": "60A5FA",
+        "warning": "F87171",
+        "background": "F4F1E8",
+        "surface": "FFFDF5",
+        "title": "F8FAE7",
+        "body": "E8F3DF",
+        "layout": "knowledge-blackboard",
+        "variant": "blackboard"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "173B33",
+    "accent": "FACC15",
+    "secondary": "60A5FA",
+    "warning": "F87171",
+    "background": "F4F1E8",
+    "surface": "FFFDF5",
+    "title": "F8FAE7",
+    "body": "E8F3DF",
+    "layout": "knowledge-blackboard",
+    "variant": "blackboard"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "blackboard-cover",
+    "defaultContentLayout": "blackboard-note",
+    "allowedLayouts": [
+      "blackboard-cover",
+      "blackboard-outline",
+      "blackboard-concept",
+      "blackboard-detail",
+      "blackboard-case",
+      "blackboard-steps",
+      "blackboard-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

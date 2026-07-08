@@ -1,0 +1,19 @@
+{
+  "slug": "data-market-trend-insight-trend-radar",
+  "name": "市场趋势洞察 - 趋势雷达",
+  "description": "适合行业趋势分析、市场机会识别和竞争格局变化汇报的趋势雷达官方模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "market-trend",
+    "trend-radar",
+    "market-opportunity",
+    "competitive-landscape"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

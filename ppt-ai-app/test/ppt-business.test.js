@@ -325,6 +325,29 @@ test("PptService renders synced product release cadence preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced feature priority matrix preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertFeaturePriorityMatrixTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "功能优先级评审",
+    slideCount: 6,
+    templateId: "product-feature-priority-review-value-matrix",
+    theme: "value-matrix",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-feature-priority-review-value-matrix" data-layout="feature-priority-matrix"/);
+  assert.match(preview, /priority-layer/);
+  assert.match(preview, /priority-matrix/);
+  assert.match(preview, /priority-ranking|priority-resource|priority-actions/);
+  assert.doesNotMatch(preview, />价值矩阵</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -525,6 +548,30 @@ test("PptService renders seed round startup story preview with dedicated layout"
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders growth funding flywheel preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertGrowthFundingFlywheelTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "A/B 轮增长融资路演",
+    slideCount: 6,
+    templateId: "pitch-growth-funding-pitch-growth-flywheel",
+    theme: "growth-flywheel",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-growth-funding-pitch-growth-flywheel" data-layout="growth-funding-flywheel"/);
+  assert.match(preview, /growth-funding-layer/);
+  assert.match(preview, /growth-funding-flywheel/);
+  assert.match(preview, /growth-funding-proof|growth-funding-roadmap|growth-funding-dashboard/);
+  assert.match(preview, /GROWTH CAPITAL MEMO|GROWTH FLYWHEEL|COMMERCIAL PROOF|EXPANSION PLAN/);
+  assert.doesNotMatch(preview, />增长飞轮</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders BI executive cockpit preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -568,6 +615,29 @@ test("PptService renders user behavior path funnel preview with dedicated layout
   assert.match(preview, /path-map|path-funnel|path-experiment|path-actions/);
   assert.match(preview, /USER JOURNEY LAB|CONVERSION ROUTE|DROP-OFF DIAGNOSIS|GROWTH EXPERIMENT/);
   assert.doesNotMatch(preview, />路径漏斗</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders market trend radar preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertMarketTrendRadarTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "市场机会趋势分析",
+    slideCount: 5,
+    templateId: "data-market-trend-insight-trend-radar",
+    theme: "trend-radar",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-market-trend-insight-trend-radar" data-layout="market-trend-radar"/);
+  assert.match(preview, /trend-layer/);
+  assert.match(preview, /trend-radar|trend-opportunity|trend-shift|trend-risk|trend-actions/);
+  assert.match(preview, /MARKET SIGNAL SCAN|TREND SIGNALS|OPPORTUNITY WINDOW|COMPETITION SHIFT/);
+  assert.doesNotMatch(preview, />趋势雷达</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -3938,6 +4008,52 @@ async function insertProductReleaseCadenceTemplate(context) {
   });
 }
 
+async function insertFeaturePriorityMatrixTemplate(context) {
+  // 测试数据库模拟官方模板同步后的功能优先级评审模板，确保预览使用独立价值矩阵布局。
+  await context.database.insert("templates", {
+    id: "product-feature-priority-review-value-matrix",
+    slug: "product-feature-priority-review-value-matrix",
+    name: "功能优先级评审 - 价值矩阵",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "value-matrix",
+        name: "价值矩阵",
+        visual: {
+          primary: "172554",
+          accent: "10B981",
+          secondary: "F97316",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0B1736",
+          body: "405166",
+          layout: "feature-priority-matrix",
+          variant: "value-matrix",
+        },
+      },
+    ],
+    visual: {
+      primary: "172554",
+      accent: "10B981",
+      secondary: "F97316",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0B1736",
+      body: "405166",
+      layout: "feature-priority-matrix",
+      variant: "value-matrix",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "feature-priority-matrix-cover",
+      defaultContentLayout: "feature-priority-matrix-content",
+      allowedLayouts: ["feature-priority-matrix-cover", "feature-priority-matrix-content", "feature-priority-matrix-analysis", "feature-priority-matrix-ranking", "feature-priority-matrix-resource", "feature-priority-matrix-summary", "title", "content", "closing"],
+    },
+  });
+}
+
 async function insertIndustryTrendForecastTemplate(context) {
   // 测试数据库模拟官方模板同步后的趋势判断主题，确保 slug 模板也能走独立趋势研判布局。
   await context.database.insert("templates", {
@@ -4392,6 +4508,50 @@ async function insertSeedRoundStartupStoryTemplate(context) {
   });
 }
 
+async function insertGrowthFundingFlywheelTemplate(context) {
+  // 测试数据库模拟官方模板同步后的增长融资路演模板，确保增长飞轮主题只用于选择，不直接写进预览页面。
+  await context.database.insert("templates", {
+    id: "pitch-growth-funding-pitch-growth-flywheel",
+    slug: "pitch-growth-funding-pitch-growth-flywheel",
+    name: "增长融资路演 - 增长飞轮",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "growth-flywheel",
+        name: "增长飞轮",
+        visual: {
+          primary: "0B1220",
+          accent: "22C55E",
+          background: "EAF1F8",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "growth-funding-flywheel",
+          variant: "growth-flywheel",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1220",
+      accent: "22C55E",
+      background: "EAF1F8",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "growth-funding-flywheel",
+      variant: "growth-flywheel",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "growth-funding-cover",
+      defaultContentLayout: "growth-funding-content",
+      allowedLayouts: ["growth-funding-cover", "growth-overview-dashboard", "growth-flywheel-model", "commercialization-progress", "growth-data-proof", "market-expansion-plan", "funding-use-milestones", "growth-funding-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertBiExecutiveCockpitTemplate(context) {
   // 测试数据库模拟官方模板同步后的 BI 数据看板，确保预览走深色驾驶舱专用布局。
   await context.database.insert("templates", {
@@ -4482,6 +4642,54 @@ async function insertUserPathFunnelTemplate(context) {
       defaultCoverLayout: "path-cover",
       defaultContentLayout: "path-analysis",
       allowedLayouts: ["path-cover", "path-overview", "path-funnel", "path-experiment", "path-actions", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertMarketTrendRadarTemplate(context) {
+  // 测试数据库模拟官方模板同步后的市场趋势洞察模板，确保预览进入趋势雷达专属布局。
+  await context.database.insert("templates", {
+    id: "data-market-trend-insight-trend-radar",
+    slug: "data-market-trend-insight-trend-radar",
+    name: "市场趋势洞察 - 趋势雷达",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "trend-radar",
+        name: "趋势雷达",
+        visual: {
+          primary: "08111F",
+          accent: "38BDF8",
+          secondary: "A78BFA",
+          warning: "F59E0B",
+          background: "050B18",
+          surface: "0F1E33",
+          title: "E6F7FF",
+          body: "B7C9DA",
+          layout: "market-trend-radar",
+          variant: "trend-radar",
+        },
+      },
+    ],
+    visual: {
+      primary: "08111F",
+      accent: "38BDF8",
+      secondary: "A78BFA",
+      warning: "F59E0B",
+      background: "050B18",
+      surface: "0F1E33",
+      title: "E6F7FF",
+      body: "B7C9DA",
+      layout: "market-trend-radar",
+      variant: "trend-radar",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "trend-radar-cover",
+      defaultContentLayout: "trend-radar-scan",
+      allowedLayouts: ["trend-radar-cover", "trend-radar-scan", "trend-opportunity-map", "trend-competition-shift", "trend-risk-signal", "trend-action-roadmap", "title", "content", "closing"],
     },
   });
 }

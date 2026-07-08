@@ -784,6 +784,41 @@ test("resolveTemplateVisual applies user behavior path funnel official visual", 
   assert.equal(visual.accent, "06B6D4");
 });
 
+test("resolveTemplateVisual applies market trend radar official visual", () => {
+  const template = {
+    id: "data-market-trend-insight-trend-radar",
+    visual: {
+      primary: "08111F",
+      accent: "38BDF8",
+      secondary: "A78BFA",
+      warning: "F59E0B",
+      background: "050B18",
+      surface: "0F1E33",
+      title: "E6F7FF",
+      body: "B7C9DA",
+      layout: "market-trend-radar",
+      variant: "trend-radar",
+    },
+    themes: [
+      {
+        id: "trend-radar",
+        visual: {
+          layout: "market-trend-radar",
+          variant: "trend-radar",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "trend-radar", template });
+
+  assert.equal(visual.id, "data-market-trend-insight-trend-radar");
+  assert.equal(visual.layout, "market-trend-radar");
+  assert.equal(visual.variant, "trend-radar");
+  assert.equal(visual.primary, "08111F");
+  assert.equal(visual.accent, "38BDF8");
+});
+
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
