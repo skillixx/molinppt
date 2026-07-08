@@ -1,0 +1,20 @@
+{
+  "slug": "pitch-seed-round-pitch-startup-story",
+  "name": "种子轮融资路演 - 创业故事",
+  "description": "适合早期项目融资、团队故事展示、市场痛点说明和投资人初次沟通的官方融资路演模板，突出创始人动机、痛点发现、MVP 验证、早期增长信号和融资计划。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "seed-round",
+    "startup-story",
+    "mvp",
+    "early-stage",
+    "investor-deck"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

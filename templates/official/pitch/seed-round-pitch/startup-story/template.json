@@ -1,0 +1,35 @@
+{
+  "baseTemplateId": "seed-round-pitch",
+  "themeId": "startup-story",
+  "style": "seed-round-storytelling",
+  "themes": [
+    {
+      "id": "startup-story",
+      "name": "创业故事"
+    }
+  ],
+  "visual": {
+    "primary": "172033",
+    "accent": "F97316",
+    "background": "F6F4EF",
+    "surface": "FFFFFF",
+    "title": "172033",
+    "body": "465266",
+    "layout": "seed-round-story",
+    "variant": "startup-story"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "seed-story-cover",
+    "defaultContentLayout": "seed-story-content",
+    "allowedLayouts": [
+      "seed-story-cover",
+      "founder-story",
+      "pain-discovery",
+      "mvp-validation",
+      "early-traction",
+      "team-belief",
+      "funding-roadmap",
+      "seed-story-closing"
+    ]
+  }
+}

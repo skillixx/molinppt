@@ -1154,6 +1154,52 @@ test("PptExportService uses business plan model decorations", () => {
   assert.doesNotMatch(slide1, /business-model/);
 });
 
+test("PptExportService uses seed round startup story decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-seed-round-pitch-startup-story",
+      theme: "startup-story",
+      templateVisual: {
+        id: "pitch-seed-round-pitch-startup-story",
+        primary: "172033",
+        accent: "F97316",
+        background: "F6F4EF",
+        surface: "FFFFFF",
+        title: "172033",
+        body: "465266",
+        layout: "seed-round-story",
+        variant: "startup-story",
+      },
+      slides: [
+        { title: "种子轮融资计划", bullets: ["真实用户痛点已经被反复验证", "MVP 形成稳定可复用的产品路径", "早期增长信号支持种子轮融资"] },
+        { title: "痛点发现", bullets: ["高频场景", "强烈付费意愿", "替代方案低效"] },
+        { title: "MVP 验证", bullets: ["核心路径", "首批客户", "体验指标"] },
+        { title: "早期增长", bullets: ["用户增长", "留存改善", "转介绍"] },
+        { title: "团队能力", bullets: ["行业洞察", "产品交付", "增长经验"] },
+        { title: "融资计划", bullets: ["资金用途", "18个月里程碑", "核心招聘"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Seed Round Story Canvas"/);
+  assert.match(slide1, /name="Seed Round MVP Mockup"/);
+  assert.match(slide1, /name="Seed Round Storyline"/);
+  assert.match(slide2, /name="Seed Round Pain Evidence 1"/);
+  assert.match(slide3, /name="Seed Round MVP Board"/);
+  assert.match(slide4, /name="Seed Round Traction Chart"/);
+  assert.match(slide6, /name="Seed Round Funding Road"/);
+  assert.doesNotMatch(slide1, /startup-story/);
+});
+
 test("PptExportService uses BI executive cockpit decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "marketing-launch-rhythm", "seed-round-story"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "marketing-launch-rhythm", "seed-round-story"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "seed-round-story") {
     if (index === 0) {
@@ -535,6 +535,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1560;
     return Math.min(fallbackSize, 1840);
   }
+  if (visual.layout === "onboarding-guide") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2500);
+    }
+    if (textLength >= 30) return 1340;
+    if (textLength >= 22) return 1540;
+    return Math.min(fallbackSize, 1820);
+  }
   if (visual.layout === "annual-summary") {
     const textUnits = estimateTextUnits(title);
     if (index === 0) {
@@ -659,10 +669,12 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
+  if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
   if (visual.layout === "corporate-training") return false;
+  if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
@@ -806,6 +818,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "bi-executive-cockpit") {
     return base + biExecutiveCockpitDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "user-path-funnel") {
+    return base + userPathFunnelDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -826,6 +841,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "corporate-training") {
     return base + corporateTrainingDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "onboarding-guide") {
+    return base + onboardingGuideDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
@@ -1710,6 +1728,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
       titleSize: isCover ? 2520 : isClosing ? 2480 : 1840,
       bodySize: isCover ? 920 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "onboarding-guide") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 493776, y: 411480, cx: 8156448, cy: 4312920 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 365760 },
+      secondaryAccent: { x: 731520, y: isCover ? 2125980 : 1927860, cx: 2926080, cy: 30480 },
+      label: { x: 731520, y: 685800, cx: 2895600, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1188720, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1082040, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 884000, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2316480, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2499360, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1874520, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2500 : isClosing ? 2460 : 1820,
+      bodySize: isCover ? 900 : 740,
       titleColor: visual.title,
       bodyColor: visual.body,
     };

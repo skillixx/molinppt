@@ -989,6 +989,7 @@ function renderDeckPreview({ deck, visual }) {
     const manufacturingSolutionScene = isManufacturingSolutionVisual(visual) ? manufacturingSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationSolutionScene = isEducationSolutionVisual(visual) ? educationSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const onboardingScene = isOnboardingGuideVisual(visual) ? onboardingGuidePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const releaseCadenceScene = isProductReleaseCadenceVisual(visual) ? productReleaseCadencePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1000,6 +1001,7 @@ function renderDeckPreview({ deck, visual }) {
     const brandStoryScene = isBrandStoryVisual(visual) ? brandStoryPreviewScene(visual) : null;
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const biCockpitScene = isBiExecutiveCockpitVisual(visual) ? biExecutiveCockpitPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const userPathScene = isUserPathFunnelVisual(visual) ? userPathFunnelPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
     const annualSummaryScene = isAnnualSummaryVisual(visual) ? annualSummaryPreviewScene(visual) : null;
     const quarterlyDashboardScene = isQuarterlyDashboardVisual(visual) ? quarterlyDashboardPreviewScene({ visual, slide, index }) : null;
@@ -1039,6 +1041,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const corporateTrainingMark = corporateTrainingScene
       ? renderCorporateTrainingPreview(slide, corporateTrainingScene)
+      : "";
+    const onboardingMark = onboardingScene
+      ? renderOnboardingGuidePreview(slide, onboardingScene)
       : "";
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
@@ -1092,6 +1097,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const biCockpitMark = biCockpitScene
       ? renderBiExecutiveCockpitPreview(slide, biCockpitScene)
+      : "";
+    const userPathMark = userPathScene
+      ? renderUserPathFunnelPreview(slide, userPathScene)
       : "";
     const educationMark = educationScene
       ? (
@@ -1163,10 +1171,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || launchRhythmScene || seedStoryScene || businessModelScene || biCockpitScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || releaseCadenceScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || onboardingScene || launchRhythmScene || seedStoryScene || businessModelScene || biCockpitScene || userPathScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pitchScene?.variant || seedStoryScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${productMark}${releaseCadenceMark}${painPointMark}${pitchMark}${seedStoryMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pitchScene?.variant || seedStoryScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${onboardingMark}${productMark}${releaseCadenceMark}${painPointMark}${pitchMark}${seedStoryMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1779,6 +1787,34 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="bi-executive-cockpit"] .cockpit-actions{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;}
     body[data-layout="bi-executive-cockpit"] .cockpit-actions span{min-height:90px;border-radius:16px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(8,17,31,.82));border:1px solid rgba(34,211,238,.2);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="bi-executive-cockpit"] .page-number{z-index:5;right:6.2%;bottom:5.4%;background:rgba(8,17,31,.72);border:1px solid rgba(34,211,238,.18);border-radius:999px;padding:5px 10px;color:rgba(230,247,255,.66);}
+    body[data-layout="user-path-funnel"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 56%,#eef7ff 100%);box-shadow:0 22px 58px rgba(15,23,42,.16);}
+    body[data-layout="user-path-funnel"] .slide::before{background:repeating-linear-gradient(90deg,rgba(23,37,84,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(6,182,212,.045) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(6,182,212,.18),transparent 25%);}
+    body[data-layout="user-path-funnel"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9%;bottom:8.5%;z-index:1;border-radius:24px;background:rgba(255,255,255,.94);border:1px solid rgba(23,37,84,.11);box-shadow:0 24px 54px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.74);}
+    body[data-layout="user-path-funnel"] .accent{height:7%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#0e7490 58%,var(--template-accent));box-shadow:inset 0 -3px 0 #22c55e;}
+    body[data-layout="user-path-funnel"] .path-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="user-path-funnel"] .path-kicker{position:absolute;left:8.4%;top:14.6%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="user-path-funnel"] .path-title{position:absolute;left:8.4%;top:21%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="user-path-funnel"] .path-rule{position:absolute;left:8.4%;top:43.5%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#22c55e,#f97316,transparent);}
+    body[data-layout="user-path-funnel"] .path-bullets{position:absolute;left:8.6%;top:50%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="user-path-funnel"] .path-bullets li{margin:.1em 0;}
+    body[data-layout="user-path-funnel"] .path-map{position:absolute;right:8%;top:18%;width:39%;height:38%;border-radius:20px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(23,37,84,.12);box-shadow:0 18px 36px rgba(15,23,42,.12);overflow:hidden;}
+    body[data-layout="user-path-funnel"] .path-map::before{content:"";position:absolute;left:10%;right:10%;top:50%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#22c55e,#f97316);transform:skewY(-11deg);box-shadow:0 0 22px rgba(6,182,212,.25);}
+    body[data-layout="user-path-funnel"] .path-map::after{content:"";position:absolute;left:12%;right:12%;top:18%;height:38%;border-radius:50%;border-top:8px solid rgba(6,182,212,.2);}
+    body[data-layout="user-path-funnel"] .path-map i{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--template-accent);box-shadow:0 0 0 7px rgba(6,182,212,.11);}
+    body[data-layout="user-path-funnel"] .path-map i:nth-child(1){left:16%;top:58%;}body[data-layout="user-path-funnel"] .path-map i:nth-child(2){left:34%;top:43%;border-color:#22c55e;box-shadow:0 0 0 7px rgba(34,197,94,.12);}body[data-layout="user-path-funnel"] .path-map i:nth-child(3){left:54%;top:35%;}body[data-layout="user-path-funnel"] .path-map i:nth-child(4){left:74%;top:24%;border-color:#f97316;box-shadow:0 0 0 7px rgba(249,115,22,.12);}
+    body[data-layout="user-path-funnel"] .path-metrics{position:absolute;left:8.4%;right:48%;bottom:14.8%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="user-path-funnel"] .path-metrics span{min-height:62px;border-radius:14px;background:#fff;border:1px solid rgba(23,37,84,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-body);}
+    body[data-layout="user-path-funnel"] .path-metrics strong{display:block;margin-bottom:5px;color:var(--template-title);font-size:20px;line-height:1;}
+    body[data-layout="user-path-funnel"] .path-funnel{position:absolute;right:8.5%;top:19%;width:36%;height:43%;display:grid;gap:12px;align-content:start;}
+    body[data-layout="user-path-funnel"] .path-funnel span{height:46px;border-radius:14px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));box-shadow:0 12px 22px rgba(15,23,42,.12);color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:space-between;padding:0 18px;}
+    body[data-layout="user-path-funnel"] .path-funnel span:nth-child(2){margin-left:7%;width:86%;background:linear-gradient(90deg,#0e7490,#06b6d4);}body[data-layout="user-path-funnel"] .path-funnel span:nth-child(3){margin-left:16%;width:68%;background:linear-gradient(90deg,#059669,#22c55e);}body[data-layout="user-path-funnel"] .path-funnel span:nth-child(4){margin-left:26%;width:50%;background:linear-gradient(90deg,#f97316,#fb923c);}
+    body[data-layout="user-path-funnel"] .path-experiment{position:absolute;right:8%;top:20%;width:38%;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    body[data-layout="user-path-funnel"] .path-experiment span{min-height:118px;border-radius:18px;background:#fff;border:1px solid rgba(23,37,84,.12);box-shadow:0 14px 28px rgba(15,23,42,.09);padding:16px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="user-path-funnel"] .path-experiment span::before{content:"";display:block;width:38px;height:8px;margin-bottom:13px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="user-path-funnel"] .path-actions{position:absolute;left:8.4%;right:8.4%;bottom:15%;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;}
+    body[data-layout="user-path-funnel"] .path-actions span{min-height:86px;border-radius:16px;background:#fff;border:1px solid rgba(23,37,84,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="user-path-funnel"] .path-actions span::before{content:"";display:block;width:28px;height:6px;margin-bottom:12px;border-radius:999px;background:#22c55e;}
+    body[data-layout="user-path-funnel"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.84);border:1px solid rgba(23,37,84,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.62);}
     body[data-layout="data-insight"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 58%,color-mix(in srgb,var(--template-accent) 12%,var(--template-bg) 88%));padding:7.4% 8.4% 6.8%;border:0;}
     body[data-layout="data-insight"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-accent) 4%,transparent) 0 1px,transparent 1px 34px),radial-gradient(circle at 78% 26%,color-mix(in srgb,var(--template-accent) 18%,transparent),transparent 27%);}
     body[data-layout="data-insight"] .slide::after{content:"";position:absolute;inset:10.8% 6.2% 9.6%;border-radius:18px;background:rgba(255,255,255,.90);border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);box-shadow:0 24px 52px rgba(16,42,67,.13);}
@@ -1972,6 +2008,36 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="corporate-training"] .training-checklist span::before{content:"";position:absolute;width:16px;height:16px;margin-left:-27px;margin-top:1px;border-radius:5px;background:#f3a712;}
     body[data-layout="corporate-training"] .training-summary-line{position:absolute;left:8%;right:8%;bottom:26%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#f3a712,transparent);}
     body[data-layout="corporate-training"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.84);border:1px solid rgba(31,58,95,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,61,.62);}
+    body[data-layout="onboarding-guide"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f4f8fb 0%,var(--template-bg) 56%,#e8f7f4 100%);box-shadow:0 22px 56px rgba(16,32,51,.14);}
+    body[data-layout="onboarding-guide"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(30,58,95,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(20,184,166,.038) 0 1px,transparent 1px 38px),radial-gradient(circle at 78% 18%,rgba(20,184,166,.16),transparent 24%);}
+    body[data-layout="onboarding-guide"] .slide::after{content:"";position:absolute;left:5.4%;right:5.4%;top:8%;bottom:8%;z-index:1;border-radius:24px;background:rgba(255,255,255,.95);border:1px solid rgba(30,58,95,.12);box-shadow:0 24px 54px rgba(16,32,51,.12);}
+    body[data-layout="onboarding-guide"] .accent{height:7%;z-index:2;background:linear-gradient(90deg,var(--template-primary),var(--template-accent) 72%,#f59e0b);}
+    body[data-layout="onboarding-guide"] .slide-content{display:none;}
+    body[data-layout="onboarding-guide"] .onboarding-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="onboarding-guide"] .onboarding-kicker{position:absolute;left:8%;top:13.5%;font-size:11px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="onboarding-guide"] .onboarding-title{position:absolute;left:8%;top:20.5%;width:44%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="onboarding-guide"] .onboarding-rule{position:absolute;left:8%;top:42%;width:32%;height:4px;border-radius:999px;background:linear-gradient(90deg,#f59e0b,var(--template-accent),transparent);}
+    body[data-layout="onboarding-guide"] .onboarding-bullets{position:absolute;left:8.2%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="onboarding-guide"] .onboarding-bullets li{margin:.1em 0;}
+    body[data-layout="onboarding-guide"] .onboarding-badge{position:absolute;right:8.2%;top:15.8%;width:33%;height:49%;border-radius:22px;background:linear-gradient(180deg,#fff,#f6fbfb);border:1px solid rgba(30,58,95,.13);box-shadow:0 18px 38px rgba(16,32,51,.10);overflow:hidden;}
+    body[data-layout="onboarding-guide"] .onboarding-badge::before{content:"";position:absolute;left:0;right:0;top:0;height:22%;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="onboarding-guide"] .onboarding-badge::after{content:"";position:absolute;left:12%;top:38%;width:70px;height:70px;border-radius:50%;background:rgba(20,184,166,.22);box-shadow:130px -12px 0 -8px rgba(245,158,11,.28),155px 68px 0 -16px rgba(30,58,95,.18);}
+    body[data-layout="onboarding-guide"] .onboarding-badge i{position:absolute;display:block;border-radius:999px;background:var(--template-primary);}
+    body[data-layout="onboarding-guide"] .onboarding-badge i:nth-child(1){left:48%;top:36%;width:36%;height:8px;}body[data-layout="onboarding-guide"] .onboarding-badge i:nth-child(2){left:48%;top:49%;width:28%;height:8px;background:var(--template-accent);}body[data-layout="onboarding-guide"] .onboarding-badge i:nth-child(3){left:48%;top:62%;width:34%;height:8px;background:#f59e0b;}
+    body[data-layout="onboarding-guide"] .onboarding-steps{position:absolute;left:8%;right:8%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="onboarding-guide"] .onboarding-steps span{position:relative;min-height:82px;border-radius:16px;background:#fff;border:1px solid rgba(30,58,95,.12);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:15px 14px 12px 48px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="onboarding-guide"] .onboarding-steps span::before{content:attr(data-step);position:absolute;left:14px;top:14px;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--template-accent);color:#fff;font-size:10px;}
+    body[data-layout="onboarding-guide"] .onboarding-handbook{position:absolute;right:8.4%;top:18%;width:34%;height:45%;border-radius:18px;background:#fff;border:1px solid rgba(30,58,95,.13);box-shadow:0 16px 32px rgba(16,32,51,.09);}
+    body[data-layout="onboarding-guide"] .onboarding-handbook::before{content:"";position:absolute;left:10%;right:10%;top:15%;height:10%;border-radius:999px;background:var(--template-primary);box-shadow:0 70px 0 rgba(20,184,166,.22),0 140px 0 rgba(245,158,11,.22);}
+    body[data-layout="onboarding-guide"] .onboarding-handbook::after{content:"";position:absolute;right:12%;top:30%;width:56px;height:96px;border-radius:18px;background:rgba(20,184,166,.22);}
+    body[data-layout="onboarding-guide"] .onboarding-culture{position:absolute;right:8.4%;top:18%;width:36%;height:47%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="onboarding-guide"] .onboarding-culture span{border-radius:16px;background:linear-gradient(135deg,#fff,#f7fbfb);border:1px solid rgba(30,58,95,.12);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="onboarding-guide"] .onboarding-culture span::before{content:"";display:block;width:30px;height:5px;margin-bottom:11px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="onboarding-guide"] .onboarding-checklist{position:absolute;left:8%;right:8%;bottom:14.4%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;}
+    body[data-layout="onboarding-guide"] .onboarding-checklist span{min-height:86px;border-radius:14px;background:#fff;border:1px solid rgba(30,58,95,.12);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:14px 14px 14px 44px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="onboarding-guide"] .onboarding-checklist span::before{content:"";position:absolute;width:17px;height:17px;margin-left:-29px;margin-top:1px;border-radius:6px;background:#f59e0b;}
+    body[data-layout="onboarding-guide"] .onboarding-summary-line{position:absolute;left:8%;right:8%;bottom:26%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#f59e0b,transparent);}
+    body[data-layout="onboarding-guide"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.84);border:1px solid rgba(30,58,95,.12);border-radius:999px;padding:5px 10px;color:rgba(16,32,51,.62);}
     body[data-layout="education-course"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 54%,color-mix(in srgb,var(--template-accent) 9%,var(--template-bg) 91%));padding:7% 8.5% 6.6%;border:0;}
     body[data-layout="education-course"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 30px),radial-gradient(circle at 12% 16%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 22%);pointer-events:none;}
     body[data-layout="education-course"] .slide::after{content:"";position:absolute;left:8.8%;right:8.2%;top:13.5%;bottom:11%;border-radius:2px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.90));border-left:8px solid color-mix(in srgb,var(--template-primary) 70%,var(--template-accent) 30%);box-shadow:0 18px 40px rgba(33,78,68,.12);}
@@ -2451,7 +2517,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
     body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
-    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
+    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case,body[data-layout="onboarding-guide"] .onboarding-badge,body[data-layout="onboarding-guide"] .onboarding-handbook,body[data-layout="onboarding-guide"] .onboarding-culture{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="onboarding-guide"] .onboarding-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
 
@@ -3477,6 +3543,66 @@ function isCorporateTrainingVisual(visual) {
   return visual?.layout === "corporate-training" && (id === "corporate-training" || id === "education-corporate-training-management");
 }
 
+function onboardingGuidePreviewScene({ slide, index, total }) {
+  const bullets = onboardingGuideBulletTexts(slide);
+  const title = onboardingGuideCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = index === 0
+    ? "cover"
+    : index === total - 1
+      ? "summary"
+      : ["handbook", "culture", "checklist", "steps"][(index - 1) % 4];
+  const steps = ["入职准备", "制度熟悉", "业务融入", "成长反馈"].map((fallback, itemIndex) => onboardingGuideCompactText(bullets[itemIndex], fallback, 10));
+  const cards = ["组织介绍", "岗位职责", "工具权限", "导师机制"].map((fallback, itemIndex) => onboardingGuideCompactText(bullets[itemIndex], fallback, 12));
+  return {
+    variant: "onboarding-guide",
+    role,
+    kicker: role === "cover" ? "NEW HIRE GUIDE" : role === "handbook" ? "HANDBOOK MAP" : role === "culture" ? "CULTURE FIT" : role === "checklist" ? "ONBOARDING CHECKLIST" : role === "steps" ? "FIRST 30 DAYS" : "GROWTH NEXT STEP",
+    title,
+    bullets,
+    steps,
+    cards,
+  };
+}
+
+function renderOnboardingGuidePreview(slide, scene) {
+  // 入职培训模板使用专属内容层承载导览结构，避免默认列表和手册图形互相覆盖。
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(onboardingGuideCompactText(item, scene.title, 40))}</li>`).join("");
+  const common = `<div class="onboarding-kicker">${escapeHtml(scene.kicker)}</div><h2 class="onboarding-title">${escapeHtml(scene.title || slide?.title || "")}</h2><div class="onboarding-rule"></div><ul class="onboarding-bullets">${bulletItems}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="onboarding-layer">${common}<div class="onboarding-badge"><i></i><i></i><i></i></div><div class="onboarding-steps">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "handbook") {
+    return `<div class="onboarding-layer">${common}<div class="onboarding-handbook"></div><div class="onboarding-steps">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "culture") {
+    return `<div class="onboarding-layer">${common}<div class="onboarding-culture">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "checklist") {
+    return `<div class="onboarding-layer">${common}<div class="onboarding-checklist">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="onboarding-layer">${common}<div class="onboarding-summary-line"></div><div class="onboarding-steps">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function onboardingGuideBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["了解组织文化与关键制度", "完成岗位工具和权限配置", "建立导师沟通和试用期目标"];
+}
+
+function onboardingGuideCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isOnboardingGuideVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "onboarding-guide" && (id === "onboarding-training" || id === "education-onboarding-training-onboarding-guide");
+}
+
 function productRoadmapPreviewScene(visual) {
   const variant = productRoadmapVariant(visual);
   const scenes = {
@@ -3642,6 +3768,87 @@ function isProductPainPointsVisual(visual) {
 function isBiExecutiveCockpitVisual(visual) {
   // 只要官方模板声明为驾驶舱布局，就启用专属预览层，避免目录迁移后被模板 id 卡住。
   return visual?.layout === "bi-executive-cockpit";
+}
+
+/**
+ * 渲染用户行为分析的路径转化预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderUserPathFunnelPreview(slide, scene) {
+  // 该模板的标题、指标和路径图统一由专属层绘制，保证预览和 PPTX 导出不会出现两套文字。
+  const title = escapeHtml(scene.title || slide?.title || "用户转化路径复盘");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(userPathCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="path-kicker">${escapeHtml(scene.kicker)}</div><h2 class="path-title">${title}</h2><div class="path-rule"></div><ul class="path-bullets">${bulletItems}</ul>`;
+  const map = `<div class="path-map"><i></i><i></i><i></i><i></i></div>`;
+  const metrics = `<div class="path-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover" || scene.kind === "overview") {
+    return `<div class="path-layer">${common}${map}${metrics}</div>`;
+  }
+  if (scene.kind === "funnel") {
+    return `<div class="path-layer">${common}<div class="path-funnel">${scene.steps.map((step) => `<span><b>${escapeHtml(step.label)}</b><em>${escapeHtml(step.value)}</em></span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "experiment") {
+    return `<div class="path-layer">${common}<div class="path-experiment">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  return `<div class="path-layer">${common}<div class="path-actions">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function userPathFunnelPreviewScene({ slide, index, total }) {
+  const bullets = userPathBulletTexts(slide);
+  const title = userPathCompactText(slide?.title, "用户转化路径复盘", index === 0 ? 30 : 28);
+  const values = userPathMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: userPathCompactText(bullets[0], "访问用户", 8) },
+    { value: values[1], label: userPathCompactText(bullets[1], "关键转化", 8) },
+    { value: values[2], label: userPathCompactText(bullets[2], "实验提升", 8) },
+  ];
+  const steps = ["访问", "激活", "提交", "留存"].map((label, stepIndex) => ({
+    label: userPathCompactText(bullets[stepIndex], label, 8),
+    value: values[stepIndex] || `${Math.max(24, 92 - stepIndex * 18)}%`,
+  }));
+  const cards = ["断点假设", "实验方案", "样本观察", "下一步动作"].map((fallback, cardIndex) => userPathCompactText(bullets[cardIndex], fallback, 14));
+  const scenes = [
+    { kind: "cover", variant: "path-funnel", kicker: "USER JOURNEY LAB", title, bullets, metrics, steps, cards },
+    { kind: "overview", variant: "path-funnel", kicker: "CONVERSION ROUTE", title, bullets, metrics, steps, cards },
+    { kind: "funnel", variant: "path-funnel", kicker: "DROP-OFF DIAGNOSIS", title, bullets, metrics, steps, cards },
+    { kind: "experiment", variant: "path-funnel", kicker: "GROWTH EXPERIMENT", title, bullets, metrics, steps, cards },
+  ];
+  if (index === total - 1) {
+    return { kind: "actions", variant: "path-funnel", kicker: "NEXT OPTIMIZATION", title, bullets, metrics, steps, cards: ["优化入口", "缩短路径", "验证假设", "复盘数据"].map((fallback, cardIndex) => userPathCompactText(bullets[cardIndex], fallback, 14)) };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function userPathBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["访问用户进入核心功能路径", "关键步骤转化率出现明显下降", "增长实验带来留存和提交率提升"];
+}
+
+function userPathMetricValues(bullets) {
+  const matches = bullets.flatMap((item) => String(item).match(/\d+(?:\.\d+)?%|\d+(?:\.\d+)?[万千]?/g) || []);
+  return [
+    matches[0] || "12.8K",
+    matches[1] || "38%",
+    matches[2] || "+12%",
+    matches[3] || "24%",
+  ];
+}
+
+function userPathCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isUserPathFunnelVisual(visual) {
+  // 只按 layout 判断，方便目录化模板同步后使用完整 slug 或基础模板 id 都能进入专属渲染。
+  return visual?.layout === "user-path-funnel";
 }
 
 function pitchDeckPreviewScene(visual) {
@@ -4242,6 +4449,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
+  if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;

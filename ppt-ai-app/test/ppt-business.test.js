@@ -501,6 +501,30 @@ test("PptService renders business plan model preview with dedicated layout", asy
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders seed round startup story preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertSeedRoundStartupStoryTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "早期项目种子轮融资",
+    slideCount: 6,
+    templateId: "pitch-seed-round-pitch-startup-story",
+    theme: "startup-story",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-seed-round-pitch-startup-story" data-layout="seed-round-story"/);
+  assert.match(preview, /seed-layer/);
+  assert.match(preview, /seed-mockup/);
+  assert.match(preview, /seed-pain-wall|seed-validation-board|seed-growth-chart|seed-team-cards|seed-funding-road/);
+  assert.match(preview, /SEED ROUND NARRATIVE|PAIN DISCOVERY|MVP VALIDATION|EARLY TRACTION|WHY THIS TEAM|NEXT INVESTOR CONVERSATION/);
+  assert.doesNotMatch(preview, />创业故事</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders BI executive cockpit preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4274,6 +4298,50 @@ async function insertBusinessPlanModelTemplate(context) {
       defaultCoverLayout: "bp-cover",
       defaultContentLayout: "bp-canvas",
       allowedLayouts: ["bp-cover", "bp-canvas", "bp-revenue", "bp-cost", "bp-value-chain", "bp-ecosystem", "bp-capital-plan", "hero", "content"],
+    },
+  });
+}
+
+async function insertSeedRoundStartupStoryTemplate(context) {
+  // 测试数据库模拟官方模板同步后的种子轮融资路演模板，确保页面内容和主题选择元数据分离。
+  await context.database.insert("templates", {
+    id: "pitch-seed-round-pitch-startup-story",
+    slug: "pitch-seed-round-pitch-startup-story",
+    name: "种子轮融资路演 - 创业故事",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "startup-story",
+        name: "创业故事",
+        visual: {
+          primary: "172033",
+          accent: "F97316",
+          background: "F6F4EF",
+          surface: "FFFFFF",
+          title: "172033",
+          body: "465266",
+          layout: "seed-round-story",
+          variant: "startup-story",
+        },
+      },
+    ],
+    visual: {
+      primary: "172033",
+      accent: "F97316",
+      background: "F6F4EF",
+      surface: "FFFFFF",
+      title: "172033",
+      body: "465266",
+      layout: "seed-round-story",
+      variant: "startup-story",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "seed-story-cover",
+      defaultContentLayout: "seed-story-content",
+      allowedLayouts: ["seed-story-cover", "founder-story", "pain-discovery", "mvp-validation", "early-traction", "team-belief", "funding-roadmap", "seed-story-closing", "title", "content"],
     },
   });
 }
