@@ -1103,6 +1103,51 @@ test("PptExportService uses business plan model decorations", () => {
   assert.doesNotMatch(slide1, /business-model/);
 });
 
+test("PptExportService uses BI executive cockpit decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-bi-dashboard-executive-cockpit",
+      theme: "executive-cockpit",
+      templateVisual: {
+        id: "data-bi-dashboard-executive-cockpit",
+        primary: "071A2F",
+        accent: "22D3EE",
+        secondary: "A3E635",
+        background: "08111F",
+        surface: "0E2238",
+        title: "E6F7FF",
+        body: "A8C7D8",
+        layout: "bi-executive-cockpit",
+        variant: "executive-cockpit",
+      },
+      slides: [
+        { title: "经营数据总览", bullets: ["收入 1.2 亿达成率 92%", "利润率 18%", "风险 3 项"] },
+        { title: "趋势变化监控", bullets: ["收入环比增长 12%", "利润改善 3%", "成本下降 5%"] },
+        { title: "部门表现排行", bullets: ["华东区域领先", "渠道贡献提升", "客户留存稳定"] },
+        { title: "异常指标预警", bullets: ["回款周期延长", "费用率抬升", "库存周转放缓"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="BI Cockpit Main Console"/);
+  assert.match(slide1, /name="BI Cockpit Gauge Panel"/);
+  assert.match(slide1, /name="BI Cockpit KPI Card 1"/);
+  assert.match(slide2, /name="BI Cockpit Trend Panel"/);
+  assert.match(slide3, /name="BI Cockpit Ranking Row 1"/);
+  assert.match(slide4, /name="BI Cockpit Alert Card 1"/);
+  assert.match(slide1, /val="08111F"/);
+  assert.match(slide1, /val="22D3EE"/);
+  assert.doesNotMatch(slide1, /管理驾驶舱/);
+});
+
 test("PptExportService uses editorial brand story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1514,6 +1559,51 @@ test("PptExportService uses education minimal course decorations", () => {
   assert.match(slide1, /name="Education Course Note Title Line"/);
   assert.match(slide1, /name="Education Course Highlight"/);
   assert.match(slide1, /val="2F5D73"/);
+});
+
+test("PptExportService uses corporate training management decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-corporate-training-management",
+      theme: "management",
+      templateVisual: {
+        id: "education-corporate-training-management",
+        primary: "1F3A5F",
+        accent: "20A39E",
+        secondary: "F3A712",
+        background: "F4F7FA",
+        surface: "FFFFFF",
+        title: "10233D",
+        body: "40516A",
+        layout: "corporate-training",
+        variant: "management",
+      },
+      slides: [
+        { title: "课程目标与收益", layout: "corporate-training-cover", bullets: ["统一管理语言", "掌握辅导工具", "输出行动计划"] },
+        { title: "学习路径安排", layout: "corporate-training-agenda", bullets: ["导入业务场景", "讲解管理模型", "小组研讨演练", "沉淀行动承诺"] },
+        { title: "管理模型拆解", layout: "corporate-training-model", bullets: ["目标设定", "过程反馈", "授权协同", "复盘迭代"] },
+        { title: "案例研讨任务", layout: "corporate-training-case", bullets: ["案例背景", "关键问题", "小组任务"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Corporate Training Learning Canvas"/);
+  assert.match(slide1, /name="Corporate Training Board"/);
+  assert.match(slide1, /name="Corporate Training Outcome Card 1"/);
+  assert.match(slide2, /name="Corporate Training Learning Path 1"/);
+  assert.match(slide3, /name="Corporate Training Model Card 1"/);
+  assert.match(slide4, /name="Corporate Training Case Panel"/);
+  assert.match(slide1, /val="1F3A5F"/);
+  assert.match(slide1, /val="20A39E"/);
+  assert.doesNotMatch(slide1, /Management Training/);
 });
 
 test("PptExportService applies template-specific visual colors to PDF output", () => {

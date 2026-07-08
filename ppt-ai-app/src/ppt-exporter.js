@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-pain-points", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-pain-points", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "marketing-launch-rhythm"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "marketing-launch-rhythm") {
     if (index === 0) {
@@ -504,6 +504,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1320;
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1820);
+  }
+  if (visual.layout === "corporate-training") {
+    if (index === 0) {
+      if (textLength >= 30) return 2000;
+      if (textLength >= 22) return 2240;
+      return Math.min(fallbackSize, 2520);
+    }
+    if (textLength >= 30) return 1360;
+    if (textLength >= 22) return 1560;
+    return Math.min(fallbackSize, 1840);
   }
   if (visual.layout === "annual-summary") {
     const textUnits = estimateTextUnits(title);
@@ -626,9 +636,11 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
   if (visual.layout === "product-pain-points") return false;
+  if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
+  if (visual.layout === "corporate-training") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
@@ -766,6 +778,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "product-pain-points") {
     return base + productPainPointsDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "bi-executive-cockpit") {
+    return base + biExecutiveCockpitDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -783,6 +798,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "sales-education-solution") {
     return base + educationSolutionDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "corporate-training") {
+    return base + corporateTrainingDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
@@ -1596,6 +1614,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "corporate-training") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 432816, cx: 8193024, cy: 4297680 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 731520, y: isCover ? 2125980 : 1943100, cx: 3200400, cy: 30480 },
+      label: { x: 731520, y: 685800, cx: 2895600, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1097280, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 899160, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2362200, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2529840, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2520 : isClosing ? 2480 : 1840,
+      bodySize: isCover ? 920 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "finance-budget-planning") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2102,6 +2144,20 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 685800, y: 3962400, cx: 7772400, cy: 457200 },
       titleSize: 2300,
       bodySize: 980,
+    };
+  }
+  if (visual.layout === "bi-executive-cockpit") {
+    return {
+      surface: { x: 438912, y: 411480, cx: 8266176, cy: 4373880 },
+      accent: { x: 438912, y: 411480, cx: 8266176, cy: 45720 },
+      secondaryAccent: { x: 731520, y: 3048000, cx: 3657600, cy: 30480 },
+      label: { x: 731520, y: 670560, cx: 2438400, cy: 243840 },
+      title: { x: 731520, y: 990600, cx: 3962400, cy: 914400 },
+      content: { x: 731520, y: 2438400, cx: 3657600, cy: 914400 },
+      titleSize: index === 0 ? 3000 : 2520,
+      bodySize: 980,
+      titleColor: visual.title,
+      bodyColor: visual.body,
     };
   }
   if (visual.layout === "top-band") {
@@ -3350,6 +3406,163 @@ function isManufacturingSolutionVisual(visual) {
   return visual?.layout === "sales-manufacturing-solution" && (id === "industry-solution" || id === "sales-industry-solution-manufacturing-industry");
 }
 
+function corporateTrainingDecorationsXml({ visual, index, role, slide }) {
+  const scene = corporateTrainingSceneFromSlide({ slide, index, role });
+  const palette = corporateTrainingColorPalette(visual);
+  // 企业内训模板主体全部使用可编辑形状绘制，导出后可继续二次调整文本和图形。
+  const backdrop = rectShapeXml({ id: 1200, name: "Corporate Training Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1201, name: "Corporate Training Glow", geom: "ellipse", x: 7040880, y: 274320, cx: 1767840, cy: 1524000, fill: palette.softAccent })
+    + rectShapeXml({ id: 1202, name: "Corporate Training Header", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + rectShapeXml({ id: 1203, name: "Corporate Training Header Accent", x: 0, y: 365760, cx: 9144000, cy: 30480, fill: visual.accent });
+  const surface = solidShapeXml({ id: 1204, name: "Corporate Training Learning Canvas", geom: "roundRect", x: 475488, y: 432816, cx: 8193024, cy: 4297680, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1205, name: "Corporate Training Canvas Border", geom: "roundRect", x: 475488, y: 432816, cx: 8193024, cy: 4297680, stroke: palette.frame, width: 12700 });
+  const header = textShapeXml({ id: 1206, name: "Corporate Training Kicker", x: 731520, y: 685800, cx: 2895600, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1207, name: "Corporate Training Focus Rule", x: 731520, y: index === 0 ? 2164080 : 1973580, cx: 3200400, cy: 30480, fill: palette.orange });
+  const bullets = corporateTrainingBulletCardsXml({ visual, palette, scene, isCover: index === 0 });
+  if (scene.role === "agenda") return backdrop + surface + header + bullets + corporateTrainingBoardXml({ visual, palette }) + corporateTrainingPathXml({ visual, palette, items: scene.path });
+  if (scene.role === "model") return backdrop + surface + header + bullets + corporateTrainingModelXml({ visual, palette, items: scene.model }) + corporateTrainingOutcomeCardsXml({ visual, palette, items: scene.outcomes });
+  if (scene.role === "case") return backdrop + surface + header + bullets + corporateTrainingCaseXml({ visual, palette }) + corporateTrainingChecklistXml({ visual, palette, items: scene.checklist });
+  if (scene.role === "tool" || scene.role === "practice") return backdrop + surface + header + bullets + corporateTrainingModelXml({ visual, palette, items: scene.model }) + corporateTrainingChecklistXml({ visual, palette, items: scene.checklist });
+  if (scene.role === "summary") return backdrop + surface + header + bullets + corporateTrainingSummaryXml({ visual, palette, items: scene.path });
+  return backdrop + surface + header + bullets + corporateTrainingBoardXml({ visual, palette }) + corporateTrainingOutcomeCardsXml({ visual, palette, items: scene.outcomes });
+}
+
+function corporateTrainingBoardXml({ visual, palette }) {
+  return solidShapeXml({ id: 1220, name: "Corporate Training Board", geom: "roundRect", x: 5780520, y: 975360, cx: 2743200, cy: 2514600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1221, name: "Corporate Training Board Border", geom: "roundRect", x: 5780520, y: 975360, cx: 2743200, cy: 2514600, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1222, name: "Corporate Training Board Header Line", x: 6065520, y: 1272540, cx: 1828800, cy: 91440, fill: visual.primary })
+    + rectShapeXml({ id: 1223, name: "Corporate Training Board Accent Line", x: 6065520, y: 1844040, cx: 914400, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 1224, name: "Corporate Training Coach Node", geom: "ellipse", x: 7444740, y: 1661160, cx: 701040, cy: 701040, fill: palette.softAccent })
+    + solidShapeXml({ id: 1225, name: "Corporate Training Practice Panel", geom: "roundRect", x: 6096000, y: 2468880, cx: 1905000, cy: 640080, fill: palette.tint });
+}
+
+function corporateTrainingOutcomeCardsXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const x = 731520 + index * 1257300;
+    return solidShapeXml({ id: 1240 + index * 3, name: `Corporate Training Outcome Card ${index + 1}`, geom: "roundRect", x, y: 3764280, cx: 1005840, cy: 487680, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1241 + index * 3, name: `Corporate Training Outcome Accent ${index + 1}`, x, y: 3764280, cx: 1005840, cy: 38100, fill: index === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1242 + index * 3, name: `Corporate Training Outcome Text ${index + 1}`, x: x + 121920, y: 3901440, cx: 762000, cy: 198120, text: corporateTrainingCompactText(item, "", 8), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function corporateTrainingBulletCardsXml({ visual, palette, scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2514600 : 1813560) + index * 243840;
+    return rectShapeXml({ id: 1260 + index * 2, name: `Corporate Training Bullet Rule ${index + 1}`, x: 749808, y: y + 30480, cx: 45720, cy: 137160, fill: index === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1261 + index * 2, name: `Corporate Training Bullet Text ${index + 1}`, x: 914400, y, cx: 3505200, cy: 198120, text: corporateTrainingCompactText(item, scene.title, 32), size: isCover ? 800 : 700, bold: false, color: visual.body });
+  }).join("");
+}
+
+function corporateTrainingPathXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 853440 + index * 1973580;
+    return solidShapeXml({ id: 1280 + index * 4, name: `Corporate Training Learning Path ${index + 1}`, geom: "roundRect", x, y: 3444240, cx: 1524000, cy: 746760, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1281 + index * 4, name: `Corporate Training Path Border ${index + 1}`, geom: "roundRect", x, y: 3444240, cx: 1524000, cy: 746760, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1282 + index * 4, name: `Corporate Training Path Marker ${index + 1}`, geom: "ellipse", x: x + 167640, y: 3611880, cx: 243840, cy: 243840, fill: index % 2 === 0 ? visual.accent : palette.orange })
+      + textShapeXml({ id: 1283 + index * 4, name: `Corporate Training Path Text ${index + 1}`, x: x + 487680, y: 3657600, cx: 822960, cy: 243840, text: corporateTrainingCompactText(item, "", 10), size: 740, bold: true, color: visual.title });
+  }).join("");
+}
+
+function corporateTrainingModelXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5943600 + col * 1219200;
+    const y = 1120140 + row * 914400;
+    return solidShapeXml({ id: 1310 + index * 4, name: `Corporate Training Model Card ${index + 1}`, geom: "roundRect", x, y, cx: 1005840, cy: 670560, fill: index === 0 ? palette.tint : "FFFFFF" })
+      + lineFrameShapeXml({ id: 1311 + index * 4, name: `Corporate Training Model Border ${index + 1}`, geom: "roundRect", x, y, cx: 1005840, cy: 670560, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1312 + index * 4, name: `Corporate Training Model Rule ${index + 1}`, x: x + 121920, y: y + 152400, cx: 365760, cy: 38100, fill: index === 2 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1313 + index * 4, name: `Corporate Training Model Text ${index + 1}`, x: x + 121920, y: y + 274320, cx: 731520, cy: 182880, text: corporateTrainingCompactText(item, "", 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function corporateTrainingCaseXml({ visual, palette }) {
+  return solidShapeXml({ id: 1340, name: "Corporate Training Case Panel", geom: "roundRect", x: 5780520, y: 1120140, cx: 2743200, cy: 2194560, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1341, name: "Corporate Training Case Border", geom: "roundRect", x: 5780520, y: 1120140, cx: 2743200, cy: 2194560, stroke: palette.frame, width: 10160 })
+    + solidShapeXml({ id: 1342, name: "Corporate Training Case Visual", geom: "roundRect", x: 6096000, y: 1402080, cx: 2133600, cy: 670560, fill: palette.tint })
+    + rectShapeXml({ id: 1343, name: "Corporate Training Case Line 1", x: 6096000, y: 2362200, cx: 1828800, cy: 60960, fill: visual.primary, transparency: 18000 })
+    + rectShapeXml({ id: 1344, name: "Corporate Training Case Line 2", x: 6096000, y: 2636520, cx: 1371600, cy: 60960, fill: visual.accent, transparency: 8000 })
+    + rectShapeXml({ id: 1345, name: "Corporate Training Case Line 3", x: 6096000, y: 2910840, cx: 1676400, cy: 60960, fill: palette.orange, transparency: 8000 });
+}
+
+function corporateTrainingChecklistXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const x = 914400 + index * 2316480;
+    return solidShapeXml({ id: 1360 + index * 4, name: `Corporate Training Checklist Card ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1828800, cy: 579120, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1361 + index * 4, name: `Corporate Training Checklist Border ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1828800, cy: 579120, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1362 + index * 4, name: `Corporate Training Checklist Marker ${index + 1}`, geom: "roundRect", x: x + 152400, y: 3825240, cx: 152400, cy: 152400, fill: index === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 1363 + index * 4, name: `Corporate Training Checklist Text ${index + 1}`, x: x + 381000, y: 3802380, cx: 1219200, cy: 213360, text: corporateTrainingCompactText(item, "", 14), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function corporateTrainingSummaryXml({ visual, palette, items }) {
+  const line = rectShapeXml({ id: 1390, name: "Corporate Training Summary Line", x: 731520, y: 3200400, cx: 6705600, cy: 38100, fill: visual.accent })
+    + rectShapeXml({ id: 1391, name: "Corporate Training Summary Warm Line", x: 4267200, y: 3200400, cx: 2286000, cy: 38100, fill: palette.orange });
+  return line + corporateTrainingPathXml({ visual, palette, items });
+}
+
+function corporateTrainingSceneFromSlide({ slide, index, role }) {
+  const bullets = corporateTrainingBulletTexts(slide);
+  const rawRole = String(role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("agenda")
+      ? "agenda"
+      : rawRole.includes("model")
+        ? "model"
+        : rawRole.includes("case")
+          ? "case"
+          : rawRole.includes("tool")
+            ? "tool"
+            : rawRole.includes("practice")
+              ? "practice"
+              : rawRole.includes("summary") || rawRole === "closing"
+                ? "summary"
+                : ["agenda", "model", "case", "tool", "practice"][(index - 1) % 5];
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "INTERNAL LEARNING PROGRAM" : sceneRole === "agenda" ? "LEARNING MAP" : sceneRole === "model" ? "MANAGEMENT MODEL" : sceneRole === "case" ? "CASE DISCUSSION" : sceneRole === "tool" ? "TOOLKIT PRACTICE" : sceneRole === "practice" ? "WORKSHOP TASK" : "ACTION COMMITMENT",
+    title: corporateTrainingCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    outcomes: ["目标", "模型", "练习"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 8)),
+    path: ["导入", "讲解", "研讨", "行动"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 10)),
+    model: ["原则", "方法", "工具", "输出"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 12)),
+    checklist: ["案例背景", "关键问题", "小组任务"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 14)),
+  };
+}
+
+function corporateTrainingBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确管理角色和团队协作目标", "掌握可复用的管理模型与沟通方法", "通过案例研讨形成课后行动计划"];
+}
+
+function corporateTrainingCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function corporateTrainingColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.3),
+    panel: blendHexColor(visual.background, visual.surface, 0.68),
+    tint: blendHexColor(visual.accent, visual.surface, 0.82),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.76),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    orange: "F3A712",
+  };
+}
+
+function isCorporateTrainingVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "corporate-training" && (id === "corporate-training" || id === "education-corporate-training-management");
+}
+
 function educationSolutionDecorationsXml({ visual, index, role, slide }) {
   const scene = educationSolutionSceneFromSlide({ slide, index, role });
   const palette = educationSolutionColorPalette(visual);
@@ -4398,6 +4611,166 @@ function dataInsightVisualXml({ visual, palette, scene, isCover }) {
     + solidShapeXml({ id: 525, name: "Data Insight Dashboard Bar 3", geom: "roundRect", x: panel.x + 1005840, y: panel.y + 762000, cx: 167640, cy: 457200, fill: visual.accent })
     + solidShapeXml({ id: 526, name: "Data Insight Dashboard Bar 4", geom: "roundRect", x: panel.x + 1310640, y: panel.y + 426720, cx: 167640, cy: 792480, fill: visual.primary })
     + solidShapeXml({ id: 527, name: "Data Insight Dashboard Alert Dot", geom: "ellipse", x: panel.x + 1478280, y: panel.y + 365760, cx: 243840, cy: 243840, fill: palette.alert });
+}
+
+function biExecutiveCockpitDecorationsXml({ visual, index, role, slide }) {
+  const scene = biExecutiveCockpitScene({ slide, index, role });
+  const palette = biCockpitColorPalette(visual);
+  const isCover = index === 0;
+  const base = solidShapeXml({ id: 1200, name: "BI Cockpit Dark Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + biCockpitGridXml({ visual, palette })
+    + solidShapeXml({ id: 1201, name: "BI Cockpit Main Console", geom: "roundRect", x: 438912, y: 411480, cx: 8266176, cy: 4373880, fill: palette.console })
+    + lineFrameShapeXml({ id: 1202, name: "BI Cockpit Console Frame", geom: "roundRect", x: 438912, y: 411480, cx: 8266176, cy: 4373880, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1203, name: "BI Cockpit Neon Header", x: 438912, y: 411480, cx: 5181600, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1204, name: "BI Cockpit Lime Pulse", x: 5334000, y: 411480, cx: 1524000, cy: 45720, fill: palette.lime })
+    + textShapeXml({ id: 1205, name: "BI Cockpit Section Kicker", x: 731520, y: 670560, cx: 2438400, cy: 198120, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const visualPanel = scene.role === "trend"
+    ? biCockpitTrendPanelXml({ visual, palette })
+    : scene.role === "distribution"
+      ? biCockpitRankingPanelXml({ visual, palette, cards: scene.cards })
+      : scene.role === "alert"
+        ? biCockpitAlertPanelXml({ visual, palette, cards: scene.cards })
+        : scene.role === "closing"
+          ? biCockpitActionCardsXml({ visual, palette, cards: scene.cards })
+          : biCockpitGaugePanelXml({ visual, palette });
+  return base
+    + visualPanel
+    + (scene.role !== "closing" ? biCockpitMetricCardsXml({ visual, palette, metrics: scene.metrics, isCover }) : "")
+    + biCockpitBulletCardsXml({ visual, palette, bullets: scene.bullets });
+}
+
+function biCockpitGridXml({ visual, palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 1210 + itemIndex, name: `BI Cockpit Vertical Grid ${itemIndex + 1}`, x: 914400 + itemIndex * 1219200, y: 609600, cx: 7620, cy: 3962400, fill: palette.grid })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 1220 + itemIndex, name: `BI Cockpit Horizontal Grid ${itemIndex + 1}`, x: 609600, y: 1066800 + itemIndex * 762000, cx: 7924800, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal
+    + solidShapeXml({ id: 1228, name: "BI Cockpit Cyan Glow", geom: "ellipse", x: 6553200, y: 365760, cx: 1676400, cy: 1676400, fill: palette.glow })
+    + solidShapeXml({ id: 1229, name: "BI Cockpit Lime Glow", geom: "ellipse", x: 304800, y: 3581400, cx: 1219200, cy: 1219200, fill: blendHexColor(visual.secondary || "A3E635", visual.background, 0.78) });
+}
+
+function biCockpitGaugePanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 1230, name: "BI Cockpit Gauge Panel", geom: "roundRect", x: 5715000, y: 1165860, cx: 2667000, cy: 1905000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1231, name: "BI Cockpit Gauge Frame", geom: "roundRect", x: 5715000, y: 1165860, cx: 2667000, cy: 1905000, stroke: palette.frame, width: 11430 })
+    + arcLineShapeXml({ id: 1232, name: "BI Cockpit Gauge Arc", x: 6096000, y: 1546860, cx: 1905000, cy: 1219200, stroke: visual.accent, width: 53340 })
+    + arcLineShapeXml({ id: 1233, name: "BI Cockpit Gauge Lime Arc", x: 6324600, y: 1623060, cx: 1447800, cy: 914400, stroke: palette.lime, width: 30480 })
+    + rectShapeXml({ id: 1234, name: "BI Cockpit Gauge Needle", x: 6934200, y: 2225040, cx: 914400, cy: 45720, fill: palette.lime })
+    + solidShapeXml({ id: 1235, name: "BI Cockpit Gauge Center", geom: "ellipse", x: 6858000, y: 2156460, cx: 182880, cy: 182880, fill: visual.title })
+    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 1236 + itemIndex, name: `BI Cockpit Mini Bar ${itemIndex + 1}`, geom: "roundRect", x: 6096000 + itemIndex * 335280, y: 2613660 - itemIndex * 121920, cx: 137160, cy: 335280 + itemIndex * 121920, fill: itemIndex % 2 ? palette.lime : visual.accent })).join("");
+}
+
+function biCockpitTrendPanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 1250, name: "BI Cockpit Trend Panel", geom: "roundRect", x: 5334000, y: 1165860, cx: 3200400, cy: 2057400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1251, name: "BI Cockpit Trend Frame", geom: "roundRect", x: 5334000, y: 1165860, cx: 3200400, cy: 2057400, stroke: palette.frame, width: 11430 })
+    + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 1252 + itemIndex, name: `BI Cockpit Trend Baseline ${itemIndex + 1}`, x: 5638800, y: 2575560 - itemIndex * 426720, cx: 2514600, cy: 15240, fill: palette.grid })).join("")
+    + arcLineShapeXml({ id: 1260, name: "BI Cockpit Trend Neon Curve", x: 5638800, y: 1546860, cx: 2438400, cy: 990600, stroke: visual.accent, width: 38100 })
+    + arcLineShapeXml({ id: 1261, name: "BI Cockpit Trend Lime Curve", x: 5791200, y: 1714500, cx: 2286000, cy: 762000, stroke: palette.lime, width: 30480 })
+    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 1262 + itemIndex, name: `BI Cockpit Trend Dot ${itemIndex + 1}`, geom: "ellipse", x: 5867400 + itemIndex * 533400, y: 2476500 - itemIndex * 198120, cx: 121920, cy: 121920, fill: itemIndex % 2 ? palette.lime : visual.accent })).join("");
+}
+
+function biCockpitRankingPanelXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const y = 1219200 + index * 426720;
+    return solidShapeXml({ id: 1280 + index * 3, name: `BI Cockpit Ranking Row ${index + 1}`, geom: "roundRect", x: 5486400, y, cx: 2895600, cy: 304800, fill: palette.panel })
+      + textShapeXml({ id: 1281 + index * 3, name: `BI Cockpit Ranking Text ${index + 1}`, x: 5684520, y: y + 76200, cx: 1066800, cy: 137160, text: card, size: 720, bold: true, color: visual.title })
+      + rectShapeXml({ id: 1282 + index * 3, name: `BI Cockpit Ranking Bar ${index + 1}`, x: 6964680, y: y + 121920, cx: 944880 - index * 121920, cy: 38100, fill: index === 0 ? palette.lime : visual.accent });
+  }).join("");
+}
+
+function biCockpitAlertPanelXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1447800;
+    const y = 1219200 + row * 914400;
+    return solidShapeXml({ id: 1300 + index * 4, name: `BI Cockpit Alert Card ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 685800, fill: palette.warningPanel })
+      + solidShapeXml({ id: 1301 + index * 4, name: `BI Cockpit Alert Beacon ${index + 1}`, geom: "ellipse", x: x + 152400, y: y + 121920, cx: 152400, cy: 152400, fill: index === 0 ? "F59E0B" : visual.accent })
+      + textShapeXml({ id: 1302 + index * 4, name: `BI Cockpit Alert Text ${index + 1}`, x: x + 152400, y: y + 365760, cx: 914400, cy: 152400, text: card, size: 700, bold: true, color: visual.title })
+      + rectShapeXml({ id: 1303 + index * 4, name: `BI Cockpit Alert Rule ${index + 1}`, x: x + 152400, y: y + 579120, cx: 762000, cy: 30480, fill: index === 0 ? "F59E0B" : visual.accent });
+  }).join("");
+}
+
+function biCockpitActionCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 3).map((card, index) => {
+    const x = 914400 + index * 2438400;
+    return solidShapeXml({ id: 1320 + index * 3, name: `BI Cockpit Action Card ${index + 1}`, geom: "roundRect", x, y: 3200400, cx: 2133600, cy: 822960, fill: palette.panel })
+      + rectShapeXml({ id: 1321 + index * 3, name: `BI Cockpit Action Rule ${index + 1}`, x: x + 152400, y: 3383280, cx: 762000, cy: 38100, fill: index === 1 ? palette.lime : visual.accent })
+      + textShapeXml({ id: 1322 + index * 3, name: `BI Cockpit Action Text ${index + 1}`, x: x + 152400, y: 3634740, cx: 1676400, cy: 182880, text: card, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function biCockpitMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 4).map((metric, index) => {
+    const x = 731520 + index * 1981200;
+    return solidShapeXml({ id: 1340 + index * 4, name: `BI Cockpit KPI Card ${index + 1}`, geom: "roundRect", x, y: 3771900, cx: 1676400, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 1341 + index * 4, name: `BI Cockpit KPI Value ${index + 1}`, x: x + 137160, y: 3886200, cx: 731520, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 1342 + index * 4, name: `BI Cockpit KPI Label ${index + 1}`, x: x + 137160, y: 4130040, cx: 1066800, cy: 137160, text: metric.label, size: 680, bold: true, color: visual.body })
+      + rectShapeXml({ id: 1343 + index * 4, name: `BI Cockpit KPI Pulse ${index + 1}`, x: x + 137160, y: 4328160, cx: 670560 + index * 91440, cy: 30480, fill: index === 1 ? palette.lime : visual.accent });
+  }).join("");
+}
+
+function biCockpitBulletCardsXml({ visual, palette, bullets }) {
+  return bullets.slice(0, 3).map((bullet, index) => {
+    const y = 2240280 + index * 365760;
+    return solidShapeXml({ id: 1370 + index * 3, name: `BI Cockpit Insight Card ${index + 1}`, geom: "roundRect", x: 731520, y, cx: 3505200, cy: 243840, fill: palette.card })
+      + solidShapeXml({ id: 1371 + index * 3, name: `BI Cockpit Insight Dot ${index + 1}`, geom: "ellipse", x: 883920, y: y + 76200, cx: 91440, cy: 91440, fill: index === 1 ? palette.lime : visual.accent })
+      + textShapeXml({ id: 1372 + index * 3, name: `BI Cockpit Insight Text ${index + 1}`, x: 1066800, y: y + 60960, cx: 2895600, cy: 121920, text: biCockpitCompactText(bullet, "关键经营信号", 28), size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function biExecutiveCockpitScene({ slide, index, role }) {
+  const bullets = biCockpitBulletTexts(slide);
+  const metrics = ["收入", "利润", "达成率", "风险项"].map((fallback, itemIndex) => biCockpitMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["业务排行", "区域表现", "渠道贡献", "异常波动"].map((fallback, itemIndex) => biCockpitCompactText(bullets[itemIndex], fallback, 12));
+  const sceneRole = role === "closing" || index >= 5 ? "closing" : ["cover", "trend", "distribution", "alert"][Math.min(index, 3)];
+  const kickerMap = {
+    cover: "EXECUTIVE DATA HUB",
+    trend: "TREND MONITOR",
+    distribution: "BUSINESS RANKING",
+    alert: "RISK SIGNAL",
+    closing: "NEXT ACTIONS",
+  };
+  return {
+    role: sceneRole,
+    kicker: kickerMap[sceneRole],
+    bullets,
+    metrics,
+    cards: sceneRole === "closing" ? ["持续增长", "风险修复", "资源投入"].map((fallback, itemIndex) => biCockpitCompactText(bullets[itemIndex], fallback, 14)) : cards,
+  };
+}
+
+function biCockpitBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["核心经营指标保持稳定增长", "部门关键数据需要持续跟踪", "异常指标已进入管理层关注清单"];
+}
+
+function biCockpitMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{2,}|[零一二三四五六七八九十百千万亿]+项?)/);
+  const value = match?.[1] || ["KPI", "ROI", "92%", "3"][index] || "KPI";
+  const label = biCockpitCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function biCockpitCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function biCockpitColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.26),
+    console: blendHexColor(visual.surface, visual.background, 0.18),
+    frame: blendHexColor(visual.accent, visual.surface, 0.62),
+    glow: blendHexColor(visual.accent, visual.background, 0.74),
+    grid: blendHexColor(visual.accent, visual.background, 0.82),
+    lime: visual.secondary || "A3E635",
+    panel: blendHexColor(visual.surface, visual.background, 0.08),
+    warningPanel: blendHexColor("F59E0B", visual.surface, 0.84),
+  };
 }
 
 function dataInsightMetricCardsXml({ visual, palette, metrics }) {

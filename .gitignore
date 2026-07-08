@@ -12,6 +12,6 @@ ppt-ai-app/logs/
 ppt-ai-app/runtime-*.log
 ppt-ai-app/runtime-*.err.log
 ppt-ai-app/test-results/
-data/
+/data/
 backups/
 node_modules/

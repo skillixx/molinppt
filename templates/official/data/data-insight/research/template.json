@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "data-insight",
+  "themeId": "research",
+  "style": "analytics-report",
+  "themes": [
+    {
+      "id": "research",
+      "name": "研究报告",
+      "visual": {
+        "primary": "2F3A4A",
+        "accent": "7C9A92",
+        "background": "F3F1EC",
+        "surface": "FFFEFA",
+        "title": "1B2430",
+        "body": "505A66",
+        "layout": "data-insight",
+        "variant": "research"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "2F3A4A",
+    "accent": "7C9A92",
+    "background": "F3F1EC",
+    "surface": "FFFEFA",
+    "title": "1B2430",
+    "body": "505A66",
+    "layout": "data-insight",
+    "variant": "research"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

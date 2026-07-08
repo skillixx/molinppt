@@ -1,0 +1,17 @@
+{
+  "slug": "data-data-insight-insight",
+  "name": "数据洞察报告 - 洞察分析",
+  "description": "适合指标解读、数据发现、分析结论和行动建议。",
+  "category_slug": "data",
+  "category_name": "数据洞察",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "data-insight",
+    "insight",
+    "analytics-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

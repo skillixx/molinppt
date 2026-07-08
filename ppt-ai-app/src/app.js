@@ -1284,6 +1284,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="education-course"] .template-thumb-image { right: 13%; top: 34%; width: 17%; height: 30%; border-radius: 4px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); box-shadow: none; }
     .template-thumb[data-layout="education-course"] .template-thumb-wave { height: 0; opacity: 0; }
     .template-thumb[data-layout="education-course"] .template-thumb-tag { background: var(--thumb-accent); color: color-mix(in srgb, var(--thumb-primary) 88%, #000 12%); }
+    .template-thumb[data-layout="corporate-training"] { background: linear-gradient(135deg, #f6f9fc 0%, var(--thumb-bg) 58%, #e8f5f4 100%); }
+    .template-thumb[data-layout="corporate-training"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 10%, transparent) 0 1px, transparent 1px 28px), radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--thumb-accent) 22%, transparent), transparent 24%); }
+    .template-thumb[data-layout="corporate-training"] .template-thumb-cover { left: 8%; right: 8%; top: 16%; bottom: 14%; border-radius: 14px; background: rgba(255,255,255,.92); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 16px 30px rgba(31,58,95,.13); }
+    .template-thumb[data-layout="corporate-training"] .template-thumb-band { left: 0; right: 0; top: 0; height: 14%; background: linear-gradient(90deg, var(--thumb-primary), var(--thumb-accent)); }
+    .template-thumb[data-layout="corporate-training"] .template-thumb-image { right: 11%; top: 24%; width: 27%; height: 42%; border-radius: 12px; background: linear-gradient(135deg, #fff, color-mix(in srgb, var(--thumb-accent) 18%, #fff 82%)); border: 1px solid color-mix(in srgb, var(--thumb-primary) 10%, transparent); box-shadow: 0 12px 22px rgba(31,58,95,.12); }
+    .template-thumb[data-layout="corporate-training"] .template-thumb-tag { background: #f3a712; color: #10233d; }
     .template-thumb[data-layout="venture"] { background: var(--thumb-bg); }
     .template-thumb[data-layout="venture"]::before { background:
       radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--thumb-accent) 26%, transparent), transparent 34%),
@@ -2276,6 +2282,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "data-insight": { date: "2026/11/03", kicker: "DATA 01", title: "洞察结论", lines: ["指标异常与趋势变化", "行动建议优先级排序"], tag: "数据报告" },
         education: { date: "2026/08/22", kicker: "COURSE 01", title: "课程导入", lines: ["教学目标与知识框架", "课堂活动路径设计"], tag: "教育培训" },
         "education-course": { date: "2026/08/22", kicker: "LESSON 01", title: "课程目标", lines: ["知识框架与重点概念", "课堂互动与练习路径"], tag: "教学课件" },
+        "corporate-training": { date: "2026/08/22", kicker: "LEARNING 01", title: "课程目标", lines: ["管理模型与案例研讨", "课堂练习与行动计划"], tag: "内训课程" },
         pitch: { date: "2026/09/10", kicker: "PITCH 01", title: "增长故事", lines: ["市场机会与产品优势", "融资计划及资金用途"], tag: "融资路演" },
         "brand-story": { date: "2026/10/26", kicker: "BRAND 01", title: "品牌叙事", lines: ["核心主张与用户心智", "传播内容矩阵规划"], tag: "品牌传播" },
         "project-status": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" }
@@ -2344,7 +2351,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2358,7 +2365,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "status-report", "red-gold", "education-course", "corporate-training", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "bi-executive-cockpit"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

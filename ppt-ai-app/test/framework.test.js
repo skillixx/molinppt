@@ -576,6 +576,40 @@ test("resolveTemplateVisual applies education minimal course visual", () => {
   assert.equal(visual.variant, "minimal");
 });
 
+test("resolveTemplateVisual applies corporate training official visual", () => {
+  const template = {
+    id: "education-corporate-training-management",
+    visual: {
+      primary: "1F3A5F",
+      accent: "20A39E",
+      background: "F4F7FA",
+      surface: "FFFFFF",
+      title: "10233D",
+      body: "40516A",
+      layout: "corporate-training",
+      variant: "management",
+    },
+    themes: [
+      {
+        id: "management",
+        visual: {
+          layout: "corporate-training",
+          variant: "management",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "management", template });
+
+  assert.equal(visual.id, "education-corporate-training-management");
+  assert.equal(visual.primary, "1F3A5F");
+  assert.equal(visual.accent, "20A39E");
+  assert.equal(visual.background, "F4F7FA");
+  assert.equal(visual.layout, "corporate-training");
+  assert.equal(visual.variant, "management");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
@@ -644,6 +678,40 @@ test("resolveTemplateVisual applies data insight commercial visuals", () => {
   assert.equal(research.layout, "data-insight");
   assert.equal(research.variant, "research");
   assert.equal(research.primary, "2F3A4A");
+});
+
+test("resolveTemplateVisual applies BI executive cockpit official visual", () => {
+  const template = {
+    id: "data-bi-dashboard-executive-cockpit",
+    visual: {
+      primary: "071A2F",
+      accent: "22D3EE",
+      secondary: "A3E635",
+      background: "08111F",
+      surface: "0E2238",
+      title: "E6F7FF",
+      body: "A8C7D8",
+      layout: "bi-executive-cockpit",
+      variant: "executive-cockpit",
+    },
+    themes: [
+      {
+        id: "executive-cockpit",
+        visual: {
+          layout: "bi-executive-cockpit",
+          variant: "executive-cockpit",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "executive-cockpit", template });
+
+  assert.equal(visual.id, "data-bi-dashboard-executive-cockpit");
+  assert.equal(visual.layout, "bi-executive-cockpit");
+  assert.equal(visual.variant, "executive-cockpit");
+  assert.equal(visual.primary, "071A2F");
+  assert.equal(visual.accent, "22D3EE");
 });
 
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {

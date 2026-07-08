@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "data-insight",
+  "themeId": "dashboard",
+  "style": "analytics-report",
+  "themes": [
+    {
+      "id": "dashboard",
+      "name": "仪表盘",
+      "visual": {
+        "primary": "123B63",
+        "accent": "18A0A6",
+        "background": "EEF6F9",
+        "surface": "FFFFFF",
+        "title": "102A43",
+        "body": "3C5364",
+        "layout": "data-insight",
+        "variant": "dashboard"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123B63",
+    "accent": "18A0A6",
+    "background": "EEF6F9",
+    "surface": "FFFFFF",
+    "title": "102A43",
+    "body": "3C5364",
+    "layout": "data-insight",
+    "variant": "dashboard"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

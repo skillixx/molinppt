@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "data-insight",
+  "themeId": "insight",
+  "style": "analytics-report",
+  "themes": [
+    {
+      "id": "insight",
+      "name": "洞察分析",
+      "visual": {
+        "primary": "273C75",
+        "accent": "F6A623",
+        "background": "F4F7FB",
+        "surface": "FFFFFF",
+        "title": "17243A",
+        "body": "46566C",
+        "layout": "data-insight",
+        "variant": "insight"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "273C75",
+    "accent": "F6A623",
+    "background": "F4F7FB",
+    "surface": "FFFFFF",
+    "title": "17243A",
+    "body": "46566C",
+    "layout": "data-insight",
+    "variant": "insight"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "title",
+      "content"
+    ]
+  }
+}

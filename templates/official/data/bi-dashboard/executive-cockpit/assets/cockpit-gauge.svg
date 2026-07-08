@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="220" viewBox="0 0 360 220" role="img" aria-label="cockpit gauge">
+  <rect width="360" height="220" rx="28" fill="#0E2238"/>
+  <path d="M70 154a110 110 0 0 1 220 0" fill="none" stroke="#1D3D5A" stroke-width="22" stroke-linecap="round"/>
+  <path d="M70 154a110 110 0 0 1 168-93" fill="none" stroke="#22D3EE" stroke-width="22" stroke-linecap="round"/>
+  <path d="M180 154l76-52" stroke="#A3E635" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="180" cy="154" r="16" fill="#E6F7FF"/>
+  <g fill="#A8C7D8" font-family="Arial, sans-serif" font-size="16" font-weight="700">
+    <text x="54" y="184">0</text>
+    <text x="284" y="184">100</text>
+  </g>
+</svg>

@@ -478,6 +478,52 @@ test("PptService renders business plan model preview with dedicated layout", asy
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders BI executive cockpit preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBiExecutiveCockpitTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "经营数据复盘",
+    slideCount: 5,
+    templateId: "data-bi-dashboard-executive-cockpit",
+    theme: "executive-cockpit",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-bi-dashboard-executive-cockpit" data-layout="bi-executive-cockpit"/);
+  assert.match(preview, /cockpit-layer/);
+  assert.match(preview, /cockpit-hero|cockpit-trend|cockpit-rank|cockpit-alerts/);
+  assert.match(preview, /EXECUTIVE DATA HUB|TREND MONITOR|BUSINESS RANKING|RISK SIGNAL/);
+  assert.doesNotMatch(preview, />管理驾驶舱</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders corporate training preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCorporateTrainingTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "员工能力提升计划",
+    slideCount: 5,
+    templateId: "education-corporate-training-management",
+    theme: "management",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="education-corporate-training-management" data-layout="corporate-training"/);
+  assert.match(preview, /training-layer/);
+  assert.match(preview, /training-board|training-path|training-model|training-case|training-checklist/);
+  assert.match(preview, /INTERNAL LEARNING PROGRAM|LEARNING MAP|MANAGEMENT MODEL|CASE WORKSHOP/);
+  assert.doesNotMatch(preview, />管理培训</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders annual business summary preview with export-aligned layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4159,6 +4205,109 @@ async function insertBusinessPlanModelTemplate(context) {
       defaultCoverLayout: "bp-cover",
       defaultContentLayout: "bp-canvas",
       allowedLayouts: ["bp-cover", "bp-canvas", "bp-revenue", "bp-cost", "bp-value-chain", "bp-ecosystem", "bp-capital-plan", "hero", "content"],
+    },
+  });
+}
+
+async function insertBiExecutiveCockpitTemplate(context) {
+  // 测试数据库模拟官方模板同步后的 BI 数据看板，确保预览走深色驾驶舱专用布局。
+  await context.database.insert("templates", {
+    id: "data-bi-dashboard-executive-cockpit",
+    slug: "data-bi-dashboard-executive-cockpit",
+    name: "BI 数据看板 - 管理驾驶舱",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "executive-cockpit",
+        name: "管理驾驶舱",
+        visual: {
+          primary: "071A2F",
+          accent: "22D3EE",
+          secondary: "A3E635",
+          background: "08111F",
+          surface: "0E2238",
+          title: "E6F7FF",
+          body: "A8C7D8",
+          layout: "bi-executive-cockpit",
+          variant: "executive-cockpit",
+        },
+      },
+    ],
+    visual: {
+      primary: "071A2F",
+      accent: "22D3EE",
+      secondary: "A3E635",
+      background: "08111F",
+      surface: "0E2238",
+      title: "E6F7FF",
+      body: "A8C7D8",
+      layout: "bi-executive-cockpit",
+      variant: "executive-cockpit",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "cockpit-cover",
+      defaultContentLayout: "cockpit-dashboard",
+      allowedLayouts: ["cockpit-cover", "cockpit-dashboard", "cockpit-trend", "cockpit-distribution", "cockpit-alert", "cockpit-closing", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertCorporateTrainingTemplate(context) {
+  // 测试数据库模拟官方模板同步后的企业内训课程模板，确保预览走内训课件专用布局。
+  await context.database.insert("templates", {
+    id: "education-corporate-training-management",
+    slug: "education-corporate-training-management",
+    name: "企业内训课程 - 管理培训",
+    categoryId: "education",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "management",
+        name: "管理培训",
+        visual: {
+          primary: "1F3A5F",
+          accent: "20A39E",
+          secondary: "F3A712",
+          background: "F4F7FA",
+          surface: "FFFFFF",
+          title: "10233D",
+          body: "40516A",
+          layout: "corporate-training",
+          variant: "management",
+        },
+      },
+    ],
+    visual: {
+      primary: "1F3A5F",
+      accent: "20A39E",
+      secondary: "F3A712",
+      background: "F4F7FA",
+      surface: "FFFFFF",
+      title: "10233D",
+      body: "40516A",
+      layout: "corporate-training",
+      variant: "management",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "corporate-training-cover",
+      defaultContentLayout: "corporate-training-content",
+      allowedLayouts: [
+        "corporate-training-cover",
+        "corporate-training-agenda",
+        "corporate-training-chapter",
+        "corporate-training-model",
+        "corporate-training-case",
+        "corporate-training-tool",
+        "corporate-training-practice",
+        "corporate-training-summary",
+        "title",
+        "content",
+      ],
     },
   });
 }

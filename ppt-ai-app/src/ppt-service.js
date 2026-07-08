@@ -988,6 +988,7 @@ function renderDeckPreview({ deck, visual }) {
     const financialSolutionScene = isFinancialSolutionVisual(visual) ? financialSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const manufacturingSolutionScene = isManufacturingSolutionVisual(visual) ? manufacturingSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationSolutionScene = isEducationSolutionVisual(visual) ? educationSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
@@ -1033,6 +1034,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const educationSolutionMark = educationSolutionScene
       ? renderEducationSolutionPreview(slide, educationSolutionScene)
+      : "";
+    const corporateTrainingMark = corporateTrainingScene
+      ? renderCorporateTrainingPreview(slide, corporateTrainingScene)
       : "";
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
@@ -1151,10 +1155,10 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || launchRhythmScene || businessModelScene || biCockpitScene
+    const defaultSlideContent = annualSummaryScene || quarterlyActionLoopScene || industryResearchScene || industryTrendScene || competitionMapScene || painPointScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || corporateTrainingScene || launchRhythmScene || businessModelScene || biCockpitScene
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${bodyList}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || productScene?.variant || painPointScene?.variant || pitchScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${productMark}${painPointMark}${pitchMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || salesScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || corporateTrainingScene?.variant || productScene?.variant || painPointScene?.variant || pitchScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${corporateTrainingMark}${productMark}${painPointMark}${pitchMark}${businessModelMark}${marketingMark}${launchRhythmMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1898,6 +1902,38 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="academy"] .accent{height:7.6%;background:var(--template-primary);box-shadow:inset 0 -3px 0 var(--template-accent);}
     body[data-layout="academy"] .motif{display:block;right:9.5%;top:26%;width:7.2%;height:40%;border-radius:8px;background:var(--template-accent);opacity:.78;}
     body[data-layout="academy"] h2{max-width:78%;font-size:42px;}
+    body[data-layout="corporate-training"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f6f9fc 0%,var(--template-bg) 55%,#e8f5f4 100%);box-shadow:0 22px 56px rgba(16,35,61,.14);}
+    body[data-layout="corporate-training"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(31,58,95,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(32,163,158,.035) 0 1px,transparent 1px 42px),radial-gradient(circle at 82% 18%,rgba(243,167,18,.14),transparent 24%);}
+    body[data-layout="corporate-training"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8.4%;bottom:8.2%;z-index:1;border-radius:20px;background:rgba(255,255,255,.94);border:1px solid rgba(31,58,95,.11);box-shadow:0 24px 54px rgba(16,35,61,.12);}
+    body[data-layout="corporate-training"] .accent{height:6.4%;z-index:2;background:linear-gradient(90deg,var(--template-primary),var(--template-accent) 70%,#f3a712);box-shadow:inset 0 -3px 0 rgba(243,167,18,.42);}
+    body[data-layout="corporate-training"] .slide-content{display:none;}
+    body[data-layout="corporate-training"] .training-layer{position:absolute;inset:0;z-index:4;pointer-events:none;color:var(--template-body);}
+    body[data-layout="corporate-training"] .training-kicker{position:absolute;left:8%;top:13.5%;font-size:11px;font-weight:900;letter-spacing:.17em;color:var(--template-accent);}
+    body[data-layout="corporate-training"] .training-title{position:absolute;left:8%;top:20.8%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.13;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="corporate-training"] .training-rule{position:absolute;left:8%;top:42.5%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f3a712,transparent);}
+    body[data-layout="corporate-training"] .training-bullets{position:absolute;left:8.2%;top:49.2%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.47;color:var(--template-body);}
+    body[data-layout="corporate-training"] .training-bullets li{margin:.1em 0;}
+    body[data-layout="corporate-training"] .training-board{position:absolute;right:8%;top:16.5%;width:36%;height:49%;border-radius:22px;background:linear-gradient(135deg,#fff,#ecf7f6);border:1px solid rgba(31,58,95,.12);box-shadow:0 18px 38px rgba(16,35,61,.11);overflow:hidden;}
+    body[data-layout="corporate-training"] .training-board::before{content:"";position:absolute;left:9%;right:9%;top:15%;height:10%;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="corporate-training"] .training-board::after{content:"";position:absolute;left:12%;right:12%;bottom:16%;height:42%;border-radius:14px;background:linear-gradient(135deg,rgba(31,58,95,.10),rgba(32,163,158,.14));}
+    body[data-layout="corporate-training"] .training-board i{position:absolute;display:block;border-radius:999px;background:#f3a712;}
+    body[data-layout="corporate-training"] .training-board i:nth-child(1){left:16%;top:37%;width:17%;height:8px;background:var(--template-primary);}body[data-layout="corporate-training"] .training-board i:nth-child(2){left:16%;top:48%;width:30%;height:8px;}body[data-layout="corporate-training"] .training-board i:nth-child(3){right:17%;top:37%;width:70px;height:70px;border-radius:50%;background:rgba(32,163,158,.24);}
+    body[data-layout="corporate-training"] .training-outcomes{position:absolute;left:8%;right:48%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="corporate-training"] .training-outcomes span{min-height:58px;border-radius:13px;background:#fff;border:1px solid rgba(31,58,95,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(16,35,61,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="corporate-training"] .training-path{position:absolute;left:8%;right:8%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="corporate-training"] .training-path span{position:relative;min-height:86px;border-radius:16px;background:#fff;border:1px solid rgba(31,58,95,.12);box-shadow:0 12px 24px rgba(16,35,61,.08);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="corporate-training"] .training-path span::before{content:"";display:block;width:24px;height:24px;margin-bottom:8px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(32,163,158,.12);}
+    body[data-layout="corporate-training"] .training-model{position:absolute;right:8%;top:18%;width:38%;height:45%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="corporate-training"] .training-model span{border-radius:16px;background:linear-gradient(135deg,#fff,#f7fbfb);border:1px solid rgba(31,58,95,.12);box-shadow:0 12px 24px rgba(16,35,61,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="corporate-training"] .training-model span::before{content:"";display:block;width:34px;height:5px;margin-bottom:11px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="corporate-training"] .training-case{position:absolute;right:8%;top:18%;width:37%;height:47%;border-radius:18px;background:#fff;border:1px solid rgba(31,58,95,.13);box-shadow:0 16px 32px rgba(16,35,61,.09);overflow:hidden;}
+    body[data-layout="corporate-training"] .training-case::before{content:"";position:absolute;left:8%;right:8%;top:13%;height:26%;border-radius:14px;background:linear-gradient(135deg,rgba(31,58,95,.12),rgba(32,163,158,.14));}
+    body[data-layout="corporate-training"] .training-case::after{content:"";position:absolute;left:12%;right:12%;bottom:16%;height:8px;border-radius:999px;background:var(--template-accent);box-shadow:0 -38px 0 rgba(31,58,95,.13),0 -76px 0 rgba(31,58,95,.10);}
+    body[data-layout="corporate-training"] .training-checklist{position:absolute;left:8%;right:8%;bottom:14.4%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;}
+    body[data-layout="corporate-training"] .training-checklist span{min-height:86px;border-radius:12px;background:#fff;border:1px solid rgba(31,58,95,.12);box-shadow:0 12px 24px rgba(16,35,61,.08);padding:14px 14px 14px 42px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="corporate-training"] .training-checklist span::before{content:"";position:absolute;width:16px;height:16px;margin-left:-27px;margin-top:1px;border-radius:5px;background:#f3a712;}
+    body[data-layout="corporate-training"] .training-summary-line{position:absolute;left:8%;right:8%;bottom:26%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),#f3a712,transparent);}
+    body[data-layout="corporate-training"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.84);border:1px solid rgba(31,58,95,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,61,.62);}
     body[data-layout="education-course"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 54%,color-mix(in srgb,var(--template-accent) 9%,var(--template-bg) 91%));padding:7% 8.5% 6.6%;border:0;}
     body[data-layout="education-course"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 30px),radial-gradient(circle at 12% 16%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 22%);pointer-events:none;}
     body[data-layout="education-course"] .slide::after{content:"";position:absolute;left:8.8%;right:8.2%;top:13.5%;bottom:11%;border-radius:2px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.90));border-left:8px solid color-mix(in srgb,var(--template-primary) 70%,var(--template-accent) 30%);box-shadow:0 18px 40px rgba(33,78,68,.12);}
@@ -2336,7 +2372,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
     body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
-    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul{max-width:92%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
+    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
 
@@ -3294,6 +3330,74 @@ function isEducationSolutionVisual(visual) {
   return visual?.layout === "sales-education-solution" && (id === "industry-solution" || id === "sales-industry-solution-education-industry");
 }
 
+function corporateTrainingPreviewScene({ slide, index, total }) {
+  const bullets = corporateTrainingBulletTexts(slide);
+  const title = corporateTrainingCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = index === 0
+    ? "cover"
+    : index === total - 1
+      ? "summary"
+      : ["agenda", "model", "case", "tool", "practice"][(index - 1) % 5];
+  const outcomes = ["目标", "模型", "练习"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 8));
+  const path = ["导入", "讲解", "研讨", "行动"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 10));
+  const model = ["原则", "方法", "工具", "输出"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 12));
+  const checklist = ["案例背景", "关键问题", "小组任务"].map((fallback, itemIndex) => corporateTrainingCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    variant: "management",
+    role,
+    kicker: role === "cover" ? "INTERNAL LEARNING PROGRAM" : role === "agenda" ? "LEARNING MAP" : role === "model" ? "MANAGEMENT MODEL" : role === "case" ? "CASE DISCUSSION" : role === "tool" ? "TOOLKIT PRACTICE" : role === "practice" ? "WORKSHOP TASK" : "ACTION COMMITMENT",
+    title,
+    bullets,
+    outcomes,
+    path,
+    model,
+    checklist,
+  };
+}
+
+function renderCorporateTrainingPreview(slide, scene) {
+  // 企业内训模板使用专属内容层承载课程结构，避免普通标题和列表与模型图形叠加。
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(corporateTrainingCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="training-kicker">${escapeHtml(scene.kicker)}</div><h2 class="training-title">${escapeHtml(scene.title || slide?.title || "")}</h2><div class="training-rule"></div><ul class="training-bullets">${bulletItems}</ul>`;
+  const board = '<div class="training-board"><i></i><i></i><i></i></div>';
+  if (scene.role === "cover") {
+    return `<div class="training-layer">${common}${board}<div class="training-outcomes">${scene.outcomes.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "agenda") {
+    return `<div class="training-layer">${common}${board}<div class="training-path">${scene.path.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "model") {
+    return `<div class="training-layer">${common}<div class="training-model">${scene.model.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="training-outcomes">${scene.outcomes.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "case") {
+    return `<div class="training-layer">${common}<div class="training-case"></div><div class="training-checklist">${scene.checklist.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "tool" || scene.role === "practice") {
+    return `<div class="training-layer">${common}<div class="training-model">${scene.model.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="training-checklist">${scene.checklist.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="training-layer">${common}<div class="training-summary-line"></div><div class="training-path">${scene.path.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function corporateTrainingBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确管理角色和团队协作目标", "掌握可复用的管理模型与沟通方法", "通过案例研讨形成课后行动计划"];
+}
+
+function corporateTrainingCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isCorporateTrainingVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "corporate-training" && (id === "corporate-training" || id === "education-corporate-training-management");
+}
+
 function productRoadmapPreviewScene(visual) {
   const variant = productRoadmapVariant(visual);
   const scenes = {
@@ -3395,7 +3499,8 @@ function isProductPainPointsVisual(visual) {
 }
 
 function isBiExecutiveCockpitVisual(visual) {
-  return false;
+  // 只要官方模板声明为驾驶舱布局，就启用专属预览层，避免目录迁移后被模板 id 卡住。
+  return visual?.layout === "bi-executive-cockpit";
 }
 
 function pitchDeckPreviewScene(visual) {
@@ -3666,6 +3771,76 @@ function isBrandStoryVisual(visual) {
   return visual?.id === "brand-story" && visual?.layout === "brand-story";
 }
 
+function renderBiExecutiveCockpitPreview(slide, scene) {
+  // 驾驶舱模板用专属数据大屏层承载文字，避免普通正文和图表装饰重叠。
+  const title = escapeHtml(scene.title || slide?.title || "经营指标总览");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(biCockpitCompactText(item, scene.title, 36))}</li>`).join("");
+  const common = `<div class="cockpit-kicker">${escapeHtml(scene.kicker)}</div><h2 class="cockpit-title">${title}</h2><ul class="cockpit-bullets">${bulletItems}</ul>`;
+  const kpis = `<div class="cockpit-kpis">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.role === "cover") {
+    return `<div class="cockpit-layer">${common}<div class="cockpit-hero"><i></i><i></i><i></i><i></i><i></i></div>${kpis}</div>`;
+  }
+  if (scene.role === "trend") {
+    return `<div class="cockpit-layer">${common}<div class="cockpit-trend"></div>${kpis}</div>`;
+  }
+  if (scene.role === "distribution") {
+    return `<div class="cockpit-layer">${common}<div class="cockpit-rank">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${kpis}</div>`;
+  }
+  if (scene.role === "alert") {
+    return `<div class="cockpit-layer">${common}<div class="cockpit-alerts">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${kpis}</div>`;
+  }
+  return `<div class="cockpit-layer">${common}<div class="cockpit-actions">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function biExecutiveCockpitPreviewScene({ slide, index, total }) {
+  const bullets = biCockpitBulletTexts(slide);
+  const title = biCockpitCompactText(slide?.title, "经营指标总览", index === 0 ? 24 : 22);
+  const metrics = ["收入", "利润", "达成率", "风险项"].map((fallback, itemIndex) => biCockpitMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["业务排行", "区域表现", "渠道贡献", "异常波动"].map((fallback, itemIndex) => biCockpitCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { role: "cover", kicker: "EXECUTIVE DATA HUB" },
+    { role: "trend", kicker: "TREND MONITOR" },
+    { role: "distribution", kicker: "BUSINESS RANKING" },
+    { role: "alert", kicker: "RISK SIGNAL" },
+  ];
+  const base = index === total - 1
+    ? { role: "closing", kicker: "NEXT ACTIONS" }
+    : scenes[Math.min(index, scenes.length - 1)];
+  return {
+    variant: "executive-cockpit",
+    ...base,
+    title,
+    bullets,
+    metrics,
+    cards: base.role === "closing"
+      ? ["持续增长", "风险修复", "资源投入"].map((fallback, itemIndex) => biCockpitCompactText(bullets[itemIndex], fallback, 14))
+      : cards,
+  };
+}
+
+function biCockpitBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["核心经营指标保持稳定增长", "部门关键数据需要持续跟踪", "异常指标已进入管理层关注清单"];
+}
+
+function biCockpitMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{2,}|[零一二三四五六七八九十百千万亿]+项?)/);
+  const value = match?.[1] || ["KPI", "ROI", "92%", "3"][index] || "KPI";
+  const label = biCockpitCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function biCockpitCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
 function dataInsightPreviewScene(visual) {
   const variant = dataInsightVariant(visual);
   const scenes = {
@@ -3840,11 +4015,13 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
   if (visual.layout === "product-pain-points") return false;
+  if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
+  if (visual.layout === "corporate-training") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
