@@ -5136,6 +5136,65 @@ async function insertKnowledgeBlackboardTemplate(context) {
   });
 }
 
+async function insertExamReviewKeypointsTemplate(context) {
+  // 测试数据库模拟官方模板同步后的考试复习模板，确保生成工作台能按新目录模板解析视觉布局。
+  await context.database.insert("templates", {
+    id: "education-exam-review-courseware-key-points",
+    slug: "education-exam-review-courseware-key-points",
+    name: "考试复习课件 - 重点梳理",
+    categoryId: "education",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "key-points",
+        name: "重点梳理",
+        visual: {
+          primary: "1E2A78",
+          accent: "F59E0B",
+          secondary: "06B6D4",
+          warning: "EF4444",
+          background: "F4F7FB",
+          surface: "FFFFFF",
+          title: "172554",
+          body: "334155",
+          layout: "exam-review-keypoints",
+          variant: "key-points",
+        },
+      },
+    ],
+    visual: {
+      primary: "1E2A78",
+      accent: "F59E0B",
+      secondary: "06B6D4",
+      warning: "EF4444",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "172554",
+      body: "334155",
+      layout: "exam-review-keypoints",
+      variant: "key-points",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "exam-review-cover",
+      defaultContentLayout: "exam-review-keypoints",
+      allowedLayouts: [
+        "exam-review-cover",
+        "exam-review-roadmap",
+        "exam-review-framework",
+        "exam-review-keypoints",
+        "exam-review-mistakes",
+        "exam-review-plan",
+        "exam-review-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
 async function postJson(url, cookie, body) {
   return fetch(url, {
     method: "POST",

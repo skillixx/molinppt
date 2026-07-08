@@ -680,6 +680,42 @@ test("resolveTemplateVisual applies knowledge handout blackboard official visual
   assert.equal(visual.variant, "blackboard");
 });
 
+test("resolveTemplateVisual applies exam review courseware official visual", () => {
+  const template = {
+    id: "education-exam-review-courseware-key-points",
+    visual: {
+      primary: "1E2A78",
+      accent: "F59E0B",
+      secondary: "06B6D4",
+      warning: "EF4444",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "172554",
+      body: "334155",
+      layout: "exam-review-keypoints",
+      variant: "key-points",
+    },
+    themes: [
+      {
+        id: "key-points",
+        visual: {
+          layout: "exam-review-keypoints",
+          variant: "key-points",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "key-points", template });
+
+  assert.equal(visual.id, "education-exam-review-courseware-key-points");
+  assert.equal(visual.primary, "1E2A78");
+  assert.equal(visual.accent, "F59E0B");
+  assert.equal(visual.background, "F4F7FB");
+  assert.equal(visual.layout, "exam-review-keypoints");
+  assert.equal(visual.variant, "key-points");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });

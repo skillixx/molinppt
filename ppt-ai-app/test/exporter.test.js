@@ -2131,6 +2131,52 @@ test("PptExportService uses knowledge handout blackboard decorations", () => {
   assert.doesNotMatch(slide1, /课堂板书/);
 });
 
+test("PptExportService uses exam review courseware decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-exam-review-courseware-key-points",
+      theme: "key-points",
+      templateVisual: {
+        id: "education-exam-review-courseware-key-points",
+        primary: "1E2A78",
+        accent: "F59E0B",
+        secondary: "06B6D4",
+        warning: "EF4444",
+        background: "F4F7FB",
+        surface: "FFFFFF",
+        title: "172554",
+        body: "334155",
+        layout: "exam-review-keypoints",
+        variant: "key-points",
+      },
+      slides: [
+        { title: "考点框架总览", layout: "exam-review-cover", bullets: ["函数图像和方程思想", "必背公式与易错条件", "冲刺练习安排"] },
+        { title: "知识框架拆解", layout: "exam-review-framework", bullets: ["定义边界", "公式适用条件", "典型题型"] },
+        { title: "错题归因分析", layout: "exam-review-mistakes", bullets: ["审题遗漏", "计算误差", "条件误判"] },
+        { title: "冲刺学习计划", layout: "exam-review-plan", bullets: ["回看框架", "限时训练", "订正错题", "考前复盘"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Exam Review Canvas"/);
+  assert.match(slide1, /name="Exam Review Answer Card"/);
+  assert.match(slide1, /name="Exam Review Plan Step 1"/);
+  assert.match(slide2, /name="Exam Review Framework Card 1"/);
+  assert.match(slide3, /name="Exam Review Mistake Card 1"/);
+  assert.match(slide4, /name="Exam Review Plan Step 1"/);
+  assert.match(slide1, /val="1E2A78"/);
+  assert.match(slide1, /val="F59E0B"/);
+  assert.doesNotMatch(slide1, /重点梳理/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });
