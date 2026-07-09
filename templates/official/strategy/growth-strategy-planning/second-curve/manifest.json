@@ -1,0 +1,18 @@
+{
+  "slug": "strategy-growth-strategy-planning-second-curve",
+  "name": "增长战略规划 - 第二曲线",
+  "description": "适合第二增长曲线规划、新业务孵化、市场扩张策略和阶段投资汇报的战略咨询模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "growth-strategy-planning",
+    "second-curve",
+    "new-business",
+    "consulting-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

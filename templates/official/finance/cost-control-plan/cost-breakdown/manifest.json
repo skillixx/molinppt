@@ -1,0 +1,18 @@
+{
+  "slug": "finance-cost-control-plan-cost-breakdown",
+  "name": "成本控制方案 - 成本拆解",
+  "description": "适合成本结构分析、降本增效方案、费用管控和责任矩阵汇报的深蓝财务咨询模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "cost-control-plan",
+    "cost-breakdown",
+    "cost-structure",
+    "expense-control"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

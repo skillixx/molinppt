@@ -1,0 +1,58 @@
+{
+  "baseTemplateId": "growth-strategy-planning",
+  "themeId": "second-curve",
+  "style": "strategy-growth",
+  "themes": [
+    {
+      "id": "second-curve",
+      "name": "第二曲线",
+      "visual": {
+        "primary": "0E2A47",
+        "accent": "16B8A6",
+        "secondary": "F2B84B",
+        "background": "EEF6F4",
+        "surface": "FFFFFF",
+        "title": "071A2D",
+        "body": "315168",
+        "layout": "strategy-second-curve",
+        "variant": "second-curve"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0E2A47",
+    "accent": "16B8A6",
+    "secondary": "F2B84B",
+    "background": "EEF6F4",
+    "surface": "FFFFFF",
+    "title": "071A2D",
+    "body": "315168",
+    "layout": "strategy-second-curve",
+    "variant": "second-curve"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "second-curve-cover",
+    "defaultContentLayout": "second-curve-content",
+    "allowedLayouts": [
+      "second-curve-cover",
+      "second-curve-context",
+      "second-curve-opportunity",
+      "second-curve-incubation",
+      "second-curve-resource",
+      "second-curve-closing",
+      "title",
+      "content"
+    ]
+  },
+  "contentSchema": {
+    "fields": [
+      "增长目标",
+      "增长假设",
+      "机会市场",
+      "目标客群",
+      "资源配置",
+      "关键举措",
+      "验证指标"
+    ]
+  }
+}

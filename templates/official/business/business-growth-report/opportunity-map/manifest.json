@@ -1,0 +1,17 @@
+{
+  "slug": "business-business-growth-report-opportunity-map",
+  "name": "业务增长汇报 - 机会地图",
+  "description": "适合业务增长分析、市场机会识别、增长路径汇报和关键动作拆解的商业化官方模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "growth-report",
+    "opportunity-map",
+    "growth-path"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js"
+}

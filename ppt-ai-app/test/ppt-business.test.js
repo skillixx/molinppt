@@ -279,6 +279,95 @@ test("PptService renders synced competition map preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders enterprise digital blueprint preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertEnterpriseDigitalBlueprintTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "集团数字化转型规划",
+    slideCount: 6,
+    templateId: "strategy-enterprise-transformation-digital-blueprint",
+    theme: "digital-blueprint",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-enterprise-transformation-digital-blueprint" data-layout="enterprise-digital-blueprint"/);
+  assert.match(preview, /enterprise-blueprint-layer/);
+  assert.match(preview, /enterprise-blueprint-grid/);
+  assert.match(preview, /enterprise-blueprint-stack|enterprise-blueprint-capabilities|enterprise-blueprint-roadmap|enterprise-blueprint-network/);
+  assert.match(preview, /DIGITAL TRANSFORMATION BLUEPRINT|CURRENT STATE DIAGNOSIS|TARGET ARCHITECTURE|CAPABILITY UPGRADE/);
+  assert.doesNotMatch(preview, />数字化蓝图</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders competitor SWOT map preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能硬件竞品 SWOT 分析",
+    slideCount: 6,
+    templateId: "competitor-analysis",
+    theme: "swot-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="competitor-analysis" data-layout="strategy-swot-map"/);
+  assert.match(preview, /swot-layer/);
+  assert.match(preview, /swot-quadrant/);
+  assert.match(preview, /swot-axis|swot-compare|swot-risk-grid|swot-strategy-roadmap/);
+  assert.doesNotMatch(preview, />SWOT 地图</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders second curve strategy preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "第二增长曲线规划",
+    slideCount: 5,
+    templateId: "growth-strategy-planning",
+    theme: "second-curve",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="growth-strategy-planning" data-layout="strategy-second-curve"/);
+  assert.match(preview, /second-curve-layer/);
+  assert.match(preview, /second-curve-chart/);
+  assert.match(preview, /second-curve-matrix|second-curve-roadmap|second-curve-portfolio/);
+  assert.doesNotMatch(preview, />第二曲线</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced SWOT map slug preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertSwotMapTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能硬件竞品 SWOT 分析",
+    slideCount: 6,
+    templateId: "strategy-competitor-analysis-swot-map",
+    theme: "swot-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-competitor-analysis-swot-map" data-layout="strategy-swot-map"/);
+  assert.match(preview, /<div class="swot-layer">/);
+  assert.match(preview, /swot-quadrant/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced product pain points preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -4138,6 +4227,56 @@ async function insertIndustryResearchSlugTemplate(context) {
   });
 }
 
+async function insertEnterpriseDigitalBlueprintTemplate(context) {
+  // 测试数据库模拟官方模板同步后的企业转型模板，确保预览走蓝图专用布局。
+  await context.database.insert("templates", {
+    id: "strategy-enterprise-transformation-digital-blueprint",
+    slug: "strategy-enterprise-transformation-digital-blueprint",
+    name: "企业转型方案 - 数字化蓝图",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "digital-blueprint",
+        name: "数字化蓝图",
+        visual: {
+          id: "strategy-enterprise-transformation-digital-blueprint",
+          primary: "0B1F3A",
+          accent: "22D3EE",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          background: "EAF4FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "enterprise-digital-blueprint",
+          variant: "digital-blueprint",
+        },
+      },
+    ],
+    visual: {
+      id: "strategy-enterprise-transformation-digital-blueprint",
+      primary: "0B1F3A",
+      accent: "22D3EE",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "EAF4FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "enterprise-digital-blueprint",
+      variant: "digital-blueprint",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "digital-blueprint-cover",
+      defaultContentLayout: "transformation-blueprint",
+      allowedLayouts: ["digital-blueprint-cover", "current-state-diagnosis", "target-digital-blueprint", "capability-upgrade-map", "system-roadmap", "organization-governance", "risk-and-enablement", "transformation-next-actions", "title", "content"],
+    },
+  });
+}
+
 async function insertCompetitionMapTemplate(context) {
   // 模拟官方模板同步后的竞争地图模板，验证生成工作台可以直接使用完整 slug。
   await context.database.insert("templates", {
@@ -4178,6 +4317,54 @@ async function insertCompetitionMapTemplate(context) {
       defaultCoverLayout: "competition-map-cover",
       defaultContentLayout: "competition-map-content",
       allowedLayouts: ["competition-map-cover", "competition-map-overview", "competition-map-players", "competition-map-positioning", "competition-map-segments", "competition-map-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertSwotMapTemplate(context) {
+  // 模拟官方模板同步后的 SWOT 地图模板，验证数据库 slug 和内置模板走同一套预览布局。
+  await context.database.insert("templates", {
+    id: "strategy-competitor-analysis-swot-map",
+    slug: "strategy-competitor-analysis-swot-map",
+    name: "竞争对手分析 - SWOT 地图",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "swot-map",
+        name: "SWOT 地图",
+        visual: {
+          primary: "102A43",
+          accent: "12A5A6",
+          secondary: "22C55E",
+          warning: "F97316",
+          background: "F5F8FB",
+          surface: "FFFFFF",
+          title: "071A2D",
+          body: "3D5363",
+          layout: "strategy-swot-map",
+          variant: "swot-map",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "12A5A6",
+      secondary: "22C55E",
+      warning: "F97316",
+      background: "F5F8FB",
+      surface: "FFFFFF",
+      title: "071A2D",
+      body: "3D5363",
+      layout: "strategy-swot-map",
+      variant: "swot-map",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "swot-map-cover",
+      defaultContentLayout: "swot-map-overview",
+      allowedLayouts: ["swot-map-cover", "swot-map-overview", "swot-map-positioning", "swot-map-strength-weakness", "swot-map-opportunity-threat", "swot-map-strategy-actions", "swot-map-closing", "title", "content"],
     },
   });
 }

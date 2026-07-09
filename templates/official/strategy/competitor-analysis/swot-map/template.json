@@ -1,0 +1,63 @@
+{
+  "baseTemplateId": "competitor-analysis",
+  "themeId": "swot-map",
+  "style": "consulting-report",
+  "themes": [
+    {
+      "id": "swot-map",
+      "name": "SWOT 地图",
+      "visual": {
+        "primary": "102A43",
+        "accent": "12A5A6",
+        "secondary": "22C55E",
+        "warning": "F97316",
+        "background": "F5F8FB",
+        "surface": "FFFFFF",
+        "title": "071A2D",
+        "body": "3D5363",
+        "layout": "strategy-swot-map",
+        "variant": "swot-map"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "12A5A6",
+    "secondary": "22C55E",
+    "warning": "F97316",
+    "background": "F5F8FB",
+    "surface": "FFFFFF",
+    "title": "071A2D",
+    "body": "3D5363",
+    "layout": "strategy-swot-map",
+    "variant": "swot-map"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "swot-map-cover",
+    "defaultContentLayout": "swot-map-content",
+    "allowedLayouts": [
+      "swot-map-cover",
+      "swot-map-overview",
+      "swot-map-positioning",
+      "swot-map-strength-weakness",
+      "swot-map-opportunity-threat",
+      "swot-map-strategy-actions",
+      "swot-map-closing",
+      "title",
+      "content"
+    ]
+  },
+  "contentSchema": {
+    "requiredFields": [
+      "竞品名称",
+      "核心能力",
+      "市场份额",
+      "优势",
+      "劣势",
+      "机会",
+      "威胁",
+      "差异化机会",
+      "策略建议"
+    ]
+  }
+}
