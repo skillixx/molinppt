@@ -563,6 +563,9 @@ test("PptExportService uses cash flow forecast decorations", () => {
 
   assert.match(slide1, /name="Cash Flow Forecast Chart"/);
   assert.match(slide1, /name="Cash Flow Metric Card 1"/);
+  assert.match(slide1, /name="Cash Flow Kicker"/);
+  assert.match(slide1, /name="Cash Flow Bullet Text 1"/);
+  assert.match(slide1, /sz="2720"/);
   assert.match(slide2, /name="Cash Flow Turnover Cycle"/);
   assert.match(slide3, /name="Cash Flow Receivables Table"/);
 });
@@ -737,6 +740,11 @@ test("PptExportService uses profit bridge decorations", () => {
 
   assert.match(slide1, /name="Profit Bridge Workspace"/);
   assert.match(slide1, /name="Profit Bridge Waterfall Panel"/);
+  assert.match(slide1, /name="Profit Bridge Kicker"/);
+  assert.match(slide1, /name="Profit Bridge Bullet Card 1"/);
+  assert.match(slide1, /name="Profit Bridge Bullet Text 1"/);
+  assert.match(slide1, /name="Profit Bridge Metric Value 1"/);
+  assert.match(slide1, /sz="2180"/);
   assert.match(slide3, /name="Profit Bridge Margin Stack Panel"/);
   assert.match(slide4, /name="Profit Bridge Factor Card 1"/);
   assert.match(slide5, /name="Profit Bridge Action Card 1"/);
@@ -956,7 +964,8 @@ test("PptExportService uses key account decision chain decorations", () => {
 
   assert.match(slide1, /name="Key Account Decision Workspace"/);
   assert.match(slide1, /name="Key Account Decision Network Panel"/);
-  assert.match(slide1, /name="Key Account Decision Sponsor Node"/);
+  assert.match(slide1, /name="Key Account Decision Center Node"/);
+  assert.match(slide1, /name="Key Account Decision Tag Card 1"/);
   assert.match(slide3, /name="Key Account Decision Path Step 1"/);
   assert.match(slide4, /name="Key Account Decision Matrix Card 1"/);
   assert.match(slide5, /name="Key Account Decision Roadmap Card 1"|name="Key Account Decision Closing Card 1"/);

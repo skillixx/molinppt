@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -525,6 +525,17 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1850);
   }
+  if (visual.layout === "sales-key-account-decision-chain") {
+    if (index === 0) {
+      if (textLength >= 30) return 1380;
+      if (textLength >= 22) return 1520;
+      return Math.min(fallbackSize, 1680);
+    }
+    // 大客户攻坚内容页标题不能按封面大字处理，否则会压住正文和右侧图形。
+    if (textLength >= 30) return 980;
+    if (textLength >= 22) return 1080;
+    return Math.min(fallbackSize, 1220);
+  }
   if (visual.layout === "finance-budget-planning") {
     if (index === 0) {
       if (textLength >= 30) return 2100;
@@ -544,6 +555,26 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1440;
     if (textLength >= 22) return 1640;
     return Math.min(fallbackSize, 1880);
+  }
+  if (visual.layout === "finance-cash-flow-forecast") {
+    if (index === 0) {
+      if (textLength >= 30) return 2100;
+      if (textLength >= 22) return 2380;
+      return Math.min(fallbackSize, 2720);
+    }
+    if (textLength >= 30) return 1420;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1880);
+  }
+  if (visual.layout === "finance-profit-bridge") {
+    if (index === 0) {
+      if (textLength >= 30) return 1740;
+      if (textLength >= 22) return 1960;
+      return Math.min(fallbackSize, 2180);
+    }
+    if (textLength >= 30) return 1260;
+    if (textLength >= 22) return 1420;
+    return Math.min(fallbackSize, 1640);
   }
   if (visual.layout === "finance-budget-variance") {
     if (index === 0) {
@@ -1044,7 +1075,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
     return base + costBreakdownDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "finance-cash-flow-forecast") {
-    return base + simpleCashFlowForecastDecorationsXml({ visual, index });
+    return base + cashFlowForecastDecorationsXml({ visual, index, role, slide });
   }
   if (visual.layout === "finance-profit-bridge") {
     return base + profitBridgeDecorationsXml({ visual, index, role, slide });
@@ -2407,6 +2438,56 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "finance-cash-flow-forecast") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 现金流模板的正文由专用图表和卡片承载，标题只占左侧，右侧留给预测图/表格。
+      surface: { x: 566928, y: 591312, cx: 8001000, cy: 4145280 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 342900 },
+      secondaryAccent: { x: 804672, y: isCover ? 2286000 : 2057400, cx: 3352800, cy: 30480 },
+      label: { x: 804672, y: 792480, cx: 2438400, cy: 274320 },
+      title: isClosing
+        ? { x: 804672, y: 1173480, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 1165860, cx: 3962400, cy: 1219200 }
+          : { x: 804672, y: 914400, cx: 4267200, cy: 731520 },
+      content: isClosing
+        ? { x: 804672, y: 2407920, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 2537460, cx: 3413760, cy: 762000 }
+          : { x: 804672, y: 1767840, cx: 3352800, cy: 914400 },
+      titleSize: isCover ? 2720 : isClosing ? 2520 : 1880,
+      bodySize: isCover ? 900 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-profit-bridge") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 利润桥模板左侧承载结论和指标，右侧承载瀑布/结构/行动图，字号和坐标需要贴近在线预览。
+      surface: { x: 566928, y: 591312, cx: 8001000, cy: 4145280 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 342900 },
+      secondaryAccent: { x: 804672, y: isCover ? 2476500 : 1805940, cx: 3200400, cy: 30480 },
+      label: { x: 804672, y: 792480, cx: 2286000, cy: 274320 },
+      title: isClosing
+        ? { x: 804672, y: 1173480, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 1165860, cx: 3886200, cy: 1127760 }
+          : { x: 804672, y: 929640, cx: 4267200, cy: 670560 },
+      content: isClosing
+        ? { x: 804672, y: 2407920, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 2644140, cx: 3505200, cy: 731520 }
+          : { x: 804672, y: 1882140, cx: 3505200, cy: 975360 },
+      titleSize: isCover ? 2180 : isClosing ? 2200 : 1640,
+      bodySize: isCover ? 760 : 620,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "finance-budget-variance") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2533,20 +2614,20 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
     return {
       surface: { x: 548640, y: 609600, cx: 8046720, cy: 4114800 },
       accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
-      secondaryAccent: { x: 792480, y: isCover ? 2263140 : 2026920, cx: 3291840, cy: 22860 },
-      label: { x: 792480, y: 807720, cx: 2438400, cy: 274320 },
+      secondaryAccent: { x: 792480, y: isCover ? 2156460 : 1706880, cx: isCover ? 3048000 : 2743200, cy: 30480 },
+      label: { x: 792480, y: 762000, cx: 2743200, cy: 274320 },
       title: isClosing
-        ? { x: 792480, y: 1188720, cx: 5486400, cy: 914400 }
+        ? { x: 792480, y: 1036320, cx: 4114800, cy: 701040 }
         : isCover
-          ? { x: 792480, y: 1158240, cx: 3962400, cy: 1219200 }
-          : { x: 792480, y: 883920, cx: 4267200, cy: 731520 },
+          ? { x: 792480, y: 1066800, cx: 3962400, cy: 975360 }
+          : { x: 792480, y: 1036320, cx: 4114800, cy: 701040 },
       content: isClosing
-        ? { x: 792480, y: 2324100, cx: 4267200, cy: 914400 }
+        ? { x: 792480, y: 2103120, cx: 3962400, cy: 1219200 }
         : isCover
-          ? { x: 792480, y: 2583180, cx: 3444240, cy: 762000 }
-          : { x: 792480, y: 1783080, cx: 3474720, cy: 914400 },
-      titleSize: isCover ? 2580 : isClosing ? 2450 : 1820,
-      bodySize: isCover ? 900 : 720,
+          ? { x: 792480, y: 2377440, cx: 3505200, cy: 914400 }
+          : { x: 792480, y: 1981200, cx: 3962400, cy: 1219200 },
+      titleSize: isCover ? 1680 : isClosing ? 1220 : 1220,
+      bodySize: isCover ? 780 : 780,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4273,37 +4354,177 @@ function isFinancialSolutionVisual(visual) {
 }
 
 function profitBridgeDecorationsXml({ visual, index, role, slide }) {
-  const bullets = channelPolicyBulletTexts(slide);
-  // 利润桥模板用瀑布图、结构堆叠和行动卡片表达利润变化，保证导出的 PPTX 图形仍可编辑。
-  const workspace = solidShapeXml({ id: 1080, name: "Profit Bridge Workspace", geom: "roundRect", x: 533400, y: 609600, cx: 8077200, cy: 4145280, fill: visual.surface })
-    + lineFrameShapeXml({ id: 1081, name: "Profit Bridge Workspace Border", geom: "roundRect", x: 533400, y: 609600, cx: 8077200, cy: 4145280, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 10160 })
-    + rectShapeXml({ id: 1082, name: "Profit Bridge Top Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
-  if (index === 2 || String(slide?.title || "").includes("毛利")) {
-    return workspace + solidShapeXml({ id: 1090, name: "Profit Bridge Margin Stack Panel", geom: "roundRect", x: 5143500, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.55) })
-      + rectShapeXml({ id: 1091, name: "Profit Bridge Margin Stack 1", x: 5486400, y: 2819400, cx: 426720, cy: 731520, fill: visual.primary })
-      + rectShapeXml({ id: 1092, name: "Profit Bridge Margin Stack 2", x: 6096000, y: 2301240, cx: 426720, cy: 1249680, fill: visual.accent })
-      + rectShapeXml({ id: 1093, name: "Profit Bridge Margin Stack 3", x: 6705600, y: 1981200, cx: 426720, cy: 1569720, fill: visual.secondary || visual.primary });
-  }
-  if (index === 3 || String(slide?.title || "").includes("因素")) {
-    return workspace + [0, 1, 2, 3].map((itemIndex) => {
-      const x = 4876800 + itemIndex * 853440;
-      return solidShapeXml({ id: 1100 + itemIndex * 2, name: `Profit Bridge Factor Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1524000, cx: 701040, cy: 883920, fill: "FFFFFF" })
-        + rectShapeXml({ id: 1101 + itemIndex * 2, name: `Profit Bridge Factor Accent ${itemIndex + 1}`, x: x + 121920, y: 2042160, cx: 457200, cy: 30480, fill: itemIndex % 2 ? visual.accent : visual.primary });
-    }).join("");
-  }
-  if (role === "closing" || index >= 4 || String(slide?.title || "").includes("行动")) {
-    return workspace + [0, 1, 2].map((itemIndex) => {
-      const x = 4876800 + itemIndex * 1036320;
-      return solidShapeXml({ id: 1110 + itemIndex * 2, name: `Profit Bridge Action Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 853440, cy: 670560, fill: blendHexColor(visual.accent, visual.surface, 0.88) })
-        + textShapeXml({ id: 1111 + itemIndex * 2, name: `Profit Bridge Action Text ${itemIndex + 1}`, x: x + 91440, y: 2788920, cx: 670560, cy: 182880, text: channelPolicyCompactText(bullets[itemIndex], `行动 ${itemIndex + 1}`, 8), size: 680, bold: true, color: visual.title });
-    }).join("");
-  }
-  return workspace + solidShapeXml({ id: 1085, name: "Profit Bridge Waterfall Panel", geom: "roundRect", x: 5029200, y: 1371600, cx: 2926080, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.58) })
-    + [0, 1, 2, 3].map((itemIndex) => {
-      const x = 5334000 + itemIndex * 548640;
-      const h = [548640, 853440, 579120, 1066800][itemIndex];
-      return rectShapeXml({ id: 1086 + itemIndex, name: `Profit Bridge Waterfall Bar ${itemIndex + 1}`, x, y: 3078480 - h, cx: 335280, cy: h, fill: itemIndex === 2 ? visual.negative || "C65A42" : itemIndex % 2 ? visual.accent : visual.primary });
-    }).join("");
+  const scene = profitBridgeSceneFromSlide({ slide, index, role });
+  const palette = profitBridgeColorPalette(visual);
+  // 利润桥模板导出端复刻在线预览的网格底、白色工作台、结论 bullet 和可编辑图表，避免下载后退回普通大标题页。
+  const ruleY = index === 0 ? 2476500 : 1805940;
+  const backdrop = rectShapeXml({ id: 1080, name: "Profit Bridge Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1081, name: "Profit Bridge Profit Glow", geom: "ellipse", x: 6705600, y: 365760, cx: 2057400, cy: 1676400, fill: palette.goldWash })
+    + solidShapeXml({ id: 1082, name: "Profit Bridge Quality Glow", geom: "ellipse", x: 6705600, y: 3657600, cx: 2438400, cy: 1676400, fill: palette.tealWash })
+    + profitBridgeGridXml({ palette });
+  const workspace = solidShapeXml({ id: 1090, name: "Profit Bridge Workspace", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1091, name: "Profit Bridge Workspace Border", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 1092, name: "Profit Bridge Header Bar", x: 0, y: 0, cx: 9144000, cy: 342900, fill: visual.primary })
+    + rectShapeXml({ id: 1093, name: "Profit Bridge Header Accent", x: 0, y: 342900, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 1094, name: "Profit Bridge Kicker", x: 804672, y: 792480, cx: 2286000, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1095, name: "Profit Bridge Focus Rule", x: 804672, y: ruleY, cx: index === 0 ? 3200400 : 2590800, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1096, name: "Profit Bridge Secondary Rule", x: 804672, y: ruleY + 53340, cx: index === 0 ? 1828800 : 1371600, cy: 15240, fill: visual.secondary || visual.accent });
+  const bullets = profitBridgeBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "margin") return backdrop + workspace + bullets + profitBridgeMarginXml({ visual, palette });
+  if (scene.role === "factor") return backdrop + workspace + bullets + profitBridgeFactorCardsXml({ visual, palette, items: scene.factors });
+  if (scene.role === "improvement") return backdrop + workspace + bullets + profitBridgeActionCardsXml({ visual, palette, items: scene.actions });
+  if (scene.role === "closing") return backdrop + workspace + profitBridgeClosingCardsXml({ visual, palette, items: scene.actions });
+  return backdrop + workspace + bullets + profitBridgeWaterfallXml({ visual, palette }) + profitBridgeMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function profitBridgeGridXml({ palette }) {
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8229600]
+    .map((x, itemIndex) => rectShapeXml({ id: 1120 + itemIndex, name: `Profit Bridge Grid Vertical ${itemIndex + 1}`, x, y: 365760, cx: 7620, cy: 4419600, fill: palette.grid })).join("");
+  const horizontal = [762000, 1143000, 1524000, 1905000, 2286000, 2667000, 3048000, 3429000, 3810000, 4191000, 4572000]
+    .map((y, itemIndex) => rectShapeXml({ id: 1140 + itemIndex, name: `Profit Bridge Grid Horizontal ${itemIndex + 1}`, x: 457200, y, cx: 8229600, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function profitBridgeBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, itemIndex) => {
+    const y = (isCover ? 2674620 : 2164080) + itemIndex * (isCover ? 281940 : 396240);
+    const cardWidth = isCover ? 3352800 : 3505200;
+    const cardHeight = isCover ? 243840 : 304800;
+    const accent = itemIndex % 2 === 1 ? visual.secondary || visual.accent : visual.accent;
+    // 下载端将 bullet 做成浅底信息条，避免 WPS 中正文裸排导致大面积空白和文本错位。
+    return solidShapeXml({ id: 1160 + itemIndex * 4, name: `Profit Bridge Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 804672, y, cx: cardWidth, cy: cardHeight, fill: blendHexColor(visual.background, visual.surface, 0.76) })
+      + rectShapeXml({ id: 1161 + itemIndex * 4, name: `Profit Bridge Bullet Accent ${itemIndex + 1}`, x: 804672, y, cx: 45720, cy: cardHeight, fill: accent })
+      + textShapeXml({ id: 1162 + itemIndex * 4, name: `Profit Bridge Bullet Text ${itemIndex + 1}`, x: 990600, y: y + (isCover ? 45720 : 60960), cx: cardWidth - 304800, cy: isCover ? 152400 : 182880, text: budgetPlanningCompactText(item, scene.title, isCover ? 30 : 26), size: isCover ? 660 : 600, bold: true, color: visual.body });
+  }).join("");
+}
+
+function profitBridgeMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 804672 + itemIndex * 1257300;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.negative || "C65A42"][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1180 + itemIndex * 5, name: `Profit Bridge Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1181 + itemIndex * 5, name: `Profit Bridge Metric Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1182 + itemIndex * 5, name: `Profit Bridge Metric Accent ${itemIndex + 1}`, x, y: 3749040, cx: 1066800, cy: 45720, fill: color })
+      + textShapeXml({ id: 1183 + itemIndex * 5, name: `Profit Bridge Metric Value ${itemIndex + 1}`, x: x + 121920, y: 3893820, cx: 822960, cy: 228600, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 1184 + itemIndex * 5, name: `Profit Bridge Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4160520, cx: 822960, cy: 182880, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function profitBridgeWaterfallXml({ visual, palette }) {
+  const heights = [914400, 1493520, 762000, 1188720, 1371600];
+  const colors = [visual.primary, visual.accent, visual.negative || "C65A42", visual.secondary || visual.accent, visual.primary];
+  const bars = heights.map((height, itemIndex) => {
+    const x = 5791200 + itemIndex * 457200;
+    return rectShapeXml({ id: 1200 + itemIndex, name: `Profit Bridge Waterfall Bar ${itemIndex + 1}`, x, y: 3200400 - height, cx: 335280, cy: height, fill: colors[itemIndex] });
+  }).join("");
+  return solidShapeXml({ id: 1195, name: "Profit Bridge Waterfall Panel", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2514600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1196, name: "Profit Bridge Waterfall Border", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2514600, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1197, name: "Profit Bridge Waterfall Axis", x: 5791200, y: 3200400, cx: 2438400, cy: 22860, fill: palette.frame })
+    + bars;
+}
+
+function profitBridgeMarginXml({ visual, palette }) {
+  const stack = solidShapeXml({ id: 1220, name: "Profit Bridge Margin Stack Panel", geom: "roundRect", x: 5486400, y: 1219200, cx: 1371600, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1221, name: "Profit Bridge Margin Stack Border", geom: "roundRect", x: 5486400, y: 1219200, cx: 1371600, cy: 2286000, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1222, name: "Profit Bridge Margin Stack 1", x: 5791200, y: 2743200, cx: 762000, cy: 457200, fill: visual.primary })
+    + rectShapeXml({ id: 1223, name: "Profit Bridge Margin Stack 2", x: 5791200, y: 2225040, cx: 762000, cy: 426720, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 1224, name: "Profit Bridge Margin Stack 3", x: 5791200, y: 1874520, cx: 762000, cy: 274320, fill: visual.negative || "C65A42" });
+  const trend = solidShapeXml({ id: 1230, name: "Profit Bridge Margin Trend Panel", geom: "roundRect", x: 7086600, y: 1219200, cx: 1447800, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1231, name: "Profit Bridge Margin Trend Border", geom: "roundRect", x: 7086600, y: 1219200, cx: 1447800, cy: 2286000, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1232, name: "Profit Bridge Margin Trend Line 1", x: 7299960, y: 2590800, cx: 914400, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1233, name: "Profit Bridge Margin Trend Line 2", x: 7543800, y: 2217420, cx: 701040, cy: 45720, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 1234, name: "Profit Bridge Margin Trend Line 3", x: 7772400, y: 1905000, cx: 457200, cy: 45720, fill: visual.negative || "C65A42" });
+  return stack + trend;
+}
+
+function profitBridgeFactorCardsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const x = 5262880 + (itemIndex % 2) * 1630680;
+    const y = 1447800 + Math.floor(itemIndex / 2) * 944880;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.negative || "C65A42", visual.primary][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1240 + itemIndex * 4, name: `Profit Bridge Factor Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 731520, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1241 + itemIndex * 4, name: `Profit Bridge Factor Card Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 731520, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1242 + itemIndex * 4, name: `Profit Bridge Factor Accent ${itemIndex + 1}`, x, y, cx: 60960, cy: 731520, fill: color })
+      + textShapeXml({ id: 1243 + itemIndex * 4, name: `Profit Bridge Factor Text ${itemIndex + 1}`, x: x + 198120, y: y + 243840, cx: 1036320, cy: 228600, text: budgetPlanningCompactText(item, "", 14), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function profitBridgeActionCardsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const x = 1066800 + itemIndex * 1905000;
+    return solidShapeXml({ id: 1260 + itemIndex * 5, name: `Profit Bridge Action Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3505200, cx: 1524000, cy: 731520, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1261 + itemIndex * 5, name: `Profit Bridge Action Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3505200, cx: 1524000, cy: 731520, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1262 + itemIndex * 5, name: `Profit Bridge Action Number ${itemIndex + 1}`, geom: "ellipse", x: x + 137160, y: 3657600, cx: 289560, cy: 289560, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1263 + itemIndex * 5, name: `Profit Bridge Action Number Text ${itemIndex + 1}`, x: x + 137160, y: 3733800, cx: 289560, cy: 91440, text: String(itemIndex + 1), size: 520, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 1264 + itemIndex * 5, name: `Profit Bridge Action Text ${itemIndex + 1}`, x: x + 502920, y: 3672840, cx: 822960, cy: 243840, text: budgetPlanningCompactText(item, "", 12), size: 650, bold: true, color: visual.title });
+  }).join("");
+}
+
+function profitBridgeClosingCardsXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 914400 + itemIndex * 2316480;
+    return solidShapeXml({ id: 1290 + itemIndex * 4, name: `Profit Bridge Closing Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2895600, cx: 1859280, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1291 + itemIndex * 4, name: `Profit Bridge Closing Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 2895600, cx: 1859280, cy: 914400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1292 + itemIndex * 4, name: `Profit Bridge Closing Card Accent ${itemIndex + 1}`, x: x + 182880, y: 3192780, cx: 365760, cy: 30480, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1293 + itemIndex * 4, name: `Profit Bridge Closing Card Text ${itemIndex + 1}`, x: x + 182880, y: 3314700, cx: 1371600, cy: 243840, text: budgetPlanningCompactText(item, "", 14), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function profitBridgeSceneFromSlide({ slide, index, role }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const resolvedRole = profitBridgeExportRoleFromSlide({ slide, index, role });
+  const metrics = [0, 1, 2].map((itemIndex) => profitBridgeMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "PROFIT ANALYSIS" : "PROFIT ATTRIBUTION",
+    title: budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24),
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    factors: [
+      budgetPlanningCompactText(bullets[0], "收入增长贡献", 14),
+      budgetPlanningCompactText(bullets[1], "成本结构变化", 14),
+      budgetPlanningCompactText(bullets[2], "费用投入影响", 14),
+      budgetPlanningCompactText(bullets[3], "盈利质量判断", 14),
+    ],
+    actions: [
+      budgetPlanningCompactText(bullets[0], "优化价格结构", 12),
+      budgetPlanningCompactText(bullets[1], "压降关键成本", 12),
+      budgetPlanningCompactText(bullets[2], "聚焦高毛利业务", 12),
+      budgetPlanningCompactText(bullets[3], "建立利润复盘节奏", 12),
+    ],
+  };
+}
+
+function profitBridgeExportRoleFromSlide({ slide, index, role }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  const title = String(slide?.title || "");
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (role === "closing" || layout.includes("closing")) return "closing";
+  if (layout.includes("margin") || layout.includes("structure") || title.includes("毛利")) return "margin";
+  if (layout.includes("factor") || layout.includes("analysis") || title.includes("因素")) return "factor";
+  if (layout.includes("improve") || layout.includes("action") || title.includes("行动")) return "improvement";
+  if (layout.includes("bridge") || layout.includes("waterfall") || layout.includes("overview")) return "waterfall";
+  return ["waterfall", "margin", "factor", "improvement"][(index - 1) % 4];
+}
+
+function profitBridgeMetricFromText(text, index) {
+  const fallbackValues = ["+12%", "38%", "￥2.6M"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["利润变化", "毛利水平", "改善空间"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function profitBridgeColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.28),
+    goldWash: blendHexColor(visual.accent, visual.background, 0.86),
+    tealWash: blendHexColor(visual.secondary || visual.accent, visual.background, 0.86),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    grid: blendHexColor(visual.primary, visual.surface, 0.91),
+  };
 }
 
 function productPricingStrategyDecorationsXml({ visual, index, role, slide }) {
@@ -4429,13 +4650,15 @@ function channelPolicyCompactText(text, fallback, maxLength) {
 function keyAccountDecisionDecorationsXml({ visual, index, role, slide }) {
   const scene = keyAccountDecisionSceneFromSlide({ slide, index, role });
   const palette = keyAccountDecisionColorPalette(visual);
-  // 大客户攻坚模板使用可编辑的关系网络、路径箭头和卡片层，避免导出后变成整页背景图。
+  // 大客户攻坚模板导出端对齐在线预览：浅网格背景、白色工作区、左文右图，全部保留为可编辑形状。
   const backdrop = rectShapeXml({ id: 1120, name: "Key Account Decision Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
-    + rectShapeXml({ id: 1121, name: "Key Account Decision Top Rule", x: 0, y: 304800, cx: 9144000, cy: 22860, fill: visual.primary })
-    + rectShapeXml({ id: 1122, name: "Key Account Decision Bottom Rule", x: 792480, y: 4587240, cx: 7620000, cy: 15240, fill: palette.frame });
-  const workspace = solidShapeXml({ id: 1123, name: "Key Account Decision Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
-    + lineFrameShapeXml({ id: 1124, name: "Key Account Decision Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: palette.frame, width: 10160 })
-    + textShapeXml({ id: 1125, name: "Key Account Decision Kicker", x: 792480, y: 807720, cx: 2438400, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+    + rectShapeXml({ id: 1121, name: "Key Account Decision Top Band", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 1122, name: "Key Account Decision Top Accent", x: 0, y: 304800, cx: 9144000, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1126, name: "Key Account Decision Grid X", x: 944880, y: 365760, cx: 7620, cy: 4145280, fill: palette.grid, transparency: 45000 })
+    + rectShapeXml({ id: 1127, name: "Key Account Decision Grid Y", x: 609600, y: 914400, cx: 7924800, cy: 7620, fill: palette.grid, transparency: 45000 });
+  const workspace = solidShapeXml({ id: 1123, name: "Key Account Decision Workspace", geom: "roundRect", x: 609600, y: 670560, cx: 7924800, cy: 3657600, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1124, name: "Key Account Decision Workspace Border", geom: "roundRect", x: 609600, y: 670560, cx: 7924800, cy: 3657600, stroke: palette.frame, width: 10160 })
+    + textShapeXml({ id: 1125, name: "Key Account Decision Kicker", x: 792480, y: 777240, cx: 2743200, cy: 274320, text: scene.kicker, size: 700, bold: true, color: visual.secondary || visual.accent });
   const bullets = keyAccountDecisionBulletCardsXml({ visual, scene, isCover: index === 0 });
   if (scene.role === "matrix") return backdrop + workspace + bullets + keyAccountDecisionMatrixXml({ visual, palette, items: scene.bullets });
   if (scene.role === "roadmap") return backdrop + workspace + bullets + keyAccountDecisionRoadmapXml({ visual, palette, items: scene.bullets });
@@ -4445,16 +4668,19 @@ function keyAccountDecisionDecorationsXml({ visual, index, role, slide }) {
 }
 
 function keyAccountDecisionNetworkXml({ visual, palette }) {
-  const panel = solidShapeXml({ id: 1130, name: "Key Account Decision Network Panel", geom: "roundRect", x: 5359400, y: 1013460, cx: 2971800, cy: 2286000, fill: palette.panel })
-    + lineFrameShapeXml({ id: 1131, name: "Key Account Decision Network Border", geom: "roundRect", x: 5359400, y: 1013460, cx: 2971800, cy: 2286000, stroke: palette.frame, width: 12700 });
+  const panel = solidShapeXml({ id: 1130, name: "Key Account Decision Network Panel", geom: "roundRect", x: 5359400, y: 975360, cx: 3200400, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1131, name: "Key Account Decision Network Border", geom: "roundRect", x: 5359400, y: 975360, cx: 3200400, cy: 2286000, stroke: palette.frame, width: 12700 });
   return panel
-    + lineFrameShapeXml({ id: 1132, name: "Key Account Decision Sponsor Link", x: 6845300, y: 1600200, cx: 0, cy: 899160, stroke: visual.accent, width: 30480 })
-    + lineFrameShapeXml({ id: 1133, name: "Key Account Decision User Link", x: 6205220, y: 2506980, cx: 1280160, cy: 0, stroke: palette.teal, width: 30480 })
-    + lineFrameShapeXml({ id: 1134, name: "Key Account Decision Finance Link", x: 6845300, y: 2506980, cx: 640080, cy: 548640, stroke: visual.primary, width: 30480 })
-    + keyAccountDecisionNodeXml({ id: 1135, name: "Key Account Decision Sponsor Node", x: 6461760, y: 1295400, cx: 762000, cy: 609600, fill: visual.accent, label: "SP", color: "FFFFFF" })
-    + keyAccountDecisionNodeXml({ id: 1138, name: "Key Account Decision User Node", x: 5913120, y: 2214880, cx: 609600, cy: 487680, fill: visual.primary, label: "BU", color: "FFFFFF" })
-    + keyAccountDecisionNodeXml({ id: 1141, name: "Key Account Decision Finance Node", x: 7178040, y: 2214880, cx: 609600, cy: 487680, fill: palette.teal, label: "FI", color: "FFFFFF" })
-    + keyAccountDecisionNodeXml({ id: 1144, name: "Key Account Decision IT Node", x: 6461760, y: 2872740, cx: 762000, cy: 609600, fill: palette.deep, label: "IT", color: "FFFFFF" });
+    // 右侧插画采用预览里的抽象链路风格，避免下载端出现另一套组织结构图。
+    + rectShapeXml({ id: 1132, name: "Key Account Decision Link One", x: 5867400, y: 1584960, cx: 1905000, cy: 38100, fill: visual.accent, transparency: 9000 })
+    + rectShapeXml({ id: 1133, name: "Key Account Decision Link Two", x: 5943600, y: 2255520, cx: 1905000, cy: 38100, fill: palette.line, transparency: 25000 })
+    + rectShapeXml({ id: 1134, name: "Key Account Decision Link Three", x: 6096000, y: 2872740, cx: 1752600, cy: 38100, fill: visual.secondary || palette.teal, transparency: 32000 })
+    + keyAccountDecisionNodeXml({ id: 1135, name: "Key Account Decision Center Node", x: 6652260, y: 1653540, cx: 701040, cy: 701040, fill: visual.accent, label: "", color: "FFFFFF" })
+    + keyAccountDecisionRingNodeXml({ id: 1138, name: "Key Account Decision Left Ring", x: 5768340, y: 1493520, fill: visual.secondary || palette.teal })
+    + keyAccountDecisionRingNodeXml({ id: 1141, name: "Key Account Decision Top Ring", x: 7673340, y: 1493520, fill: visual.primary })
+    + keyAccountDecisionRingNodeXml({ id: 1144, name: "Key Account Decision Bottom Ring", x: 6065520, y: 2674620, fill: visual.accent })
+    + solidShapeXml({ id: 1147, name: "Key Account Decision Deep Dot", geom: "ellipse", x: 8077200, y: 2926080, cx: 365760, cy: 365760, fill: palette.deep })
+    + solidShapeXml({ id: 1148, name: "Key Account Decision Teal Dot", geom: "ellipse", x: 5707380, y: 2827020, cx: 365760, cy: 365760, fill: visual.secondary || palette.teal });
 }
 
 function keyAccountDecisionNodeXml({ id, name, x, y, cx, cy, fill, label, color }) {
@@ -4462,20 +4688,31 @@ function keyAccountDecisionNodeXml({ id, name, x, y, cx, cy, fill, label, color 
     + textShapeXml({ id: id + 1, name: `${name} Label`, x, y: y + cy * 0.30, cx, cy: cy * 0.36, text: label, size: 720, bold: true, color });
 }
 
+function keyAccountDecisionRingNodeXml({ id, name, x, y, fill }) {
+  return solidShapeXml({ id, name, geom: "ellipse", x, y, cx: 320040, cy: 320040, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: id + 1, name: `${name} Border`, geom: "ellipse", x, y, cx: 320040, cy: 320040, stroke: fill, width: 38100 })
+    + solidShapeXml({ id: id + 2, name: `${name} Core`, geom: "ellipse", x: x + 99060, y: y + 99060, cx: 121920, cy: 121920, fill });
+}
+
 function keyAccountDecisionTagCardsXml({ visual, tags }) {
   return tags.slice(0, 3).map((tag, index) => {
-    const x = 5524500 + index * 944880;
-    return solidShapeXml({ id: 1150 + index * 3, name: `Key Account Decision Tag Card ${index + 1}`, geom: "roundRect", x, y: 3665220, cx: 822960, cy: 396240, fill: "FFFFFF" })
-      + rectShapeXml({ id: 1151 + index * 3, name: `Key Account Decision Tag Accent ${index + 1}`, x: x + 91440, y: 3848100, cx: 91440, cy: 45720, fill: index === 1 ? visual.accent : visual.primary })
-      + textShapeXml({ id: 1152 + index * 3, name: `Key Account Decision Tag Text ${index + 1}`, x: x + 198120, y: 3764280, cx: 548640, cy: 182880, text: keyAccountDecisionCompactText(tag, "", 8), size: 700, bold: true, color: visual.title });
+    const x = 792480 + index * 853440;
+    return solidShapeXml({ id: 1150 + index * 3, name: `Key Account Decision Tag Card ${index + 1}`, geom: "roundRect", x, y: 3505200, cx: 731520, cy: 396240, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1151 + index * 3, name: `Key Account Decision Tag Accent ${index + 1}`, x, y: 3505200, cx: 731520, cy: 45720, fill: index === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1152 + index * 3, name: `Key Account Decision Tag Text ${index + 1}`, x: x + 76200, y: 3665220, cx: 579120, cy: 182880, text: keyAccountDecisionCompactText(tag, "", 9), size: 620, bold: true, color: visual.title });
   }).join("");
 }
 
 function keyAccountDecisionBulletCardsXml({ visual, scene, isCover }) {
   return scene.bullets.slice(0, isCover ? 3 : 4).map((item, index) => {
-    const y = (isCover ? 2560320 : 1706880) + index * 289560;
-    return rectShapeXml({ id: 1160 + index * 2, name: `Key Account Decision Bullet Rule ${index + 1}`, x: 792480, y: y + 30480, cx: 45720, cy: 152400, fill: index % 2 ? visual.accent : visual.primary })
-      + textShapeXml({ id: 1161 + index * 2, name: `Key Account Decision Bullet Text ${index + 1}`, x: 960120, y, cx: 3474720, cy: 198120, text: keyAccountDecisionCompactText(item, scene.title, 32), size: isCover ? 780 : 690, bold: false, color: visual.body });
+    const y = (isCover ? 2385060 : 1981200) + index * (isCover ? 320040 : 411480);
+    const cardWidth = isCover ? 3505200 : 3962400;
+    const cardHeight = isCover ? 259080 : 335280;
+    const accent = index % 2 ? visual.accent : visual.primary;
+    // 下载端正文用卡片行强化信息层级，避免主内容看起来比标题弱很多。
+    return solidShapeXml({ id: 1160 + index * 4, name: `Key Account Decision Bullet Card ${index + 1}`, geom: "roundRect", x: 792480, y: y - 45720, cx: cardWidth, cy: cardHeight, fill: blendHexColor(visual.background, visual.surface, 0.76) })
+      + rectShapeXml({ id: 1161 + index * 4, name: `Key Account Decision Bullet Rule ${index + 1}`, x: 792480, y: y - 45720, cx: 60960, cy: cardHeight, fill: accent })
+      + textShapeXml({ id: 1162 + index * 4, name: `Key Account Decision Bullet Text ${index + 1}`, x: 990600, y: y + 30480, cx: cardWidth - 304800, cy: cardHeight - 91440, text: keyAccountDecisionCompactText(item, scene.title, isCover ? 34 : 40), size: isCover ? 720 : 760, bold: true, color: visual.body });
   }).join("");
 }
 
@@ -4521,6 +4758,8 @@ function keyAccountDecisionSceneFromSlide({ slide, index, role }) {
   const layout = String(slide?.layout || "").toLowerCase();
   const resolvedRole = role === "closing" || layout.includes("closing")
     ? "closing"
+    : layout.includes("organization")
+      ? "organization"
     : layout.includes("matrix") || layout.includes("stakeholder")
       ? "matrix"
       : layout.includes("roadmap") || layout.includes("win")
@@ -4529,16 +4768,18 @@ function keyAccountDecisionSceneFromSlide({ slide, index, role }) {
           ? "path"
       : index === 0
         ? "cover"
+        : index === 1
+          ? "organization"
         : index === 2
           ? "path"
           : index === 3
             ? "matrix"
             : index >= 4
               ? "roadmap"
-              : "cover";
+              : "organization";
   return {
     role: resolvedRole,
-    kicker: index === 0 ? "KEY ACCOUNT WAR ROOM" : "DECISION CHAIN",
+    kicker: resolvedRole === "cover" ? "KEY ACCOUNT COMMAND MAP" : resolvedRole === "organization" ? "STAKEHOLDER NETWORK" : resolvedRole === "path" ? "DECISION PATH" : resolvedRole === "matrix" ? "INFLUENCE MATRIX" : resolvedRole === "roadmap" ? "WIN PLAN ROADMAP" : "NEXT ACTION",
     title,
     bullets: bullets.length > 0 ? bullets : ["识别关键决策人和影响链路", "拆解客户组织关系与采购路径", "明确推进节奏、责任人和赢单动作"],
     tags: ["决策人", "影响者", "推进动作"].map((fallback, itemIndex) => keyAccountDecisionCompactText(bullets[itemIndex], fallback, 8)),
@@ -4560,6 +4801,8 @@ function keyAccountDecisionColorPalette(visual) {
     backdrop: blendHexColor(visual.background, visual.surface, 0.35),
     panel: blendHexColor(visual.background, visual.surface, 0.70),
     frame: blendHexColor(visual.primary, visual.surface, 0.72),
+    grid: blendHexColor(visual.secondary || "15A39A", visual.surface, 0.78),
+    line: blendHexColor(visual.primary, visual.surface, 0.82),
     teal: visual.secondary || "15A39A",
     deep: blendHexColor(visual.primary, "000000", 0.14),
   };
@@ -4612,16 +4855,230 @@ function simpleProductPricingDecorationsXml({ visual, index }) {
   return base + solidShapeXml({ id: 1423, name: "Product Pricing Mockup Panel", geom: "roundRect", x: 5359400, y: 1371600, cx: 2438400, cy: 1828800, fill: blendHexColor(visual.background, visual.surface, 0.72) });
 }
 
-function simpleCashFlowForecastDecorationsXml({ visual, index }) {
-  // 现金流预测模板输出图表、周转闭环和回款表格的核心可编辑占位层。
-  const base = solidShapeXml({ id: 1390, name: "Cash Flow Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
-    + lineFrameShapeXml({ id: 1391, name: "Cash Flow Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: visual.primary, width: 10160 })
-    + rectShapeXml({ id: 1392, name: "Cash Flow Accent Rule", x: 548640, y: 609600, cx: 8046720, cy: 45720, fill: visual.accent });
-  if (index === 1) return base + solidShapeXml({ id: 1393, name: "Cash Flow Turnover Cycle", geom: "ellipse", x: 5359400, y: 1371600, cx: 2133600, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.72) });
-  if (index >= 2) return base + solidShapeXml({ id: 1394, name: "Cash Flow Receivables Table", geom: "roundRect", x: 5173980, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
-  return base
-    + solidShapeXml({ id: 1395, name: "Cash Flow Forecast Chart", geom: "roundRect", x: 5173980, y: 1219200, cx: 2895600, cy: 2286000, fill: blendHexColor(visual.background, visual.surface, 0.72) })
-    + simpleNamedCardsXml({ prefix: "Cash Flow Metric Card", startId: 1400, visual, x: 853440, y: 3505200 });
+function cashFlowForecastDecorationsXml({ visual, index, role, slide }) {
+  const scene = cashFlowForecastSceneFromSlide({ slide, index, role });
+  const palette = cashFlowForecastColorPalette(visual);
+  // 现金流模板导出端复刻在线预览的网格底、白色工作台和财务图表区域，避免退回空白占位图形。
+  const backdrop = rectShapeXml({ id: 1390, name: "Cash Flow Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1391, name: "Cash Flow Left Liquidity Glow", geom: "ellipse", x: -457200, y: 3200400, cx: 4876800, cy: 2057400, fill: palette.tealWash })
+    + solidShapeXml({ id: 1392, name: "Cash Flow Right Forecast Glow", geom: "ellipse", x: 6807200, y: 365760, cx: 2057400, cy: 1828800, fill: palette.blueWash })
+    + cashFlowGridXml({ visual, palette });
+  const surface = solidShapeXml({ id: 1398, name: "Cash Flow Workspace", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1399, name: "Cash Flow Workspace Border", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, stroke: palette.frame, width: 15240 });
+  const ruleY = index === 0 ? 2286000 : 1684020;
+  const header = solidShapeXml({ id: 1400, name: "Cash Flow Header Bar", x: 0, y: 0, cx: 9144000, cy: 342900, fill: visual.primary })
+    + rectShapeXml({ id: 1401, name: "Cash Flow Header Accent", x: 0, y: 342900, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 1402, name: "Cash Flow Kicker", x: 804672, y: 792480, cx: 2438400, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1403, name: "Cash Flow Focus Rule", x: 804672, y: ruleY, cx: index === 0 ? 3200400 : 2590800, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1404, name: "Cash Flow Secondary Rule", x: 804672, y: ruleY + 53340, cx: index === 0 ? 1828800 : 1371600, cy: 15240, fill: visual.secondary || visual.accent });
+  const bullets = cashFlowBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "cycle") return backdrop + surface + header + bullets + cashFlowCycleXml({ visual, palette, steps: scene.cycleSteps });
+  if (scene.role === "receivables") return backdrop + surface + header + bullets + cashFlowReceivablesXml({ visual, palette, rows: scene.receivableRows });
+  if (scene.role === "risk") return backdrop + surface + header + bullets + cashFlowRiskCardsXml({ visual, palette, cards: scene.riskCards });
+  if (scene.role === "dashboard") return backdrop + surface + header + bullets + cashFlowDashboardXml({ visual, palette, cards: scene.riskCards });
+  if (scene.role === "closing") return backdrop + surface + header + cashFlowClosingXml({ visual, palette, items: scene.riskCards });
+  if (scene.role === "waterfall") return backdrop + surface + header + bullets + cashFlowWaterfallXml({ visual, palette });
+  return backdrop + surface + header + bullets + cashFlowForecastChartXml({ visual, palette }) + cashFlowMetricCardsXml({ visual, metrics: scene.metrics, palette });
+}
+
+function cashFlowGridXml({ visual, palette }) {
+  // 用浅色细线模拟在线预览的网格背景，控制数量避免导出体积过大。
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8229600]
+    .map((x, itemIndex) => rectShapeXml({ id: 1410 + itemIndex, name: `Cash Flow Grid Vertical ${itemIndex + 1}`, x, y: 365760, cx: 7620, cy: 4419600, fill: palette.grid })).join("");
+  const horizontal = [762000, 1143000, 1524000, 1905000, 2286000, 2667000, 3048000, 3429000, 3810000, 4191000, 4572000]
+    .map((y, itemIndex) => rectShapeXml({ id: 1430 + itemIndex, name: `Cash Flow Grid Horizontal ${itemIndex + 1}`, x: 457200, y, cx: 8229600, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal + solidShapeXml({ id: 1445, name: "Cash Flow Grid Soft Mask", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, fill: blendHexColor(visual.surface, visual.background, 0.24) });
+}
+
+function cashFlowForecastChartXml({ visual, palette }) {
+  const panel = solidShapeXml({ id: 1450, name: "Cash Flow Forecast Chart", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2514600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1451, name: "Cash Flow Forecast Chart Border", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2514600, stroke: palette.frame, width: 10160 });
+  const grid = [0, 1, 2, 3, 4].map((itemIndex) => rectShapeXml({ id: 1455 + itemIndex, name: `Cash Flow Chart Grid Row ${itemIndex + 1}`, x: 5791200, y: 1371600 + itemIndex * 365760, cx: 2438400, cy: 7620, fill: palette.grid })).join("")
+    + [0, 1, 2, 3, 4].map((itemIndex) => rectShapeXml({ id: 1465 + itemIndex, name: `Cash Flow Chart Grid Column ${itemIndex + 1}`, x: 5943600 + itemIndex * 457200, y: 1219200, cx: 7620, cy: 1676400, fill: palette.grid })).join("");
+  const trend = rectShapeXml({ id: 1475, name: "Cash Flow Forecast Trend Line", x: 5943600, y: 2514600, cx: 2438400, cy: 76200, fill: visual.accent })
+    + rectShapeXml({ id: 1476, name: "Cash Flow Forecast Target Line", x: 6858000, y: 1905000, cx: 1371600, cy: 38100, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 1477, name: "Cash Flow Forecast Risk Line", x: 6858000, y: 1676400, cx: 1371600, cy: 38100, fill: visual.warning || "E05F3F" });
+  return panel + grid + trend;
+}
+
+function cashFlowMetricCardsXml({ visual, metrics, palette }) {
+  return metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 804672 + itemIndex * 1257300;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.warning || "E05F3F"][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1485 + itemIndex * 5, name: `Cash Flow Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1486 + itemIndex * 5, name: `Cash Flow Metric Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1487 + itemIndex * 5, name: `Cash Flow Metric Accent ${itemIndex + 1}`, x, y: 3749040, cx: 1066800, cy: 45720, fill: color })
+      + textShapeXml({ id: 1488 + itemIndex * 5, name: `Cash Flow Metric Value ${itemIndex + 1}`, x: x + 121920, y: 3893820, cx: 822960, cy: 228600, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 1489 + itemIndex * 5, name: `Cash Flow Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4160520, cx: 822960, cy: 182880, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function cashFlowBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, itemIndex) => {
+    const y = (isCover ? 2537460 : 2164080) + itemIndex * (isCover ? 243840 : 396240);
+    const cardWidth = isCover ? 3352800 : 3505200;
+    const accent = itemIndex % 2 === 1 ? visual.secondary || visual.accent : visual.accent;
+    // 内容页把 bullet 放入浅色卡片，避免长句和分隔线、右侧图表互相压住。
+    return solidShapeXml({ id: 1510 + itemIndex * 4, name: `Cash Flow Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 804672, y: y - 45720, cx: cardWidth, cy: isCover ? 259080 : 304800, fill: blendHexColor(visual.background, visual.surface, 0.72) })
+      + rectShapeXml({ id: 1511 + itemIndex * 4, name: `Cash Flow Bullet Accent ${itemIndex + 1}`, x: 804672, y: y - 45720, cx: 45720, cy: isCover ? 259080 : 304800, fill: accent })
+      + textShapeXml({ id: 1512 + itemIndex * 4, name: `Cash Flow Bullet Text ${itemIndex + 1}`, x: 990600, y: y + (isCover ? 15240 : 45720), cx: cardWidth - 304800, cy: isCover ? 182880 : 213360, text: budgetPlanningCompactText(item, scene.title, isCover ? 32 : 28), size: isCover ? 760 : 650, bold: true, color: visual.body });
+  }).join("");
+}
+
+function cashFlowWaterfallXml({ visual, palette }) {
+  const heights = [1371600, 914400, 1219200, 670560, 1036320, 1524000];
+  const colors = [visual.primary, visual.accent, visual.secondary || visual.accent, visual.warning || "E05F3F", visual.accent, visual.primary];
+  const bars = heights.map((height, itemIndex) => {
+    const x = 5783580 + itemIndex * 396240;
+    return rectShapeXml({ id: 1530 + itemIndex, name: `Cash Flow Waterfall Bar ${itemIndex + 1}`, x, y: 3192780 - height, cx: 274320, cy: height, fill: colors[itemIndex] });
+  }).join("");
+  return solidShapeXml({ id: 1525, name: "Cash Flow Waterfall Panel", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2514600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1526, name: "Cash Flow Waterfall Border", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2514600, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1527, name: "Cash Flow Waterfall Axis", x: 5783580, y: 3192780, cx: 2438400, cy: 22860, fill: palette.frame })
+    + bars;
+}
+
+function cashFlowCycleXml({ visual, palette, steps }) {
+  const nodes = [
+    { x: 6553200, y: 1219200 },
+    { x: 7467600, y: 2133600 },
+    { x: 6553200, y: 3048000 },
+    { x: 5638800, y: 2133600 },
+  ];
+  const cards = nodes.map((node, itemIndex) => solidShapeXml({ id: 1560 + itemIndex * 3, name: `Cash Flow Cycle Node ${itemIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 853440, cy: 426720, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1561 + itemIndex * 3, name: `Cash Flow Cycle Node Border ${itemIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 853440, cy: 426720, stroke: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent, width: 12700 })
+    + textShapeXml({ id: 1562 + itemIndex * 3, name: `Cash Flow Cycle Text ${itemIndex + 1}`, x: node.x + 91440, y: node.y + 121920, cx: 670560, cy: 152400, text: budgetPlanningCompactText(steps[itemIndex], "", 8), size: 660, bold: true, color: visual.title })).join("");
+  return solidShapeXml({ id: 1550, name: "Cash Flow Turnover Cycle", geom: "ellipse", x: 5943600, y: 1371600, cx: 1981200, cy: 1981200, fill: palette.panel })
+    + arcLineShapeXml({ id: 1551, name: "Cash Flow Cycle Arc", x: 6065520, y: 1493520, cx: 1737360, cy: 1737360, stroke: visual.accent, width: 76200 })
+    + cards;
+}
+
+function cashFlowReceivablesXml({ visual, palette, rows }) {
+  const tableX = 5486400;
+  const tableY = 1219200;
+  const rowH = 457200;
+  const tableW = 3048000;
+  const shell = solidShapeXml({ id: 1585, name: "Cash Flow Receivables Table", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1586, name: "Cash Flow Receivables Table Border", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1587, name: "Cash Flow Receivables Header", x: tableX, y: tableY, cx: tableW, cy: rowH, fill: visual.primary });
+  const cells = rows.map((row, rowIndex) => {
+    const y = tableY + rowIndex * rowH;
+    const rule = rowIndex > 0 ? rectShapeXml({ id: 1590 + rowIndex, name: `Cash Flow Receivables Row Rule ${rowIndex}`, x: tableX, y, cx: tableW, cy: 7620, fill: palette.grid }) : "";
+    return rule + row.map((cell, cellIndex) => textShapeXml({
+      id: 1600 + rowIndex * 8 + cellIndex,
+      name: `Cash Flow Receivables Cell ${rowIndex + 1}-${cellIndex + 1}`,
+      x: tableX + 137160 + cellIndex * 701040,
+      y: y + 137160,
+      cx: 640080,
+      cy: 152400,
+      text: budgetPlanningCompactText(cell, "", cellIndex === 0 ? 9 : 6),
+      size: rowIndex === 0 ? 620 : 560,
+      bold: true,
+      color: rowIndex === 0 ? "FFFFFF" : visual.body,
+    })).join("");
+  }).join("");
+  return shell + cells;
+}
+
+function cashFlowRiskCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 5262880 + (itemIndex % 2) * 1630680;
+    const y = 1905000 + Math.floor(itemIndex / 2) * 914400;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.warning || "E05F3F", visual.primary][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1640 + itemIndex * 4, name: `Cash Flow Risk Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 670560, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1641 + itemIndex * 4, name: `Cash Flow Risk Card Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 670560, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1642 + itemIndex * 4, name: `Cash Flow Risk Accent ${itemIndex + 1}`, x, y, cx: 60960, cy: 670560, fill: color })
+      + textShapeXml({ id: 1643 + itemIndex * 4, name: `Cash Flow Risk Text ${itemIndex + 1}`, x: x + 198120, y: y + 213360, cx: 1036320, cy: 228600, text: budgetPlanningCompactText(card, "", 16), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function cashFlowDashboardXml({ visual, palette, cards }) {
+  const main = solidShapeXml({ id: 1670, name: "Cash Flow Dashboard Main Card", geom: "roundRect", x: 5262880, y: 1905000, cx: 1447800, cy: 1584960, fill: visual.primary })
+    + textShapeXml({ id: 1671, name: "Cash Flow Dashboard Main Text", x: 5430520, y: 2545080, cx: 1066800, cy: 304800, text: budgetPlanningCompactText(cards[0], "", 12), size: 680, bold: true, color: "FFFFFF" });
+  const side = cards.slice(1, 3).map((card, itemIndex) => {
+    const y = 1905000 + itemIndex * 838200;
+    return solidShapeXml({ id: 1680 + itemIndex * 3, name: `Cash Flow Dashboard Side Card ${itemIndex + 1}`, geom: "roundRect", x: 7010400, y, cx: 1447800, cy: 670560, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1681 + itemIndex * 3, name: `Cash Flow Dashboard Side Border ${itemIndex + 1}`, geom: "roundRect", x: 7010400, y, cx: 1447800, cy: 670560, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 1682 + itemIndex * 3, name: `Cash Flow Dashboard Side Text ${itemIndex + 1}`, x: 7162800, y: y + 228600, cx: 1066800, cy: 182880, text: budgetPlanningCompactText(card, "", 12), size: 620, bold: true, color: visual.title });
+  }).join("");
+  return main + side;
+}
+
+function cashFlowClosingXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 914400 + itemIndex * 2316480;
+    return solidShapeXml({ id: 1700 + itemIndex * 4, name: `Cash Flow Closing Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2895600, cx: 1859280, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1701 + itemIndex * 4, name: `Cash Flow Closing Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 2895600, cx: 1859280, cy: 914400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1702 + itemIndex * 4, name: `Cash Flow Closing Card Accent ${itemIndex + 1}`, x: x + 182880, y: 3192780, cx: 365760, cy: 30480, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1703 + itemIndex * 4, name: `Cash Flow Closing Card Text ${itemIndex + 1}`, x: x + 182880, y: 3314700, cx: 1371600, cy: 243840, text: budgetPlanningCompactText(item, "", 14), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function cashFlowForecastSceneFromSlide({ slide, index, role }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const resolvedRole = cashFlowForecastRoleFromSlide({ slide, index, role });
+  const metrics = [0, 1, 2].map((itemIndex) => cashFlowMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "CASH FLOW REPORT" : "LIQUIDITY BOARD",
+    title: budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24),
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    cycleSteps: [
+      budgetPlanningCompactText(bullets[0], "销售确认", 10),
+      budgetPlanningCompactText(bullets[1], "开票回款", 10),
+      budgetPlanningCompactText(bullets[2], "资金调拨", 10),
+      budgetPlanningCompactText(bullets[3], "风险复盘", 10),
+    ],
+    receivableRows: [
+      ["客户/账期", "金额", "状态", "动作"],
+      ...[0, 1, 2].map((rowIndex) => [
+        budgetPlanningCompactText(bullets[rowIndex], `回款项 ${rowIndex + 1}`, 12),
+        metrics[rowIndex].value,
+        ["跟进", "预警", "确认"][rowIndex],
+        ["催收", "对账", "锁定"][rowIndex],
+      ]),
+    ],
+    riskCards: [
+      budgetPlanningCompactText(bullets[0], "现金缺口预警", 14),
+      budgetPlanningCompactText(bullets[1], "大客户回款延迟", 14),
+      budgetPlanningCompactText(bullets[2], "资金周转压力", 14),
+      budgetPlanningCompactText(bullets[3], "融资窗口判断", 14),
+    ],
+  };
+}
+
+function cashFlowForecastRoleFromSlide({ slide, index, role }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (role === "closing" || layout.includes("closing")) return "closing";
+  if (layout.includes("waterfall")) return "waterfall";
+  if (layout.includes("turnover") || layout.includes("cycle")) return "cycle";
+  if (layout.includes("receivable") || layout.includes("collection")) return "receivables";
+  if (layout.includes("risk") || layout.includes("warning")) return "risk";
+  if (layout.includes("dashboard") || layout.includes("forecast")) return "dashboard";
+  return ["waterfall", "cycle", "receivables", "risk", "dashboard"][(index - 1) % 5];
+}
+
+function cashFlowMetricFromText(text, index) {
+  const fallbackValues = ["13周", "￥8.6M", "42天"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["预测周期", "安全余额", "回款账期"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m|周|天|月)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function cashFlowForecastColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.28),
+    tealWash: blendHexColor(visual.accent, visual.background, 0.86),
+    blueWash: blendHexColor(visual.secondary || visual.accent, visual.background, 0.86),
+    panel: blendHexColor(visual.background, visual.surface, 0.68),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    grid: blendHexColor(visual.primary, visual.surface, 0.90),
+  };
 }
 
 function simpleNamedCardsXml({ prefix, startId, visual, x, y }) {
