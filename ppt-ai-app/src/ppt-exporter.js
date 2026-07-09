@@ -1011,7 +1011,7 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
     return base + productInterviewInsightDecorationsXml({ visual, index, role, slide });
   }
   if (visual.layout === "product-pricing-strategy") {
-    return base + simpleProductPricingDecorationsXml({ visual, index });
+    return base + productPricingStrategyDecorationsXml({ visual, index, role, slide });
   }
   if (visual.layout === "feature-priority-matrix") {
     return base + featurePriorityMatrixDecorationsXml({ visual, index, layout, role, slide });
@@ -4304,6 +4304,55 @@ function profitBridgeDecorationsXml({ visual, index, role, slide }) {
       const h = [548640, 853440, 579120, 1066800][itemIndex];
       return rectShapeXml({ id: 1086 + itemIndex, name: `Profit Bridge Waterfall Bar ${itemIndex + 1}`, x, y: 3078480 - h, cx: 335280, cy: h, fill: itemIndex === 2 ? visual.negative || "C65A42" : itemIndex % 2 ? visual.accent : visual.primary });
     }).join("");
+}
+
+function productPricingStrategyDecorationsXml({ visual, index, role, slide }) {
+  const bullets = channelPolicyBulletTexts(slide);
+  const palette = {
+    panel: blendHexColor(visual.background, visual.surface, 0.52),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.78),
+    softSecondary: blendHexColor(visual.secondary || visual.accent, visual.surface, 0.78),
+  };
+  // 产品商业化定价模板用可编辑的套餐卡、权益矩阵和闭环图承载信息，避免回退到普通三段文字。
+  const canvas = solidShapeXml({ id: 1200, name: "Product Pricing Canvas", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1201, name: "Product Pricing Canvas Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 10160 })
+    + rectShapeXml({ id: 1202, name: "Product Pricing Header Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
+  if (index === 1 || String(slide?.title || "").includes("套餐")) {
+    return canvas + [0, 1, 2].map((itemIndex) => {
+      const x = 4876800 + itemIndex * 1036320;
+      return solidShapeXml({ id: 1210 + itemIndex * 3, name: `Product Pricing Tier Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1524000 - (itemIndex === 1 ? 121920 : 0), cx: 853440, cy: 1524000, fill: itemIndex === 1 ? palette.softAccent : "FFFFFF" })
+        + rectShapeXml({ id: 1211 + itemIndex * 3, name: `Product Pricing Tier Accent ${itemIndex + 1}`, x: x + 121920, y: 1767840 - (itemIndex === 1 ? 121920 : 0), cx: 609600, cy: 91440, fill: itemIndex === 1 ? visual.accent : visual.primary })
+        + textShapeXml({ id: 1212 + itemIndex * 3, name: `Product Pricing Tier Text ${itemIndex + 1}`, x: x + 91440, y: 2362200 - (itemIndex === 1 ? 121920 : 0), cx: 670560, cy: 365760, text: channelPolicyCompactText(bullets[itemIndex], `Package ${itemIndex + 1}`, 12), size: 660, bold: true, color: visual.title });
+    }).join("");
+  }
+  if (index === 3 || String(slide?.title || "").includes("矩阵")) {
+    return canvas + solidShapeXml({ id: 1220, name: "Product Pricing Benefit Matrix", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: "FFFFFF" })
+      + [0, 1, 2, 3, 4].map((itemIndex) => {
+        const y = 1600200 + itemIndex * 335280;
+        return rectShapeXml({ id: 1221 + itemIndex * 2, name: `Product Pricing Matrix Row ${itemIndex + 1}`, x: 5105400, y, cx: 2438400, cy: 213360, fill: itemIndex % 2 ? palette.panel : "F8FAFC" })
+          + rectShapeXml({ id: 1222 + itemIndex * 2, name: `Product Pricing Matrix Signal ${itemIndex + 1}`, x: 6705600, y: y + 60960, cx: 609600, cy: 60960, fill: itemIndex % 2 ? visual.accent : visual.secondary || visual.primary });
+      }).join("");
+  }
+  if (role === "closing" || index >= 4 || String(slide?.title || "").includes("闭环")) {
+    return canvas + solidShapeXml({ id: 1230, name: "Product Pricing Commercial Loop", geom: "ellipse", x: 5029200, y: 1371600, cx: 2438400, cy: 2133600, fill: palette.softSecondary })
+      + solidShapeXml({ id: 1231, name: "Product Pricing Loop Core", geom: "ellipse", x: 5791200, y: 1981200, cx: 914400, cy: 914400, fill: visual.surface })
+      + [0, 1, 2, 3].map((itemIndex) => {
+        const positions = [
+          [6004560, 1371600],
+          [7162800, 2286000],
+          [6004560, 3352800],
+          [4876800, 2286000],
+        ];
+        const [x, y] = positions[itemIndex];
+        return solidShapeXml({ id: 1232 + itemIndex * 2, name: `Product Pricing Loop Node ${itemIndex + 1}`, geom: "ellipse", x, y, cx: 304800, cy: 304800, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+          + textShapeXml({ id: 1233 + itemIndex * 2, name: `Product Pricing Loop Text ${itemIndex + 1}`, x: x - 182880, y: y + 335280, cx: 670560, cy: 182880, text: channelPolicyCompactText(bullets[itemIndex], `Step ${itemIndex + 1}`, 8), size: 560, bold: true, color: visual.title });
+      }).join("");
+  }
+  return canvas + solidShapeXml({ id: 1205, name: "Product Pricing Mockup Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: palette.panel })
+    + rectShapeXml({ id: 1206, name: "Product Pricing Mockup Header", x: 5181600, y: 1691640, cx: 1371600, cy: 121920, fill: visual.primary })
+    + rectShapeXml({ id: 1207, name: "Product Pricing Mockup Bar 1", x: 5181600, y: 2148840, cx: 1828800, cy: 91440, fill: visual.accent })
+    + rectShapeXml({ id: 1208, name: "Product Pricing Mockup Bar 2", x: 5181600, y: 2468880, cx: 1219200, cy: 91440, fill: visual.secondary || visual.primary })
+    + solidShapeXml({ id: 1209, name: "Product Pricing Mockup Badge", geom: "ellipse", x: 6705600, y: 2819400, cx: 548640, cy: 548640, fill: visual.accent });
 }
 
 function productInterviewInsightDecorationsXml({ visual, index, role, slide }) {

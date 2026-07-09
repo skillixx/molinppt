@@ -3081,7 +3081,7 @@ test("PptService preview renders dome role classes and business image assets", a
   assert.doesNotMatch(html, /data-dome-role="closing"[\s\S]*<li>感谢观看<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="cover"[\s\S]*<li>年度汇报<\/li>/);
   assert.doesNotMatch(html, /data-dome-role="section-divider"[\s\S]*<li>PART 01<\/li>/);
-  const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
+  const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2(?:\s[^>]*)?>([^<]+)<\/h2>/g)];
   const explicitCoverSlide = previewSlides.find(([, , , title]) => title === "追加封面");
   assert.equal(explicitCoverSlide?.[2], "cover");
   assert.match(explicitCoverSlide?.[1] || "", /\bslide-cover\b/);
@@ -3117,7 +3117,7 @@ test("PptService preview infers image-report role from work summary titles", asy
 
   const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2>([^<]+)<\/h2>/g)];
+  const previewSlides = [...html.matchAll(/<div class="([^"]*\bslide\b[^"]*)" data-dome-role="([^"]+)"[\s\S]*?<h2(?:\s[^>]*)?>([^<]+)<\/h2>/g)];
   const summarySlide = previewSlides.find(([, , , title]) => title === "年度工作概况");
   assert.equal(summarySlide?.[2], "image-report");
 });
