@@ -1027,6 +1027,41 @@ test("resolveTemplateVisual applies metric anomaly attribution official visual",
   assert.equal(visual.accent, "06B6D4");
 });
 
+test("resolveTemplateVisual applies operating problem diagnosis official visual", () => {
+  const template = {
+    id: "business-operating-problem-diagnosis-problem-tree",
+    visual: {
+      primary: "17233B",
+      accent: "E94B3C",
+      secondary: "0EA5A8",
+      warning: "F59E0B",
+      background: "F5F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "operating-problem-tree",
+      variant: "problem-tree",
+    },
+    themes: [
+      {
+        id: "problem-tree",
+        visual: {
+          layout: "operating-problem-tree",
+          variant: "problem-tree",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "problem-tree", template });
+
+  assert.equal(visual.id, "business-operating-problem-diagnosis-problem-tree");
+  assert.equal(visual.layout, "operating-problem-tree");
+  assert.equal(visual.variant, "problem-tree");
+  assert.equal(visual.primary, "17233B");
+  assert.equal(visual.accent, "E94B3C");
+});
+
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
