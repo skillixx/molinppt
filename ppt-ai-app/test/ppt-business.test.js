@@ -2033,6 +2033,41 @@ test("PromptManager keeps deck template context compact", () => {
   assert.equal(JSON.stringify(prompt).length < 5000, true);
 });
 
+test("PromptManager keeps deck outline context compact", () => {
+  const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
+  const prompt = new PromptManager().buildDeckPrompt({
+    outline: {
+      id: "outline-long",
+      ownerUserId: 7,
+      topic: "季度经营复盘",
+      theme: "modern",
+      templateId: "business",
+      status: "outline_edited",
+      created_at: "2026-07-09T00:00:00.000Z",
+      updated_at: "2026-07-09T00:00:00.000Z",
+      input: { raw: "这段原始输入不应该进入生成 PPT 提示词。".repeat(300) },
+      slides: Array.from({ length: 20 }, (_, index) => ({
+        id: `slide-${index + 1}`,
+        sortOrder: index + 1,
+        title: `第 ${index + 1} 页经营复盘标题 ${"需要压缩".repeat(20)}`,
+        layout: index === 0 ? "cover" : "content",
+        bullets: Array.from({ length: 6 }, (__, bulletIndex) => (
+          `第 ${bulletIndex + 1} 条经营分析要点，包含很长的业务背景、数据解释、原因推导和行动建议。`.repeat(8)
+        )),
+        speakerNotes: "很长的演讲备注不应该进入 deck 生成提示词。".repeat(200),
+      })),
+    },
+    template,
+  });
+
+  assert.equal(prompt.outline.input, undefined);
+  assert.equal(prompt.outline.ownerUserId, undefined);
+  assert.equal(prompt.outline.status, undefined);
+  assert.equal(prompt.outline.slides.length, 20);
+  assert.equal(prompt.outline.slides[0].speakerNotes, undefined);
+  assert.equal(JSON.stringify(prompt).length < 5000, true);
+});
+
 test("PromptManager auto-loads PPT design master skill for outline, deck, and slide polish", () => {
   const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
   const manager = new PromptManager();

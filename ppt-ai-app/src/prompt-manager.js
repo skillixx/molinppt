@@ -1,5 +1,14 @@
 import { loadPptDesignMasterSkill } from "./ppt-design-skill.js";
 
+const DECK_OUTLINE_PROMPT_BUDGET = 2400;
+const DECK_OUTLINE_COMPACT_PROFILES = [
+  { titleLimit: 90, bulletLimit: 120, maxBullets: 4 },
+  { titleLimit: 72, bulletLimit: 88, maxBullets: 4 },
+  { titleLimit: 64, bulletLimit: 64, maxBullets: 3 },
+  { titleLimit: 48, bulletLimit: 42, maxBullets: 2 },
+  { titleLimit: 40, bulletLimit: 28, maxBullets: 1 },
+];
+
 const DOME_LAYOUT_ROLES = [
   "cover",
   "agenda",
@@ -44,7 +53,7 @@ export class PromptManager {
   buildDeckPrompt({ outline, template }) {
     return {
       kind: "deck",
-      outline,
+      outline: buildDeckOutlineContext(outline),
       templateContext: buildTemplateContext(template),
       designSkill: loadPptDesignMasterSkill("deck"),
       templateInstructions: buildTemplateInstructions(template),
@@ -64,6 +73,72 @@ export class PromptManager {
       designSkill: loadPptDesignMasterSkill("regenerate_slide"),
     };
   }
+}
+
+/**
+ * 为生成 PPT 阶段构建精简大纲，避免把数据库元数据、长输入和历史字段塞进模型提示词。
+ * @param {object | undefined} outline
+ * @returns {object}
+ */
+function buildDeckOutlineContext(outline) {
+  if (!outline) return {};
+  const sourceSlides = Array.isArray(outline.slides) ? outline.slides : [];
+  const base = {
+    id: outline.id,
+    topic: compactText(outline.topic, 120),
+    theme: outline.theme,
+    templateId: outline.templateId,
+    sourceTemplateId: outline.sourceTemplateId,
+    sourceTheme: outline.sourceTheme,
+  };
+  for (const profile of DECK_OUTLINE_COMPACT_PROFILES) {
+    const context = {
+      ...base,
+      slides: sourceSlides.map((slide, index) => compactSlideForDeckPrompt(slide, index, profile)),
+    };
+    if (JSON.stringify(context).length <= DECK_OUTLINE_PROMPT_BUDGET) return context;
+  }
+  return {
+    ...base,
+    slides: sourceSlides.map((slide, index) => ({
+      id: slide?.id || `slide-${index + 1}`,
+      sortOrder: slide?.sortOrder || index + 1,
+      title: compactText(slide?.title || `第 ${index + 1} 页`, 36),
+      layout: slide?.layout,
+    })),
+  };
+}
+
+/**
+ * 只保留模型生成页面所需的核心字段，业务长文本会在字段内做截断。
+ * @param {object | undefined} slide
+ * @param {number} index
+ * @param {{titleLimit: number, bulletLimit: number, maxBullets: number}} profile
+ * @returns {object}
+ */
+function compactSlideForDeckPrompt(slide, index, profile) {
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.slice(0, profile.maxBullets).map((bullet) => compactText(bullet, profile.bulletLimit)).filter(Boolean)
+    : [];
+  return {
+    id: slide?.id || `slide-${index + 1}`,
+    sortOrder: slide?.sortOrder || index + 1,
+    title: compactText(slide?.title || `第 ${index + 1} 页`, profile.titleLimit),
+    layout: slide?.layout,
+    bullets,
+  };
+}
+
+/**
+ * 截断提示词字段时保留语义前缀，避免超长输入触发模型或本地长度限制。
+ * @param {unknown} value
+ * @param {number} limit
+ * @returns {string}
+ */
+function compactText(value, limit) {
+  const text = String(value ?? "").replace(/\s+/g, " ").trim();
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 1)).trim()}…`;
 }
 
 /**
