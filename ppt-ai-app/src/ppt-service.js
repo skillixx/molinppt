@@ -4984,11 +4984,7 @@ function isFinancialSolutionVisual(visual) {
 function keyAccountDecisionPreviewScene({ slide, index, total }) {
   const bullets = keyAccountDecisionBulletTexts(slide);
   const title = keyAccountDecisionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
-  const role = index === 0
-    ? "cover"
-    : index === total - 1
-      ? "closing"
-      : ["organization", "decision-path", "stakeholder-matrix", "win-roadmap"][(index - 1) % 4];
+  const role = keyAccountDecisionPreviewRole({ slide, index, total });
   const tags = ["关键人识别", "组织关系", "推进动作"].map((fallback, itemIndex) => keyAccountDecisionCompactText(bullets[itemIndex], fallback, 8));
   const path = ["需求确认", "技术评估", "商务测算", "高层拍板", "合同推进"].map((fallback, itemIndex) => keyAccountDecisionCompactText(bullets[itemIndex], fallback, 8));
   const matrix = ["重点突破", "维持支持", "风险转化", "持续观察"].map((fallback, itemIndex) => keyAccountDecisionCompactText(bullets[itemIndex], fallback, 10));
@@ -5002,6 +4998,18 @@ function keyAccountDecisionPreviewScene({ slide, index, total }) {
     path,
     matrix,
   };
+}
+
+function keyAccountDecisionPreviewRole({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  if (layout.includes("closing")) return "closing";
+  if (layout.includes("organization")) return "organization";
+  if (layout.includes("matrix") || layout.includes("stakeholder")) return "stakeholder-matrix";
+  if (layout.includes("roadmap") || layout.includes("win")) return "win-roadmap";
+  if (layout.includes("path") || layout.includes("decision")) return "decision-path";
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  return ["organization", "decision-path", "stakeholder-matrix", "win-roadmap"][(index - 1) % 4];
 }
 
 function renderKeyAccountDecisionPreview(slide, scene) {
