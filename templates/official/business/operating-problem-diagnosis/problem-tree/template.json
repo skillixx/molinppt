@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "operating-problem-diagnosis",
+  "themeId": "problem-tree",
+  "style": "operating-problem-diagnosis",
+  "themes": [
+    {
+      "id": "problem-tree",
+      "name": "问题树",
+      "visual": {
+        "primary": "17233B",
+        "accent": "E94B3C",
+        "secondary": "0EA5A8",
+        "warning": "F59E0B",
+        "background": "F5F7FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "operating-problem-tree",
+        "variant": "problem-tree"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "17233B",
+    "accent": "E94B3C",
+    "secondary": "0EA5A8",
+    "warning": "F59E0B",
+    "background": "F5F7FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "operating-problem-tree",
+    "variant": "problem-tree"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "operating-problem-tree-cover",
+    "defaultContentLayout": "operating-problem-tree-diagnosis",
+    "allowedLayouts": [
+      "operating-problem-tree-cover",
+      "operating-problem-tree-overview",
+      "operating-problem-tree-diagnosis",
+      "operating-problem-tree-root-cause",
+      "operating-problem-tree-impact",
+      "operating-problem-tree-action",
+      "operating-problem-tree-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

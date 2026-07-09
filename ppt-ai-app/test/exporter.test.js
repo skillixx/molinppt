@@ -324,6 +324,122 @@ test("PptExportService uses competition map decorations", () => {
   assert.doesNotMatch(slide1, /competition-map/);
 });
 
+test("PptExportService uses second curve strategy decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-growth-strategy-planning-second-curve",
+      theme: "second-curve",
+      templateVisual: {
+        primary: "0E2A47",
+        accent: "16B8A6",
+        secondary: "F2B84B",
+        background: "EEF6F4",
+        surface: "FFFFFF",
+        title: "071A2D",
+        body: "315168",
+        layout: "strategy-second-curve",
+        variant: "second-curve",
+      },
+      slides: [
+        { title: "新业务增长曲线规划", bullets: ["增长目标：三年形成新增收入来源", "增长假设：目标客群愿意为效率提升付费", "资源配置：先试点再扩大投入"] },
+        { title: "机会池与目标客群判断", bullets: ["高价值客户集中在存量升级场景", "渠道伙伴具备试点入口", "产品能力需要快速验证"] },
+        { title: "孵化路径和阶段投入", bullets: ["验证问题价值", "完成 PMF", "规模化复制", "独立经营单元"] },
+        { title: "资源组合和阶段决策", bullets: ["设置阶段投资门槛", "跟踪验证指标", "形成复盘机制"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Second Curve Consulting Canvas"/);
+  assert.match(slide1, /name="Second Curve Growth Chart"/);
+  assert.match(slide1, /name="Second Curve Metric Card 1"/);
+  assert.match(slide3, /name="Second Curve Opportunity Matrix"/);
+  assert.match(slide4, /name="Second Curve Roadmap Step 1"/);
+  assert.doesNotMatch(slide1, /second-curve/);
+});
+
+test("PptExportService uses enterprise digital blueprint decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-enterprise-transformation-digital-blueprint",
+      theme: "digital-blueprint",
+      templateVisual: {
+        id: "strategy-enterprise-transformation-digital-blueprint",
+        primary: "0B1F3A",
+        accent: "22D3EE",
+        secondary: "38BDF8",
+        warning: "F59E0B",
+        background: "EAF4FB",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "enterprise-digital-blueprint",
+        variant: "digital-blueprint",
+      },
+      slides: [
+        { title: "Enterprise transformation blueprint", bullets: ["Systems are fragmented", "Data flow needs governance", "Operating model needs upgrade"] },
+        { title: "Current state diagnosis", bullets: ["System silos", "Data quality gaps", "Process offline", "Governance unclear"] },
+        { title: "Target digital blueprint", bullets: ["Experience layer", "Process layer", "Data platform", "AI automation"] },
+        { title: "Capability upgrade map", bullets: ["Online process", "Data asset", "Intelligent decision", "Agile organization"] },
+        { title: "System roadmap", bullets: ["0-3 month foundation", "3-6 month platform", "6-12 month scale"] },
+        { title: "Organization governance", bullets: ["Transformation committee", "Business owner", "Data governance", "PMO"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Enterprise Blueprint Content Surface"/);
+  assert.match(slide1, /name="Enterprise Blueprint Architecture Frame"/);
+  assert.match(slide1, /name="Enterprise Blueprint Planned Content"/);
+  assert.match(slide4, /name="Enterprise Blueprint Capability Card 1"/);
+  assert.match(slide5, /name="Enterprise Blueprint Roadmap Node 1"/);
+  assert.match(slide6, /name="Enterprise Blueprint Governance Node 1"/);
+  assert.doesNotMatch(slide1, /digital-blueprint/);
+});
+
+test("PptExportService uses competitor SWOT map decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "competitor-analysis",
+      theme: "swot-map",
+      slides: [
+        { title: "从增长瓶颈到破局行动：2026 年 Q2 竞品复盘", bullets: ["竞品能力分布呈现强弱分化", "差异化机会集中在高价值场景", "需要建立可验证的策略动作"] },
+        { title: "SWOT 要素拆解与竞争判断", bullets: ["核心优势来自交付速度", "关键短板是渠道覆盖不足", "机会窗口集中在行业场景"] },
+        { title: "竞争坐标定位与机会空白", bullets: ["产品能力形成高端定位", "市场机会来自存量替换", "服务闭环决定差异化"] },
+        { title: "能力差距与补位方向", bullets: ["补齐行业方案能力", "强化客户成功体系", "建立策略跟踪机制"] },
+        { title: "机会威胁响应与行动优先级", bullets: ["优先放大优势场景", "建立价格战防守线", "锁定重点客户验证"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="SWOT Map Consulting Canvas"/);
+  assert.match(slide1, /name="SWOT Quadrant Matrix"/);
+  assert.match(slide1, /name="SWOT Strategy Card 1"/);
+  assert.match(slide3, /name="SWOT Position Axis"/);
+  assert.match(slide4, /name="SWOT Compare Card 1"/);
+  assert.doesNotMatch(slide1, /swot-map/);
+});
+
 test("PptExportService uses commercial financial quarterly decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -371,6 +487,44 @@ test("PptExportService uses commercial financial forecast decorations", () => {
   assert.match(slide1, /name="Financial Forecast Dot 4"/);
   assert.match(slide1, /val="123B4D"/);
   assert.match(slide1, /val="2F9E9A"/);
+});
+
+test("PptExportService uses cost control breakdown decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-cost-control-plan-cost-breakdown",
+      theme: "cost-breakdown",
+      templateVisual: {
+        primary: "102A43",
+        accent: "D59E3D",
+        secondary: "2A9D8F",
+        warning: "C8553D",
+        background: "EEF3F6",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "334155",
+        layout: "finance-cost-breakdown",
+        variant: "cost-breakdown",
+      },
+      slides: [
+        { title: "成本控制方案", bullets: ["总成本下降 18%", "采购节约 ￥2.4M", "治理周期 12周"] },
+        { title: "成本结构拆解", bullets: ["固定成本占比 42%", "变动成本占比 37%", "可优化费用池 21%"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Cost Breakdown Dashboard"/);
+  assert.match(slide1, /name="Cost Breakdown Metric Card 1"/);
+  assert.match(slide2, /name="Cost Breakdown Structure Panel"/);
+  assert.doesNotMatch(slide1, /Bullet List/);
+  assert.match(slide1, /val="102A43"/);
+  assert.match(slide1, /val="D59E3D"/);
 });
 
 test("PptExportService uses budget planning decorations", () => {
@@ -1178,6 +1332,46 @@ test("PptExportService uses quarterly action loop decorations", () => {
   assert.match(slide2, /name="Quarterly Action Loop V2 Owner Matrix 1"/);
   assert.match(slide2, /name="Quarterly Action Loop V2 Roadmap Arrow 1"/);
   assert.doesNotMatch(slide1, /行动闭环/);
+});
+
+test("PptExportService uses business opportunity map decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "business-business-growth-report-opportunity-map",
+      theme: "opportunity-map",
+      templateVisual: {
+        id: "business-business-growth-report-opportunity-map",
+        primary: "123A5A",
+        accent: "17A673",
+        secondary: "D9A441",
+        background: "EEF5F7",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "33475B",
+        layout: "business-opportunity-map",
+        variant: "opportunity-map",
+      },
+      slides: [
+        { title: "业务增长分析与突破路径", bullets: ["重点区域需求提升", "渠道转化存在改善空间", "关键动作需要形成闭环"] },
+        { title: "市场机会识别与优先级", bullets: ["高潜客户集中在核心城市", "存量客户复购空间扩大", "新渠道线索成本下降"] },
+        { title: "增长路径拆解与资源投入", bullets: ["先验证核心场景", "再扩大重点渠道", "最后沉淀复制打法"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  // 导出的 PPTX 也必须由可编辑形状绘制机会地图、指标卡和增长路径，不依赖整页背景图。
+  assert.match(slide1, /name="Business Opportunity Map Panel"/);
+  assert.match(slide1, /name="Business Opportunity Metric 1"/);
+  assert.match(slide2, /name="Business Opportunity Map Panel"/);
+  assert.match(slide3, /name="Business Opportunity Quadrant 1"/);
+  assert.doesNotMatch(slide1, /机会地图/);
 });
 
 test("PptExportService keeps commercial template theme chips decorative", () => {

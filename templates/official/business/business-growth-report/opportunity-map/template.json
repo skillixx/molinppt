@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "business-growth-report",
+  "themeId": "opportunity-map",
+  "style": "business-growth-report",
+  "themes": [
+    {
+      "id": "opportunity-map",
+      "name": "机会地图",
+      "visual": {
+        "primary": "123A5A",
+        "accent": "17A673",
+        "secondary": "D9A441",
+        "warning": "F97316",
+        "background": "EEF5F7",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "33475B",
+        "layout": "business-opportunity-map",
+        "variant": "opportunity-map"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123A5A",
+    "accent": "17A673",
+    "secondary": "D9A441",
+    "warning": "F97316",
+    "background": "EEF5F7",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "33475B",
+    "layout": "business-opportunity-map",
+    "variant": "opportunity-map"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "growth-map-cover",
+    "defaultContentLayout": "growth-map-content",
+    "allowedLayouts": [
+      "growth-map-cover",
+      "growth-map-overview",
+      "growth-map-analysis",
+      "growth-map-path",
+      "growth-map-actions",
+      "growth-map-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

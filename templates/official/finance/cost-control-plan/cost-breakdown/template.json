@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "cost-control-plan",
+  "themeId": "cost-breakdown",
+  "style": "cost-breakdown",
+  "themes": [
+    {
+      "id": "cost-breakdown",
+      "name": "成本拆解",
+      "visual": {
+        "primary": "102A43",
+        "accent": "D59E3D",
+        "secondary": "2A9D8F",
+        "warning": "C8553D",
+        "background": "EEF3F6",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "334155",
+        "layout": "finance-cost-breakdown",
+        "variant": "cost-breakdown"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "D59E3D",
+    "secondary": "2A9D8F",
+    "warning": "C8553D",
+    "background": "EEF3F6",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "334155",
+    "layout": "finance-cost-breakdown",
+    "variant": "cost-breakdown"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cost-breakdown-cover",
+    "defaultContentLayout": "cost-breakdown-content",
+    "allowedLayouts": [
+      "cost-breakdown-cover",
+      "cost-structure-overview",
+      "cost-driver-analysis",
+      "cost-saving-roadmap",
+      "expense-control-loop",
+      "responsibility-matrix",
+      "cost-breakdown-closing",
+      "title",
+      "content"
+    ]
+  }
+}

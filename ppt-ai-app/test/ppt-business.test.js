@@ -279,6 +279,95 @@ test("PptService renders synced competition map preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders enterprise digital blueprint preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertEnterpriseDigitalBlueprintTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "集团数字化转型规划",
+    slideCount: 6,
+    templateId: "strategy-enterprise-transformation-digital-blueprint",
+    theme: "digital-blueprint",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-enterprise-transformation-digital-blueprint" data-layout="enterprise-digital-blueprint"/);
+  assert.match(preview, /enterprise-blueprint-layer/);
+  assert.match(preview, /enterprise-blueprint-grid/);
+  assert.match(preview, /enterprise-blueprint-stack|enterprise-blueprint-capabilities|enterprise-blueprint-roadmap|enterprise-blueprint-network/);
+  assert.match(preview, /DIGITAL TRANSFORMATION BLUEPRINT|CURRENT STATE DIAGNOSIS|TARGET ARCHITECTURE|CAPABILITY UPGRADE/);
+  assert.doesNotMatch(preview, />数字化蓝图</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders competitor SWOT map preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能硬件竞品 SWOT 分析",
+    slideCount: 6,
+    templateId: "competitor-analysis",
+    theme: "swot-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="competitor-analysis" data-layout="strategy-swot-map"/);
+  assert.match(preview, /swot-layer/);
+  assert.match(preview, /swot-quadrant/);
+  assert.match(preview, /swot-axis|swot-compare|swot-risk-grid|swot-strategy-roadmap/);
+  assert.doesNotMatch(preview, />SWOT 地图</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders second curve strategy preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "第二增长曲线规划",
+    slideCount: 5,
+    templateId: "growth-strategy-planning",
+    theme: "second-curve",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="growth-strategy-planning" data-layout="strategy-second-curve"/);
+  assert.match(preview, /second-curve-layer/);
+  assert.match(preview, /second-curve-chart/);
+  assert.match(preview, /second-curve-matrix|second-curve-roadmap|second-curve-portfolio/);
+  assert.doesNotMatch(preview, />第二曲线</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced SWOT map slug preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertSwotMapTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能硬件竞品 SWOT 分析",
+    slideCount: 6,
+    templateId: "strategy-competitor-analysis-swot-map",
+    theme: "swot-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-competitor-analysis-swot-map" data-layout="strategy-swot-map"/);
+  assert.match(preview, /<div class="swot-layer">/);
+  assert.match(preview, /swot-quadrant/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced product pain points preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -413,6 +502,28 @@ test("PptService renders synced budget planning preview with dedicated layout", 
   assert.match(preview, /budget-dashboard|budget-allocation|budget-table|budget-flow/);
   assert.match(preview, /budget-surface/);
   assert.doesNotMatch(preview, />预算编制</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders cost control breakdown preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCostControlTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "成本结构分析和降本增效方案",
+    slideCount: 5,
+    templateId: "finance-cost-control-plan-cost-breakdown",
+    theme: "cost-breakdown",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-cost-control-plan-cost-breakdown" data-layout="finance-cost-breakdown"/);
+  assert.match(preview, /cost-dashboard|cost-tree|cost-waterfall|cost-roadmap|cost-loop|cost-matrix/);
+  assert.match(preview, /cost-surface/);
+  assert.doesNotMatch(preview, />成本拆解</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -943,6 +1054,52 @@ test("PptService renders quarterly action loop preview with dedicated layout", a
   assert.match(preview, /quarterly-action-progress/);
   assert.match(preview, /body\[data-layout="quarterly-action-loop"\] \.slide-content h2/);
   assert.doesNotMatch(preview, />行动闭环</);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+});
+
+test("PptService renders operating problem diagnosis preview with problem tree layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertOperatingProblemDiagnosisTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "经营问题诊断",
+    slideCount: 5,
+    templateId: "business-operating-problem-diagnosis-problem-tree",
+    theme: "problem-tree",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="business-operating-problem-diagnosis-problem-tree" data-layout="operating-problem-tree"/);
+  assert.match(preview, /problem-tree-layer/);
+  assert.match(preview, /problem-tree-board|problem-tree-risk-matrix|problem-tree-actions|problem-tree-lens/);
+  assert.match(preview, /OPERATING DIAGNOSIS|ROOT CAUSE MAP|IMPACT PRIORITY|FIX LOOP/);
+  assert.doesNotMatch(preview, />问题树</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders business opportunity map preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBusinessOpportunityMapTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "业务增长汇报",
+    slideCount: 4,
+    templateId: "business-business-growth-report-opportunity-map",
+    theme: "opportunity-map",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  // 机会地图模板必须走专用地图/路径/动作卡布局，页面中不直接显示主题风格名称。
+  assert.match(preview, /<body data-template="business-business-growth-report-opportunity-map" data-layout="business-opportunity-map"/);
+  assert.match(preview, /business-opportunity-map/);
+  assert.match(preview, /business-opportunity-metrics|business-opportunity-quadrants|business-opportunity-path/);
+  assert.doesNotMatch(preview, />机会地图</);
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 
@@ -4138,6 +4295,161 @@ async function insertIndustryResearchSlugTemplate(context) {
   });
 }
 
+async function insertOperatingProblemDiagnosisTemplate(context) {
+  // 测试数据库模拟官方模板同步后的经营问题诊断模板，确保主题名称只用于选择器，不直接写进 PPT 页面。
+  await context.database.insert("templates", {
+    id: "business-operating-problem-diagnosis-problem-tree",
+    slug: "business-operating-problem-diagnosis-problem-tree",
+    name: "经营问题诊断",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "problem-tree",
+        name: "问题树",
+        visual: {
+          primary: "17233B",
+          accent: "E94B3C",
+          secondary: "0EA5A8",
+          warning: "F59E0B",
+          background: "F5F7FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "operating-problem-tree",
+          variant: "problem-tree",
+        },
+      },
+    ],
+    visual: {
+      primary: "17233B",
+      accent: "E94B3C",
+      secondary: "0EA5A8",
+      warning: "F59E0B",
+      background: "F5F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "operating-problem-tree",
+      variant: "problem-tree",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "operating-problem-tree-cover",
+      defaultContentLayout: "operating-problem-tree-diagnosis",
+      allowedLayouts: [
+        "operating-problem-tree-cover",
+        "operating-problem-tree-overview",
+        "operating-problem-tree-diagnosis",
+        "operating-problem-tree-root-cause",
+        "operating-problem-tree-impact",
+        "operating-problem-tree-action",
+        "operating-problem-tree-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertBusinessOpportunityMapTemplate(context) {
+  // 测试数据库模拟官方模板同步后的业务增长机会地图模板，确保预览走专用增长路径布局。
+  await context.database.insert("templates", {
+    id: "business-business-growth-report-opportunity-map",
+    slug: "business-business-growth-report-opportunity-map",
+    name: "业务增长汇报",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "opportunity-map",
+        name: "机会地图",
+        visual: {
+          primary: "123A5A",
+          accent: "17A673",
+          secondary: "D9A441",
+          background: "EEF5F7",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "33475B",
+          layout: "business-opportunity-map",
+          variant: "opportunity-map",
+        },
+      },
+    ],
+    visual: {
+      primary: "123A5A",
+      accent: "17A673",
+      secondary: "D9A441",
+      background: "EEF5F7",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "33475B",
+      layout: "business-opportunity-map",
+      variant: "opportunity-map",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "growth-map-cover",
+      defaultContentLayout: "growth-map-analysis",
+      allowedLayouts: ["growth-map-cover", "growth-map-overview", "growth-map-analysis", "growth-map-path", "growth-map-actions", "growth-map-closing", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertEnterpriseDigitalBlueprintTemplate(context) {
+  // 测试数据库模拟官方模板同步后的企业转型模板，确保预览走蓝图专用布局。
+  await context.database.insert("templates", {
+    id: "strategy-enterprise-transformation-digital-blueprint",
+    slug: "strategy-enterprise-transformation-digital-blueprint",
+    name: "企业转型方案 - 数字化蓝图",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "digital-blueprint",
+        name: "数字化蓝图",
+        visual: {
+          id: "strategy-enterprise-transformation-digital-blueprint",
+          primary: "0B1F3A",
+          accent: "22D3EE",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          background: "EAF4FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "enterprise-digital-blueprint",
+          variant: "digital-blueprint",
+        },
+      },
+    ],
+    visual: {
+      id: "strategy-enterprise-transformation-digital-blueprint",
+      primary: "0B1F3A",
+      accent: "22D3EE",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "EAF4FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "enterprise-digital-blueprint",
+      variant: "digital-blueprint",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "digital-blueprint-cover",
+      defaultContentLayout: "transformation-blueprint",
+      allowedLayouts: ["digital-blueprint-cover", "current-state-diagnosis", "target-digital-blueprint", "capability-upgrade-map", "system-roadmap", "organization-governance", "risk-and-enablement", "transformation-next-actions", "title", "content"],
+    },
+  });
+}
+
 async function insertCompetitionMapTemplate(context) {
   // 模拟官方模板同步后的竞争地图模板，验证生成工作台可以直接使用完整 slug。
   await context.database.insert("templates", {
@@ -4178,6 +4490,54 @@ async function insertCompetitionMapTemplate(context) {
       defaultCoverLayout: "competition-map-cover",
       defaultContentLayout: "competition-map-content",
       allowedLayouts: ["competition-map-cover", "competition-map-overview", "competition-map-players", "competition-map-positioning", "competition-map-segments", "competition-map-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertSwotMapTemplate(context) {
+  // 模拟官方模板同步后的 SWOT 地图模板，验证数据库 slug 和内置模板走同一套预览布局。
+  await context.database.insert("templates", {
+    id: "strategy-competitor-analysis-swot-map",
+    slug: "strategy-competitor-analysis-swot-map",
+    name: "竞争对手分析 - SWOT 地图",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "swot-map",
+        name: "SWOT 地图",
+        visual: {
+          primary: "102A43",
+          accent: "12A5A6",
+          secondary: "22C55E",
+          warning: "F97316",
+          background: "F5F8FB",
+          surface: "FFFFFF",
+          title: "071A2D",
+          body: "3D5363",
+          layout: "strategy-swot-map",
+          variant: "swot-map",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "12A5A6",
+      secondary: "22C55E",
+      warning: "F97316",
+      background: "F5F8FB",
+      surface: "FFFFFF",
+      title: "071A2D",
+      body: "3D5363",
+      layout: "strategy-swot-map",
+      variant: "swot-map",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "swot-map-cover",
+      defaultContentLayout: "swot-map-overview",
+      allowedLayouts: ["swot-map-cover", "swot-map-overview", "swot-map-positioning", "swot-map-strength-weakness", "swot-map-opportunity-threat", "swot-map-strategy-actions", "swot-map-closing", "title", "content"],
     },
   });
 }
@@ -4500,6 +4860,54 @@ async function insertBudgetPlanningTemplate(context) {
       defaultCoverLayout: "finance-budget-planning-cover",
       defaultContentLayout: "finance-budget-planning-content",
       allowedLayouts: ["finance-budget-planning-cover", "finance-budget-planning-overview", "finance-budget-planning-allocation", "finance-budget-planning-table", "finance-budget-planning-flow", "finance-budget-planning-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertCostControlTemplate(context) {
+  // 测试数据库模拟官方模板同步后的成本控制方案，确保在线预览走成本拆解专用布局。
+  await context.database.insert("templates", {
+    id: "finance-cost-control-plan-cost-breakdown",
+    slug: "finance-cost-control-plan-cost-breakdown",
+    name: "成本控制方案 - 成本拆解",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "cost-breakdown",
+        name: "成本拆解",
+        visual: {
+          primary: "102A43",
+          accent: "D59E3D",
+          secondary: "2A9D8F",
+          warning: "C8553D",
+          background: "EEF3F6",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "finance-cost-breakdown",
+          variant: "cost-breakdown",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "D59E3D",
+      secondary: "2A9D8F",
+      warning: "C8553D",
+      background: "EEF3F6",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "finance-cost-breakdown",
+      variant: "cost-breakdown",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "cost-breakdown-cover",
+      defaultContentLayout: "cost-breakdown-content",
+      allowedLayouts: ["cost-breakdown-cover", "cost-structure-overview", "cost-driver-analysis", "cost-saving-roadmap", "expense-control-loop", "responsibility-matrix", "cost-breakdown-closing", "title", "content"],
     },
   });
 }

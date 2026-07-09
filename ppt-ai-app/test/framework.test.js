@@ -337,7 +337,8 @@ test("TemplateManager provides a multi-template default catalog with themes", ()
   const catalog = templates.listTemplates();
 
   assert.equal(catalog.length >= 10, true);
-  assert.deepEqual(catalog.slice(0, 4).map((template) => template.id), ["business", "strategy-consulting", "industry-research", "financial-review"]);
+  assert.deepEqual(catalog.slice(0, 5).map((template) => template.id), ["business", "strategy-consulting", "industry-research", "competitor-analysis", "growth-strategy-planning"]);
+  assert.equal(catalog.some((template) => template.id === "financial-review"), true);
   assert.equal(catalog.some((template) => template.id === "sales-proposal"), true);
   assert.equal(catalog.some((template) => template.id === "product-roadmap"), true);
   assert.equal(catalog.some((template) => template.id === "marketing-campaign"), true);
@@ -456,6 +457,26 @@ test("resolveTemplateVisual applies industry research landscape visual", () => {
   assert.equal(visual.variant, "industry-landscape");
 });
 
+test("resolveTemplateVisual applies competitor analysis SWOT map visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "competitor-analysis", theme: "swot-map" });
+
+  assert.equal(visual.primary, "102A43");
+  assert.equal(visual.accent, "12A5A6");
+  assert.equal(visual.background, "F5F8FB");
+  assert.equal(visual.layout, "strategy-swot-map");
+  assert.equal(visual.variant, "swot-map");
+});
+
+test("resolveTemplateVisual applies growth strategy second curve visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "growth-strategy-planning", theme: "second-curve" });
+
+  assert.equal(visual.primary, "0E2A47");
+  assert.equal(visual.accent, "16B8A6");
+  assert.equal(visual.background, "EEF6F4");
+  assert.equal(visual.layout, "strategy-second-curve");
+  assert.equal(visual.variant, "second-curve");
+});
+
 test("resolveTemplateVisual applies financial review quarterly commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "quarterly" });
 
@@ -484,6 +505,16 @@ test("resolveTemplateVisual applies financial review forecast commercial visual"
   assert.equal(visual.background, "EEF6F7");
   assert.equal(visual.layout, "executive");
   assert.equal(visual.variant, "forecast");
+});
+
+test("resolveTemplateVisual applies cost control breakdown official visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "cost-control-plan", theme: "cost-breakdown" });
+
+  assert.equal(visual.primary, "102A43");
+  assert.equal(visual.accent, "D59E3D");
+  assert.equal(visual.background, "EEF3F6");
+  assert.equal(visual.layout, "finance-cost-breakdown");
+  assert.equal(visual.variant, "cost-breakdown");
 });
 
 test("resolveTemplateVisual applies sales proposal enterprise commercial visual", () => {

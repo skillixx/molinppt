@@ -393,8 +393,28 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
+  if (visual.layout === "operating-problem-tree") {
+    if (index === 0) {
+      if (textLength >= 30) return 2050;
+      if (textLength >= 22) return 2320;
+      return Math.min(fallbackSize, 2680);
+    }
+    if (textLength >= 30) return 1400;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1860);
+  }
+  if (visual.layout === "enterprise-digital-blueprint") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2220;
+      return Math.min(fallbackSize, 2520);
+    }
+    if (textLength >= 30) return 1360;
+    if (textLength >= 22) return 1540;
+    return Math.min(fallbackSize, 1800);
+  }
   if (visual.layout === "knowledge-blackboard") {
     if (index === 0) {
       if (textLength >= 30) return 1900;
@@ -515,6 +535,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1650;
     return Math.min(fallbackSize, 1900);
   }
+  if (visual.layout === "finance-cost-breakdown") {
+    if (index === 0) {
+      if (textLength >= 30) return 2120;
+      if (textLength >= 22) return 2360;
+      return Math.min(fallbackSize, 2720);
+    }
+    if (textLength >= 30) return 1440;
+    if (textLength >= 22) return 1640;
+    return Math.min(fallbackSize, 1880);
+  }
   if (visual.layout === "finance-budget-variance") {
     if (index === 0) {
       if (textLength >= 30) return 2080;
@@ -564,6 +594,26 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1320;
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1820);
+  }
+  if (visual.layout === "strategy-second-curve") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2200;
+      return Math.min(fallbackSize, 2460);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1500;
+    return Math.min(fallbackSize, 1800);
+  }
+  if (visual.layout === "strategy-swot-map") {
+    if (index === 0) {
+      if (textLength >= 30) return 1940;
+      if (textLength >= 22) return 2160;
+      return Math.min(fallbackSize, 2400);
+    }
+    if (textLength >= 30) return 1280;
+    if (textLength >= 22) return 1480;
+    return Math.min(fallbackSize, 1780);
   }
   if (visual.layout === "product-pain-points") {
     if (index === 0) {
@@ -753,12 +803,18 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "seed-round-story") return false;
   if (visual.layout === "quarterly-action-loop") return false;
+  if (visual.layout === "operating-problem-tree") return false;
+  if (visual.layout === "business-opportunity-map") return false;
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
+  if (visual.layout === "finance-cost-breakdown") return false;
   if (visual.layout === "finance-budget-variance") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "strategy-second-curve") return false;
+  if (visual.layout === "strategy-swot-map") return false;
+  if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "feature-priority-matrix") return false;
@@ -902,6 +958,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "quarterly-action-loop") {
     return base + quarterlyActionLoopDecorationsXmlV2({ visual, index, layout, slide });
   }
+  if (visual.layout === "operating-problem-tree") {
+    return base + operatingProblemTreeDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "business-opportunity-map") {
+    return base + businessOpportunityMapDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "industry-research") {
     return base + industryResearchDecorationsXml({ visual, index, layout, role });
   }
@@ -910,6 +972,15 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "strategy-competition-map") {
     return base + competitionMapDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "strategy-second-curve") {
+    return base + secondCurveDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "strategy-swot-map") {
+    return base + swotMapDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (isEnterpriseDigitalBlueprintVisual(visual)) {
+    return base + enterpriseDigitalBlueprintDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "product-release-cadence") {
     return base + productReleaseCadenceDecorationsXml({ visual, index, layout, role, slide });
@@ -943,6 +1014,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "finance-cost-breakdown") {
+    return base + costBreakdownDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "finance-budget-variance") {
     return base + budgetVarianceDecorationsXml({ visual, index, layout, role, slide });
@@ -1706,6 +1780,74 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "operating-problem-tree") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 431292, cx: 8193024, cy: 4267200 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 609600 },
+      secondaryAccent: { x: 731520, y: isCover ? 2225040 : 2164080, cx: 2743200, cy: 30480 },
+      label: { x: 731520, y: 655320, cx: 2895600, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 4267200, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1074420, cx: 3962400, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3810000, cy: 792480 },
+      content: isCover
+        ? { x: 777240, y: 2590800, cx: 3352800, cy: 762000 }
+        : { x: 777240, y: 1905000, cx: 3352800, cy: 990600 },
+      titleSize: isCover ? 2680 : isClosing ? 2360 : 1860,
+      bodySize: isCover ? 820 : 720,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "enterprise-digital-blueprint") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 493776, y: 421640, cx: 8153400, cy: 4366260 },
+      accent: { x: 493776, y: 421640, cx: 8153400, cy: 53340 },
+      secondaryAccent: { x: 731520, y: isCover ? 2125980 : 1905000, cx: 3200400, cy: 38100 },
+      label: { x: 731520, y: 640080, cx: 3352800, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1112520, cx: 4572000, cy: 762000 }
+        : isCover
+          ? { x: 731520, y: 1051560, cx: 3886200, cy: 975360 }
+          : { x: 731520, y: 899160, cx: 3886200, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2103120, cx: 3657600, cy: 762000 }
+        : isCover
+          ? { x: 777240, y: 2385060, cx: 3352800, cy: 701040 }
+          : { x: 777240, y: 1783080, cx: 3352800, cy: 914400 },
+      titleSize: isCover ? 2520 : isClosing ? 2280 : 1800,
+      bodySize: isCover ? 800 : 680,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "business-opportunity-map") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 512064, y: 442976, cx: 8120000, cy: 4260000 },
+      accent: { x: 512064, y: 442976, cx: 8120000, cy: 57150 },
+      secondaryAccent: { x: 768096, y: isCover ? 2148840 : 1996440, cx: 3169920, cy: 30480 },
+      label: { x: 768096, y: 731520, cx: 2438400, cy: 274320 },
+      title: isClosing
+        ? { x: 768096, y: 1219200, cx: 4724400, cy: 822960 }
+        : isCover
+          ? { x: 768096, y: 1066800, cx: 3962400, cy: 1066800 }
+          : { x: 768096, y: 914400, cx: 3810000, cy: 792480 },
+      content: isCover
+        ? { x: 792480, y: 2514600, cx: 3429000, cy: 762000 }
+        : { x: 792480, y: 1889760, cx: 3429000, cy: 1066800 },
+      titleSize: isCover ? 2450 : isClosing ? 2480 : 1800,
+      bodySize: isCover ? 820 : 720,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "industry-research") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -1770,6 +1912,54 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
       titleSize: isCover ? 2460 : isClosing ? 2480 : 1820,
       bodySize: isCover ? 920 : 760,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "strategy-second-curve") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 452628, cx: 8193024, cy: 4248531 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1973580, cx: 3200400, cy: 30480 },
+      label: { x: 731520, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1188720, cx: 5334000, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1082040, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2324100, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2545080, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2460 : isClosing ? 2480 : 1800,
+      bodySize: isCover ? 900 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "strategy-swot-map") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 452628, cx: 8193024, cy: 4248531 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1973580, cx: 3200400, cy: 22860 },
+      label: { x: 731520, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1219200, cx: 5486400, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1135380, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2362200, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2545080, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2400 : isClosing ? 2440 : 1780,
+      bodySize: isCover ? 900 : 740,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -2130,6 +2320,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 841248, y: 1828800, cx: 3474720, cy: 914400 },
       titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
       bodySize: isCover ? 960 : 780,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-cost-breakdown") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 566928, y: 606552, cx: 8016240, cy: 4107180 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 822960, y: isCover ? 2286000 : 2034540, cx: 3200400, cy: 30480 },
+      label: { x: 822960, y: 807720, cx: 2286000, cy: 274320 },
+      title: isClosing
+        ? { x: 822960, y: 1188720, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 822960, y: 1188720, cx: 4114800, cy: 1219200 }
+          : { x: 822960, y: 899160, cx: 4267200, cy: 731520 },
+      content: isClosing
+        ? { x: 822960, y: 2407920, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 822960, y: 2590800, cx: 3505200, cy: 762000 }
+          : { x: 822960, y: 1798320, cx: 3474720, cy: 914400 },
+      titleSize: isCover ? 2720 : isClosing ? 2520 : 1880,
+      bodySize: isCover ? 940 : 740,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -3304,6 +3518,208 @@ function budgetPlanningColorPalette(visual) {
 function isBudgetPlanningVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "finance-budget-planning" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-planning");
+}
+
+function costBreakdownDecorationsXml({ visual, index, role, slide }) {
+  const scene = costBreakdownSceneFromSlide({ slide, index, role });
+  const palette = costBreakdownColorPalette(visual);
+  // 成本拆解模板全部用可编辑图形表达结构树、瀑布图和责任矩阵，避免下载 PPTX 与在线预览不一致。
+  const backdrop = rectShapeXml({ id: 780, name: "Cost Breakdown Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 781, name: "Cost Breakdown Left Plane", geom: "parallelogram", x: -487680, y: 548640, cx: 1981200, cy: 4572000, fill: palette.tint })
+    + solidShapeXml({ id: 782, name: "Cost Breakdown Gold Halo", geom: "ellipse", x: 7246620, y: -243840, cx: 2133600, cy: 2133600, fill: palette.goldWash })
+    + solidShapeXml({ id: 783, name: "Cost Breakdown Control Halo", geom: "ellipse", x: 7467600, y: 3924300, cx: 1524000, cy: 1066800, fill: palette.controlWash });
+  const surface = solidShapeXml({ id: 784, name: "Cost Breakdown Workspace", geom: "roundRect", x: 566928, y: 606552, cx: 8016240, cy: 4107180, fill: visual.surface })
+    + lineFrameShapeXml({ id: 785, name: "Cost Breakdown Workspace Border", geom: "roundRect", x: 566928, y: 606552, cx: 8016240, cy: 4107180, stroke: palette.frame, width: 15240 });
+  const header = solidShapeXml({ id: 786, name: "Cost Breakdown Header", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 787, name: "Cost Breakdown Header Accent", x: 0, y: 304800, cx: 9144000, cy: 22860, fill: visual.accent })
+    + rectShapeXml({ id: 788, name: "Cost Breakdown Focus Rule", x: 822960, y: index === 0 ? 2286000 : 2034540, cx: 3200400, cy: 30480, fill: visual.accent })
+    + textShapeXml({ id: 789, name: "Cost Breakdown Kicker", x: 822960, y: 807720, cx: 2286000, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent });
+  const bullets = costBreakdownBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "structure") return backdrop + surface + header + bullets + costBreakdownTreeXml({ visual, palette, nodes: scene.treeNodes });
+  if (scene.role === "drivers") return backdrop + surface + header + bullets + costBreakdownWaterfallXml({ visual, palette });
+  if (scene.role === "roadmap") return backdrop + surface + header + bullets + costBreakdownRoadmapXml({ visual, palette, steps: scene.roadmap });
+  if (scene.role === "loop") return backdrop + surface + header + bullets + costBreakdownLoopXml({ visual, palette, steps: scene.loopSteps });
+  if (scene.role === "matrix") return backdrop + surface + header + costBreakdownMatrixXml({ visual, palette, rows: scene.matrixRows });
+  if (scene.role === "closing") return backdrop + surface + header + bullets + costBreakdownClosingXml({ visual, palette, items: scene.roadmap });
+  return backdrop + surface + header + bullets + costBreakdownDashboardXml({ visual, palette }) + costBreakdownMetricCardsXml({ visual, metrics: scene.metrics });
+}
+
+function costBreakdownDashboardXml({ visual, palette }) {
+  return solidShapeXml({ id: 790, name: "Cost Breakdown Dashboard", geom: "roundRect", x: 5780520, y: 997200, cx: 3048000, cy: 2362200, fill: palette.panel })
+    + lineFrameShapeXml({ id: 791, name: "Cost Breakdown Dashboard Border", geom: "roundRect", x: 5780520, y: 997200, cx: 3048000, cy: 2362200, stroke: palette.frame, width: 12700 })
+    + arcLineShapeXml({ id: 792, name: "Cost Breakdown Cost Ring Risk", x: 6096000, y: 1325880, cx: 914400, cy: 914400, stroke: visual.warning || "C8553D", width: 91440 })
+    + arcLineShapeXml({ id: 793, name: "Cost Breakdown Cost Ring Gold", x: 6096000, y: 1325880, cx: 914400, cy: 914400, stroke: visual.accent, width: 60960 })
+    + rectShapeXml({ id: 794, name: "Cost Breakdown Ledger Line 1", x: 7306320, y: 1272540, cx: 990600, cy: 38100, fill: visual.primary, transparency: 24000 })
+    + rectShapeXml({ id: 795, name: "Cost Breakdown Ledger Line 2", x: 7306320, y: 1584960, cx: 1219200, cy: 38100, fill: visual.accent, transparency: 17000 })
+    + rectShapeXml({ id: 796, name: "Cost Breakdown Ledger Line 3", x: 7306320, y: 1897380, cx: 762000, cy: 38100, fill: visual.secondary || visual.accent, transparency: 18000 })
+    + rectShapeXml({ id: 797, name: "Cost Breakdown Ledger Line 4", x: 7306320, y: 2209800, cx: 1066800, cy: 38100, fill: visual.primary, transparency: 38000 });
+}
+
+function costBreakdownMetricCardsXml({ visual, metrics }) {
+  return metrics.map((metric, index) => {
+    const x = 822960 + index * 1257300;
+    return solidShapeXml({ id: 800 + index * 3, name: `Cost Breakdown Metric Card ${index + 1}`, geom: "roundRect", x, y: 3716028, cx: 1066800, cy: 579120, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 801 + index * 3, name: `Cost Breakdown Metric Card Border ${index + 1}`, geom: "roundRect", x, y: 3716028, cx: 1066800, cy: 579120, stroke: blendHexColor(visual.primary, visual.surface, 0.76), width: 10160 })
+      + textShapeXml({ id: 802 + index * 3, name: `Cost Breakdown Metric Text ${index + 1}`, x: x + 137160, y: 3830328, cx: 792480, cy: 274320, text: `${metric.value}\n${metric.label}`, size: 780, bold: true, color: visual.title });
+  }).join("");
+}
+
+function costBreakdownBulletCardsXml({ visual, scene, isCover }) {
+  const items = scene.bullets.slice(0, isCover ? 3 : 4);
+  return items.map((item, index) => {
+    const y = (isCover ? 2590800 : 1798320) + index * 259080;
+    return rectShapeXml({ id: 820 + index * 2, name: `Cost Breakdown Bullet Rule ${index + 1}`, x: 822960, y: y + 30480, cx: 45720, cy: 152400, fill: visual.accent })
+      + textShapeXml({ id: 821 + index * 2, name: `Cost Breakdown Bullet Text ${index + 1}`, x: 990600, y, cx: 3444240, cy: 198120, text: budgetPlanningCompactText(item, scene.title, 32), size: isCover ? 820 : 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function costBreakdownTreeXml({ visual, palette, nodes }) {
+  const boxes = [
+    { x: 6451600, y: 1158240, text: nodes[0] },
+    { x: 5791200, y: 2209800, text: nodes[1] },
+    { x: 7315200, y: 2209800, text: nodes[2] },
+    { x: 6451600, y: 3261360, text: nodes[3] },
+  ];
+  const lines = rectShapeXml({ id: 835, name: "Cost Breakdown Tree Spine", x: 7025640, y: 1722120, cx: 30480, cy: 1775460, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 836, name: "Cost Breakdown Tree Cross", x: 6250940, y: 2484120, cx: 1554480, cy: 22860, fill: visual.secondary || visual.accent });
+  return solidShapeXml({ id: 830, name: "Cost Breakdown Structure Panel", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2590800, fill: palette.panel })
+    + lineFrameShapeXml({ id: 831, name: "Cost Breakdown Structure Border", geom: "roundRect", x: 5486400, y: 1066800, cx: 3048000, cy: 2590800, stroke: palette.frame, width: 12700 })
+    + lines
+    + boxes.map((box, index) => solidShapeXml({ id: 840 + index * 2, name: `Cost Breakdown Tree Node ${index + 1}`, geom: "roundRect", x: box.x, y: box.y, cx: 1143000, cy: 411480, fill: "FFFFFF" })
+      + textShapeXml({ id: 841 + index * 2, name: `Cost Breakdown Tree Text ${index + 1}`, x: box.x + 91440, y: box.y + 106680, cx: 960120, cy: 152400, text: box.text, size: 720, bold: true, color: visual.title })).join("");
+}
+
+function costBreakdownWaterfallXml({ visual, palette }) {
+  const heights = [1371600, 914400, 701040, 518160, 1097280];
+  const colors = [visual.primary, visual.warning || "C8553D", visual.accent, visual.secondary || visual.accent, visual.primary];
+  const bars = heights.map((height, index) => {
+    const x = 5699760 + index * 548640;
+    return rectShapeXml({ id: 870 + index, name: `Cost Breakdown Driver Bar ${index + 1}`, x, y: 3284220 - height, cx: 365760, cy: height, fill: colors[index] });
+  }).join("");
+  return solidShapeXml({ id: 865, name: "Cost Breakdown Waterfall Panel", geom: "roundRect", x: 5486400, y: 1112520, cx: 3048000, cy: 2514600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 866, name: "Cost Breakdown Waterfall Border", geom: "roundRect", x: 5486400, y: 1112520, cx: 3048000, cy: 2514600, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 867, name: "Cost Breakdown Waterfall Baseline", x: 5699760, y: 3284220, cx: 2499360, cy: 22860, fill: palette.frame })
+    + bars;
+}
+
+function costBreakdownRoadmapXml({ visual, palette, steps }) {
+  return steps.slice(0, 4).map((step, index) => {
+    const x = 853440 + index * 1905000;
+    const connector = index < 3 ? rectShapeXml({ id: 900 + index, name: `Cost Breakdown Roadmap Connector ${index + 1}`, x: x + 1257300, y: 3642360, cx: 457200, cy: 22860, fill: visual.accent }) : "";
+    return solidShapeXml({ id: 885 + index * 4, name: `Cost Breakdown Roadmap Step ${index + 1}`, geom: "roundRect", x, y: 3220728, cx: 1371600, cy: 822960, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 886 + index * 4, name: `Cost Breakdown Roadmap Border ${index + 1}`, geom: "roundRect", x, y: 3220728, cx: 1371600, cy: 822960, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 887 + index * 4, name: `Cost Breakdown Roadmap Dot ${index + 1}`, geom: "ellipse", x: x + 137160, y: 3373128, cx: 213360, cy: 213360, fill: visual.accent })
+      + textShapeXml({ id: 888 + index * 4, name: `Cost Breakdown Roadmap Text ${index + 1}`, x: x + 411480, y: 3380748, cx: 792480, cy: 304800, text: budgetPlanningCompactText(step, "", 14), size: 700, bold: true, color: visual.title })
+      + connector;
+  }).join("");
+}
+
+function costBreakdownLoopXml({ visual, palette, steps }) {
+  const nodes = [
+    { x: 6705600, y: 1234440 },
+    { x: 7543800, y: 2194560 },
+    { x: 6705600, y: 3154680 },
+    { x: 5867400, y: 2194560 },
+  ];
+  return solidShapeXml({ id: 930, name: "Cost Breakdown Control Loop Panel", geom: "roundRect", x: 5486400, y: 1112520, cx: 3048000, cy: 2590800, fill: palette.panel })
+    + lineFrameShapeXml({ id: 931, name: "Cost Breakdown Control Loop Border", geom: "roundRect", x: 5486400, y: 1112520, cx: 3048000, cy: 2590800, stroke: palette.frame, width: 12700 })
+    + arcLineShapeXml({ id: 932, name: "Cost Breakdown Loop Arc", x: 6250940, y: 1600200, cx: 1524000, cy: 1524000, stroke: visual.secondary || visual.accent, width: 60960 })
+    + nodes.map((node, index) => solidShapeXml({ id: 935 + index * 2, name: `Cost Breakdown Loop Node ${index + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 762000, cy: 365760, fill: "FFFFFF" })
+      + textShapeXml({ id: 936 + index * 2, name: `Cost Breakdown Loop Text ${index + 1}`, x: node.x + 76200, y: node.y + 91440, cx: 609600, cy: 137160, text: steps[index], size: 680, bold: true, color: visual.title })).join("");
+}
+
+function costBreakdownMatrixXml({ visual, palette, rows }) {
+  const tableX = 822960;
+  const tableY = 2506980;
+  const rowH = 335280;
+  const tableW = 7467600;
+  const shell = solidShapeXml({ id: 960, name: "Cost Breakdown Responsibility Matrix", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 961, name: "Cost Breakdown Responsibility Matrix Border", geom: "roundRect", x: tableX, y: tableY, cx: tableW, cy: rowH * rows.length, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 962, name: "Cost Breakdown Responsibility Matrix Header", x: tableX, y: tableY, cx: tableW, cy: rowH, fill: visual.primary });
+  const cells = rows.map((row, rowIndex) => {
+    const y = tableY + rowIndex * rowH;
+    const color = rowIndex === 0 ? "FFFFFF" : visual.body;
+    const rule = rowIndex > 0 ? rectShapeXml({ id: 970 + rowIndex, name: `Cost Breakdown Matrix Row Rule ${rowIndex}`, x: tableX, y, cx: tableW, cy: 7620, fill: blendHexColor(visual.primary, visual.surface, 0.82) }) : "";
+    return rule + row.map((cell, cellIndex) => textShapeXml({
+      id: 980 + rowIndex * 8 + cellIndex,
+      name: `Cost Breakdown Matrix Cell ${rowIndex + 1}-${cellIndex + 1}`,
+      x: tableX + 182880 + cellIndex * 1752600,
+      y: y + 76200,
+      cx: 1524000,
+      cy: 152400,
+      text: budgetPlanningCompactText(cell, "", 12),
+      size: rowIndex === 0 ? 720 : 660,
+      bold: true,
+      color,
+    })).join("");
+  }).join("");
+  return shell + cells;
+}
+
+function costBreakdownClosingXml({ visual, palette, items }) {
+  const values = [items[0] || "明确成本责任", items[1] || "固化费用管控", items[2] || "持续追踪收益"];
+  return values.slice(0, 3).map((item, index) => {
+    const x = 853440 + index * 2438400;
+    return solidShapeXml({ id: 1020 + index * 3, name: `Cost Breakdown Closing Card ${index + 1}`, geom: "roundRect", x, y: 2819400, cx: 2133600, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1021 + index * 3, name: `Cost Breakdown Closing Card Border ${index + 1}`, geom: "roundRect", x, y: 2819400, cx: 2133600, cy: 914400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1022 + index * 3, name: `Cost Breakdown Closing Card Accent ${index + 1}`, x: x + 152400, y: 2971800, cx: 45720, cy: 457200, fill: visual.accent })
+      + textShapeXml({ id: 1023 + index * 3, name: `Cost Breakdown Closing Card Text ${index + 1}`, x: x + 289560, y: 3048000, cx: 1524000, cy: 304800, text: budgetPlanningCompactText(item, "", 24), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function costBreakdownSceneFromSlide({ slide, index, role }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 26);
+  const resolvedRole = index === 0 ? "cover" : role === "closing" ? "closing" : ["structure", "drivers", "roadmap", "loop", "matrix"][(index - 1) % 5];
+  const metrics = [0, 1, 2].map((itemIndex) => costBreakdownMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "COST CONTROL" : "COST BREAKDOWN",
+    title,
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    treeNodes: ["总成本", "固定成本", "变动成本", "可优化项"],
+    roadmap: [
+      budgetPlanningCompactText(bullets[0], "识别成本池", 14),
+      budgetPlanningCompactText(bullets[1], "锁定驱动因子", 14),
+      budgetPlanningCompactText(bullets[2], "制定降本动作", 14),
+      budgetPlanningCompactText(bullets[3], "复盘节约收益", 14),
+    ],
+    loopSteps: ["预算", "审批", "执行", "复盘"],
+    matrixRows: [
+      ["事项", "Owner", "目标", "节奏"],
+      ...[0, 1, 2].map((rowIndex) => {
+        const metric = metrics[rowIndex];
+        return [budgetPlanningCompactText(bullets[rowIndex], `成本项 ${rowIndex + 1}`, 12), ["财务", "业务", "采购"][rowIndex], metric.value, ["周", "月", "季"][rowIndex]];
+      }),
+    ],
+  };
+}
+
+function costBreakdownMetricFromText(text, index) {
+  const fallbackValues = ["18%", "￥2.4M", "12周"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["成本压降", "节约空间", "治理周期"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m|周|月)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function costBreakdownColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.30),
+    tint: blendHexColor(visual.primary, visual.background, 0.88),
+    goldWash: blendHexColor(visual.accent, visual.background, 0.80),
+    controlWash: blendHexColor(visual.secondary || visual.accent, visual.background, 0.84),
+    panel: blendHexColor(visual.background, visual.surface, 0.68),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+  };
+}
+
+function isCostBreakdownVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-cost-breakdown" && (id === "cost-control-plan" || id === "finance-cost-control-plan-cost-breakdown");
 }
 
 function budgetVarianceDecorationsXml({ visual, index, role, slide }) {
@@ -8283,6 +8699,146 @@ function isBrandStoryVisual(visual) {
   return visual?.id === "brand-story" && visual?.layout === "brand-story";
 }
 
+function operatingProblemTreeDecorationsXml({ visual, index, role, slide }) {
+  // 经营问题诊断模板的导出图层用 DrawingML 直接绘制，保证下载 PPTX 和在线预览的主体结构一致。
+  const palette = operatingProblemTreeColorPalette(visual);
+  const scene = operatingProblemTreeExportScene({ slide, index, role });
+  const header = rectShapeXml({ id: 2300, name: "Operating Problem Diagnosis Header", x: 0, y: 0, cx: 9144000, cy: 609600, fill: visual.primary })
+    + rectShapeXml({ id: 2301, name: "Operating Problem Diagnosis Header Accent", x: 0, y: 579120, cx: 9144000, cy: 30480, fill: visual.accent })
+    + solidShapeXml({ id: 2302, name: "Operating Problem Diagnosis Canvas", geom: "roundRect", x: 475488, y: 431292, cx: 8193024, cy: 4267200, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 2303, name: "Operating Problem Diagnosis Canvas Frame", geom: "roundRect", x: 475488, y: 431292, cx: 8193024, cy: 4267200, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2304, name: "Operating Problem Diagnosis Rule", x: 731520, y: 2225040, cx: 2743200, cy: 30480, fill: visual.accent });
+  const bullets = operatingProblemTreeBulletXml({ visual, scene });
+  const base = header
+    + textShapeXml({ id: 2305, name: "Operating Problem Diagnosis Kicker", x: 731520, y: 655320, cx: 2895600, cy: 274320, text: scene.kicker, size: 820, bold: true, color: visual.accent })
+    + bullets;
+  if (scene.kind === "cover" || scene.kind === "overview") {
+    return base
+      + operatingProblemTreeLensXml({ visual, palette })
+      + operatingProblemTreeMetricCardsXml({ visual, scene, palette });
+  }
+  if (scene.kind === "impact") {
+    return base
+      + operatingProblemTreeRiskMatrixXml({ visual, palette })
+      + operatingProblemTreeMetricCardsXml({ visual, scene, palette });
+  }
+  if (scene.kind === "action" || scene.kind === "closing") {
+    return base
+      + operatingProblemTreeActionCardsXml({ visual, scene, palette })
+      + operatingProblemTreeLoopXml({ visual, palette });
+  }
+  return base
+    + operatingProblemTreeBoardXml({ visual, scene, palette })
+    + operatingProblemTreeLoopXml({ visual, palette });
+}
+
+function operatingProblemTreeBulletXml({ visual, scene }) {
+  const body = scene.bullets.slice(0, 4).map((item) => paragraphXml(`• ${operatingProblemTreeCompactText(item, scene.title, 44)}`, 780, false, visual.body)).join("");
+  return textShapeXml({ id: 2310, name: "Operating Problem Diagnosis Bullet List", x: 777240, y: 2514600, cx: 3352800, cy: 914400, body: body || paragraphXml("", 780, false, visual.body), size: 780, bold: false, color: visual.body });
+}
+
+function operatingProblemTreeLensXml({ visual, palette }) {
+  return lineFrameShapeXml({ id: 2320, name: "Operating Problem Tree Lens", geom: "ellipse", x: 6248400, y: 1371600, cx: 1371600, cy: 1371600, stroke: visual.accent, width: 68580, transparency: 15000 })
+    + lineFrameShapeXml({ id: 2321, name: "Operating Problem Tree Lens Inner", geom: "ellipse", x: 6446520, y: 1569720, cx: 975360, cy: 975360, stroke: palette.frame, width: 22860, transparency: 24000 })
+    + lineFrameShapeXml({ id: 2322, name: "Operating Problem Tree Lens Handle", geom: "roundRect", x: 7406640, y: 2667000, cx: 822960, cy: 99060, stroke: visual.primary, width: 76200, rotation: 2700000 });
+}
+
+function operatingProblemTreeMetricCardsXml({ visual, scene, palette }) {
+  return scene.metrics.slice(0, 3).map((metric, index) => {
+    const x = 731520 + index * 1219200;
+    return solidShapeXml({ id: 2330 + index * 3, name: `Operating Problem Tree Metric Card ${index + 1}`, geom: "roundRect", x, y: 3810000, cx: 1036320, cy: 533400, fill: palette.card })
+      + rectShapeXml({ id: 2331 + index * 3, name: `Operating Problem Tree Metric Accent ${index + 1}`, x, y: 3810000, cx: 1036320, cy: 38100, fill: index === 1 ? visual.warning || visual.secondary : visual.accent })
+      + textShapeXml({ id: 2332 + index * 3, name: `Operating Problem Tree Metric Text ${index + 1}`, x: x + 91440, y: 3924300, cx: 853440, cy: 304800, text: `${metric.value}\n${metric.label}`, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function operatingProblemTreeBoardXml({ visual, scene, palette }) {
+  const board = solidShapeXml({ id: 2350, name: "Operating Problem Tree Board", geom: "roundRect", x: 5669280, y: 975360, cx: 2895600, cy: 2743200, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2351, name: "Operating Problem Tree Board Frame", geom: "roundRect", x: 5669280, y: 975360, cx: 2895600, cy: 2743200, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 2352, name: "Operating Problem Tree Root Node", geom: "roundRect", x: 6477000, y: 1280160, cx: 1280160, cy: 518160, fill: visual.primary })
+    + textShapeXml({ id: 2353, name: "Operating Problem Tree Root Text", x: 6576060, y: 1394460, cx: 1082040, cy: 243840, text: scene.root, size: 780, bold: true, color: "FFFFFF" })
+    + rectShapeXml({ id: 2354, name: "Operating Problem Tree Trunk", x: 7117080, y: 1798320, cx: 22860, cy: 533400, fill: palette.frame })
+    + rectShapeXml({ id: 2355, name: "Operating Problem Tree Branch Line", x: 6096000, y: 2331720, cx: 2133600, cy: 22860, fill: palette.frame });
+  const branches = scene.branches.slice(0, 3).map((item, index) => {
+    const x = 5928360 + index * 838200;
+    return rectShapeXml({ id: 2360 + index * 4, name: `Operating Problem Tree Branch Connector ${index + 1}`, x: x + 381000, y: 2331720, cx: 22860, cy: 274320, fill: palette.frame })
+      + solidShapeXml({ id: 2361 + index * 4, name: `Operating Problem Tree Branch ${index + 1}`, geom: "roundRect", x, y: 2606040, cx: 701040, cy: 655320, fill: palette.card })
+      + rectShapeXml({ id: 2362 + index * 4, name: `Operating Problem Tree Branch Accent ${index + 1}`, x, y: 2606040, cx: 701040, cy: 45720, fill: index === 1 ? visual.warning || visual.secondary : visual.accent })
+      + textShapeXml({ id: 2363 + index * 4, name: `Operating Problem Tree Branch Text ${index + 1}`, x: x + 60960, y: 2804160, cx: 579120, cy: 243840, text: item, size: 700, bold: true, color: visual.title });
+  }).join("");
+  return board + branches;
+}
+
+function operatingProblemTreeRiskMatrixXml({ visual, palette }) {
+  const x = 5974080;
+  const y = 1219200;
+  return solidShapeXml({ id: 2380, name: "Operating Problem Tree Risk Matrix", geom: "roundRect", x, y, cx: 2438400, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2381, name: "Operating Problem Tree Risk Matrix Frame", geom: "roundRect", x, y, cx: 2438400, cy: 2286000, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2382, name: "Operating Problem Tree Risk Matrix X Axis", x: x + 274320, y: y + 1143000, cx: 1890000, cy: 19050, fill: palette.frame })
+    + rectShapeXml({ id: 2383, name: "Operating Problem Tree Risk Matrix Y Axis", x: x + 1219200, y: y + 274320, cx: 19050, cy: 1737360, fill: palette.frame })
+    + solidShapeXml({ id: 2384, name: "Operating Problem Tree Risk Dot 1", geom: "ellipse", x: x + 548640, y: y + 1371600, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 2385, name: "Operating Problem Tree Risk Dot 2", geom: "ellipse", x: x + 1371600, y: y + 624840, cx: 152400, cy: 152400, fill: visual.accent })
+    + solidShapeXml({ id: 2386, name: "Operating Problem Tree Risk Dot 3", geom: "ellipse", x: x + 1767840, y: y + 883920, cx: 152400, cy: 152400, fill: visual.warning || visual.secondary })
+    + solidShapeXml({ id: 2387, name: "Operating Problem Tree Risk Dot 4", geom: "ellipse", x: x + 1524000, y: y + 1554480, cx: 152400, cy: 152400, fill: visual.primary });
+}
+
+function operatingProblemTreeActionCardsXml({ visual, scene, palette }) {
+  return scene.actions.slice(0, 4).map((item, index) => {
+    const x = 5943600 + (index % 2) * 1219200;
+    const y = 1219200 + Math.floor(index / 2) * 807720;
+    return solidShapeXml({ id: 2400 + index * 2, name: `Operating Problem Tree Action Card ${index + 1}`, geom: "roundRect", x, y, cx: 1066800, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 2401 + index * 2, name: `Operating Problem Tree Action Text ${index + 1}`, x: x + 91440, y: y + 198120, cx: 883920, cy: 243840, text: item, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function operatingProblemTreeLoopXml({ visual, palette }) {
+  const y = 4152900;
+  const xs = [1112520, 3429000, 5745480, 8061960];
+  return rectShapeXml({ id: 2420, name: "Operating Problem Tree Fix Loop", x: 731520, y, cx: 7620000, cy: 30480, fill: visual.accent })
+    + xs.map((x, index) => solidShapeXml({ id: 2421 + index, name: `Operating Problem Tree Fix Loop Node ${index + 1}`, geom: "ellipse", x, y: y - 76200, cx: 182880, cy: 182880, fill: index === 1 ? visual.warning || visual.secondary : index === 2 ? visual.primary : palette.card })).join("");
+}
+
+function operatingProblemTreeExportScene({ slide, index, role }) {
+  const bullets = operatingProblemTreeExportBullets(slide);
+  const kind = index === 0 ? "cover" : role === "closing" ? "closing" : ["overview", "diagnosis", "impact", "action"][(index - 1) % 4];
+  return {
+    kind,
+    kicker: kind === "cover" ? "OPERATING DIAGNOSIS" : kind === "impact" ? "IMPACT PRIORITY" : kind === "action" ? "FIX LOOP" : kind === "closing" ? "NEXT REVIEW LOOP" : "ROOT CAUSE MAP",
+    title: operatingProblemTreeCompactText(slide?.title, "经营问题诊断", 26),
+    bullets,
+    root: operatingProblemTreeCompactText(bullets[0], "核心问题", 12),
+    branches: ["收入端", "成本端", "效率端"].map((fallback, itemIndex) => operatingProblemTreeCompactText(bullets[itemIndex], fallback, 12)),
+    metrics: operatingProblemTreeExportMetrics(bullets),
+    actions: ["止损动作", "责任归属", "周度复盘", "机制固化"].map((fallback, itemIndex) => operatingProblemTreeCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function operatingProblemTreeExportBullets(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["经营指标出现异常，需要定位关键影响链路", "围绕收入、成本、效率拆解根因", "明确责任人与整改节奏形成闭环"];
+}
+
+function operatingProblemTreeExportMetrics(bullets) {
+  const joined = bullets.join(" ");
+  const matches = Array.from(joined.matchAll(/(?:同比|环比|下降|增长|提升|降低|利润|收入|成本|转化|流失)[^0-9%]{0,8}([+-]?\d+(?:\.\d+)?%?)/g)).map((match) => match[1]);
+  const values = matches.length ? matches.slice(0, 3) : ["P1", "3", "7天"];
+  return ["影响等级", "关键链路", "闭环周期"].map((label, index) => ({ label, value: values[index] || values[values.length - 1] || "-" }));
+}
+
+function operatingProblemTreeCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function operatingProblemTreeColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface || "FFFFFF", visual.background || "F5F7FB", 0.16),
+    card: blendHexColor(visual.surface || "FFFFFF", visual.background || "F5F7FB", 0.28),
+    frame: blendHexColor(visual.primary || "17233B", visual.accent || "E94B3C", 0.22),
+  };
+}
+
 function quarterlyDiagnosisDecorationsXml({ visual, index, layout }) {
   const scene = quarterlyDiagnosisScene(visual);
   const palette = quarterlyDiagnosisColorPalette(visual);
@@ -8717,6 +9273,176 @@ function quarterlyActionLoopSceneV2() {
       { title: "结果复盘", items: ["目标达成", "经验沉淀", "问题修复", "下季计划"] },
     ],
     owners: ["负责人", "协同部门", "截止日期"],
+  };
+}
+
+function businessOpportunityMapDecorationsXml({ visual, index, role, slide }) {
+  const scene = businessOpportunityMapSceneFromSlide({ slide, index, role });
+  const palette = businessOpportunityMapColorPalette(visual);
+  // 机会地图模板主体用 DrawingML 图形实现，导出的 PPTX 可继续编辑节点、卡片和路径。
+  const backdrop = rectShapeXml({ id: 2300, name: "Business Opportunity Map Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 2301, name: "Business Opportunity Glow Green", geom: "ellipse", x: 6934200, y: 213360, cx: 1905000, cy: 1447800, fill: palette.softAccent })
+    + solidShapeXml({ id: 2302, name: "Business Opportunity Glow Gold", geom: "ellipse", x: 228600, y: 3657600, cx: 1828800, cy: 1219200, fill: palette.softGold });
+  const surface = solidShapeXml({ id: 2303, name: "Business Opportunity Canvas", geom: "roundRect", x: 512064, y: 442976, cx: 8120000, cy: 4260000, fill: visual.surface })
+    + lineFrameShapeXml({ id: 2304, name: "Business Opportunity Canvas Border", geom: "roundRect", x: 512064, y: 442976, cx: 8120000, cy: 4260000, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 2305, name: "Business Opportunity Top Rule", x: 512064, y: 442976, cx: 8120000, cy: 57150, fill: visual.primary })
+    + rectShapeXml({ id: 2306, name: "Business Opportunity Accent Rule", x: 512064, y: 500126, cx: 8120000, cy: 22860, fill: visual.accent });
+  const header = textShapeXml({ id: 2307, name: "Business Opportunity Kicker", x: 768096, y: 731520, cx: 2438400, cy: 274320, text: scene.kicker, size: 740, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 2308, name: "Business Opportunity Focus Rule", x: 768096, y: index === 0 ? 2164080 : 1996440, cx: 3169920, cy: 30480, fill: palette.gold });
+  const content = businessOpportunityTextBlockXml({ visual, palette, scene, slide, index });
+  if (scene.role === "analysis") return backdrop + surface + header + content + businessOpportunityQuadrantsXml({ visual, palette, items: scene.cards });
+  if (scene.role === "path") return backdrop + surface + header + content + businessOpportunityPathXml({ visual, palette, items: scene.steps });
+  if (scene.role === "actions") return backdrop + surface + header + content + businessOpportunityActionGridXml({ visual, palette, items: scene.cards });
+  if (scene.role === "closing") return backdrop + surface + header + content + businessOpportunityClosingXml({ visual, palette }) + businessOpportunityPathXml({ visual, palette, items: scene.steps });
+  return backdrop + surface + header + content + businessOpportunityMapPanelXml({ visual, palette }) + businessOpportunityMetricsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function businessOpportunityTextBlockXml({ visual, palette, scene, slide, index }) {
+  const title = businessOpportunityCompactText(slide?.title || scene.title, scene.title, index === 0 ? 30 : 28);
+  const note = businessOpportunityCompactText(String(slide?.speakerNotes || scene.summary || "").replace(/作者：[^。；;]*/g, ""), scene.summary, 42);
+  const bullets = businessOpportunityBulletTexts(slide).slice(0, 3).map((item, bulletIndex) => (
+    textShapeXml({
+      id: 2320 + bulletIndex,
+      name: `Business Opportunity Bullet ${bulletIndex + 1}`,
+      x: 792480,
+      y: 2674620 + bulletIndex * 274320,
+      cx: 3429000,
+      cy: 182880,
+      text: `• ${businessOpportunityCompactText(item, "", 32)}`,
+      size: 760,
+      bold: false,
+      color: visual.body,
+    })
+  )).join("");
+  return textShapeXml({ id: 2310, name: "Business Opportunity Title", x: 768096, y: index === 0 ? 1066800 : 914400, cx: 3962400, cy: index === 0 ? 1066800 : 792480, text: title, size: index === 0 ? 2450 : 1800, bold: true, color: visual.title })
+    + textShapeXml({ id: 2311, name: "Business Opportunity Summary", x: 792480, y: index === 0 ? 2286000 : 1752600, cx: 3429000, cy: 365760, text: note, size: 740, bold: true, color: palette.muted })
+    + bullets;
+}
+
+function businessOpportunityMapPanelXml({ visual, palette }) {
+  const panel = solidShapeXml({ id: 2340, name: "Business Opportunity Map Panel", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2438400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2341, name: "Business Opportunity Map Border", geom: "roundRect", x: 5486400, y: 975360, cx: 3048000, cy: 2438400, stroke: palette.frame, width: 10160 });
+  const grid = [0, 1, 2, 3].map((item) => {
+    const x = 5791200 + item * 594360;
+    return lineFrameShapeXml({ id: 2342 + item, name: `Business Opportunity Map Grid V ${item + 1}`, x, y: 1219200, cx: 0, cy: 1828800, stroke: palette.grid, width: 6350, transparency: 58000 });
+  }).join("") + [0, 1, 2].map((item) => {
+    const y = 1371600 + item * 457200;
+    return lineFrameShapeXml({ id: 2350 + item, name: `Business Opportunity Map Grid H ${item + 1}`, x: 5791200, y, cx: 2438400, cy: 0, stroke: palette.grid, width: 6350, transparency: 58000 });
+  }).join("");
+  const path = rectShapeXml({ id: 2354, name: "Business Opportunity Growth Route", x: 5892800, y: 2712720, cx: 2133600, cy: 57150, fill: visual.accent })
+    + solidShapeXml({ id: 2355, name: "Business Opportunity Route Arrow", geom: "triangle", x: 7886700, y: 2606040, cx: 243840, cy: 274320, fill: visual.accent });
+  const nodes = [
+    { x: 5867400, y: 2651760, fill: visual.accent },
+    { x: 6545580, y: 2225040, fill: palette.gold },
+    { x: 7241540, y: 1973580, fill: visual.accent },
+    { x: 7833360, y: 1615440, fill: palette.orange },
+  ].map((node, item) => solidShapeXml({ id: 2360 + item, name: `Business Opportunity Node ${item + 1}`, geom: "ellipse", x: node.x, y: node.y, cx: 182880, cy: 182880, fill: node.fill })).join("");
+  return panel + grid + path + nodes;
+}
+
+function businessOpportunityMetricsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, index) => {
+    const x = 792480 + index * 1219200;
+    return solidShapeXml({ id: 2370 + index * 3, name: `Business Opportunity Metric ${index + 1}`, geom: "roundRect", x, y: 3703320, cx: 975360, cy: 579120, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2371 + index * 3, name: `Business Opportunity Metric Border ${index + 1}`, geom: "roundRect", x, y: 3703320, cx: 975360, cy: 579120, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 2372 + index * 3, name: `Business Opportunity Metric Text ${index + 1}`, x: x + 121920, y: 3825240, cx: 731520, cy: 274320, text: `${metric.value} ${metric.label}`, size: 740, bold: true, color: index === 1 ? palette.gold : visual.title });
+  }).join("");
+}
+
+function businessOpportunityQuadrantsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1524000;
+    const y = 1097280 + row * 914400;
+    return solidShapeXml({ id: 2380 + index * 4, name: `Business Opportunity Quadrant ${index + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 701040, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2381 + index * 4, name: `Business Opportunity Quadrant Border ${index + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 701040, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 2382 + index * 4, name: `Business Opportunity Quadrant Accent ${index + 1}`, x: x + 152400, y: y + 137160, cx: 365760, cy: 45720, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 2383 + index * 4, name: `Business Opportunity Quadrant Text ${index + 1}`, x: x + 152400, y: y + 274320, cx: 944880, cy: 243840, text: businessOpportunityCompactText(item, "", 12), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessOpportunityPathXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 914400 + index * 1828800;
+    return solidShapeXml({ id: 2410 + index * 4, name: `Business Opportunity Path Step ${index + 1}`, geom: "roundRect", x, y: 3601720, cx: 1447800, cy: 640080, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2411 + index * 4, name: `Business Opportunity Path Border ${index + 1}`, geom: "roundRect", x, y: 3601720, cx: 1447800, cy: 640080, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 2412 + index * 4, name: `Business Opportunity Path Number ${index + 1}`, x: x + 137160, y: 3733800, cx: 274320, cy: 213360, text: String(index + 1).padStart(2, "0"), size: 860, bold: true, color: visual.accent })
+      + textShapeXml({ id: 2413 + index * 4, name: `Business Opportunity Path Text ${index + 1}`, x: x + 457200, y: 3733800, cx: 822960, cy: 213360, text: businessOpportunityCompactText(item, "", 10), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessOpportunityActionGridXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + col * 1524000;
+    const y = 1158240 + row * 929640;
+    return solidShapeXml({ id: 2440 + index * 4, name: `Business Opportunity Action ${index + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 716280, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2441 + index * 4, name: `Business Opportunity Action Border ${index + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 716280, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 2442 + index * 4, name: `Business Opportunity Action Dot ${index + 1}`, geom: "ellipse", x: x + 152400, y: y + 121920, cx: 213360, cy: 213360, fill: index === 2 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 2443 + index * 4, name: `Business Opportunity Action Text ${index + 1}`, x: x + 152400, y: y + 396240, cx: 944880, cy: 213360, text: businessOpportunityCompactText(item, "", 12), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessOpportunityClosingXml({ visual, palette }) {
+  return solidShapeXml({ id: 2470, name: "Business Opportunity Closing Panel", geom: "roundRect", x: 5486400, y: 1219200, cx: 2743200, cy: 1981200, fill: visual.primary })
+    + rectShapeXml({ id: 2471, name: "Business Opportunity Closing Route", x: 5791200, y: 1828800, cx: 1828800, cy: 76200, fill: visual.accent })
+    + rectShapeXml({ id: 2472, name: "Business Opportunity Closing Route Gold", x: 6705600, y: 1828800, cx: 731520, cy: 76200, fill: palette.gold })
+    + lineFrameShapeXml({ id: 2473, name: "Business Opportunity Closing Frame", geom: "roundRect", x: 5943600, y: 2286000, cx: 1676400, cy: 609600, stroke: palette.softAccent, width: 10160, transparency: 22000 });
+}
+
+function businessOpportunityMapSceneFromSlide({ slide, index, role }) {
+  const bullets = businessOpportunityBulletTexts(slide);
+  const roleText = String(role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : role === "closing"
+      ? "closing"
+      : roleText.includes("analysis")
+        ? "analysis"
+        : roleText.includes("path")
+          ? "path"
+          : roleText.includes("actions")
+            ? "actions"
+            : ["map", "analysis", "path", "actions"][(index - 1) % 4];
+  return {
+    role: sceneRole,
+    title: businessOpportunityCompactText(slide?.title, "业务增长机会识别", index === 0 ? 30 : 28),
+    summary: businessOpportunityCompactText(String(slide?.speakerNotes || "").replace(/作者：[^。；;]*/g, ""), "围绕市场机会、业务路径和关键动作形成增长判断。", 42),
+    kicker: sceneRole === "cover" ? "GROWTH COMMAND" : sceneRole === "analysis" ? "MARKET FIT" : sceneRole === "path" ? "GROWTH PATH" : sceneRole === "actions" ? "ACTION BOARD" : sceneRole === "closing" ? "NEXT GROWTH" : "OPPORTUNITY SCAN",
+    metrics: [
+      { value: "3", label: "高潜方向" },
+      { value: "12%", label: "增长空间" },
+      { value: "4", label: "关键动作" },
+    ],
+    cards: ["高空间低门槛", "高收益需验证", "资源可复制", "风险需观察"].map((fallback, itemIndex) => businessOpportunityCompactText(bullets[itemIndex], fallback, 12)),
+    steps: ["机会识别", "小步验证", "资源加码", "规模复制"].map((fallback, itemIndex) => businessOpportunityCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function businessOpportunityBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["增长机会与目标客户判断", "关键路径与资源投入拆解", "行动闭环和指标追踪"];
+}
+
+function businessOpportunityCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!value) return fallback || "";
+  return Array.from(value).slice(0, maxLength).join("");
+}
+
+function businessOpportunityMapColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.34),
+    panel: blendHexColor(visual.background, visual.surface, 0.62),
+    frame: blendHexColor(visual.primary, visual.surface, 0.76),
+    grid: blendHexColor(visual.primary, visual.surface, 0.58),
+    muted: blendHexColor(visual.body, visual.surface, 0.12),
+    softAccent: blendHexColor(visual.accent, visual.surface, 0.78),
+    softGold: blendHexColor(visual.secondary || "D9A441", visual.surface, 0.78),
+    gold: visual.secondary || "D9A441",
+    orange: visual.warning || "F97316",
   };
 }
 
@@ -9168,6 +9894,527 @@ function competitionMapColorPalette(visual) {
     axis: blendHexColor(visual.primary, visual.background, 0.34),
     grid: blendHexColor(visual.primary, visual.background, 0.62),
     mapFill: blendHexColor(visual.background, visual.surface, 0.46),
+  };
+}
+
+function secondCurveDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = secondCurveScene({ slide, index, role });
+  const palette = secondCurveColorPalette(visual);
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1621, name: "Second Curve Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1622, name: "Second Curve Header Bar", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 1623, name: "Second Curve Accent Rule", x: 0, y: 289560, cx: 9144000, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1624, name: "Second Curve Gold Rule", x: 6873240, y: 289560, cx: 2270760, cy: 30480, fill: palette.gold })
+    + lineFrameShapeXml({ id: 1625, name: "Second Curve Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1626, name: "Second Curve Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 1627, name: "Second Curve Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const bullets = secondCurveBulletCardsXml({ visual, items: scene.bullets, isClosing });
+  if (isClosing) {
+    return surface + header + focusRule + bullets + secondCurveNextActionsXml({ visual, palette, items: scene.cards }) + secondCurveChartXml({ visual, palette, compact: true });
+  }
+  if (scene.kind === "opportunity") {
+    return surface + header + focusRule + bullets + secondCurveOpportunityMatrixXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "incubation") {
+    return surface + header + focusRule + bullets + secondCurveRoadmapXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "resource") {
+    return surface + header + focusRule + bullets + secondCurvePortfolioXml({ visual, palette, items: scene.cards }) + secondCurveAllocationXml({ visual, palette });
+  }
+  return surface + header + focusRule + bullets + secondCurveChartXml({ visual, palette, compact: false }) + secondCurveMetricCardsXml({ visual, palette, items: scene.cards });
+}
+
+function secondCurveChartXml({ visual, palette, compact }) {
+  const x = compact ? 5486400 : 5181600;
+  const y = compact ? 1066800 : 914400;
+  const w = compact ? 2827020 : 3200400;
+  const h = compact ? 2133600 : 2583180;
+  const gridLines = Array.from({ length: 4 }, (_, index) => {
+    const offsetX = x + Math.round((w / 5) * (index + 1));
+    const offsetY = y + Math.round((h / 5) * (index + 1));
+    return rectShapeXml({ id: 1640 + index * 2, name: `Second Curve Grid V ${index + 1}`, x: offsetX, y, cx: 7620, cy: h, fill: palette.grid, transparency: 52000 })
+      + rectShapeXml({ id: 1641 + index * 2, name: `Second Curve Grid H ${index + 1}`, x, y: offsetY, cx: w, cy: 7620, fill: palette.grid, transparency: 52000 });
+  }).join("");
+  return solidShapeXml({ id: 1630, name: "Second Curve Growth Chart", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + gridLines
+    + lineFrameShapeXml({ id: 1631, name: "Second Curve Chart Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1632, name: "Second Curve Baseline", x: x + 243840, y: y + Math.round(h * 0.74), cx: w - 487680, cy: 15240, fill: palette.axis })
+    + arcLineShapeXml({ id: 1633, name: "First Curve Plateau Arc", x: x + 335280, y: y + Math.round(h * 0.40), cx: Math.round(w * 0.52), cy: Math.round(h * 0.42), stroke: palette.mutedLine, width: 30480 })
+    + arcLineShapeXml({ id: 1634, name: "Second Curve Growth Arc", x: x + Math.round(w * 0.26), y: y + Math.round(h * 0.20), cx: Math.round(w * 0.60), cy: Math.round(h * 0.58), stroke: visual.accent, width: 45720 })
+    + rectShapeXml({ id: 1635, name: "Investment Gate", x: x + Math.round(w * 0.44), y: y + Math.round(h * 0.32), cx: 30480, cy: Math.round(h * 0.45), fill: palette.gold })
+    + solidShapeXml({ id: 1636, name: "Current Business Node", geom: "ellipse", x: x + Math.round(w * 0.20), y: y + Math.round(h * 0.63), cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1637, name: "Validation Node", geom: "ellipse", x: x + Math.round(w * 0.48), y: y + Math.round(h * 0.41), cx: 152400, cy: 152400, fill: palette.gold })
+    + solidShapeXml({ id: 1638, name: "Scale Node", geom: "ellipse", x: x + Math.round(w * 0.75), y: y + Math.round(h * 0.27), cx: 152400, cy: 152400, fill: visual.accent });
+}
+
+function secondCurveBulletCardsXml({ visual, items, isClosing }) {
+  const x = 731520;
+  const y = isClosing ? 2217420 : 2438400;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 335280;
+    return rectShapeXml({ id: 1660 + index * 3, name: `Second Curve Insight Accent ${index + 1}`, x, y: offsetY + 38100, cx: 60960, cy: 198120, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1661 + index * 3, name: `Second Curve Insight Text ${index + 1}`, x: x + 121920, y: offsetY, cx: 3444240, cy: 243840, text: secondCurveCompactText(item, "", 34), size: 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function secondCurveMetricCardsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3825240;
+  const width = 1280160;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetX = x + index * 1432560;
+    return solidShapeXml({ id: 1670 + index * 4, name: `Second Curve Metric Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1671 + index * 4, name: `Second Curve Metric Accent ${index + 1}`, x: offsetX, y, cx: 76200, cy: 518160, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 1672 + index * 4, name: `Second Curve Metric Title ${index + 1}`, x: offsetX + 152400, y: y + 129540, cx: width - 304800, cy: 152400, text: item.title, size: 760, bold: true, color: visual.title })
+      + textShapeXml({ id: 1673 + index * 4, name: `Second Curve Metric Caption ${index + 1}`, x: offsetX + 152400, y: y + 304800, cx: width - 304800, cy: 152400, text: item.caption, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function secondCurveOpportunityMatrixXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1127760;
+  const w = 2743200;
+  const h = 2362200;
+  const cells = items.slice(0, 4).map((item, index) => {
+    const cellW = Math.round((w - 304800) / 2);
+    const cellH = Math.round((h - 304800) / 2);
+    const cellX = x + 152400 + (index % 2) * cellW;
+    const cellY = y + 152400 + Math.floor(index / 2) * cellH;
+    return solidShapeXml({ id: 1690 + index * 3, name: `Second Curve Opportunity ${index + 1}`, geom: "roundRect", x: cellX + 76200, y: cellY + 76200, cx: cellW - 152400, cy: cellH - 152400, fill: index === 1 ? blendHexColor(palette.gold, visual.surface, 0.72) : palette.card })
+      + textShapeXml({ id: 1691 + index * 3, name: `Second Curve Opportunity Text ${index + 1}`, x: cellX + 182880, y: cellY + 243840, cx: cellW - 365760, cy: 243840, text: item.title, size: 720, bold: true, color: visual.title });
+  }).join("");
+  return solidShapeXml({ id: 1680, name: "Second Curve Opportunity Matrix", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1681, name: "Second Curve Opportunity Matrix Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1682, name: "Second Curve Opportunity Vertical Axis", x: x + Math.round(w / 2), y: y + 182880, cx: 15240, cy: h - 365760, fill: palette.axis })
+    + rectShapeXml({ id: 1683, name: "Second Curve Opportunity Horizontal Axis", x: x + 182880, y: y + Math.round(h / 2), cx: w - 365760, cy: 15240, fill: palette.axis })
+    + cells;
+}
+
+function secondCurveRoadmapXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3657600;
+  return rectShapeXml({ id: 1700, name: "Second Curve Roadmap Line", x: x + 228600, y: y - 228600, cx: 7437120, cy: 30480, fill: visual.accent })
+    + items.slice(0, 4).map((item, index) => {
+      const offsetX = x + index * 1981200;
+      return solidShapeXml({ id: 1701 + index * 4, name: `Second Curve Roadmap Step ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1676400, cy: 640080, fill: palette.card })
+        + solidShapeXml({ id: 1702 + index * 4, name: `Second Curve Roadmap Dot ${index + 1}`, geom: "ellipse", x: offsetX + 152400, y: y + 137160, cx: 167640, cy: 167640, fill: index === 2 ? palette.gold : visual.primary })
+        + textShapeXml({ id: 1703 + index * 4, name: `Second Curve Roadmap Number ${index + 1}`, x: offsetX + 205740, y: y + 177800, cx: 76200, cy: 76200, text: String(index + 1), size: 420, bold: true, color: "FFFFFF" })
+        + textShapeXml({ id: 1704 + index * 4, name: `Second Curve Roadmap Text ${index + 1}`, x: offsetX + 396240, y: y + 198120, cx: 1066800, cy: 182880, text: item.title, size: 680, bold: true, color: visual.title });
+    }).join("");
+}
+
+function secondCurvePortfolioXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1066800;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 701040;
+    return solidShapeXml({ id: 1720 + index * 4, name: `Second Curve Portfolio Card ${index + 1}`, geom: "roundRect", x, y: offsetY, cx: 2743200, cy: 548640, fill: palette.card })
+      + rectShapeXml({ id: 1721 + index * 4, name: `Second Curve Portfolio Accent ${index + 1}`, x, y: offsetY, cx: 76200, cy: 548640, fill: index === 1 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 1722 + index * 4, name: `Second Curve Portfolio Title ${index + 1}`, x: x + 152400, y: offsetY + 114300, cx: 2286000, cy: 182880, text: item.title, size: 760, bold: true, color: visual.title })
+      + textShapeXml({ id: 1723 + index * 4, name: `Second Curve Portfolio Caption ${index + 1}`, x: x + 152400, y: offsetY + 320040, cx: 2286000, cy: 152400, text: item.caption, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function secondCurveAllocationXml({ visual, palette }) {
+  const x = 914400;
+  const y = 3482340;
+  return solidShapeXml({ id: 1740, name: "Second Curve Allocation Panel", geom: "roundRect", x, y, cx: 3505200, cy: 822960, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1741, name: "Second Curve Allocation Frame", geom: "roundRect", x, y, cx: 3505200, cy: 822960, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1742, name: "Second Curve Allocation Axis", x: x + 335280, y: y + 624840, cx: 2743200, cy: 15240, fill: palette.axis })
+    + rectShapeXml({ id: 1743, name: "Second Curve Allocation Bar 1", x: x + 685800, y: y + 365760, cx: 304800, cy: 259080, fill: visual.primary })
+    + rectShapeXml({ id: 1744, name: "Second Curve Allocation Bar 2", x: x + 1516380, y: y + 243840, cx: 304800, cy: 381000, fill: visual.accent })
+    + rectShapeXml({ id: 1745, name: "Second Curve Allocation Bar 3", x: x + 2346960, y: y + 457200, cx: 304800, cy: 167640, fill: palette.gold });
+}
+
+function secondCurveNextActionsXml({ visual, palette, items }) {
+  const x = 731520;
+  const y = 3543300;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + index * 1981200;
+    return solidShapeXml({ id: 1760 + index * 3, name: `Second Curve Next Action ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1676400, cy: 609600, fill: palette.card })
+      + rectShapeXml({ id: 1761 + index * 3, name: `Second Curve Next Action Rule ${index + 1}`, x: offsetX, y, cx: 1676400, cy: 45720, fill: index === 2 ? palette.gold : visual.accent })
+      + textShapeXml({ id: 1762 + index * 3, name: `Second Curve Next Action Text ${index + 1}`, x: offsetX + 152400, y: y + 198120, cx: 1371600, cy: 182880, text: item.title, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function secondCurveScene({ slide, index, role }) {
+  const bullets = secondCurveBulletTexts(slide);
+  const cardFallbacks = [
+    ["增长目标", "目标口径"],
+    ["增长假设", "验证逻辑"],
+    ["资源配置", "投入节奏"],
+    ["验证指标", "阶段门槛"],
+  ];
+  const cards = cardFallbacks.map(([titleFallback, captionFallback], itemIndex) => {
+    const text = secondCurveCompactText(bullets[itemIndex], titleFallback, 18);
+    const [rawTitle, rawCaption] = text.split(/[:：]/);
+    return {
+      title: secondCurveCompactText(rawTitle, titleFallback, 8),
+      caption: secondCurveCompactText(rawCaption || bullets[itemIndex + 1], captionFallback, 10),
+    };
+  });
+  if (role === "closing") {
+    return { kind: "closing", kicker: "NEXT DECISION", bullets, cards: ["确认增长假设", "启动试点验证", "配置阶段资源", "复盘关键指标"].map((item, itemIndex) => ({ title: secondCurveCompactText(bullets[itemIndex], item, 9), caption: "" })) };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "GROWTH CURVE", bullets, cards: cards.slice(0, 3) },
+    { kind: "context", kicker: "BUSINESS CONTEXT", bullets, cards: cards.slice(0, 3) },
+    { kind: "opportunity", kicker: "OPPORTUNITY POOL", bullets, cards },
+    { kind: "incubation", kicker: "INCUBATION PATH", bullets, cards },
+    { kind: "resource", kicker: "RESOURCE BETS", bullets, cards },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function secondCurveBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["现有业务增长趋缓，需要识别新增长空间", "围绕目标客群验证新业务价值假设", "按阶段投入资源并设置关键验证指标"];
+}
+
+function secondCurveCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function secondCurveColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.14),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
+    axis: blendHexColor(visual.primary, visual.background, 0.44),
+    grid: blendHexColor(visual.primary, visual.background, 0.62),
+    mapFill: blendHexColor(visual.background, visual.surface, 0.45),
+    mutedLine: blendHexColor(visual.primary, visual.background, 0.45),
+    gold: visual.secondary || "F2B84B",
+  };
+}
+
+function enterpriseDigitalBlueprintDecorationsXml({ visual, index, layout, role, slide }) {
+  const palette = enterpriseDigitalBlueprintPalette(visual);
+  const scene = enterpriseDigitalBlueprintScene({ slide, index, role });
+  const surface = solidShapeXml({ id: 1500, name: "Enterprise Blueprint Content Surface", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1501, name: "Enterprise Blueprint Surface Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1502, name: "Enterprise Blueprint Top Accent", ...layout.accent, fill: visual.primary })
+    + rectShapeXml({ id: 1503, name: "Enterprise Blueprint Cyan Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const header = textShapeXml({ id: 1510, name: "Enterprise Blueprint Section Label", ...layout.label, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const content = enterpriseDigitalBlueprintContentXml({ visual, palette, scene, layout });
+  const grid = enterpriseDigitalBlueprintGridXml({ palette });
+  if (scene.kind === "architecture" || scene.kind === "cover") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintArchitectureXml({ visual, palette, scene });
+  }
+  if (scene.kind === "capability") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintCapabilityXml({ visual, palette, scene });
+  }
+  if (scene.kind === "roadmap") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintRoadmapXml({ visual, palette, scene });
+  }
+  if (scene.kind === "governance") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintGovernanceXml({ visual, palette, scene });
+  }
+  if (scene.kind === "risk") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintRiskXml({ visual, palette, scene });
+  }
+  if (scene.kind === "closing") {
+    return surface + grid + header + content + enterpriseDigitalBlueprintActionXml({ visual, scene });
+  }
+  return surface + grid + header + content + enterpriseDigitalBlueprintGovernanceXml({ visual, palette, scene });
+}
+
+function enterpriseDigitalBlueprintGridXml({ palette }) {
+  const lines = [];
+  for (let offset = 0; offset < 8; offset += 1) {
+    lines.push(rectShapeXml({ id: 1520 + offset, name: `Enterprise Blueprint Vertical Grid ${offset + 1}`, x: 823000 + offset * 838200, y: 640080, cx: 6350, cy: 3901440, fill: palette.grid }));
+  }
+  for (let offset = 0; offset < 6; offset += 1) {
+    lines.push(rectShapeXml({ id: 1530 + offset, name: `Enterprise Blueprint Horizontal Grid ${offset + 1}`, x: 640080, y: 777240 + offset * 609600, cx: 7772400, cy: 5080, fill: palette.grid }));
+  }
+  return lines.join("");
+}
+
+function enterpriseDigitalBlueprintContentXml({ visual, palette, scene, layout }) {
+  // 导出端将用户生成的大纲内容放入左侧信息卡，和在线预览的内容区域保持一致。
+  const summary = textShapeXml({ id: 1540, name: "Enterprise Blueprint Planned Content", x: layout.content.x, y: layout.content.y, cx: layout.content.cx, cy: 274320, text: enterpriseBlueprintCompactText(scene.summary, "", 34), size: 780, bold: true, color: visual.body });
+  const bullets = scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = layout.content.y + 381000 + itemIndex * 243840;
+    return solidShapeXml({ id: 1542 + itemIndex * 4, name: `Enterprise Blueprint Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: layout.content.x + 15240, y: y + 60960, cx: 53340, cy: 53340, fill: itemIndex % 2 === 0 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1543 + itemIndex * 4, name: `Enterprise Blueprint Bullet Text ${itemIndex + 1}`, x: layout.content.x + 91440, y, cx: layout.content.cx - 121920, cy: 182880, text: enterpriseBlueprintCompactText(item, "", 26), size: 650, bold: false, color: visual.body });
+  }).join("");
+  return solidShapeXml({ id: 1541, name: "Enterprise Blueprint Content Callout", geom: "roundRect", x: layout.content.x - 60960, y: layout.content.y - 121920, cx: layout.content.cx + 121920, cy: 1280160, fill: palette.callout }) + summary + bullets;
+}
+
+function enterpriseDigitalBlueprintArchitectureXml({ visual, palette, scene }) {
+  const frame = solidShapeXml({ id: 1560, name: "Enterprise Blueprint Architecture Frame", geom: "roundRect", x: 5638800, y: 1112520, cx: 2514600, cy: 2057400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1561, name: "Enterprise Blueprint Architecture Border", geom: "roundRect", x: 5638800, y: 1112520, cx: 2514600, cy: 2057400, stroke: palette.frame, width: 12700 });
+  const cards = scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5943600 + (itemIndex % 2) * 1066800;
+    const y = 1478280 + Math.floor(itemIndex / 2) * 594360;
+    return solidShapeXml({ id: 1562 + itemIndex * 4, name: `Enterprise Blueprint Architecture Node ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 853440, cy: 365760, fill: itemIndex === 0 ? visual.primary : visual.surface })
+      + lineFrameShapeXml({ id: 1563 + itemIndex * 4, name: `Enterprise Blueprint Architecture Node Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 853440, cy: 365760, stroke: itemIndex === 0 ? visual.primary : palette.frame, width: 12700 })
+      + textShapeXml({ id: 1564 + itemIndex * 4, name: `Enterprise Blueprint Architecture Text ${itemIndex + 1}`, x: x + 76200, y: y + 106680, cx: 701040, cy: 152400, text: enterpriseBlueprintCompactText(item, "", 10), size: 650, bold: true, color: itemIndex === 0 ? "FFFFFF" : visual.title });
+  }).join("");
+  const flow = rectShapeXml({ id: 1584, name: "Enterprise Blueprint Data Flow", x: 6248400, y: 2506980, cx: 1447800, cy: 38100, fill: visual.accent })
+    + solidShapeXml({ id: 1585, name: "Enterprise Blueprint Flow Node A", geom: "ellipse", x: 6217920, y: 2423160, cx: 198120, cy: 198120, fill: visual.accent })
+    + solidShapeXml({ id: 1586, name: "Enterprise Blueprint Flow Node B", geom: "ellipse", x: 7566660, y: 2423160, cx: 198120, cy: 198120, fill: visual.primary });
+  return frame + cards + flow;
+}
+
+function enterpriseDigitalBlueprintCapabilityXml({ visual, palette, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5486400 + (itemIndex % 2) * 1371600;
+    const y = 1264920 + Math.floor(itemIndex / 2) * 838200;
+    return solidShapeXml({ id: 1600 + itemIndex * 5, name: `Enterprise Blueprint Capability Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 609600, fill: visual.surface })
+      + lineFrameShapeXml({ id: 1601 + itemIndex * 5, name: `Enterprise Blueprint Capability Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 609600, stroke: palette.frame, width: 12700 })
+      + solidShapeXml({ id: 1602 + itemIndex * 5, name: `Enterprise Blueprint Capability Icon ${itemIndex + 1}`, geom: "ellipse", x: x + 121920, y: y + 121920, cx: 198120, cy: 198120, fill: itemIndex % 2 === 0 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1603 + itemIndex * 5, name: `Enterprise Blueprint Capability Text ${itemIndex + 1}`, x: x + 365760, y: y + 167640, cx: 731520, cy: 243840, text: enterpriseBlueprintCompactText(item, "", 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function enterpriseDigitalBlueprintRoadmapXml({ visual, palette, scene }) {
+  const y = 3505200;
+  const line = rectShapeXml({ id: 1630, name: "Enterprise Blueprint Roadmap Base", x: 822960, y: y + 259080, cx: 7467600, cy: 38100, fill: palette.line });
+  const nodes = scene.steps.slice(0, 4).map((item, itemIndex) => {
+    const x = 1005840 + itemIndex * 1905000;
+    return solidShapeXml({ id: 1631 + itemIndex * 5, name: `Enterprise Blueprint Roadmap Node ${itemIndex + 1}`, geom: "ellipse", x, y, cx: 457200, cy: 457200, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1632 + itemIndex * 5, name: `Enterprise Blueprint Roadmap Text ${itemIndex + 1}`, x: x - 365760, y: y + 548640, cx: 1188720, cy: 182880, text: enterpriseBlueprintCompactText(item, "", 10), size: 680, bold: true, color: visual.title });
+  }).join("");
+  return line + nodes;
+}
+
+function enterpriseDigitalBlueprintGovernanceXml({ visual, palette, scene }) {
+  const frame = lineFrameShapeXml({ id: 1660, name: "Enterprise Blueprint Governance Network", geom: "roundRect", x: 5486400, y: 1264920, cx: 2743200, cy: 1828800, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1661, name: "Enterprise Blueprint Governance Link X", x: 5943600, y: 2125980, cx: 1828800, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1662, name: "Enterprise Blueprint Governance Link Y", x: 6858000, y: 1524000, cx: 30480, cy: 1219200, fill: visual.accent });
+  const nodes = scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5791200 + (itemIndex % 2) * 1371600;
+    const y = 1478280 + Math.floor(itemIndex / 2) * 762000;
+    return solidShapeXml({ id: 1663 + itemIndex * 5, name: `Enterprise Blueprint Governance Node ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 914400, cy: 365760, fill: visual.surface })
+      + lineFrameShapeXml({ id: 1664 + itemIndex * 5, name: `Enterprise Blueprint Governance Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 914400, cy: 365760, stroke: palette.frame, width: 12700 })
+      + textShapeXml({ id: 1665 + itemIndex * 5, name: `Enterprise Blueprint Governance Text ${itemIndex + 1}`, x: x + 76200, y: y + 106680, cx: 762000, cy: 152400, text: enterpriseBlueprintCompactText(item, "", 10), size: 650, bold: true, color: visual.title });
+  }).join("");
+  return frame + nodes;
+}
+
+function enterpriseDigitalBlueprintRiskXml({ visual, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const y = 1219200 + itemIndex * 563880;
+    return solidShapeXml({ id: 1690 + itemIndex * 4, name: `Enterprise Blueprint Risk Card ${itemIndex + 1}`, geom: "roundRect", x: 5638800, y, cx: 2438400, cy: 396240, fill: visual.surface })
+      + rectShapeXml({ id: 1691 + itemIndex * 4, name: `Enterprise Blueprint Risk Accent ${itemIndex + 1}`, x: 5638800, y, cx: 60960, cy: 396240, fill: itemIndex % 2 === 0 ? visual.warning : visual.accent })
+      + textShapeXml({ id: 1692 + itemIndex * 4, name: `Enterprise Blueprint Risk Text ${itemIndex + 1}`, x: 5814060, y: y + 106680, cx: 1981200, cy: 152400, text: enterpriseBlueprintCompactText(item, "", 18), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function enterpriseDigitalBlueprintActionXml({ visual, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5486400 + (itemIndex % 2) * 1371600;
+    const y = 1371600 + Math.floor(itemIndex / 2) * 838200;
+    return solidShapeXml({ id: 1720 + itemIndex * 4, name: `Enterprise Blueprint Action Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 609600, fill: itemIndex === 0 ? visual.primary : visual.surface })
+      + textShapeXml({ id: 1721 + itemIndex * 4, name: `Enterprise Blueprint Action Text ${itemIndex + 1}`, x: x + 121920, y: y + 198120, cx: 975360, cy: 182880, text: enterpriseBlueprintCompactText(item, "", 12), size: 720, bold: true, color: itemIndex === 0 ? "FFFFFF" : visual.title });
+  }).join("");
+}
+
+function enterpriseDigitalBlueprintScene({ slide, index, role }) {
+  const bullets = enterpriseBlueprintBulletTexts(slide);
+  const cards = ["业务流程", "数据资产", "系统平台", "组织能力"].map((fallback, itemIndex) => enterpriseBlueprintCompactText(bullets[itemIndex], fallback, 12));
+  const steps = ["现状诊断", "蓝图设计", "试点建设", "规模推广"].map((fallback, itemIndex) => enterpriseBlueprintCompactText(bullets[itemIndex], fallback, 10));
+  if (role === "closing") {
+    return { kind: "closing", kicker: "NEXT TRANSFORMATION ACTIONS", summary: enterpriseBlueprintCompactText(bullets[0], "聚焦高价值场景启动试点，按阶段复盘和扩展", 34), bullets, cards: ["确定试点场景", "组建转型小组", "拆解里程碑", "建立复盘机制"].map((fallback, itemIndex) => enterpriseBlueprintCompactText(bullets[itemIndex], fallback, 12)), steps };
+  }
+  const kinds = ["cover", "diagnosis", "architecture", "capability", "roadmap", "governance", "risk"];
+  const kickers = ["DIGITAL TRANSFORMATION BLUEPRINT", "CURRENT STATE DIAGNOSIS", "TARGET ARCHITECTURE", "CAPABILITY UPGRADE", "IMPLEMENTATION ROADMAP", "GOVERNANCE MODEL", "RISK & ENABLEMENT"];
+  const fallbackSummaries = ["围绕业务、数据、系统和组织建立转型蓝图", "识别流程断点、系统孤岛和组织协同瓶颈", "构建体验层、流程层、数据层和智能应用层", "把转型能力拆解为可建设、可衡量、可运营模块", "明确阶段目标、交付节奏和里程碑验收标准", "建立转型办公室、业务 owner 和数据治理机制", "提前识别投入、组织、数据和系统集成风险"];
+  const sceneIndex = Math.min(index, kinds.length - 1);
+  return { kind: kinds[sceneIndex], kicker: kickers[sceneIndex], summary: enterpriseBlueprintCompactText(bullets[0], fallbackSummaries[sceneIndex], 34), bullets, cards, steps };
+}
+
+function enterpriseBlueprintBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["业务流程与系统能力需要统一规划", "数据治理和平台能力成为转型基础", "组织协同和阶段路线决定落地效果"];
+}
+
+function enterpriseBlueprintCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function enterpriseDigitalBlueprintPalette(visual) {
+  return {
+    panel: blendHexColor(visual.surface, visual.background, 0.16),
+    callout: blendHexColor(visual.surface, visual.background, 0.08),
+    frame: blendHexColor(visual.primary, visual.surface, 0.72),
+    grid: blendHexColor(visual.accent, visual.surface, 0.86),
+    line: blendHexColor(visual.primary, visual.surface, 0.62),
+  };
+}
+
+function isEnterpriseDigitalBlueprintVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "enterprise-digital-blueprint" && (id === "enterprise-transformation" || id === "strategy-enterprise-transformation-digital-blueprint");
+}
+
+function swotMapDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = swotMapScene({ slide, index, role });
+  const palette = swotMapColorPalette(visual);
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1831, name: "SWOT Map Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface });
+  const header = solidShapeXml({ id: 1832, name: "SWOT Map Header Bar", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 1833, name: "SWOT Map Accent Rule", x: 0, y: 274320, cx: 9144000, cy: 30480, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1834, name: "SWOT Map Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 1835, name: "SWOT Map Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const focusRule = rectShapeXml({ id: 1836, name: "SWOT Map Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+  const bullets = swotMapBulletCardsXml({ visual, palette, items: scene.bullets, isClosing });
+  // SWOT 模板不输出普通 bullets，避免下载 PPTX 时文字层和四象限图形重叠。
+  if (isClosing || scene.kind === "strategy") {
+    return surface + header + focusRule + bullets + swotMapStrategyCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "position") {
+    return surface + header + focusRule + bullets + swotMapAxisXml({ visual, palette }) + swotMapCompareCardsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "compare") {
+    return surface + header + focusRule + bullets + swotMapCompareCardsXml({ visual, palette, items: scene.cards }) + swotMapScoreBarsXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "risk") {
+    return surface + header + focusRule + bullets + swotMapRiskGridXml({ visual, palette, items: scene.cards }) + swotMapQuadrantXml({ visual, palette, items: scene.cards, compact: true });
+  }
+  return surface + header + focusRule + bullets + swotMapQuadrantXml({ visual, palette, items: scene.cards, compact: false }) + swotMapStrategyCardsXml({ visual, palette, items: scene.tags });
+}
+
+function swotMapQuadrantXml({ visual, palette, items, compact }) {
+  const x = compact ? 6126480 : 5257800;
+  const y = compact ? 1264920 : 975360;
+  const w = compact ? 2209800 : 2743200;
+  const h = compact ? 1524000 : 2209800;
+  const gap = 60960;
+  const cellW = Math.round((w - gap) / 2);
+  const cellH = Math.round((h - gap) / 2);
+  const fills = [palette.strength, palette.weakness, palette.opportunity, palette.threat];
+  const labels = ["S", "W", "O", "T"];
+  const names = ["Strength", "Weakness", "Opportunity", "Threat"];
+  const cards = labels.map((label, itemIndex) => {
+    const cellX = x + (itemIndex % 2) * (cellW + gap);
+    const cellY = y + Math.floor(itemIndex / 2) * (cellH + gap);
+    const text = swotMapCompactText(items[itemIndex], names[itemIndex], compact ? 10 : 14);
+    return solidShapeXml({ id: 1840 + itemIndex * 4, name: `SWOT Quadrant ${names[itemIndex]}`, geom: "roundRect", x: cellX, y: cellY, cx: cellW, cy: cellH, fill: fills[itemIndex] })
+      + rectShapeXml({ id: 1841 + itemIndex * 4, name: `SWOT Quadrant ${label} Rule`, x: cellX + 152400, y: cellY + 152400, cx: 457200, cy: 45720, fill: "FFFFFF" })
+      + textShapeXml({ id: 1842 + itemIndex * 4, name: `SWOT Quadrant ${label} Letter`, x: cellX + 152400, y: cellY + 243840, cx: 335280, cy: 304800, text: label, size: compact ? 1160 : 1500, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 1843 + itemIndex * 4, name: `SWOT Quadrant ${label} Text`, x: cellX + 548640, y: cellY + 274320, cx: cellW - 700000, cy: 335280, text, size: compact ? 620 : 720, bold: true, color: "FFFFFF" });
+  }).join("");
+  return lineFrameShapeXml({ id: 1839, name: "SWOT Quadrant Matrix", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 }) + cards;
+}
+
+function swotMapAxisXml({ visual, palette }) {
+  const x = 5394960;
+  const y = 1036320;
+  const w = 2743200;
+  const h = 2209800;
+  return solidShapeXml({ id: 1860, name: "SWOT Position Axis Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1861, name: "SWOT Position Axis Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1862, name: "SWOT Position Axis Vertical", x: x + Math.round(w / 2), y: y + 243840, cx: 15240, cy: h - 487680, fill: palette.axis })
+    + rectShapeXml({ id: 1863, name: "SWOT Position Axis Horizontal", x: x + 243840, y: y + Math.round(h / 2), cx: w - 487680, cy: 15240, fill: palette.axis })
+    + solidShapeXml({ id: 1864, name: "SWOT Position Axis", geom: "ellipse", x: x + Math.round(w * 0.62), y: y + Math.round(h * 0.22), cx: 182880, cy: 182880, fill: visual.accent })
+    + solidShapeXml({ id: 1865, name: "SWOT Position Competitor A", geom: "ellipse", x: x + Math.round(w * 0.28), y: y + Math.round(h * 0.52), cx: 152400, cy: 152400, fill: visual.primary })
+    + solidShapeXml({ id: 1866, name: "SWOT Position Competitor B", geom: "ellipse", x: x + Math.round(w * 0.72), y: y + Math.round(h * 0.60), cx: 152400, cy: 152400, fill: palette.warning })
+    + textShapeXml({ id: 1867, name: "SWOT Axis Label Top", x: x + 121920, y: y + 121920, cx: 975360, cy: 182880, text: "优势强度", size: 560, bold: true, color: visual.body })
+    + textShapeXml({ id: 1868, name: "SWOT Axis Label Bottom", x: x + w - 1097280, y: y + h - 304800, cx: 975360, cy: 182880, text: "市场机会", size: 560, bold: true, color: visual.body });
+}
+
+function swotMapBulletCardsXml({ visual, palette, items, isClosing }) {
+  const x = 731520;
+  const y = isClosing ? 2217420 : 2438400;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 335280;
+    return rectShapeXml({ id: 1870 + index * 3, name: `SWOT Insight Accent ${index + 1}`, x, y: offsetY + 38100, cx: 60960, cy: 198120, fill: index === 1 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1871 + index * 3, name: `SWOT Insight Text ${index + 1}`, x: x + 121920, y: offsetY, cx: 3444240, cy: 243840, text: swotMapCompactText(item, "", 34), size: 720, bold: false, color: visual.body });
+  }).join("");
+}
+
+function swotMapStrategyCardsXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 3474720;
+  const labels = ["SO", "ST", "WO", "WT"];
+  return labels.map((label, index) => {
+    const offsetX = x + (index % 2) * 1371600;
+    const offsetY = y + Math.floor(index / 2) * 502920;
+    const fill = index % 2 ? palette.card : blendHexColor(visual.accent, visual.surface, 0.82);
+    return solidShapeXml({ id: 1880 + index * 4, name: `SWOT Strategy Card ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: 1219200, cy: 396240, fill })
+      + textShapeXml({ id: 1881 + index * 4, name: `SWOT Strategy Label ${index + 1}`, x: offsetX + 121920, y: offsetY + 91440, cx: 304800, cy: 182880, text: label, size: 720, bold: true, color: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1882 + index * 4, name: `SWOT Strategy Text ${index + 1}`, x: offsetX + 457200, y: offsetY + 106680, cx: 609600, cy: 152400, text: swotMapCompactText(items[index], "策略动作", 8), size: 580, bold: true, color: visual.title });
+  }).join("");
+}
+
+function swotMapCompareCardsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 5394960 + (index % 2) * 1371600;
+    const y = 1066800 + Math.floor(index / 2) * 914400;
+    return solidShapeXml({ id: 1900 + index * 4, name: `SWOT Compare Card ${index + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 731520, fill: index % 2 ? palette.card : blendHexColor(visual.accent, visual.surface, 0.86) })
+      + rectShapeXml({ id: 1901 + index * 4, name: `SWOT Compare Rule ${index + 1}`, x: x + 152400, y: y + 152400, cx: 457200, cy: 45720, fill: index % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1902 + index * 4, name: `SWOT Compare Text ${index + 1}`, x: x + 152400, y: y + 304800, cx: 914400, cy: 243840, text: swotMapCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function swotMapScoreBarsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 5394960;
+    const y = 3375660 + index * 259080;
+    const width = 914400 + index * 304800;
+    return textShapeXml({ id: 1920 + index * 3, name: `SWOT Score Label ${index + 1}`, x, y: y - 45720, cx: 792480, cy: 152400, text: swotMapCompactText(item, `能力${index + 1}`, 5), size: 520, bold: true, color: visual.body })
+      + rectShapeXml({ id: 1921 + index * 3, name: `SWOT Score Track ${index + 1}`, x: x + 853440, y, cx: 1828800, cy: 76200, fill: palette.card })
+      + rectShapeXml({ id: 1922 + index * 3, name: `SWOT Score Bar ${index + 1}`, x: x + 853440, y, cx: width, cy: 76200, fill: index % 2 ? visual.primary : visual.accent });
+  }).join("");
+}
+
+function swotMapRiskGridXml({ visual, palette, items }) {
+  const labels = ["机会", "威胁", "响应", "优先级"];
+  return labels.map((label, index) => {
+    const x = 5265420 + (index % 2) * 1447800;
+    const y = 1036320 + Math.floor(index / 2) * 868680;
+    const isThreat = index === 1;
+    return solidShapeXml({ id: 1940 + index * 4, name: `SWOT Risk Grid ${index + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 731520, fill: isThreat ? blendHexColor(palette.warning, visual.surface, 0.78) : palette.card })
+      + textShapeXml({ id: 1941 + index * 4, name: `SWOT Risk Label ${index + 1}`, x: x + 152400, y: y + 137160, cx: 762000, cy: 182880, text: label, size: 760, bold: true, color: isThreat ? palette.warning : visual.primary })
+      + textShapeXml({ id: 1942 + index * 4, name: `SWOT Risk Text ${index + 1}`, x: x + 152400, y: y + 381000, cx: 975360, cy: 182880, text: swotMapCompactText(items[index], "", 12), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function swotMapScene({ slide, index, role }) {
+  const bullets = swotMapBulletTexts(slide);
+  const tags = ["SO 增长", "ST 防守", "WO 补位", "WT 收缩"].map((fallback, itemIndex) => swotMapCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["核心优势", "关键短板", "机会窗口", "外部威胁"].map((fallback, itemIndex) => swotMapCompactText(bullets[itemIndex], fallback, 12));
+  if (role === "closing") {
+    return { kind: "closing", kicker: "STRATEGIC ACTIONS", bullets, tags, cards: ["放大优势打法", "建立风险护栏", "补齐短板能力", "锁定差异化战场"].map((fallback, itemIndex) => swotMapCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "COMPETITOR SWOT", bullets, tags, cards },
+    { kind: "overview", kicker: "SWOT OVERVIEW", bullets, tags, cards },
+    { kind: "position", kicker: "POSITIONING MAP", bullets, tags, cards },
+    { kind: "compare", kicker: "CAPABILITY GAP", bullets, tags, cards },
+    { kind: "risk", kicker: "OPPORTUNITY & THREAT", bullets, tags, cards },
+    { kind: "strategy", kicker: "STRATEGIC ACTIONS", bullets, tags, cards: ["SO 增长打法", "ST 防守策略", "WO 补位计划", "WT 风险收缩"].map((fallback, itemIndex) => swotMapCompactText(bullets[itemIndex], fallback, 12)) },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function swotMapBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).map((item) => item.trim()).filter(Boolean) : [];
+  return values.length ? values : ["竞品能力分布呈现强弱分化", "差异化机会集中在高价值场景", "需要建立可验证的策略动作"];
+}
+
+function swotMapCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function swotMapColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.12),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
+    axis: blendHexColor(visual.primary, visual.background, 0.35),
+    mapFill: blendHexColor(visual.background, visual.surface, 0.44),
+    strength: visual.primary,
+    weakness: visual.accent,
+    opportunity: visual.secondary || "22C55E",
+    threat: visual.warning || "F97316",
+    warning: visual.warning || "F97316",
   };
 }
 
