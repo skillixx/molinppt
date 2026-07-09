@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "teaching-achievement-report",
+  "themeId": "showcase",
+  "style": "teaching-achievement-gallery",
+  "themes": [
+    {
+      "id": "showcase",
+      "name": "成果展示",
+      "visual": {
+        "primary": "1E3A8A",
+        "accent": "14B8A6",
+        "secondary": "F59E0B",
+        "success": "22C55E",
+        "background": "F4F8FB",
+        "surface": "FFFFFF",
+        "title": "172554",
+        "body": "334155",
+        "layout": "teaching-achievement-showcase",
+        "variant": "showcase"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E3A8A",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "success": "22C55E",
+    "background": "F4F8FB",
+    "surface": "FFFFFF",
+    "title": "172554",
+    "body": "334155",
+    "layout": "teaching-achievement-showcase",
+    "variant": "showcase"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "teaching-achievement-showcase-cover",
+    "defaultContentLayout": "teaching-achievement-showcase-content",
+    "allowedLayouts": [
+      "teaching-achievement-showcase-cover",
+      "teaching-achievement-showcase-gallery",
+      "teaching-achievement-showcase-content",
+      "teaching-achievement-showcase-analysis",
+      "teaching-achievement-showcase-review",
+      "teaching-achievement-showcase-summary"
+    ]
+  }
+}

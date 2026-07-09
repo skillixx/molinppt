@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="240" viewBox="0 0 720 240" fill="none">
+  <rect width="720" height="240" rx="28" fill="#F8FBFD"/>
+  <path d="M42 172H678" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="7 8"/>
+  <path d="M42 112H678" stroke="#F97316" stroke-width="2" stroke-dasharray="9 8"/>
+  <path d="M44 156C92 150 102 102 148 112C192 122 206 168 252 158C300 148 306 78 354 84C396 90 404 142 450 136C494 130 500 104 540 112C584 121 598 174 676 142" stroke="#06B6D4" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="354" cy="84" r="14" fill="#EF4444"/>
+  <circle cx="354" cy="84" r="28" stroke="#EF4444" stroke-width="4" opacity=".24"/>
+  <rect x="476" y="44" width="166" height="48" rx="24" fill="#0F172A"/>
+  <text x="504" y="75" fill="#FFFFFF" font-size="20" font-family="Arial, Microsoft YaHei" font-weight="700">异常峰值</text>
+</svg>

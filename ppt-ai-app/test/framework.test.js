@@ -716,6 +716,42 @@ test("resolveTemplateVisual applies exam review courseware official visual", () 
   assert.equal(visual.variant, "key-points");
 });
 
+test("resolveTemplateVisual applies teaching achievement showcase official visual", () => {
+  const template = {
+    id: "education-teaching-achievement-report-showcase",
+    visual: {
+      primary: "1E3A8A",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      success: "22C55E",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "172554",
+      body: "334155",
+      layout: "teaching-achievement-showcase",
+      variant: "showcase",
+    },
+    themes: [
+      {
+        id: "showcase",
+        visual: {
+          layout: "teaching-achievement-showcase",
+          variant: "showcase",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "showcase", template });
+
+  assert.equal(visual.id, "education-teaching-achievement-report-showcase");
+  assert.equal(visual.primary, "1E3A8A");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.background, "F4F8FB");
+  assert.equal(visual.layout, "teaching-achievement-showcase");
+  assert.equal(visual.variant, "showcase");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
@@ -923,6 +959,41 @@ test("resolveTemplateVisual applies customer segmentation layering official visu
   assert.equal(visual.variant, "persona-layering");
   assert.equal(visual.primary, "111827");
   assert.equal(visual.accent, "14B8A6");
+});
+
+test("resolveTemplateVisual applies metric anomaly attribution official visual", () => {
+  const template = {
+    id: "data-metric-anomaly-diagnosis-attribution-analysis",
+    visual: {
+      primary: "0F172A",
+      accent: "06B6D4",
+      secondary: "F97316",
+      warning: "EF4444",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "0B1220",
+      body: "334155",
+      layout: "metric-anomaly-attribution",
+      variant: "attribution-analysis",
+    },
+    themes: [
+      {
+        id: "attribution-analysis",
+        visual: {
+          layout: "metric-anomaly-attribution",
+          variant: "attribution-analysis",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "attribution-analysis", template });
+
+  assert.equal(visual.id, "data-metric-anomaly-diagnosis-attribution-analysis");
+  assert.equal(visual.layout, "metric-anomaly-attribution");
+  assert.equal(visual.variant, "attribution-analysis");
+  assert.equal(visual.primary, "0F172A");
+  assert.equal(visual.accent, "06B6D4");
 });
 
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {

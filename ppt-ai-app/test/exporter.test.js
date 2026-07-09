@@ -1680,6 +1680,53 @@ test("PptExportService uses customer segmentation layering decorations", () => {
   assert.doesNotMatch(slide1, /人群分层/);
 });
 
+test("PptExportService uses metric anomaly attribution decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-metric-anomaly-diagnosis-attribution-analysis",
+      theme: "attribution-analysis",
+      templateVisual: {
+        id: "data-metric-anomaly-diagnosis-attribution-analysis",
+        primary: "0F172A",
+        accent: "06B6D4",
+        secondary: "F97316",
+        warning: "EF4444",
+        background: "F4F8FB",
+        surface: "FFFFFF",
+        title: "0B1220",
+        body: "334155",
+        layout: "metric-anomaly-attribution",
+        variant: "attribution-analysis",
+      },
+      slides: [
+        { title: "指标异常诊断复盘", layout: "metric-anomaly-attribution-cover", bullets: ["GMV 环比下降 18.6%", "影响 3 条关键链路", "修复优先级 P1"] },
+        { title: "阈值波动概览", layout: "metric-anomaly-attribution-overview", bullets: ["流量入口低于阈值", "转化效率连续 3 日下滑", "客单结构偏离预期"] },
+        { title: "根因归因网络", layout: "metric-anomaly-attribution-diagnosis", bullets: ["投放质量下降", "价格敏感用户增加", "履约时效波动", "客服响应滞后"] },
+        { title: "影响范围矩阵", layout: "metric-anomaly-attribution-impact", bullets: ["高影响高紧急", "持续时间 72 小时", "责任模块明确", "业务损失可控"] },
+        { title: "修复动作闭环", layout: "metric-anomaly-attribution-action", bullets: ["立即止损", "短期修复", "长期治理", "监控复盘"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Metric Anomaly Diagnosis Canvas"/);
+  assert.match(slide1, /name="Metric Anomaly Wave Panel"/);
+  assert.match(slide1, /name="Metric Anomaly KPI Card 1"/);
+  assert.match(slide3, /name="Metric Anomaly Cause Network Panel"/);
+  assert.match(slide4, /name="Metric Anomaly Impact Matrix"/);
+  assert.match(slide5, /name="Metric Anomaly Fix Loop"/);
+  assert.match(slide1, /val="F4F8FB"/);
+  assert.match(slide1, /val="06B6D4"/);
+  assert.doesNotMatch(slide1, /归因分析/);
+});
+
 test("PptExportService uses editorial brand story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -2273,6 +2320,52 @@ test("PptExportService uses exam review courseware decorations", () => {
   assert.match(slide1, /val="1E2A78"/);
   assert.match(slide1, /val="F59E0B"/);
   assert.doesNotMatch(slide1, /重点梳理/);
+});
+
+test("PptExportService uses teaching achievement showcase decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-teaching-achievement-report-showcase",
+      theme: "showcase",
+      templateVisual: {
+        id: "education-teaching-achievement-report-showcase",
+        primary: "1E3A8A",
+        accent: "14B8A6",
+        secondary: "F59E0B",
+        success: "22C55E",
+        background: "F4F8FB",
+        surface: "FFFFFF",
+        title: "172554",
+        body: "334155",
+        layout: "teaching-achievement-showcase",
+        variant: "showcase",
+      },
+      slides: [
+        { title: "教学项目成果复盘", layout: "teaching-achievement-showcase-cover", bullets: ["课程目标达成率超过预期", "学生项目作品沉淀完成", "课堂反馈形成改进闭环"] },
+        { title: "课程作品成果墙", layout: "teaching-achievement-showcase-gallery", bullets: ["优秀课程作品展示", "项目任务完成情况", "学生协作亮点"] },
+        { title: "学生表现分析", layout: "teaching-achievement-showcase-analysis", bullets: ["出勤与完成率提升", "课堂互动明显增加", "能力评价持续改善"] },
+        { title: "教育项目复盘", layout: "teaching-achievement-showcase-review", bullets: ["目标复核", "过程证据", "评估反馈", "下一轮迭代"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Teaching Achievement Canvas"/);
+  assert.match(slide1, /name="Teaching Achievement Medal Panel"/);
+  assert.match(slide1, /name="Teaching Achievement Metric Card 1"/);
+  assert.match(slide2, /name="Teaching Achievement Wall Card 1"/);
+  assert.match(slide3, /name="Teaching Achievement Analysis Panel"/);
+  assert.match(slide4, /name="Teaching Achievement Roadmap Panel"/);
+  assert.match(slide1, /val="1E3A8A"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /成果展示/);
 });
 
 test("PptExportService applies template-specific visual colors to PDF output", () => {

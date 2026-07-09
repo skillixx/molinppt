@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "industry-research", "industry-trend-forecast", "strategy-competition-map", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "knowledge-blackboard") {
     if (index === 0) {
@@ -414,6 +414,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1300;
     if (textLength >= 22) return 1500;
     return Math.min(fallbackSize, 1780);
+  }
+  if (visual.layout === "teaching-achievement-showcase") {
+    if (index === 0) {
+      if (textLength >= 30) return 1850;
+      if (textLength >= 22) return 2100;
+      return Math.min(fallbackSize, 2460);
+    }
+    if (textLength >= 30) return 1280;
+    if (textLength >= 22) return 1480;
+    return Math.min(fallbackSize, 1760);
   }
   if (visual.layout === "growth-funding-flywheel") {
     if (index === 0) {
@@ -758,6 +768,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;
   if (visual.layout === "customer-segmentation-layering") return false;
+  if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -765,6 +776,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
   if (visual.layout === "exam-review-keypoints") return false;
+  if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
@@ -926,6 +938,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "customer-segmentation-layering") {
     return base + customerSegmentationLayeringDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "metric-anomaly-attribution") {
+    return base + metricAnomalyAttributionDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -955,6 +970,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "exam-review-keypoints") {
     return base + examReviewKeypointsDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "teaching-achievement-showcase") {
+    return base + teachingAchievementDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
@@ -2068,6 +2086,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "teaching-achievement-showcase") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 530352, y: 411480, cx: 8083296, cy: 4312920 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 365760 },
+      secondaryAccent: { x: 786384, y: isCover ? 2194560 : 1905000, cx: 2895600, cy: 53340 },
+      label: { x: 786384, y: 670560, cx: 3048000, cy: 274320 },
+      title: isClosing
+        ? { x: 786384, y: 1127760, cx: 4724400, cy: 792480 }
+        : isCover
+          ? { x: 786384, y: 1036320, cx: 3962400, cy: 1036320 }
+          : { x: 786384, y: 884000, cx: 3962400, cy: 792480 },
+      content: isClosing
+        ? { x: 804672, y: 2186940, cx: 3657600, cy: 822960 }
+        : isCover
+          ? { x: 804672, y: 2423160, cx: 3505200, cy: 762000 }
+          : { x: 804672, y: 1844040, cx: 3505200, cy: 1005840 },
+      titleSize: isCover ? 2460 : isClosing ? 2320 : 1760,
+      bodySize: isCover ? 780 : 690,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "finance-budget-planning") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2614,6 +2656,20 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 731520, y: 2438400, cx: 3657600, cy: 914400 },
       titleSize: index === 0 ? 3000 : 2520,
       bodySize: 940,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "metric-anomaly-attribution") {
+    return {
+      surface: { x: 521208, y: 411480, cx: 8101584, cy: 4381500 },
+      accent: { x: 521208, y: 411480, cx: 6096000, cy: 54864 },
+      secondaryAccent: { x: 777240, y: 2423160, cx: 3505200, cy: 30480 },
+      label: { x: 777240, y: 670560, cx: 2895600, cy: 243840 },
+      title: { x: 777240, y: 990600, cx: 3810000, cy: 914400 },
+      content: { x: 777240, y: 2438400, cx: 3505200, cy: 914400 },
+      titleSize: index === 0 ? 3000 : 2480,
+      bodySize: 920,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4447,6 +4503,177 @@ function examReviewKeypointsColorPalette(visual) {
 function isExamReviewKeypointsVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "exam-review-keypoints" && (id === "exam-review-courseware" || id === "education-exam-review-courseware-key-points");
+}
+
+function teachingAchievementDecorationsXml({ visual, index, role, slide }) {
+  const scene = teachingAchievementSceneFromSlide({ slide, index, role });
+  const palette = teachingAchievementColorPalette(visual);
+  // 教学成果汇报模板的页面骨架用 DrawingML 绘制，保证在线预览和下载 PPTX 都能保留可编辑结构。
+  const base = rectShapeXml({ id: 2701, name: "Teaching Achievement Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.background })
+    + teachingAchievementGridXml({ palette })
+    + solidShapeXml({ id: 2710, name: "Teaching Achievement Canvas", geom: "roundRect", x: 530352, y: 411480, cx: 8083296, cy: 4312920, fill: palette.surface })
+    + lineFrameShapeXml({ id: 2711, name: "Teaching Achievement Canvas Frame", geom: "roundRect", x: 530352, y: 411480, cx: 8083296, cy: 4312920, stroke: palette.frame, width: 9525 })
+    + rectShapeXml({ id: 2712, name: "Teaching Achievement Header", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + solidShapeXml({ id: 2713, name: "Teaching Achievement Glow", geom: "ellipse", x: 6217920, y: 182880, cx: 2438400, cy: 1676400, fill: palette.glow })
+    + solidShapeXml({ id: 2714, name: "Teaching Achievement Corner Tag", geom: "roundRect", x: 7437120, y: 571500, cx: 533400, cy: 1277640, fill: palette.mint })
+    + textShapeXml({ id: 2715, name: "Teaching Achievement Kicker", x: 786384, y: 670560, cx: 3048000, cy: 274320, text: scene.kicker, size: 780, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 2716, name: "Teaching Achievement Focus Rule", x: 786384, y: index === 0 ? 2194560 : 1905000, cx: 2895600, cy: 53340, fill: visual.accent });
+  const bullets = teachingAchievementBulletXml({ visual, scene, index });
+  if (scene.role === "gallery") return base + bullets + teachingAchievementWallXml({ visual, scene, palette }) + teachingAchievementMetricsXml({ visual, scene, palette });
+  if (scene.role === "analysis") return base + bullets + teachingAchievementAnalysisXml({ visual, scene, palette }) + teachingAchievementFeedbackXml({ visual, scene, palette });
+  if (scene.role === "review") return base + bullets + teachingAchievementRoadmapXml({ visual, scene, palette }) + teachingAchievementFeedbackXml({ visual, scene, palette });
+  if (scene.role === "summary") return base + bullets + teachingAchievementSummaryXml({ visual, scene, palette }) + teachingAchievementRoadmapXml({ visual, scene, palette });
+  return base + bullets + teachingAchievementMedalXml({ visual, scene, palette }) + teachingAchievementMetricsXml({ visual, scene, palette });
+}
+
+function teachingAchievementGridXml({ palette }) {
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8229600]
+    .map((x, index) => rectShapeXml({ id: 2720 + index, name: `Teaching Achievement Grid V ${index + 1}`, x, y: 411480, cx: 7620, cy: 4312920, fill: palette.grid })).join("");
+  const horizontal = [792480, 1188720, 1584960, 1981200, 2377440, 2773680, 3169920, 3566160, 3962400, 4358640]
+    .map((y, index) => rectShapeXml({ id: 2745 + index, name: `Teaching Achievement Grid H ${index + 1}`, x: 530352, y, cx: 8083296, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function teachingAchievementBulletXml({ visual, scene, index }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = (index === 0 ? 2476500 : 1844040) + itemIndex * 243840;
+    return solidShapeXml({ id: 2760 + itemIndex * 3, name: `Teaching Achievement Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 804672, y: y + 45720, cx: 68580, cy: 68580, fill: visual.accent })
+      + textShapeXml({ id: 2761 + itemIndex * 3, name: `Teaching Achievement Bullet Text ${itemIndex + 1}`, x: 914400, y, cx: 3444240, cy: 198120, text: teachingAchievementCompactText(item, scene.title, 34), size: index === 0 ? 740 : 660, bold: false, color: visual.body });
+  }).join("");
+}
+
+function teachingAchievementMedalXml({ visual, scene, palette }) {
+  return solidShapeXml({ id: 2780, name: "Teaching Achievement Medal Panel", geom: "roundRect", x: 5638800, y: 914400, cx: 2590800, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2781, name: "Teaching Achievement Medal Frame", geom: "roundRect", x: 5638800, y: 914400, cx: 2590800, cy: 2133600, stroke: palette.frame, width: 9525 })
+    + solidShapeXml({ id: 2782, name: "Teaching Achievement Medal Ribbon Left", geom: "parallelogram", x: 6339840, y: 2217420, cx: 381000, cy: 822960, fill: visual.primary })
+    + solidShapeXml({ id: 2783, name: "Teaching Achievement Medal Ribbon Right", geom: "parallelogram", x: 6804660, y: 2217420, cx: 381000, cy: 822960, fill: visual.accent })
+    + solidShapeXml({ id: 2784, name: "Teaching Achievement Medal Disc", geom: "ellipse", x: 6256020, y: 1188720, cx: 1143000, cy: 1143000, fill: visual.secondary || "F59E0B" })
+    + solidShapeXml({ id: 2785, name: "Teaching Achievement Medal Inner Disc", geom: "ellipse", x: 6507480, y: 1440180, cx: 640080, cy: 640080, fill: palette.goldSoft })
+    + textShapeXml({ id: 2786, name: "Teaching Achievement Medal Label", x: 5913120, y: 3337560, cx: 2133600, cy: 243840, text: teachingAchievementCompactText(scene.cards[0], "Learning Milestone", 16), size: 700, bold: true, color: visual.title });
+}
+
+function teachingAchievementMetricsXml({ visual, scene, palette }) {
+  return scene.metrics.slice(0, 3).map((item, index) => {
+    const x = 731520 + index * 2011680;
+    return solidShapeXml({ id: 2800 + index * 5, name: `Teaching Achievement Metric Card ${index + 1}`, geom: "roundRect", x, y: 3893820, cx: 1767840, cy: 609600, fill: palette.metric })
+      + lineFrameShapeXml({ id: 2801 + index * 5, name: `Teaching Achievement Metric Frame ${index + 1}`, geom: "roundRect", x, y: 3893820, cx: 1767840, cy: 609600, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2802 + index * 5, name: `Teaching Achievement Metric Number ${index + 1}`, x: x + 167640, y: 4015740, cx: 502920, cy: 213360, text: ["92%", "36", "4.8"][index], size: 820, bold: true, color: visual.primary })
+      + rectShapeXml({ id: 2803 + index * 5, name: `Teaching Achievement Metric Rule ${index + 1}`, x: x + 167640, y: 4282440, cx: 457200, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 2804 + index * 5, name: `Teaching Achievement Metric Text ${index + 1}`, x: x + 746760, y: 4038600, cx: 807720, cy: 274320, text: teachingAchievementCompactText(item, "", 10), size: 610, bold: true, color: visual.title });
+  }).join("");
+}
+
+function teachingAchievementWallXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 4).map((item, index) => {
+    const x = 5486400 + (index % 2) * 1325880;
+    const y = 914400 + Math.floor(index / 2) * 1066800;
+    return solidShapeXml({ id: 2820 + index * 4, name: `Teaching Achievement Wall Card ${index + 1}`, geom: "roundRect", x, y, cx: 1188720, cy: 899160, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2821 + index * 4, name: `Teaching Achievement Wall Frame ${index + 1}`, geom: "roundRect", x, y, cx: 1188720, cy: 899160, stroke: palette.frame, width: 7620 })
+      + rectShapeXml({ id: 2822 + index * 4, name: `Teaching Achievement Wall Color Strip ${index + 1}`, x, y, cx: 1188720, cy: 76200, fill: index % 2 === 0 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2823 + index * 4, name: `Teaching Achievement Wall Text ${index + 1}`, x: x + 137160, y: y + 259080, cx: 853440, cy: 274320, text: teachingAchievementCompactText(item, "", 12), size: 650, bold: true, color: visual.title });
+  }).join("");
+}
+
+function teachingAchievementAnalysisXml({ visual, scene, palette }) {
+  const bars = scene.metrics.slice(0, 4).map((item, index) => {
+    const y = 1303020 + index * 396240;
+    const width = [1524000, 1219200, 1676400, 1066800][index];
+    return textShapeXml({ id: 2840 + index * 4, name: `Teaching Achievement Chart Label ${index + 1}`, x: 5638800, y: y - 30480, cx: 914400, cy: 167640, text: teachingAchievementCompactText(item, "", 6), size: 560, bold: true, color: visual.body })
+      + solidShapeXml({ id: 2841 + index * 4, name: `Teaching Achievement Chart Track ${index + 1}`, geom: "roundRect", x: 6629400, y, cx: 1524000, cy: 152400, fill: palette.track })
+      + solidShapeXml({ id: 2842 + index * 4, name: `Teaching Achievement Chart Bar ${index + 1}`, geom: "roundRect", x: 6629400, y, cx: width, cy: 152400, fill: index % 2 === 0 ? visual.accent : visual.secondary || "F59E0B" });
+  }).join("");
+  return solidShapeXml({ id: 2836, name: "Teaching Achievement Analysis Panel", geom: "roundRect", x: 5486400, y: 944880, cx: 2895600, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2837, name: "Teaching Achievement Analysis Frame", geom: "roundRect", x: 5486400, y: 944880, cx: 2895600, cy: 2133600, stroke: palette.frame, width: 7620 })
+    + textShapeXml({ id: 2838, name: "Teaching Achievement Analysis Title", x: 5715000, y: 1097280, cx: 2133600, cy: 213360, text: "Outcome Index", size: 720, bold: true, color: visual.title })
+    + bars;
+}
+
+function teachingAchievementFeedbackXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const x = 5638800 + index * 914400;
+    return solidShapeXml({ id: 2860 + index * 4, name: `Teaching Achievement Feedback Bubble ${index + 1}`, geom: "roundRect", x, y: 3413760, cx: 762000, cy: 548640, fill: palette.feedback })
+      + solidShapeXml({ id: 2861 + index * 4, name: `Teaching Achievement Feedback Dot ${index + 1}`, geom: "ellipse", x: x + 259080, y: 4053840, cx: 213360, cy: 213360, fill: index % 2 === 0 ? visual.accent : visual.secondary || "F59E0B" })
+      + textShapeXml({ id: 2862 + index * 4, name: `Teaching Achievement Feedback Text ${index + 1}`, x: x + 106680, y: 3566160, cx: 548640, cy: 182880, text: teachingAchievementCompactText(item, "", 8), size: 560, bold: true, color: visual.title });
+  }).join("");
+}
+
+function teachingAchievementRoadmapXml({ visual, scene, palette }) {
+  const rail = rectShapeXml({ id: 2870, name: "Teaching Achievement Roadmap Rail", x: 5524500, y: 2484120, cx: 2743200, cy: 38100, fill: palette.frame });
+  const steps = scene.metrics.slice(0, 4).map((item, index) => {
+    const x = 5638800 + index * 655320;
+    return solidShapeXml({ id: 2871 + index * 4, name: `Teaching Achievement Roadmap Node ${index + 1}`, geom: "ellipse", x, y: 2362200, cx: 281940, cy: 281940, fill: index % 2 === 0 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2872 + index * 4, name: `Teaching Achievement Roadmap Text ${index + 1}`, x: x - 121920, y: 2788920, cx: 548640, cy: 228600, text: teachingAchievementCompactText(item, "", 8), size: 560, bold: true, color: visual.title });
+  }).join("");
+  return solidShapeXml({ id: 2869, name: "Teaching Achievement Roadmap Panel", geom: "roundRect", x: 5486400, y: 914400, cx: 2895600, cy: 2743200, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2879, name: "Teaching Achievement Roadmap Frame", geom: "roundRect", x: 5486400, y: 914400, cx: 2895600, cy: 2743200, stroke: palette.frame, width: 7620 })
+    + textShapeXml({ id: 2880, name: "Teaching Achievement Roadmap Label", x: 5715000, y: 1127760, cx: 1981200, cy: 213360, text: "Project Review", size: 720, bold: true, color: visual.title })
+    + rail
+    + steps;
+}
+
+function teachingAchievementSummaryXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const y = 1066800 + index * 701040;
+    return solidShapeXml({ id: 2890 + index * 4, name: `Teaching Achievement Summary Card ${index + 1}`, geom: "roundRect", x: 5638800, y, cx: 2590800, cy: 548640, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2891 + index * 4, name: `Teaching Achievement Summary Accent ${index + 1}`, x: 5638800, y, cx: 76200, cy: 548640, fill: index % 2 === 0 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2892 + index * 4, name: `Teaching Achievement Summary Text ${index + 1}`, x: 5867400, y: y + 152400, cx: 1676400, cy: 213360, text: teachingAchievementCompactText(item, "", 14), size: 650, bold: true, color: visual.title });
+  }).join("");
+}
+
+function teachingAchievementSceneFromSlide({ slide, index, role }) {
+  const bullets = teachingAchievementTexts(slide);
+  const rawRole = String(slide?.layout || role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("gallery")
+      ? "gallery"
+      : rawRole.includes("analysis")
+        ? "analysis"
+        : rawRole.includes("review")
+          ? "review"
+          : rawRole.includes("summary") || rawRole === "closing"
+            ? "summary"
+            : ["gallery", "analysis", "review", "summary"][(index - 1) % 4];
+  const kickerMap = { cover: "LEARNING OUTCOMES", gallery: "PORTFOLIO WALL", analysis: "STUDENT INSIGHT", review: "PROJECT REVIEW", summary: "NEXT ACTION" };
+  return {
+    role: sceneRole,
+    title: exportTextValue(slide?.title) || "教学成果汇报",
+    kicker: kickerMap[sceneRole] || "LEARNING OUTCOMES",
+    bullets,
+    cards: ["课堂作品", "能力提升", "评价反馈", "优秀案例"].map((fallback, itemIndex) => teachingAchievementCompactText(bullets[itemIndex], fallback, 12)),
+    metrics: ["完成率", "作品数", "满意度", "改进项"].map((fallback, itemIndex) => teachingAchievementCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function teachingAchievementTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["沉淀课程项目成果与课堂作品", "呈现学生表现和能力提升数据", "复盘教学过程并形成改进建议"];
+}
+
+function teachingAchievementCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function teachingAchievementColorPalette(visual) {
+  return {
+    background: normalizeHexColor(visual.background || "F4F8FB"),
+    surface: normalizeHexColor(visual.surface || "FFFFFF"),
+    frame: "C7D2FE",
+    grid: "E7EEF8",
+    glow: blendHexColor(normalizeHexColor(visual.accent || "14B8A6"), normalizeHexColor(visual.background || "F4F8FB"), 0.78),
+    mint: "CCFBF1",
+    metric: "F8FAFC",
+    track: "E2E8F0",
+    feedback: "F0FDFA",
+    goldSoft: "FEF3C7",
+  };
+}
+
+function isTeachingAchievementShowcaseVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "teaching-achievement-showcase" && (id === "teaching-achievement-report" || id === "education-teaching-achievement-report-showcase");
 }
 
 function educationSolutionDecorationsXml({ visual, index, role, slide }) {
@@ -7585,6 +7812,189 @@ function customerSegmentationLayeringColorPalette(visual) {
 
 function visualColorFallback(value, fallback) {
   return /^[0-9A-Fa-f]{6}$/.test(String(value || "")) ? value : fallback;
+}
+
+function metricAnomalyAttributionDecorationsXml({ visual, index, role, slide }) {
+  const scene = metricAnomalyAttributionScene({ slide, index, role });
+  const palette = metricAnomalyAttributionColorPalette(visual);
+  // 指标异常诊断模板全部用可编辑图形绘制，保留异常波形、归因节点和修复动作的结构一致性。
+  const shell = rectShapeXml({ id: 2400, name: "Metric Anomaly Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + metricAnomalyGridXml({ palette })
+    + solidShapeXml({ id: 2401, name: "Metric Anomaly Diagnosis Canvas", geom: "roundRect", x: 521208, y: 411480, cx: 8101584, cy: 4381500, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 2402, name: "Metric Anomaly Diagnosis Canvas Frame", geom: "roundRect", x: 521208, y: 411480, cx: 8101584, cy: 4381500, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2403, name: "Metric Anomaly Alert Header", x: 521208, y: 411480, cx: 1828800, cy: 54864, fill: visual.warning || "EF4444" })
+    + rectShapeXml({ id: 2404, name: "Metric Anomaly Attribution Header", x: 2350010, y: 411480, cx: 2438400, cy: 54864, fill: visual.secondary || "F97316" })
+    + rectShapeXml({ id: 2405, name: "Metric Anomaly Monitor Header", x: 4788410, y: 411480, cx: 3352800, cy: 54864, fill: visual.accent })
+    + textShapeXml({ id: 2406, name: "Metric Anomaly Section Kicker", x: 777240, y: 670560, cx: 3200400, cy: 198120, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const rightPanel = scene.kind === "cause"
+    ? metricAnomalyCauseMapXml({ visual, palette, cards: scene.cards })
+    : scene.kind === "impact"
+      ? metricAnomalyImpactMatrixXml({ visual, palette })
+      : scene.kind === "action" || scene.kind === "closing"
+        ? metricAnomalyLoopXml({ visual, palette })
+        : metricAnomalySignalPanelXml({ visual, palette });
+  return shell
+    + rightPanel
+    + metricAnomalyInsightRowsXml({ visual, palette, bullets: scene.bullets })
+    + (scene.kind === "impact" || scene.kind === "action" || scene.kind === "closing" ? metricAnomalyActionCardsXml({ visual, palette, cards: scene.cards }) : metricAnomalyMetricCardsXml({ visual, palette, metrics: scene.metrics }));
+}
+
+function metricAnomalyGridXml({ palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 2410 + itemIndex, name: `Metric Anomaly Vertical Grid ${itemIndex + 1}`, x: 914400 + itemIndex * 1219200, y: 609600, cx: 7620, cy: 3962400, fill: palette.grid })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 2420 + itemIndex, name: `Metric Anomaly Horizontal Grid ${itemIndex + 1}`, x: 609600, y: 1066800 + itemIndex * 762000, cx: 7924800, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal
+    + solidShapeXml({ id: 2428, name: "Metric Anomaly Red Glow", geom: "ellipse", x: 6705600, y: 411480, cx: 1676400, cy: 1676400, fill: palette.redGlow })
+    + solidShapeXml({ id: 2429, name: "Metric Anomaly Cyan Glow", geom: "ellipse", x: 228600, y: 3352800, cx: 1524000, cy: 1524000, fill: palette.cyanGlow });
+}
+
+function metricAnomalySignalPanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 2430, name: "Metric Anomaly Wave Panel", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 2133600, fill: visual.primary })
+    + lineFrameShapeXml({ id: 2431, name: "Metric Anomaly Wave Panel Frame", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 2133600, stroke: palette.cyanFrame, width: 11430 })
+    + rectShapeXml({ id: 2432, name: "Metric Anomaly Threshold Line", x: 5638800, y: 1798320, cx: 2438400, cy: 15240, fill: visual.secondary || "F97316" })
+    + rectShapeXml({ id: 2433, name: "Metric Anomaly Baseline", x: 5638800, y: 2286000, cx: 2438400, cy: 15240, fill: palette.softLine })
+    + metricAnomalyWaveBarsXml({ visual, palette })
+    + solidShapeXml({ id: 2438, name: "Metric Anomaly Peak Dot", geom: "ellipse", x: 6766560, y: 1424940, cx: 182880, cy: 182880, fill: visual.warning || "EF4444" })
+    + lineFrameShapeXml({ id: 2439, name: "Metric Anomaly Peak Ring", geom: "ellipse", x: 6682740, y: 1341120, cx: 350520, cy: 350520, stroke: visual.warning || "EF4444", width: 19050, transparency: 42000 })
+    + solidShapeXml({ id: 2440, name: "Metric Anomaly Risk Badge", geom: "roundRect", x: 7315200, y: 1120140, cx: 762000, cy: 274320, fill: visual.secondary || "F97316" })
+    + textShapeXml({ id: 2441, name: "Metric Anomaly Risk Badge Text", x: 7429500, y: 1181100, cx: 533400, cy: 106680, text: "高风险", size: 640, bold: true, color: "FFFFFF" });
+}
+
+function metricAnomalyWaveBarsXml({ visual, palette }) {
+  const bars = [
+    { x: 5638800, y: 2072640, cx: 304800, cy: 457200, fill: visual.accent },
+    { x: 6103620, y: 1965960, cx: 304800, cy: 563880, fill: visual.accent },
+    { x: 6568440, y: 1516380, cx: 304800, cy: 1013460, fill: visual.warning || "EF4444" },
+    { x: 7033260, y: 1828800, cx: 304800, cy: 701040, fill: visual.accent },
+    { x: 7498080, y: 1706880, cx: 304800, cy: 822960, fill: visual.secondary || "F97316" },
+  ];
+  return bars.map((bar, index) => solidShapeXml({ id: 2446 + index, name: `Metric Anomaly Wave Bar ${index + 1}`, geom: "roundRect", ...bar })).join("")
+    + rectShapeXml({ id: 2452, name: "Metric Anomaly Trend Segment A", x: 5654040, y: 1965960, cx: 746760, cy: 38100, fill: palette.cyanFrame })
+    + rectShapeXml({ id: 2453, name: "Metric Anomaly Trend Segment B", x: 6362700, y: 1744980, cx: 746760, cy: 38100, fill: visual.warning || "EF4444" })
+    + rectShapeXml({ id: 2454, name: "Metric Anomaly Trend Segment C", x: 7071360, y: 1905000, cx: 746760, cy: 38100, fill: palette.cyanFrame });
+}
+
+function metricAnomalyCauseMapXml({ visual, palette, cards }) {
+  const nodes = cards.slice(0, 4);
+  const positions = [
+    { x: 5486400, y: 1158240, fill: visual.accent },
+    { x: 7467600, y: 1158240, fill: visual.secondary || "F97316" },
+    { x: 5486400, y: 2743200, fill: palette.violet },
+    { x: 7467600, y: 2743200, fill: "22C55E" },
+  ];
+  return solidShapeXml({ id: 2460, name: "Metric Anomaly Cause Network Panel", geom: "roundRect", x: 5181600, y: 990600, cx: 3352800, cy: 2438400, fill: visual.primary })
+    + lineFrameShapeXml({ id: 2461, name: "Metric Anomaly Cause Network Frame", geom: "roundRect", x: 5181600, y: 990600, cx: 3352800, cy: 2438400, stroke: palette.cyanFrame, width: 11430 })
+    + rectShapeXml({ id: 2462, name: "Metric Anomaly Cause Link H", x: 5943600, y: 2194560, cx: 1981200, cy: 22860, fill: palette.cyanFrame })
+    + rectShapeXml({ id: 2463, name: "Metric Anomaly Cause Link V", x: 6918960, y: 1394460, cx: 22860, cy: 1600200, fill: palette.cyanFrame })
+    + solidShapeXml({ id: 2464, name: "Metric Anomaly Root Cause Core", geom: "ellipse", x: 6598920, y: 1866900, cx: 670560, cy: 670560, fill: visual.warning || "EF4444" })
+    + textShapeXml({ id: 2465, name: "Metric Anomaly Root Cause Text", x: 6637020, y: 2103120, cx: 594360, cy: 106680, text: "异常", size: 700, bold: true, color: "FFFFFF" })
+    + positions.map((position, index) => solidShapeXml({ id: 2470 + index * 3, name: `Metric Anomaly Cause Node ${index + 1}`, geom: "ellipse", x: position.x, y: position.y, cx: 548640, cy: 548640, fill: position.fill })
+      + textShapeXml({ id: 2471 + index * 3, name: `Metric Anomaly Cause Node Text ${index + 1}`, x: position.x + 76200, y: position.y + 205740, cx: 396240, cy: 121920, text: nodes[index] || "原因", size: 620, bold: true, color: "FFFFFF" })).join("");
+}
+
+function metricAnomalyImpactMatrixXml({ visual, palette }) {
+  return solidShapeXml({ id: 2490, name: "Metric Anomaly Impact Matrix", geom: "roundRect", x: 5486400, y: 1120140, cx: 2895600, cy: 2133600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 2491, name: "Metric Anomaly Impact Matrix Frame", geom: "roundRect", x: 5486400, y: 1120140, cx: 2895600, cy: 2133600, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 2492, name: "Metric Anomaly Impact Axis X", x: 5791200, y: 2194560, cx: 2286000, cy: 15240, fill: palette.axis })
+    + rectShapeXml({ id: 2493, name: "Metric Anomaly Impact Axis Y", x: 6934200, y: 1325880, cx: 15240, cy: 1600200, fill: palette.axis })
+    + solidShapeXml({ id: 2494, name: "Metric Anomaly Impact Critical", geom: "ellipse", x: 7246620, y: 1470660, cx: 198120, cy: 198120, fill: visual.warning || "EF4444" })
+    + solidShapeXml({ id: 2495, name: "Metric Anomaly Impact Medium", geom: "ellipse", x: 6248400, y: 1653540, cx: 167640, cy: 167640, fill: visual.accent })
+    + solidShapeXml({ id: 2496, name: "Metric Anomaly Impact Cost", geom: "ellipse", x: 7086600, y: 2522220, cx: 152400, cy: 152400, fill: visual.secondary || "F97316" })
+    + textShapeXml({ id: 2497, name: "Metric Anomaly Impact Label", x: 5791200, y: 2926080, cx: 1981200, cy: 152400, text: "Impact / Urgency", size: 700, bold: true, color: visual.title });
+}
+
+function metricAnomalyLoopXml({ visual, palette }) {
+  return lineFrameShapeXml({ id: 2510, name: "Metric Anomaly Fix Loop", geom: "ellipse", x: 5943600, y: 1270000, cx: 1981200, cy: 1981200, stroke: visual.accent, width: 68580 })
+    + lineFrameShapeXml({ id: 2511, name: "Metric Anomaly Fix Loop Orange", geom: "ellipse", x: 6248400, y: 1574800, cx: 1371600, cy: 1371600, stroke: visual.secondary || "F97316", width: 38100 })
+    + solidShapeXml({ id: 2512, name: "Metric Anomaly Fix Core", geom: "roundRect", x: 6781800, y: 2072640, cx: 548640, cy: 548640, fill: visual.primary })
+    + textShapeXml({ id: 2513, name: "Metric Anomaly Fix Core Text", x: 6743700, y: 2263140, cx: 655320, cy: 137160, text: "FIX", size: 760, bold: true, color: "FFFFFF" });
+}
+
+function metricAnomalyMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, index) => {
+    const x = 777240 + index * 1524000;
+    return solidShapeXml({ id: 2530 + index * 4, name: `Metric Anomaly KPI Card ${index + 1}`, geom: "roundRect", x, y: 3771900, cx: 1219200, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 2531 + index * 4, name: `Metric Anomaly KPI Value ${index + 1}`, x: x + 137160, y: 3886200, cx: 579120, cy: 182880, text: metric.value, size: 1080, bold: true, color: index === 0 ? (visual.warning || "EF4444") : visual.title })
+      + textShapeXml({ id: 2532 + index * 4, name: `Metric Anomaly KPI Label ${index + 1}`, x: x + 137160, y: 4130040, cx: 853440, cy: 137160, text: metric.label, size: 640, bold: true, color: visual.body })
+      + rectShapeXml({ id: 2533 + index * 4, name: `Metric Anomaly KPI Pulse ${index + 1}`, x: x + 137160, y: 4328160, cx: 487680 + index * 91440, cy: 30480, fill: index === 0 ? (visual.warning || "EF4444") : visual.accent });
+  }).join("");
+}
+
+function metricAnomalyActionCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const x = 731520 + index * 1981200;
+    return solidShapeXml({ id: 2550 + index * 3, name: `Metric Anomaly Action Card ${index + 1}`, geom: "roundRect", x, y: 3596640, cx: 1676400, cy: 609600, fill: palette.card })
+      + rectShapeXml({ id: 2551 + index * 3, name: `Metric Anomaly Action Rule ${index + 1}`, x: x + 137160, y: 3764280, cx: 579120, cy: 38100, fill: index === 0 ? (visual.warning || "EF4444") : visual.accent })
+      + textShapeXml({ id: 2552 + index * 3, name: `Metric Anomaly Action Text ${index + 1}`, x: x + 137160, y: 3985260, cx: 1219200, cy: 182880, text: card, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function metricAnomalyInsightRowsXml({ visual, palette, bullets }) {
+  return bullets.slice(0, 3).map((bullet, index) => {
+    const y = 2240280 + index * 365760;
+    return solidShapeXml({ id: 2570 + index * 3, name: `Metric Anomaly Evidence Row ${index + 1}`, geom: "roundRect", x: 777240, y, cx: 3505200, cy: 243840, fill: palette.card })
+      + solidShapeXml({ id: 2571 + index * 3, name: `Metric Anomaly Evidence Dot ${index + 1}`, geom: "ellipse", x: 929640, y: y + 76200, cx: 91440, cy: 91440, fill: index === 0 ? (visual.warning || "EF4444") : visual.accent })
+      + textShapeXml({ id: 2572 + index * 3, name: `Metric Anomaly Evidence Text ${index + 1}`, x: 1112520, y: y + 60960, cx: 2895600, cy: 121920, text: metricAnomalyCompactText(bullet, "异常诊断证据", 30), size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function metricAnomalyAttributionScene({ slide, index, role }) {
+  const bullets = metricAnomalyBulletTexts(slide);
+  const values = metricAnomalyMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: metricAnomalyCompactText(bullets[0], "异常幅度", 8) },
+    { value: values[1], label: metricAnomalyCompactText(bullets[1], "影响范围", 8) },
+    { value: values[2], label: metricAnomalyCompactText(bullets[2], "修复优先级", 8) },
+  ];
+  const roleText = String(role || "");
+  const kind = index === 0 ? "cover" : roleText.includes("diagnosis") || roleText.includes("analysis") ? "cause" : roleText.includes("impact") ? "impact" : roleText.includes("action") ? "action" : roleText.includes("summary") || roleText.includes("closing") ? "closing" : ["overview", "cause", "impact", "action"][(index - 1) % 4];
+  const cards = kind === "impact"
+    ? ["影响等级", "持续时间", "责任模块", "业务损失"].map((fallback, itemIndex) => metricAnomalyCompactText(bullets[itemIndex], fallback, 12))
+    : kind === "action" || kind === "closing"
+      ? ["立即止损", "短期修复", "长期治理", "监控复盘"].map((fallback, itemIndex) => metricAnomalyCompactText(bullets[itemIndex], fallback, 12))
+      : ["流量入口", "转化效率", "客单结构", "履约体验"].map((fallback, itemIndex) => metricAnomalyCompactText(bullets[itemIndex], fallback, 12));
+  return {
+    kind,
+    kicker: kind === "cover" ? "ANOMALY SIGNAL" : kind === "overview" ? "THRESHOLD REVIEW" : kind === "cause" ? "CAUSE NETWORK" : kind === "impact" ? "IMPACT MATRIX" : kind === "action" ? "FIX ACTIONS" : "NEXT DIAGNOSIS LOOP",
+    bullets,
+    metrics,
+    cards,
+  };
+}
+
+function metricAnomalyBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["核心指标偏离阈值并影响关键业务链路", "从流量、转化、客单和履约拆解潜在原因", "输出止损动作、责任模块和后续监控机制"];
+}
+
+function metricAnomalyMetricValues(bullets) {
+  const matches = bullets.flatMap((item) => String(item).match(/[+-]?\d+(?:\.\d+)?%|\d+(?:\.\d+)?[万千亿]?|P[0-3]|S[1-4]/gi) || []);
+  return [matches[0] || "-18.6%", matches[1] || "3条", matches[2] || "P1"];
+}
+
+function metricAnomalyCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function metricAnomalyAttributionColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.94),
+    panel: blendHexColor(visual.surface, visual.background, 0.88),
+    card: blendHexColor("FFFFFF", visual.background, 0.90),
+    frame: blendHexColor(visual.primary, visual.background, 0.74),
+    grid: blendHexColor(visual.primary, visual.background, 0.88),
+    axis: blendHexColor(visual.primary, visual.background, 0.72),
+    softLine: blendHexColor("FFFFFF", visual.primary, 0.54),
+    cyanFrame: blendHexColor(visual.accent, "FFFFFF", 0.10),
+    redGlow: blendHexColor(visual.warning || "EF4444", visual.background, 0.84),
+    cyanGlow: blendHexColor(visual.accent, visual.background, 0.84),
+    violet: "8B5CF6",
+  };
 }
 
 function dataInsightMetricCardsXml({ visual, palette, metrics }) {

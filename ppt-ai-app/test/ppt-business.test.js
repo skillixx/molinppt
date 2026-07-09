@@ -758,6 +758,29 @@ test("PptService renders customer segmentation layering preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders metric anomaly attribution preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertMetricAnomalyAttributionTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "指标异常诊断复盘",
+    slideCount: 5,
+    templateId: "data-metric-anomaly-diagnosis-attribution-analysis",
+    theme: "attribution-analysis",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-metric-anomaly-diagnosis-attribution-analysis" data-layout="metric-anomaly-attribution"/);
+  assert.match(preview, /anomaly-layer/);
+  assert.match(preview, /anomaly-signal|anomaly-cause-map|anomaly-impact|anomaly-loop/);
+  assert.match(preview, /ANOMALY SIGNAL|THRESHOLD REVIEW|CAUSE NETWORK|IMPACT MATRIX/);
+  assert.doesNotMatch(preview, />归因分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders corporate training preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -847,6 +870,29 @@ test("PptService renders exam review courseware preview with dedicated layout", 
   assert.match(preview, /exam-review-card|exam-review-framework|exam-review-mistakes|exam-review-plan/);
   assert.match(preview, /EXAM REVIEW|KNOWLEDGE MAP|ERROR ANALYSIS|FINAL SPRINT/);
   assert.doesNotMatch(preview, />重点梳理</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders teaching achievement showcase preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertTeachingAchievementShowcaseTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "教学项目成果复盘",
+    slideCount: 5,
+    templateId: "education-teaching-achievement-report-showcase",
+    theme: "showcase",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="education-teaching-achievement-report-showcase" data-layout="teaching-achievement-showcase"/);
+  assert.match(preview, /achievement-layer/);
+  assert.match(preview, /achievement-medal|achievement-wall|achievement-analysis|achievement-roadmap/);
+  assert.match(preview, /LEARNING OUTCOMES|PORTFOLIO WALL|STUDENT INSIGHT|PROJECT REVIEW/);
+  assert.doesNotMatch(preview, />成果展示</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -5104,6 +5150,65 @@ async function insertCustomerSegmentationLayeringTemplate(context) {
   });
 }
 
+async function insertMetricAnomalyAttributionTemplate(context) {
+  // 测试数据库模拟官方模板同步后的指标异常诊断模板，覆盖归因分析的预览和动态版式解析。
+  await context.database.insert("templates", {
+    id: "data-metric-anomaly-diagnosis-attribution-analysis",
+    slug: "data-metric-anomaly-diagnosis-attribution-analysis",
+    name: "指标异常诊断 - 归因分析",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "attribution-analysis",
+        name: "归因分析",
+        visual: {
+          primary: "0F172A",
+          accent: "06B6D4",
+          secondary: "F97316",
+          warning: "EF4444",
+          background: "F4F8FB",
+          surface: "FFFFFF",
+          title: "0B1220",
+          body: "334155",
+          layout: "metric-anomaly-attribution",
+          variant: "attribution-analysis",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F172A",
+      accent: "06B6D4",
+      secondary: "F97316",
+      warning: "EF4444",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "0B1220",
+      body: "334155",
+      layout: "metric-anomaly-attribution",
+      variant: "attribution-analysis",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "metric-anomaly-attribution-cover",
+      defaultContentLayout: "metric-anomaly-attribution-diagnosis",
+      allowedLayouts: [
+        "metric-anomaly-attribution-cover",
+        "metric-anomaly-attribution-overview",
+        "metric-anomaly-attribution-diagnosis",
+        "metric-anomaly-attribution-analysis",
+        "metric-anomaly-attribution-impact",
+        "metric-anomaly-attribution-action",
+        "metric-anomaly-attribution-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
 async function insertCorporateTrainingTemplate(context) {
   // 测试数据库模拟官方模板同步后的企业内训课程模板，确保预览走内训课件专用布局。
   await context.database.insert("templates", {
@@ -5328,6 +5433,64 @@ async function insertExamReviewKeypointsTemplate(context) {
         "exam-review-mistakes",
         "exam-review-plan",
         "exam-review-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertTeachingAchievementShowcaseTemplate(context) {
+  // 测试数据库模拟官方模板同步后的教学成果汇报模板，覆盖大纲生成和在线预览的专用版式。
+  await context.database.insert("templates", {
+    id: "education-teaching-achievement-report-showcase",
+    slug: "education-teaching-achievement-report-showcase",
+    name: "教学成果汇报 - 成果展示",
+    categoryId: "education",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "showcase",
+        name: "成果展示",
+        visual: {
+          primary: "1E3A8A",
+          accent: "14B8A6",
+          secondary: "F59E0B",
+          success: "22C55E",
+          background: "F4F8FB",
+          surface: "FFFFFF",
+          title: "172554",
+          body: "334155",
+          layout: "teaching-achievement-showcase",
+          variant: "showcase",
+        },
+      },
+    ],
+    visual: {
+      primary: "1E3A8A",
+      accent: "14B8A6",
+      secondary: "F59E0B",
+      success: "22C55E",
+      background: "F4F8FB",
+      surface: "FFFFFF",
+      title: "172554",
+      body: "334155",
+      layout: "teaching-achievement-showcase",
+      variant: "showcase",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "teaching-achievement-showcase-cover",
+      defaultContentLayout: "teaching-achievement-showcase-content",
+      allowedLayouts: [
+        "teaching-achievement-showcase-cover",
+        "teaching-achievement-showcase-gallery",
+        "teaching-achievement-showcase-content",
+        "teaching-achievement-showcase-analysis",
+        "teaching-achievement-showcase-review",
+        "teaching-achievement-showcase-summary",
         "title",
         "content",
         "closing",
