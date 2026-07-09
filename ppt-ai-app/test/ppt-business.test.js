@@ -1080,6 +1080,56 @@ test("PptService renders operating problem diagnosis preview with problem tree l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService refreshes operating problem diagnosis visual before exporting stale decks", async () => {
+  const context = await createBusinessContext();
+  await insertOperatingProblemDiagnosisTemplate(context);
+  const deck = await context.database.insert("decks", {
+    id: "stale-operating-problem-deck",
+    ownerUserId: 7,
+    title: "季度经营复盘报告",
+    templateId: "business-operating-problem-diagnosis-problem-tree",
+    templateName: "经营问题诊断 - 问题树",
+    // 模拟历史 deck 保存了通用 visual 快照，导出时必须重新按当前官方模板补齐专用布局。
+    templateVisual: {
+      primary: "0F172A",
+      accent: "2563EB",
+      background: "F8FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "top-band",
+      variant: "legacy",
+    },
+    theme: "problem-tree",
+    status: "ready",
+    slides: [
+      { title: "季度经营复盘报告：穿越波动，聚焦增长", bullets: ["报告周期：2024年Q4", "核心问题：营收未达标"] },
+      { title: "增长放缓源于三大结构性矛盾", bullets: ["老客留存下降", "新客获取成本上升", "产品结构失衡"] },
+      { title: "整改动作闭环", bullets: ["立即止损", "责任到人", "周度复盘", "机制固化"] },
+    ],
+  });
+  await context.database.insert("ppt_assets", {
+    id: "asset-stale-operating-problem-deck",
+    ownerUserId: 7,
+    deckId: deck.id,
+    title: deck.title,
+    status: "active",
+    slideCount: deck.slides.length,
+    templateId: deck.templateId,
+    templateName: deck.templateName,
+    theme: deck.theme,
+  });
+
+  const exported = await context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pptx" });
+  const downloaded = await context.storage.download({ ownerUserId: 7, fileId: exported.file.id });
+  const text = downloaded.content.toString("latin1");
+
+  assert.match(text, /name="Operating Problem Diagnosis Canvas"/);
+  assert.match(text, /name="Operating Problem Tree Lens"|name="Operating Problem Tree Board"|name="Operating Problem Tree Fix Loop"/);
+  assert.match(text, /val="E94B3C"/);
+  assert.doesNotMatch(text, /name="Top Band Surface"/);
+});
+
 test("PptService renders business opportunity map preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

@@ -558,21 +558,17 @@ export class PptService {
   async previewDeck({ ownerUserId, deckId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
+    const deckForPreview = this.#withCurrentTemplateVisual({ deck, ownerUserId });
     if (this.pptPreviewRenderer) {
-      const pptx = this.exporter.exportDeck({ deck, format: "pptx" });
+      const pptx = this.exporter.exportDeck({ deck: deckForPreview, format: "pptx" });
       const rendered = await this.pptPreviewRenderer.render({
-        deck,
+        deck: deckForPreview,
         pptx: pptx.content,
         fileName: pptx.fileName,
       });
       if (rendered) return rendered;
     }
-    const visual = resolveTemplateVisual({
-      templateId: deck.templateId,
-      theme: deck.theme,
-      template: { id: deck.templateId, name: deck.templateName, visual: deck.templateVisual },
-    });
-    return renderDeckPreview({ deck, visual });
+    return renderDeckPreview({ deck: deckForPreview, visual: deckForPreview.templateVisual });
   }
 
   /**
@@ -584,7 +580,8 @@ export class PptService {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
     const asset = await this.#getActiveAssetForDeck({ ownerUserId, deckId });
-    const exportPayload = this.exporter.exportDeck({ deck, format });
+    const deckForExport = this.#withCurrentTemplateVisual({ deck, ownerUserId });
+    const exportPayload = this.exporter.exportDeck({ deck: deckForExport, format });
     const file = await this.storage.upload({
       ownerUserId,
       fileName: exportPayload.fileName,
@@ -746,6 +743,34 @@ export class PptService {
     if (deck.status !== "ready") return null;
     const outline = await this.database.findOne("outlines", (item) => item.id === deck.outlineId && Number(item.ownerUserId) === Number(ownerUserId));
     return this.#createAssetForDeck({ deck, outline });
+  }
+
+  /**
+   * 使用当前模板管理器重新补齐 deck 的视觉快照，避免旧 deck 下载时退回通用 PPTX 样式。
+   * @param {{deck: object, ownerUserId: number}} input
+   * @returns {object}
+   */
+  #withCurrentTemplateVisual({ deck, ownerUserId }) {
+    let template = null;
+    try {
+      template = this.templateManager.getTemplate(deck.templateId, { ownerUserId });
+    } catch {
+      template = null;
+    }
+    const shouldUseCurrentTemplate = template?.official === true;
+    const templatePayload = shouldUseCurrentTemplate
+      ? { id: template.id, name: template.name, visual: template.visual, themes: template.themes }
+      : { id: deck.templateId, name: deck.templateName, visual: deck.templateVisual };
+    return {
+      ...deck,
+      templateName: shouldUseCurrentTemplate ? template.name : deck.templateName,
+      templateLayoutSchema: shouldUseCurrentTemplate ? template.layoutSchema : deck.templateLayoutSchema,
+      templateVisual: resolveTemplateVisual({
+        templateId: deck.templateId,
+        theme: deck.theme,
+        template: templatePayload,
+      }),
+    };
   }
 
   /**
