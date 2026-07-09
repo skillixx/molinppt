@@ -412,6 +412,57 @@ test("PptExportService uses enterprise digital blueprint decorations", () => {
   assert.doesNotMatch(slide1, /digital-blueprint/);
 });
 
+test("PptExportService aligns product pricing strategy PPTX scenes with online preview", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "产品商业化方案",
+      templateId: "product-product-commercialization-plan-pricing-strategy",
+      theme: "pricing-strategy",
+      templateVisual: {
+        id: "product-product-commercialization-plan-pricing-strategy",
+        primary: "14213D",
+        accent: "F4B740",
+        secondary: "2EC4B6",
+        warning: "EF476F",
+        background: "F3F6FA",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "334155",
+        layout: "product-pricing-strategy",
+        variant: "pricing-strategy",
+      },
+      slides: [
+        { title: "产品定价与商业化路径", layout: "product-pricing-cover", bullets: ["目标客户分层", "价值锚点设计", "收入模型验证"] },
+        { title: "套餐层级与权益说明", layout: "product-pricing-tier-cards", bullets: ["基础版覆盖轻量使用", "专业版承接核心付费", "企业版支持定制服务"] },
+        { title: "价值锚点和价格假设", layout: "product-pricing-value-anchor", bullets: ["客户价值提升", "成本结构可控", "竞品价格对标", "收入目标拆解"] },
+        { title: "套餐权益矩阵", layout: "product-pricing-benefit-matrix", bullets: ["核心权益", "进阶权益", "服务支持", "数据能力", "安全权限"] },
+        { title: "商业化转化闭环", layout: "product-pricing-commercial-loop", bullets: ["试用触达", "付费转化", "续费留存", "增购扩张"] },
+        { title: "下一步商业化动作", layout: "product-pricing-closing", bullets: ["确认价格假设", "灰度套餐权益", "验证转化漏斗", "复盘收入模型"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
+  const slide3 = Buffer.from(pptPartText(text, "ppt/slides/slide3.xml"), "latin1").toString("utf8");
+  const slide4 = Buffer.from(pptPartText(text, "ppt/slides/slide4.xml"), "latin1").toString("utf8");
+  const slide5 = Buffer.from(pptPartText(text, "ppt/slides/slide5.xml"), "latin1").toString("utf8");
+  const slide6 = Buffer.from(pptPartText(text, "ppt/slides/slide6.xml"), "latin1").toString("utf8");
+
+  assert.match(slide2, /name="Product Pricing Tier Card 1"/);
+  assert.match(slide2, /<a:t>基础版覆盖轻量使用<\/a:t>/);
+  assert.match(slide3, /name="Product Pricing Anchor Card 1"/);
+  assert.match(slide3, /<a:t>客户价值提升<\/a:t>/);
+  assert.match(slide4, /name="Product Pricing Benefit Matrix"/);
+  assert.match(slide4, /name="Product Pricing Matrix Text 1"/);
+  assert.match(slide5, /name="Product Pricing Commercial Loop"/);
+  assert.match(slide5, /<a:t>试用触达<\/a:t>/);
+  assert.match(slide6, /name="Product Pricing Commercial Loop"/);
+  assert.match(slide6, /<a:t>确认价格假设<\/a:t>/);
+  assert.doesNotMatch(slide5, /name="Product Pricing Closing Panel"/);
+});
+
 test("PptExportService uses competitor SWOT map decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -734,6 +785,7 @@ test("PptExportService uses profit bridge decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
   const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
   const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
   const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
@@ -741,10 +793,12 @@ test("PptExportService uses profit bridge decorations", () => {
   assert.match(slide1, /name="Profit Bridge Workspace"/);
   assert.match(slide1, /name="Profit Bridge Waterfall Panel"/);
   assert.match(slide1, /name="Profit Bridge Kicker"/);
+  assert.match(slide1, /name="Profit Bridge Dedicated Title"/);
   assert.match(slide1, /name="Profit Bridge Bullet Card 1"/);
   assert.match(slide1, /name="Profit Bridge Bullet Text 1"/);
   assert.match(slide1, /name="Profit Bridge Metric Value 1"/);
-  assert.match(slide1, /sz="2180"/);
+  assert.match(slide1, /sz="1320"/);
+  assert.doesNotMatch(slide1, /sz="2180"/);
   assert.match(slide3, /name="Profit Bridge Margin Stack Panel"/);
   assert.match(slide4, /name="Profit Bridge Factor Card 1"/);
   assert.match(slide5, /name="Profit Bridge Action Card 1"/);
@@ -823,12 +877,17 @@ test("PptExportService uses channel recruitment policy decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
   const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
   const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
   const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
 
   assert.match(slide1, /name="Channel Policy Workspace"/);
+  assert.match(slide1, /name="Channel Policy Kicker"/);
+  assert.match(slide1, /name="Channel Policy Bullet Text 1"/);
   assert.match(slide1, /name="Channel Policy Network Panel"/);
+  assert.match(slide1, /name="Channel Policy Metric Card 1"/);
+  assert.match(slide2, /name="Channel Policy Overview Card 1"/);
   assert.match(slide3, /name="Channel Policy Rights Cell 1"/);
   assert.match(slide4, /name="Channel Policy Revenue Panel"/);
   assert.match(slide5, /name="Channel Policy Process Arrow 1"/);
