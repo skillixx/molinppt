@@ -1929,6 +1929,54 @@ test("PptExportService uses metric anomaly attribution decorations", () => {
   assert.doesNotMatch(slide1, /归因分析/);
 });
 
+test("PptExportService uses operating problem diagnosis decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "business-operating-problem-diagnosis-problem-tree",
+      theme: "problem-tree",
+      templateVisual: {
+        id: "business-operating-problem-diagnosis-problem-tree",
+        primary: "17233B",
+        accent: "E94B3C",
+        secondary: "0EA5A8",
+        warning: "F59E0B",
+        background: "F5F7FB",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "operating-problem-tree",
+        variant: "problem-tree",
+      },
+      slides: [
+        { title: "经营问题诊断", layout: "operating-problem-tree-cover", bullets: ["收入同比下降 8%", "成本上升 12%", "转化周期延长 7天"] },
+        { title: "异常指标概览", layout: "operating-problem-tree-overview", bullets: ["收入端承压", "成本端波动", "效率端下降"] },
+        { title: "根因拆解", layout: "operating-problem-tree-diagnosis", bullets: ["渠道转化下滑", "履约成本上升", "组织协同延迟"] },
+        { title: "影响优先级", layout: "operating-problem-tree-impact", bullets: ["高影响高紧急", "持续影响 3 条链路", "需要本周闭环"] },
+        { title: "整改动作闭环", layout: "operating-problem-tree-action", bullets: ["立即止损", "责任到人", "周度复盘", "机制固化"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Operating Problem Diagnosis Canvas"/);
+  assert.match(slide1, /name="Operating Problem Tree Lens"/);
+  assert.match(slide1, /name="Operating Problem Tree Metric Card 1"/);
+  assert.match(slide3, /name="Operating Problem Tree Root Node"/);
+  assert.match(slide3, /name="Operating Problem Tree Branch 1"/);
+  assert.match(slide4, /name="Operating Problem Tree Risk Matrix"/);
+  assert.match(slide5, /name="Operating Problem Tree Fix Loop"/);
+  assert.match(slide5, /name="Operating Problem Tree Action Card 1"/);
+  assert.match(slide1, /val="E94B3C"/);
+  assert.doesNotMatch(slide1, /problem-tree/);
+});
+
 test("PptExportService uses editorial brand story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
