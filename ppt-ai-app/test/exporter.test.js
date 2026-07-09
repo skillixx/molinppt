@@ -1356,9 +1356,11 @@ test("PptExportService uses business opportunity map decorations", () => {
         variant: "opportunity-map",
       },
       slides: [
-        { title: "业务增长分析与突破路径", bullets: ["重点区域需求提升", "渠道转化存在改善空间", "关键动作需要形成闭环"] },
-        { title: "市场机会识别与优先级", bullets: ["高潜客户集中在核心城市", "存量客户复购空间扩大", "新渠道线索成本下降"] },
-        { title: "增长路径拆解与资源投入", bullets: ["先验证核心场景", "再扩大重点渠道", "最后沉淀复制打法"] },
+        { title: "Growth opportunity review", bullets: ["Regional demand is rising", "Channel conversion has room", "Key actions need loop tracking"] },
+        { title: "Market opportunity priority", bullets: ["High potential accounts cluster", "Renewal demand expands", "Lead cost decreases"] },
+        { title: "Opportunity fit diagnosis", bullets: ["Validate target segment", "Compare resource payoff", "Watch execution risk"] },
+        { title: "Growth path and resourcing", bullets: ["Validate core scenario", "Expand priority channel", "Package repeatable playbook"] },
+        { title: "Action board and owner loop", bullets: ["Assign channel owner", "Track conversion cadence", "Review weekly efficiency"] },
       ],
     },
     format: "pptx",
@@ -1367,13 +1369,17 @@ test("PptExportService uses business opportunity map decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
   const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
 
   // 导出的 PPTX 也必须由可编辑形状绘制机会地图、指标卡和增长路径，不依赖整页背景图。
   assert.match(slide1, /name="Business Opportunity Map Panel"/);
   assert.match(slide1, /name="Business Opportunity Metric 1"/);
   assert.match(slide2, /name="Business Opportunity Map Panel"/);
   assert.match(slide3, /name="Business Opportunity Quadrant 1"/);
-  assert.doesNotMatch(slide1, /机会地图/);
+  assert.match(slide4, /name="Business Opportunity Path Step 1"/);
+  assert.match(slide5, /name="Business Opportunity Action 1"/);
+  assert.doesNotMatch(slide1, /<a:t>Opportunity Map<\/a:t>/);
 });
 
 test("PptExportService keeps commercial template theme chips decorative", () => {
