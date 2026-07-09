@@ -45,7 +45,7 @@ export class PromptManager {
     return {
       kind: "deck",
       outline,
-      template,
+      templateContext: buildTemplateContext(template),
       designSkill: loadPptDesignMasterSkill("deck"),
       templateInstructions: buildTemplateInstructions(template),
     };
@@ -73,12 +73,22 @@ export class PromptManager {
  */
 function buildTemplateContext(template) {
   if (!template) return {};
+  const themeContexts = Array.isArray(template.themes)
+    ? template.themes.slice(0, 6).map((theme) => ({
+        id: theme.id,
+        name: theme.name,
+        visualLayout: theme?.visual?.layout || template?.visual?.layout || "",
+        variant: theme?.visual?.variant || "",
+      }))
+    : [];
   return {
     id: template.id,
     name: template.name,
     categoryId: template.categoryId,
     allowedLayouts: Array.isArray(template?.layoutSchema?.allowedLayouts) ? template.layoutSchema.allowedLayouts : [],
     visualLayout: template?.visual?.layout || "",
+    variant: template?.visual?.variant || "",
+    themes: themeContexts,
   };
 }
 

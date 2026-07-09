@@ -2011,6 +2011,28 @@ test("PromptManager keeps business modern on generic top-band instructions", () 
   assert.equal(prompt.templateInstructions?.roleHints, undefined);
 });
 
+test("PromptManager keeps deck template context compact", () => {
+  const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
+  const prompt = new PromptManager().buildDeckPrompt({
+    outline: {
+      topic: "季度经营复盘",
+      theme: "modern",
+      slides: [{ title: "增长概览", bullets: ["收入增长 18%"] }],
+    },
+    template: {
+      ...template,
+      description: "x".repeat(8000),
+      thumbnailUrl: "https://example.test/large-thumbnail.png",
+      extraMetadata: { raw: "y".repeat(8000) },
+    },
+  });
+
+  assert.equal(prompt.template, undefined);
+  assert.equal(prompt.templateContext.id, "business");
+  assert.equal(prompt.templateContext.categoryId, "business");
+  assert.equal(JSON.stringify(prompt).length < 5000, true);
+});
+
 test("PromptManager auto-loads PPT design master skill for outline, deck, and slide polish", () => {
   const template = new TemplateManager().getTemplate("business", { ownerUserId: 7 });
   const manager = new PromptManager();

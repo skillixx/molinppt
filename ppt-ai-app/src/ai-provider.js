@@ -37,12 +37,12 @@ export class MockAiProvider {
    * @param {{outline: {slides: object[], theme?: string}}} input
    * @returns {Promise<object[]>}
    */
-  async generateSlides({ outline, template }) {
+  async generateSlides({ outline, template, templateContext }) {
     if (this.failNextDeck) {
       this.failNextDeck = false;
       throw new Error("AI_PROVIDER_FAILED");
     }
-    const transformer = slideTransformerForTemplate(template);
+    const transformer = slideTransformerForTemplate(template || templateContext);
     return outline.slides.map((slide, index) => ({
       id: `slide_${index + 1}`,
       sortOrder: index + 1,
@@ -74,7 +74,8 @@ export class MockAiProvider {
  * @returns {{bullets(bullets: string[]): string[], notesPrefix: string, coverLayout: string, contentLayout: string}}
  */
 function slideTransformerForTemplate(template) {
-  if (template?.id === "pitch") {
+  const templateId = template?.id || template?.templateContext?.id;
+  if (templateId === "pitch") {
     return {
       bullets: (bullets) => bullets.map((bullet) => `Pitch angle: ${bullet}`),
       notesPrefix: "Frame as investor-ready narrative for",
@@ -82,7 +83,7 @@ function slideTransformerForTemplate(template) {
       contentLayout: "story",
     };
   }
-  if (template?.id === "education") {
+  if (templateId === "education") {
     return {
       bullets: (bullets) => bullets.map((bullet) => `Learning point: ${bullet}`),
       notesPrefix: "Explain step by step for",
