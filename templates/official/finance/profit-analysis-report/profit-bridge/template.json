@@ -1,0 +1,53 @@
+{
+  "baseTemplateId": "profit-analysis-report",
+  "themeId": "profit-bridge",
+  "style": "finance-profit-attribution",
+  "themes": [
+    {
+      "id": "profit-bridge",
+      "name": "利润桥",
+      "visual": {
+        "primary": "14213D",
+        "accent": "C99A2E",
+        "secondary": "2E7D7A",
+        "negative": "C65A42",
+        "background": "EEF3F7",
+        "surface": "FFFFFF",
+        "title": "0B1528",
+        "body": "334155",
+        "layout": "finance-profit-bridge",
+        "variant": "profit-bridge"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "14213D",
+    "accent": "C99A2E",
+    "secondary": "2E7D7A",
+    "negative": "C65A42",
+    "background": "EEF3F7",
+    "surface": "FFFFFF",
+    "title": "0B1528",
+    "body": "334155",
+    "layout": "finance-profit-bridge",
+    "variant": "profit-bridge"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-profit-bridge-cover",
+    "defaultContentLayout": "finance-profit-bridge-content",
+    "allowedLayouts": [
+      "finance-profit-bridge-cover",
+      "finance-profit-bridge-waterfall",
+      "finance-profit-bridge-margin-structure",
+      "finance-profit-bridge-factor-analysis",
+      "finance-profit-bridge-improvement",
+      "finance-profit-bridge-closing",
+      "title",
+      "content"
+    ]
+  },
+  "assetPolicy": {
+    "allowDecorativeImages": true,
+    "fullPageBackgroundImage": false
+  }
+}

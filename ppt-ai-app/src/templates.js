@@ -75,6 +75,69 @@ const COST_CONTROL_LAYOUT_SCHEMA = {
   ],
 };
 
+const CASH_FLOW_FORECAST_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "cash-flow-forecast-cover",
+  defaultContentLayout: "cash-flow-forecast-content",
+  allowedLayouts: [
+    "cash-flow-forecast-cover",
+    "cash-flow-waterfall",
+    "cash-turnover-cycle",
+    "receivables-management",
+    "cash-risk-warning",
+    "cash-forecast-dashboard",
+    "cash-flow-forecast-closing",
+    "title",
+    "content",
+  ],
+};
+
+const KEY_ACCOUNT_DECISION_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "key-account-decision-cover",
+  defaultContentLayout: "key-account-decision-content",
+  allowedLayouts: [
+    "key-account-decision-cover",
+    "key-account-organization-map",
+    "key-account-decision-path",
+    "key-account-stakeholder-matrix",
+    "key-account-win-roadmap",
+    "key-account-closing",
+    "title",
+    "content",
+  ],
+};
+
+const PRODUCT_COMMERCIALIZATION_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "product-pricing-cover",
+  defaultContentLayout: "product-pricing-content",
+  allowedLayouts: [
+    "product-pricing-cover",
+    "product-pricing-tier-cards",
+    "product-pricing-value-anchor",
+    "product-pricing-benefit-matrix",
+    "product-pricing-commercial-loop",
+    "product-pricing-closing",
+    "title",
+    "content",
+  ],
+};
+
+const PRODUCT_INTERVIEW_INSIGHT_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "product-interview-insight-cover",
+  defaultContentLayout: "product-interview-insight-content",
+  allowedLayouts: [
+    "product-interview-insight-cover",
+    "product-interview-insight-sample",
+    "product-interview-insight-quotes",
+    "product-interview-insight-cluster",
+    "product-interview-insight-opportunity",
+    "product-interview-insight-recommendation",
+    "product-interview-insight-closing",
+    "title",
+    "content",
+    "closing",
+  ],
+};
+
 /**
  * Built-in template catalog used when no external catalog is configured.
  */
@@ -489,6 +552,46 @@ export const DEFAULT_TEMPLATES = [
     layoutSchema: COST_CONTROL_LAYOUT_SCHEMA,
   },
   {
+    id: "cash-flow-analysis-report",
+    name: "现金流分析报告",
+    categoryId: "finance",
+    scope: "official",
+    status: "active",
+    style: "cash-flow-forecast",
+    description: "适合现金流预测、资金周转分析、回款管理和财务风险预警的专业财务模板。",
+    themes: [
+      {
+        id: "cash-flow-forecast",
+        name: "现金流预测",
+        visual: {
+          primary: "0F3D4A",
+          accent: "20B486",
+          secondary: "3A7BD5",
+          warning: "E05F3F",
+          background: "EAF4F2",
+          surface: "FFFFFF",
+          title: "082A35",
+          body: "334155",
+          layout: "finance-cash-flow-forecast",
+          variant: "cash-flow-forecast",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F3D4A",
+      accent: "20B486",
+      secondary: "3A7BD5",
+      warning: "E05F3F",
+      background: "EAF4F2",
+      surface: "FFFFFF",
+      title: "082A35",
+      body: "334155",
+      layout: "finance-cash-flow-forecast",
+      variant: "cash-flow-forecast",
+    },
+    layoutSchema: CASH_FLOW_FORECAST_LAYOUT_SCHEMA,
+  },
+  {
     id: "sales-proposal",
     name: "销售提案方案",
     categoryId: "sales",
@@ -552,6 +655,46 @@ export const DEFAULT_TEMPLATES = [
     layoutSchema: ACADEMY_LAYOUT_SCHEMA,
   },
   {
+    id: "key-account-plan",
+    name: "大客户攻坚方案",
+    categoryId: "sales",
+    scope: "official",
+    status: "active",
+    style: "key-account-attack",
+    description: "适合大客户销售、关键人识别、客户组织图、决策链路分析和赢单路径推进的商务作战模板。",
+    themes: [
+      {
+        id: "decision-chain",
+        name: "决策链路",
+        visual: {
+          primary: "102A43",
+          accent: "F59E0B",
+          secondary: "15A39A",
+          warning: "E11D48",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "sales-key-account-decision-chain",
+          variant: "decision-chain",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "F59E0B",
+      secondary: "15A39A",
+      warning: "E11D48",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "sales-key-account-decision-chain",
+      variant: "decision-chain",
+    },
+    layoutSchema: KEY_ACCOUNT_DECISION_LAYOUT_SCHEMA,
+  },
+  {
     id: "product-roadmap",
     name: "产品路线规划",
     categoryId: "product",
@@ -613,6 +756,84 @@ export const DEFAULT_TEMPLATES = [
       layout: "academy",
     },
     layoutSchema: ACADEMY_LAYOUT_SCHEMA,
+  },
+  {
+    id: "product-commercialization-plan",
+    name: "产品商业化方案",
+    categoryId: "product",
+    scope: "official",
+    status: "active",
+    style: "product-commercialization",
+    description: "适合产品定价设计、套餐权益说明、商业化路径和收入模型汇报的产品规划类官方模板。",
+    themes: [
+      {
+        id: "pricing-strategy",
+        name: "定价策略",
+        visual: {
+          primary: "14213D",
+          accent: "F4B740",
+          secondary: "2EC4B6",
+          warning: "EF476F",
+          background: "F3F6FA",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "product-pricing-strategy",
+          variant: "pricing-strategy",
+        },
+      },
+    ],
+    visual: {
+      primary: "14213D",
+      accent: "F4B740",
+      secondary: "2EC4B6",
+      warning: "EF476F",
+      background: "F3F6FA",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "product-pricing-strategy",
+      variant: "pricing-strategy",
+    },
+    layoutSchema: PRODUCT_COMMERCIALIZATION_LAYOUT_SCHEMA,
+  },
+  {
+    id: "user-research-report",
+    name: "用户研究报告",
+    categoryId: "product",
+    scope: "official",
+    status: "active",
+    style: "product-research",
+    description: "适合用户访谈总结、用户画像、需求机会识别和产品优化建议的产品研究类模板。",
+    themes: [
+      {
+        id: "interview-insight",
+        name: "访谈洞察",
+        visual: {
+          primary: "155E75",
+          accent: "F59E0B",
+          secondary: "7C3AED",
+          background: "F6F8FB",
+          surface: "FFFFFF",
+          title: "132238",
+          body: "475569",
+          layout: "product-interview-insight",
+          variant: "interview-insight",
+        },
+      },
+    ],
+    visual: {
+      primary: "155E75",
+      accent: "F59E0B",
+      secondary: "7C3AED",
+      background: "F6F8FB",
+      surface: "FFFFFF",
+      title: "132238",
+      body: "475569",
+      layout: "product-interview-insight",
+      variant: "interview-insight",
+    },
+    layoutSchema: PRODUCT_INTERVIEW_INSIGHT_LAYOUT_SCHEMA,
   },
   {
     id: "marketing-campaign",
@@ -1160,6 +1381,10 @@ function normalizeTemplateLookupId(templateId) {
   // 官方模板同步后的 slug 会带分类和主题后缀，运行时只拿到 slug 时也要回到对应的内置模板视觉。
   const officialTemplateAliases = {
     "finance-cost-control-plan-cost-breakdown": "cost-control-plan",
+    "finance-cash-flow-analysis-report-cash-flow-forecast": "cash-flow-analysis-report",
+    "sales-key-account-plan-decision-chain": "key-account-plan",
+    "product-product-commercialization-plan-pricing-strategy": "product-commercialization-plan",
+    "product-user-research-report-interview-insight": "user-research-report",
   };
   return officialTemplateAliases[id] || id;
 }

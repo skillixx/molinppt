@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+﻿import { readFileSync } from "node:fs";
 
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
@@ -393,7 +393,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -625,6 +625,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1820);
   }
+  if (visual.layout === "product-pricing-strategy") {
+    if (index === 0) {
+      if (textLength >= 34) return 1960;
+      if (textLength >= 24) return 2220;
+      return Math.min(fallbackSize, 2520);
+    }
+    if (textLength >= 32) return 1320;
+    if (textLength >= 22) return 1520;
+    return Math.min(fallbackSize, 1840);
+  }
   if (visual.layout === "feature-priority-matrix") {
     if (index === 0) {
       if (textLength >= 30) return 1980;
@@ -808,6 +818,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
+  if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-budget-variance") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "industry-trend-forecast") return false;
@@ -817,6 +828,9 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
+  if (visual.layout === "product-interview-insight") return false;
+  if (visual.layout === "finance-cash-flow-forecast") return false;
+  if (visual.layout === "product-pricing-strategy") return false;
   if (visual.layout === "feature-priority-matrix") return false;
   if (visual.layout === "experience-journey-map") return false;
   if (visual.layout === "capability-radar-map") return false;
@@ -828,6 +842,11 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
+  if (visual.layout === "sales-key-account-decision-chain") return false;
+  if (visual.layout === "finance-profit-bridge") return false;
+  if (visual.layout === "channel-recruitment-policy") return false;
+  if (visual.layout === "product-interview-insight") return false;
+  if (visual.layout === "channel-recruitment-policy") return false;
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
@@ -988,6 +1007,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "product-pain-points") {
     return base + productPainPointsDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "product-interview-insight") {
+    return base + productInterviewInsightDecorationsXml({ visual, index, role, slide });
+  }
+  if (visual.layout === "product-pricing-strategy") {
+    return base + simpleProductPricingDecorationsXml({ visual, index });
+  }
   if (visual.layout === "feature-priority-matrix") {
     return base + featurePriorityMatrixDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1018,6 +1043,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "finance-cost-breakdown") {
     return base + costBreakdownDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "finance-cash-flow-forecast") {
+    return base + simpleCashFlowForecastDecorationsXml({ visual, index });
+  }
+  if (visual.layout === "finance-profit-bridge") {
+    return base + profitBridgeDecorationsXml({ visual, index, role, slide });
+  }
   if (visual.layout === "finance-budget-variance") {
     return base + budgetVarianceDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1032,6 +1063,12 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "sales-education-solution") {
     return base + educationSolutionDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "channel-recruitment-policy") {
+    return base + channelRecruitmentPolicyDecorationsXml({ visual, index, role, slide });
+  }
+  if (visual.layout === "sales-key-account-decision-chain") {
+    return base + keyAccountDecisionDecorationsXml({ visual, index, role, slide });
   }
   if (visual.layout === "corporate-training") {
     return base + corporateTrainingDecorationsXml({ visual, index, layout, role, slide });
@@ -2012,6 +2049,28 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "product-pricing-strategy") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 定价策略模板右侧保留商业化示意区，文本只占左侧，避免导出 PPTX 中标题和图形互相挤压。
+      surface: { x: 548640, y: 609600, cx: 8046720, cy: 4114800 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 342900 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1981200, cx: 3505200, cy: 30480 },
+      label: { x: 731520, y: 746760, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 1005840, y: 1371600, cx: 4419600, cy: 914400 }
+        : { x: 731520, y: isCover ? 990600 : 944880, cx: 4267200, cy: isCover ? 960120 : 838200 },
+      content: isCover
+        ? { x: 914400, y: 2301240, cx: 3810000, cy: 1219200 }
+        : { x: 914400, y: 2216400, cx: 3505200, cy: 1447800 },
+      titleSize: isCover ? 2520 : 1840,
+      bodySize: isCover ? 1250 : 1080,
+      fontFace: "Microsoft YaHei",
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "feature-priority-matrix") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2464,6 +2523,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 768096, y: 1813560, cx: 3474720, cy: 914400 },
       titleSize: isCover ? 2650 : isClosing ? 2500 : 1850,
       bodySize: isCover ? 930 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "sales-key-account-decision-chain") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 548640, y: 609600, cx: 8046720, cy: 4114800 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 792480, y: isCover ? 2263140 : 2026920, cx: 3291840, cy: 22860 },
+      label: { x: 792480, y: 807720, cx: 2438400, cy: 274320 },
+      title: isClosing
+        ? { x: 792480, y: 1188720, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 792480, y: 1158240, cx: 3962400, cy: 1219200 }
+          : { x: 792480, y: 883920, cx: 4267200, cy: 731520 },
+      content: isClosing
+        ? { x: 792480, y: 2324100, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 792480, y: 2583180, cx: 3444240, cy: 762000 }
+          : { x: 792480, y: 1783080, cx: 3474720, cy: 914400 },
+      titleSize: isCover ? 2580 : isClosing ? 2450 : 1820,
+      bodySize: isCover ? 900 : 720,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4187,6 +4270,322 @@ function financialSolutionColorPalette(visual) {
 function isFinancialSolutionVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "sales-financial-solution" && (id === "industry-solution" || id === "sales-industry-solution-financial-industry");
+}
+
+function profitBridgeDecorationsXml({ visual, index, role, slide }) {
+  const bullets = channelPolicyBulletTexts(slide);
+  // 利润桥模板用瀑布图、结构堆叠和行动卡片表达利润变化，保证导出的 PPTX 图形仍可编辑。
+  const workspace = solidShapeXml({ id: 1080, name: "Profit Bridge Workspace", geom: "roundRect", x: 533400, y: 609600, cx: 8077200, cy: 4145280, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1081, name: "Profit Bridge Workspace Border", geom: "roundRect", x: 533400, y: 609600, cx: 8077200, cy: 4145280, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 10160 })
+    + rectShapeXml({ id: 1082, name: "Profit Bridge Top Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
+  if (index === 2 || String(slide?.title || "").includes("毛利")) {
+    return workspace + solidShapeXml({ id: 1090, name: "Profit Bridge Margin Stack Panel", geom: "roundRect", x: 5143500, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.55) })
+      + rectShapeXml({ id: 1091, name: "Profit Bridge Margin Stack 1", x: 5486400, y: 2819400, cx: 426720, cy: 731520, fill: visual.primary })
+      + rectShapeXml({ id: 1092, name: "Profit Bridge Margin Stack 2", x: 6096000, y: 2301240, cx: 426720, cy: 1249680, fill: visual.accent })
+      + rectShapeXml({ id: 1093, name: "Profit Bridge Margin Stack 3", x: 6705600, y: 1981200, cx: 426720, cy: 1569720, fill: visual.secondary || visual.primary });
+  }
+  if (index === 3 || String(slide?.title || "").includes("因素")) {
+    return workspace + [0, 1, 2, 3].map((itemIndex) => {
+      const x = 4876800 + itemIndex * 853440;
+      return solidShapeXml({ id: 1100 + itemIndex * 2, name: `Profit Bridge Factor Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1524000, cx: 701040, cy: 883920, fill: "FFFFFF" })
+        + rectShapeXml({ id: 1101 + itemIndex * 2, name: `Profit Bridge Factor Accent ${itemIndex + 1}`, x: x + 121920, y: 2042160, cx: 457200, cy: 30480, fill: itemIndex % 2 ? visual.accent : visual.primary });
+    }).join("");
+  }
+  if (role === "closing" || index >= 4 || String(slide?.title || "").includes("行动")) {
+    return workspace + [0, 1, 2].map((itemIndex) => {
+      const x = 4876800 + itemIndex * 1036320;
+      return solidShapeXml({ id: 1110 + itemIndex * 2, name: `Profit Bridge Action Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2590800, cx: 853440, cy: 670560, fill: blendHexColor(visual.accent, visual.surface, 0.88) })
+        + textShapeXml({ id: 1111 + itemIndex * 2, name: `Profit Bridge Action Text ${itemIndex + 1}`, x: x + 91440, y: 2788920, cx: 670560, cy: 182880, text: channelPolicyCompactText(bullets[itemIndex], `行动 ${itemIndex + 1}`, 8), size: 680, bold: true, color: visual.title });
+    }).join("");
+  }
+  return workspace + solidShapeXml({ id: 1085, name: "Profit Bridge Waterfall Panel", geom: "roundRect", x: 5029200, y: 1371600, cx: 2926080, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.58) })
+    + [0, 1, 2, 3].map((itemIndex) => {
+      const x = 5334000 + itemIndex * 548640;
+      const h = [548640, 853440, 579120, 1066800][itemIndex];
+      return rectShapeXml({ id: 1086 + itemIndex, name: `Profit Bridge Waterfall Bar ${itemIndex + 1}`, x, y: 3078480 - h, cx: 335280, cy: h, fill: itemIndex === 2 ? visual.negative || "C65A42" : itemIndex % 2 ? visual.accent : visual.primary });
+    }).join("");
+}
+
+function productInterviewInsightDecorationsXml({ visual, index, role, slide }) {
+  const bullets = channelPolicyBulletTexts(slide);
+  // 用户访谈模板使用样本卡、原声卡和聚类面板，和在线预览的研究报告结构保持一致。
+  const surface = solidShapeXml({ id: 1250, name: "Interview Insight Surface", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1251, name: "Interview Insight Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 10160 })
+    + rectShapeXml({ id: 1252, name: "Interview Insight Header Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
+  if (index === 1 || String(slide?.title || "").includes("原声")) {
+    return surface + [0, 1, 2].map((itemIndex) => {
+      const y = 1371600 + itemIndex * 731520;
+      return solidShapeXml({ id: 1260 + itemIndex * 2, name: `Interview Quote Card ${itemIndex + 1}`, geom: "roundRect", x: 4876800, y, cx: 3048000, cy: 548640, fill: blendHexColor(visual.background, visual.surface, 0.58) })
+        + textShapeXml({ id: 1261 + itemIndex * 2, name: `Interview Quote Text ${itemIndex + 1}`, x: 5105400, y: y + 152400, cx: 2438400, cy: 182880, text: channelPolicyCompactText(bullets[itemIndex], `用户原声 ${itemIndex + 1}`, 14), size: 720, bold: true, color: visual.title });
+    }).join("");
+  }
+  if (index === 2 || String(slide?.title || "").includes("聚类")) {
+    return surface + solidShapeXml({ id: 1270, name: "Interview Cluster Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: blendHexColor(visual.primary, visual.surface, 0.9) })
+      + [0, 1, 2, 3].map((itemIndex) => {
+        const x = 5105400 + (itemIndex % 2) * 1219200;
+        const y = 1600200 + Math.floor(itemIndex / 2) * 792480;
+        return solidShapeXml({ id: 1271 + itemIndex, name: `Interview Cluster Node ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 914400, cy: 487680, fill: itemIndex % 2 ? visual.accent : visual.primary });
+      }).join("");
+  }
+  return surface + solidShapeXml({ id: 1255, name: "Interview Sample Card", geom: "roundRect", x: 4876800, y: 1447800, cx: 3048000, cy: 1905000, fill: blendHexColor(visual.background, visual.surface, 0.62) })
+    + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 1256 + itemIndex, name: `Interview Sample Bar ${itemIndex + 1}`, x: 5181600, y: 1828800 + itemIndex * 426720, cx: 1219200 + itemIndex * 304800, cy: 91440, fill: itemIndex % 2 ? visual.accent : visual.primary })).join("");
+}
+
+function channelRecruitmentPolicyDecorationsXml({ visual, index, role, slide }) {
+  const bullets = channelPolicyBulletTexts(slide);
+  const palette = {
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    panel: blendHexColor(visual.background, visual.surface, 0.58),
+    gold: visual.secondary || "D9A441",
+  };
+  // 渠道招商合作政策模板用可编辑的网络、权益矩阵、收益模型和流程箭头，避免预览和下载版式脱节。
+  const workspace = solidShapeXml({ id: 1300, name: "Channel Policy Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1301, name: "Channel Policy Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1302, name: "Channel Policy Top Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
+  if (index === 2 || String(slide?.layout || "").includes("rights") || String(slide?.title || "").includes("权益")) {
+    return workspace + [0, 1, 2, 3].map((itemIndex) => {
+      const x = 4876800 + (itemIndex % 2) * 1447800;
+      const y = 1371600 + Math.floor(itemIndex / 2) * 914400;
+      return solidShapeXml({ id: 1320 + itemIndex * 2, name: `Channel Policy Rights Cell ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 670560, fill: palette.panel })
+        + textShapeXml({ id: 1321 + itemIndex * 2, name: `Channel Policy Rights Text ${itemIndex + 1}`, x: x + 137160, y: y + 228600, cx: 914400, cy: 182880, text: channelPolicyCompactText(bullets[itemIndex], `权益 ${itemIndex + 1}`, 8), size: 680, bold: true, color: visual.title });
+    }).join("");
+  }
+  if (index === 3 || String(slide?.layout || "").includes("revenue") || String(slide?.title || "").includes("收益")) {
+    return workspace + solidShapeXml({ id: 1330, name: "Channel Policy Revenue Panel", geom: "roundRect", x: 4876800, y: 1447800, cx: 3048000, cy: 1981200, fill: palette.panel })
+      + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 1331 + itemIndex, name: `Channel Policy Revenue Bar ${itemIndex + 1}`, x: 5257800 + itemIndex * 548640, y: 3048000 - itemIndex * 243840, cx: 335280, cy: 457200 + itemIndex * 243840, fill: itemIndex % 2 ? visual.accent : visual.primary })).join("");
+  }
+  if (index === 4 || role === "closing" || String(slide?.layout || "").includes("process") || String(slide?.title || "").includes("路线")) {
+    return workspace + [0, 1, 2, 3].map((itemIndex) => {
+      const x = 4648200 + itemIndex * 853440;
+      return solidShapeXml({ id: 1340 + itemIndex * 2, name: `Channel Policy Process Arrow ${itemIndex + 1}`, geom: "chevron", x, y: 2286000, cx: 731520, cy: 457200, fill: itemIndex % 2 ? visual.accent : visual.primary })
+        + textShapeXml({ id: 1341 + itemIndex * 2, name: `Channel Policy Process Text ${itemIndex + 1}`, x: x + 91440, y: 2453640, cx: 487680, cy: 152400, text: channelPolicyCompactText(bullets[itemIndex], `阶段 ${itemIndex + 1}`, 6), size: 620, bold: true, color: "FFFFFF" });
+    }).join("");
+  }
+  return workspace + solidShapeXml({ id: 1310, name: "Channel Policy Network Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: palette.panel })
+    + arcLineShapeXml({ id: 1311, name: "Channel Policy Network Arc 1", x: 5265420, y: 1600200, cx: 1828800, cy: 1219200, stroke: visual.accent, width: 60960 })
+    + arcLineShapeXml({ id: 1312, name: "Channel Policy Network Arc 2", x: 5554980, y: 1836420, cx: 1371600, cy: 914400, stroke: visual.primary, width: 45720 })
+    + solidShapeXml({ id: 1313, name: "Channel Policy Partner Hub", geom: "ellipse", x: 6126480, y: 2209800, cx: 426720, cy: 426720, fill: palette.gold });
+}
+
+function channelPolicyBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+}
+
+function channelPolicyCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, Math.max(1, maxLength - 1))}…` : normalized;
+}
+
+function keyAccountDecisionDecorationsXml({ visual, index, role, slide }) {
+  const scene = keyAccountDecisionSceneFromSlide({ slide, index, role });
+  const palette = keyAccountDecisionColorPalette(visual);
+  // 大客户攻坚模板使用可编辑的关系网络、路径箭头和卡片层，避免导出后变成整页背景图。
+  const backdrop = rectShapeXml({ id: 1120, name: "Key Account Decision Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + rectShapeXml({ id: 1121, name: "Key Account Decision Top Rule", x: 0, y: 304800, cx: 9144000, cy: 22860, fill: visual.primary })
+    + rectShapeXml({ id: 1122, name: "Key Account Decision Bottom Rule", x: 792480, y: 4587240, cx: 7620000, cy: 15240, fill: palette.frame });
+  const workspace = solidShapeXml({ id: 1123, name: "Key Account Decision Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1124, name: "Key Account Decision Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: palette.frame, width: 10160 })
+    + textShapeXml({ id: 1125, name: "Key Account Decision Kicker", x: 792480, y: 807720, cx: 2438400, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const bullets = keyAccountDecisionBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "matrix") return backdrop + workspace + bullets + keyAccountDecisionMatrixXml({ visual, palette, items: scene.bullets });
+  if (scene.role === "roadmap") return backdrop + workspace + bullets + keyAccountDecisionRoadmapXml({ visual, palette, items: scene.bullets });
+  if (scene.role === "closing") return backdrop + workspace + bullets + keyAccountDecisionClosingXml({ visual, palette, items: scene.bullets });
+  if (scene.role === "path") return backdrop + workspace + bullets + keyAccountDecisionPathXml({ visual, palette, items: scene.bullets });
+  return backdrop + workspace + bullets + keyAccountDecisionNetworkXml({ visual, palette }) + keyAccountDecisionTagCardsXml({ visual, tags: scene.tags });
+}
+
+function keyAccountDecisionNetworkXml({ visual, palette }) {
+  const panel = solidShapeXml({ id: 1130, name: "Key Account Decision Network Panel", geom: "roundRect", x: 5359400, y: 1013460, cx: 2971800, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1131, name: "Key Account Decision Network Border", geom: "roundRect", x: 5359400, y: 1013460, cx: 2971800, cy: 2286000, stroke: palette.frame, width: 12700 });
+  return panel
+    + lineFrameShapeXml({ id: 1132, name: "Key Account Decision Sponsor Link", x: 6845300, y: 1600200, cx: 0, cy: 899160, stroke: visual.accent, width: 30480 })
+    + lineFrameShapeXml({ id: 1133, name: "Key Account Decision User Link", x: 6205220, y: 2506980, cx: 1280160, cy: 0, stroke: palette.teal, width: 30480 })
+    + lineFrameShapeXml({ id: 1134, name: "Key Account Decision Finance Link", x: 6845300, y: 2506980, cx: 640080, cy: 548640, stroke: visual.primary, width: 30480 })
+    + keyAccountDecisionNodeXml({ id: 1135, name: "Key Account Decision Sponsor Node", x: 6461760, y: 1295400, cx: 762000, cy: 609600, fill: visual.accent, label: "SP", color: "FFFFFF" })
+    + keyAccountDecisionNodeXml({ id: 1138, name: "Key Account Decision User Node", x: 5913120, y: 2214880, cx: 609600, cy: 487680, fill: visual.primary, label: "BU", color: "FFFFFF" })
+    + keyAccountDecisionNodeXml({ id: 1141, name: "Key Account Decision Finance Node", x: 7178040, y: 2214880, cx: 609600, cy: 487680, fill: palette.teal, label: "FI", color: "FFFFFF" })
+    + keyAccountDecisionNodeXml({ id: 1144, name: "Key Account Decision IT Node", x: 6461760, y: 2872740, cx: 762000, cy: 609600, fill: palette.deep, label: "IT", color: "FFFFFF" });
+}
+
+function keyAccountDecisionNodeXml({ id, name, x, y, cx, cy, fill, label, color }) {
+  return solidShapeXml({ id, name, geom: "ellipse", x, y, cx, cy, fill })
+    + textShapeXml({ id: id + 1, name: `${name} Label`, x, y: y + cy * 0.30, cx, cy: cy * 0.36, text: label, size: 720, bold: true, color });
+}
+
+function keyAccountDecisionTagCardsXml({ visual, tags }) {
+  return tags.slice(0, 3).map((tag, index) => {
+    const x = 5524500 + index * 944880;
+    return solidShapeXml({ id: 1150 + index * 3, name: `Key Account Decision Tag Card ${index + 1}`, geom: "roundRect", x, y: 3665220, cx: 822960, cy: 396240, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1151 + index * 3, name: `Key Account Decision Tag Accent ${index + 1}`, x: x + 91440, y: 3848100, cx: 91440, cy: 45720, fill: index === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1152 + index * 3, name: `Key Account Decision Tag Text ${index + 1}`, x: x + 198120, y: 3764280, cx: 548640, cy: 182880, text: keyAccountDecisionCompactText(tag, "", 8), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function keyAccountDecisionBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, index) => {
+    const y = (isCover ? 2560320 : 1706880) + index * 289560;
+    return rectShapeXml({ id: 1160 + index * 2, name: `Key Account Decision Bullet Rule ${index + 1}`, x: 792480, y: y + 30480, cx: 45720, cy: 152400, fill: index % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1161 + index * 2, name: `Key Account Decision Bullet Text ${index + 1}`, x: 960120, y, cx: 3474720, cy: 198120, text: keyAccountDecisionCompactText(item, scene.title, 32), size: isCover ? 780 : 690, bold: false, color: visual.body });
+  }).join("");
+}
+
+function keyAccountDecisionPathXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 5006340 + index * 883920;
+    return solidShapeXml({ id: 1180 + index * 4, name: `Key Account Decision Path Step ${index + 1}`, geom: "chevron", x, y: 1950720, cx: 792480, cy: 609600, fill: index % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1181 + index * 4, name: `Key Account Decision Path Step Text ${index + 1}`, x: x + 91440, y: 2118360, cx: 579120, cy: 182880, text: keyAccountDecisionCompactText(item, `阶段 ${index + 1}`, 8), size: 660, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function keyAccountDecisionMatrixXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, index) => {
+    const x = 5173980 + (index % 2) * 1516380;
+    const y = 1516380 + Math.floor(index / 2) * 792480;
+    return solidShapeXml({ id: 1200 + index * 3, name: `Key Account Decision Matrix Card ${index + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 640080, fill: palette.panel })
+      + rectShapeXml({ id: 1201 + index * 3, name: `Key Account Decision Matrix Accent ${index + 1}`, x, y, cx: 60960, cy: 640080, fill: index % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1202 + index * 3, name: `Key Account Decision Matrix Text ${index + 1}`, x: x + 152400, y: y + 167640, cx: 1066800, cy: 243840, text: keyAccountDecisionCompactText(item, `角色 ${index + 1}`, 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function keyAccountDecisionRoadmapXml({ visual, palette, items }) {
+  const rail = rectShapeXml({ id: 1220, name: "Key Account Decision Roadmap Rail", x: 5082540, y: 2590800, cx: 2895600, cy: 45720, fill: palette.frame });
+  return rail + items.slice(0, 4).map((item, index) => {
+    const x = 4930140 + index * 838200;
+    return solidShapeXml({ id: 1221 + index * 4, name: `Key Account Decision Roadmap Card ${index + 1}`, geom: "roundRect", x, y: 1661160, cx: 701040, cy: 731520, fill: index % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1222 + index * 4, name: `Key Account Decision Roadmap Text ${index + 1}`, x: x + 76200, y: 1828800, cx: 548640, cy: 274320, text: keyAccountDecisionCompactText(item, `推进 ${index + 1}`, 8), size: 650, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function keyAccountDecisionClosingXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => {
+    const x = 5036820 + index * 1036320;
+    return solidShapeXml({ id: 1240 + index * 3, name: `Key Account Decision Closing Card ${index + 1}`, geom: "roundRect", x, y: 2506980, cx: 914400, cy: 731520, fill: palette.panel })
+      + rectShapeXml({ id: 1241 + index * 3, name: `Key Account Decision Closing Accent ${index + 1}`, x: x + 121920, y: 2667000, cx: 45720, cy: 320040, fill: visual.accent })
+      + textShapeXml({ id: 1242 + index * 3, name: `Key Account Decision Closing Text ${index + 1}`, x: x + 228600, y: 2636520, cx: 548640, cy: 274320, text: keyAccountDecisionCompactText(item, `行动 ${index + 1}`, 10), size: 690, bold: true, color: visual.title });
+  }).join("");
+}
+
+function keyAccountDecisionSceneFromSlide({ slide, index, role }) {
+  const bullets = keyAccountDecisionBulletTexts(slide);
+  const title = keyAccountDecisionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const resolvedRole = role === "closing" || layout.includes("closing")
+    ? "closing"
+    : layout.includes("matrix") || layout.includes("stakeholder")
+      ? "matrix"
+      : layout.includes("roadmap") || layout.includes("win")
+        ? "roadmap"
+        : layout.includes("path") || layout.includes("decision")
+          ? "path"
+      : index === 0
+        ? "cover"
+        : index === 2
+          ? "path"
+          : index === 3
+            ? "matrix"
+            : index >= 4
+              ? "roadmap"
+              : "cover";
+  return {
+    role: resolvedRole,
+    kicker: index === 0 ? "KEY ACCOUNT WAR ROOM" : "DECISION CHAIN",
+    title,
+    bullets: bullets.length > 0 ? bullets : ["识别关键决策人和影响链路", "拆解客户组织关系与采购路径", "明确推进节奏、责任人和赢单动作"],
+    tags: ["决策人", "影响者", "推进动作"].map((fallback, itemIndex) => keyAccountDecisionCompactText(bullets[itemIndex], fallback, 8)),
+  };
+}
+
+function keyAccountDecisionBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+}
+
+function keyAccountDecisionCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function keyAccountDecisionColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.35),
+    panel: blendHexColor(visual.background, visual.surface, 0.70),
+    frame: blendHexColor(visual.primary, visual.surface, 0.72),
+    teal: visual.secondary || "15A39A",
+    deep: blendHexColor(visual.primary, "000000", 0.14),
+  };
+}
+
+function isKeyAccountDecisionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-key-account-decision-chain" && (id === "key-account-plan" || id === "sales-key-account-plan-decision-chain");
+}
+
+function simpleProfitBridgeDecorationsXml({ visual, index }) {
+  // 利润桥模板先补齐可编辑核心图层，保证导出端不会退回普通正文页。
+  const base = solidShapeXml({ id: 1260, name: "Profit Bridge Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1261, name: "Profit Bridge Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: visual.primary, width: 10160 })
+    + rectShapeXml({ id: 1264, name: "Profit Bridge Accent Rule", x: 548640, y: 609600, cx: 8046720, cy: 45720, fill: visual.accent });
+  if (index === 2) return base + solidShapeXml({ id: 1262, name: "Profit Bridge Margin Stack Panel", geom: "roundRect", x: 5359400, y: 1371600, cx: 2590800, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
+  if (index === 3) return base + simpleNamedCardsXml({ prefix: "Profit Bridge Factor Card", startId: 1270, visual, x: 5173980, y: 1516380 });
+  if (index >= 4) return base + simpleNamedCardsXml({ prefix: "Profit Bridge Action Card", startId: 1280, visual, x: 5173980, y: 1516380 });
+  return base + solidShapeXml({ id: 1263, name: "Profit Bridge Waterfall Panel", geom: "roundRect", x: 5173980, y: 1219200, cx: 2895600, cy: 2286000, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+}
+
+function simpleChannelPolicyDecorationsXml({ visual, index }) {
+  // 渠道招商合作政策模板补齐政策网络、权益矩阵、收益模型和流程箭头。
+  const base = solidShapeXml({ id: 1300, name: "Channel Policy Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1301, name: "Channel Policy Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: blendHexColor(visual.primary, visual.surface, 0.70), width: 10160 });
+  if (index === 2) return base + simpleNamedCardsXml({ prefix: "Channel Policy Rights Cell", startId: 1310, visual, x: 5173980, y: 1516380 });
+  if (index === 3) return base + solidShapeXml({ id: 1320, name: "Channel Policy Revenue Panel", geom: "roundRect", x: 5173980, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
+  if (index >= 4) return base + simpleArrowStepsXml({ prefix: "Channel Policy Process Arrow", startId: 1330, visual, x: 4930140, y: 2057400 });
+  return base + solidShapeXml({ id: 1302, name: "Channel Policy Network Panel", geom: "roundRect", x: 5359400, y: 1219200, cx: 2590800, cy: 2286000, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+}
+
+function simpleInterviewInsightDecorationsXml({ visual, index }) {
+  // 用户访谈洞察模板补齐样本卡、原声卡和聚类面板，导出后仍然是可编辑形状。
+  const base = solidShapeXml({ id: 1360, name: "Interview Insight Surface", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1361, name: "Interview Insight Surface Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: visual.primary, width: 10160 })
+    + rectShapeXml({ id: 1363, name: "Interview Insight Accent Rule", x: 548640, y: 609600, cx: 8046720, cy: 45720, fill: visual.accent });
+  if (index === 1) return base + simpleNamedCardsXml({ prefix: "Interview Quote Card", startId: 1370, visual, x: 5173980, y: 1516380 });
+  if (index >= 2) return base + solidShapeXml({ id: 1380, name: "Interview Cluster Panel", geom: "roundRect", x: 5173980, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
+  return base + solidShapeXml({ id: 1362, name: "Interview Sample Card", geom: "roundRect", x: 5359400, y: 1371600, cx: 2438400, cy: 1828800, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+}
+
+function simpleProductPricingDecorationsXml({ visual, index }) {
+  // 定价策略模板补齐套餐卡、权益矩阵和商业闭环，导出端不再退回通用正文页。
+  const base = solidShapeXml({ id: 1420, name: "Product Pricing Canvas", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1421, name: "Product Pricing Canvas Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: visual.primary, width: 10160 })
+    + rectShapeXml({ id: 1422, name: "Product Pricing Accent Rule", x: 548640, y: 609600, cx: 8046720, cy: 45720, fill: visual.accent });
+  if (index === 1) return base + simpleNamedCardsXml({ prefix: "Product Pricing Tier Card", startId: 1430, visual, x: 5173980, y: 1371600 });
+  if (index === 3) return base + solidShapeXml({ id: 1440, name: "Product Pricing Benefit Matrix", geom: "roundRect", x: 5173980, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
+  if (index >= 4) return base + solidShapeXml({ id: 1441, name: "Product Pricing Commercial Loop", geom: "ellipse", x: 5359400, y: 1371600, cx: 2133600, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+  return base + solidShapeXml({ id: 1423, name: "Product Pricing Mockup Panel", geom: "roundRect", x: 5359400, y: 1371600, cx: 2438400, cy: 1828800, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+}
+
+function simpleCashFlowForecastDecorationsXml({ visual, index }) {
+  // 现金流预测模板输出图表、周转闭环和回款表格的核心可编辑占位层。
+  const base = solidShapeXml({ id: 1390, name: "Cash Flow Workspace", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1391, name: "Cash Flow Workspace Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: visual.primary, width: 10160 })
+    + rectShapeXml({ id: 1392, name: "Cash Flow Accent Rule", x: 548640, y: 609600, cx: 8046720, cy: 45720, fill: visual.accent });
+  if (index === 1) return base + solidShapeXml({ id: 1393, name: "Cash Flow Turnover Cycle", geom: "ellipse", x: 5359400, y: 1371600, cx: 2133600, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.72) });
+  if (index >= 2) return base + solidShapeXml({ id: 1394, name: "Cash Flow Receivables Table", geom: "roundRect", x: 5173980, y: 1371600, cx: 2743200, cy: 2133600, fill: blendHexColor(visual.background, visual.surface, 0.62) });
+  return base
+    + solidShapeXml({ id: 1395, name: "Cash Flow Forecast Chart", geom: "roundRect", x: 5173980, y: 1219200, cx: 2895600, cy: 2286000, fill: blendHexColor(visual.background, visual.surface, 0.72) })
+    + simpleNamedCardsXml({ prefix: "Cash Flow Metric Card", startId: 1400, visual, x: 853440, y: 3505200 });
+}
+
+function simpleNamedCardsXml({ prefix, startId, visual, x, y }) {
+  return [0, 1, 2, 3].map((itemIndex) => {
+    const cardX = x + (itemIndex % 2) * 1371600;
+    const cardY = y + Math.floor(itemIndex / 2) * 731520;
+    return solidShapeXml({ id: startId + itemIndex * 2, name: `${prefix} ${itemIndex + 1}`, geom: "roundRect", x: cardX, y: cardY, cx: 1219200, cy: 548640, fill: blendHexColor(visual.background, visual.surface, 0.62) })
+      + rectShapeXml({ id: startId + itemIndex * 2 + 1, name: `${prefix} Accent ${itemIndex + 1}`, x: cardX, y: cardY, cx: 60960, cy: 548640, fill: itemIndex % 2 ? visual.accent : visual.primary });
+  }).join("");
+}
+
+function simpleArrowStepsXml({ prefix, startId, visual, x, y }) {
+  return [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: startId + itemIndex, name: `${prefix} ${itemIndex + 1}`, geom: "chevron", x: x + itemIndex * 746760, y, cx: 670560, cy: 609600, fill: itemIndex % 2 ? visual.accent : visual.primary })).join("");
 }
 
 function manufacturingSolutionDecorationsXml({ visual, index, role, slide }) {

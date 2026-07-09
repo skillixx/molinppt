@@ -524,6 +524,13 @@ test("resolveTemplateVisual maps cost control official slug to dedicated visual"
   assert.equal(visual.variant, "cost-breakdown");
 });
 
+test("resolveTemplateVisual maps cash flow official slug to dedicated visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "finance-cash-flow-analysis-report-cash-flow-forecast", theme: "cash-flow-forecast" });
+
+  assert.equal(visual.layout, "finance-cash-flow-forecast");
+  assert.equal(visual.variant, "cash-flow-forecast");
+});
+
 test("resolveTemplateVisual applies sales proposal enterprise commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "enterprise" });
 
@@ -554,6 +561,24 @@ test("resolveTemplateVisual applies sales proposal renewal commercial visual", (
   assert.equal(visual.variant, "renewal");
 });
 
+test("resolveTemplateVisual applies key account decision chain official visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "key-account-plan", theme: "decision-chain" });
+
+  assert.equal(visual.primary, "102A43");
+  assert.equal(visual.accent, "F59E0B");
+  assert.equal(visual.secondary, "15A39A");
+  assert.equal(visual.background, "EEF4F8");
+  assert.equal(visual.layout, "sales-key-account-decision-chain");
+  assert.equal(visual.variant, "decision-chain");
+});
+
+test("resolveTemplateVisual maps key account official slug to dedicated visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "sales-key-account-plan-decision-chain", theme: "decision-chain" });
+
+  assert.equal(visual.layout, "sales-key-account-decision-chain");
+  assert.equal(visual.variant, "decision-chain");
+});
+
 test("resolveTemplateVisual applies product roadmap commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "roadmap" });
 
@@ -582,6 +607,24 @@ test("resolveTemplateVisual applies product review commercial visual", () => {
   assert.equal(visual.background, "F5F6F2");
   assert.equal(visual.layout, "academy");
   assert.equal(visual.variant, "product-review");
+});
+
+test("resolveTemplateVisual applies product commercialization pricing strategy visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "product-commercialization-plan", theme: "pricing-strategy" });
+
+  assert.equal(visual.primary, "14213D");
+  assert.equal(visual.accent, "F4B740");
+  assert.equal(visual.secondary, "2EC4B6");
+  assert.equal(visual.background, "F3F6FA");
+  assert.equal(visual.layout, "product-pricing-strategy");
+  assert.equal(visual.variant, "pricing-strategy");
+});
+
+test("resolveTemplateVisual maps product commercialization official slug", () => {
+  const visual = resolveTemplateVisual({ templateId: "product-product-commercialization-plan-pricing-strategy", theme: "pricing-strategy" });
+
+  assert.equal(visual.layout, "product-pricing-strategy");
+  assert.equal(visual.variant, "pricing-strategy");
 });
 
 test("resolveTemplateVisual applies education lecture course visual", () => {
@@ -1069,6 +1112,41 @@ test("resolveTemplateVisual applies operating problem diagnosis official visual"
   assert.equal(visual.accent, "E94B3C");
 });
 
+test("resolveTemplateVisual applies channel recruitment policy official visual", () => {
+  const template = {
+    id: "sales-channel-recruitment-plan-cooperation-policy",
+    visual: {
+      primary: "0F2D4A",
+      accent: "10B981",
+      secondary: "D9A441",
+      warning: "F97316",
+      background: "F3F8F7",
+      surface: "FFFFFF",
+      title: "10233D",
+      body: "40566D",
+      layout: "channel-recruitment-policy",
+      variant: "cooperation-policy",
+    },
+    themes: [
+      {
+        id: "cooperation-policy",
+        visual: {
+          layout: "channel-recruitment-policy",
+          variant: "cooperation-policy",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "cooperation-policy", template });
+
+  assert.equal(visual.id, "sales-channel-recruitment-plan-cooperation-policy");
+  assert.equal(visual.layout, "channel-recruitment-policy");
+  assert.equal(visual.variant, "cooperation-policy");
+  assert.equal(visual.primary, "0F2D4A");
+  assert.equal(visual.accent, "10B981");
+});
+
 test("TemplateManager lists official active templates and the owner user templates by category", async () => {
   const database = new JsonFileDatabase({
     filePath: path.join(tempDir, "db.json"),
@@ -1116,7 +1194,7 @@ test("TemplateManager lists official active templates and the owner user templat
   const catalog = await templates.listTemplates({ ownerUserId: 7, categoryId: "sales" });
   const categories = templates.listCategories({ ownerUserId: 7 });
 
-  assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "official-sales", "user-sales"]);
+  assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "key-account-plan", "official-sales", "user-sales"]);
   assert.equal(categories.some((category) => category.id === "sales"), true);
   assert.equal(categories.some((category) => category.id === "empty"), false);
   assert.equal(catalog[0].category.id, "sales");

@@ -391,6 +391,29 @@ test("PptService renders synced product pain points preview with dedicated layou
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced user research interview insight preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProductInterviewInsightTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "用户访谈研究总结",
+    slideCount: 6,
+    templateId: "product-user-research-report-interview-insight",
+    theme: "interview-insight",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-user-research-report-interview-insight" data-layout="product-interview-insight"/);
+  assert.match(preview, /interview-layer/);
+  assert.match(preview, /interview-sample-card/);
+  assert.match(preview, /interview-quote-wall|interview-cluster|interview-notes/);
+  assert.doesNotMatch(preview, />访谈洞察</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced product release cadence preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -527,6 +550,28 @@ test("PptService renders cost control breakdown preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders cash flow forecast preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertCashFlowTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "现金流预测、资金周转分析和财务风险预警",
+    slideCount: 5,
+    templateId: "finance-cash-flow-analysis-report-cash-flow-forecast",
+    theme: "cash-flow-forecast",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-cash-flow-analysis-report-cash-flow-forecast" data-layout="finance-cash-flow-forecast"/);
+  assert.match(preview, /cash-forecast|cash-waterfall|cash-cycle|cash-receivables|cash-risk|cash-dashboard/);
+  assert.match(preview, /cash-surface/);
+  assert.doesNotMatch(preview, />现金流预测</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget adjustment preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -571,6 +616,28 @@ test("PptService renders synced budget variance preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced profit bridge preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProfitBridgeTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "利润变化拆解与盈利改善复盘",
+    slideCount: 5,
+    templateId: "finance-profit-analysis-report-profit-bridge",
+    theme: "profit-bridge",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-profit-analysis-report-profit-bridge" data-layout="finance-profit-bridge"/);
+  assert.match(preview, /profit-waterfall|profit-margin|profit-factors|profit-actions/);
+  assert.match(preview, /profit-surface/);
+  assert.doesNotMatch(preview, />利润桥</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders financial industry solution preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -590,6 +657,28 @@ test("PptService renders financial industry solution preview with dedicated layo
   assert.match(preview, /financial-solution-layer/);
   assert.match(preview, /financial-solution-shield|financial-solution-architecture|financial-solution-value/);
   assert.doesNotMatch(preview, />金融行业</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders channel recruitment policy preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertChannelRecruitmentPolicyTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "渠道招商合作政策",
+    slideCount: 5,
+    templateId: "sales-channel-recruitment-plan-cooperation-policy",
+    theme: "cooperation-policy",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-channel-recruitment-plan-cooperation-policy" data-layout="channel-recruitment-policy"/);
+  assert.match(preview, /channel-policy-layer/);
+  assert.match(preview, /channel-policy-network|channel-policy-matrix|channel-policy-revenue|channel-policy-process/);
+  assert.doesNotMatch(preview, />合作政策</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -634,6 +723,72 @@ test("PptService renders manufacturing industry solution preview with dedicated 
   assert.match(preview, /manufacturing-solution-layer/);
   assert.match(preview, /manufacturing-solution-factory|manufacturing-solution-process|manufacturing-solution-dashboard/);
   assert.doesNotMatch(preview, />制造行业</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders key account decision chain preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "大客户攻坚与决策链路推进",
+    slideCount: 5,
+    templateId: "key-account-plan",
+    theme: "decision-chain",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="key-account-plan" data-layout="sales-key-account-decision-chain"/);
+  assert.match(preview, /key-account-layer/);
+  assert.match(preview, /key-account-network/);
+  assert.match(preview, /key-account-path|key-account-matrix|key-account-roadmap/);
+  assert.doesNotMatch(preview, />决策链路</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced key account decision chain preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertKeyAccountDecisionTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "重点客户组织图与赢单路径",
+    slideCount: 5,
+    templateId: "sales-key-account-plan-decision-chain",
+    theme: "decision-chain",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-key-account-plan-decision-chain" data-layout="sales-key-account-decision-chain"/);
+  assert.match(preview, /<div class="key-account-layer">/);
+  assert.match(preview, /key-account-network/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders product commercialization pricing strategy preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertProductPricingStrategyTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品商业化定价方案",
+    slideCount: 6,
+    templateId: "product-product-commercialization-plan-pricing-strategy",
+    theme: "pricing-strategy",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-product-commercialization-plan-pricing-strategy" data-layout="product-pricing-strategy"/);
+  assert.match(preview, /pricing-layer/);
+  assert.match(preview, /pricing-mockup/);
+  assert.match(preview, /pricing-card-row|pricing-anchor-grid|pricing-benefit-table|pricing-loop|pricing-actions/);
+  assert.doesNotMatch(preview, />定价策略</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -4638,6 +4793,100 @@ async function insertProductPainPointsTemplate(context) {
   });
 }
 
+async function insertProductPricingStrategyTemplate(context) {
+  // 测试数据库模拟官方模板同步后的产品商业化定价策略模板，覆盖生成工作台选择完整 slug 的路径。
+  await context.database.insert("templates", {
+    id: "product-product-commercialization-plan-pricing-strategy",
+    slug: "product-product-commercialization-plan-pricing-strategy",
+    name: "产品商业化方案 - 定价策略",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "pricing-strategy",
+        name: "定价策略",
+        visual: {
+          primary: "14213D",
+          accent: "F4B740",
+          secondary: "2EC4B6",
+          warning: "EF476F",
+          background: "F3F6FA",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "product-pricing-strategy",
+          variant: "pricing-strategy",
+        },
+      },
+    ],
+    visual: {
+      primary: "14213D",
+      accent: "F4B740",
+      secondary: "2EC4B6",
+      warning: "EF476F",
+      background: "F3F6FA",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "product-pricing-strategy",
+      variant: "pricing-strategy",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-pricing-cover",
+      defaultContentLayout: "product-pricing-content",
+      allowedLayouts: ["product-pricing-cover", "product-pricing-tier-cards", "product-pricing-value-anchor", "product-pricing-benefit-matrix", "product-pricing-commercial-loop", "product-pricing-closing", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertProductInterviewInsightTemplate(context) {
+  // 模拟官方模板同步后的用户研究访谈洞察模板，确保生成工作台使用访谈研究专属布局。
+  await context.database.insert("templates", {
+    id: "product-user-research-report-interview-insight",
+    slug: "product-user-research-report-interview-insight",
+    name: "用户研究报告 - 访谈洞察",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "interview-insight",
+        name: "访谈洞察",
+        visual: {
+          primary: "155E75",
+          accent: "F59E0B",
+          secondary: "7C3AED",
+          background: "F6F8FB",
+          surface: "FFFFFF",
+          title: "132238",
+          body: "475569",
+          layout: "product-interview-insight",
+          variant: "interview-insight",
+        },
+      },
+    ],
+    visual: {
+      primary: "155E75",
+      accent: "F59E0B",
+      secondary: "7C3AED",
+      background: "F6F8FB",
+      surface: "FFFFFF",
+      title: "132238",
+      body: "475569",
+      layout: "product-interview-insight",
+      variant: "interview-insight",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-interview-insight-cover",
+      defaultContentLayout: "product-interview-insight-content",
+      allowedLayouts: ["product-interview-insight-cover", "product-interview-insight-sample", "product-interview-insight-quotes", "product-interview-insight-cluster", "product-interview-insight-opportunity", "product-interview-insight-recommendation", "product-interview-insight-closing", "title", "content", "closing"],
+    },
+  });
+}
+
 async function insertProductReleaseCadenceTemplate(context) {
   // 测试数据库模拟官方模板同步后的产品路线图版本节奏模板，确保完整 slug 命中专用发布节奏布局。
   await context.database.insert("templates", {
@@ -4962,6 +5211,54 @@ async function insertCostControlTemplate(context) {
   });
 }
 
+async function insertCashFlowTemplate(context) {
+  // 测试数据库模拟官方模板同步后的现金流分析报告，确保预览走现金流预测专用布局。
+  await context.database.insert("templates", {
+    id: "finance-cash-flow-analysis-report-cash-flow-forecast",
+    slug: "finance-cash-flow-analysis-report-cash-flow-forecast",
+    name: "现金流分析报告 - 现金流预测",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "cash-flow-forecast",
+        name: "现金流预测",
+        visual: {
+          primary: "0F3D4A",
+          accent: "20B486",
+          secondary: "3A7BD5",
+          warning: "E05F3F",
+          background: "EAF4F2",
+          surface: "FFFFFF",
+          title: "082A35",
+          body: "334155",
+          layout: "finance-cash-flow-forecast",
+          variant: "cash-flow-forecast",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F3D4A",
+      accent: "20B486",
+      secondary: "3A7BD5",
+      warning: "E05F3F",
+      background: "EAF4F2",
+      surface: "FFFFFF",
+      title: "082A35",
+      body: "334155",
+      layout: "finance-cash-flow-forecast",
+      variant: "cash-flow-forecast",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "cash-flow-forecast-cover",
+      defaultContentLayout: "cash-flow-forecast-content",
+      allowedLayouts: ["cash-flow-forecast-cover", "cash-flow-waterfall", "cash-turnover-cycle", "receivables-management", "cash-risk-warning", "cash-forecast-dashboard", "cash-flow-forecast-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertBudgetAdjustmentTemplate(context) {
   // 测试数据库模拟官方模板同步后的预算调整模板，确保预览和导出都走专用预算决策布局。
   await context.database.insert("templates", {
@@ -5058,6 +5355,54 @@ async function insertBudgetVarianceTemplate(context) {
   });
 }
 
+async function insertProfitBridgeTemplate(context) {
+  // 测试数据库模拟官方模板同步后的利润桥模板，确保预览和下载都使用利润归因专用布局。
+  await context.database.insert("templates", {
+    id: "finance-profit-analysis-report-profit-bridge",
+    slug: "finance-profit-analysis-report-profit-bridge",
+    name: "利润分析报告 - 利润桥",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "profit-bridge",
+        name: "利润桥",
+        visual: {
+          primary: "14213D",
+          accent: "C99A2E",
+          secondary: "2E7D7A",
+          negative: "C65A42",
+          background: "EEF3F7",
+          surface: "FFFFFF",
+          title: "0B1528",
+          body: "334155",
+          layout: "finance-profit-bridge",
+          variant: "profit-bridge",
+        },
+      },
+    ],
+    visual: {
+      primary: "14213D",
+      accent: "C99A2E",
+      secondary: "2E7D7A",
+      negative: "C65A42",
+      background: "EEF3F7",
+      surface: "FFFFFF",
+      title: "0B1528",
+      body: "334155",
+      layout: "finance-profit-bridge",
+      variant: "profit-bridge",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-profit-bridge-cover",
+      defaultContentLayout: "finance-profit-bridge-content",
+      allowedLayouts: ["finance-profit-bridge-cover", "finance-profit-bridge-waterfall", "finance-profit-bridge-margin-structure", "finance-profit-bridge-factor-analysis", "finance-profit-bridge-improvement", "finance-profit-bridge-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertFinancialSolutionTemplate(context) {
   // 测试数据库模拟官方模板同步后的金融行业解决方案模板，确保生成、预览和导出都命中专用销售方案布局。
   await context.database.insert("templates", {
@@ -5098,6 +5443,102 @@ async function insertFinancialSolutionTemplate(context) {
       defaultCoverLayout: "sales-financial-solution-cover",
       defaultContentLayout: "sales-financial-solution-content",
       allowedLayouts: ["sales-financial-solution-cover", "sales-financial-solution-painpoints", "sales-financial-solution-architecture", "sales-financial-solution-compliance", "sales-financial-solution-value", "sales-financial-solution-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertChannelRecruitmentPolicyTemplate(context) {
+  // 测试数据库模拟官方模板同步后的渠道招商模板，确保合作政策主题使用专属招商版式。
+  await context.database.insert("templates", {
+    id: "sales-channel-recruitment-plan-cooperation-policy",
+    slug: "sales-channel-recruitment-plan-cooperation-policy",
+    name: "渠道招商方案 - 合作政策",
+    categoryId: "sales",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "cooperation-policy",
+        name: "合作政策",
+        visual: {
+          primary: "0F2D4A",
+          accent: "10B981",
+          secondary: "D9A441",
+          warning: "F97316",
+          background: "F3F8F7",
+          surface: "FFFFFF",
+          title: "10233D",
+          body: "40566D",
+          layout: "channel-recruitment-policy",
+          variant: "cooperation-policy",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F2D4A",
+      accent: "10B981",
+      secondary: "D9A441",
+      warning: "F97316",
+      background: "F3F8F7",
+      surface: "FFFFFF",
+      title: "10233D",
+      body: "40566D",
+      layout: "channel-recruitment-policy",
+      variant: "cooperation-policy",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "channel-recruitment-policy-cover",
+      defaultContentLayout: "channel-recruitment-policy-content",
+      allowedLayouts: ["channel-recruitment-policy-cover", "channel-recruitment-policy-overview", "channel-recruitment-policy-rights-matrix", "channel-recruitment-policy-revenue-model", "channel-recruitment-policy-process", "channel-recruitment-policy-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertKeyAccountDecisionTemplate(context) {
+  // 测试数据库模拟官方模板同步后的大客户攻坚模板，确保官方 slug 也能命中决策链路专用布局。
+  await context.database.insert("templates", {
+    id: "sales-key-account-plan-decision-chain",
+    slug: "sales-key-account-plan-decision-chain",
+    name: "大客户攻坚方案 - 决策链路",
+    categoryId: "sales",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "decision-chain",
+        name: "决策链路",
+        visual: {
+          primary: "102A43",
+          accent: "F59E0B",
+          secondary: "15A39A",
+          warning: "E11D48",
+          background: "EEF4F8",
+          surface: "FFFFFF",
+          title: "0B1F33",
+          body: "334155",
+          layout: "sales-key-account-decision-chain",
+          variant: "decision-chain",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "F59E0B",
+      secondary: "15A39A",
+      warning: "E11D48",
+      background: "EEF4F8",
+      surface: "FFFFFF",
+      title: "0B1F33",
+      body: "334155",
+      layout: "sales-key-account-decision-chain",
+      variant: "decision-chain",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "key-account-decision-cover",
+      defaultContentLayout: "key-account-decision-content",
+      allowedLayouts: ["key-account-decision-cover", "key-account-organization-map", "key-account-decision-path", "key-account-stakeholder-matrix", "key-account-win-roadmap", "key-account-closing", "title", "content"],
     },
   });
 }

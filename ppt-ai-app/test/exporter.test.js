@@ -529,6 +529,44 @@ test("PptExportService uses cost control breakdown decorations", () => {
   assert.match(slide1, /val="D59E3D"/);
 });
 
+test("PptExportService uses cash flow forecast decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-cash-flow-analysis-report-cash-flow-forecast",
+      theme: "cash-flow-forecast",
+      templateVisual: {
+        primary: "0F3D4A",
+        accent: "20B486",
+        secondary: "3A7BD5",
+        warning: "E05F3F",
+        background: "EAF4F2",
+        surface: "FFFFFF",
+        title: "082A35",
+        body: "334155",
+        layout: "finance-cash-flow-forecast",
+        variant: "cash-flow-forecast",
+      },
+      slides: [
+        { title: "现金流预测报告", bullets: ["预测周期 13周", "安全余额 ￥8.6M", "回款账期 42天"] },
+        { title: "资金周转闭环", layout: "cash-turnover-cycle", bullets: ["销售确认", "开票回款", "资金调拨", "风险复盘"] },
+        { title: "回款管理清单", layout: "receivables-management", bullets: ["重点客户回款 ￥320万", "逾期账期 18天", "催收动作 3项"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Cash Flow Forecast Chart"/);
+  assert.match(slide1, /name="Cash Flow Metric Card 1"/);
+  assert.match(slide2, /name="Cash Flow Turnover Cycle"/);
+  assert.match(slide3, /name="Cash Flow Receivables Table"/);
+});
+
 test("PptExportService uses budget planning decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -662,6 +700,51 @@ test("PptExportService uses budget variance decorations", () => {
   assert.doesNotMatch(slide1, /execution-variance/);
 });
 
+test("PptExportService uses profit bridge decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-profit-analysis-report-profit-bridge",
+      theme: "profit-bridge",
+      templateVisual: {
+        primary: "14213D",
+        accent: "C99A2E",
+        secondary: "2E7D7A",
+        negative: "C65A42",
+        background: "EEF3F7",
+        surface: "FFFFFF",
+        title: "0B1528",
+        body: "334155",
+        layout: "finance-profit-bridge",
+        variant: "profit-bridge",
+      },
+      slides: [
+        { title: "利润变化拆解报告", bullets: ["利润同比提升 +12%", "毛利率达到 38%", "费用优化空间 ￥2.6M"] },
+        { title: "利润桥总览", bullets: ["收入增长贡献 +860 万", "成本上升影响 -240 万", "费用效率改善 +180 万"] },
+        { title: "毛利结构分析", bullets: ["高毛利品类贡献 42%", "低毛利业务占比下降 8%", "价格策略带来结构改善"] },
+        { title: "关键影响因素", bullets: ["收入增长贡献", "成本结构变化", "费用投入影响", "盈利质量判断"] },
+        { title: "盈利改善行动", bullets: ["优化价格结构", "压降关键成本", "聚焦高毛利业务", "建立利润复盘节奏"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Profit Bridge Workspace"/);
+  assert.match(slide1, /name="Profit Bridge Waterfall Panel"/);
+  assert.match(slide3, /name="Profit Bridge Margin Stack Panel"/);
+  assert.match(slide4, /name="Profit Bridge Factor Card 1"/);
+  assert.match(slide5, /name="Profit Bridge Action Card 1"/);
+  assert.match(slide1, /val="14213D"/);
+  assert.match(slide1, /val="C99A2E"/);
+  assert.doesNotMatch(slide1, /profit-bridge/);
+});
+
 test("PptExportService uses financial industry solution decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -699,6 +782,49 @@ test("PptExportService uses financial industry solution decorations", () => {
   assert.match(slide3, /name="Financial Solution Architecture Layer 1"/);
   assert.match(slide4, /name="Financial Solution Value Panel"/);
   assert.doesNotMatch(slide1, /financial-industry/);
+});
+
+test("PptExportService uses channel recruitment policy decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-channel-recruitment-plan-cooperation-policy",
+      theme: "cooperation-policy",
+      templateVisual: {
+        primary: "0F2D4A",
+        accent: "10B981",
+        secondary: "D9A441",
+        warning: "F97316",
+        background: "F3F8F7",
+        surface: "FFFFFF",
+        title: "10233D",
+        body: "40566D",
+        layout: "channel-recruitment-policy",
+        variant: "cooperation-policy",
+      },
+      slides: [
+        { title: "渠道招商合作计划", bullets: ["3级伙伴准入政策", "6项总部扶持权益", "90天启动赋能周期"] },
+        { title: "合作政策总览", layout: "channel-recruitment-policy-overview", bullets: ["准入门槛清晰", "授权范围明确", "扶持政策可落地"] },
+        { title: "渠道权益矩阵", layout: "channel-recruitment-policy-rights-matrix", bullets: ["返利政策", "培训支持", "线索分发", "联合推广"] },
+        { title: "渠道收益模型", layout: "channel-recruitment-policy-revenue-model", bullets: ["销售分润", "达标返利", "增值服务", "续费收益"] },
+        { title: "招商路线说明", layout: "channel-recruitment-policy-process", bullets: ["提交申请", "资质审核", "签约授权", "启动赋能"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Channel Policy Workspace"/);
+  assert.match(slide1, /name="Channel Policy Network Panel"/);
+  assert.match(slide3, /name="Channel Policy Rights Cell 1"/);
+  assert.match(slide4, /name="Channel Policy Revenue Panel"/);
+  assert.match(slide5, /name="Channel Policy Process Arrow 1"/);
+  assert.doesNotMatch(slide1, /cooperation-policy/);
 });
 
 test("PptExportService uses manufacturing industry solution decorations", () => {
@@ -791,6 +917,52 @@ test("PptExportService uses education industry solution decorations", () => {
   assert.match(slide6, /SERVICE ROADMAP/);
   assert.match(slide6, /name="Education Solution Platform Panel"/);
   assert.doesNotMatch(slide1, /education-industry/);
+});
+
+test("PptExportService uses key account decision chain decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-key-account-plan-decision-chain",
+      theme: "decision-chain",
+      templateVisual: {
+        primary: "102A43",
+        accent: "F59E0B",
+        secondary: "15A39A",
+        warning: "E11D48",
+        background: "EEF4F8",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "334155",
+        layout: "sales-key-account-decision-chain",
+        variant: "decision-chain",
+      },
+      slides: [
+        { title: "大客户攻坚与决策链路推进", bullets: ["识别客户组织内关键决策人", "拆解采购、技术和财务影响关系", "推进高层共识和合同闭环"] },
+        { title: "客户组织图和关键人地图", bullets: ["决策人关注业务价值", "采购关注成本与流程", "技术团队关注集成风险"] },
+        { title: "决策链路推进路径", bullets: ["需求确认", "技术评估", "商务测算", "高层拍板", "合同推进"] },
+        { title: "关键人策略矩阵", bullets: ["重点突破", "维持支持", "风险转化", "持续观察"] },
+        { title: "赢单路径和下一步动作", bullets: ["本周完成技术澄清", "两周内推进高层交流", "锁定合同评审窗口"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Key Account Decision Workspace"/);
+  assert.match(slide1, /name="Key Account Decision Network Panel"/);
+  assert.match(slide1, /name="Key Account Decision Sponsor Node"/);
+  assert.match(slide3, /name="Key Account Decision Path Step 1"/);
+  assert.match(slide4, /name="Key Account Decision Matrix Card 1"/);
+  assert.match(slide5, /name="Key Account Decision Roadmap Card 1"|name="Key Account Decision Closing Card 1"/);
+  assert.match(slide1, /val="102A43"/);
+  assert.match(slide1, /val="F59E0B"/);
+  assert.doesNotMatch(slide1, /decision-chain/);
 });
 
 test("PptExportService uses commercial sales enterprise decorations", () => {
@@ -912,6 +1084,113 @@ test("PptExportService uses product pain points decorations", () => {
   assert.match(slide1, /name="Product Pain Persona Panel"/);
   assert.match(slide3, /name="Product Pain Evidence Card 1"/);
   assert.doesNotMatch(slide1, /user-pain-points/);
+});
+
+test("PptExportService uses product commercialization pricing strategy decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-commercialization-plan-pricing-strategy",
+      theme: "pricing-strategy",
+      templateVisual: {
+        primary: "14213D",
+        accent: "F4B740",
+        secondary: "2EC4B6",
+        warning: "EF476F",
+        background: "F3F6FA",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "334155",
+        layout: "product-pricing-strategy",
+        variant: "pricing-strategy",
+      },
+      slides: [
+        {
+          title: "Commercial pricing model for Q3 launch",
+          bullets: ["Entry package targets trial conversion", "Professional package anchors revenue", "Enterprise package supports expansion"],
+        },
+        {
+          title: "Package rights and willingness to pay",
+          bullets: ["Basic rights", "Advanced rights", "Service rights", "Expansion rights"],
+        },
+        {
+          title: "Pricing anchor and customer segment fit",
+          bullets: ["Starter users need low risk entry", "Growth users value automation", "Enterprise users need governance"],
+        },
+        {
+          title: "Benefit matrix and monetization path",
+          bullets: ["Rights package", "Usage boundary", "Gross margin guardrail", "Renewal trigger"],
+        },
+        {
+          title: "Commercial loop and next actions",
+          bullets: ["Publish package page", "Track conversion cohort", "Review discount policy"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Product Pricing Canvas"/);
+  assert.match(slide1, /name="Product Pricing Mockup Panel"/);
+  assert.match(slide2, /name="Product Pricing Tier Card 1"/);
+  assert.match(slide4, /name="Product Pricing Benefit Matrix"/);
+  assert.match(slide5, /name="Product Pricing Commercial Loop"/);
+  assert.doesNotMatch(slide1, /pricing-strategy/);
+});
+
+test("PptExportService uses user research interview insight decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-user-research-report-interview-insight",
+      theme: "interview-insight",
+      templateVisual: {
+        primary: "155E75",
+        accent: "F59E0B",
+        secondary: "7C3AED",
+        background: "F6F8FB",
+        surface: "FFFFFF",
+        title: "132238",
+        body: "475569",
+        layout: "product-interview-insight",
+        variant: "interview-insight",
+      },
+      slides: [
+        {
+          title: "用户访谈样本与关键问题",
+          bullets: ["覆盖新用户、活跃用户和流失用户三类样本", "真实原声集中在理解成本和信任感", "需求机会需要进入原型验证"],
+        },
+        {
+          title: "用户原声与高频反馈",
+          bullets: ["用户希望快速理解核心价值", "流程中的等待感影响继续使用", "决策前需要更明确的收益证据"],
+        },
+        {
+          title: "主题聚类与机会方向",
+          bullets: ["价值认知", "路径效率", "信任证明", "持续触达"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Interview Insight Surface"/);
+  assert.match(slide1, /name="Interview Sample Card"/);
+  assert.match(slide2, /name="Interview Quote Card 1"/);
+  assert.match(slide3, /name="Interview Cluster Panel"/);
+  assert.match(slide1, /val="155E75"/);
+  assert.match(slide1, /val="F59E0B"/);
+  assert.doesNotMatch(slide1, /interview-insight/);
 });
 
 test("PptExportService uses product release cadence decorations", () => {

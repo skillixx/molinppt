@@ -1,0 +1,28 @@
+{
+  "slug": "finance-cash-flow-analysis-report-cash-flow-forecast",
+  "name": "现金流分析报告 - 现金流预测",
+  "description": "面向现金流预测、资金周转分析、回款管理和财务风险预警的官方财务经营模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "categoryId": "finance",
+  "categoryName": "财务经营",
+  "templateId": "cash-flow-analysis-report",
+  "templateName": "现金流分析报告",
+  "themeId": "cash-flow-forecast",
+  "themeName": "现金流预测",
+  "status": "active",
+  "tags": [
+    "cash-flow",
+    "forecast",
+    "finance",
+    "risk-warning"
+  ],
+  "assets": [
+    "assets/cash-flow-network.svg"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png",
+  "thumbnail": "thumbnail.png"
+}

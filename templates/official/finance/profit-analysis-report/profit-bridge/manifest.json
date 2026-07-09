@@ -1,0 +1,19 @@
+{
+  "slug": "finance-profit-analysis-report-profit-bridge",
+  "name": "利润分析报告 - 利润桥",
+  "description": "适合利润变化拆解、毛利结构分析、盈利改善汇报和经营复盘的财务经营模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "profit-analysis-report",
+    "profit-bridge",
+    "gross-margin",
+    "profit-improvement"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
