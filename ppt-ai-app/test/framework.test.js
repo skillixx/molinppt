@@ -517,6 +517,13 @@ test("resolveTemplateVisual applies cost control breakdown official visual", () 
   assert.equal(visual.variant, "cost-breakdown");
 });
 
+test("resolveTemplateVisual maps cost control official slug to dedicated visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "finance-cost-control-plan-cost-breakdown", theme: "cost-breakdown" });
+
+  assert.equal(visual.layout, "finance-cost-breakdown");
+  assert.equal(visual.variant, "cost-breakdown");
+});
+
 test("resolveTemplateVisual applies sales proposal enterprise commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "enterprise" });
 

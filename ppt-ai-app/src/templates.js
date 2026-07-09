@@ -1120,19 +1120,21 @@ export class TemplateManager {
  * @returns {{id: string, name: string, primary: string, accent: string, background: string, surface: string, title: string, body: string, layout: string, variant: string}}
  */
 export function resolveTemplateVisual(input = {}) {
-  const baseTemplate = DEFAULT_TEMPLATES.find((item) => item.id === input.templateId) || DEFAULT_TEMPLATES[0];
-  const templateOverrides = input.template ? removeUndefinedValues(input.template) : null;
-  const selectedTheme = String(input.theme || "").trim();
+  const request = typeof input === "string" ? { templateId: input } : (input || {});
+  const requestedTemplateId = normalizeTemplateLookupId(request.templateId);
+  const baseTemplate = DEFAULT_TEMPLATES.find((item) => item.id === requestedTemplateId) || DEFAULT_TEMPLATES[0];
+  const templateOverrides = request.template ? removeUndefinedValues(request.template) : null;
+  const selectedTheme = String(request.theme || "").trim();
   // 非 business 官方模板的主题风格是模板版式来源，必须优先于 deck 里可能过期的 visual 快照。
   // business 下存在 red-gold 这类依赖 visual 快照的历史模板，不能被 modern/minimal 主题强行覆盖。
   const officialThemeVisual = baseTemplate.id !== "business" ? resolveThemeVisual(baseTemplate.themes || [], selectedTheme) : null;
-  const template = input.template
+  const template = request.template
     ? {
       ...baseTemplate,
       ...templateOverrides,
       visual: { ...(baseTemplate.visual || {}), ...(templateOverrides.visual || {}) },
     }
-    : (input.visual ? { ...baseTemplate, visual: { ...(baseTemplate.visual || {}), ...input.visual } } : baseTemplate);
+    : (request.visual ? { ...baseTemplate, visual: { ...(baseTemplate.visual || {}), ...request.visual } } : baseTemplate);
   const hasVisualOverride = hasVisualOverrideAgainstBase(template.visual, baseTemplate.visual || {});
   const themeVisual = officialThemeVisual || (!hasVisualOverride ? resolveThemeVisual(template.themes || baseTemplate.themes || [], selectedTheme) : null);
   const mergedVisual = { ...template.visual, ...(templateOverrides?.visual || {}), ...(themeVisual || {}) };
@@ -1151,6 +1153,15 @@ export function resolveTemplateVisual(input = {}) {
     layout: visual.layout || DEFAULT_VISUAL.layout,
     variant: typeof visual.variant === "string" ? visual.variant : "",
   };
+}
+
+function normalizeTemplateLookupId(templateId) {
+  const id = String(templateId || "").trim();
+  // 官方模板同步后的 slug 会带分类和主题后缀，运行时只拿到 slug 时也要回到对应的内置模板视觉。
+  const officialTemplateAliases = {
+    "finance-cost-control-plan-cost-breakdown": "cost-control-plan",
+  };
+  return officialTemplateAliases[id] || id;
 }
 
 function resolveThemeVisual(themes, themeId) {

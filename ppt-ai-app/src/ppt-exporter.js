@@ -3670,7 +3670,7 @@ function costBreakdownClosingXml({ visual, palette, items }) {
 function costBreakdownSceneFromSlide({ slide, index, role }) {
   const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
   const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 26);
-  const resolvedRole = index === 0 ? "cover" : role === "closing" ? "closing" : ["structure", "drivers", "roadmap", "loop", "matrix"][(index - 1) % 5];
+  const resolvedRole = costBreakdownRoleFromSlide({ slide, index, role });
   const metrics = [0, 1, 2].map((itemIndex) => costBreakdownMetricFromText(bullets[itemIndex], itemIndex));
   return {
     role: resolvedRole,
@@ -3694,6 +3694,19 @@ function costBreakdownSceneFromSlide({ slide, index, role }) {
       }),
     ],
   };
+}
+
+function costBreakdownRoleFromSlide({ slide, index, role }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 导出时同样优先使用页面布局语义，保证和 HTML 在线预览的成本拆解场景一致。
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (role === "closing" || layout.includes("closing")) return "closing";
+  if (layout.includes("responsibility") || layout.includes("matrix")) return "matrix";
+  if (layout.includes("roadmap") || layout.includes("saving")) return "roadmap";
+  if (layout.includes("driver") || layout.includes("analysis")) return "drivers";
+  if (layout.includes("loop") || layout.includes("control")) return "loop";
+  if (layout.includes("structure") || layout.includes("overview")) return "structure";
+  return ["structure", "drivers", "roadmap", "loop", "matrix"][(index - 1) % 5];
 }
 
 function costBreakdownMetricFromText(text, index) {
