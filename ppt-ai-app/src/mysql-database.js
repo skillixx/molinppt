@@ -28,13 +28,13 @@ export class MySqlDocumentDatabase {
     this.state = {};
     for (const collection of this.collections) {
       validateCollectionName(collection);
-      await this.connection.query(`CREATE TABLE IF NOT EXISTS \`${collection}\` (
+      await this.#query(`CREATE TABLE IF NOT EXISTS \`${collection}\` (
         id VARCHAR(191) PRIMARY KEY,
         data JSON NOT NULL,
         created_at DATETIME(3) NOT NULL,
         updated_at DATETIME(3) NOT NULL
       )`);
-      const [rows] = await this.connection.query(`SELECT id, data FROM \`${collection}\``);
+      const [rows] = await this.#query(`SELECT id, data FROM \`${collection}\``);
       this.state[collection] = rows.map((row) => normalizeRow(row));
     }
     return this.state;
@@ -48,7 +48,7 @@ export class MySqlDocumentDatabase {
   async reloadCollection(collection) {
     this.#requireCollection(collection);
     validateCollectionName(collection);
-    const [rows] = await this.connection.query(`SELECT id, data FROM \`${collection}\``);
+    const [rows] = await this.#query(`SELECT id, data FROM \`${collection}\``);
     this.state[collection] = rows.map((row) => normalizeRow(row));
     return this.state[collection];
   }
@@ -71,7 +71,7 @@ export class MySqlDocumentDatabase {
     this.#requireCollection(collection);
     const now = new Date().toISOString();
     const stored = { id: randomUUID(), created_at: now, updated_at: now, ...record };
-    await this.connection.execute(
+    await this.#execute(
       `INSERT INTO \`${collection}\` (id, data, created_at, updated_at) VALUES (?, ?, ?, ?)`,
       [stored.id, JSON.stringify(stored), toMysqlDateTime(stored.created_at), toMysqlDateTime(stored.updated_at)],
     );
@@ -117,7 +117,7 @@ export class MySqlDocumentDatabase {
       ...changes,
       updated_at: new Date().toISOString(),
     };
-    await this.connection.execute(
+    await this.#execute(
       `UPDATE \`${collection}\` SET data = ?, updated_at = ? WHERE id = ?`,
       [JSON.stringify(stored), toMysqlDateTime(stored.updated_at), id],
     );
@@ -132,11 +132,11 @@ export class MySqlDocumentDatabase {
    */
   async acquireLock(key) {
     const lockName = `ppt-ai-app:${key}`.slice(0, 64);
-    const [rows] = await this.connection.query("SELECT GET_LOCK(?, 0) AS acquired", [lockName]);
+    const [rows] = await this.#query("SELECT GET_LOCK(?, 0) AS acquired", [lockName]);
     if (Number(rows?.[0]?.acquired) !== 1) return null;
     return {
       release: async () => {
-        await this.connection.query("SELECT RELEASE_LOCK(?)", [lockName]);
+        await this.#query("SELECT RELEASE_LOCK(?)", [lockName]);
       },
     };
   }
@@ -152,6 +152,35 @@ export class MySqlDocumentDatabase {
       });
     });
     return mysql.createConnection(normalizeMysqlUrl(this.url));
+  }
+
+  async #query(sql, params) {
+    return this.#withReconnect((connection) => connection.query(sql, params));
+  }
+
+  async #execute(sql, params) {
+    return this.#withReconnect((connection) => connection.execute(sql, params));
+  }
+
+  async #withReconnect(operation) {
+    try {
+      return await operation(this.connection);
+    } catch (error) {
+      if (!isClosedConnectionError(error)) throw error;
+      // MySQL 单连接在本地长时间运行后可能被服务端关闭；这里重连并只重试一次当前命令。
+      await this.#reconnect();
+      return operation(this.connection);
+    }
+  }
+
+  async #reconnect() {
+    try {
+      if (this.connection?.destroy) this.connection.destroy();
+      else if (this.connection?.end) await this.connection.end();
+    } catch {
+      // 旧连接已经不可用时忽略关闭失败，后续新连接会重新接管数据库操作。
+    }
+    this.connection = await this.#connect();
   }
 
   /** @param {string} collection */
@@ -175,6 +204,14 @@ function validateCollectionName(collection) {
   if (!/^[a-z_]+$/.test(collection)) {
     throw new AppError({ code: "DATABASE_COLLECTION_INVALID", status: 500, message: "Database collection name is invalid" });
   }
+}
+
+function isClosedConnectionError(error) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("closed state")
+    || message.includes("connection lost")
+    || error?.code === "PROTOCOL_CONNECTION_LOST"
+    || error?.code === "ECONNRESET";
 }
 
 function toMysqlDateTime(value) {

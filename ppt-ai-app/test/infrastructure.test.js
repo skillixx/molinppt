@@ -67,6 +67,43 @@ test("MySQL adapter upserts official templates without changing the slug id", as
   assert.equal(operations.some(([kind, sql]) => kind === "execute" && sql.includes("UPDATE `templates`")), true);
 });
 
+test("MySQL adapter reconnects once when a connection is closed", async () => {
+  const rows = new Map();
+  let connectionCount = 0;
+  let failedOnce = false;
+  const database = createDatabase({
+    url: "mysql://ppt:secret@127.0.0.1:3306/ppt_ai_app",
+    collections: ["templates"],
+    mysqlConnector: async () => {
+      connectionCount += 1;
+      return {
+        query: async (sql) => {
+          if (sql.startsWith("SELECT")) {
+            return [[...rows.values()].map((row) => ({ id: row.id, data: JSON.stringify(row.data) }))];
+          }
+          return [[]];
+        },
+        execute: async (sql, params) => {
+          if (!failedOnce) {
+            failedOnce = true;
+            throw new Error("Can't add new command when connection is in closed state");
+          }
+          if (sql.startsWith("INSERT")) rows.set(params[0], { id: params[0], data: JSON.parse(params[1]) });
+          return [[]];
+        },
+        end: async () => {},
+      };
+    },
+  });
+
+  await database.initialize();
+  await database.insert("templates", { id: "education-demo", name: "Education Demo" });
+  const stored = await database.findOne("templates", (template) => template.id === "education-demo");
+
+  assert.equal(connectionCount, 2);
+  assert.equal(stored.name, "Education Demo");
+});
+
 test("MySQL adapter uses advisory locks for cross-instance generation guards", async () => {
   const operations = [];
   let locked = false;
