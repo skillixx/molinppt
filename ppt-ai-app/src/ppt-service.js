@@ -7064,20 +7064,21 @@ function privateDomainMemberLayeringPreviewScene({ slide, index, total }) {
   const bullets = privateDomainMemberLayeringBulletTexts(slide);
   const title = privateDomainMemberLayeringCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
   const layout = String(slide?.layout || "").toLowerCase();
+  // 明确的页面布局优先于页码规则，避免最后一页的复购闭环页被误判为行动页。
   const role = index === 0 || layout.includes("cover")
     ? "cover"
-    : index === total - 1 || layout.includes("action") || layout.includes("closing")
-      ? "action"
-      : layout.includes("path") || layout.includes("touch")
-        ? "path"
-        : layout.includes("benefit") || layout.includes("rights")
-          ? "benefits"
-          : layout.includes("loop") || layout.includes("repurchase")
-            ? "loop"
-            : layout.includes("dashboard") || layout.includes("data")
-              ? "dashboard"
-              : layout.includes("pyramid") || layout.includes("layer")
-                ? "pyramid"
+    : layout.includes("path") || layout.includes("touch")
+      ? "path"
+      : layout.includes("benefit") || layout.includes("rights")
+        ? "benefits"
+        : layout.includes("loop") || layout.includes("repurchase")
+          ? "loop"
+          : layout.includes("dashboard") || layout.includes("data")
+            ? "dashboard"
+            : layout.includes("pyramid") || layout.includes("layer")
+              ? "pyramid"
+              : index === total - 1 || layout.includes("action") || layout.includes("closing")
+                ? "action"
                 : ["pyramid", "path", "benefits", "loop", "dashboard"][(index - 1) % 5];
   const labels = ["高价值用户", "活跃会员", "成长会员", "沉睡用户"].map((fallback, itemIndex) => privateDomainMemberLayeringCompactText(bullets[itemIndex], fallback, 15));
   return {

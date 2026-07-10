@@ -1167,6 +1167,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "social-video-growth") {
     return base + socialVideoGrowthDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "private-domain-member-layering") {
+    return base + privateDomainMemberLayeringDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (isGrowthFundingFlywheelVisual(visual)) {
     return base + growthFundingFlywheelDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1823,6 +1826,23 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
         ? { x: 768096, y: 1028700, cx: 3840480, cy: 792480 }
         : { x: 768096, y: 1028700, cx: 3688080, cy: 670560 },
       content: { x: 777240, y: 2209800, cx: 3657600, cy: 1219200 },
+      titleSize: isCover ? 2700 : 1880,
+      bodySize: isCover ? 980 : 820,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "private-domain-member-layering") {
+    const isCover = index === 0;
+    return {
+      surface: { x: 530352, y: 431800, cx: 8083296, cy: 4305300 },
+      accent: { x: 530352, y: 431800, cx: 8083296, cy: 53340 },
+      secondaryAccent: { x: 5486400, y: 975360, cx: 2286000, cy: 2667000 },
+      label: { x: 786384, y: 730250, cx: 2133600, cy: 228600 },
+      title: isCover
+        ? { x: 786384, y: 1043940, cx: 3931920, cy: 792480 }
+        : { x: 786384, y: 1043940, cx: 3688080, cy: 670560 },
+      content: { x: 804672, y: 2209800, cx: 3657600, cy: 1219200 },
       titleSize: isCover ? 2700 : 1880,
       bodySize: isCover ? 980 : 820,
       titleColor: visual.title,
@@ -9036,6 +9056,190 @@ function socialVideoGrowthColorPalette(visual) {
     blueGlow: blendHexColor(visual.secondary || "0EA5E9", visual.background || "F4F7FB", 0.76),
     softBlue: blendHexColor(visual.secondary || "0EA5E9", "FFFFFF", 0.58),
     softGreen: blendHexColor(visual.accent || "22C55E", "FFFFFF", 0.58),
+  };
+}
+
+function privateDomainMemberLayeringDecorationsXml({ visual, index, role, slide }) {
+  const scene = privateDomainMemberLayeringSceneFromSlide({ slide, index, role });
+  const palette = privateDomainMemberLayeringColorPalette(visual);
+  // 私域运营模板用可编辑图形表达会员卡、触达路径和复购闭环，避免使用整页背景图。
+  const background = rectShapeXml({ id: 1360, name: "Private Domain Canvas Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 1361, name: "Private Domain Gold Glow", geom: "ellipse", x: 6621780, y: -335280, cx: 1828800, cy: 1828800, fill: palette.goldGlow })
+    + solidShapeXml({ id: 1362, name: "Private Domain Green Glow", geom: "ellipse", x: -304800, y: 3733800, cx: 1828800, cy: 1219200, fill: palette.greenGlow })
+    + solidShapeXml({ id: 1363, name: "Private Domain Main Surface", geom: "roundRect", x: 530352, y: 431800, cx: 8083296, cy: 4305300, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1364, name: "Private Domain Surface Frame", geom: "roundRect", x: 530352, y: 431800, cx: 8083296, cy: 4305300, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1365, name: "Private Domain Primary Rail", x: 530352, y: 431800, cx: 3048000, cy: 53340, fill: visual.primary })
+    + rectShapeXml({ id: 1366, name: "Private Domain Gold Rail", x: 3578352, y: 431800, cx: 2590800, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 1367, name: "Private Domain Coral Rail", x: 6169152, y: 431800, cx: 2667448, cy: 53340, fill: visual.secondary || "F06A4B" });
+  const heading = textShapeXml({ id: 1370, name: "Private Domain Kicker", x: 786384, y: 730250, cx: 2133600, cy: 198120, text: scene.kicker, size: 660, bold: true, color: visual.accent, fontFace: "Arial" })
+    + textShapeXml({ id: 1371, name: "Private Domain Title", x: 786384, y: 1043940, cx: 3931920, cy: 853440, text: scene.title, size: index === 0 ? 2100 : 1680, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+    + textShapeXml({ id: 1372, name: "Private Domain Summary", x: 786384, y: 2026920, cx: 3657600, cy: 396240, text: scene.summary, size: 760, bold: true, color: visual.body, fontFace: "Microsoft YaHei" })
+    + privateDomainMemberLayeringBulletXml({ scene, visual });
+  if (scene.role === "pyramid") return background + heading + privateDomainMemberLayeringPyramidXml({ scene, visual }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+  if (scene.role === "path") return background + heading + privateDomainMemberLayeringPathXml({ scene, visual, palette }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+  if (scene.role === "benefits") return background + heading + privateDomainMemberLayeringBenefitsXml({ scene, visual, palette }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+  if (scene.role === "loop") return background + heading + privateDomainMemberLayeringLoopXml({ scene, visual, palette }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+  if (scene.role === "dashboard") return background + heading + privateDomainMemberLayeringDashboardXml({ visual, palette }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+  if (scene.role === "action") return background + heading + privateDomainMemberLayeringActionXml({ scene, visual, palette });
+  return background + heading + privateDomainMemberLayeringHeroXml({ visual, palette }) + privateDomainMemberLayeringMetricXml({ scene, visual, palette });
+}
+
+function privateDomainMemberLayeringBulletXml({ scene, visual }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2621280 + itemIndex * 243840;
+    return solidShapeXml({ id: 1380 + itemIndex * 3, name: `Private Domain Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 826008, y: y + 38100, cx: 68580, cy: 68580, fill: itemIndex % 2 ? visual.secondary || "F06A4B" : visual.accent })
+      + textShapeXml({ id: 1381 + itemIndex * 3, name: `Private Domain Bullet Text ${itemIndex + 1}`, x: 932688, y, cx: 3291840, cy: 167640, text: privateDomainMemberLayeringCompactText(item, scene.title, 34), size: 720, bold: false, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function privateDomainMemberLayeringMetricXml({ scene, visual, palette }) {
+  return scene.metrics.map((metric, itemIndex) => {
+    const x = 786384 + itemIndex * 1188720;
+    return solidShapeXml({ id: 1400 + itemIndex * 4, name: `Private Domain Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 4008120, cx: 975360, cy: 518160, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1401 + itemIndex * 4, name: `Private Domain Metric Border ${itemIndex + 1}`, geom: "roundRect", x, y: 4008120, cx: 975360, cy: 518160, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1402 + itemIndex * 4, name: `Private Domain Metric Value ${itemIndex + 1}`, x: x + 121920, y: 4130040, cx: 701040, cy: 152400, text: metric.value, size: 1120, bold: true, color: visual.title, fontFace: "Arial" })
+      + textShapeXml({ id: 1403 + itemIndex * 4, name: `Private Domain Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4320540, cx: 701040, cy: 129540, text: metric.label, size: 560, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function privateDomainMemberLayeringHeroXml({ visual, palette }) {
+  return solidShapeXml({ id: 1420, name: "Private Domain Member Card", geom: "roundRect", x: 5943600, y: 960120, cx: 2438400, cy: 1752600, fill: visual.primary })
+    + solidShapeXml({ id: 1421, name: "Private Domain Member Card Gold", geom: "ellipse", x: 7528560, y: 2057400, cx: 822960, cy: 822960, fill: palette.goldSoft })
+    + rectShapeXml({ id: 1422, name: "Private Domain Member Card Line 1", x: 6248400, y: 1371600, cx: 1219200, cy: 76200, fill: "FFFFFF" })
+    + rectShapeXml({ id: 1423, name: "Private Domain Member Card Line 2", x: 6248400, y: 1600200, cx: 914400, cy: 60960, fill: palette.goldSoft })
+    + solidShapeXml({ id: 1424, name: "Private Domain Chat Bubble A", geom: "roundRect", x: 5638800, y: 3048000, cx: 1188720, cy: 365760, fill: "FFFFFF" })
+    + solidShapeXml({ id: 1425, name: "Private Domain Chat Bubble B", geom: "roundRect", x: 7086600, y: 3505200, cx: 1188720, cy: 365760, fill: "FFFFFF" })
+    + rectShapeXml({ id: 1426, name: "Private Domain Chat Rule A", x: 5867400, y: 3185160, cx: 579120, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1427, name: "Private Domain Chat Rule B", x: 7315200, y: 3642360, cx: 579120, cy: 45720, fill: visual.secondary || "F06A4B" });
+}
+
+function privateDomainMemberLayeringPyramidXml({ scene, visual }) {
+  return scene.labels.slice(0, 4).map((item, itemIndex) => {
+    const widths = [914400, 1371600, 1828800, 2286000];
+    const x = 6865620 - widths[itemIndex] / 2;
+    const y = 1066800 + itemIndex * 502920;
+    return solidShapeXml({ id: 1440 + itemIndex * 3, name: `Private Domain Layer Bar ${itemIndex + 1}`, geom: "roundRect", x, y, cx: widths[itemIndex], cy: 365760, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 1441 + itemIndex * 3, name: `Private Domain Layer Text ${itemIndex + 1}`, x: x + 121920, y: y + 91440, cx: widths[itemIndex] - 243840, cy: 137160, text: privateDomainMemberLayeringCompactText(item, "", 14), size: 720, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function privateDomainMemberLayeringPathXml({ scene, visual, palette }) {
+  return ["识别", "打标", "触达", "权益", "转化"].map((item, itemIndex) => {
+    const x = 5029200 + itemIndex * 701040;
+    return solidShapeXml({ id: 1460 + itemIndex * 4, name: `Private Domain Touch Node ${itemIndex + 1}`, geom: "roundRect", x, y: 1249680, cx: 609600, cy: 914400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1461 + itemIndex * 4, name: `Private Domain Touch Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 1249680, cx: 609600, cy: 914400, stroke: palette.frame, width: 7620 })
+      + solidShapeXml({ id: 1462 + itemIndex * 4, name: `Private Domain Touch Icon ${itemIndex + 1}`, geom: "ellipse", x: x + 167640, y: 1447800, cx: 274320, cy: 274320, fill: itemIndex % 2 ? visual.secondary || "F06A4B" : visual.accent })
+      + textShapeXml({ id: 1463 + itemIndex * 4, name: `Private Domain Touch Text ${itemIndex + 1}`, x: x + 76200, y: 1897380, cx: 457200, cy: 182880, text: privateDomainMemberLayeringCompactText(scene.labels[itemIndex] || item, item, 10), size: 620, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function privateDomainMemberLayeringBenefitsXml({ scene, visual, palette }) {
+  return scene.labels.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5257800 + col * 1524000;
+    const y = 1112520 + row * 1036320;
+    return solidShapeXml({ id: 1490 + itemIndex * 4, name: `Private Domain Benefit Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 822960, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1491 + itemIndex * 4, name: `Private Domain Benefit Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 822960, stroke: palette.frame, width: 7620 })
+      + rectShapeXml({ id: 1492 + itemIndex * 4, name: `Private Domain Benefit Rule ${itemIndex + 1}`, x: x + 152400, y: y + 182880, cx: 609600, cy: 60960, fill: itemIndex % 2 ? visual.secondary || "F06A4B" : visual.accent })
+      + textShapeXml({ id: 1493 + itemIndex * 4, name: `Private Domain Benefit Text ${itemIndex + 1}`, x: x + 152400, y: y + 365760, cx: 1005840, cy: 182880, text: privateDomainMemberLayeringCompactText(item, "", 14), size: 720, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function privateDomainMemberLayeringLoopXml({ scene, visual, palette }) {
+  const nodes = ["识别用户", "权益触发", "活动承接", "数据回流"].map((item, itemIndex) => {
+    const positions = [
+      { x: 6324600, y: 914400 },
+      { x: 7543800, y: 2034540 },
+      { x: 6324600, y: 3154680 },
+      { x: 5105400, y: 2034540 },
+    ];
+    const pos = positions[itemIndex];
+    return solidShapeXml({ id: 1520 + itemIndex * 4, name: `Private Domain Loop Node ${itemIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 914400, cy: 365760, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1521 + itemIndex * 4, name: `Private Domain Loop Node Frame ${itemIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 914400, cy: 365760, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1522 + itemIndex * 4, name: `Private Domain Loop Node Text ${itemIndex + 1}`, x: pos.x + 91440, y: pos.y + 106680, cx: 731520, cy: 121920, text: privateDomainMemberLayeringCompactText(scene.labels[itemIndex] || item, item, 10), size: 620, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+  return arcLineShapeXml({ id: 1510, name: "Private Domain Repurchase Loop", x: 5486400, y: 1112520, cx: 2438400, cy: 2286000, stroke: visual.accent, width: 45720 })
+    + arcLineShapeXml({ id: 1511, name: "Private Domain Data Return Loop", x: 5700000, y: 1325880, cx: 2011680, cy: 1859280, stroke: visual.primary, width: 30480 })
+    + nodes;
+}
+
+function privateDomainMemberLayeringDashboardXml({ visual, palette }) {
+  const bars = [0.34, 0.58, 0.76, 0.52].map((heightRatio, itemIndex) => {
+    const height = Math.round(1219200 * heightRatio);
+    return rectShapeXml({ id: 1550 + itemIndex, name: `Private Domain Dashboard Bar ${itemIndex + 1}`, x: 5872480 + itemIndex * 426720, y: 2941320 - height, cx: 213360, cy: height, fill: itemIndex === 3 ? visual.secondary || "F06A4B" : itemIndex % 2 ? visual.accent : visual.primary });
+  }).join("");
+  return solidShapeXml({ id: 1540, name: "Private Domain Dashboard Panel", geom: "roundRect", x: 5410200, y: 1051560, cx: 2819400, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1541, name: "Private Domain Dashboard Border", geom: "roundRect", x: 5410200, y: 1051560, cx: 2819400, cy: 2133600, stroke: palette.frame, width: 7620 })
+    + rectShapeXml({ id: 1542, name: "Private Domain Dashboard Header", x: 5654040, y: 1318260, cx: 1219200, cy: 60960, fill: palette.goldSoft })
+    + bars
+    + rectShapeXml({ id: 1543, name: "Private Domain Dashboard Baseline", x: 5654040, y: 2941320, cx: 2286000, cy: 30480, fill: palette.line });
+}
+
+function privateDomainMemberLayeringActionXml({ scene, visual, palette }) {
+  return scene.labels.slice(0, 3).map((item, itemIndex) => {
+    const x = 1066800 + itemIndex * 2286000;
+    return solidShapeXml({ id: 1570 + itemIndex * 4, name: `Private Domain Action Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3154680, cx: 1828800, cy: 792480, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1571 + itemIndex * 4, name: `Private Domain Action Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3154680, cx: 1828800, cy: 792480, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1572 + itemIndex * 4, name: `Private Domain Action Text ${itemIndex + 1}`, x: x + 182880, y: 3398520, cx: 1371600, cy: 182880, text: privateDomainMemberLayeringCompactText(item, "", 16), size: 820, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+      + rectShapeXml({ id: 1573 + itemIndex * 4, name: `Private Domain Action Rule ${itemIndex + 1}`, x: x + 182880, y: 3794760, cx: 457200, cy: 45720, fill: itemIndex % 2 ? visual.secondary || "F06A4B" : visual.accent });
+  }).join("");
+}
+
+function privateDomainMemberLayeringSceneFromSlide({ slide, index, role }) {
+  const bullets = privateDomainMemberLayeringBulletTexts(slide);
+  const rawRole = `${slide?.layout || ""} ${role || ""}`.toLowerCase();
+  // 导出时同样优先采用 slide.layout，保证 PPTX 与在线预览的页面类型一致。
+  const sceneRole = index === 0 || rawRole.includes("cover")
+    ? "cover"
+    : rawRole.includes("path") || rawRole.includes("touch")
+      ? "path"
+      : rawRole.includes("benefit") || rawRole.includes("rights")
+        ? "benefits"
+        : rawRole.includes("loop") || rawRole.includes("repurchase")
+          ? "loop"
+          : rawRole.includes("dashboard") || rawRole.includes("data")
+            ? "dashboard"
+            : rawRole.includes("pyramid") || rawRole.includes("layer")
+                ? "pyramid"
+                : rawRole.includes("action") || rawRole.includes("closing")
+                  ? "action"
+                  : ["pyramid", "path", "benefits", "loop", "dashboard"][(index - 1) % 5];
+  const labels = ["高价值用户", "活跃会员", "成长会员", "沉睡用户"].map((fallback, itemIndex) => privateDomainMemberLayeringCompactText(bullets[itemIndex], fallback, 15));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "PRIVATE GROWTH OPS" : sceneRole === "pyramid" ? "USER VALUE MAP" : sceneRole === "path" ? "TOUCH JOURNEY" : sceneRole === "benefits" ? "RIGHTS DESIGN" : sceneRole === "loop" ? "REPURCHASE LOOP" : sceneRole === "dashboard" ? "DATA REVIEW" : "NEXT ACTIONS",
+    title: privateDomainMemberLayeringCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    summary: privateDomainMemberLayeringCompactText(bullets[0], "围绕用户价值识别、触达路径、权益策略和复购闭环建立私域增长方案。", 42),
+    bullets,
+    labels,
+    metrics: [
+      { value: "4", label: "用户层级" },
+      { value: "5", label: "触达节点" },
+      { value: "30D", label: "复购周期" },
+    ],
+  };
+}
+
+function privateDomainMemberLayeringBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["识别不同价值会员与复购潜力", "规划社群、短信和企微触达路径", "设计层级权益和专属活动机制", "建立复购转化与数据回流闭环"];
+}
+
+function privateDomainMemberLayeringCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}...`;
+}
+
+function privateDomainMemberLayeringColorPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary || "123C35", visual.surface || "FFFFFF", 0.72),
+    greenGlow: blendHexColor(visual.primary || "123C35", visual.background || "F3F7F1", 0.78),
+    goldGlow: blendHexColor(visual.accent || "D6A84F", visual.background || "F3F7F1", 0.74),
+    goldSoft: blendHexColor(visual.accent || "D6A84F", "FFFFFF", 0.58),
+    line: blendHexColor(visual.primary || "123C35", "FFFFFF", 0.72),
   };
 }
 

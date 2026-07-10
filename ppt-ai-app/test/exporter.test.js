@@ -1613,6 +1613,49 @@ test("PptExportService uses social media operation plan decorations", () => {
   assert.doesNotMatch(slide1, /短视频增长/);
 });
 
+test("PptExportService uses private domain member layering decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-private-domain-operation-plan-member-layering",
+      theme: "member-layering",
+      templateVisual: {
+        id: "marketing-private-domain-operation-plan-member-layering",
+        primary: "123C35",
+        accent: "D6A84F",
+        secondary: "F06A4B",
+        background: "F3F7F1",
+        surface: "FFFFFF",
+        title: "10231F",
+        body: "43514C",
+        layout: "private-domain-member-layering",
+        variant: "member-layering",
+      },
+      slides: [
+        { title: "私域增长运营总览", bullets: ["识别不同价值会员与复购潜力", "规划社群和企微触达路径", "建立权益策略和复购闭环"] },
+        { title: "用户价值层级设计", layout: "private-domain-member-layering-pyramid", bullets: ["高价值用户", "活跃会员", "成长会员", "沉睡用户"] },
+        { title: "触达路径设计", layout: "private-domain-member-layering-touch-path", bullets: ["入群识别", "标签打标", "内容触达", "权益激活"] },
+        { title: "复购闭环复盘", layout: "private-domain-member-layering-repurchase-loop", bullets: ["识别用户", "权益触发", "活动承接", "数据回流"] },
+        { title: "数据复盘看板", layout: "private-domain-member-layering-dashboard", bullets: ["触达率", "转化率", "复购率", "客单价"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Private Domain Member Card"/);
+  assert.match(slide1, /name="Private Domain Metric Card 1"/);
+  assert.match(slide2, /name="Private Domain Layer Bar 1"/);
+  assert.match(slide4, /name="Private Domain Repurchase Loop"/);
+  assert.match(slide5, /name="Private Domain Dashboard Panel"/);
+  assert.doesNotMatch(slide1, /会员分层/);
+});
+
 test("PptExportService uses commercial marketing brand decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
