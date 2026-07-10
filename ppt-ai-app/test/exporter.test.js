@@ -1656,6 +1656,49 @@ test("PptExportService uses private domain member layering decorations", () => {
   assert.doesNotMatch(slide1, /会员分层/);
 });
 
+test("PptExportService uses department performance team decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "business-department-performance-report-team-performance",
+      theme: "team-performance",
+      templateVisual: {
+        id: "business-department-performance-report-team-performance",
+        primary: "173B73",
+        accent: "F5B84B",
+        secondary: "24B8A8",
+        background: "F5F8FC",
+        surface: "FFFFFF",
+        title: "102033",
+        body: "334155",
+        layout: "department-team-performance",
+        variant: "team-performance",
+      },
+      slides: [
+        { title: "部门述职与团队成果", bullets: ["复盘部门目标完成与团队贡献", "展示关键项目成果和绩效数据", "梳理团队协同与能力建设"] },
+        { title: "目标复盘", layout: "department-team-goals", bullets: ["目标达成", "团队协作", "成果沉淀", "改进计划"] },
+        { title: "绩效雷达", layout: "department-team-radar", bullets: ["质量提升", "效率改善", "收入贡献", "组织协同"] },
+        { title: "成果展示", layout: "department-team-results", bullets: ["关键项目交付", "客户价值提升", "流程沉淀", "团队成长"] },
+        { title: "改进计划", layout: "department-team-improvement", bullets: ["问题识别", "原因分析", "行动推进", "效果复盘"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Department Team Hero Card"/);
+  assert.match(slide1, /name="Department Team Metric Card 1"/);
+  assert.match(slide2, /name="Department Team Goal Card 1"/);
+  assert.match(slide3, /name="Department Team Radar Outer"/);
+  assert.match(slide4, /name="Department Team Award Card 1"/);
+  assert.doesNotMatch(slide1, /团队绩效/);
+});
+
 test("PptExportService uses commercial marketing brand decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1825,6 +1868,56 @@ test("PptExportService uses business opportunity map decorations", () => {
   assert.match(slide4, /name="Business Opportunity Path Step 1"/);
   assert.match(slide5, /name="Business Opportunity Action 1"/);
   assert.doesNotMatch(slide1, /<a:t>Opportunity Map<\/a:t>/);
+});
+
+test("PptExportService uses management meeting agenda decision decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "business-management-meeting-materials-agenda-decision",
+      theme: "agenda-decision",
+      templateVisual: {
+        id: "business-management-meeting-materials-agenda-decision",
+        primary: "13233F",
+        accent: "C99A3B",
+        secondary: "2F6B7E",
+        warning: "B64E3A",
+        background: "EEF2F6",
+        surface: "FFFFFF",
+        title: "0B1426",
+        body: "334155",
+        layout: "management-agenda-decision",
+        variant: "agenda-decision",
+      },
+      slides: [
+        { title: "管理层会议材料", layout: "management-agenda-cover", bullets: ["确认本次会议关键议题", "形成可执行决策结论", "建立会后行动追踪"] },
+        { title: "会议议题总览", layout: "management-agenda-overview", bullets: ["经营议题", "风险事项", "资源投入", "行动追踪"] },
+        { title: "核心议题决策", layout: "management-agenda-topic", bullets: ["方案 A 快速推进", "方案 B 分阶段验证", "方案 C 保守观察"] },
+        { title: "决策事项记录", layout: "management-agenda-decision-record", bullets: ["会议结论", "决策依据", "风险保留", "责任确认"] },
+        { title: "行动事项追踪", layout: "management-agenda-action-track", bullets: ["事项确认", "责任人", "截止时间", "检查节点"] },
+        { title: "下一次会议输入", layout: "management-agenda-closing", bullets: ["提出议题", "形成结论", "责任下发", "复盘追踪"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  // 导出的 PPTX 需要保留会议桌、议题卡、决策记录和追踪路径等可编辑结构，不能退回通用标题正文。
+  assert.match(slide1, /name="Management Agenda Meeting Board"/);
+  assert.match(slide1, /name="Management Agenda Dedicated Title"/);
+  assert.match(slide2, /name="Management Agenda Topic Card 1"/);
+  assert.match(slide3, /name="Management Agenda Option 1"/);
+  assert.match(slide4, /name="Management Agenda Record Block 1"/);
+  assert.match(slide5, /name="Management Agenda Track Node 1"/);
+  assert.match(slide6, /name="Management Agenda Closing Step 1"/);
+  assert.doesNotMatch(slide1, /议题决策/);
 });
 
 test("PptExportService keeps commercial template theme chips decorative", () => {
@@ -2049,6 +2142,56 @@ test("PptExportService uses growth funding flywheel decorations", () => {
   assert.match(slide4, /name="Growth Funding Proof Card 1"|name="Growth Funding Data Dashboard"/);
   assert.match(slide5, /name="Growth Funding Roadmap Node 1"/);
   assert.doesNotMatch(slide1, /growth-flywheel/);
+});
+
+test("PptExportService uses Pre-A market validation decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-pre-a-funding-bp-market-validation",
+      theme: "market-validation",
+      templateVisual: {
+        id: "pitch-pre-a-funding-bp-market-validation",
+        primary: "0B1220",
+        accent: "14B8A6",
+        secondary: "38BDF8",
+        warning: "F59E0B",
+        background: "EAF2F8",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "pre-a-market-validation",
+        variant: "market-validation",
+      },
+      slides: [
+        { title: "Pre-A funding brief", bullets: ["Customer interviews and pilots validate the pain point", "Traction metrics show paid conversion", "Funding will expand product, market and sales"] },
+        { title: "Customer evidence", bullets: ["High-frequency pain", "Pilot feedback", "Paid intent", "Repeat signal"] },
+        { title: "Traction dashboard", bullets: ["MoM growth", "Retention expansion", "CAC efficiency"] },
+        { title: "Business model", bullets: ["Customer segments", "Revenue streams", "Delivery loop", "Expansion engine"] },
+        { title: "Defensibility", bullets: ["Product capability", "Data asset", "Channel resource", "Team experience"] },
+        { title: "Capital allocation", bullets: ["Product R&D", "Market expansion", "Sales team", "Delivery operations"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Pre-A Main Investor Sheet"/);
+  assert.match(slide1, /name="Pre-A Product Interface Panel"/);
+  assert.match(slide1, /name="Pre-A Metric Card 1"/);
+  assert.match(slide2, /name="Pre-A Evidence Card 1"/);
+  assert.match(slide3, /name="Pre-A Traction Dashboard"/);
+  assert.match(slide4, /name="Pre-A Business Canvas 1"/);
+  assert.match(slide5, /name="Pre-A Moat Outer Ring"/);
+  assert.match(slide6, /name="Pre-A Capital Use 1"/);
+  assert.doesNotMatch(slide1, /market-validation/);
 });
 
 test("PptExportService uses product funding highlights decorations", () => {

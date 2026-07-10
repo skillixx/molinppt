@@ -396,7 +396,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -427,6 +427,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1280;
     if (textLength >= 22) return 1480;
     return Math.min(fallbackSize, 1760);
+  }
+  if (visual.layout === "concept-breakdown-courseware") {
+    if (index === 0) {
+      if (textLength >= 30) return 1880;
+      if (textLength >= 22) return 2140;
+      return Math.min(fallbackSize, 2440);
+    }
+    if (textLength >= 30) return 1260;
+    if (textLength >= 22) return 1460;
+    return Math.min(fallbackSize, 1740);
   }
   if (visual.layout === "exam-review-keypoints") {
     if (index === 0) {
@@ -507,6 +517,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1400;
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1880);
+  }
+  if (visual.layout === "pre-a-market-validation") {
+    if (index === 0) {
+      if (textLength >= 30) return 2020;
+      if (textLength >= 22) return 2280;
+      return Math.min(fallbackSize, 2580);
+    }
+    if (textLength >= 30) return 1380;
+    if (textLength >= 22) return 1560;
+    return Math.min(fallbackSize, 1840);
   }
   if (visual.layout === "private-domain-member-layering") {
     if (index === 0) {
@@ -863,12 +883,14 @@ function shouldRenderDomeBodyList(visual, role) {
  */
 function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "growth-funding-flywheel") return false;
+  if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "product-funding-highlights") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "seed-round-story") return false;
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "operating-problem-tree") return false;
   if (visual.layout === "business-opportunity-map") return false;
+  if (visual.layout === "management-agenda-decision") return false;
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
@@ -894,6 +916,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "customer-segmentation-layering") return false;
   if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "market-survey-analysis") return false;
+  if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -905,11 +928,13 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
+  if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "private-domain-member-layering") return false;
+  if (visual.layout === "department-team-performance") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -924,8 +949,13 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "product-interview-insight") return false;
   if (visual.layout === "product-pricing-strategy") return false;
   if (visual.layout === "market-survey-analysis") return false;
+  if (visual.layout === "experiment-ab-test") return false;
+  if (visual.layout === "management-agenda-decision") return false;
+  if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "social-video-growth") return false;
+  if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "private-domain-member-layering") return false;
+  if (visual.layout === "department-team-performance") return false;
   return true;
 }
 
@@ -1056,6 +1086,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "business-opportunity-map") {
     return base + businessOpportunityMapDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "management-agenda-decision") {
+    return base + managementAgendaDecisionDecorationsXml({ visual, index, role, slide });
+  }
   if (visual.layout === "industry-research") {
     return base + industryResearchDecorationsXml({ visual, index, layout, role });
   }
@@ -1113,6 +1146,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "market-survey-analysis") {
     return base + marketSurveyAnalysisDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "experiment-ab-test") {
+    return base + experimentAbTestDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1155,6 +1191,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "knowledge-blackboard") {
     return base + knowledgeBlackboardDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "concept-breakdown-courseware") {
+    return base + conceptBreakdownCoursewareDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "exam-review-keypoints") {
     return base + examReviewKeypointsDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1170,8 +1209,14 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "private-domain-member-layering") {
     return base + privateDomainMemberLayeringDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "department-team-performance") {
+    return base + departmentTeamPerformanceDecorationsXml({ visual, index, role, slide });
+  }
   if (isGrowthFundingFlywheelVisual(visual)) {
     return base + growthFundingFlywheelDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (isPreAMarketValidationVisual(visual)) {
+    return base + preAMarketValidationDecorationsXml({ visual, index, layout, role, slide });
   }
   if (isProductFundingHighlightsVisual(visual)) {
     return base + productFundingHighlightsDecorationsXml({ visual, index, layout, role, slide });
@@ -2303,6 +2348,30 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 777240, y: 1844040, cx: 3505200, cy: 1005840 },
       titleSize: isCover ? 2600 : isClosing ? 2400 : 1880,
       bodySize: isCover ? 860 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "pre-a-market-validation") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      surface: { x: 475488, y: 452120, cx: 8193024, cy: 4333240 },
+      accent: { x: 475488, y: 452120, cx: 8193024, cy: 53340 },
+      secondaryAccent: { x: 731520, y: isCover ? 2057400 : 1813560, cx: 3048000, cy: 38100 },
+      label: { x: 731520, y: 655320, cx: 3200400, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1112520, cx: 4572000, cy: 762000 }
+        : isCover
+          ? { x: 731520, y: 1028700, cx: 3840480, cy: 990600 }
+          : { x: 731520, y: 899160, cx: 3810000, cy: 762000 },
+      content: isClosing
+        ? { x: 731520, y: 2072640, cx: 3657600, cy: 762000 }
+        : isCover
+          ? { x: 777240, y: 2354580, cx: 3429000, cy: 731520 }
+          : { x: 777240, y: 1767840, cx: 3429000, cy: 914400 },
+      titleSize: isCover ? 2580 : isClosing ? 2320 : 1840,
+      bodySize: isCover ? 840 : 720,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -6167,6 +6236,184 @@ function isKnowledgeBlackboardVisual(visual) {
   return visual?.layout === "knowledge-blackboard" && (id === "knowledge-handout" || id === "education-knowledge-handout-blackboard");
 }
 
+function conceptBreakdownCoursewareDecorationsXml({ visual, index, role, slide }) {
+  const scene = conceptBreakdownCoursewareSceneFromSlide({ slide, index, role });
+  const palette = conceptBreakdownCoursewareColorPalette(visual);
+  // 概念拆解课件使用可编辑形状模拟白板、概念节点和练习反馈区，避免下载 PPTX 只剩整页截图。
+  const base = rectShapeXml({ id: 2100, name: "Concept Breakdown Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.background })
+    + conceptBreakdownGridXml({ palette })
+    + solidShapeXml({ id: 2110, name: "Concept Breakdown Stage", geom: "roundRect", x: 521208, y: 411480, cx: 8101584, cy: 4320540, fill: visual.surface })
+    + lineFrameShapeXml({ id: 2111, name: "Concept Breakdown Stage Frame", geom: "roundRect", x: 521208, y: 411480, cx: 8101584, cy: 4320540, stroke: palette.frame, width: 9525 })
+    + solidShapeXml({ id: 2112, name: "Concept Breakdown Learning Rail", geom: "roundRect", x: 670560, y: 640080, cx: 76200, cy: 3962400, fill: visual.primary })
+    + solidShapeXml({ id: 2113, name: "Concept Breakdown Rail Glow", geom: "roundRect", x: 868680, y: 640080, cx: 45720, cy: 3962400, fill: palette.railGlow })
+    + textShapeXml({ id: 2120, name: "Concept Breakdown Kicker", x: 914400, y: 731520, cx: 2438400, cy: 213360, text: scene.kicker, size: 700, bold: true, color: visual.primary })
+    + textShapeXml({ id: 2121, name: "Concept Breakdown Title", x: 914400, y: index === 0 ? 1066800 : 914400, cx: 3962400, cy: index === 0 ? 975360 : 731520, text: scene.title, size: index === 0 ? 2260 : 1680, bold: true, color: visual.title })
+    + solidShapeXml({ id: 2122, name: "Concept Breakdown Title Underline", geom: "roundRect", x: 914400, y: index === 0 ? 2209800 : 1905000, cx: 1737360, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 2123, name: "Concept Breakdown Blue Marker", geom: "roundRect", x: 2293620, y: index === 0 ? 2042160 : 1737360, cx: 594360, cy: 38100, fill: visual.secondary || "3B82F6", transparency: 22000 });
+  const bullets = conceptBreakdownBulletXml({ visual, scene, index });
+  if (scene.role === "map" || scene.role === "detail") return base + bullets + conceptBreakdownMapXml({ visual, scene, palette }) + conceptBreakdownCardsXml({ visual, scene, palette });
+  if (scene.role === "case") return base + bullets + conceptBreakdownCaseXml({ visual, scene, palette }) + conceptBreakdownCardsXml({ visual, scene, palette });
+  if (scene.role === "practice") return base + bullets + conceptBreakdownPracticeXml({ visual, scene, palette }) + conceptBreakdownFeedbackXml({ visual, scene, palette });
+  if (scene.role === "summary") return base + bullets + conceptBreakdownSummaryXml({ visual, scene, palette }) + conceptBreakdownFeedbackXml({ visual, scene, palette });
+  return base + bullets + conceptBreakdownBoardXml({ visual, palette }) + conceptBreakdownCardsXml({ visual, scene, palette });
+}
+
+function conceptBreakdownGridXml({ palette }) {
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8230560].map((x, index) =>
+    rectShapeXml({ id: 2130 + index, name: `Concept Breakdown Grid Vertical ${index + 1}`, x, y: 457200, cx: 7620, cy: 4114800, fill: palette.grid, transparency: 76000 }),
+  ).join("");
+  const horizontal = [731520, 1097280, 1463040, 1828800, 2194560, 2560320, 2926080, 3291840, 3657600, 4023360, 4389120].map((y, index) =>
+    rectShapeXml({ id: 2150 + index, name: `Concept Breakdown Grid Horizontal ${index + 1}`, x: 609600, y, cx: 7924800, cy: 7620, fill: palette.grid, transparency: 79000 }),
+  ).join("");
+  return vertical + horizontal;
+}
+
+function conceptBreakdownBulletXml({ visual, scene, index }) {
+  const yStart = index === 0 ? 2506980 : 2026920;
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = yStart + itemIndex * 259080;
+    return solidShapeXml({ id: 2170 + itemIndex * 3, name: `Concept Breakdown Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 944880, y: y + 53340, cx: 83820, cy: 83820, fill: itemIndex % 2 === 0 ? visual.accent : visual.secondary || "3B82F6" })
+      + textShapeXml({ id: 2171 + itemIndex * 3, name: `Concept Breakdown Bullet Text ${itemIndex + 1}`, x: 1097280, y, cx: 3352800, cy: 198120, text: conceptBreakdownCoursewareCompactText(item, scene.title, 36), size: index === 0 ? 720 : 660, bold: false, color: visual.body });
+  }).join("");
+}
+
+function conceptBreakdownBoardXml({ visual, palette }) {
+  return solidShapeXml({ id: 2190, name: "Concept Breakdown Whiteboard", geom: "roundRect", x: 5676900, y: 914400, cx: 2438400, cy: 2286000, fill: palette.board })
+    + solidShapeXml({ id: 2191, name: "Concept Breakdown Whiteboard Card", geom: "roundRect", x: 5951220, y: 1272540, cx: 762000, cy: 1310640, fill: visual.surface })
+    + rectShapeXml({ id: 2192, name: "Concept Breakdown Board Line 1", x: 6995160, y: 1363980, cx: 914400, cy: 68580, fill: visual.primary })
+    + rectShapeXml({ id: 2193, name: "Concept Breakdown Board Line 2", x: 6995160, y: 1737360, cx: 731520, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 2194, name: "Concept Breakdown Board Line 3", x: 6995160, y: 2110740, cx: 914400, cy: 60960, fill: visual.secondary || "3B82F6" })
+    + solidShapeXml({ id: 2195, name: "Concept Breakdown Board Mark", geom: "ellipse", x: 5943600, y: 2636520, cx: 304800, cy: 304800, fill: visual.success || "16A34A" });
+}
+
+function conceptBreakdownMapXml({ visual, scene, palette }) {
+  return solidShapeXml({ id: 2210, name: "Concept Breakdown Map Root", geom: "roundRect", x: 6057900, y: 929640, cx: 1524000, cy: 640080, fill: visual.primary })
+    + textShapeXml({ id: 2211, name: "Concept Breakdown Map Root Text", x: 6225540, y: 1112520, cx: 1188720, cy: 182880, text: conceptBreakdownCoursewareCompactText(scene.cards[0], "定义边界", 10), size: 680, bold: true, color: "FFFFFF" })
+    + rectShapeXml({ id: 2212, name: "Concept Breakdown Map Connector", x: 6355080, y: 1889760, cx: 1066800, cy: 38100, fill: visual.accent })
+    + rectShapeXml({ id: 2213, name: "Concept Breakdown Map Connector Left", x: 6096000, y: 1927860, cx: 38100, cy: 685800, fill: visual.accent })
+    + rectShapeXml({ id: 2214, name: "Concept Breakdown Map Connector Right", x: 7650480, y: 1927860, cx: 38100, cy: 685800, fill: visual.accent })
+    + conceptBreakdownNodeXml({ id: 2220, x: 5554980, y: 2667000, text: scene.cards[1], fill: palette.node })
+    + conceptBreakdownNodeXml({ id: 2230, x: 7109460, y: 2667000, text: scene.cards[2], fill: palette.node });
+}
+
+function conceptBreakdownNodeXml({ id, x, y, text, fill }) {
+  return solidShapeXml({ id, name: `Concept Breakdown Node ${id}`, geom: "roundRect", x, y, cx: 1280160, cy: 640080, fill })
+    + textShapeXml({ id: id + 1, name: `Concept Breakdown Node Text ${id}`, x: x + 137160, y: y + 198120, cx: 975360, cy: 182880, text: conceptBreakdownCoursewareCompactText(text, "", 10), size: 660, bold: true, color: "182B3A" });
+}
+
+function conceptBreakdownCardsXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const x = 914400 + index * 2286000;
+    return solidShapeXml({ id: 2250 + index * 4, name: `Concept Breakdown Card ${index + 1}`, geom: "roundRect", x, y: 3764280, cx: 1828800, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2251 + index * 4, name: `Concept Breakdown Card Border ${index + 1}`, geom: "roundRect", x, y: 3764280, cx: 1828800, cy: 609600, stroke: palette.frame, width: 7620 })
+      + rectShapeXml({ id: 2252 + index * 4, name: `Concept Breakdown Card Accent ${index + 1}`, x: x + 152400, y: 3901440, cx: 548640, cy: 45720, fill: index === 1 ? visual.secondary || "3B82F6" : visual.accent })
+      + textShapeXml({ id: 2253 + index * 4, name: `Concept Breakdown Card Text ${index + 1}`, x: x + 152400, y: 4023360, cx: 1371600, cy: 182880, text: conceptBreakdownCoursewareCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function conceptBreakdownCaseXml({ visual, scene, palette }) {
+  return solidShapeXml({ id: 2280, name: "Concept Breakdown Case Panel", geom: "roundRect", x: 5638800, y: 914400, cx: 2438400, cy: 2438400, fill: palette.case })
+    + rectShapeXml({ id: 2281, name: "Concept Breakdown Case Highlight", x: 5943600, y: 1272540, cx: 1371600, cy: 91440, fill: visual.accent })
+    + rectShapeXml({ id: 2282, name: "Concept Breakdown Case Line 1", x: 5943600, y: 1714500, cx: 1676400, cy: 68580, fill: visual.primary })
+    + rectShapeXml({ id: 2283, name: "Concept Breakdown Case Line 2", x: 5943600, y: 2118360, cx: 1371600, cy: 68580, fill: visual.secondary || "3B82F6" })
+    + textShapeXml({ id: 2284, name: "Concept Breakdown Case Caption", x: 5943600, y: 2674620, cx: 1676400, cy: 243840, text: conceptBreakdownCoursewareCompactText(scene.cards[0], "案例背景", 12), size: 700, bold: true, color: visual.title });
+}
+
+function conceptBreakdownPracticeXml({ visual, scene, palette }) {
+  return scene.cards.concat(scene.feedback.slice(0, 1)).slice(0, 4).map((item, index) => {
+    const column = index % 2;
+    const row = Math.floor(index / 2);
+    const x = 5486400 + column * 1310640;
+    const y = 990600 + row * 1097280;
+    return solidShapeXml({ id: 2310 + index * 4, name: `Concept Breakdown Practice Tile ${index + 1}`, geom: "roundRect", x, y, cx: 1127760, cy: 792480, fill: "FFFFFF" })
+      + solidShapeXml({ id: 2311 + index * 4, name: `Concept Breakdown Practice Dot ${index + 1}`, geom: "ellipse", x: x + 152400, y: y + 137160, cx: 213360, cy: 213360, fill: index % 2 === 0 ? visual.accent : visual.secondary || "3B82F6" })
+      + textShapeXml({ id: 2312 + index * 4, name: `Concept Breakdown Practice Text ${index + 1}`, x: x + 152400, y: y + 426720, cx: 792480, cy: 182880, text: conceptBreakdownCoursewareCompactText(item, "", 9), size: 620, bold: true, color: visual.title });
+  }).join("") + lineFrameShapeXml({ id: 2329, name: "Concept Breakdown Practice Panel Frame", geom: "roundRect", x: 5354320, y: 883920, cx: 2743200, cy: 2438400, stroke: palette.frame, width: 7620 });
+}
+
+function conceptBreakdownFeedbackXml({ visual, scene, palette }) {
+  return scene.feedback.slice(0, 4).map((item, index) => {
+    const x = 914400 + index * 1905000;
+    return solidShapeXml({ id: 2340 + index * 4, name: `Concept Breakdown Feedback ${index + 1}`, geom: "roundRect", x, y: 3840480, cx: 1524000, cy: 548640, fill: palette.feedback })
+      + rectShapeXml({ id: 2341 + index * 4, name: `Concept Breakdown Feedback Rule ${index + 1}`, x: x + 137160, y: 3992880, cx: 396240, cy: 38100, fill: index % 2 === 0 ? visual.accent : visual.secondary || "3B82F6" })
+      + textShapeXml({ id: 2342 + index * 4, name: `Concept Breakdown Feedback Text ${index + 1}`, x: x + 137160, y: 4107180, cx: 1127760, cy: 152400, text: conceptBreakdownCoursewareCompactText(item, "", 9), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function conceptBreakdownSummaryXml({ visual, scene }) {
+  return scene.cards.slice(0, 3).map((item, index) => {
+    const y = 1066800 + index * 716280;
+    return solidShapeXml({ id: 2370 + index * 4, name: `Concept Breakdown Summary Note ${index + 1}`, geom: "roundRect", x: 5707380, y, cx: 2316480, cy: 487680, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2371 + index * 4, name: `Concept Breakdown Summary Stripe ${index + 1}`, x: 5707380, y, cx: 76200, cy: 487680, fill: index === 1 ? visual.secondary || "3B82F6" : visual.primary })
+      + textShapeXml({ id: 2372 + index * 4, name: `Concept Breakdown Summary Text ${index + 1}`, x: 5913120, y: y + 137160, cx: 1676400, cy: 182880, text: conceptBreakdownCoursewareCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function conceptBreakdownCoursewareSceneFromSlide({ slide, index, role }) {
+  const bullets = conceptBreakdownCoursewareBulletTexts(slide);
+  const rawRole = String(slide?.layout || role || "");
+  const sceneRole = index === 0
+    ? "cover"
+    : rawRole.includes("map") || rawRole.includes("concept")
+      ? "map"
+      : rawRole.includes("case")
+        ? "case"
+        : rawRole.includes("practice") || rawRole.includes("exercise")
+          ? "practice"
+          : rawRole.includes("summary") || rawRole === "closing"
+            ? "summary"
+            : ["map", "detail", "case", "practice", "summary"][(index - 1) % 5];
+  const kickerMap = {
+    cover: "LESSON FRAME",
+    map: "CORE STRUCTURE",
+    detail: "DEEP DIVE",
+    case: "CLASS CASE",
+    practice: "PRACTICE LAB",
+    summary: "LEARNING CHECK",
+  };
+  return {
+    role: sceneRole,
+    kicker: kickerMap[sceneRole] || "DEEP DIVE",
+    title: conceptBreakdownCoursewareCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    cards: ["定义边界", "组成结构", "迁移应用"].map((fallback, itemIndex) => conceptBreakdownCoursewareCompactText(bullets[itemIndex], fallback, 12)),
+    feedback: ["理解", "辨析", "应用", "复盘"].map((fallback, itemIndex) => conceptBreakdownCoursewareCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function conceptBreakdownCoursewareBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确概念定义和适用边界", "拆解组成结构与关键关系", "结合案例完成迁移练习"];
+}
+
+function conceptBreakdownCoursewareCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function conceptBreakdownCoursewareColorPalette(visual) {
+  return {
+    background: blendHexColor(visual.background, visual.surface, 0.28),
+    grid: blendHexColor(visual.primary, visual.background, 0.58),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    railGlow: blendHexColor(visual.primary, visual.surface, 0.82),
+    board: blendHexColor(visual.primary, visual.surface, 0.86),
+    node: blendHexColor(visual.secondary || "3B82F6", visual.surface, 0.84),
+    case: blendHexColor(visual.accent, visual.surface, 0.84),
+    feedback: blendHexColor(visual.primary, visual.surface, 0.9),
+  };
+}
+
+function isConceptBreakdownCoursewareVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "concept-breakdown-courseware" && (id === "knowledge-point-courseware" || id === "education-knowledge-point-courseware-concept-breakdown");
+}
+
 function examReviewKeypointsDecorationsXml({ visual, index, role, slide }) {
   const scene = examReviewKeypointsSceneFromSlide({ slide, index, role });
   const palette = examReviewKeypointsColorPalette(visual);
@@ -7903,6 +8150,197 @@ function isGrowthFundingFlywheelVisual(visual) {
   return visual?.layout === "growth-funding-flywheel" && (id === "growth-funding-pitch" || id === "pitch-growth-funding-pitch-growth-flywheel");
 }
 
+function preAMarketValidationDecorationsXml({ visual, index, role, slide }) {
+  const scene = preAMarketValidationScene({ slide, index, role });
+  const palette = preAMarketValidationPalette(visual);
+  const background = solidShapeXml({ id: 25001, name: "Pre-A Dark Investor Stage", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.primary })
+    + solidShapeXml({ id: 25002, name: "Pre-A Main Investor Sheet", geom: "roundRect", x: 475488, y: 452120, cx: 8193024, cy: 4333240, fill: visual.surface })
+    + lineFrameShapeXml({ id: 25003, name: "Pre-A Sheet Frame", geom: "roundRect", x: 475488, y: 452120, cx: 8193024, cy: 4333240, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 25004, name: "Pre-A Validation Accent", x: 475488, y: 452120, cx: 8193024, cy: 53340, fill: visual.accent })
+    + solidShapeXml({ id: 25005, name: "Pre-A Growth Beam", geom: "parallelogram", x: 6507480, y: 0, cx: 2438400, cy: 609600, fill: palette.beam })
+    + rectShapeXml({ id: 25006, name: "Pre-A Title Rule", x: 731520, y: scene.role === "cover" ? 2057400 : 1813560, cx: 3048000, cy: 38100, fill: visual.accent });
+  const heading = preAMarketValidationHeadingXml({ visual, scene, slide });
+  const bullets = preAMarketValidationBulletXml({ visual, scene, slide });
+  if (scene.role === "cover") {
+    return background + heading + bullets + preAMarketValidationProductPanelXml({ visual, palette }) + preAMarketValidationMetricsXml({ visual, scene });
+  }
+  if (scene.role === "evidence") {
+    return background + heading + bullets + preAMarketValidationEvidenceXml({ visual, scene, slide }) + preAMarketValidationMetricsXml({ visual, scene });
+  }
+  if (scene.role === "traction") {
+    return background + heading + bullets + preAMarketValidationDashboardXml({ visual, palette }) + preAMarketValidationMetricsXml({ visual, scene });
+  }
+  if (scene.role === "model") {
+    return background + heading + bullets + preAMarketValidationCanvasXml({ visual, scene, slide });
+  }
+  if (scene.role === "moat") {
+    return background + heading + bullets + preAMarketValidationMoatXml({ visual, scene, slide, palette });
+  }
+  if (scene.role === "capital") {
+    return background + heading + bullets + preAMarketValidationCapitalXml({ visual, scene, slide });
+  }
+  return background + heading + bullets + preAMarketValidationClosingXml({ visual, palette }) + preAMarketValidationCapitalXml({ visual, scene, slide });
+}
+
+function preAMarketValidationHeadingXml({ visual, scene, slide }) {
+  const title = preAMarketValidationCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 28);
+  const bullets = preAMarketValidationBulletTexts(slide);
+  const summary = preAMarketValidationCompactText(bullets[0], scene.summary, 46);
+  return textShapeXml({ id: 25020, name: "Pre-A Investor Kicker", x: 731520, y: 655320, cx: 3200400, cy: 274320, text: scene.kicker, size: 820, bold: true, color: visual.accent })
+    + textShapeXml({ id: 25021, name: "Pre-A Investor Title", x: 731520, y: scene.role === "cover" ? 1028700 : 899160, cx: 3810000, cy: scene.role === "cover" ? 990600 : 762000, text: title, size: scene.role === "cover" ? 2580 : 1840, bold: true, color: visual.title })
+    + textShapeXml({ id: 25022, name: "Pre-A Investor Summary", x: 777240, y: scene.role === "cover" ? 2354580 : 1767840, cx: 3429000, cy: 365760, text: summary, size: 780, bold: true, color: visual.body });
+}
+
+function preAMarketValidationBulletXml({ visual, scene, slide }) {
+  const bullets = preAMarketValidationBulletTexts(slide).slice(0, 4);
+  return bullets.map((item, itemIndex) => {
+    const y = (scene.role === "cover" ? 2827020 : 2217420) + itemIndex * 243840;
+    return solidShapeXml({ id: 25030 + itemIndex * 3, name: `Pre-A Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 777240, y: y + 53340, cx: 60960, cy: 60960, fill: visual.accent })
+      + textShapeXml({ id: 25031 + itemIndex * 3, name: `Pre-A Bullet Text ${itemIndex + 1}`, x: 883920, y, cx: 3200400, cy: 182880, text: preAMarketValidationCompactText(item, scene.summary, 34), size: 700, bold: false, color: visual.body });
+  }).join("");
+}
+
+function preAMarketValidationMetricsXml({ visual, scene }) {
+  return scene.metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 731520 + itemIndex * 1219200;
+    return solidShapeXml({ id: 25050 + itemIndex * 3, name: `Pre-A Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3886200, cx: 1066800, cy: 548640, fill: visual.surface })
+      + lineFrameShapeXml({ id: 25051 + itemIndex * 3, name: `Pre-A Metric Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3886200, cx: 1066800, cy: 548640, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 7620 })
+      + textShapeXml({ id: 25052 + itemIndex * 3, name: `Pre-A Metric Text ${itemIndex + 1}`, x: x + 121920, y: 3992880, cx: 822960, cy: 304800, text: `${metric.value}\n${metric.label}`, size: 860, bold: true, color: itemIndex === 1 ? visual.accent : visual.title });
+  }).join("");
+}
+
+function preAMarketValidationProductPanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 25070, name: "Pre-A Product Interface Panel", geom: "roundRect", x: 5638800, y: 1005840, cx: 3048000, cy: 2667000, fill: visual.primary })
+    + rectShapeXml({ id: 25071, name: "Pre-A Interface Growth Rule", x: 5943600, y: 1325880, cx: 2286000, cy: 76200, fill: visual.accent })
+    + solidShapeXml({ id: 25072, name: "Pre-A Interface Screen", geom: "roundRect", x: 5943600, y: 1783080, cx: 2438400, cy: 1371600, fill: palette.screen })
+    + rectShapeXml({ id: 25073, name: "Pre-A Growth Signal 1", x: 6248400, y: 2743200, cx: 518160, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 25074, name: "Pre-A Growth Signal 2", x: 6964680, y: 2583180, cx: 640080, cy: 60960, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 25075, name: "Pre-A Growth Signal 3", x: 7802880, y: 2362200, cx: 518160, cy: 60960, fill: visual.warning || visual.accent });
+}
+
+function preAMarketValidationEvidenceXml({ visual, scene, slide }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  return scene.cards.slice(0, 6).map((card, itemIndex) => {
+    const col = itemIndex % 3;
+    const row = Math.floor(itemIndex / 3);
+    const x = 5379720 + col * 1043940;
+    const y = 1158240 + row * 990600;
+    return solidShapeXml({ id: 25090 + itemIndex * 4, name: `Pre-A Evidence Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 914400, cy: 792480, fill: visual.surface })
+      + lineFrameShapeXml({ id: 25091 + itemIndex * 4, name: `Pre-A Evidence Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 914400, cy: 792480, stroke: blendHexColor(visual.accent, visual.surface, 0.58), width: 7620 })
+      + solidShapeXml({ id: 25092 + itemIndex * 4, name: `Pre-A Evidence Icon ${itemIndex + 1}`, geom: "roundRect", x: x + 121920, y: y + 137160, cx: 228600, cy: 228600, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + textShapeXml({ id: 25093 + itemIndex * 4, name: `Pre-A Evidence Text ${itemIndex + 1}`, x: x + 121920, y: y + 441960, cx: 670560, cy: 213360, text: preAMarketValidationCompactText(bullets[itemIndex] || card, card, 15), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function preAMarketValidationDashboardXml({ visual, palette }) {
+  return solidShapeXml({ id: 25130, name: "Pre-A Traction Dashboard", geom: "roundRect", x: 5334000, y: 1066800, cx: 3352800, cy: 2438400, fill: visual.surface })
+    + lineFrameShapeXml({ id: 25131, name: "Pre-A Dashboard Frame", geom: "roundRect", x: 5334000, y: 1066800, cx: 3352800, cy: 2438400, stroke: blendHexColor(visual.primary, visual.surface, 0.74), width: 7620 })
+    + rectShapeXml({ id: 25132, name: "Pre-A Dashboard Header", x: 5638800, y: 1341120, cx: 2438400, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 25133, name: "Pre-A Bar 1", geom: "roundRect", x: 5791200, y: 2819400, cx: 304800, cy: 457200, fill: visual.accent })
+    + solidShapeXml({ id: 25134, name: "Pre-A Bar 2", geom: "roundRect", x: 6339840, y: 2506980, cx: 304800, cy: 769620, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: 25135, name: "Pre-A Bar 3", geom: "roundRect", x: 6888480, y: 2049780, cx: 304800, cy: 1226820, fill: visual.accent })
+    + solidShapeXml({ id: 25136, name: "Pre-A Bar 4", geom: "roundRect", x: 7437120, y: 2346960, cx: 304800, cy: 929640, fill: visual.warning || visual.accent })
+    + rectShapeXml({ id: 25137, name: "Pre-A Dashboard Axis", x: 5638800, y: 3276600, cx: 2438400, cy: 22860, fill: palette.line });
+}
+
+function preAMarketValidationCanvasXml({ visual, scene, slide }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  return scene.cards.slice(0, 4).map((card, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5334000 + col * 1676400;
+    const y = 1066800 + row * 1066800;
+    return solidShapeXml({ id: 25150 + itemIndex * 3, name: `Pre-A Business Canvas ${itemIndex + 1}`, geom: "roundRect", x, y, cx: itemIndex === 0 ? 1524000 : 1447800, cy: 914400, fill: itemIndex === 0 ? blendHexColor(visual.accent, visual.surface, 0.82) : visual.surface })
+      + rectShapeXml({ id: 25151 + itemIndex * 3, name: `Pre-A Canvas Rule ${itemIndex + 1}`, x: x + 137160, y: y + 152400, cx: 609600, cy: 45720, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + textShapeXml({ id: 25152 + itemIndex * 3, name: `Pre-A Canvas Text ${itemIndex + 1}`, x: x + 137160, y: y + 381000, cx: 1219200, cy: 228600, text: preAMarketValidationCompactText(bullets[itemIndex] || card, card, 18), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function preAMarketValidationMoatXml({ visual, scene, slide, palette }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  const centerX = 6920000;
+  const centerY = 2470000;
+  return solidShapeXml({ id: 25180, name: "Pre-A Moat Outer Ring", geom: "ellipse", x: 5608320, y: 1066800, cx: 2438400, cy: 2438400, fill: palette.ring })
+    + solidShapeXml({ id: 25181, name: "Pre-A Moat Inner Core", geom: "ellipse", x: 6421120, y: 1879600, cx: 812800, cy: 812800, fill: visual.primary })
+    + scene.cards.slice(0, 4).map((card, itemIndex) => {
+      const positions = [
+        { x: centerX - 518160, y: 838200 },
+        { x: 7848600, y: centerY - 213360 },
+        { x: centerX - 518160, y: 3535680 },
+        { x: 5173980, y: centerY - 213360 },
+      ];
+      const pos = positions[itemIndex];
+      return solidShapeXml({ id: 25190 + itemIndex * 2, name: `Pre-A Moat Node ${itemIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 914400, cy: 396240, fill: visual.surface })
+        + textShapeXml({ id: 25191 + itemIndex * 2, name: `Pre-A Moat Node Text ${itemIndex + 1}`, x: pos.x + 91440, y: pos.y + 106680, cx: 731520, cy: 152400, text: preAMarketValidationCompactText(bullets[itemIndex] || card, card, 12), size: 660, bold: true, color: visual.title });
+    }).join("");
+}
+
+function preAMarketValidationCapitalXml({ visual, scene, slide }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  return scene.cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 731520 + itemIndex * 1905000;
+    return solidShapeXml({ id: 25220 + itemIndex * 3, name: `Pre-A Capital Use ${itemIndex + 1}`, geom: "roundRect", x, y: 3657600, cx: 1600200, cy: 609600, fill: visual.surface })
+      + rectShapeXml({ id: 25221 + itemIndex * 3, name: `Pre-A Capital Rule ${itemIndex + 1}`, x: x + 152400, y: 4076700, cx: 1219200, cy: 38100, fill: itemIndex === 2 ? (visual.warning || visual.accent) : visual.accent })
+      + textShapeXml({ id: 25222 + itemIndex * 3, name: `Pre-A Capital Text ${itemIndex + 1}`, x: x + 152400, y: 3810000, cx: 1295400, cy: 167640, text: preAMarketValidationCompactText(bullets[itemIndex] || card, card, 16), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function preAMarketValidationClosingXml({ visual, palette }) {
+  return solidShapeXml({ id: 25260, name: "Pre-A Closing Panel", geom: "roundRect", x: 5638800, y: 1143000, cx: 3048000, cy: 2133600, fill: visual.primary })
+    + rectShapeXml({ id: 25261, name: "Pre-A Closing Signal", x: 6035040, y: 1600200, cx: 2286000, cy: 76200, fill: visual.accent })
+    + lineFrameShapeXml({ id: 25262, name: "Pre-A Closing Inner Frame", geom: "roundRect", x: 6156960, y: 2057400, cx: 1981200, cy: 914400, stroke: palette.soft, width: 15240 });
+}
+
+function preAMarketValidationPalette(visual) {
+  return {
+    beam: blendHexColor(visual.primary, visual.accent, 0.22),
+    frame: blendHexColor(visual.primary, visual.surface, 0.70),
+    line: blendHexColor(visual.primary, visual.background, 0.55),
+    ring: blendHexColor(visual.accent, visual.surface, 0.78),
+    screen: blendHexColor(visual.background, visual.surface, 0.36),
+    soft: blendHexColor(visual.accent, visual.surface, 0.36),
+  };
+}
+
+function preAMarketValidationScene({ slide, index, role }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  const title = preAMarketValidationCompactText(slide?.title, "用市场验证证明 Pre-A 融资价值", index === 0 ? 30 : 28);
+  const metrics = [
+    { value: "120+", label: "客户访谈" },
+    { value: "38%", label: "试点转付费" },
+    { value: "16m", label: "Runway" },
+  ];
+  const cards = ["客户痛点验证", "试点付费信号", "增长牵引数据", "资金用途里程碑"].map((fallback, itemIndex) => preAMarketValidationCompactText(bullets[itemIndex], fallback, 16));
+  if (role === "closing") {
+    return { role: "closing", variant: "market-validation", kicker: "NEXT INVESTOR STEP", title, summary: "用清晰投资亮点、验证证据和下一步沟通推动投资决策。", metrics, cards: ["验证材料", "产品演示", "数据复核", "投资沟通"] };
+  }
+  const scenes = [
+    { role: "cover", variant: "market-validation", kicker: "PRE-A INVESTOR BRIEF", title, summary: "用市场验证、牵引数据和资金用途说明 Pre-A 阶段的融资确定性。", metrics, cards },
+    { role: "evidence", variant: "market-validation", kicker: "CUSTOMER EVIDENCE", title, summary: "把客户访谈、试点反馈、付费意愿和复购线索整理成投资人可判断的证据墙。", metrics, cards: ["痛点高频出现", "试点反馈明确", "付费意愿增强", "复购线索形成", "决策链路清晰", "交付边界稳定"] },
+    { role: "traction", variant: "market-validation", kicker: "TRACTION DASHBOARD", title, summary: "用增长、留存、收入和获客效率说明商业牵引不是单点样本。", metrics: [{ value: "MoM", label: "月度增长" }, { value: "NRR", label: "留存扩张" }, { value: "CAC", label: "获客效率" }], cards },
+    { role: "model", variant: "market-validation", kicker: "BUSINESS MODEL", title, summary: "把客户分层、收入来源、交付路径和扩张机制放进同一张商业画布。", metrics, cards: ["目标客户分层", "收入来源组合", "交付闭环路径", "规模化扩张机制"] },
+    { role: "moat", variant: "market-validation", kicker: "DEFENSIBILITY MAP", title, summary: "说明产品能力、数据资产、渠道资源和团队经验如何形成 Pre-A 阶段壁垒。", metrics, cards: ["产品能力", "数据资产", "渠道资源", "团队经验"] },
+    { role: "capital", variant: "market-validation", kicker: "CAPITAL ALLOCATION", title, summary: "把资金用途和 12-18 个月里程碑绑定，说明融资后如何放大验证结果。", metrics, cards: ["产品研发", "市场拓展", "销售团队", "运营交付"] },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function preAMarketValidationBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["目标客户痛点已经通过访谈和试点验证", "牵引数据体现留存、付费和获客效率改善", "融资资金将用于产品、市场、销售和交付里程碑"];
+}
+
+function preAMarketValidationCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isPreAMarketValidationVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "pre-a-market-validation" && (id === "pre-a-funding-bp" || id === "pitch-pre-a-funding-bp-market-validation");
+}
+
 function productFundingHighlightsDecorationsXml({ visual, index, role, slide }) {
   const scene = productFundingHighlightsScene({ slide, index, role });
   const palette = productFundingHighlightsPalette(visual);
@@ -9059,6 +9497,176 @@ function socialVideoGrowthColorPalette(visual) {
   };
 }
 
+function departmentTeamPerformanceDecorationsXml({ visual, index, slide }) {
+  const scene = departmentTeamPerformanceSceneFromSlide({ slide, index });
+  const palette = departmentTeamPerformancePalette(visual);
+  const bullets = scene.bullets.slice(0, 4);
+  const bulletBody = bullets.map((item) => paragraphXml(`• ${departmentTeamPerformanceCompactText(item, "", 34)}`, 760, true, visual.body)).join("");
+  const base = solidShapeXml({ id: 1701, name: "Department Team Surface", geom: "roundRect", x: 502920, y: 421640, cx: 8138160, cy: 4312920, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1702, name: "Department Team Surface Frame", geom: "roundRect", x: 502920, y: 421640, cx: 8138160, cy: 4312920, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1703, name: "Department Team Header Rule", x: 502920, y: 421640, cx: 8138160, cy: 60960, fill: visual.primary })
+    + rectShapeXml({ id: 1704, name: "Department Team Accent Rule", x: 502920, y: 482600, cx: 8138160, cy: 25400, fill: visual.accent })
+    + textShapeXml({ id: 1705, name: "Department Team Kicker", x: 777240, y: 708660, cx: 2438400, cy: 182880, text: scene.kicker, size: 780, bold: true, color: visual.secondary || visual.accent })
+    + textShapeXml({ id: 1706, name: "Department Team Title", x: 777240, y: 960120, cx: 3810000, cy: 853440, text: scene.title, size: 1900, bold: true, color: visual.title })
+    + textShapeXml({ id: 1707, name: "Department Team Summary", x: 777240, y: 1905000, cx: 3429000, cy: 365760, text: scene.summary, size: 760, bold: true, color: visual.body })
+    + textShapeXml({ id: 1708, name: "Department Team Bullets", x: 777240, y: 2468880, cx: 3429000, cy: 914400, body: bulletBody, size: 760, bold: true, color: visual.body });
+  const metrics = scene.metrics.map((metric, itemIndex) => {
+    const x = 777240 + itemIndex * 1097280;
+    return solidShapeXml({ id: 1720 + itemIndex * 3, name: `Department Team Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3924300, cx: 975360, cy: 533400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1721 + itemIndex * 3, name: `Department Team Metric Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3924300, cx: 975360, cy: 533400, stroke: palette.frame, width: 9525 })
+      + textShapeXml({ id: 1722 + itemIndex * 3, name: `Department Team Metric Text ${itemIndex + 1}`, x: x + 91440, y: 4015740, cx: 792480, cy: 335280, body: paragraphXml(metric.value, 1150, true, visual.title) + paragraphXml(metric.label, 620, true, visual.body), size: 760, bold: true, color: visual.title });
+  }).join("");
+  const roleXml = scene.role === "goals"
+    ? departmentTeamGoalMapXml({ visual, palette, labels: scene.labels })
+    : scene.role === "radar"
+      ? departmentTeamRadarXml({ visual, palette })
+      : scene.role === "results"
+        ? departmentTeamAwardsXml({ visual, palette, labels: scene.labels })
+        : scene.role === "improvement"
+          ? departmentTeamTimelineXml({ visual, palette, labels: scene.labels })
+          : scene.role === "closing"
+            ? departmentTeamActionsXml({ visual, palette, labels: scene.labels })
+            : departmentTeamHeroXml({ visual, palette });
+  return base + metrics + roleXml;
+}
+
+function departmentTeamHeroXml({ visual, palette }) {
+  return solidShapeXml({ id: 1760, name: "Department Team Hero Card", geom: "roundRect", x: 5486400, y: 914400, cx: 3048000, cy: 2438400, fill: visual.primary })
+    + solidShapeXml({ id: 1761, name: "Department Team Hero Glow", geom: "ellipse", x: 7467600, y: 2590800, cx: 1219200, cy: 1219200, fill: visual.accent })
+    + rectShapeXml({ id: 1762, name: "Department Team Hero Bar 1", x: 6096000, y: 2621280, cx: 274320, cy: 731520, fill: "FFFFFF", transparency: 16000 })
+    + rectShapeXml({ id: 1763, name: "Department Team Hero Bar 2", x: 6614160, y: 2316480, cx: 274320, cy: 1036320, fill: "FFFFFF", transparency: 16000 })
+    + rectShapeXml({ id: 1764, name: "Department Team Hero Bar 3", x: 7132320, y: 2011680, cx: 274320, cy: 1341120, fill: visual.accent })
+    + lineFrameShapeXml({ id: 1765, name: "Department Team Hero Orbit", geom: "ellipse", x: 5638800, y: 1066800, cx: 2743200, cy: 2133600, stroke: palette.frame, width: 19050 });
+}
+
+function departmentTeamGoalMapXml({ visual, palette, labels }) {
+  return labels.slice(0, 4).map((label, itemIndex) => {
+    const x = 5486400 + (itemIndex % 2) * 1524000;
+    const y = 914400 + Math.floor(itemIndex / 2) * 1066800;
+    return solidShapeXml({ id: 1780 + itemIndex * 4, name: `Department Team Goal Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 853440, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1781 + itemIndex * 4, name: `Department Team Goal Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 853440, stroke: palette.frame, width: 9525 })
+      + rectShapeXml({ id: 1782 + itemIndex * 4, name: `Department Team Goal Accent ${itemIndex + 1}`, x: x + 152400, y: y + 152400, cx: 457200, cy: 45720, fill: itemIndex % 2 ? visual.accent : visual.secondary || visual.accent })
+      + textShapeXml({ id: 1783 + itemIndex * 4, name: `Department Team Goal Text ${itemIndex + 1}`, x: x + 152400, y: y + 274320, cx: 1066800, cy: 365760, text: departmentTeamPerformanceCompactText(label, "", 18), size: 760, bold: true, color: visual.title });
+  }).join("") + departmentTeamProgressXml({ visual, palette });
+}
+
+function departmentTeamRadarXml({ visual, palette }) {
+  const labels = [
+    { x: 6979920, y: 701040 },
+    { x: 8077200, y: 1661160 },
+    { x: 7467600, y: 2865120 },
+    { x: 5943600, y: 2865120 },
+    { x: 5334000, y: 1661160 },
+  ];
+  const labelXml = labels.map((item, index) => solidShapeXml({ id: 1810 + index, name: `Department Team Radar Label ${index + 1}`, geom: "roundRect", x: item.x, y: item.y, cx: 792480, cy: 274320, fill: "FFFFFF" })).join("");
+  return solidShapeXml({ id: 1800, name: "Department Team Radar Outer", geom: "ellipse", x: 5791200, y: 853440, cx: 2438400, cy: 2438400, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: 1801, name: "Department Team Radar Inner", geom: "ellipse", x: 6248400, y: 1310640, cx: 1524000, cy: 1524000, fill: "FFFFFF" })
+    + solidShapeXml({ id: 1802, name: "Department Team Radar Polygon", geom: "pentagon", x: 6477000, y: 1432560, cx: 1066800, cy: 1066800, fill: palette.radarFill })
+    + lineFrameShapeXml({ id: 1803, name: "Department Team Radar Frame", geom: "ellipse", x: 5791200, y: 853440, cx: 2438400, cy: 2438400, stroke: visual.primary, width: 19050, transparency: 25000 })
+    + labelXml;
+}
+
+function departmentTeamAwardsXml({ visual, palette, labels }) {
+  const cards = labels.slice(0, 4).map((label, itemIndex) => {
+    const x = 5486400 + (itemIndex % 2) * 1524000;
+    const y = 914400 + Math.floor(itemIndex / 2) * 1005840;
+    return solidShapeXml({ id: 1830 + itemIndex * 4, name: `Department Team Award Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 792480, fill: "FFFFFF" })
+      + solidShapeXml({ id: 1831 + itemIndex * 4, name: `Department Team Award Badge ${itemIndex + 1}`, geom: "ellipse", x: x + 152400, y: y + 121920, cx: 304800, cy: 304800, fill: visual.accent })
+      + textShapeXml({ id: 1832 + itemIndex * 4, name: `Department Team Award Text ${itemIndex + 1}`, x: x + 152400, y: y + 472440, cx: 1066800, cy: 213360, text: departmentTeamPerformanceCompactText(label, "", 16), size: 720, bold: true, color: visual.title })
+      + rectShapeXml({ id: 1833 + itemIndex * 4, name: `Department Team Award Rule ${itemIndex + 1}`, x: x + 152400, y: y + 701040, cx: 457200, cy: 38100, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent });
+  }).join("");
+  return cards + solidShapeXml({ id: 1850, name: "Department Team Medal", geom: "ellipse", x: 7223760, y: 3467100, cx: 762000, cy: 762000, fill: visual.accent })
+    + solidShapeXml({ id: 1851, name: "Department Team Medal Ribbon", geom: "parallelogram", x: 7421880, y: 3268980, cx: 365760, cy: 365760, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1852, name: "Department Team Medal Ring", geom: "ellipse", x: 7338060, y: 3581400, cx: 533400, cy: 533400, stroke: "FFFFFF", width: 25400 });
+}
+
+function departmentTeamTimelineXml({ visual, palette, labels }) {
+  const items = ["问题识别", "原因分析", "行动推进", "效果复盘"].map((fallback, index) => labels[index] || fallback);
+  const nodes = items.map((item, index) => {
+    const y = 914400 + index * 655320;
+    return solidShapeXml({ id: 1870 + index * 4, name: `Department Team Timeline Card ${index + 1}`, geom: "roundRect", x: 5486400, y, cx: 3048000, cy: 487680, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1871 + index * 4, name: `Department Team Timeline Accent ${index + 1}`, x: 5486400, y, cx: 60960, cy: 487680, fill: index % 2 ? visual.accent : visual.secondary || visual.accent })
+      + solidShapeXml({ id: 1872 + index * 4, name: `Department Team Timeline Dot ${index + 1}`, geom: "ellipse", x: 5684520, y: y + 152400, cx: 182880, cy: 182880, fill: visual.accent })
+      + textShapeXml({ id: 1873 + index * 4, name: `Department Team Timeline Text ${index + 1}`, x: 5974080, y: y + 121920, cx: 2286000, cy: 243840, text: departmentTeamPerformanceCompactText(item, "", 22), size: 760, bold: true, color: visual.title });
+  }).join("");
+  return nodes + departmentTeamProgressXml({ visual, palette });
+}
+
+function departmentTeamActionsXml({ visual, palette, labels }) {
+  return labels.slice(0, 3).map((label, index) => {
+    const x = 1219200 + index * 2286000;
+    return solidShapeXml({ id: 1900 + index * 4, name: `Department Team Next Action ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1981200, cy: 731520, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1901 + index * 4, name: `Department Team Next Action Border ${index + 1}`, geom: "roundRect", x, y: 3657600, cx: 1981200, cy: 731520, stroke: palette.frame, width: 9525 })
+      + rectShapeXml({ id: 1902 + index * 4, name: `Department Team Next Action Rule ${index + 1}`, x: x + 152400, y: 4114800, cx: 487680, cy: 45720, fill: index % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1903 + index * 4, name: `Department Team Next Action Text ${index + 1}`, x: x + 152400, y: 3810000, cx: 1676400, cy: 274320, text: departmentTeamPerformanceCompactText(label, "", 20), size: 820, bold: true, color: visual.title });
+  }).join("") + departmentTeamHeroXml({ visual, palette });
+}
+
+function departmentTeamProgressXml({ visual }) {
+  return solidShapeXml({ id: 1918, name: "Department Team Progress Panel", geom: "roundRect", x: 5486400, y: 3611880, cx: 3048000, cy: 731520, fill: "102033" })
+    + rectShapeXml({ id: 1919, name: "Department Team Progress Rule", x: 5730240, y: 3794760, cx: 2438400, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1920, name: "Department Team Progress Bar 1", x: 5943600, y: 4015740, cx: 274320, cy: 243840, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 1921, name: "Department Team Progress Bar 2", x: 6461760, y: 3886200, cx: 274320, cy: 373380, fill: visual.secondary || visual.accent })
+    + rectShapeXml({ id: 1922, name: "Department Team Progress Bar 3", x: 6979920, y: 3756660, cx: 274320, cy: 502920, fill: visual.accent })
+    + rectShapeXml({ id: 1923, name: "Department Team Progress Bar 4", x: 7498080, y: 3832860, cx: 274320, cy: 426720, fill: visual.accent });
+}
+
+function departmentTeamPerformanceSceneFromSlide({ slide, index }) {
+  const bullets = departmentTeamPerformanceBulletTexts(slide);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("goal") || layout.includes("okr") || layout.includes("target")
+      ? "goals"
+      : layout.includes("radar") || layout.includes("performance") || layout.includes("kpi")
+        ? "radar"
+        : layout.includes("result") || layout.includes("achievement") || layout.includes("award")
+          ? "results"
+          : layout.includes("improve") || layout.includes("plan") || layout.includes("problem")
+            ? "improvement"
+            : layout.includes("closing") || layout.includes("action")
+              ? "closing"
+              : ["goals", "radar", "results", "improvement"][(Math.max(1, index) - 1) % 4];
+  const labels = ["目标达成", "团队协作", "成果沉淀", "改进计划"].map((fallback, itemIndex) => departmentTeamPerformanceCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    role,
+    kicker: role === "cover" ? "DEPARTMENT REVIEW" : role === "goals" ? "GOAL REVIEW" : role === "radar" ? "PERFORMANCE RADAR" : role === "results" ? "RESULTS SHOWCASE" : role === "improvement" ? "IMPROVEMENT PLAN" : "NEXT STAGE",
+    title: departmentTeamPerformanceCompactText(slide?.title, index === 0 ? "部门述职与团队成果" : "团队绩效复盘", index === 0 ? 28 : 26),
+    summary: departmentTeamPerformanceCompactText(bullets[0], "围绕团队目标、绩效达成、关键成果和改进计划进行结构化述职。", 42),
+    bullets,
+    labels,
+    metrics: [
+      { value: "92%", label: "目标达成" },
+      { value: "4", label: "核心成果" },
+      { value: "3", label: "改进动作" },
+    ],
+  };
+}
+
+function departmentTeamPerformanceBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["复盘部门目标完成与团队贡献", "展示关键项目成果和绩效数据", "梳理团队协同与能力建设", "明确下阶段改进动作和资源需求"];
+}
+
+function departmentTeamPerformanceCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function departmentTeamPerformancePalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary || "173B73", "FFFFFF", 0.72),
+    radarFill: blendHexColor(visual.secondary || visual.accent || "24B8A8", "FFFFFF", 0.35),
+  };
+}
+
+function isDepartmentTeamPerformanceVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "department-team-performance" && (id === "department-performance-report" || id === "business-department-performance-report-team-performance");
+}
+
 function privateDomainMemberLayeringDecorationsXml({ visual, index, role, slide }) {
   const scene = privateDomainMemberLayeringSceneFromSlide({ slide, index, role });
   const palette = privateDomainMemberLayeringColorPalette(visual);
@@ -9430,6 +10038,180 @@ function marketSurveyExportMetricFromText(text, fallback, index) {
 }
 
 function marketSurveyExportCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function experimentAbTestDecorationsXml({ visual, index, role, slide }) {
+  // 实验分析模板在导出端完整绘制标题、正文和实验图形，避免通用文本框破坏 A/B 对照结构。
+  const palette = experimentAbTestColorPalette(visual);
+  const scene = experimentAbTestScene({ slide, index, role });
+  const canvas = solidShapeXml({ id: 2700, name: "Experiment AB Canvas", geom: "roundRect", x: 512064, y: 426720, cx: 8113776, cy: 4244340, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 2701, name: "Experiment AB Canvas Frame", geom: "roundRect", x: 512064, y: 426720, cx: 8113776, cy: 4244340, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2702, name: "Experiment AB Top Rule", x: 512064, y: 426720, cx: 8113776, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 2703, name: "Experiment AB Evidence Rule", x: 914400, y: 3436620, cx: 3581400, cy: 22860, fill: visual.accent });
+  const title = textShapeXml({ id: 2704, name: "Experiment AB Title", x: 914400, y: 975360, cx: 3657600, cy: 853440, text: scene.title, size: scene.kind === "cover" ? 2050 : 1660, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  const kicker = textShapeXml({ id: 2705, name: "Experiment AB Kicker", x: 914400, y: 716280, cx: 2743200, cy: 213360, text: scene.kicker, size: 740, bold: true, color: visual.accent, fontFace: "Microsoft YaHei" });
+  const summary = textShapeXml({ id: 2706, name: "Experiment AB Summary", x: 914400, y: 2057400, cx: 3048000, cy: 396240, text: scene.summary, size: 760, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+  const roleXml = {
+    cover: experimentAbTestGroupsXml({ visual, palette }),
+    design: experimentAbTestFlowXml({ visual, palette, cards: scene.cards }),
+    result: experimentAbTestResultXml({ visual, palette, cards: scene.cards }),
+    funnel: experimentAbTestFunnelXml({ visual }),
+    decision: experimentAbTestDecisionXml({ visual, palette, cards: scene.cards }),
+    next: experimentAbTestSignalXml({ visual, palette }) + experimentAbTestNextXml({ visual, palette, cards: scene.cards }),
+    summary: experimentAbTestSignalXml({ visual, palette }) + experimentAbTestNextXml({ visual, palette, cards: scene.cards }),
+  }[scene.kind] || experimentAbTestGroupsXml({ visual, palette });
+  return canvas + kicker + title + summary + experimentAbTestBulletsXml({ visual, scene }) + roleXml + experimentAbTestMetricCardsXml({ visual, metrics: scene.metrics, palette });
+}
+
+function experimentAbTestBulletsXml({ visual, scene }) {
+  return scene.bullets.slice(0, 4).map((bullet, itemIndex) => {
+    const y = 2705100 + itemIndex * 243840;
+    return textShapeXml({ id: 2720 + itemIndex, name: `Experiment AB Evidence ${itemIndex + 1}`, x: 914400, y, cx: 3200400, cy: 152400, text: `• ${experimentAbTestCompactText(bullet, "实验分析证据", 30)}`, size: 640, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function experimentAbTestMetricCardsXml({ visual, metrics, palette }) {
+  return metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 914400 + itemIndex * 1127760;
+    return solidShapeXml({ id: 2740 + itemIndex * 3, name: `Experiment AB Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3832860, cx: 914400, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2741 + itemIndex * 3, name: `Experiment AB Metric Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3832860, cx: 914400, cy: 548640, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2742 + itemIndex * 3, name: `Experiment AB Metric Text ${itemIndex + 1}`, x: x + 106680, y: 3939540, cx: 670560, cy: 304800, text: `${metric.value}\n${metric.label}`, size: 760, bold: true, color: itemIndex === 1 ? visual.accent : visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function experimentAbTestGroupsXml({ visual, palette }) {
+  return solidShapeXml({ id: 2760, name: "Experiment AB Group Stage", geom: "roundRect", x: 5410200, y: 1097280, cx: 3048000, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2761, name: "Experiment AB Group Stage Border", geom: "roundRect", x: 5410200, y: 1097280, cx: 3048000, cy: 2133600, stroke: palette.frame, width: 7620 })
+    + rectShapeXml({ id: 2762, name: "Experiment AB Connector", x: 5836920, y: 2087880, cx: 2194560, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 2763, name: "Experiment AB Group A", geom: "roundRect", x: 5684520, y: 1546860, cx: 899160, cy: 777240, fill: visual.primary })
+    + solidShapeXml({ id: 2764, name: "Experiment AB Group B", geom: "roundRect", x: 7306320, y: 1546860, cx: 899160, cy: 777240, fill: visual.accent })
+    + textShapeXml({ id: 2765, name: "Experiment AB Group A Text", x: 5966460, y: 1744980, cx: 335280, cy: 304800, text: "A", size: 1700, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+    + textShapeXml({ id: 2766, name: "Experiment AB Group B Text", x: 7588260, y: 1744980, cx: 335280, cy: 304800, text: "B", size: 1700, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+}
+
+function experimentAbTestFlowXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 5113020 + itemIndex * 914400;
+    return solidShapeXml({ id: 2780 + itemIndex * 4, name: `Experiment AB Flow Step ${itemIndex + 1}`, geom: "roundRect", x, y: 1257300, cx: 746760, cy: 1295400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2781 + itemIndex * 4, name: `Experiment AB Flow Border ${itemIndex + 1}`, geom: "roundRect", x, y: 1257300, cx: 746760, cy: 1295400, stroke: palette.frame, width: 7620 })
+      + solidShapeXml({ id: 2782 + itemIndex * 4, name: `Experiment AB Flow Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 121920, y: 1455420, cx: 213360, cy: 213360, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 2783 + itemIndex * 4, name: `Experiment AB Flow Text ${itemIndex + 1}`, x: x + 91440, y: 1905000, cx: 563880, cy: 304800, text: card, size: 640, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function experimentAbTestResultXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 5265420 + (itemIndex % 2) * 1600200;
+    const y = 1181100 + Math.floor(itemIndex / 2) * 914400;
+    return solidShapeXml({ id: 2800 + itemIndex * 4, name: `Experiment AB Result Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 670560, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2801 + itemIndex * 4, name: `Experiment AB Result Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 670560, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2802 + itemIndex * 4, name: `Experiment AB Result Text ${itemIndex + 1}`, x: x + 137160, y: y + 152400, cx: 1066800, cy: 213360, text: card, size: 660, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+      + rectShapeXml({ id: 2803 + itemIndex * 4, name: `Experiment AB Result Bar ${itemIndex + 1}`, x: x + 137160, y: y + 487680, cx: 762000 + itemIndex * 76200, cy: 60960, fill: itemIndex % 2 ? visual.accent : visual.primary });
+  }).join("");
+}
+
+function experimentAbTestFunnelXml({ visual }) {
+  return solidShapeXml({ id: 2820, name: "Experiment AB Funnel Top", geom: "roundRect", x: 5638800, y: 1257300, cx: 2286000, cy: 396240, fill: visual.primary })
+    + solidShapeXml({ id: 2821, name: "Experiment AB Funnel Mid", geom: "roundRect", x: 5943600, y: 1905000, cx: 1676400, cy: 396240, fill: visual.accent })
+    + solidShapeXml({ id: 2822, name: "Experiment AB Funnel Bottom", geom: "roundRect", x: 6248400, y: 2552700, cx: 1066800, cy: 396240, fill: visual.secondary || visual.accent });
+}
+
+function experimentAbTestDecisionXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 5265420 + (itemIndex % 2) * 1600200;
+    const y = 1181100 + Math.floor(itemIndex / 2) * 914400;
+    return solidShapeXml({ id: 2840 + itemIndex * 4, name: `Experiment AB Decision Cell ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 670560, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2841 + itemIndex * 4, name: `Experiment AB Decision Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 670560, stroke: palette.frame, width: 7620 })
+      + rectShapeXml({ id: 2842 + itemIndex * 4, name: `Experiment AB Decision Rule ${itemIndex + 1}`, x: x + 137160, y: y + 121920, cx: 381000, cy: 60960, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 2843 + itemIndex * 4, name: `Experiment AB Decision Text ${itemIndex + 1}`, x: x + 137160, y: y + 274320, cx: 1066800, cy: 213360, text: card, size: 700, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function experimentAbTestNextXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 914400 + itemIndex * 1905000;
+    return solidShapeXml({ id: 2860 + itemIndex * 3, name: `Experiment AB Next Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3832860, cx: 1524000, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2861 + itemIndex * 3, name: `Experiment AB Next Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3832860, cx: 1524000, cy: 548640, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2862 + itemIndex * 3, name: `Experiment AB Next Text ${itemIndex + 1}`, x: x + 137160, y: 4015740, cx: 1066800, cy: 182880, text: card, size: 700, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function experimentAbTestSignalXml({ visual, palette }) {
+  return solidShapeXml({ id: 2880, name: "Experiment AB Signal Panel", geom: "roundRect", x: 5943600, y: 1219200, cx: 2362200, cy: 1828800, fill: visual.primary })
+    + rectShapeXml({ id: 2881, name: "Experiment AB Signal Spectrum", x: 6248400, y: 1676400, cx: 1676400, cy: 76200, fill: visual.accent })
+    + solidShapeXml({ id: 2882, name: "Experiment AB Signal Card", geom: "roundRect", x: 6400800, y: 2133600, cx: 1371600, cy: 609600, fill: palette.darkCard });
+}
+
+function experimentAbTestColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.08),
+    darkCard: blendHexColor(visual.primary, "0F172A", 0.28),
+    frame: blendHexColor(visual.primary, visual.surface, 0.76),
+  };
+}
+
+function experimentAbTestScene({ slide, index, role }) {
+  const bullets = experimentAbTestExportBulletTexts(slide);
+  const title = experimentAbTestCompactText(slide?.title, "实验结果分析", 23);
+  const metrics = ["样本量", "提升幅度", "置信水平"].map((fallback, itemIndex) => experimentAbTestMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["实验假设", "A 组基线", "B 组策略", "判定标准"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 13));
+  const roleMap = {
+    "experiment-ab-test-cover": "cover",
+    "experiment-ab-test-design": "design",
+    "experiment-ab-test-result": "result",
+    "experiment-ab-test-funnel": "funnel",
+    "experiment-ab-test-decision": "decision",
+    "experiment-ab-test-next": "next",
+    "experiment-ab-test-summary": "summary",
+  };
+  const explicit = roleMap[String(slide?.layout || "")] || "";
+  const kinds = ["cover", "design", "result", "funnel", "decision", "next"];
+  const kind = explicit || (index === 0 ? "cover" : String(role || "").includes("closing") ? "summary" : kinds[Math.min(index, kinds.length - 1)]);
+  const kicker = {
+    cover: "EXPERIMENT BRIEF",
+    design: "HYPOTHESIS DESIGN",
+    result: "RESULT COMPARISON",
+    funnel: "CONVERSION PATH",
+    decision: "DECISION MATRIX",
+    next: "NEXT ITERATION",
+    summary: "NEXT ITERATION",
+  }[kind] || "EXPERIMENT REVIEW";
+  return {
+    kind,
+    kicker,
+    title,
+    bullets,
+    metrics,
+    cards: kind === "decision"
+      ? ["保留策略", "继续验证", "优化变量", "暂停上线"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 12))
+      : kind === "next" || kind === "summary"
+        ? ["补充样本", "拆分变量", "监控风险", "复盘结论"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 12))
+        : cards,
+    summary: experimentAbTestCompactText(bullets[0], "围绕实验假设、分组表现和显著性结果沉淀可执行策略。", 36),
+  };
+}
+
+function experimentAbTestExportBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["B 组转化率较 A 组提升 12.8%", "有效样本覆盖核心用户分层", "显著性结果支持继续放量"];
+}
+
+function experimentAbTestMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{1,5}|[零一二三四五六七八九十百千万亿]+份?)/);
+  const value = match?.[1] || ["N", "+12%", "95%"][index] || "N";
+  const label = experimentAbTestCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function experimentAbTestCompactText(text, fallback, maxLength) {
   const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
   if (Array.from(value).length <= maxLength) return value;
   return `${Array.from(value).slice(0, maxLength).join("")}...`;
@@ -11198,6 +11980,208 @@ function quarterlyActionLoopSceneV2() {
       { title: "结果复盘", items: ["目标达成", "经验沉淀", "问题修复", "下季计划"] },
     ],
     owners: ["负责人", "协同部门", "截止日期"],
+  };
+}
+
+function managementAgendaDecisionDecorationsXml({ visual, index, role, slide }) {
+  const scene = managementAgendaDecisionSceneFromSlide({ slide, index, role });
+  const palette = managementAgendaDecisionPalette(visual);
+  // 管理层会议材料导出端采用可编辑 DrawingML，和在线预览保持同一套会议决策语义。
+  const backdrop = rectShapeXml({ id: 3400, name: "Management Agenda Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 3401, name: "Management Agenda Gold Glow", geom: "ellipse", x: 6903720, y: 152400, cx: 1905000, cy: 1371600, fill: palette.softGold })
+    + solidShapeXml({ id: 3402, name: "Management Agenda Blue Glow", geom: "ellipse", x: 121920, y: 3657600, cx: 1828800, cy: 1219200, fill: palette.softBlue });
+  const canvas = solidShapeXml({ id: 3403, name: "Management Agenda Canvas", geom: "roundRect", x: 438912, y: 411480, cx: 8266176, cy: 4389120, fill: visual.surface })
+    + lineFrameShapeXml({ id: 3404, name: "Management Agenda Canvas Frame", geom: "roundRect", x: 438912, y: 411480, cx: 8266176, cy: 4389120, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 3405, name: "Management Agenda Header Rule", x: 438912, y: 411480, cx: 8266176, cy: 60960, fill: visual.primary })
+    + rectShapeXml({ id: 3406, name: "Management Agenda Accent Rule", x: 438912, y: 472440, cx: 8266176, cy: 22860, fill: visual.accent });
+  const common = managementAgendaDecisionTextXml({ visual, palette, scene, slide, index });
+  if (scene.role === "cover") return backdrop + canvas + common + managementAgendaDecisionBoardXml({ visual, palette }) + managementAgendaDecisionMetricsXml({ visual, metrics: scene.metrics }) + managementAgendaDecisionStampXml({ visual, palette, x: 6979920, y: 3581400 });
+  if (scene.role === "overview") return backdrop + canvas + common + managementAgendaDecisionCardsXml({ visual, palette, cards: scene.cards });
+  if (scene.role === "topic") return backdrop + canvas + common + managementAgendaDecisionOptionsXml({ visual, palette, options: scene.options });
+  if (scene.role === "record") return backdrop + canvas + common + managementAgendaDecisionRecordXml({ visual, palette, records: scene.records }) + managementAgendaDecisionStampXml({ visual, palette, x: 7391400, y: 3291840 });
+  if (scene.role === "track") return backdrop + canvas + common + managementAgendaDecisionTrackXml({ visual, palette, scene });
+  return backdrop + canvas + common + managementAgendaDecisionClosingXml({ visual, palette, steps: scene.steps });
+}
+
+function managementAgendaDecisionTextXml({ visual, scene, slide, index }) {
+  const title = managementAgendaDecisionCompactText(slide?.title || scene.title, scene.title, index === 0 ? 30 : 28);
+  const note = managementAgendaDecisionCompactText(String(slide?.speakerNotes || scene.summary || "").replace(/作者：[^。；;]*/g, ""), scene.summary, 46);
+  const bullets = managementAgendaDecisionBulletTexts(slide).slice(0, 3).map((item, itemIndex) => textShapeXml({
+    id: 3420 + itemIndex,
+    name: `Management Agenda Bullet ${itemIndex + 1}`,
+    x: 731520,
+    y: 2651760 + itemIndex * 274320,
+    cx: 3429000,
+    cy: 182880,
+    text: `• ${managementAgendaDecisionCompactText(item, "", 30)}`,
+    size: 690,
+    color: visual.body,
+  })).join("");
+  return textShapeXml({ id: 3410, name: "Management Agenda Kicker", x: 713232, y: 704088, cx: 2438400, cy: 243840, text: scene.kicker, size: 690, bold: true, color: visual.accent })
+    + textShapeXml({ id: 3411, name: "Management Agenda Dedicated Title", x: 713232, y: 1066800, cx: 4300000, cy: 914400, text: title, size: 1600, bold: true, color: visual.title })
+    + textShapeXml({ id: 3412, name: "Management Agenda Summary", x: 731520, y: 2057400, cx: 3505200, cy: 426720, text: note, size: 640, bold: true, color: visual.body })
+    + rectShapeXml({ id: 3413, name: "Management Agenda Title Rule", x: 731520, y: 1905000, cx: 3048000, cy: 30480, fill: visual.accent })
+    + bullets;
+}
+
+function managementAgendaDecisionBoardXml({ visual, palette }) {
+  return solidShapeXml({ id: 3440, name: "Management Agenda Meeting Board", geom: "roundRect", x: 5303520, y: 975360, cx: 3169920, cy: 2438400, fill: palette.panel })
+    + lineFrameShapeXml({ id: 3441, name: "Management Agenda Meeting Board Frame", geom: "roundRect", x: 5303520, y: 975360, cx: 3169920, cy: 2438400, stroke: palette.frame, width: 9525 })
+    + solidShapeXml({ id: 3442, name: "Management Agenda Table Ring", geom: "ellipse", x: 5753100, y: 1402080, cx: 2286000, cy: 1295400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 3443, name: "Management Agenda Table Ring Frame", geom: "ellipse", x: 5753100, y: 1402080, cx: 2286000, cy: 1295400, stroke: visual.primary, width: 50800 })
+    + rectShapeXml({ id: 3444, name: "Management Agenda Table Decision Line", x: 6187440, y: 1973580, cx: 1371600, cy: 57150, fill: visual.accent })
+    + rectShapeXml({ id: 3445, name: "Management Agenda Table Note Line", x: 6339840, y: 2316480, cx: 1066800, cy: 57150, fill: visual.secondary })
+    + solidShapeXml({ id: 3446, name: "Management Agenda Seat A", geom: "roundRect", x: 5494020, y: 1158240, cx: 457200, cy: 213360, fill: visual.primary })
+    + solidShapeXml({ id: 3447, name: "Management Agenda Seat B", geom: "roundRect", x: 7818120, y: 1158240, cx: 457200, cy: 213360, fill: visual.primary })
+    + solidShapeXml({ id: 3448, name: "Management Agenda Seat C", geom: "roundRect", x: 5494020, y: 2987040, cx: 457200, cy: 213360, fill: visual.primary })
+    + solidShapeXml({ id: 3449, name: "Management Agenda Seat D", geom: "roundRect", x: 7818120, y: 2987040, cx: 457200, cy: 213360, fill: visual.primary });
+}
+
+function managementAgendaDecisionMetricsXml({ visual, metrics }) {
+  return metrics.map((metric, itemIndex) => {
+    const x = 713232 + itemIndex * 1257300;
+    return solidShapeXml({ id: 3460 + itemIndex * 3, name: `Management Agenda Metric ${itemIndex + 1}`, geom: "roundRect", x, y: 3855720, cx: 1066800, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 3461 + itemIndex * 3, name: `Management Agenda Metric Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3855720, cx: 1066800, cy: 548640, stroke: "E2E8F0", width: 9525 })
+      + textShapeXml({ id: 3462 + itemIndex * 3, name: `Management Agenda Metric Text ${itemIndex + 1}`, x: x + 121920, y: 3985260, cx: 822960, cy: 274320, text: `${metric.value}\n${metric.label}`, size: 700, bold: true, color: itemIndex === 1 ? visual.accent : visual.title });
+  }).join("");
+}
+
+function managementAgendaDecisionCardsXml({ visual, palette, cards }) {
+  return cards.map((card, itemIndex) => {
+    const x = 5303520 + (itemIndex % 2) * 1600200;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 990600;
+    return solidShapeXml({ id: 3480 + itemIndex * 4, name: `Management Agenda Topic Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 838200, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 3481 + itemIndex * 4, name: `Management Agenda Topic Card Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 838200, stroke: palette.frame, width: 9525 })
+      + rectShapeXml({ id: 3482 + itemIndex * 4, name: `Management Agenda Topic Card Rule ${itemIndex + 1}`, x, y, cx: 1447800, cy: 60960, fill: itemIndex % 2 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 3483 + itemIndex * 4, name: `Management Agenda Topic Card Text ${itemIndex + 1}`, x: x + 121920, y: y + 167640, cx: 1203960, cy: 365760, text: `${String(itemIndex + 1).padStart(2, "0")}  ${card.title}\n${card.meta}`, size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function managementAgendaDecisionOptionsXml({ visual, palette, options }) {
+  return options.map((option, itemIndex) => {
+    const y = 1066800 + itemIndex * 792480;
+    return solidShapeXml({ id: 3500 + itemIndex * 4, name: `Management Agenda Option ${itemIndex + 1}`, geom: "roundRect", x: 5303520, y, cx: 3169920, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 3501 + itemIndex * 4, name: `Management Agenda Option Frame ${itemIndex + 1}`, geom: "roundRect", x: 5303520, y, cx: 3169920, cy: 609600, stroke: palette.frame, width: 9525 })
+      + solidShapeXml({ id: 3502 + itemIndex * 4, name: `Management Agenda Option Icon ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y: y + 152400, cx: 365760, cy: 304800, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 3503 + itemIndex * 4, name: `Management Agenda Option Text ${itemIndex + 1}`, x: 6035040, y: y + 182880, cx: 2240280, cy: 243840, text: option, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function managementAgendaDecisionRecordXml({ visual, palette, records }) {
+  return records.map((record, itemIndex) => {
+    const x = 5303520 + (itemIndex % 2) * 1600200;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 883920;
+    return solidShapeXml({ id: 3520 + itemIndex * 3, name: `Management Agenda Record Block ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 731520, fill: palette.panel })
+      + lineFrameShapeXml({ id: 3521 + itemIndex * 3, name: `Management Agenda Record Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1447800, cy: 731520, stroke: palette.frame, width: 9525 })
+      + textShapeXml({ id: 3522 + itemIndex * 3, name: `Management Agenda Record Text ${itemIndex + 1}`, x: x + 152400, y: y + 243840, cx: 1143000, cy: 167640, text: record, size: 790, bold: true, color: visual.title });
+  }).join("");
+}
+
+function managementAgendaDecisionTrackXml({ visual, palette, scene }) {
+  const steps = scene.steps.map((step, itemIndex) => {
+    const x = 5486400 + itemIndex * 716280;
+    return solidShapeXml({ id: 3540 + itemIndex * 3, name: `Management Agenda Track Node ${itemIndex + 1}`, geom: "ellipse", x, y: 1432560, cx: 304800, cy: 304800, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 3541 + itemIndex * 3, name: `Management Agenda Track Node Frame ${itemIndex + 1}`, geom: "ellipse", x, y: 1432560, cx: 304800, cy: 304800, stroke: visual.accent, width: 38100 })
+      + textShapeXml({ id: 3542 + itemIndex * 3, name: `Management Agenda Track Text ${itemIndex + 1}`, x: x - 152400, y: 1844040, cx: 609600, cy: 152400, text: step, size: 540, bold: true, color: visual.title });
+  }).join("");
+  const rows = scene.actions.map((action, itemIndex) => {
+    const y = 2857500 + itemIndex * 228600;
+    return solidShapeXml({ id: 3560 + itemIndex * 3, name: `Management Agenda Action Row ${itemIndex + 1}`, geom: "roundRect", x: 5303520, y, cx: 3169920, cy: 167640, fill: itemIndex % 2 ? palette.panel : "FFFFFF" })
+      + textShapeXml({ id: 3561 + itemIndex * 3, name: `Management Agenda Action Text ${itemIndex + 1}`, x: 5486400, y: y + 30480, cx: 2057400, cy: 91440, text: action, size: 520, bold: true, color: visual.body })
+      + textShapeXml({ id: 3562 + itemIndex * 3, name: `Management Agenda Action Badge ${itemIndex + 1}`, x: 7650480, y: y + 30480, cx: 487680, cy: 91440, text: scene.badge, size: 460, bold: true, color: visual.accent });
+  }).join("");
+  return rectShapeXml({ id: 3538, name: "Management Agenda Track Line", x: 5638800, y: 1577340, cx: 2438400, cy: 45720, fill: visual.primary }) + steps + rows;
+}
+
+function managementAgendaDecisionClosingXml({ visual, palette, steps }) {
+  const path = steps.map((step, itemIndex) => {
+    const x = 5303520 + itemIndex * 792480;
+    return solidShapeXml({ id: 3580 + itemIndex * 3, name: `Management Agenda Closing Step ${itemIndex + 1}`, geom: "roundRect", x, y: 1371600, cx: 670560, cy: 792480, fill: itemIndex % 2 ? palette.panel : "FFFFFF" })
+      + lineFrameShapeXml({ id: 3581 + itemIndex * 3, name: `Management Agenda Closing Step Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 1371600, cx: 670560, cy: 792480, stroke: palette.frame, width: 9525 })
+      + textShapeXml({ id: 3582 + itemIndex * 3, name: `Management Agenda Closing Step Text ${itemIndex + 1}`, x: x + 76200, y: 1661160, cx: 518160, cy: 152400, text: step, size: 580, bold: true, color: visual.title });
+  }).join("");
+  return path
+    + lineFrameShapeXml({ id: 3595, name: "Management Agenda Signature Box", geom: "roundRect", x: 5303520, y: 3200400, cx: 3169920, cy: 609600, stroke: palette.frame, width: 9525 })
+    + textShapeXml({ id: 3596, name: "Management Agenda Signature Label", x: 5486400, y: 3406140, cx: 1828800, cy: 121920, text: "责任确认 / 下次输入", size: 620, bold: true, color: visual.body });
+}
+
+function managementAgendaDecisionStampXml({ visual, palette, x, y }) {
+  return solidShapeXml({ id: 3600, name: "Management Agenda Decision Stamp", geom: "ellipse", x, y, cx: 731520, cy: 731520, fill: "FFF7E6" })
+    + lineFrameShapeXml({ id: 3601, name: "Management Agenda Decision Stamp Frame", geom: "ellipse", x, y, cx: 731520, cy: 731520, stroke: visual.accent, width: 50800 })
+    + textShapeXml({ id: 3602, name: "Management Agenda Decision Stamp Check", x: x + 182880, y: y + 213360, cx: 365760, cy: 243840, text: "OK", size: 860, bold: true, color: visual.primary });
+}
+
+function managementAgendaDecisionSceneFromSlide({ slide, index, role }) {
+  const sceneRole = managementAgendaDecisionExportRole(slide, index, role);
+  return {
+    role: sceneRole,
+    variant: "agenda-decision",
+    kicker: {
+      cover: "MANAGEMENT MEETING",
+      overview: "AGENDA OVERVIEW",
+      topic: "DECISION OPTIONS",
+      record: "MEETING MINUTES",
+      track: "ACTION TRACKING",
+      closing: "NEXT REVIEW",
+    }[sceneRole] || "DECISION OPTIONS",
+    title: "管理层会议材料",
+    summary: "围绕关键议题、决策依据、责任归属和会后追踪形成管理层会议材料。",
+    metrics: [
+      { value: "6", label: "会议页" },
+      { value: "4", label: "决策域" },
+      { value: "1", label: "行动闭环" },
+    ],
+    cards: [
+      { title: "经营议题", meta: "负责人 / 决策时点" },
+      { title: "风险事项", meta: "影响等级 / 应对口径" },
+      { title: "资源投入", meta: "预算 / 人力 / 排期" },
+      { title: "行动追踪", meta: "责任人 / 截止日" },
+    ],
+    options: ["方案 A：快速推进", "方案 B：分阶段验证", "方案 C：保守观察"],
+    records: ["会议结论", "决策依据", "风险保留", "责任确认"],
+    steps: ["提出议题", "形成结论", "责任下发", "复盘追踪"],
+    actions: ["事项确认", "责任人", "截止时间", "检查节点"],
+    badge: "待跟进",
+  };
+}
+
+function managementAgendaDecisionExportRole(slide, index, role) {
+  const layout = String(slide?.layout || "");
+  if (layout.includes("cover") || role === "cover") return "cover";
+  if (layout.includes("overview")) return "overview";
+  if (layout.includes("decision-record")) return "record";
+  if (layout.includes("action-track")) return "track";
+  if (layout.includes("closing") || role === "closing") return "closing";
+  if (index === 1) return "overview";
+  if (index === 3) return "record";
+  if (index >= 4) return role === "closing" ? "closing" : "track";
+  return "topic";
+}
+
+function managementAgendaDecisionBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((item) => {
+        if (typeof item === "string") return item.trim();
+        if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+        return "";
+      }).filter(Boolean)
+    : [];
+  return bullets.length ? bullets : ["本次会议需确认的关键议题", "决策依据与备选方案对比", "会后责任人和行动追踪节奏"];
+}
+
+function managementAgendaDecisionCompactText(text, fallback, maxLength) {
+  const normalized = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return Array.from(normalized).length > maxLength ? `${Array.from(normalized).slice(0, maxLength).join("")}...` : normalized;
+}
+
+function managementAgendaDecisionPalette(visual) {
+  return {
+    backdrop: visual.background,
+    frame: blendHexColor(visual.primary, visual.surface, 0.28),
+    panel: blendHexColor(visual.surface, visual.background, 0.35),
+    softGold: blendHexColor(visual.accent, visual.background, 0.74),
+    softBlue: blendHexColor(visual.secondary || visual.primary, visual.background, 0.78),
   };
 }
 

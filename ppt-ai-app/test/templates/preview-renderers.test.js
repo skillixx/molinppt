@@ -45,3 +45,141 @@ test("product pricing strategy online preview uses dedicated scenes", async () =
   assert.match(html, /确认价格假设/);
   assert.doesNotMatch(html, /<body[^>]*data-layout="top-band"/);
 });
+
+test("product pricing strategy preview respects explicit page layouts after structure changes", async () => {
+  const deck = {
+    id: "deck-product-pricing-reordered",
+    ownerUserId: 7,
+    title: "产品商业化方案",
+    templateId: "product-commercialization-plan",
+    theme: "pricing-strategy",
+    status: "ready",
+    slides: [
+      { title: "商业化总览", layout: "product-pricing-cover", bullets: ["目标客户", "价值锚点", "收入模型"] },
+      { title: "先看权益差异", layout: "product-pricing-benefit-matrix", bullets: ["核心权益", "进阶权益", "服务支持"] },
+      { title: "再看价格锚点", layout: "product-pricing-value-anchor", bullets: ["客户价值", "成本结构", "竞品对标"] },
+      { title: "最后确定套餐", layout: "product-pricing-tier-cards", bullets: ["基础版", "专业版", "企业版"] },
+      { title: "转化与续费", layout: "product-pricing-commercial-loop", bullets: ["试用", "付费", "续费", "增购"] },
+      { title: "下一步验证", layout: "product-pricing-closing", bullets: ["灰度验证", "跟踪转化", "复盘收入"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.ok(html.indexOf('class="pricing-benefit-table"') < html.indexOf('class="pricing-anchor-grid"'));
+  assert.ok(html.indexOf('class="pricing-anchor-grid"') < html.indexOf('class="pricing-card-row"'));
+  assert.ok(html.indexOf('class="pricing-card-row"') < html.indexOf('class="pricing-loop"'));
+  assert.match(html, /class="pricing-closing-panel"/);
+});
+
+test("private domain operation member layering preview uses dedicated scenes", async () => {
+  const deck = {
+    id: "deck-private-domain-member-layering",
+    ownerUserId: 7,
+    title: "私域运营方案",
+    templateId: "marketing-private-domain-operation-plan-member-layering",
+    theme: "member-layering",
+    templateVisual: {
+      id: "marketing-private-domain-operation-plan-member-layering",
+      primary: "123C35",
+      accent: "D6A84F",
+      secondary: "F06A4B",
+      background: "F3F7F1",
+      surface: "FFFFFF",
+      title: "10231F",
+      body: "43514C",
+      layout: "private-domain-member-layering",
+      variant: "member-layering",
+    },
+    status: "ready",
+    slides: [
+      { title: "私域增长运营总览", layout: "private-domain-member-layering-cover", bullets: ["识别不同价值会员与复购潜力", "规划社群和企微触达路径", "建立权益策略和复购闭环"] },
+      { title: "用户价值层级设计", layout: "private-domain-member-layering-pyramid", bullets: ["高价值用户", "活跃会员", "成长会员", "沉睡用户"] },
+      { title: "触达路径设计", layout: "private-domain-member-layering-touch-path", bullets: ["入群识别", "标签打标", "内容触达", "权益激活"] },
+      { title: "复购闭环复盘", layout: "private-domain-member-layering-repurchase-loop", bullets: ["识别用户", "权益触发", "活动承接", "数据回流"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="private-domain-member-layering"/);
+  assert.match(html, /class="private-domain-member-card"/);
+  assert.match(html, /class="private-domain-pyramid"/);
+  assert.match(html, /class="private-domain-path"/);
+  assert.match(html, /class="private-domain-loop"/);
+  assert.doesNotMatch(html, />会员分层</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
+test("management meeting agenda decision preview uses dedicated scenes", async () => {
+  const deck = {
+    id: "deck-management-agenda-decision",
+    ownerUserId: 7,
+    title: "管理层会议材料",
+    templateId: "business-management-meeting-materials-agenda-decision",
+    theme: "agenda-decision",
+    templateVisual: {
+      id: "business-management-meeting-materials-agenda-decision",
+      primary: "13233F",
+      accent: "C99A3B",
+      secondary: "2F6B7E",
+      warning: "B64E3A",
+      background: "EEF2F6",
+      surface: "FFFFFF",
+      title: "0B1426",
+      body: "334155",
+      layout: "management-agenda-decision",
+      variant: "agenda-decision",
+    },
+    status: "ready",
+    slides: [
+      { title: "管理层会议材料", layout: "management-agenda-cover", bullets: ["确认本次会议关键议题", "形成可执行决策结论", "建立会后行动追踪"] },
+      { title: "会议议题总览", layout: "management-agenda-overview", bullets: ["经营议题", "风险事项", "资源投入", "行动追踪"] },
+      { title: "核心议题决策", layout: "management-agenda-topic", bullets: ["方案 A 快速推进", "方案 B 分阶段验证", "方案 C 保守观察"] },
+      { title: "决策事项记录", layout: "management-agenda-decision-record", bullets: ["会议结论", "决策依据", "风险保留", "责任确认"] },
+      { title: "行动事项追踪", layout: "management-agenda-action-track", bullets: ["事项确认", "责任人", "截止时间", "检查节点"] },
+      { title: "下一次会议输入", layout: "management-agenda-closing", bullets: ["提出议题", "形成结论", "责任下发", "复盘追踪"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="management-agenda-decision"/);
+  assert.match(html, /class="management-agenda-layer"/);
+  assert.match(html, /class="management-board"/);
+  assert.match(html, /class="management-agenda-card"/);
+  assert.match(html, /class="management-option"/);
+  assert.match(html, /class="management-track"/);
+  assert.doesNotMatch(html, />议题决策</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});

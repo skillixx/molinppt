@@ -1033,6 +1033,7 @@ function renderDeckPreview({ deck, visual }) {
     const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const onboardingScene = isOnboardingGuideVisual(visual) ? onboardingGuidePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const blackboardScene = typeof isKnowledgeBlackboardVisual === "function" && isKnowledgeBlackboardVisual(visual) ? knowledgeBlackboardPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const conceptBreakdownScene = isConceptBreakdownCoursewareVisual(visual) ? conceptBreakdownCoursewarePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const examReviewScene = isExamReviewKeypointsVisual(visual) ? examReviewKeypointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const teachingAchievementScene = isTeachingAchievementShowcaseVisual(visual) ? teachingAchievementPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
@@ -1046,6 +1047,7 @@ function renderDeckPreview({ deck, visual }) {
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
     const seedStoryScene = isSeedRoundStoryVisual(visual) ? seedRoundStoryPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const growthFundingScene = isGrowthFundingFlywheelVisual(visual) ? growthFundingFlywheelPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const preAMarketScene = isPreAMarketValidationVisual(visual) ? preAMarketValidationPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productFundingScene = isProductFundingHighlightsVisual(visual) ? productFundingHighlightsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const investorUpdateScene = typeof isInvestorUpdateProgressVisual === "function" && isInvestorUpdateProgressVisual(visual) ? investorUpdateProgressPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const enterpriseBlueprintScene = isEnterpriseDigitalBlueprintVisual(visual) ? enterpriseDigitalBlueprintPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1054,6 +1056,7 @@ function renderDeckPreview({ deck, visual }) {
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const socialVideoScene = isSocialVideoGrowthVisual(visual) ? socialVideoGrowthPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const privateDomainScene = isPrivateDomainMemberLayeringVisual(visual) ? privateDomainMemberLayeringPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const departmentTeamScene = isDepartmentTeamPerformanceVisual(visual) ? departmentTeamPerformancePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const brandStoryScene = isBrandStoryVisual(visual) ? brandStoryPreviewScene(visual) : null;
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const biCockpitScene = isBiExecutiveCockpitVisual(visual) ? biExecutiveCockpitPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1062,6 +1065,7 @@ function renderDeckPreview({ deck, visual }) {
     const segmentationScene = typeof isCustomerSegmentationLayeringVisual === "function" && isCustomerSegmentationLayeringVisual(visual) ? customerSegmentationLayeringPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const anomalyScene = typeof isMetricAnomalyAttributionVisual === "function" && isMetricAnomalyAttributionVisual(visual) ? metricAnomalyAttributionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const surveyScene = typeof isMarketSurveyAnalysisVisual === "function" && isMarketSurveyAnalysisVisual(visual) ? marketSurveyAnalysisPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const experimentScene = typeof isExperimentAbTestVisual === "function" && isExperimentAbTestVisual(visual) ? experimentAbTestPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
     const annualSummaryScene = isAnnualSummaryVisual(visual) ? annualSummaryPreviewScene(visual) : null;
     const quarterlyDashboardScene = isQuarterlyDashboardVisual(visual) ? quarterlyDashboardPreviewScene({ visual, slide, index }) : null;
@@ -1069,6 +1073,7 @@ function renderDeckPreview({ deck, visual }) {
     const quarterlyActionLoopScene = isQuarterlyActionLoopVisual(visual) ? quarterlyActionLoopPreviewScene(visual) : null;
     const operatingProblemTreeScene = isOperatingProblemTreeVisual(visual) ? operatingProblemTreePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessOpportunityScene = isBusinessOpportunityMapVisual(visual) ? businessOpportunityMapPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const managementAgendaScene = isManagementAgendaDecisionVisual(visual) ? managementAgendaDecisionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const industryResearchScene = isIndustryResearchVisual(visual) ? industryResearchPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const industryTrendScene = isIndustryTrendForecastVisual(visual) ? industryTrendForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const competitionMapScene = isCompetitionMapVisual(visual) ? competitionMapPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1121,6 +1126,9 @@ function renderDeckPreview({ deck, visual }) {
     const blackboardMark = blackboardScene
       ? renderKnowledgeBlackboardPreview(slide, blackboardScene)
       : "";
+    const conceptBreakdownMark = conceptBreakdownScene
+      ? renderConceptBreakdownCoursewarePreview(slide, conceptBreakdownScene)
+      : "";
     const examReviewMark = examReviewScene
       ? renderExamReviewKeypointsPreview(slide, examReviewScene)
       : "";
@@ -1165,6 +1173,9 @@ function renderDeckPreview({ deck, visual }) {
     const growthFundingMark = growthFundingScene
       ? renderGrowthFundingFlywheelPreview(slide, growthFundingScene)
       : "";
+    const preAMarketMark = preAMarketScene
+      ? renderPreAMarketValidationPreview(slide, preAMarketScene)
+      : "";
     const productFundingMark = productFundingScene
       ? renderProductFundingHighlightsPreview(slide, productFundingScene)
       : "";
@@ -1193,6 +1204,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const privateDomainMark = privateDomainScene
       ? renderPrivateDomainMemberLayeringPreview(slide, privateDomainScene)
+      : "";
+    const departmentTeamMark = departmentTeamScene
+      ? renderDepartmentTeamPerformancePreview(departmentTeamScene)
       : "";
     const brandStoryMark = brandStoryScene
       ? (
@@ -1227,7 +1241,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const surveyMark = surveyScene
       ? renderMarketSurveyAnalysisPreview(slide, surveyScene)
-      : "";
+      : experimentScene
+        ? renderExperimentAbTestPreview(slide, experimentScene)
+        : "";
     const educationMark = educationScene
       ? (
           `${index === 0
@@ -1281,6 +1297,9 @@ function renderDeckPreview({ deck, visual }) {
     const businessOpportunityMark = businessOpportunityScene
       ? renderBusinessOpportunityMapPreview(slide, businessOpportunityScene)
       : "";
+    const managementAgendaMark = managementAgendaScene
+      ? renderManagementAgendaDecisionPreview(slide, managementAgendaScene)
+      : "";
     const industryResearchMark = industryResearchScene
       ? renderIndustryResearchPreview(slide, industryResearchScene)
       : "";
@@ -1319,11 +1338,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || industryResearchScene || industryTrendScene || competitionMapScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || costBreakdownScene || cashFlowScene || profitBridgeScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || corporateTrainingScene || onboardingScene || blackboardScene || examReviewScene || teachingAchievementScene || launchRhythmScene || socialVideoScene || privateDomainScene || seedStoryScene || growthFundingScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || costBreakdownScene || cashFlowScene || profitBridgeScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelMark}${marketingMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelMark}${marketingMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1386,6 +1405,43 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="top-band"] .page-number{z-index:2;background:rgba(15,23,42,.05);padding:5px 10px;border-radius:999px;border:1px solid rgba(15,23,42,.10);backdrop-filter:blur(3px);}
     body[data-layout="top-band"] h2{max-width:62%;font-size:36px;line-height:1.12;color:var(--template-title);padding-left:5.1%;}
     body[data-layout="top-band"] ul{max-width:58%;font-size:16px;margin-left:5.1%;padding-left:1.06em;line-height:1.56;}
+    body[data-layout="management-agenda-decision"]{background:#dfe6ee;}
+    body[data-layout="management-agenda-decision"] main{width:min(100%,1160px);}
+    body[data-layout="management-agenda-decision"] .slide{padding:0;border:0;background:#eef2f6;box-shadow:0 24px 58px rgba(11,20,38,.18);}
+    body[data-layout="management-agenda-decision"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 16%,rgba(201,154,59,.18),transparent 24%),radial-gradient(circle at 13% 78%,rgba(47,107,126,.16),transparent 26%),repeating-linear-gradient(90deg,rgba(19,35,63,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(19,35,63,.03) 0 1px,transparent 1px 42px);}
+    body[data-layout="management-agenda-decision"] .slide::after{content:"";position:absolute;left:4.8%;right:4.8%;top:8%;bottom:7.4%;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(19,35,63,.14);box-shadow:0 22px 48px rgba(11,20,38,.12),inset 0 0 0 1px rgba(255,255,255,.72);z-index:1;}
+    body[data-layout="management-agenda-decision"] .accent{left:4.8%;right:4.8%;top:8%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));z-index:4;}
+    body[data-layout="management-agenda-decision"] .management-agenda-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="management-agenda-decision"] .management-agenda-kicker{position:absolute;left:7.8%;top:13.7%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-accent);}
+    body[data-layout="management-agenda-decision"] .management-agenda-title{position:absolute;left:7.8%;top:20.5%;width:47%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="management-agenda-decision"] .management-agenda-summary{position:absolute;left:7.9%;top:40%;width:39%;font-size:12.5px;line-height:1.5;font-weight:800;color:#475569;overflow-wrap:anywhere;}
+    body[data-layout="management-agenda-decision"] .management-agenda-bullets{position:absolute;left:8%;top:50.5%;width:38%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="management-agenda-decision"] .management-agenda-bullets li{margin:.18em 0;}
+    body[data-layout="management-agenda-decision"] .management-board{position:absolute;right:7.5%;top:18%;width:39%;height:47%;border-radius:18px;background:linear-gradient(135deg,#fff,#edf3f7);border:1px solid rgba(19,35,63,.13);box-shadow:0 18px 36px rgba(11,20,38,.12);overflow:hidden;}
+    body[data-layout="management-agenda-decision"] .management-board::before{content:"";position:absolute;left:12%;right:12%;top:20%;bottom:20%;border:8px solid var(--template-primary);border-radius:50%;opacity:.88;}
+    body[data-layout="management-agenda-decision"] .management-board::after{content:"";position:absolute;left:22%;right:22%;top:38%;height:8px;border-radius:999px;background:var(--template-accent);box-shadow:0 34px 0 rgba(47,107,126,.72);}
+    body[data-layout="management-agenda-decision"] .management-board span{position:absolute;width:46px;height:22px;border-radius:999px;background:var(--template-primary);box-shadow:0 0 0 8px rgba(19,35,63,.08);}
+    body[data-layout="management-agenda-decision"] .management-board span:nth-child(1){left:11%;top:15%;}body[data-layout="management-agenda-decision"] .management-board span:nth-child(2){right:11%;top:15%;}body[data-layout="management-agenda-decision"] .management-board span:nth-child(3){left:11%;bottom:15%;}body[data-layout="management-agenda-decision"] .management-board span:nth-child(4){right:11%;bottom:15%;}
+    body[data-layout="management-agenda-decision"] .management-stamp{position:absolute;right:14%;bottom:16%;width:92px;height:92px;border-radius:50%;border:8px solid var(--template-accent);background:#fff7e6;display:grid;place-items:center;color:var(--template-primary);font-size:34px;font-weight:900;transform:rotate(-10deg);box-shadow:0 16px 28px rgba(201,154,59,.20);}
+    body[data-layout="management-agenda-decision"] .management-metrics{position:absolute;left:7.8%;right:49%;bottom:13.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="management-agenda-decision"] .management-metrics span{min-height:58px;border-radius:13px;background:#fff;border:1px solid rgba(19,35,63,.10);box-shadow:0 10px 22px rgba(11,20,38,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:800;color:#52657a;}
+    body[data-layout="management-agenda-decision"] .management-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="management-agenda-decision"] .management-agenda-cards{position:absolute;right:7.3%;top:19%;width:40%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="management-agenda-decision"] .management-agenda-card{min-height:110px;border-radius:16px;background:#fff;border:1px solid rgba(19,35,63,.12);box-shadow:0 12px 26px rgba(11,20,38,.09);padding:14px;display:grid;align-content:start;gap:8px;}
+    body[data-layout="management-agenda-decision"] .management-agenda-card b{font-size:12px;color:var(--template-accent);}.management-agenda-card strong{font-size:15px;color:var(--template-title);line-height:1.22;}.management-agenda-card span{font-size:10.5px;font-weight:800;color:#64748b;}
+    body[data-layout="management-agenda-decision"] .management-option-grid{position:absolute;right:7.4%;top:18.5%;width:40%;display:grid;grid-template-columns:1fr;gap:12px;}
+    body[data-layout="management-agenda-decision"] .management-option{min-height:84px;border-radius:16px;background:#fff;border:1px solid rgba(19,35,63,.12);box-shadow:0 12px 26px rgba(11,20,38,.08);padding:13px 16px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="management-agenda-decision"] .management-option i{width:36px;height:36px;border-radius:12px;background:var(--template-primary);display:block;box-shadow:inset 0 -8px 0 rgba(201,154,59,.46);}
+    body[data-layout="management-agenda-decision"] .management-record-grid{position:absolute;right:7.5%;top:18%;width:40%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="management-agenda-decision"] .management-record-grid span{min-height:96px;border-radius:16px;background:#fff;border:1px solid rgba(19,35,63,.12);box-shadow:0 12px 24px rgba(11,20,38,.08);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);display:grid;align-content:center;}
+    body[data-layout="management-agenda-decision"] .management-track{position:absolute;right:8%;top:26%;width:38%;height:18%;border-top:7px solid var(--template-primary);display:grid;grid-template-columns:repeat(4,1fr);align-items:start;}
+    body[data-layout="management-agenda-decision"] .management-track span{position:relative;display:grid;justify-items:center;gap:10px;font-size:11px;font-weight:900;color:var(--template-title);transform:translateY(-18px);}
+    body[data-layout="management-agenda-decision"] .management-track span::before{content:"";width:32px;height:32px;border-radius:50%;background:#fff;border:7px solid var(--template-accent);box-shadow:0 10px 18px rgba(11,20,38,.10);}
+    body[data-layout="management-agenda-decision"] .management-action-table{position:absolute;right:7.5%;bottom:15%;width:40%;display:grid;gap:8px;}
+    body[data-layout="management-agenda-decision"] .management-action-table span{min-height:34px;border-radius:10px;background:#fff;border:1px solid rgba(19,35,63,.10);display:grid;grid-template-columns:1fr auto;align-items:center;padding:0 14px;font-size:11px;font-weight:900;color:#334155;}
+    body[data-layout="management-agenda-decision"] .management-closing-path{position:absolute;right:8%;top:25%;width:38%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    body[data-layout="management-agenda-decision"] .management-closing-path span{min-height:92px;border-radius:16px;background:linear-gradient(180deg,#fff,#f7fafc);border:1px solid rgba(19,35,63,.12);box-shadow:0 12px 24px rgba(11,20,38,.08);display:grid;place-items:center;text-align:center;padding:10px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="management-agenda-decision"] .management-signature{position:absolute;right:8.2%;bottom:15%;width:36%;height:74px;border-radius:14px;border:1px dashed rgba(19,35,63,.28);background:rgba(255,255,255,.72);}
     body[data-layout="business-opportunity-map"]{background:#dfe8ee;}
     body[data-layout="business-opportunity-map"] main{width:min(100%,1160px);}
     body[data-layout="business-opportunity-map"] .slide{padding:0;border:0;background:linear-gradient(135deg,#ecf4f7 0%,#ffffff 44%,#e8f3f0 100%);box-shadow:0 24px 58px rgba(12,42,64,.18);}
@@ -1451,6 +1507,45 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="growth-funding-flywheel"] .growth-funding-closing::before{content:"";position:absolute;left:13%;right:13%;top:27%;height:8px;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#f59e0b);}
     body[data-layout="growth-funding-flywheel"] .growth-funding-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:24%;height:34%;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);}
     body[data-layout="growth-funding-flywheel"] .page-number{z-index:6;color:rgba(15,23,42,.58);background:rgba(255,255,255,.76);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="pre-a-market-validation"]{background:#dbe8f1;}
+    body[data-layout="pre-a-market-validation"] main{width:min(100%,1160px);}
+    body[data-layout="pre-a-market-validation"] .slide{padding:0;border:0;background:linear-gradient(135deg,#07111f 0%,#0b1220 48%,#123044 100%);box-shadow:0 24px 58px rgba(7,17,31,.28);}
+    body[data-layout="pre-a-market-validation"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 20%,rgba(20,184,166,.22),transparent 27%),radial-gradient(circle at 18% 82%,rgba(56,189,248,.18),transparent 29%),repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 42px);pointer-events:none;}
+    body[data-layout="pre-a-market-validation"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8.8%;bottom:7.8%;z-index:1;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(237,247,251,.92));border:1px solid rgba(148,163,184,.24);box-shadow:0 22px 46px rgba(7,17,31,.22);}
+    body[data-layout="pre-a-market-validation"] .accent{left:5.2%;right:5.2%;top:8.8%;height:6px;z-index:5;border-radius:999px;background:linear-gradient(90deg,#14b8a6,#38bdf8,#f59e0b);}
+    body[data-layout="pre-a-market-validation"] .pre-a-layer{position:absolute;inset:0;z-index:8;color:#334155;pointer-events:none;}
+    body[data-layout="pre-a-market-validation"] .pre-a-kicker{position:absolute;left:8%;top:14%;font-size:12px;font-weight:900;letter-spacing:.14em;color:#0f766e;}
+    body[data-layout="pre-a-market-validation"] .pre-a-title{position:absolute;left:8%;top:20%;width:42%;margin:0;color:#0f172a;font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="pre-a-market-validation"] .pre-a-summary{position:absolute;left:8%;top:40%;width:37%;font-size:13px;line-height:1.48;color:#475569;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="pre-a-market-validation"] .pre-a-bullets{position:absolute;left:8.1%;top:51%;width:36%;margin:0;padding-left:1.05em;font-size:11px;line-height:1.45;font-weight:800;color:#334155;}
+    body[data-layout="pre-a-market-validation"] .pre-a-bullets li{margin:.22em 0;}
+    body[data-layout="pre-a-market-validation"] .pre-a-metrics{position:absolute;left:8%;bottom:13%;width:39%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="pre-a-market-validation"] .pre-a-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.09);box-shadow:0 10px 22px rgba(15,23,42,.09);display:grid;align-content:center;gap:3px;padding:11px 12px;font-size:10px;font-weight:900;color:#64748b;}
+    body[data-layout="pre-a-market-validation"] .pre-a-metrics strong{font-size:18px;line-height:1;color:#0f172a;}
+    body[data-layout="pre-a-market-validation"] .pre-a-product-panel{position:absolute;right:7.4%;top:18%;width:39%;height:52%;border-radius:24px;background:#0b1220;box-shadow:0 22px 44px rgba(15,23,42,.22);overflow:hidden;}
+    body[data-layout="pre-a-market-validation"] .pre-a-product-panel::before{content:"";position:absolute;left:8%;right:8%;top:13%;height:7px;border-radius:999px;background:linear-gradient(90deg,#14b8a6 0 42%,#38bdf8 42% 74%,#f59e0b 74%);}
+    body[data-layout="pre-a-market-validation"] .pre-a-product-panel::after{content:"";position:absolute;left:9%;right:9%;bottom:14%;height:54%;border-radius:18px;background:linear-gradient(180deg,#f8fafc,#e0f2fe);box-shadow:inset 0 0 0 1px rgba(255,255,255,.42);}
+    body[data-layout="pre-a-market-validation"] .pre-a-product-panel i{position:absolute;z-index:2;border-radius:999px;background:#14b8a6;}
+    body[data-layout="pre-a-market-validation"] .pre-a-product-panel i:nth-child(1){left:17%;bottom:30%;width:16%;height:7px;}body[data-layout="pre-a-market-validation"] .pre-a-product-panel i:nth-child(2){left:39%;bottom:38%;width:20%;height:7px;background:#38bdf8;}body[data-layout="pre-a-market-validation"] .pre-a-product-panel i:nth-child(3){left:65%;bottom:50%;width:18%;height:7px;background:#f59e0b;}
+    body[data-layout="pre-a-market-validation"] .pre-a-evidence-wall{position:absolute;right:7.2%;top:21%;width:42%;height:47%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="pre-a-market-validation"] .pre-a-evidence-wall span{border-radius:16px;background:#fff;border:1px solid rgba(20,184,166,.20);box-shadow:0 10px 24px rgba(15,23,42,.09);padding:15px 12px;font-size:11px;line-height:1.32;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
+    body[data-layout="pre-a-market-validation"] .pre-a-evidence-wall span::before{content:"";display:block;width:30px;height:30px;border-radius:12px;margin-bottom:10px;background:linear-gradient(135deg,#14b8a6,#38bdf8);}
+    body[data-layout="pre-a-market-validation"] .pre-a-dashboard{position:absolute;right:7.2%;top:20%;width:42%;height:47%;border-radius:20px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 16px 34px rgba(15,23,42,.12);padding:6.5% 5.5%;}
+    body[data-layout="pre-a-market-validation"] .pre-a-dashboard i{display:inline-block;width:12.5%;margin:0 4% 0 0;vertical-align:bottom;border-radius:9px 9px 0 0;background:linear-gradient(180deg,#14b8a6,#38bdf8);}
+    body[data-layout="pre-a-market-validation"] .pre-a-dashboard i:nth-child(1){height:30%;}body[data-layout="pre-a-market-validation"] .pre-a-dashboard i:nth-child(2){height:46%;}body[data-layout="pre-a-market-validation"] .pre-a-dashboard i:nth-child(3){height:72%;}body[data-layout="pre-a-market-validation"] .pre-a-dashboard i:nth-child(4){height:58%;background:#f59e0b;}
+    body[data-layout="pre-a-market-validation"] .pre-a-canvas{position:absolute;right:7.2%;top:19%;width:42%;height:48%;display:grid;grid-template-columns:1.1fr .9fr;grid-template-rows:1fr 1fr;gap:12px;}
+    body[data-layout="pre-a-market-validation"] .pre-a-canvas span{border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 24px rgba(15,23,42,.08);padding:15px 13px;font-size:12px;font-weight:900;color:#0f172a;}
+    body[data-layout="pre-a-market-validation"] .pre-a-canvas span:first-child{grid-row:span 2;background:linear-gradient(135deg,#ecfeff,#fff);}
+    body[data-layout="pre-a-market-validation"] .pre-a-moat-map{position:absolute;right:8%;top:20%;width:39%;height:45%;border-radius:50%;border:14px solid rgba(20,184,166,.20);border-left-color:#14b8a6;border-bottom-color:#38bdf8;box-shadow:0 18px 34px rgba(15,23,42,.10);}
+    body[data-layout="pre-a-market-validation"] .pre-a-moat-map span{position:absolute;width:96px;min-height:42px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.10);display:grid;place-items:center;text-align:center;padding:0 12px;font-size:11px;font-weight:900;color:#0f172a;}
+    body[data-layout="pre-a-market-validation"] .pre-a-moat-map span:nth-child(1){left:35%;top:-10%;}body[data-layout="pre-a-market-validation"] .pre-a-moat-map span:nth-child(2){right:-12%;top:32%;}body[data-layout="pre-a-market-validation"] .pre-a-moat-map span:nth-child(3){left:36%;bottom:-10%;}body[data-layout="pre-a-market-validation"] .pre-a-moat-map span:nth-child(4){left:-12%;top:32%;}
+    body[data-layout="pre-a-market-validation"] .pre-a-capital-plan{position:absolute;left:8%;right:8%;bottom:14%;height:24%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="pre-a-market-validation"] .pre-a-capital-plan span{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:17px 14px 12px;font-size:12px;line-height:1.28;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
+    body[data-layout="pre-a-market-validation"] .pre-a-capital-plan span::after{content:"";position:absolute;left:14px;right:14px;bottom:12px;height:4px;border-radius:999px;background:linear-gradient(90deg,#14b8a6,#38bdf8,#f59e0b);}
+    body[data-layout="pre-a-market-validation"] .pre-a-closing{position:absolute;right:8.6%;top:22%;width:36%;height:42%;border-radius:22px;background:linear-gradient(135deg,#0b1220,#0f766e);box-shadow:0 22px 42px rgba(15,23,42,.22);}
+    body[data-layout="pre-a-market-validation"] .pre-a-closing::before{content:"";position:absolute;left:14%;right:14%;top:28%;height:8px;border-radius:999px;background:linear-gradient(90deg,#14b8a6,#38bdf8,#f59e0b);}
+    body[data-layout="pre-a-market-validation"] .pre-a-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:23%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.08);}
+    body[data-layout="pre-a-market-validation"] .page-number{z-index:9;color:rgba(15,23,42,.58);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
     body[data-layout="product-funding-highlights"]{background:#dfe9f4;}
     body[data-layout="product-funding-highlights"] main{width:min(100%,1160px);}
     body[data-layout="product-funding-highlights"] .slide{background:linear-gradient(135deg,#eaf2f8 0%,#ffffff 42%,#edf7fb 100%);padding:0;border:0;box-shadow:0 24px 58px rgba(15,23,42,.18);}
@@ -2704,6 +2799,45 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="market-survey-analysis"] .survey-closing::before{content:"";position:absolute;left:13%;right:13%;top:25%;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),var(--template-warning));}
     body[data-layout="market-survey-analysis"] .survey-closing::after{content:"";position:absolute;left:17%;right:17%;bottom:22%;height:36%;border-radius:16px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
     body[data-layout="market-survey-analysis"] .page-number{z-index:6;right:7%;bottom:6.4%;color:rgba(15,48,66,.56);background:rgba(255,255,255,.78);border:1px solid rgba(21,94,117,.10);border-radius:999px;padding:5px 10px;}
+    body[data-layout="experiment-ab-test"]{background:#e8f2f4;}
+    body[data-layout="experiment-ab-test"] main{width:min(100%,1160px);}
+    body[data-layout="experiment-ab-test"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fcfd 0%,#ffffff 47%,#eef7f8 100%);box-shadow:0 24px 58px rgba(11,23,42,.16);}
+    body[data-layout="experiment-ab-test"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 18%,rgba(22,163,163,.16),transparent 25%),radial-gradient(circle at 16% 82%,rgba(245,158,11,.14),transparent 27%),repeating-linear-gradient(90deg,rgba(18,53,91,.045) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(18,53,91,.032) 0 1px,transparent 1px 38px);}
+    body[data-layout="experiment-ab-test"] .slide::after{content:"";position:absolute;left:5.6%;right:5.6%;top:8.4%;bottom:8%;z-index:1;border-radius:26px;background:rgba(255,255,255,.95);border:1px solid rgba(18,53,91,.12);box-shadow:0 22px 50px rgba(11,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.75);}
+    body[data-layout="experiment-ab-test"] .accent{left:5.6%;right:5.6%;top:8.4%;height:6px;z-index:4;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));}
+    body[data-layout="experiment-ab-test"] .experiment-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="experiment-ab-test"] .experiment-kicker{position:absolute;left:8.4%;top:14.2%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-accent);}
+    body[data-layout="experiment-ab-test"] .experiment-title{position:absolute;left:8.4%;top:20.2%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.1;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="experiment-ab-test"] .experiment-summary{position:absolute;left:8.4%;top:39.5%;width:35%;font-size:13px;line-height:1.48;font-weight:800;color:#40576a;overflow-wrap:anywhere;}
+    body[data-layout="experiment-ab-test"] .experiment-bullets{position:absolute;left:8.5%;top:50.2%;width:37%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="experiment-ab-test"] .experiment-bullets li{margin:.18em 0;}
+    body[data-layout="experiment-ab-test"] .experiment-metrics{position:absolute;left:8.4%;right:49%;bottom:14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="experiment-ab-test"] .experiment-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(11,23,42,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:800;color:#587083;}
+    body[data-layout="experiment-ab-test"] .experiment-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="experiment-ab-test"] .experiment-groups{position:absolute;right:8.2%;top:18%;width:40%;height:43%;border-radius:22px;background:#fff;border:1px solid rgba(18,53,91,.12);box-shadow:0 18px 36px rgba(11,23,42,.12);overflow:hidden;}
+    body[data-layout="experiment-ab-test"] .experiment-groups::before{content:"";position:absolute;left:8%;right:8%;top:50%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="experiment-ab-test"] .experiment-groups span{position:absolute;top:23%;width:32%;height:38%;border-radius:18px;background:var(--template-primary);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:900;box-shadow:0 14px 28px rgba(11,23,42,.14);}
+    body[data-layout="experiment-ab-test"] .experiment-groups span:nth-child(1){left:10%;}.experiment-groups span:nth-child(2){right:10%;background:var(--template-accent);}
+    body[data-layout="experiment-ab-test"] .experiment-flow{position:absolute;right:8.1%;top:19%;width:40%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+    body[data-layout="experiment-ab-test"] .experiment-flow span{position:relative;min-height:118px;border-radius:16px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(11,23,42,.08);padding:16px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experiment-ab-test"] .experiment-flow span::before{content:"";display:block;width:24px;height:24px;border-radius:50%;margin-bottom:11px;background:var(--template-accent);box-shadow:0 0 0 8px rgba(22,163,163,.12);}
+    body[data-layout="experiment-ab-test"] .experiment-result{position:absolute;right:8.1%;top:20%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    body[data-layout="experiment-ab-test"] .experiment-result span{min-height:116px;border-radius:18px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 12px 24px rgba(11,23,42,.08);padding:16px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experiment-ab-test"] .experiment-result span::after{content:"";display:block;height:8px;border-radius:999px;margin-top:16px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="experiment-ab-test"] .experiment-result span:nth-child(2)::after{background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="experiment-ab-test"] .experiment-funnel{position:absolute;right:9%;top:20%;width:34%;height:42%;}
+    body[data-layout="experiment-ab-test"] .experiment-funnel span{display:block;margin:0 auto 14px;height:42px;border-radius:13px;background:var(--template-primary);box-shadow:0 10px 20px rgba(11,23,42,.10);}
+    body[data-layout="experiment-ab-test"] .experiment-funnel span:nth-child(1){width:100%;}.experiment-funnel span:nth-child(2){width:76%;background:var(--template-accent);}.experiment-funnel span:nth-child(3){width:52%;background:var(--template-secondary);}
+    body[data-layout="experiment-ab-test"] .experiment-decision{position:absolute;right:8%;top:19%;width:40%;height:43%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="experiment-ab-test"] .experiment-decision span{border-radius:16px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(11,23,42,.08);padding:15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experiment-ab-test"] .experiment-decision span::before{content:"";display:block;width:34px;height:6px;border-radius:999px;margin-bottom:10px;background:var(--template-accent);}
+    body[data-layout="experiment-ab-test"] .experiment-next{position:absolute;left:8.4%;right:8.4%;bottom:14%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="experiment-ab-test"] .experiment-next span{min-height:78px;border-radius:15px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(11,23,42,.08);padding:16px 13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experiment-ab-test"] .experiment-next span::after{content:"";display:block;width:46%;height:5px;margin-top:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="experiment-ab-test"] .experiment-signal{position:absolute;right:9%;top:22%;width:34%;height:40%;border-radius:22px;background:linear-gradient(135deg,var(--template-primary),#0f172a);box-shadow:0 20px 40px rgba(11,23,42,.18);}
+    body[data-layout="experiment-ab-test"] .experiment-signal::before{content:"";position:absolute;left:15%;right:15%;top:30%;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="experiment-ab-test"] .experiment-signal::after{content:"";position:absolute;left:22%;right:22%;bottom:22%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
+    body[data-layout="experiment-ab-test"] .page-number{z-index:6;right:7%;bottom:6.4%;color:rgba(11,23,42,.56);background:rgba(255,255,255,.78);border:1px solid rgba(18,53,91,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="brand-story"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 62%,color-mix(in srgb,var(--template-accent) 10%,var(--template-bg) 90%));padding:7.8% 8.8% 6.8%;border:0;}
     body[data-layout="brand-story"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 7%,transparent) 0 14%,transparent 14%),repeating-linear-gradient(0deg,rgba(17,24,39,.024) 0 1px,transparent 1px 38px),radial-gradient(circle at 78% 24%,color-mix(in srgb,var(--template-accent) 18%,transparent),transparent 28%);}
     body[data-layout="brand-story"] .slide::after{content:"";position:absolute;inset:10.5% 6.5% 9.8%;border-radius:4px;background:rgba(255,255,255,.92);box-shadow:0 24px 54px rgba(23,27,38,.13);border:1px solid color-mix(in srgb,var(--template-primary) 9%,transparent);}
@@ -2890,6 +3024,51 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="private-domain-member-layering"] .private-domain-actions span{min-height:86px;border-radius:18px;background:#fff;border:1px solid rgba(18,60,53,.10);box-shadow:0 12px 24px rgba(18,60,53,.08);padding:17px 15px;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="private-domain-member-layering"] .private-domain-actions span::after{content:"";display:block;width:42px;height:5px;margin-top:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
     body[data-layout="private-domain-member-layering"] .page-number{z-index:6;color:#64736e;background:rgba(255,255,255,.78);border:1px solid rgba(18,60,53,.10);border-radius:999px;padding:5px 10px;}
+    body[data-layout="department-team-performance"]{background:#e9eff8;}
+    body[data-layout="department-team-performance"] main{width:min(100%,1160px);}
+    body[data-layout="department-team-performance"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f5f8fc 0%,#ffffff 46%,#eef6f8 100%);box-shadow:0 24px 58px rgba(16,32,51,.16);}
+    body[data-layout="department-team-performance"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 18%,rgba(245,184,75,.22),transparent 27%),radial-gradient(circle at 13% 82%,rgba(36,184,168,.16),transparent 28%),repeating-linear-gradient(90deg,rgba(23,59,115,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(23,59,115,.028) 0 1px,transparent 1px 42px);pointer-events:none;}
+    body[data-layout="department-team-performance"] .slide::after{content:"";position:absolute;left:5.5%;right:5.5%;top:8.2%;bottom:8%;z-index:1;border-radius:26px;background:rgba(255,255,255,.93);border:1px solid rgba(23,59,115,.12);box-shadow:0 22px 48px rgba(16,32,51,.10),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="department-team-performance"] .accent{left:5.5%;right:5.5%;top:8.2%;height:7px;z-index:4;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary),var(--template-accent));}
+    body[data-layout="department-team-performance"] .slide-content{display:none;}
+    body[data-layout="department-team-performance"] .dept-team-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="department-team-performance"] .dept-team-kicker{position:absolute;left:8.5%;top:13.8%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-secondary);}
+    body[data-layout="department-team-performance"] .dept-team-title{position:absolute;left:8.5%;top:20%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="department-team-performance"] .dept-team-summary{position:absolute;left:8.5%;top:39.5%;width:37%;font-size:13px;line-height:1.5;color:#475569;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="department-team-performance"] .dept-team-bullets{position:absolute;left:8.6%;top:50%;width:38%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.46;font-weight:800;color:#334155;}
+    body[data-layout="department-team-performance"] .dept-team-bullets li{margin:.18em 0;}
+    body[data-layout="department-team-performance"] .dept-team-metrics{position:absolute;left:8.5%;right:48%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="department-team-performance"] .dept-team-metrics span{min-height:58px;border-radius:16px;background:#fff;border:1px solid rgba(23,59,115,.10);box-shadow:0 10px 22px rgba(16,32,51,.08);display:grid;align-content:center;gap:3px;padding:11px 12px;font-size:10px;font-weight:800;color:#64748b;}
+    body[data-layout="department-team-performance"] .dept-team-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="department-team-performance"] .dept-team-hero-card{position:absolute;right:8.4%;top:17%;width:37%;height:47%;border-radius:24px;background:linear-gradient(135deg,var(--template-primary),#102033 58%,#123f78);box-shadow:0 24px 48px rgba(16,32,51,.22);overflow:hidden;}
+    body[data-layout="department-team-performance"] .dept-team-hero-card::before{content:"";position:absolute;left:8%;right:8%;top:16%;height:9%;border-radius:999px;background:rgba(255,255,255,.76);}
+    body[data-layout="department-team-performance"] .dept-team-hero-card::after{content:"";position:absolute;right:-10%;bottom:-18%;width:48%;height:56%;border-radius:50%;background:rgba(245,184,75,.44);}
+    body[data-layout="department-team-performance"] .dept-team-hero-card i{position:absolute;bottom:18%;border-radius:18px 18px 0 0;background:#fff;opacity:.86;}
+    body[data-layout="department-team-performance"] .dept-team-hero-card i:nth-child(1){left:18%;width:16%;height:24%;}body[data-layout="department-team-performance"] .dept-team-hero-card i:nth-child(2){left:41%;width:16%;height:40%;}body[data-layout="department-team-performance"] .dept-team-hero-card i:nth-child(3){left:64%;width:16%;height:58%;background:var(--template-accent);}
+    body[data-layout="department-team-performance"] .dept-team-goal-map{position:absolute;right:7.8%;top:19%;width:41%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;}
+    body[data-layout="department-team-performance"] .dept-team-goal-map span{min-height:92px;border-radius:18px;background:#fff;border:1px solid rgba(23,59,115,.10);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:17px 15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="department-team-performance"] .dept-team-goal-map span::before{content:"";display:block;width:34px;height:6px;border-radius:999px;margin-bottom:11px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent));}
+    body[data-layout="department-team-performance"] .dept-team-progress{position:absolute;right:8%;bottom:15%;width:39%;height:18%;border-radius:16px;background:#102033;box-shadow:0 18px 34px rgba(16,32,51,.16);overflow:hidden;}
+    body[data-layout="department-team-performance"] .dept-team-progress::before{content:"";position:absolute;left:7%;right:7%;top:18%;height:5px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary) 0 42%,var(--template-accent) 42% 75%,#fff 75%);}
+    body[data-layout="department-team-performance"] .dept-team-progress i{position:absolute;bottom:20%;width:12%;border-radius:8px 8px 0 0;background:var(--template-secondary);}
+    body[data-layout="department-team-performance"] .dept-team-progress i:nth-child(1){left:13%;height:28%;}body[data-layout="department-team-performance"] .dept-team-progress i:nth-child(2){left:33%;height:48%;}body[data-layout="department-team-performance"] .dept-team-progress i:nth-child(3){left:53%;height:68%;}body[data-layout="department-team-performance"] .dept-team-progress i:nth-child(4){left:73%;height:56%;background:var(--template-accent);}
+    body[data-layout="department-team-performance"] .dept-team-radar{position:absolute;right:9.2%;top:17%;width:34%;height:50%;border-radius:50%;background:radial-gradient(circle at center,#fff 0 18%,rgba(36,184,168,.12) 19% 24%,transparent 25%),conic-gradient(from 18deg,var(--template-secondary),var(--template-accent),var(--template-primary),var(--template-secondary));box-shadow:0 18px 38px rgba(16,32,51,.16);}
+    body[data-layout="department-team-performance"] .dept-team-radar::before{content:"";position:absolute;inset:12%;border-radius:50%;background:#fff;border:1px solid rgba(23,59,115,.08);}
+    body[data-layout="department-team-performance"] .dept-team-radar::after{content:"";position:absolute;left:26%;top:20%;width:48%;height:56%;clip-path:polygon(50% 0,92% 36%,75% 100%,25% 100%,8% 36%);background:rgba(36,184,168,.34);border:3px solid var(--template-secondary);}
+    body[data-layout="department-team-performance"] .dept-team-radar span{position:absolute;width:82px;height:32px;border-radius:999px;background:#fff;border:1px solid rgba(23,59,115,.16);box-shadow:0 10px 20px rgba(16,32,51,.12);}
+    body[data-layout="department-team-performance"] .dept-team-radar span:nth-child(1){left:38%;top:-5%;}body[data-layout="department-team-performance"] .dept-team-radar span:nth-child(2){right:-8%;top:28%;}body[data-layout="department-team-performance"] .dept-team-radar span:nth-child(3){right:6%;bottom:0;}body[data-layout="department-team-performance"] .dept-team-radar span:nth-child(4){left:6%;bottom:0;}body[data-layout="department-team-performance"] .dept-team-radar span:nth-child(5){left:-8%;top:28%;}
+    body[data-layout="department-team-performance"] .dept-team-awards{position:absolute;right:8%;top:18%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="department-team-performance"] .dept-team-awards span{min-height:104px;border-radius:18px;background:#fff;border:1px solid rgba(23,59,115,.10);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:17px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="department-team-performance"] .dept-team-awards span::after{content:"";display:block;width:44px;height:5px;margin-top:13px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="department-team-performance"] .dept-team-medal{position:absolute;right:11%;bottom:14%;width:18%;height:22%;border-radius:50%;background:radial-gradient(circle at 50% 42%,#fff 0 24%,var(--template-accent) 25% 58%,#d88d1e 59% 100%);box-shadow:0 18px 34px rgba(16,32,51,.16);}
+    body[data-layout="department-team-performance"] .dept-team-medal::before{content:"";position:absolute;left:34%;top:-30%;width:32%;height:42%;background:linear-gradient(180deg,var(--template-primary),var(--template-secondary));clip-path:polygon(0 0,100% 0,76% 100%,24% 100%);}
+    body[data-layout="department-team-performance"] .dept-team-timeline{position:absolute;right:8%;top:18%;width:40%;height:50%;display:grid;gap:10px;}
+    body[data-layout="department-team-performance"] .dept-team-timeline span{position:relative;border-radius:16px;background:#fff;border-left:6px solid var(--template-secondary);box-shadow:0 10px 22px rgba(16,32,51,.08);padding:15px 16px 13px 42px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="department-team-performance"] .dept-team-timeline span::before{content:"";position:absolute;left:15px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 6px rgba(245,184,75,.14);}
+    body[data-layout="department-team-performance"] .dept-team-actions{position:absolute;left:8.5%;right:8.5%;bottom:15%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="department-team-performance"] .dept-team-actions span{min-height:88px;border-radius:18px;background:#fff;border:1px solid rgba(23,59,115,.10);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:18px 15px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="department-team-performance"] .dept-team-actions span::after{content:"";display:block;width:44px;height:5px;margin-top:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="department-team-performance"] .page-number{z-index:6;color:#64748b;background:rgba(255,255,255,.78);border:1px solid rgba(23,59,115,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="academy"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 72%);padding:8% 10%;border:0;}
     body[data-layout="academy"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(15,23,42,.022) 0 1px,transparent 1px 32px);}
     body[data-layout="academy"] .slide::after{content:"";position:absolute;inset:14% 7.5% 12%;background:var(--template-surface);box-shadow:0 16px 40px rgba(11,93,102,.10);}
@@ -2982,6 +3161,39 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="knowledge-blackboard"] .blackboard-summary{position:absolute;right:9%;top:18%;width:30%;height:44%;display:grid;gap:12px;}
     body[data-layout="knowledge-blackboard"] .blackboard-summary span{border-radius:12px;background:#fffdf5;color:#173b33;padding:13px 15px;font-size:12px;font-weight:900;box-shadow:6px 7px 0 rgba(0,0,0,.14);}
     body[data-layout="knowledge-blackboard"] .page-number{z-index:5;right:7.6%;bottom:6.1%;background:rgba(248,250,231,.14);border:1px solid rgba(248,250,231,.28);border-radius:999px;padding:5px 10px;color:#f8fae7;}
+    body[data-layout="concept-breakdown-courseware"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f5f2e9 0%,#fffdf7 52%,#eaf4f0 100%);box-shadow:0 22px 58px rgba(24,43,58,.13);}
+    body[data-layout="concept-breakdown-courseware"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(36,91,90,.045) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(36,91,90,.032) 0 1px,transparent 1px 40px),radial-gradient(circle at 85% 18%,rgba(245,158,11,.18),transparent 23%);}
+    body[data-layout="concept-breakdown-courseware"] .accent,body[data-layout="concept-breakdown-courseware"] .slide-content{display:none;}
+    body[data-layout="concept-breakdown-courseware"] .concept-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="concept-breakdown-courseware"] .concept-stage{position:absolute;left:5.7%;right:5.7%;top:8%;bottom:8%;border-radius:22px;background:rgba(255,253,247,.96);border:1px solid rgba(36,91,90,.14);box-shadow:0 24px 48px rgba(36,91,90,.12),inset 0 0 0 8px rgba(255,255,255,.42);}
+    body[data-layout="concept-breakdown-courseware"] .concept-rail{position:absolute;left:7.4%;top:12%;bottom:12%;width:8px;border-radius:999px;background:linear-gradient(180deg,var(--template-primary),var(--template-accent));box-shadow:20px 0 0 rgba(36,91,90,.08);}
+    body[data-layout="concept-breakdown-courseware"] .concept-kicker{position:absolute;left:10%;top:13.8%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-primary);}
+    body[data-layout="concept-breakdown-courseware"] .concept-title{position:absolute;left:10%;top:20.6%;width:43%;margin:0;color:var(--template-title);font-size:31px;line-height:1.13;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="concept-breakdown-courseware"] .concept-bullets{position:absolute;left:10.3%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="concept-breakdown-courseware"] .concept-bullets li{margin:.08em 0;}
+    body[data-layout="concept-breakdown-courseware"] .concept-underbar{position:absolute;left:10%;top:43.5%;width:19%;height:7px;border-radius:999px;background:var(--template-accent);box-shadow:144px -18px 0 -2px rgba(59,130,246,.36);}
+    body[data-layout="concept-breakdown-courseware"] .concept-board{position:absolute;right:8.5%;top:17%;width:34%;height:43%;border-radius:20px;background:linear-gradient(135deg,#f9fbfb,#e4f0ec);border:1px solid rgba(36,91,90,.15);box-shadow:0 16px 32px rgba(36,91,90,.12);}
+    body[data-layout="concept-breakdown-courseware"] .concept-board::before{content:"";position:absolute;left:10%;top:15%;width:32%;height:62%;border-radius:16px;background:#fff;border:1px solid rgba(36,91,90,.13);box-shadow:0 10px 18px rgba(36,91,90,.08);}
+    body[data-layout="concept-breakdown-courseware"] .concept-board::after{content:"";position:absolute;right:10%;top:18%;width:42%;height:13px;border-radius:999px;background:var(--template-primary);box-shadow:0 38px 0 rgba(245,158,11,.72),0 76px 0 rgba(59,130,246,.48);}
+    body[data-layout="concept-breakdown-courseware"] .concept-map{position:absolute;right:8.5%;top:18%;width:35%;height:44%;}
+    body[data-layout="concept-breakdown-courseware"] .concept-node{position:absolute;border-radius:16px;background:#fff;border:1px solid rgba(36,91,90,.15);box-shadow:0 10px 20px rgba(36,91,90,.1);padding:10px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="concept-breakdown-courseware"] .concept-node:nth-child(1){left:28%;top:4%;width:44%;height:26%;background:var(--template-primary);color:#fff;}
+    body[data-layout="concept-breakdown-courseware"] .concept-node:nth-child(2){left:2%;bottom:6%;width:38%;height:28%;}
+    body[data-layout="concept-breakdown-courseware"] .concept-node:nth-child(3){right:2%;bottom:6%;width:38%;height:28%;}
+    body[data-layout="concept-breakdown-courseware"] .concept-map-line{position:absolute;left:20%;right:20%;top:46%;height:3px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="concept-breakdown-courseware"] .concept-map-line::before,.concept-map-line::after{content:"";position:absolute;top:0;width:3px;height:84px;background:var(--template-accent);}.concept-map-line::before{left:0;transform:rotate(28deg);transform-origin:top}.concept-map-line::after{right:0;transform:rotate(-28deg);transform-origin:top}
+    body[data-layout="concept-breakdown-courseware"] .concept-cards{position:absolute;left:10%;right:10%;bottom:14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="concept-breakdown-courseware"] .concept-cards span{min-height:78px;border-radius:15px;background:#fff;border:1px solid rgba(36,91,90,.12);border-top:5px solid var(--template-accent);box-shadow:0 12px 24px rgba(36,91,90,.08);padding:13px 15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="concept-breakdown-courseware"] .concept-case-panel{position:absolute;right:8.5%;top:18%;width:35%;height:48%;border-radius:22px;background:#fff3df;border:1px solid rgba(245,158,11,.22);box-shadow:0 16px 34px rgba(245,158,11,.15);}
+    body[data-layout="concept-breakdown-courseware"] .concept-case-panel::before{content:"";position:absolute;left:12%;right:12%;top:18%;height:12px;border-radius:999px;background:var(--template-accent);box-shadow:0 42px 0 rgba(36,91,90,.52),0 84px 0 rgba(59,130,246,.42);}
+    body[data-layout="concept-breakdown-courseware"] .concept-practice{position:absolute;right:8.5%;top:19%;width:35%;height:43%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="concept-breakdown-courseware"] .concept-practice span{border-radius:18px;background:#fff;border:1px solid rgba(36,91,90,.12);box-shadow:0 10px 20px rgba(36,91,90,.08);padding:15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="concept-breakdown-courseware"] .concept-practice span::before{content:"";display:block;width:26px;height:26px;margin-bottom:10px;border-radius:50%;background:var(--template-accent);}
+    body[data-layout="concept-breakdown-courseware"] .concept-feedback{position:absolute;left:10%;right:10%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="concept-breakdown-courseware"] .concept-feedback span{min-height:68px;border-radius:14px;background:rgba(36,91,90,.08);border:1px solid rgba(36,91,90,.12);padding:13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="concept-breakdown-courseware"] .concept-summary{position:absolute;right:9%;top:19%;width:32%;height:45%;display:grid;gap:12px;}
+    body[data-layout="concept-breakdown-courseware"] .concept-summary span{border-radius:14px;background:#fff;border-left:7px solid var(--template-primary);box-shadow:0 10px 20px rgba(36,91,90,.08);padding:13px 16px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="concept-breakdown-courseware"] .page-number{z-index:5;right:7.4%;bottom:6%;background:#fff;border:1px solid rgba(36,91,90,.12);border-radius:999px;padding:5px 10px;color:rgba(24,43,58,.62);}
     body[data-layout="exam-review-keypoints"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f4f7fb 0%,#fff 54%,#edf6ff 100%);box-shadow:0 22px 58px rgba(30,42,120,.16);}
     body[data-layout="exam-review-keypoints"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(30,42,120,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(30,42,120,.04) 0 1px,transparent 1px 38px);}
     body[data-layout="exam-review-keypoints"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8%;bottom:8%;z-index:1;border-radius:18px;background:rgba(255,255,255,.96);border:1px solid rgba(30,42,120,.12);box-shadow:0 24px 54px rgba(30,42,120,.12);}
@@ -3559,7 +3771,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
     body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
-    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case,body[data-layout="onboarding-guide"] .onboarding-badge,body[data-layout="onboarding-guide"] .onboarding-handbook,body[data-layout="onboarding-guide"] .onboarding-culture,body[data-layout="knowledge-blackboard"] .blackboard-note,body[data-layout="knowledge-blackboard"] .blackboard-formula,body[data-layout="knowledge-blackboard"] .blackboard-summary{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="onboarding-guide"] .onboarding-bullets,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="knowledge-blackboard"] .blackboard-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
+    @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="concept-breakdown-courseware"] .concept-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case,body[data-layout="onboarding-guide"] .onboarding-badge,body[data-layout="onboarding-guide"] .onboarding-handbook,body[data-layout="onboarding-guide"] .onboarding-culture,body[data-layout="knowledge-blackboard"] .blackboard-note,body[data-layout="knowledge-blackboard"] .blackboard-formula,body[data-layout="knowledge-blackboard"] .blackboard-summary,body[data-layout="concept-breakdown-courseware"] .concept-board,body[data-layout="concept-breakdown-courseware"] .concept-map,body[data-layout="concept-breakdown-courseware"] .concept-case-panel,body[data-layout="concept-breakdown-courseware"] .concept-practice,body[data-layout="concept-breakdown-courseware"] .concept-summary{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="onboarding-guide"] .onboarding-bullets,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="knowledge-blackboard"] .blackboard-bullets,body[data-layout="concept-breakdown-courseware"] .concept-title,body[data-layout="concept-breakdown-courseware"] .concept-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
 
@@ -4203,6 +4415,103 @@ function quarterlyActionLoopVariant(visual) {
 function isQuarterlyActionLoopVisual(visual) {
   const id = String(visual?.id || "");
   return (id === "quarterly-business-review" || id === "business-quarterly-business-review-action-loop") && visual?.layout === "quarterly-action-loop";
+}
+
+function renderManagementAgendaDecisionPreview(slide, scene) {
+  // 管理层会议模板把真实标题和要点放入专用议题层，避免通用标题和会议装饰互相重叠。
+  const title = escapeHtml(managementAgendaCompactText(slide?.title || scene.title, scene.title, scene.role === "cover" ? 30 : 28));
+  const summaryText = String(slide?.speakerNotes || scene.summary || "").replace(/作者：[^。；;]*/g, "").trim() || scene.summary;
+  const summary = escapeHtml(managementAgendaCompactText(summaryText, scene.summary, 62));
+  const bullets = managementAgendaBulletTexts(slide).slice(0, 3).map((item) => `<li>${escapeHtml(managementAgendaCompactText(item, "", 34))}</li>`).join("");
+  const common = `<div class="management-agenda-kicker">${escapeHtml(scene.kicker)}</div><h2 class="management-agenda-title">${title}</h2><div class="management-agenda-summary">${summary}</div><ul class="management-agenda-bullets">${bullets}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="management-agenda-layer">${common}<div class="management-board"><span></span><span></span><span></span><span></span></div><div class="management-stamp">✓</div><div class="management-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "overview") {
+    return `<div class="management-agenda-layer">${common}<div class="management-agenda-cards">${scene.cards.map((card, index) => `<section class="management-agenda-card"><b>${String(index + 1).padStart(2, "0")}</b><strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(card.meta)}</span></section>`).join("")}</div></div>`;
+  }
+  if (scene.role === "topic") {
+    return `<div class="management-agenda-layer">${common}<div class="management-option-grid">${scene.options.map((item) => `<span class="management-option"><i></i>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "record") {
+    return `<div class="management-agenda-layer">${common}<div class="management-record-grid">${scene.records.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="management-stamp">✓</div></div>`;
+  }
+  if (scene.role === "track") {
+    return `<div class="management-agenda-layer">${common}<div class="management-track">${scene.steps.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="management-action-table">${scene.actions.map((item) => `<span>${escapeHtml(item)}<b>${escapeHtml(scene.badge)}</b></span>`).join("")}</div></div>`;
+  }
+  return `<div class="management-agenda-layer">${common}<div class="management-closing-path">${scene.steps.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="management-signature"></div></div>`;
+}
+
+function managementAgendaDecisionPreviewScene({ slide, index, total }) {
+  const role = managementAgendaDecisionRole(slide, index, total);
+  const title = slide?.title || "管理层会议材料";
+  const base = {
+    variant: "agenda-decision",
+    title,
+    summary: "围绕关键议题、决策依据、责任归属和会后追踪形成管理层会议材料。",
+    metrics: [
+      { value: "6", label: "会议页" },
+      { value: "4", label: "决策域" },
+      { value: "1", label: "行动闭环" },
+    ],
+    cards: [
+      { title: "经营议题", meta: "负责人 / 决策时点" },
+      { title: "风险事项", meta: "影响等级 / 应对口径" },
+      { title: "资源投入", meta: "预算 / 人力 / 排期" },
+      { title: "行动追踪", meta: "责任人 / 截止日" },
+    ],
+    options: ["方案 A：快速推进", "方案 B：分阶段验证", "方案 C：保守观察"],
+    records: ["会议结论", "决策依据", "风险保留", "责任确认"],
+    steps: ["提出议题", "形成结论", "责任下发", "复盘追踪"],
+    actions: ["事项确认", "责任人", "截止时间", "检查节点"],
+    badge: "待跟进",
+  };
+  const sceneByRole = {
+    cover: { kicker: "MANAGEMENT MEETING", role: "cover" },
+    overview: { kicker: "AGENDA OVERVIEW", role: "overview" },
+    topic: { kicker: "DECISION OPTIONS", role: "topic" },
+    record: { kicker: "MEETING MINUTES", role: "record" },
+    track: { kicker: "ACTION TRACKING", role: "track" },
+    closing: { kicker: "NEXT REVIEW", role: "closing" },
+  };
+  return { ...base, ...(sceneByRole[role] || sceneByRole.topic) };
+}
+
+function managementAgendaDecisionRole(slide, index, total) {
+  const layout = String(slide?.layout || "");
+  if (layout.includes("cover")) return "cover";
+  if (layout.includes("overview")) return "overview";
+  if (layout.includes("decision-record")) return "record";
+  if (layout.includes("action-track")) return "track";
+  if (layout.includes("closing")) return "closing";
+  if (index === 0) return "cover";
+  if (index === 1) return "overview";
+  if (index === total - 1) return "closing";
+  if (index === total - 2) return "track";
+  if (index === 3) return "record";
+  return "topic";
+}
+
+function managementAgendaBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets)
+    ? slide.bullets.map((item) => {
+        if (typeof item === "string") return item.trim();
+        if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+        return "";
+      }).filter(Boolean)
+    : [];
+  return values.length ? values : ["本次会议需确认的关键议题", "决策依据与备选方案对比", "会后责任人和行动追踪节奏"];
+}
+
+function managementAgendaCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isManagementAgendaDecisionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "management-agenda-decision" && (id === "management-meeting-materials" || id === "business-management-meeting-materials-agenda-decision");
 }
 
 function renderBusinessOpportunityMapPreview(slide, scene) {
@@ -5483,6 +5792,78 @@ function isKnowledgeBlackboardVisual(visual) {
   return visual?.layout === "knowledge-blackboard" && (id === "knowledge-handout" || id === "education-knowledge-handout-blackboard");
 }
 
+function conceptBreakdownCoursewarePreviewScene({ slide, index, total }) {
+  const bullets = conceptBreakdownCoursewareBulletTexts(slide);
+  const layout = String(slide?.layout || "");
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : index === total - 1 || layout.includes("summary") || layout === "closing"
+      ? "summary"
+      : layout.includes("case")
+        ? "case"
+        : layout.includes("practice") || layout.includes("exercise")
+          ? "practice"
+          : layout.includes("map") || layout.includes("concept")
+            ? "map"
+            : "detail";
+  const kickerMap = {
+    cover: "LESSON FRAME",
+    map: "CORE STRUCTURE",
+    detail: "DEEP DIVE",
+    case: "CLASS CASE",
+    practice: "PRACTICE LAB",
+    summary: "LEARNING CHECK",
+  };
+  return {
+    variant: "concept-breakdown",
+    role,
+    kicker: kickerMap[role] || "DEEP DIVE",
+    title: conceptBreakdownCoursewareCompactText(slide?.title, "知识点讲解", role === "cover" ? 28 : 24),
+    bullets,
+    cards: ["定义边界", "组成结构", "迁移应用"].map((fallback, itemIndex) => conceptBreakdownCoursewareCompactText(bullets[itemIndex], fallback, 12)),
+    feedback: ["理解", "辨析", "应用", "复盘"].map((fallback, itemIndex) => conceptBreakdownCoursewareCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function renderConceptBreakdownCoursewarePreview(slide, scene) {
+  // 概念拆解课件将标题、要点、案例和练习放入专用教学画布，避免默认正文层遮挡课堂元素。
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(conceptBreakdownCoursewareCompactText(item, scene.title, 40))}</li>`).join("");
+  const common = `<div class="concept-stage"></div><div class="concept-rail"></div><div class="concept-kicker">${escapeHtml(scene.kicker)}</div><h2 class="concept-title">${escapeHtml(scene.title || slide?.title || "")}</h2><div class="concept-underbar"></div><ul class="concept-bullets">${bulletItems}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="concept-layer">${common}<div class="concept-board"></div><div class="concept-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "map" || scene.role === "detail") {
+    return `<div class="concept-layer">${common}<div class="concept-map"><span class="concept-node">${escapeHtml(scene.cards[0])}</span><span class="concept-node">${escapeHtml(scene.cards[1])}</span><span class="concept-node">${escapeHtml(scene.cards[2])}</span><i class="concept-map-line"></i></div><div class="concept-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "case") {
+    return `<div class="concept-layer">${common}<div class="concept-case-panel"></div><div class="concept-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "practice") {
+    return `<div class="concept-layer">${common}<div class="concept-practice">${scene.cards.concat(scene.feedback.slice(0, 1)).slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="concept-feedback">${scene.feedback.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="concept-layer">${common}<div class="concept-summary">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="concept-feedback">${scene.feedback.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function conceptBreakdownCoursewareBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确概念定义和适用边界", "拆解组成结构与关键关系", "结合案例完成迁移练习"];
+}
+
+function conceptBreakdownCoursewareCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isConceptBreakdownCoursewareVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "concept-breakdown-courseware" && (id === "knowledge-point-courseware" || id === "education-knowledge-point-courseware-concept-breakdown");
+}
+
 function examReviewKeypointsPreviewScene({ slide, index, total }) {
   const bullets = examReviewKeypointTexts(slide);
   const layout = String(slide?.layout || "");
@@ -6587,6 +6968,87 @@ function isGrowthFundingFlywheelVisual(visual) {
 }
 
 /**
+ * 渲染 Pre-A 融资 BP 的市场验证型在线预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderPreAMarketValidationPreview(slide, scene) {
+  // Pre-A 市场验证模板用专属层承载投资人叙事，避免主题名称和默认正文层直接出现在 PPT 页面中。
+  const title = escapeHtml(preAMarketValidationCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 28));
+  const bullets = preAMarketValidationBulletTexts(slide);
+  const summary = escapeHtml(preAMarketValidationCompactText(bullets[0], scene.summary, 48));
+  const bulletItems = bullets.slice(0, 4).map((item) => `<li>${escapeHtml(preAMarketValidationCompactText(item, scene.summary, 34))}</li>`).join("");
+  const common = `<div class="pre-a-kicker">${escapeHtml(scene.kicker)}</div><h2 class="pre-a-title">${title}</h2><div class="pre-a-summary">${summary}</div><ul class="pre-a-bullets">${bulletItems}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-product-panel"><i></i><i></i><i></i></div><div class="pre-a-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "evidence") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-evidence-wall">${scene.cards.map((item, index) => `<span>${escapeHtml(preAMarketValidationCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div><div class="pre-a-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "traction") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-dashboard"><i></i><i></i><i></i><i></i></div><div class="pre-a-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "model") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-canvas">${scene.cards.map((item, index) => `<span>${escapeHtml(preAMarketValidationCompactText(bullets[index] || item, item, 20))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "moat") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-moat-map">${scene.cards.map((item, index) => `<span>${escapeHtml(preAMarketValidationCompactText(bullets[index] || item, item, 14))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "capital") {
+    return `<div class="pre-a-layer">${common}<div class="pre-a-capital-plan">${scene.cards.map((item, index) => `<span>${escapeHtml(preAMarketValidationCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="pre-a-layer">${common}<div class="pre-a-closing"></div><div class="pre-a-capital-plan">${scene.cards.map((item, index) => `<span>${escapeHtml(preAMarketValidationCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div></div>`;
+}
+
+function preAMarketValidationPreviewScene({ slide, index, total }) {
+  const bullets = preAMarketValidationBulletTexts(slide);
+  const title = preAMarketValidationCompactText(slide?.title, "用市场验证证明 Pre-A 融资价值", index === 0 ? 30 : 28);
+  const metrics = [
+    { value: "120+", label: "目标客户访谈" },
+    { value: "38%", label: "试点转付费" },
+    { value: "16m", label: "融资后 runway" },
+  ];
+  const cards = ["客户痛点验证", "试点付费信号", "增长牵引数据", "资金用途里程碑"].map((fallback, itemIndex) => preAMarketValidationCompactText(bullets[itemIndex], fallback, 16));
+  const scenes = [
+    { role: "cover", variant: "market-validation", kicker: "PRE-A INVESTOR BRIEF", title, summary: "用市场验证、牵引数据和资金用途说明 Pre-A 阶段的融资确定性。", metrics, cards },
+    { role: "evidence", variant: "market-validation", kicker: "CUSTOMER EVIDENCE", title, summary: "把客户访谈、试点反馈、付费意愿和复购线索整理成投资人可判断的证据墙。", metrics, cards: ["痛点高频出现", "试点反馈明确", "付费意愿增强", "复购线索形成", "决策链路清晰", "交付边界稳定"] },
+    { role: "traction", variant: "market-validation", kicker: "TRACTION DASHBOARD", title, summary: "用增长、留存、收入和获客效率说明商业牵引不是单点样本。", metrics: [
+      { value: "MoM", label: "月度增长" },
+      { value: "NRR", label: "留存扩张" },
+      { value: "CAC", label: "获客效率" },
+    ], cards },
+    { role: "model", variant: "market-validation", kicker: "BUSINESS MODEL", title, summary: "把客户分层、收入来源、交付路径和扩张机制放进同一张商业画布。", metrics, cards: ["目标客户分层", "收入来源组合", "交付闭环路径", "规模化扩张机制"] },
+    { role: "moat", variant: "market-validation", kicker: "DEFENSIBILITY MAP", title, summary: "说明产品能力、数据资产、渠道资源和团队经验如何形成 Pre-A 阶段壁垒。", metrics, cards: ["产品能力", "数据资产", "渠道资源", "团队经验"] },
+    { role: "capital", variant: "market-validation", kicker: "CAPITAL ALLOCATION", title, summary: "把资金用途和 12-18 个月里程碑绑定，说明融资后如何放大验证结果。", metrics, cards: ["产品研发", "市场拓展", "销售团队", "运营交付"] },
+  ];
+  if (index === total - 1) {
+    return { role: "closing", variant: "market-validation", kicker: "NEXT INVESTOR STEP", title, summary: "用清晰投资亮点、验证证据和下一步沟通推动投资决策。", metrics, cards: ["验证材料", "产品演示", "数据复核", "投资沟通"] };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function preAMarketValidationBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["目标客户痛点已经通过访谈和试点验证", "牵引数据体现留存、付费和获客效率改善", "融资资金将用于产品、市场、销售和交付里程碑"];
+}
+
+function preAMarketValidationCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isPreAMarketValidationVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "pre-a-market-validation" && (id === "pre-a-funding-bp" || id === "pitch-pre-a-funding-bp-market-validation");
+}
+
+/**
  * 渲染产品融资路演的产品演示型在线预览层。
  * @param {object} slide
  * @param {object} scene
@@ -7134,6 +7596,76 @@ function isPrivateDomainMemberLayeringVisual(visual) {
   return visual?.layout === "private-domain-member-layering" && (id === "private-domain-operation-plan" || id === "marketing-private-domain-operation-plan-member-layering");
 }
 
+function departmentTeamPerformancePreviewScene({ slide, index, total }) {
+  const bullets = departmentTeamPerformanceBulletTexts(slide);
+  const title = departmentTeamPerformanceCompactText(slide?.title, index === 0 ? "部门述职与团队成果" : `Page ${index + 1}`, index === 0 ? 28 : 26);
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 显式 layout 优先，避免 AI 生成的最后一页被固定识别为结尾页。
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("goal") || layout.includes("okr") || layout.includes("target")
+      ? "goals"
+      : layout.includes("radar") || layout.includes("performance") || layout.includes("kpi")
+        ? "radar"
+        : layout.includes("result") || layout.includes("achievement") || layout.includes("award")
+          ? "results"
+          : layout.includes("improve") || layout.includes("plan") || layout.includes("problem")
+            ? "improvement"
+            : index === total - 1 || layout.includes("closing") || layout.includes("action")
+              ? "closing"
+              : ["goals", "radar", "results", "improvement"][(index - 1) % 4];
+  const labels = ["目标达成", "团队协作", "成果沉淀", "改进计划"].map((fallback, itemIndex) => departmentTeamPerformanceCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    variant: "team-performance",
+    role,
+    kicker: role === "cover" ? "DEPARTMENT REVIEW" : role === "goals" ? "GOAL REVIEW" : role === "radar" ? "PERFORMANCE RADAR" : role === "results" ? "RESULTS SHOWCASE" : role === "improvement" ? "IMPROVEMENT PLAN" : "NEXT STAGE",
+    title,
+    summary: departmentTeamPerformanceCompactText(bullets[0], "围绕团队目标、绩效达成、关键成果和改进计划进行结构化述职。", 42),
+    bullets,
+    labels,
+    metrics: [
+      { value: "92%", label: "目标达成" },
+      { value: "4", label: "核心成果" },
+      { value: "3", label: "改进动作" },
+    ],
+  };
+}
+
+function renderDepartmentTeamPerformancePreview(scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(departmentTeamPerformanceCompactText(item, scene.title, 36))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const common = `<div class="dept-team-kicker">${escapeHtml(scene.kicker)}</div><h2 class="dept-team-title">${escapeHtml(scene.title)}</h2><div class="dept-team-summary">${escapeHtml(scene.summary)}</div><ul class="dept-team-bullets">${bulletItems}</ul>`;
+  const visual = scene.role === "goals"
+    ? `<div class="dept-team-goal-map">${scene.labels.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="dept-team-progress"><i></i><i></i><i></i><i></i></div>`
+    : scene.role === "radar"
+      ? `<div class="dept-team-radar"><span></span><span></span><span></span><span></span><span></span></div><div class="dept-team-metrics">${metrics}</div>`
+      : scene.role === "results"
+        ? `<div class="dept-team-awards">${scene.labels.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="dept-team-medal"></div>`
+        : scene.role === "improvement"
+          ? `<div class="dept-team-timeline">${["问题识别", "原因分析", "行动推进", "效果复盘"].map((item, itemIndex) => `<span>${escapeHtml(scene.labels[itemIndex] || item)}</span>`).join("")}</div><div class="dept-team-progress"><i></i><i></i><i></i><i></i></div>`
+          : scene.role === "closing"
+            ? `<div class="dept-team-actions">${scene.labels.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="dept-team-medal"></div>`
+            : `<div class="dept-team-hero-card"><i></i><i></i><i></i></div><div class="dept-team-metrics">${metrics}</div>`;
+  return `<div class="dept-team-layer">${common}${visual}</div>`;
+}
+
+function departmentTeamPerformanceBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["复盘部门目标完成与团队贡献", "展示关键项目成果和绩效数据", "梳理团队协同与能力建设", "明确下阶段改进动作和资源需求"];
+}
+
+function departmentTeamPerformanceCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function isDepartmentTeamPerformanceVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "department-team-performance" && (id === "department-performance-report" || id === "business-department-performance-report-team-performance");
+}
+
 function brandStoryPreviewScene(visual) {
   const variant = brandStoryVariant(visual);
   const scenes = {
@@ -7327,6 +7859,101 @@ function isMarketSurveyAnalysisVisual(visual) {
   return visual?.layout === "market-survey-analysis";
 }
 
+function renderExperimentAbTestPreview(slide, scene) {
+  const bullets = scene.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const common = `<div class="experiment-layer"><div class="experiment-kicker">${escapeHtml(scene.kicker)}</div><h2 class="experiment-title">${escapeHtml(scene.title)}</h2><div class="experiment-summary">${escapeHtml(scene.summary)}</div><ul class="experiment-bullets">${bullets}</ul>`;
+  if (scene.kind === "cover") {
+    return `${common}<div class="experiment-groups"><span>A</span><span>B</span></div><div class="experiment-metrics">${metrics}</div></div>`;
+  }
+  if (scene.kind === "design") {
+    return `${common}<div class="experiment-flow">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="experiment-metrics">${metrics}</div></div>`;
+  }
+  if (scene.kind === "result") {
+    return `${common}<div class="experiment-result">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="experiment-metrics">${metrics}</div></div>`;
+  }
+  if (scene.kind === "funnel") {
+    return `${common}<div class="experiment-funnel"><span></span><span></span><span></span></div><div class="experiment-metrics">${metrics}</div></div>`;
+  }
+  if (scene.kind === "decision") {
+    return `${common}<div class="experiment-decision">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "next") {
+    return `${common}<div class="experiment-signal"></div><div class="experiment-next">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `${common}<div class="experiment-signal"></div><div class="experiment-next">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function experimentAbTestPreviewScene({ slide, index, total }) {
+  const bullets = experimentAbTestBulletTexts(slide);
+  const title = experimentAbTestCompactText(slide?.title, "实验结果分析", 24);
+  const metrics = ["样本量", "提升幅度", "置信水平"].map((fallback, itemIndex) => experimentAbTestMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["实验假设", "A 组基线", "B 组策略", "判定标准"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 15));
+  const roleMap = {
+    "experiment-ab-test-cover": "cover",
+    "experiment-ab-test-design": "design",
+    "experiment-ab-test-result": "result",
+    "experiment-ab-test-funnel": "funnel",
+    "experiment-ab-test-decision": "decision",
+    "experiment-ab-test-next": "next",
+    "experiment-ab-test-summary": "summary",
+  };
+  const explicit = roleMap[String(slide?.layout || "")] || "";
+  const scenes = [
+    { kind: "cover", kicker: "EXPERIMENT BRIEF" },
+    { kind: "design", kicker: "HYPOTHESIS DESIGN" },
+    { kind: "result", kicker: "RESULT COMPARISON" },
+    { kind: "funnel", kicker: "CONVERSION PATH" },
+    { kind: "decision", kicker: "DECISION MATRIX" },
+    { kind: "next", kicker: "NEXT ITERATION" },
+  ];
+  const base = explicit
+    ? { kind: explicit, kicker: scenes.find((item) => item.kind === explicit)?.kicker || "EXPERIMENT REVIEW" }
+    : index === total - 1 && total > 2
+      ? { kind: "summary", kicker: "NEXT ITERATION" }
+      : scenes[Math.min(index, scenes.length - 1)];
+  return {
+    variant: "ab-test",
+    ...base,
+    title,
+    bullets,
+    metrics,
+    cards: base.kind === "decision"
+      ? ["保留策略", "继续验证", "优化变量", "暂停上线"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 13))
+      : base.kind === "next" || base.kind === "summary"
+        ? ["补充样本", "拆分变量", "监控风险", "复盘结论"].map((fallback, itemIndex) => experimentAbTestCompactText(bullets[itemIndex], fallback, 13))
+        : cards,
+    summary: experimentAbTestCompactText(bullets[0], "围绕实验假设、分组表现和显著性结果沉淀可执行策略。", 42),
+  };
+}
+
+function experimentAbTestBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["B 组转化率较 A 组提升 12.8%", "有效样本覆盖核心用户分层", "显著性结果支持继续放量"];
+}
+
+function experimentAbTestMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{1,5}|[零一二三四五六七八九十百千万亿]+份?)/);
+  const value = match?.[1] || ["N", "+12%", "95%"][index] || "N";
+  const label = experimentAbTestCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function experimentAbTestCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isExperimentAbTestVisual(visual) {
+  return visual?.layout === "experiment-ab-test";
+}
+
 function dataInsightPreviewScene(visual) {
   const variant = dataInsightVariant(visual);
   const scenes = {
@@ -7497,10 +8124,12 @@ function shouldRenderDomePreviewBodyList(visual, role) {
  */
 function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "growth-funding-flywheel") return false;
+  if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "product-funding-highlights") return false;
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "operating-problem-tree") return false;
   if (visual.layout === "business-opportunity-map") return false;
+  if (visual.layout === "management-agenda-decision") return false;
   if (visual.layout === "industry-research") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
@@ -7519,6 +8148,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;
   if (visual.layout === "market-survey-analysis") return false;
+  if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
@@ -7530,11 +8160,13 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
+  if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "private-domain-member-layering") return false;
+  if (visual.layout === "department-team-performance") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }
 

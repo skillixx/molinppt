@@ -1,0 +1,19 @@
+{
+  "slug": "business-management-meeting-materials-agenda-decision",
+  "name": "管理层会议材料 - 议题决策",
+  "description": "适合管理层会议、议题讨论、决策事项记录和行动追踪的正式会议材料模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "management-meeting",
+    "agenda",
+    "decision",
+    "action-tracking"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

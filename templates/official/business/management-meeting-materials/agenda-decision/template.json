@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "management-meeting-materials",
+  "themeId": "agenda-decision",
+  "style": "management-meeting-materials",
+  "themes": [
+    {
+      "id": "agenda-decision",
+      "name": "议题决策",
+      "visual": {
+        "primary": "13233F",
+        "accent": "C99A3B",
+        "secondary": "2F6B7E",
+        "warning": "B64E3A",
+        "background": "EEF2F6",
+        "surface": "FFFFFF",
+        "title": "0B1426",
+        "body": "334155",
+        "layout": "management-agenda-decision",
+        "variant": "agenda-decision"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "13233F",
+    "accent": "C99A3B",
+    "secondary": "2F6B7E",
+    "warning": "B64E3A",
+    "background": "EEF2F6",
+    "surface": "FFFFFF",
+    "title": "0B1426",
+    "body": "334155",
+    "layout": "management-agenda-decision",
+    "variant": "agenda-decision"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "management-agenda-cover",
+    "defaultContentLayout": "management-agenda-topic",
+    "allowedLayouts": [
+      "management-agenda-cover",
+      "management-agenda-overview",
+      "management-agenda-topic",
+      "management-agenda-decision-record",
+      "management-agenda-action-track",
+      "management-agenda-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}
