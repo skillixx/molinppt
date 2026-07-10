@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-label="performance medal">
+  <defs>
+    <linearGradient id="medalGold" x1="84" y1="56" x2="238" y2="254" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE7A6"/>
+      <stop offset=".46" stop-color="#F5B84B"/>
+      <stop offset="1" stop-color="#D88D1E"/>
+    </linearGradient>
+  </defs>
+  <path d="M98 30h52l18 82h-54L98 30Zm72 0h52l-16 82h-54l18-82Z" fill="#173B73"/>
+  <path d="M128 36h64l-18 86h-28l-18-86Z" fill="#24B8A8"/>
+  <circle cx="160" cy="188" r="92" fill="url(#medalGold)"/>
+  <circle cx="160" cy="188" r="68" fill="none" stroke="#fff" stroke-width="12" opacity=".68"/>
+  <path d="m160 126 18 38 42 6-30 30 7 42-37-20-37 20 7-42-30-30 42-6 18-38Z" fill="#fff"/>
+  <path d="M84 282h152" stroke="#173B73" stroke-width="10" stroke-linecap="round" opacity=".18"/>
+</svg>

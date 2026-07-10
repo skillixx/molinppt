@@ -783,6 +783,9 @@ test("PptService renders product commercialization pricing strategy preview with
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+  const exported = await context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pptx" });
+  const downloaded = await context.storage.download({ fileId: exported.file.id, ownerUserId: 7 });
+  const exportedText = downloaded.content.toString("latin1");
 
   assert.match(preview, /<body data-template="product-product-commercialization-plan-pricing-strategy" data-layout="product-pricing-strategy"/);
   assert.match(preview, /pricing-layer/);
@@ -790,6 +793,13 @@ test("PptService renders product commercialization pricing strategy preview with
   assert.match(preview, /pricing-card-row|pricing-anchor-grid|pricing-benefit-table|pricing-loop|pricing-actions/);
   assert.doesNotMatch(preview, />定价策略</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+  // 从业务服务实际导出的文件也必须保留和在线预览一致的专用信息层，而不是退回通用白底正文页。
+  assert.match(exportedText, /name="Product Pricing Grid Vertical 1"/);
+  assert.match(exportedText, /name="Product Pricing Dedicated Title"/);
+  assert.match(exportedText, /name="Product Pricing Bullet Card 1"/);
+  assert.match(exportedText, /name="Product Pricing Tag 1"/);
+  assert.match(exportedText, /name="Product Pricing Tier Card 1"/);
+  assert.match(exportedText, /name="Product Pricing Tier Price 1"/);
 });
 
 test("PptService renders new product launch rhythm preview with dedicated layout", async () => {
@@ -881,6 +891,30 @@ test("PptService renders growth funding flywheel preview with dedicated layout",
   assert.match(preview, /growth-funding-proof|growth-funding-roadmap|growth-funding-dashboard/);
   assert.match(preview, /GROWTH CAPITAL MEMO|GROWTH FLYWHEEL|COMMERCIAL PROOF|EXPANSION PLAN/);
   assert.doesNotMatch(preview, />增长飞轮</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders Pre-A market validation preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertPreAMarketValidationTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Pre-A 融资路演市场验证",
+    slideCount: 6,
+    templateId: "pitch-pre-a-funding-bp-market-validation",
+    theme: "market-validation",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-pre-a-funding-bp-market-validation" data-layout="pre-a-market-validation"/);
+  assert.match(preview, /pre-a-layer/);
+  assert.match(preview, /pre-a-product-panel/);
+  assert.match(preview, /pre-a-evidence-wall|pre-a-dashboard|pre-a-capital-plan/);
+  assert.match(preview, /PRE-A INVESTOR BRIEF|CUSTOMER EVIDENCE|TRACTION DASHBOARD|CAPITAL ALLOCATION/);
+  assert.doesNotMatch(preview, />市场验证</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -1044,6 +1078,29 @@ test("PptService renders metric anomaly attribution preview with dedicated layou
   assert.match(preview, /anomaly-signal|anomaly-cause-map|anomaly-impact|anomaly-loop/);
   assert.match(preview, /ANOMALY SIGNAL|THRESHOLD REVIEW|CAUSE NETWORK|IMPACT MATRIX/);
   assert.doesNotMatch(preview, />归因分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders market survey analysis preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertMarketSurveyAnalysisTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "市场调研结论汇报",
+    slideCount: 6,
+    templateId: "data-market-research-report-survey-analysis",
+    theme: "survey-analysis",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-market-research-report-survey-analysis" data-layout="market-survey-analysis"/);
+  assert.match(preview, /survey-layer/);
+  assert.match(preview, /survey-form|survey-sample-grid|survey-bars|survey-cross|survey-findings|survey-strategy/);
+  assert.match(preview, /RESEARCH BRIEF|SAMPLE STRUCTURE|QUESTION ITEM REVIEW|CROSS FINDINGS/);
+  assert.doesNotMatch(preview, />问卷分析</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -1305,6 +1362,29 @@ test("PptService renders business opportunity map preview with dedicated layout"
   assert.match(preview, /business-opportunity-map/);
   assert.match(preview, /business-opportunity-metrics|business-opportunity-quadrants|business-opportunity-path/);
   assert.doesNotMatch(preview, />机会地图</);
+  assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
+});
+
+test("PptService renders department performance team preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertDepartmentTeamPerformanceTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "部门述职报告",
+    slideCount: 5,
+    templateId: "business-department-performance-report-team-performance",
+    theme: "team-performance",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  // 团队绩效模板由专用驾驶舱、雷达和成果卡承载内容，主题风格名不直接写入页面。
+  assert.match(preview, /<body data-template="business-department-performance-report-team-performance" data-layout="department-team-performance"/);
+  assert.match(preview, /dept-team-layer/);
+  assert.match(preview, /dept-team-hero-card|dept-team-radar|dept-team-awards/);
+  assert.doesNotMatch(preview, />团队绩效</);
   assert.doesNotMatch(preview, /<body[^>]+data-layout="top-band"/);
 });
 
@@ -4605,6 +4685,62 @@ async function insertBusinessOpportunityMapTemplate(context) {
   });
 }
 
+async function insertDepartmentTeamPerformanceTemplate(context) {
+  // 测试数据库模拟官方模板同步后的部门述职报告模板，确保预览走团队绩效专用布局。
+  await context.database.insert("templates", {
+    id: "business-department-performance-report-team-performance",
+    slug: "business-department-performance-report-team-performance",
+    name: "部门述职报告",
+    categoryId: "business",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "team-performance",
+        name: "团队绩效",
+        visual: {
+          primary: "173B73",
+          accent: "F5B84B",
+          secondary: "24B8A8",
+          background: "F5F8FC",
+          surface: "FFFFFF",
+          title: "102033",
+          body: "334155",
+          layout: "department-team-performance",
+          variant: "team-performance",
+        },
+      },
+    ],
+    visual: {
+      primary: "173B73",
+      accent: "F5B84B",
+      secondary: "24B8A8",
+      background: "F5F8FC",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "334155",
+      layout: "department-team-performance",
+      variant: "team-performance",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "department-team-cover",
+      defaultContentLayout: "department-team-content",
+      allowedLayouts: [
+        "department-team-cover",
+        "department-team-goals",
+        "department-team-radar",
+        "department-team-results",
+        "department-team-improvement",
+        "department-team-closing",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
 async function insertEnterpriseDigitalBlueprintTemplate(context) {
   // 测试数据库模拟官方模板同步后的企业转型模板，确保预览走蓝图专用布局。
   await context.database.insert("templates", {
@@ -5809,6 +5945,54 @@ async function insertGrowthFundingFlywheelTemplate(context) {
   });
 }
 
+async function insertPreAMarketValidationTemplate(context) {
+  // 测试数据库模拟官方模板同步后的 Pre-A 融资 BP，确保主题名只用于选择器，不直接写进预览页面。
+  await context.database.insert("templates", {
+    id: "pitch-pre-a-funding-bp-market-validation",
+    slug: "pitch-pre-a-funding-bp-market-validation",
+    name: "Pre-A 融资 BP - 市场验证",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "market-validation",
+        name: "市场验证",
+        visual: {
+          primary: "0B1220",
+          accent: "14B8A6",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          background: "EAF2F8",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "pre-a-market-validation",
+          variant: "market-validation",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1220",
+      accent: "14B8A6",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "EAF2F8",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "pre-a-market-validation",
+      variant: "market-validation",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "pre-a-validation-cover",
+      defaultContentLayout: "pre-a-validation-content",
+      allowedLayouts: ["pre-a-validation-cover", "pre-a-evidence-wall", "pre-a-traction-dashboard", "pre-a-business-model", "pre-a-moat-map", "pre-a-capital-plan", "pre-a-team-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertProductFundingHighlightsTemplate(context) {
   // 测试数据库模拟官方模板同步后的产品融资路演模板，确保产品亮点主题只用于选择器，不直接写进 PPT 页面。
   await context.database.insert("templates", {
@@ -6157,6 +6341,65 @@ async function insertMetricAnomalyAttributionTemplate(context) {
         "metric-anomaly-attribution-impact",
         "metric-anomaly-attribution-action",
         "metric-anomaly-attribution-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertMarketSurveyAnalysisTemplate(context) {
+  // 测试数据库模拟官方模板同步后的市场调研报告模板，覆盖问卷分析专属预览布局。
+  await context.database.insert("templates", {
+    id: "data-market-research-report-survey-analysis",
+    slug: "data-market-research-report-survey-analysis",
+    name: "市场调研报告 - 问卷分析",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "survey-analysis",
+        name: "问卷分析",
+        visual: {
+          primary: "155E75",
+          accent: "14B8A6",
+          secondary: "F97316",
+          warning: "F59E0B",
+          background: "F5FAFC",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "market-survey-analysis",
+          variant: "survey-analysis",
+        },
+      },
+    ],
+    visual: {
+      primary: "155E75",
+      accent: "14B8A6",
+      secondary: "F97316",
+      warning: "F59E0B",
+      background: "F5FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "market-survey-analysis",
+      variant: "survey-analysis",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "market-survey-analysis-cover",
+      defaultContentLayout: "market-survey-analysis-question",
+      allowedLayouts: [
+        "market-survey-analysis-cover",
+        "market-survey-analysis-sample",
+        "market-survey-analysis-question",
+        "market-survey-analysis-cross",
+        "market-survey-analysis-finding",
+        "market-survey-analysis-strategy",
+        "market-survey-analysis-summary",
         "title",
         "content",
         "closing",

@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "department-performance-report",
+  "themeId": "team-performance",
+  "style": "department-performance-report",
+  "themes": [
+    {
+      "id": "team-performance",
+      "name": "团队绩效",
+      "visual": {
+        "primary": "173B73",
+        "accent": "F5B84B",
+        "secondary": "24B8A8",
+        "background": "F5F8FC",
+        "surface": "FFFFFF",
+        "title": "102033",
+        "body": "334155",
+        "layout": "department-team-performance",
+        "variant": "team-performance"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "173B73",
+    "accent": "F5B84B",
+    "secondary": "24B8A8",
+    "background": "F5F8FC",
+    "surface": "FFFFFF",
+    "title": "102033",
+    "body": "334155",
+    "layout": "department-team-performance",
+    "variant": "team-performance"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "department-team-cover",
+    "defaultContentLayout": "department-team-content",
+    "allowedLayouts": [
+      "department-team-cover",
+      "department-team-goals",
+      "department-team-radar",
+      "department-team-results",
+      "department-team-improvement",
+      "department-team-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

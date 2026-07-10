@@ -1,0 +1,20 @@
+{
+  "slug": "data-experiment-analysis-report-ab-test",
+  "name": "实验分析报告 - A/B 测试",
+  "description": "适合 A/B 实验分析、策略验证、显著性结果汇报和增长实验复盘的数据洞悉模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 100,
+  "status": "active",
+  "tags": [
+    "data",
+    "experiment-analysis-report",
+    "ab-test",
+    "experiment-analysis",
+    "significance",
+    "growth-review"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
