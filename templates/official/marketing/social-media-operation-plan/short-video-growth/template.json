@@ -1,0 +1,67 @@
+{
+  "id": "marketing-social-media-operation-plan-short-video-growth",
+  "slug": "marketing-social-media-operation-plan-short-video-growth",
+  "name": "社媒运营方案 - 短视频增长",
+  "description": "围绕内容节奏、平台矩阵、转化漏斗和数据复盘设计的短视频运营方案模板。",
+  "category": "市场营销",
+  "categorySlug": "marketing",
+  "baseTemplateId": "social-media-operation-plan",
+  "themeId": "short-video-growth",
+  "style": "social-video-growth",
+  "status": "active",
+  "sortOrder": 64,
+  "tags": [
+    "市场营销",
+    "社媒运营",
+    "内容节奏",
+    "平台矩阵",
+    "转化漏斗"
+  ],
+  "themes": [
+    {
+      "id": "short-video-growth",
+      "name": "短视频增长",
+      "description": "面向短视频运营、内容排期、平台矩阵和转化效率提升。",
+      "visual": {
+        "id": "marketing-social-media-operation-plan-short-video-growth",
+        "layout": "social-video-growth",
+        "variant": "short-video-growth",
+        "primary": "111827",
+        "secondary": "0EA5E9",
+        "accent": "22C55E",
+        "warning": "F97316",
+        "background": "F4F7FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155"
+      }
+    }
+  ],
+  "visual": {
+    "id": "marketing-social-media-operation-plan-short-video-growth",
+    "layout": "social-video-growth",
+    "variant": "short-video-growth",
+    "primary": "111827",
+    "secondary": "0EA5E9",
+    "accent": "22C55E",
+    "warning": "F97316",
+    "background": "F4F7FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "social-video-growth-cover",
+    "defaultContentLayout": "social-video-growth-content",
+    "allowedLayouts": [
+      "social-video-growth-cover",
+      "social-video-growth-matrix",
+      "social-video-growth-content-rhythm",
+      "social-video-growth-funnel",
+      "social-video-growth-dashboard",
+      "social-video-growth-action-plan",
+      "title",
+      "content"
+    ]
+  }
+}

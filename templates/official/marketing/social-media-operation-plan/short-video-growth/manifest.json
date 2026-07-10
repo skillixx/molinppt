@@ -1,0 +1,21 @@
+{
+  "slug": "marketing-social-media-operation-plan-short-video-growth",
+  "name": "社媒运营方案 - 短视频增长",
+  "description": "适合短视频运营、内容节奏规划、平台矩阵分析和转化漏斗优化的商业化市场营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "social-media-operation-plan",
+    "short-video-growth",
+    "short-video",
+    "content-rhythm",
+    "platform-matrix",
+    "conversion-funnel"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -444,21 +444,32 @@ test("PptExportService aligns product pricing strategy PPTX scenes with online p
     format: "pptx",
   });
   const text = result.content.toString("latin1");
+  const slide1 = Buffer.from(pptPartText(text, "ppt/slides/slide1.xml"), "latin1").toString("utf8");
   const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
   const slide3 = Buffer.from(pptPartText(text, "ppt/slides/slide3.xml"), "latin1").toString("utf8");
   const slide4 = Buffer.from(pptPartText(text, "ppt/slides/slide4.xml"), "latin1").toString("utf8");
   const slide5 = Buffer.from(pptPartText(text, "ppt/slides/slide5.xml"), "latin1").toString("utf8");
   const slide6 = Buffer.from(pptPartText(text, "ppt/slides/slide6.xml"), "latin1").toString("utf8");
 
+  assert.doesNotMatch(text, /cap="round"/);
+  assert.match(slide1, /name="Product Pricing Grid Vertical 1"/);
+  assert.match(slide1, /name="Product Pricing Kicker"/);
+  assert.match(slide1, /name="Product Pricing Dedicated Title"/);
+  assert.match(slide1, /name="Product Pricing Bullet Card 1"/);
+  assert.match(slide1, /name="Product Pricing Tag 1"/);
   assert.match(slide2, /name="Product Pricing Tier Card 1"/);
+  assert.match(slide2, /name="Product Pricing Tier Price 1"/);
+  assert.match(slide2, /name="Product Pricing Bullet Card 1"/);
   assert.match(slide2, /<a:t>基础版覆盖轻量使用<\/a:t>/);
   assert.match(slide3, /name="Product Pricing Anchor Card 1"/);
   assert.match(slide3, /<a:t>客户价值提升<\/a:t>/);
   assert.match(slide4, /name="Product Pricing Benefit Matrix"/);
   assert.match(slide4, /name="Product Pricing Matrix Text 1"/);
   assert.match(slide5, /name="Product Pricing Commercial Loop"/);
+  assert.match(slide5, /name="Product Pricing Action Card 1"/);
   assert.match(slide5, /<a:t>试用触达<\/a:t>/);
-  assert.match(slide6, /name="Product Pricing Commercial Loop"/);
+  assert.match(slide6, /name="Product Pricing Closing Panel"/);
+  assert.match(slide6, /name="Product Pricing Closing Action Card 1"/);
   assert.match(slide6, /<a:t>确认价格假设<\/a:t>/);
   assert.doesNotMatch(slide5, /name="Product Pricing Closing Panel"/);
 });
@@ -1558,6 +1569,50 @@ test("PptExportService uses new product launch rhythm decorations", () => {
   assert.doesNotMatch(slide1, /launch-rhythm/);
 });
 
+test("PptExportService uses social media operation plan decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-social-media-operation-plan-short-video-growth",
+      theme: "short-video-growth",
+      templateVisual: {
+        id: "marketing-social-media-operation-plan-short-video-growth",
+        primary: "111827",
+        secondary: "0EA5E9",
+        accent: "22C55E",
+        warning: "F97316",
+        background: "F4F7FB",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "social-video-growth",
+        variant: "short-video-growth",
+      },
+      slides: [
+        { title: "社媒运营增长方案", bullets: ["明确账号定位与目标人群", "规划平台矩阵和内容栏目", "建立发布节奏与复盘指标"] },
+        { title: "平台矩阵分工", bullets: ["主账号承接品牌表达", "垂类账号测试内容题材", "达人合作放大触达"] },
+        { title: "内容节奏规划", bullets: ["工作日发布教育型内容", "周末发布场景型内容", "热点节点补充转化素材"] },
+        { title: "转化漏斗优化", bullets: ["曝光触达", "互动停留", "私信咨询", "线索转化"] },
+        { title: "数据复盘看板", bullets: ["完播率", "互动率", "私信转化率", "成交线索"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Social Video Phone Shell"/);
+  assert.match(slide1, /name="Social Video Metric Card 1"/);
+  assert.match(slide2, /name="Social Video Matrix Card 1"/);
+  assert.match(slide4, /name="Social Video Funnel Level 1"/);
+  assert.match(slide5, /name="Social Video Dashboard Panel"/);
+  assert.doesNotMatch(slide1, /短视频增长/);
+});
+
 test("PptExportService uses commercial marketing brand decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -2274,6 +2329,54 @@ test("PptExportService uses metric anomaly attribution decorations", () => {
   assert.match(slide1, /val="F4F8FB"/);
   assert.match(slide1, /val="06B6D4"/);
   assert.doesNotMatch(slide1, /归因分析/);
+});
+
+test("PptExportService uses market survey analysis decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-market-research-report-survey-analysis",
+      theme: "survey-analysis",
+      templateVisual: {
+        id: "data-market-research-report-survey-analysis",
+        primary: "155E75",
+        accent: "14B8A6",
+        secondary: "F97316",
+        warning: "F59E0B",
+        background: "F5FAFC",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "market-survey-analysis",
+        variant: "survey-analysis",
+      },
+      slides: [
+        { title: "调研结论总览", layout: "market-survey-analysis-cover", bullets: ["有效样本 1200 份", "核心题项有效率 92%", "沉淀 3 个关键发现"] },
+        { title: "样本结构分析", layout: "market-survey-analysis-sample", bullets: ["目标客群覆盖一二线城市", "年龄结构集中在 25-40 岁", "高频用户占比 38%"] },
+        { title: "题项结果分布", layout: "market-survey-analysis-question", bullets: ["价格敏感度最高", "服务体验影响复购", "品牌认知仍需加强"] },
+        { title: "交叉分析发现", layout: "market-survey-analysis-cross", bullets: ["年轻用户更关注体验", "高频用户更关注权益", "新客更关注价格"] },
+        { title: "策略建议输出", layout: "market-survey-analysis-strategy", bullets: ["优化价格沟通", "提升体验触点", "强化品牌证据", "建立追踪机制"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Market Survey Canvas"/);
+  assert.match(slide1, /name="Market Survey Form Card"/);
+  assert.match(slide2, /name="Market Survey Sample Panel"/);
+  assert.match(slide3, /name="Market Survey Question Row 1"/);
+  assert.match(slide4, /name="Market Survey Cross Cell 1"/);
+  assert.match(slide5, /name="Market Survey Strategy Card 1"/);
+  assert.match(slide1, /val="F5FAFC"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /问卷分析/);
 });
 
 test("PptExportService uses operating problem diagnosis decorations", () => {

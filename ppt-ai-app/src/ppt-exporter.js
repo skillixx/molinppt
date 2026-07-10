@@ -396,7 +396,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "seed-round-story", "growth-funding-flywheel", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -497,6 +497,26 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1400;
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1900);
+  }
+  if (visual.layout === "social-video-growth") {
+    if (index === 0) {
+      if (textLength >= 30) return 2050;
+      if (textLength >= 22) return 2320;
+      return Math.min(fallbackSize, 2700);
+    }
+    if (textLength >= 30) return 1400;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1880);
+  }
+  if (visual.layout === "private-domain-member-layering") {
+    if (index === 0) {
+      if (textLength >= 30) return 2050;
+      if (textLength >= 22) return 2320;
+      return Math.min(fallbackSize, 2700);
+    }
+    if (textLength >= 30) return 1400;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1880);
   }
   if (visual.layout === "sales-financial-solution") {
     if (index === 0) {
@@ -873,6 +893,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "market-trend-radar") return false;
   if (visual.layout === "customer-segmentation-layering") return false;
   if (visual.layout === "metric-anomaly-attribution") return false;
+  if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -887,6 +908,8 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
+  if (visual.layout === "social-video-growth") return false;
+  if (visual.layout === "private-domain-member-layering") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -899,6 +922,10 @@ function shouldRenderTemplateBodyList(visual, role) {
 function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "product-interview-insight") return false;
+  if (visual.layout === "product-pricing-strategy") return false;
+  if (visual.layout === "market-survey-analysis") return false;
+  if (visual.layout === "social-video-growth") return false;
+  if (visual.layout === "private-domain-member-layering") return false;
   return true;
 }
 
@@ -1083,6 +1110,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "metric-anomaly-attribution") {
     return base + metricAnomalyAttributionDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "market-survey-analysis") {
+    return base + marketSurveyAnalysisDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1133,6 +1163,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "social-video-growth") {
+    return base + socialVideoGrowthDecorationsXml({ visual, index, layout, role, slide });
   }
   if (isGrowthFundingFlywheelVisual(visual)) {
     return base + growthFundingFlywheelDecorationsXml({ visual, index, layout, role, slide });
@@ -1776,6 +1809,23 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodySize: 2100,
       // 椤堕儴鍗＄墖鐗堝紡鐨勫唴瀹归〉鏍囬鍘嬪湪绾㈠簳涓?娣辫壊鏍囬鍑犱箮涓嶅彲璇?鏀圭敤娴呰壊(涓庨瑙堜竴鑷?銆?
       titleColor: ["image-report", "showcase", "retrospective"].includes(role) ? redGoldPalette.surfaceText : visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "social-video-growth") {
+    const isCover = index === 0;
+    return {
+      surface: { x: 512064, y: 421640, cx: 8125968, cy: 4320540 },
+      accent: { x: 512064, y: 421640, cx: 8125968, cy: 45720 },
+      secondaryAccent: { x: 5486400, y: 975360, cx: 2286000, cy: 2667000 },
+      label: { x: 768096, y: 719010, cx: 2133600, cy: 228600 },
+      title: isCover
+        ? { x: 768096, y: 1028700, cx: 3840480, cy: 792480 }
+        : { x: 768096, y: 1028700, cx: 3688080, cy: 670560 },
+      content: { x: 777240, y: 2209800, cx: 3657600, cy: 1219200 },
+      titleSize: isCover ? 2700 : 1880,
+      bodySize: isCover ? 980 : 820,
+      titleColor: visual.title,
       bodyColor: visual.body,
     };
   }
@@ -3251,7 +3301,8 @@ function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050
   const alpha = transparency > 0 ? `<a:alpha val="${Math.max(0, Math.min(100000, 100000 - transparency))}"/>` : "";
   const dashXml = dash ? `<a:prstDash val="${escapeXml(dash)}"/>` : "";
   const rotationXml = rotation ? ` rot="${rotation}"` : "";
-  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm${rotationXml}><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}">${alpha}</a:srgbClr></a:solidFill>${dashXml}</a:ln></p:spPr></p:sp>`;
+  // DrawingML 的圆形线帽枚举值是 rnd；round 虽会被部分 WPS 版本容错，但标准解析器会拒绝。
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm${rotationXml}><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="${escapeXml(geom)}"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="rnd"><a:solidFill><a:srgbClr val="${stroke}">${alpha}</a:srgbClr></a:solidFill>${dashXml}</a:ln></p:spPr></p:sp>`;
 }
 
 /**
@@ -3261,7 +3312,7 @@ function lineFrameShapeXml({ id, name, geom, x, y, cx, cy, stroke, width = 19050
  * @returns {string}
  */
 function arcLineShapeXml({ id, name, x, y, cx, cy, stroke, width }) {
-  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="arc"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="round"><a:solidFill><a:srgbClr val="${stroke}"/></a:solidFill></a:ln></p:spPr></p:sp>`;
+  return `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${escapeXml(name)}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="arc"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="${width}" cap="rnd"><a:solidFill><a:srgbClr val="${stroke}"/></a:solidFill></a:ln></p:spPr></p:sp>`;
 }
 
 /**
@@ -4578,62 +4629,144 @@ function profitBridgeColorPalette(visual) {
 
 function productPricingStrategyDecorationsXml({ visual, index, role, slide }) {
   const scene = productPricingExportScene({ slide, index, role });
-  const bullets = scene.bullets;
-  const palette = {
+  const palette = productPricingExportPalette(visual);
+  // 定价策略页完全由专用图层承载动态文本和商业化图形，避免导出时只剩通用标题与空白卡片。
+  const common = productPricingBackdropXml({ visual, palette })
+    + productPricingCanvasXml({ visual, palette })
+    + productPricingHeaderXml({ visual, scene, index })
+    + productPricingBulletCardsXml({ visual, scene, palette, index });
+  if (scene.kind === "tiers") return common + productPricingTierCardsXml({ visual, scene, palette });
+  if (scene.kind === "anchor") return common + productPricingAnchorCardsXml({ visual, scene, palette }) + productPricingTagsXml({ visual, scene, palette });
+  if (scene.kind === "matrix") return common + productPricingMatrixXml({ visual, scene, palette }) + productPricingTagsXml({ visual, scene, palette });
+  if (scene.kind === "loop") return common + productPricingLoopXml({ visual, scene, palette }) + productPricingActionCardsXml({ visual, scene, palette, prefix: "Product Pricing Action" });
+  if (scene.kind === "closing") return common + productPricingClosingPanelXml({ visual, palette }) + productPricingActionCardsXml({ visual, scene, palette, prefix: "Product Pricing Closing Action" });
+  return common + productPricingMockupXml({ visual, palette }) + productPricingTagsXml({ visual, scene, palette });
+}
+
+function productPricingExportPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.24),
+    grid: blendHexColor(visual.primary, visual.surface, 0.92),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
     panel: blendHexColor(visual.background, visual.surface, 0.52),
     softAccent: blendHexColor(visual.accent, visual.surface, 0.78),
     softSecondary: blendHexColor(visual.secondary || visual.accent, visual.surface, 0.78),
   };
-  // 产品商业化定价模板用可编辑的套餐卡、权益矩阵和闭环图承载信息，避免回退到普通三段文字。
-  const canvas = solidShapeXml({ id: 1200, name: "Product Pricing Canvas", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
-    + lineFrameShapeXml({ id: 1201, name: "Product Pricing Canvas Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: blendHexColor(visual.primary, visual.surface, 0.78), width: 10160 })
-    + rectShapeXml({ id: 1202, name: "Product Pricing Header Rule", x: 731520, y: 807720, cx: 7680960, cy: 30480, fill: visual.accent });
-  if (scene.kind === "tiers") {
-    return canvas + [0, 1, 2].map((itemIndex) => {
-      const x = 4876800 + itemIndex * 1036320;
-      return solidShapeXml({ id: 1210 + itemIndex * 3, name: `Product Pricing Tier Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1524000 - (itemIndex === 1 ? 121920 : 0), cx: 853440, cy: 1524000, fill: itemIndex === 1 ? palette.softAccent : "FFFFFF" })
-        + rectShapeXml({ id: 1211 + itemIndex * 3, name: `Product Pricing Tier Accent ${itemIndex + 1}`, x: x + 121920, y: 1767840 - (itemIndex === 1 ? 121920 : 0), cx: 609600, cy: 91440, fill: itemIndex === 1 ? visual.accent : visual.primary })
-        + textShapeXml({ id: 1212 + itemIndex * 3, name: `Product Pricing Tier Text ${itemIndex + 1}`, x: x + 91440, y: 2362200 - (itemIndex === 1 ? 121920 : 0), cx: 670560, cy: 365760, text: scene.cards[itemIndex] || `Package ${itemIndex + 1}`, size: 660, bold: true, color: visual.title });
+}
+
+function productPricingBackdropXml({ visual, palette }) {
+  const vertical = [457200, 914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8229600, 8686800]
+    .map((x, itemIndex) => rectShapeXml({ id: 1110 + itemIndex, name: `Product Pricing Grid Vertical ${itemIndex + 1}`, x, y: 0, cx: 7620, cy: 5143500, fill: palette.grid })).join("");
+  const horizontal = [457200, 914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000]
+    .map((y, itemIndex) => rectShapeXml({ id: 1140 + itemIndex, name: `Product Pricing Grid Horizontal ${itemIndex + 1}`, x: 0, y, cx: 9144000, cy: 7620, fill: palette.grid })).join("");
+  return rectShapeXml({ id: 1100, name: "Product Pricing Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1101, name: "Product Pricing Gold Glow", geom: "ellipse", x: 6705600, y: 0, cx: 2438400, cy: 1219200, fill: palette.softAccent })
+    + solidShapeXml({ id: 1102, name: "Product Pricing Teal Glow", geom: "ellipse", x: 0, y: 3657600, cx: 2743200, cy: 1485900, fill: palette.softSecondary })
+    + vertical
+    + horizontal;
+}
+
+function productPricingCanvasXml({ visual, palette }) {
+  return solidShapeXml({ id: 1200, name: "Product Pricing Canvas", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1201, name: "Product Pricing Canvas Border", geom: "roundRect", x: 548640, y: 609600, cx: 8046720, cy: 4114800, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1202, name: "Product Pricing Header Primary", x: 731520, y: 807720, cx: 2560320, cy: 30480, fill: visual.primary })
+    + rectShapeXml({ id: 1203, name: "Product Pricing Header Accent", x: 3291840, y: 807720, cx: 2560320, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1204, name: "Product Pricing Header Secondary", x: 5852160, y: 807720, cx: 2560320, cy: 30480, fill: visual.secondary || visual.accent });
+}
+
+function productPricingHeaderXml({ visual, scene, index }) {
+  return textShapeXml({ id: 1250, name: "Product Pricing Kicker", x: 731520, y: 990600, cx: 2286000, cy: 182880, text: scene.kicker, size: 620, bold: true, color: visual.secondary || visual.accent })
+    + textShapeXml({ id: 1251, name: "Product Pricing Dedicated Title", x: 731520, y: 1219200, cx: 3505200, cy: 914400, text: scene.title, size: index === 0 ? 2100 : 1850, bold: true, color: visual.title })
+    + rectShapeXml({ id: 1252, name: "Product Pricing Title Accent", x: 731520, y: 2232660, cx: 1524000, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1253, name: "Product Pricing Title Secondary", x: 2255520, y: 2232660, cx: 914400, cy: 30480, fill: visual.secondary || visual.accent });
+}
+
+function productPricingBulletCardsXml({ visual, scene, palette, index }) {
+  return scene.bullets.slice(0, index === 0 ? 3 : 4).map((item, itemIndex) => {
+    const y = 2446020 + itemIndex * 335280;
+    return solidShapeXml({ id: 1260 + itemIndex * 4, name: `Product Pricing Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 731520, y, cx: 3505200, cy: 259080, fill: palette.panel })
+      + rectShapeXml({ id: 1261 + itemIndex * 4, name: `Product Pricing Bullet Accent ${itemIndex + 1}`, x: 731520, y, cx: 45720, cy: 259080, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1262 + itemIndex * 4, name: `Product Pricing Bullet Text ${itemIndex + 1}`, x: 899160, y: y + 60960, cx: 3177540, cy: 137160, text: productPricingExportCompactText(item, scene.title, 34), size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function productPricingTagsXml({ visual, scene, palette }) {
+  return scene.tags.slice(0, 3).map((tag, itemIndex) => {
+    const x = 731520 + itemIndex * 1066800;
+    return solidShapeXml({ id: 1280 + itemIndex * 3, name: `Product Pricing Tag ${itemIndex + 1}`, geom: "roundRect", x, y: 3863340, cx: 914400, cy: 426720, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1281 + itemIndex * 3, name: `Product Pricing Tag Rule ${itemIndex + 1}`, x, y: 3863340, cx: 914400, cy: 45720, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1282 + itemIndex * 3, name: `Product Pricing Tag Text ${itemIndex + 1}`, x: x + 91440, y: 4015740, cx: 731520, cy: 137160, text: tag, size: 580, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPricingMockupXml({ visual, palette }) {
+  return solidShapeXml({ id: 1300, name: "Product Pricing Mockup Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1301, name: "Product Pricing Mockup Border", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1302, name: "Product Pricing Mockup Header", x: 5181600, y: 1691640, cx: 1828800, cy: 121920, fill: visual.primary })
+    + rectShapeXml({ id: 1303, name: "Product Pricing Mockup Bar 1", x: 5181600, y: 2148840, cx: 1828800, cy: 91440, fill: visual.accent })
+    + rectShapeXml({ id: 1304, name: "Product Pricing Mockup Bar 2", x: 5181600, y: 2468880, cx: 1219200, cy: 91440, fill: visual.secondary || visual.primary })
+    + solidShapeXml({ id: 1305, name: "Product Pricing Mockup Badge", geom: "ellipse", x: 6705600, y: 2819400, cx: 548640, cy: 548640, fill: visual.accent });
+}
+
+function productPricingTierCardsXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 731520 + itemIndex * 2590800;
+    const y = itemIndex === 1 ? 3352800 : 3505200;
+    const fill = itemIndex === 1 ? palette.softAccent : "FFFFFF";
+    return solidShapeXml({ id: 1320 + itemIndex * 4, name: `Product Pricing Tier Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2286000, cy: 914400, fill })
+      + lineFrameShapeXml({ id: 1321 + itemIndex * 4, name: `Product Pricing Tier Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2286000, cy: 914400, stroke: itemIndex === 1 ? visual.accent : palette.frame, width: 10160 })
+      + textShapeXml({ id: 1322 + itemIndex * 4, name: `Product Pricing Tier Price ${itemIndex + 1}`, x: x + 182880, y: y + 152400, cx: 914400, cy: 274320, text: scene.prices[itemIndex], size: 1180, bold: true, color: visual.primary })
+      + textShapeXml({ id: 1323 + itemIndex * 4, name: `Product Pricing Tier Text ${itemIndex + 1}`, x: x + 182880, y: y + 518160, cx: 1905000, cy: 182880, text: item, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPricingAnchorCardsXml({ visual, scene, palette }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 4876800 + (itemIndex % 2) * 1524000;
+    const y = 1371600 + Math.floor(itemIndex / 2) * 914400;
+    return solidShapeXml({ id: 1360 + itemIndex * 3, name: `Product Pricing Anchor Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 731520, fill: itemIndex % 2 ? palette.softSecondary : "FFFFFF" })
+      + rectShapeXml({ id: 1361 + itemIndex * 3, name: `Product Pricing Anchor Rule ${itemIndex + 1}`, x: x + 137160, y: y + 137160, cx: 396240, cy: 60960, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1362 + itemIndex * 3, name: `Product Pricing Anchor Text ${itemIndex + 1}`, x: x + 137160, y: y + 335280, cx: 1097280, cy: 182880, text: item, size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPricingMatrixXml({ visual, scene, palette }) {
+  return solidShapeXml({ id: 1390, name: "Product Pricing Benefit Matrix", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1391, name: "Product Pricing Benefit Matrix Border", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, stroke: palette.frame, width: 10160 })
+    + scene.cards.slice(0, 5).map((item, itemIndex) => {
+      const y = 1600200 + itemIndex * 335280;
+      return rectShapeXml({ id: 1392 + itemIndex * 3, name: `Product Pricing Matrix Row ${itemIndex + 1}`, x: 5105400, y, cx: 2438400, cy: 213360, fill: itemIndex % 2 ? palette.panel : "F8FAFC" })
+        + textShapeXml({ id: 1393 + itemIndex * 3, name: `Product Pricing Matrix Text ${itemIndex + 1}`, x: 5257800, y: y + 53340, cx: 1066800, cy: 121920, text: item, size: 560, bold: true, color: visual.title })
+        + rectShapeXml({ id: 1394 + itemIndex * 3, name: `Product Pricing Matrix Signal ${itemIndex + 1}`, x: 6705600, y: y + 60960, cx: 609600, cy: 60960, fill: itemIndex % 2 ? visual.accent : visual.secondary || visual.primary });
     }).join("");
-  }
-  if (scene.kind === "anchor") {
-    return canvas + [0, 1, 2, 3].map((itemIndex) => {
-      const x = 4876800 + (itemIndex % 2) * 1447800;
-      const y = 1371600 + Math.floor(itemIndex / 2) * 914400;
-      return solidShapeXml({ id: 1240 + itemIndex * 3, name: `Product Pricing Anchor Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 670560, fill: itemIndex % 2 ? palette.softSecondary : "FFFFFF" })
-        + rectShapeXml({ id: 1241 + itemIndex * 3, name: `Product Pricing Anchor Rule ${itemIndex + 1}`, x: x + 137160, y: y + 137160, cx: 396240, cy: 60960, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
-        + textShapeXml({ id: 1242 + itemIndex * 3, name: `Product Pricing Anchor Text ${itemIndex + 1}`, x: x + 137160, y: y + 289560, cx: 914400, cy: 182880, text: scene.cards[itemIndex] || `Anchor ${itemIndex + 1}`, size: 640, bold: true, color: visual.title });
+}
+
+function productPricingLoopXml({ visual, scene, palette }) {
+  const positions = [[6004560, 1371600], [7162800, 2286000], [6004560, 3352800], [4876800, 2286000]];
+  return solidShapeXml({ id: 1430, name: "Product Pricing Commercial Loop", geom: "ellipse", x: 5029200, y: 1371600, cx: 2438400, cy: 2133600, fill: palette.softSecondary })
+    + solidShapeXml({ id: 1431, name: "Product Pricing Loop Core", geom: "ellipse", x: 5791200, y: 1981200, cx: 914400, cy: 914400, fill: visual.surface })
+    + textShapeXml({ id: 1432, name: "Product Pricing Loop Core Text", x: 5943600, y: 2301240, cx: 609600, cy: 182880, text: "商业闭环", size: 620, bold: true, color: visual.title })
+    + scene.cards.slice(0, 4).map((item, itemIndex) => {
+      const [x, y] = positions[itemIndex];
+      return solidShapeXml({ id: 1433 + itemIndex * 2, name: `Product Pricing Loop Node ${itemIndex + 1}`, geom: "ellipse", x, y, cx: 304800, cy: 304800, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+        + textShapeXml({ id: 1434 + itemIndex * 2, name: `Product Pricing Loop Text ${itemIndex + 1}`, x: x - 182880, y: y + 335280, cx: 670560, cy: 182880, text: item, size: 560, bold: true, color: visual.title });
     }).join("");
-  }
-  if (scene.kind === "matrix") {
-    return canvas + solidShapeXml({ id: 1220, name: "Product Pricing Benefit Matrix", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: "FFFFFF" })
-      + [0, 1, 2, 3, 4].map((itemIndex) => {
-        const y = 1600200 + itemIndex * 335280;
-        return rectShapeXml({ id: 1221 + itemIndex * 2, name: `Product Pricing Matrix Row ${itemIndex + 1}`, x: 5105400, y, cx: 2438400, cy: 213360, fill: itemIndex % 2 ? palette.panel : "F8FAFC" })
-          + textShapeXml({ id: 1222 + itemIndex * 3, name: `Product Pricing Matrix Text ${itemIndex + 1}`, x: 5257800, y: y + 53340, cx: 975360, cy: 121920, text: scene.cards[itemIndex] || `Benefit ${itemIndex + 1}`, size: 560, bold: true, color: visual.title })
-          + rectShapeXml({ id: 1223 + itemIndex * 3, name: `Product Pricing Matrix Signal ${itemIndex + 1}`, x: 6705600, y: y + 60960, cx: 609600, cy: 60960, fill: itemIndex % 2 ? visual.accent : visual.secondary || visual.primary });
-      }).join("");
-  }
-  if (scene.kind === "loop" || scene.kind === "closing") {
-    return canvas + solidShapeXml({ id: 1230, name: "Product Pricing Commercial Loop", geom: "ellipse", x: 5029200, y: 1371600, cx: 2438400, cy: 2133600, fill: palette.softSecondary })
-      + solidShapeXml({ id: 1231, name: "Product Pricing Loop Core", geom: "ellipse", x: 5791200, y: 1981200, cx: 914400, cy: 914400, fill: visual.surface })
-      + [0, 1, 2, 3].map((itemIndex) => {
-        const positions = [
-          [6004560, 1371600],
-          [7162800, 2286000],
-          [6004560, 3352800],
-          [4876800, 2286000],
-        ];
-        const [x, y] = positions[itemIndex];
-        return solidShapeXml({ id: 1232 + itemIndex * 2, name: `Product Pricing Loop Node ${itemIndex + 1}`, geom: "ellipse", x, y, cx: 304800, cy: 304800, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
-          + textShapeXml({ id: 1233 + itemIndex * 2, name: `Product Pricing Loop Text ${itemIndex + 1}`, x: x - 182880, y: y + 335280, cx: 670560, cy: 182880, text: scene.cards[itemIndex] || `Step ${itemIndex + 1}`, size: 560, bold: true, color: visual.title });
-      }).join("");
-  }
-  return canvas + solidShapeXml({ id: 1205, name: "Product Pricing Mockup Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: palette.panel })
-    + rectShapeXml({ id: 1206, name: "Product Pricing Mockup Header", x: 5181600, y: 1691640, cx: 1371600, cy: 121920, fill: visual.primary })
-    + rectShapeXml({ id: 1207, name: "Product Pricing Mockup Bar 1", x: 5181600, y: 2148840, cx: 1828800, cy: 91440, fill: visual.accent })
-    + rectShapeXml({ id: 1208, name: "Product Pricing Mockup Bar 2", x: 5181600, y: 2468880, cx: 1219200, cy: 91440, fill: visual.secondary || visual.primary })
-    + solidShapeXml({ id: 1209, name: "Product Pricing Mockup Badge", geom: "ellipse", x: 6705600, y: 2819400, cx: 548640, cy: 548640, fill: visual.accent });
+}
+
+function productPricingActionCardsXml({ visual, scene, palette, prefix }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 731520 + itemIndex * 1981200;
+    return solidShapeXml({ id: 1480 + itemIndex * 3, name: `${prefix} Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3863340, cx: 1676400, cy: 548640, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1481 + itemIndex * 3, name: `${prefix} Icon ${itemIndex + 1}`, x: x + 152400, y: 4000500, cx: 228600, cy: 228600, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1482 + itemIndex * 3, name: `${prefix} Text ${itemIndex + 1}`, x: x + 457200, y: 4008120, cx: 1066800, cy: 152400, text: item, size: 560, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productPricingClosingPanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 1520, name: "Product Pricing Closing Panel", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1521, name: "Product Pricing Closing Panel Border", geom: "roundRect", x: 4876800, y: 1371600, cx: 3048000, cy: 2133600, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1522, name: "Product Pricing Closing Signal", x: 5257800, y: 1905000, cx: 2286000, cy: 91440, fill: visual.accent })
+    + solidShapeXml({ id: 1523, name: "Product Pricing Closing Summary", geom: "roundRect", x: 5334000, y: 2362200, cx: 2133600, cy: 762000, fill: palette.softSecondary });
 }
 
 function productPricingExportScene({ slide, index, role }) {
@@ -4641,16 +4774,17 @@ function productPricingExportScene({ slide, index, role }) {
   const layout = String(slide?.layout || "").toLowerCase();
   const title = String(slide?.title || "");
   const isClosing = role === "closing" || layout.includes("closing") || title.includes("总结") || title.includes("下一步");
-  if (index === 0 || layout.includes("cover")) return productPricingExportSceneByKind("cover", bullets);
-  if (isClosing) return productPricingExportSceneByKind("closing", bullets);
-  if (layout.includes("matrix") || title.includes("矩阵") || title.includes("对比")) return productPricingExportSceneByKind("matrix", bullets);
-  if (layout.includes("anchor") || title.includes("锚点") || title.includes("价值")) return productPricingExportSceneByKind("anchor", bullets);
-  if (layout.includes("tier") || title.includes("套餐") || title.includes("权益")) return productPricingExportSceneByKind("tiers", bullets);
-  if (layout.includes("loop") || title.includes("闭环") || title.includes("路径") || title.includes("转化")) return productPricingExportSceneByKind("loop", bullets);
-  return productPricingExportSceneByKind(["tiers", "anchor", "matrix", "loop"][(index - 1) % 4], bullets);
+  const compactTitle = productPricingExportCompactText(title, "产品定价与商业化路径", index === 0 ? 30 : 28);
+  if (index === 0 || layout.includes("cover")) return productPricingExportSceneByKind("cover", bullets, compactTitle);
+  if (isClosing) return productPricingExportSceneByKind("closing", bullets, compactTitle);
+  if (layout.includes("matrix") || title.includes("矩阵") || title.includes("对比")) return productPricingExportSceneByKind("matrix", bullets, compactTitle);
+  if (layout.includes("anchor") || title.includes("锚点") || title.includes("价值")) return productPricingExportSceneByKind("anchor", bullets, compactTitle);
+  if (layout.includes("tier") || title.includes("套餐") || title.includes("权益")) return productPricingExportSceneByKind("tiers", bullets, compactTitle);
+  if (layout.includes("loop") || title.includes("闭环") || title.includes("路径") || title.includes("转化")) return productPricingExportSceneByKind("loop", bullets, compactTitle);
+  return productPricingExportSceneByKind(["tiers", "anchor", "matrix", "loop"][(index - 1) % 4], bullets, compactTitle);
 }
 
-function productPricingExportSceneByKind(kind, bullets) {
+function productPricingExportSceneByKind(kind, bullets, title) {
   const defaults = {
     cover: ["目标客户", "价值锚点", "收入模型"],
     tiers: ["基础版", "专业版", "企业版"],
@@ -4660,10 +4794,22 @@ function productPricingExportSceneByKind(kind, bullets) {
     closing: ["确认价格假设", "灰度套餐权益", "验证转化漏斗", "复盘收入模型"],
   };
   const maxLength = kind === "cover" ? 8 : 12;
+  const kickerMap = {
+    cover: "PRICING MODEL",
+    tiers: "PACKAGE TIERS",
+    anchor: "VALUE ANCHOR",
+    matrix: "BENEFIT MATRIX",
+    loop: "COMMERCIAL LOOP",
+    closing: "NEXT COMMERCIAL MOVES",
+  };
   return {
     kind,
+    kicker: kickerMap[kind] || kickerMap.cover,
+    title,
     bullets,
     cards: (defaults[kind] || defaults.cover).map((fallback, itemIndex) => productPricingExportCompactText(bullets[itemIndex], fallback, maxLength)),
+    tags: defaults.cover.map((fallback, itemIndex) => productPricingExportCompactText(bullets[itemIndex], fallback, 8)),
+    prices: ["¥99", "¥299", "定制"],
   };
 }
 
@@ -8728,6 +8874,361 @@ function launchRhythmColorPalette(visual) {
 function isLaunchRhythmVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "marketing-launch-rhythm" && (id === "new-product-launch" || id === "marketing-new-product-launch-launch-rhythm");
+}
+
+function socialVideoGrowthDecorationsXml({ visual, index, role, slide }) {
+  const scene = socialVideoGrowthSceneFromSlide({ slide, index, role });
+  const palette = socialVideoGrowthColorPalette(visual);
+  // 社媒模板主体全部用可编辑图形绘制，手机和卡片只是运营场景隐喻，不使用整页背景图。
+  const background = rectShapeXml({ id: 1160, name: "Social Video Canvas Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 1161, name: "Social Video Green Glow", geom: "ellipse", x: 6583680, y: -335280, cx: 1828800, cy: 1828800, fill: palette.greenGlow })
+    + solidShapeXml({ id: 1162, name: "Social Video Blue Glow", geom: "ellipse", x: -304800, y: 3733800, cx: 1828800, cy: 1219200, fill: palette.blueGlow })
+    + solidShapeXml({ id: 1163, name: "Social Video Main Surface", geom: "roundRect", x: 512064, y: 421640, cx: 8125968, cy: 4320540, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1164, name: "Social Video Surface Frame", geom: "roundRect", x: 512064, y: 421640, cx: 8125968, cy: 4320540, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1165, name: "Social Video Accent Rail", x: 512064, y: 421640, cx: 8125968, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1166, name: "Social Video Secondary Rail", x: 2575560, y: 421640, cx: 3352800, cy: 45720, fill: visual.secondary || "0EA5E9" })
+    + rectShapeXml({ id: 1167, name: "Social Video Warning Rail", x: 5928360, y: 421640, cx: 2794000, cy: 45720, fill: visual.warning || "F97316" });
+  const heading = textShapeXml({ id: 1170, name: "Social Video Kicker", x: 768096, y: 719010, cx: 2133600, cy: 198120, text: scene.kicker, size: 660, bold: true, color: visual.secondary || "0EA5E9", fontFace: "Arial" })
+    + textShapeXml({ id: 1171, name: "Social Video Title", x: 768096, y: 1028700, cx: 3840480, cy: 883920, text: scene.title, size: index === 0 ? 2100 : 1680, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+    + textShapeXml({ id: 1172, name: "Social Video Summary", x: 768096, y: 1996440, cx: 3657600, cy: 396240, text: scene.summary, size: 760, bold: true, color: visual.body, fontFace: "Microsoft YaHei" })
+    + socialVideoGrowthBulletXml({ scene, visual });
+  if (scene.role === "matrix") return background + heading + socialVideoGrowthMatrixXml({ scene, visual, palette }) + socialVideoGrowthMetricXml({ scene, visual });
+  if (scene.role === "rhythm") return background + heading + socialVideoGrowthCalendarXml({ scene, visual }) + socialVideoGrowthMetricXml({ scene, visual });
+  if (scene.role === "funnel") return background + heading + socialVideoGrowthFunnelXml({ scene, visual }) + socialVideoGrowthMetricXml({ scene, visual });
+  if (scene.role === "dashboard") return background + heading + socialVideoGrowthDashboardXml({ visual, palette }) + socialVideoGrowthMetricXml({ scene, visual });
+  if (scene.role === "action") return background + heading + socialVideoGrowthActionXml({ scene, visual });
+  return background + heading + socialVideoGrowthPhoneXml({ visual, palette }) + socialVideoGrowthMetricXml({ scene, visual });
+}
+
+function socialVideoGrowthBulletXml({ scene, visual }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2606040 + itemIndex * 243840;
+    return solidShapeXml({ id: 1180 + itemIndex * 3, name: `Social Video Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 807720, y: y + 38100, cx: 68580, cy: 68580, fill: itemIndex % 2 ? visual.secondary || "0EA5E9" : visual.accent })
+      + textShapeXml({ id: 1181 + itemIndex * 3, name: `Social Video Bullet Text ${itemIndex + 1}`, x: 914400, y, cx: 3291840, cy: 167640, text: socialVideoGrowthCompactText(item, scene.title, 34), size: 720, bold: false, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function socialVideoGrowthMetricXml({ scene, visual }) {
+  return scene.metrics.map((metric, itemIndex) => {
+    const x = 768096 + itemIndex * 1188720;
+    return solidShapeXml({ id: 1200 + itemIndex * 4, name: `Social Video Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3992880, cx: 975360, cy: 518160, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1201 + itemIndex * 4, name: `Social Video Metric Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3992880, cx: 975360, cy: 518160, stroke: "DCE7F3", width: 7620 })
+      + textShapeXml({ id: 1202 + itemIndex * 4, name: `Social Video Metric Value ${itemIndex + 1}`, x: x + 121920, y: 4114800, cx: 701040, cy: 152400, text: metric.value, size: 1120, bold: true, color: visual.title, fontFace: "Arial" })
+      + textShapeXml({ id: 1203 + itemIndex * 4, name: `Social Video Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4305300, cx: 701040, cy: 129540, text: metric.label, size: 560, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function socialVideoGrowthPhoneXml({ visual, palette }) {
+  return solidShapeXml({ id: 1220, name: "Social Video Phone Shell", geom: "roundRect", x: 6126480, y: 975360, cx: 1676400, cy: 2819400, fill: visual.primary })
+    + solidShapeXml({ id: 1221, name: "Social Video Phone Screen", geom: "roundRect", x: 6278880, y: 1226820, cx: 1371600, cy: 2057400, fill: "F8FAFC" })
+    + solidShapeXml({ id: 1222, name: "Social Video Play Button", geom: "triangle", x: 6766560, y: 2057400, cx: 411480, cy: 411480, fill: visual.accent })
+    + rectShapeXml({ id: 1223, name: "Social Video Screen Line 1", x: 6477000, y: 1493520, cx: 944880, cy: 76200, fill: palette.softBlue })
+    + rectShapeXml({ id: 1224, name: "Social Video Screen Line 2", x: 6477000, y: 1706880, cx: 762000, cy: 60960, fill: palette.softGreen })
+    + solidShapeXml({ id: 1225, name: "Social Video Floating Card A", geom: "roundRect", x: 5486400, y: 1524000, cx: 1219200, cy: 457200, fill: "FFFFFF" })
+    + solidShapeXml({ id: 1226, name: "Social Video Floating Card B", geom: "roundRect", x: 7086600, y: 3192780, cx: 1219200, cy: 457200, fill: "FFFFFF" })
+    + rectShapeXml({ id: 1227, name: "Social Video Floating Rule A", x: 5715000, y: 1706880, cx: 640080, cy: 60960, fill: visual.secondary || "0EA5E9" })
+    + rectShapeXml({ id: 1228, name: "Social Video Floating Rule B", x: 7315200, y: 3375660, cx: 640080, cy: 60960, fill: visual.warning || "F97316" });
+}
+
+function socialVideoGrowthMatrixXml({ scene, visual, palette }) {
+  return scene.labels.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5410200 + col * 1524000;
+    const y = 1143000 + row * 1066800;
+    return solidShapeXml({ id: 1240 + itemIndex * 5, name: `Social Video Matrix Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 853440, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1241 + itemIndex * 5, name: `Social Video Matrix Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 853440, stroke: "DCE7F3", width: 7620 })
+      + solidShapeXml({ id: 1242 + itemIndex * 5, name: `Social Video Matrix Icon ${itemIndex + 1}`, geom: "roundRect", x: x + 152400, y: y + 137160, cx: 274320, cy: 274320, fill: itemIndex % 2 ? visual.secondary || "0EA5E9" : visual.accent })
+      + rectShapeXml({ id: 1243 + itemIndex * 5, name: `Social Video Matrix Rule ${itemIndex + 1}`, x: x + 152400, y: y + 502920, cx: 640080, cy: 45720, fill: palette.softGreen })
+      + textShapeXml({ id: 1244 + itemIndex * 5, name: `Social Video Matrix Text ${itemIndex + 1}`, x: x + 152400, y: y + 594360, cx: 975360, cy: 152400, text: item, size: 700, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function socialVideoGrowthCalendarXml({ scene, visual }) {
+  return ["MON", "WED", "FRI", "SUN"].map((day, itemIndex) => {
+    const x = 5105400 + itemIndex * 876300;
+    return solidShapeXml({ id: 1270 + itemIndex * 4, name: `Social Video Calendar Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1066800, cx: 762000, cy: 1524000, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1271 + itemIndex * 4, name: `Social Video Calendar Border ${itemIndex + 1}`, geom: "roundRect", x, y: 1066800, cx: 762000, cy: 1524000, stroke: "DCE7F3", width: 7620 })
+      + textShapeXml({ id: 1272 + itemIndex * 4, name: `Social Video Calendar Day ${itemIndex + 1}`, x: x + 91440, y: 1234440, cx: 579120, cy: 152400, text: day, size: 760, bold: true, color: visual.secondary || "0EA5E9", fontFace: "Arial" })
+      + textShapeXml({ id: 1273 + itemIndex * 4, name: `Social Video Calendar Text ${itemIndex + 1}`, x: x + 91440, y: 1676400, cx: 579120, cy: 457200, text: scene.labels[itemIndex], size: 660, bold: true, color: visual.title, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function socialVideoGrowthFunnelXml({ scene, visual }) {
+  return scene.labels.slice(0, 4).map((item, itemIndex) => {
+    const x = 5486400 + itemIndex * 274320;
+    const y = 1127760 + itemIndex * 533400;
+    const cx = 2438400 - itemIndex * 548640;
+    return solidShapeXml({ id: 1300 + itemIndex * 3, name: `Social Video Funnel Level ${itemIndex + 1}`, geom: "roundRect", x, y, cx, cy: 381000, fill: itemIndex % 2 ? visual.secondary || "0EA5E9" : visual.accent })
+      + textShapeXml({ id: 1301 + itemIndex * 3, name: `Social Video Funnel Text ${itemIndex + 1}`, x: x + 152400, y: y + 91440, cx: cx - 304800, cy: 121920, text: socialVideoGrowthCompactText(item, "", 12), size: 700, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function socialVideoGrowthDashboardXml({ visual, palette }) {
+  const bars = [0.32, 0.54, 0.76, 0.48].map((heightRatio, itemIndex) => {
+    const height = Math.round(1219200 * heightRatio);
+    return rectShapeXml({ id: 1330 + itemIndex, name: `Social Video Dashboard Bar ${itemIndex + 1}`, x: 5872480 + itemIndex * 426720, y: 2941320 - height, cx: 213360, cy: height, fill: itemIndex === 3 ? visual.warning || "F97316" : itemIndex % 2 ? visual.secondary || "0EA5E9" : visual.accent });
+  }).join("");
+  return solidShapeXml({ id: 1320, name: "Social Video Dashboard Panel", geom: "roundRect", x: 5410200, y: 1051560, cx: 2819400, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1321, name: "Social Video Dashboard Border", geom: "roundRect", x: 5410200, y: 1051560, cx: 2819400, cy: 2133600, stroke: "DCE7F3", width: 7620 })
+    + rectShapeXml({ id: 1322, name: "Social Video Dashboard Header", x: 5654040, y: 1318260, cx: 1219200, cy: 60960, fill: palette.softBlue })
+    + bars
+    + rectShapeXml({ id: 1323, name: "Social Video Dashboard Baseline", x: 5654040, y: 2941320, cx: 2286000, cy: 30480, fill: "CBD5E1" });
+}
+
+function socialVideoGrowthActionXml({ scene, visual }) {
+  return scene.labels.slice(0, 3).map((item, itemIndex) => {
+    const x = 1066800 + itemIndex * 2286000;
+    return solidShapeXml({ id: 1350 + itemIndex * 4, name: `Social Video Action Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3154680, cx: 1828800, cy: 792480, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1351 + itemIndex * 4, name: `Social Video Action Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3154680, cx: 1828800, cy: 792480, stroke: "DCE7F3", width: 7620 })
+      + textShapeXml({ id: 1352 + itemIndex * 4, name: `Social Video Action Text ${itemIndex + 1}`, x: x + 182880, y: 3398520, cx: 1371600, cy: 182880, text: item, size: 820, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+      + rectShapeXml({ id: 1353 + itemIndex * 4, name: `Social Video Action Rule ${itemIndex + 1}`, x: x + 182880, y: 3794760, cx: 457200, cy: 45720, fill: itemIndex % 2 ? visual.secondary || "0EA5E9" : visual.accent });
+  }).join("");
+}
+
+function socialVideoGrowthSceneFromSlide({ slide, index, role }) {
+  const bullets = socialVideoGrowthBulletTexts(slide);
+  const sceneRole = index === 0
+    ? "cover"
+    : String(role || "").includes("matrix")
+      ? "matrix"
+      : String(role || "").includes("rhythm")
+        ? "rhythm"
+        : String(role || "").includes("funnel")
+          ? "funnel"
+          : String(role || "").includes("dashboard")
+            ? "dashboard"
+            : String(role || "").includes("action")
+              ? "action"
+              : ["matrix", "rhythm", "funnel", "dashboard"][(index - 1) % 4];
+  const labels = ["内容定位", "平台分工", "发布节奏", "转化动作"].map((fallback, itemIndex) => socialVideoGrowthCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "CONTENT OPS" : sceneRole === "matrix" ? "PLATFORM MATRIX" : sceneRole === "rhythm" ? "CONTENT CALENDAR" : sceneRole === "funnel" ? "CONVERSION PATH" : sceneRole === "dashboard" ? "DATA REVIEW" : "NEXT ACTIONS",
+    title: socialVideoGrowthCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    summary: socialVideoGrowthCompactText(bullets[0], "围绕内容节奏、平台矩阵与转化链路建立可复盘的运营方案。", 42),
+    bullets,
+    labels,
+    metrics: [
+      { value: "7D", label: "内容节奏" },
+      { value: "4", label: "平台触点" },
+      { value: "3", label: "转化层级" },
+    ],
+  };
+}
+
+function socialVideoGrowthBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确账号定位与目标人群", "规划平台矩阵和内容栏目", "建立发布节奏与复盘指标", "打通私域线索转化路径"];
+}
+
+function socialVideoGrowthCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}...`;
+}
+
+function socialVideoGrowthColorPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary || "111827", visual.surface || "FFFFFF", 0.72),
+    greenGlow: blendHexColor(visual.accent || "22C55E", visual.background || "F4F7FB", 0.76),
+    blueGlow: blendHexColor(visual.secondary || "0EA5E9", visual.background || "F4F7FB", 0.76),
+    softBlue: blendHexColor(visual.secondary || "0EA5E9", "FFFFFF", 0.58),
+    softGreen: blendHexColor(visual.accent || "22C55E", "FFFFFF", 0.58),
+  };
+}
+
+function marketSurveyAnalysisDecorationsXml({ visual, index, role, slide }) {
+  // 问卷分析模板的主体内容在专属图层绘制，确保预览和 PPTX 导出共享同一套调研报告结构。
+  const palette = marketSurveyAnalysisColorPalette(visual);
+  const scene = marketSurveyAnalysisScene({ slide, index, role });
+  const canvas = solidShapeXml({ id: 2400, name: "Market Survey Canvas", geom: "roundRect", x: 530352, y: 452628, cx: 8083296, cy: 4221480, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 2401, name: "Market Survey Canvas Frame", geom: "roundRect", x: 530352, y: 452628, cx: 8083296, cy: 4221480, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2402, name: "Market Survey Top Rule", x: 530352, y: 452628, cx: 8083296, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 2403, name: "Market Survey Grid Line", x: 914400, y: 3429000, cx: 3581400, cy: 22860, fill: visual.accent });
+  const title = textShapeXml({ id: 2404, name: "Market Survey Title", x: 914400, y: 1036320, cx: 3657600, cy: 777240, text: scene.title, size: scene.kind === "cover" ? 2050 : 1680, bold: true, color: visual.title });
+  const kicker = textShapeXml({ id: 2405, name: "Market Survey Kicker", x: 914400, y: 754380, cx: 2743200, cy: 213360, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  const summary = textShapeXml({ id: 2406, name: "Market Survey Summary", x: 914400, y: 2057400, cx: 3048000, cy: 396240, text: scene.summary, size: 780, bold: true, color: visual.body });
+  const roleXml = {
+    cover: marketSurveyFormXml({ visual, palette, x: 5646420, y: 1127760, cx: 2743200, cy: 2133600 }),
+    sample: marketSurveySampleDotsXml({ visual, palette }),
+    question: marketSurveyQuestionBarsXml({ visual, palette, cards: scene.cards }),
+    cross: marketSurveyCrossMatrixXml({ visual, palette, cards: scene.cards }),
+    finding: marketSurveyFindingCardsXml({ visual, palette, cards: scene.cards }),
+    strategy: marketSurveyFormXml({ visual, palette, x: 5791200, y: 1112520, cx: 2362200, cy: 1828800 }) + marketSurveyStrategyCardsXml({ visual, palette, cards: scene.cards }),
+    summary: marketSurveyClosingXml({ visual, palette }) + marketSurveyStrategyCardsXml({ visual, palette, cards: scene.cards }),
+  }[scene.kind] || "";
+  return canvas + kicker + title + summary + marketSurveyBulletsXml({ visual, scene }) + roleXml + marketSurveyMetricCardsXml({ visual, metrics: scene.metrics, palette });
+}
+
+function marketSurveyBulletsXml({ visual, scene }) {
+  return scene.bullets.slice(0, 3).map((item, itemIndex) => {
+    const y = 2583180 + itemIndex * 274320;
+    return solidShapeXml({ id: 2410 + itemIndex * 2, name: `Market Survey Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 914400, y: y + 53340, cx: 76200, cy: 76200, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 2411 + itemIndex * 2, name: `Market Survey Bullet Text ${itemIndex + 1}`, x: 1066800, y, cx: 3200400, cy: 182880, text: item, size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function marketSurveyMetricCardsXml({ visual, metrics, palette }) {
+  return metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 914400 + itemIndex * 1158240;
+    return solidShapeXml({ id: 2420 + itemIndex * 3, name: `Market Survey Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3726180, cx: 1005840, cy: 487680, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2421 + itemIndex * 3, name: `Market Survey Metric Card Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3726180, cx: 1005840, cy: 487680, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2422 + itemIndex * 3, name: `Market Survey Metric Text ${itemIndex + 1}`, x: x + 106680, y: 3832860, cx: 792480, cy: 243840, text: `${metric.value}\n${metric.label}`, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function marketSurveyFormXml({ visual, palette, x, y, cx, cy }) {
+  const rows = [0, 1, 2].map((itemIndex) => {
+    const rowY = y + 701040 + itemIndex * 350520;
+    return solidShapeXml({ id: 2460 + itemIndex * 4, name: `Market Survey Form Option ${itemIndex + 1}`, geom: "roundRect", x: x + 213360, y: rowY, cx: cx - 426720, cy: 243840, fill: palette.soft })
+      + solidShapeXml({ id: 2461 + itemIndex * 4, name: `Market Survey Form Option Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 335280, y: rowY + 76200, cx: 91440, cy: 91440, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + rectShapeXml({ id: 2462 + itemIndex * 4, name: `Market Survey Form Option Rule ${itemIndex + 1}`, x: x + 518160, y: rowY + 99060, cx: 1219200 - itemIndex * 152400, cy: 45720, fill: palette.line })
+      + solidShapeXml({ id: 2463 + itemIndex * 4, name: `Market Survey Form Option Pill ${itemIndex + 1}`, geom: "roundRect", x: x + cx - 822960, y: rowY + 60960, cx: 426720, cy: 121920, fill: itemIndex === 0 ? palette.orangeSoft : palette.tealSoft });
+  }).join("");
+  return solidShapeXml({ id: 2450, name: "Market Survey Form Card", geom: "roundRect", x, y, cx, cy, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2451, name: "Market Survey Form Frame", geom: "roundRect", x, y, cx, cy, stroke: palette.frame, width: 7620 })
+    + rectShapeXml({ id: 2452, name: "Market Survey Form Header", x: x + 243840, y: y + 243840, cx: 1188720, cy: 76200, fill: visual.primary })
+    + rectShapeXml({ id: 2453, name: "Market Survey Form Subheader", x: x + 243840, y: y + 457200, cx: 1828800, cy: 45720, fill: palette.line })
+    + rows;
+}
+
+function marketSurveySampleDotsXml({ visual, palette }) {
+  const dots = Array.from({ length: 15 }, (_, itemIndex) => {
+    const col = itemIndex % 5;
+    const row = Math.floor(itemIndex / 5);
+    const fill = itemIndex % 3 === 0 ? visual.primary : itemIndex % 3 === 1 ? visual.accent : visual.secondary || visual.accent;
+    return solidShapeXml({ id: 2480 + itemIndex, name: `Market Survey Sample Dot ${itemIndex + 1}`, geom: "ellipse", x: 5943600 + col * 335280, y: 1371600 + row * 396240, cx: 182880, cy: 182880, fill });
+  }).join("");
+  return solidShapeXml({ id: 2475, name: "Market Survey Sample Panel", geom: "roundRect", x: 5646420, y: 1112520, cx: 2743200, cy: 2133600, fill: palette.tealSoft })
+    + lineFrameShapeXml({ id: 2476, name: "Market Survey Sample Panel Frame", geom: "roundRect", x: 5646420, y: 1112520, cx: 2743200, cy: 2133600, stroke: palette.frame, width: 7620 })
+    + dots
+    + rectShapeXml({ id: 2498, name: "Market Survey Sample Baseline", x: 5943600, y: 3002280, cx: 1828800, cy: 60960, fill: palette.line })
+    + rectShapeXml({ id: 2499, name: "Market Survey Sample Active Baseline", x: 5943600, y: 3002280, cx: 1219200, cy: 60960, fill: visual.accent });
+}
+
+function marketSurveyQuestionBarsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const y = 1158240 + itemIndex * 426720;
+    const width = [1676400, 1981200, 1371600, 1828800][itemIndex] || 1524000;
+    return solidShapeXml({ id: 2500 + itemIndex * 4, name: `Market Survey Question Row ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y, cx: 2971800, cy: 320040, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2501 + itemIndex * 4, name: `Market Survey Question Row Frame ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y, cx: 2971800, cy: 320040, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2502 + itemIndex * 4, name: `Market Survey Question Text ${itemIndex + 1}`, x: 5638800, y: y + 60960, cx: 1219200, cy: 137160, text: card, size: 680, bold: true, color: visual.title })
+      + rectShapeXml({ id: 2503 + itemIndex * 4, name: `Market Survey Question Bar ${itemIndex + 1}`, x: 5638800, y: y + 213360, cx: width, cy: 60960, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent });
+  }).join("");
+}
+
+function marketSurveyCrossMatrixXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5486400 + col * 1524000;
+    const y = 1196340 + row * 914400;
+    return solidShapeXml({ id: 2530 + itemIndex * 3, name: `Market Survey Cross Cell ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 731520, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2531 + itemIndex * 3, name: `Market Survey Cross Cell Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 731520, stroke: palette.frame, width: 7620 })
+      + rectShapeXml({ id: 2532 + itemIndex * 3, name: `Market Survey Cross Rule ${itemIndex + 1}`, x: x + 152400, y: y + 152400, cx: 457200, cy: 60960, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 2545 + itemIndex, name: `Market Survey Cross Text ${itemIndex + 1}`, x: x + 152400, y: y + 304800, cx: 1066800, cy: 182880, text: card, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function marketSurveyFindingCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const y = 1043940 + itemIndex * 670560;
+    return solidShapeXml({ id: 2560 + itemIndex * 4, name: `Market Survey Finding Card ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y, cx: 2971800, cy: 502920, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2561 + itemIndex * 4, name: `Market Survey Finding Frame ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y, cx: 2971800, cy: 502920, stroke: palette.frame, width: 7620 })
+      + solidShapeXml({ id: 2562 + itemIndex * 4, name: `Market Survey Finding Dot ${itemIndex + 1}`, geom: "ellipse", x: 5638800, y: y + 152400, cx: 152400, cy: 152400, fill: itemIndex % 2 ? visual.accent : visual.secondary || visual.accent })
+      + textShapeXml({ id: 2563 + itemIndex * 4, name: `Market Survey Finding Text ${itemIndex + 1}`, x: 5943600, y: y + 129540, cx: 2133600, cy: 182880, text: card, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function marketSurveyStrategyCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, itemIndex) => {
+    const x = 914400 + itemIndex * 1828800;
+    return solidShapeXml({ id: 2580 + itemIndex * 3, name: `Market Survey Strategy Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3855720, cx: 1600200, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2581 + itemIndex * 3, name: `Market Survey Strategy Frame ${itemIndex + 1}`, geom: "roundRect", x, y: 3855720, cx: 1600200, cy: 609600, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 2582 + itemIndex * 3, name: `Market Survey Strategy Text ${itemIndex + 1}`, x: x + 152400, y: 4023360, cx: 1219200, cy: 182880, text: card, size: 720, bold: true, color: visual.title })
+      + rectShapeXml({ id: 2596 + itemIndex, name: `Market Survey Strategy Rule ${itemIndex + 1}`, x: x + 152400, y: 4373880, cx: 609600, cy: 45720, fill: itemIndex % 2 ? visual.secondary || visual.accent : visual.accent });
+  }).join("");
+}
+
+function marketSurveyClosingXml({ visual, palette }) {
+  return solidShapeXml({ id: 2600, name: "Market Survey Closing Panel", geom: "roundRect", x: 5943600, y: 1219200, cx: 2362200, cy: 1828800, fill: visual.primary })
+    + rectShapeXml({ id: 2601, name: "Market Survey Closing Spectrum", x: 6248400, y: 1676400, cx: 1676400, cy: 76200, fill: visual.accent })
+    + solidShapeXml({ id: 2602, name: "Market Survey Closing Card", geom: "roundRect", x: 6400800, y: 2133600, cx: 1371600, cy: 609600, fill: palette.darkCard });
+}
+
+function marketSurveyAnalysisColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.08),
+    darkCard: blendHexColor(visual.primary, "0F172A", 0.28),
+    frame: blendHexColor(visual.primary, visual.surface, 0.76),
+    line: blendHexColor(visual.primary, visual.background, 0.68),
+    orangeSoft: blendHexColor(visual.secondary || visual.accent, visual.surface, 0.74),
+    soft: blendHexColor(visual.background, visual.surface, 0.35),
+    tealSoft: blendHexColor(visual.accent, visual.surface, 0.78),
+  };
+}
+
+function marketSurveyAnalysisScene({ slide, index, role }) {
+  const bullets = marketSurveyExportBulletTexts(slide);
+  const title = marketSurveyExportCompactText(slide?.title, "调研关键发现", 23);
+  const metrics = ["样本量", "有效问卷", "核心发现"].map((fallback, itemIndex) => marketSurveyExportMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["题项分布", "样本差异", "交叉信号", "策略建议"].map((fallback, itemIndex) => marketSurveyExportCompactText(bullets[itemIndex], fallback, 14));
+  const roleMap = {
+    "market-survey-analysis-cover": "cover",
+    "market-survey-analysis-sample": "sample",
+    "market-survey-analysis-question": "question",
+    "market-survey-analysis-cross": "cross",
+    "market-survey-analysis-finding": "finding",
+    "market-survey-analysis-strategy": "strategy",
+    "market-survey-analysis-summary": "summary",
+    cover: "cover",
+    closing: "summary",
+  };
+  const fallbackKinds = ["cover", "sample", "question", "cross", "finding", "strategy"];
+  const kind = roleMap[slide?.layout] || roleMap[role] || fallbackKinds[Math.min(index, fallbackKinds.length - 1)] || "question";
+  const kickers = {
+    cover: "RESEARCH BRIEF",
+    sample: "SAMPLE STRUCTURE",
+    question: "QUESTION ITEM REVIEW",
+    cross: "CROSS FINDINGS",
+    finding: "KEY EVIDENCE",
+    strategy: "ACTION MATRIX",
+    summary: "NEXT STUDY LOOP",
+  };
+  return {
+    kind,
+    kicker: kickers[kind] || "RESEARCH BRIEF",
+    title,
+    bullets,
+    metrics,
+    cards: kind === "summary" ? ["补充样本", "验证假设", "输出策略", "持续追踪"].map((fallback, itemIndex) => marketSurveyExportCompactText(bullets[itemIndex], fallback, 12)) : cards,
+    summary: marketSurveyExportCompactText(bullets[0], "基于问卷样本、题项分布和交叉分析沉淀可执行建议。", 36),
+  };
+}
+
+function marketSurveyExportBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["有效样本覆盖核心目标人群", "题项结果呈现明确偏好差异", "结论可转化为下一轮策略动作"];
+}
+
+function marketSurveyExportMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{1,4}|[零一二三四五六七八九十百千万亿]+份?)/);
+  const value = match?.[1] || ["N", "92%", "3"][index] || "N";
+  const label = marketSurveyExportCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function marketSurveyExportCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
 }
 
 function dataInsightVisualXml({ visual, palette, scene, isCover }) {

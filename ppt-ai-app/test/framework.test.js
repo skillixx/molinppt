@@ -1077,6 +1077,77 @@ test("resolveTemplateVisual applies metric anomaly attribution official visual",
   assert.equal(visual.accent, "06B6D4");
 });
 
+test("resolveTemplateVisual applies market survey analysis official visual", () => {
+  const template = {
+    id: "data-market-research-report-survey-analysis",
+    visual: {
+      primary: "155E75",
+      accent: "14B8A6",
+      secondary: "F97316",
+      warning: "F59E0B",
+      background: "F5FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "market-survey-analysis",
+      variant: "survey-analysis",
+    },
+    themes: [
+      {
+        id: "survey-analysis",
+        visual: {
+          layout: "market-survey-analysis",
+          variant: "survey-analysis",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "survey-analysis", template });
+
+  assert.equal(visual.id, "data-market-research-report-survey-analysis");
+  assert.equal(visual.layout, "market-survey-analysis");
+  assert.equal(visual.variant, "survey-analysis");
+  assert.equal(visual.primary, "155E75");
+  assert.equal(visual.accent, "14B8A6");
+});
+
+test("resolveTemplateVisual applies social media operation plan official visual", () => {
+  const template = {
+    id: "marketing-social-media-operation-plan-short-video-growth",
+    visual: {
+      id: "marketing-social-media-operation-plan-short-video-growth",
+      primary: "111827",
+      secondary: "0EA5E9",
+      accent: "22C55E",
+      warning: "F97316",
+      background: "F4F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "social-video-growth",
+      variant: "short-video-growth",
+    },
+    themes: [
+      {
+        id: "short-video-growth",
+        visual: {
+          layout: "social-video-growth",
+          variant: "short-video-growth",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "short-video-growth", template });
+
+  assert.equal(visual.id, "marketing-social-media-operation-plan-short-video-growth");
+  assert.equal(visual.layout, "social-video-growth");
+  assert.equal(visual.variant, "short-video-growth");
+  assert.equal(visual.primary, "111827");
+  assert.equal(visual.accent, "22C55E");
+});
+
 test("resolveTemplateVisual applies operating problem diagnosis official visual", () => {
   const template = {
     id: "business-operating-problem-diagnosis-problem-tree",
