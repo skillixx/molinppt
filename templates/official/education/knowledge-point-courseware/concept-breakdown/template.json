@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "knowledge-point-courseware",
+  "themeId": "concept-breakdown",
+  "style": "concept-breakdown-courseware",
+  "themes": [
+    {
+      "id": "concept-breakdown",
+      "name": "概念拆解",
+      "visual": {
+        "primary": "245B5A",
+        "accent": "F59E0B",
+        "secondary": "3B82F6",
+        "success": "16A34A",
+        "background": "F5F2E9",
+        "surface": "FFFDF7",
+        "title": "182B3A",
+        "body": "415466",
+        "layout": "concept-breakdown-courseware",
+        "variant": "concept-breakdown"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "245B5A",
+    "accent": "F59E0B",
+    "secondary": "3B82F6",
+    "success": "16A34A",
+    "background": "F5F2E9",
+    "surface": "FFFDF7",
+    "title": "182B3A",
+    "body": "415466",
+    "layout": "concept-breakdown-courseware",
+    "variant": "concept-breakdown"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "concept-breakdown-cover",
+    "defaultContentLayout": "concept-breakdown-detail",
+    "allowedLayouts": [
+      "concept-breakdown-cover",
+      "concept-breakdown-map",
+      "concept-breakdown-detail",
+      "concept-breakdown-case",
+      "concept-breakdown-practice",
+      "concept-breakdown-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

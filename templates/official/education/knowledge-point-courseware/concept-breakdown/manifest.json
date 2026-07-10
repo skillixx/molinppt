@@ -1,0 +1,19 @@
+{
+  "slug": "education-knowledge-point-courseware-concept-breakdown",
+  "name": "知识点讲解课件 - 概念拆解",
+  "description": "适合课程知识点讲解、概念拆解、案例教学和课堂练习反馈的结构化教学课件模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "courseware",
+    "knowledge-point",
+    "concept-map",
+    "teaching"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
