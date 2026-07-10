@@ -1,0 +1,21 @@
+{
+  "slug": "pitch-pre-a-funding-bp-market-validation",
+  "name": "Pre-A 融资 BP - 市场验证",
+  "description": "适合 Pre-A 融资路演、市场验证、牵引数据展示和资金用途说明的官方融资模板，突出客户验证、增长证据、商业化牵引和资金使用里程碑。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "pre-a",
+    "funding-bp",
+    "market-validation",
+    "traction",
+    "capital-allocation",
+    "investor-deck"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

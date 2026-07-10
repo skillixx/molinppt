@@ -1148,6 +1148,41 @@ test("resolveTemplateVisual applies social media operation plan official visual"
   assert.equal(visual.accent, "22C55E");
 });
 
+test("resolveTemplateVisual applies Pre-A market validation official visual", () => {
+  const template = {
+    id: "pitch-pre-a-funding-bp-market-validation",
+    visual: {
+      primary: "0B1220",
+      secondary: "38BDF8",
+      accent: "14B8A6",
+      warning: "F59E0B",
+      background: "EAF2F8",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "pre-a-market-validation",
+      variant: "market-validation",
+    },
+    themes: [
+      {
+        id: "market-validation",
+        visual: {
+          layout: "pre-a-market-validation",
+          variant: "market-validation",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "market-validation", template });
+
+  assert.equal(visual.id, "pitch-pre-a-funding-bp-market-validation");
+  assert.equal(visual.layout, "pre-a-market-validation");
+  assert.equal(visual.variant, "market-validation");
+  assert.equal(visual.primary, "0B1220");
+  assert.equal(visual.accent, "14B8A6");
+});
+
 test("resolveTemplateVisual applies operating problem diagnosis official visual", () => {
   const template = {
     id: "business-operating-problem-diagnosis-problem-tree",
