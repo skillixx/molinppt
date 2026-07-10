@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "market-research-report",
+  "themeId": "survey-analysis",
+  "style": "market-survey-analysis",
+  "themes": [
+    {
+      "id": "survey-analysis",
+      "name": "问卷分析",
+      "visual": {
+        "primary": "155E75",
+        "accent": "14B8A6",
+        "secondary": "F97316",
+        "warning": "F59E0B",
+        "background": "F5FAFC",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "market-survey-analysis",
+        "variant": "survey-analysis"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "155E75",
+    "accent": "14B8A6",
+    "secondary": "F97316",
+    "warning": "F59E0B",
+    "background": "F5FAFC",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "market-survey-analysis",
+    "variant": "survey-analysis"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "market-survey-analysis-cover",
+    "defaultContentLayout": "market-survey-analysis-question",
+    "allowedLayouts": [
+      "market-survey-analysis-cover",
+      "market-survey-analysis-sample",
+      "market-survey-analysis-question",
+      "market-survey-analysis-cross",
+      "market-survey-analysis-finding",
+      "market-survey-analysis-strategy",
+      "market-survey-analysis-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

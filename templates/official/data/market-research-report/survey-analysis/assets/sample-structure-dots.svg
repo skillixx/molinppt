@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" fill="none">
+  <rect width="360" height="240" rx="24" fill="#ECFEFF"/>
+  <g opacity=".9">
+    <circle cx="70" cy="62" r="18" fill="#155E75"/>
+    <circle cx="120" cy="62" r="18" fill="#14B8A6"/>
+    <circle cx="170" cy="62" r="18" fill="#F97316"/>
+    <circle cx="220" cy="62" r="18" fill="#155E75"/>
+    <circle cx="270" cy="62" r="18" fill="#14B8A6"/>
+    <circle cx="95" cy="112" r="18" fill="#14B8A6"/>
+    <circle cx="145" cy="112" r="18" fill="#F59E0B"/>
+    <circle cx="195" cy="112" r="18" fill="#155E75"/>
+    <circle cx="245" cy="112" r="18" fill="#F97316"/>
+    <circle cx="70" cy="162" r="18" fill="#F59E0B"/>
+    <circle cx="120" cy="162" r="18" fill="#155E75"/>
+    <circle cx="170" cy="162" r="18" fill="#14B8A6"/>
+    <circle cx="220" cy="162" r="18" fill="#155E75"/>
+    <circle cx="270" cy="162" r="18" fill="#14B8A6"/>
+  </g>
+  <path d="M55 202H305" stroke="#155E75" stroke-width="8" stroke-linecap="round" opacity=".2"/>
+  <path d="M55 202H214" stroke="#14B8A6" stroke-width="8" stroke-linecap="round"/>
+</svg>
