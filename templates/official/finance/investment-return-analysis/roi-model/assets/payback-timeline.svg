@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" role="img" aria-label="回收周期时间轴">
+  <rect width="760" height="180" rx="28" fill="#FFFFFF"/>
+  <path d="M70 92h620" stroke="#0F2742" stroke-opacity=".16" stroke-width="10" stroke-linecap="round"/>
+  <path d="M70 92h360" stroke="#16A34A" stroke-width="10" stroke-linecap="round"/>
+  <g font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="800">
+    <circle cx="70" cy="92" r="24" fill="#0F2742"/><text x="48" y="142" fill="#334155">投入</text>
+    <circle cx="250" cy="92" r="24" fill="#16A34A"/><text x="228" y="142" fill="#334155">上线</text>
+    <circle cx="430" cy="92" r="30" fill="#F59E0B"/><text x="386" y="142" fill="#334155">回收点</text>
+    <circle cx="690" cy="92" r="24" fill="#CBD5E1"/><text x="646" y="142" fill="#334155">扩张期</text>
+  </g>
+</svg>

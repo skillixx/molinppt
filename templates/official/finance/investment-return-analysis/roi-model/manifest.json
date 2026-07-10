@@ -1,0 +1,19 @@
+{
+  "slug": "finance-investment-return-analysis-roi-model",
+  "name": "投资回报分析 - ROI 模型",
+  "description": "适合项目投资分析、投入产出测算、回收周期说明和收益曲线汇报的财务经营官方模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "investment-return-analysis",
+    "roi",
+    "payback-period",
+    "return-curve"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

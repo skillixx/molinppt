@@ -363,7 +363,7 @@ function slideFiles(deck, visual) {
     const titleShape = shouldRenderTemplateTitle(visual, role)
       ? textShapeXml({ id: 20, name: titleName, ...layout.title, text: slide.title, size: titleSize, bold: true, color: titleColor, fontFace, fillStyle: titleFillStyle })
       : "";
-    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide)}${titleShape}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+    const slideXml = `<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:spTree>${groupShapeXml()}${templateDecorationsXml(visual, index, layout, role, slide, deck.slides.length)}${titleShape}${bodyShape}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
     files[`ppt/slides/slide${index + 1}.xml`] = scaleTemplateGeometryXml(slideXml, visual);
     files[`ppt/slides/_rels/slide${index + 1}.xml.rels`] = slideRelsXml(visual, role);
   }
@@ -396,7 +396,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -669,6 +669,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1820);
   }
+  if (visual.layout === "strategy-region-entry") {
+    if (index === 0) {
+      if (textLength >= 30) return 1980;
+      if (textLength >= 22) return 2200;
+      return Math.min(fallbackSize, 2460);
+    }
+    if (textLength >= 30) return 1320;
+    if (textLength >= 22) return 1500;
+    return Math.min(fallbackSize, 1800);
+  }
   if (visual.layout === "strategy-second-curve") {
     if (index === 0) {
       if (textLength >= 30) return 1980;
@@ -894,14 +904,18 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "quarterly-dashboard") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
+  if (visual.layout === "finance-risk-inspection") return false;
   if (visual.layout === "finance-profit-bridge") return false;
+  if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "finance-budget-variance") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "strategy-second-curve") return false;
   if (visual.layout === "strategy-swot-map") return false;
   if (visual.layout === "enterprise-digital-blueprint") return false;
+  if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "product-interview-insight") return false;
@@ -945,12 +959,16 @@ function shouldRenderTemplateBodyList(visual, role) {
  * @returns {boolean}
  */
 function shouldRenderTemplateTitle(visual, role) {
+  if (visual.layout === "finance-risk-inspection") return false;
   if (visual.layout === "finance-profit-bridge") return false;
+  if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "product-interview-insight") return false;
+  if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "product-pricing-strategy") return false;
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "management-agenda-decision") return false;
+  if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "pre-a-market-validation") return false;
@@ -989,7 +1007,7 @@ function scaleTemplateGeometryXml(xml, visual) {
   });
 }
 
-function templateDecorationsXml(visual, index, layout, role, slide) {
+function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
   if (visual.layout === "red-gold") {
     const redGoldPalette = redGoldColorPalette(visual);
@@ -1098,6 +1116,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "strategy-competition-map") {
     return base + competitionMapDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "strategy-region-entry") {
+    return base + strategyRegionEntryDecorationsXml({ visual, index, layout, role, slide });
+  }
   if (visual.layout === "strategy-second-curve") {
     return base + secondCurveDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1106,6 +1127,9 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   }
   if (isEnterpriseDigitalBlueprintVisual(visual)) {
     return base + enterpriseDigitalBlueprintDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (isBusinessModelValueChainVisual(visual)) {
+    return base + businessModelValueChainDecorationsXml({ visual, index, role, slide });
   }
   if (visual.layout === "product-release-cadence") {
     return base + productReleaseCadenceDecorationsXml({ visual, index, layout, role, slide });
@@ -1161,11 +1185,17 @@ function templateDecorationsXml(visual, index, layout, role, slide) {
   if (visual.layout === "finance-profit-bridge") {
     return base + profitBridgeDecorationsXml({ visual, index, role, slide });
   }
+  if (visual.layout === "finance-investment-roi-model") {
+    return base + investmentRoiModelDecorationsXml({ visual, index, role, slide, total });
+  }
   if (visual.layout === "finance-budget-variance") {
     return base + budgetVarianceDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "finance-budget-adjustment") {
     return base + budgetAdjustmentDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "finance-risk-inspection") {
+    return base + riskInspectionDecorationsXml({ visual, index, role, slide, total });
   }
   if (visual.layout === "sales-financial-solution") {
     return base + financialSolutionDecorationsXml({ visual, index, layout, role, slide });
@@ -2114,6 +2144,31 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
+  if (visual.layout === "strategy-region-entry") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 区域进入模板左侧承载战略判断，右侧承载区域地图、路径和渠道卡片，保持可编辑形状。
+      surface: { x: 475488, y: 452628, cx: 8193024, cy: 4248531 },
+      accent: { x: 475488, y: 452628, cx: 8193024, cy: 53340 },
+      secondaryAccent: { x: 731520, y: isCover ? 2103120 : 1973580, cx: 3200400, cy: 30480 },
+      label: { x: 731520, y: 701040, cx: 2743200, cy: 274320 },
+      title: isClosing
+        ? { x: 731520, y: 1188720, cx: 5334000, cy: 822960 }
+        : isCover
+          ? { x: 731520, y: 1082040, cx: 3931920, cy: 1066800 }
+          : { x: 731520, y: 914400, cx: 3931920, cy: 792480 },
+      content: isClosing
+        ? { x: 731520, y: 2324100, cx: 3962400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2545080, cx: 3505200, cy: 792480 }
+          : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2460 : isClosing ? 2480 : 1800,
+      bodySize: isCover ? 900 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "strategy-second-curve") {
     const isCover = index === 0;
     const isClosing = role === "closing";
@@ -2633,6 +2688,31 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 804672, y: 929640, cx: 4267200, cy: 670560 },
       content: isClosing
         ? { x: 804672, y: 2407920, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 804672, y: 2644140, cx: 3505200, cy: 731520 }
+          : { x: 804672, y: 1882140, cx: 3505200, cy: 975360 },
+      titleSize: isCover ? 2180 : isClosing ? 2200 : 1640,
+      bodySize: isCover ? 760 : 620,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-investment-roi-model") {
+    const isCover = index === 0;
+    const isClosing = role === "closing" || role === "decision";
+    return {
+      // ROI 模板左侧保留结论和指标，右侧承载模型、曲线或情景测算，坐标与在线预览保持一致。
+      surface: { x: 566928, y: 591312, cx: 8001000, cy: 4145280 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 342900 },
+      secondaryAccent: { x: 804672, y: isCover ? 2476500 : 1882140, cx: 3200400, cy: 30480 },
+      label: { x: 804672, y: 792480, cx: 2438400, cy: 274320 },
+      title: isClosing
+        ? { x: 804672, y: 1112520, cx: 5943600, cy: 701040 }
+        : isCover
+          ? { x: 804672, y: 1127760, cx: 3886200, cy: 944880 }
+          : { x: 804672, y: 929640, cx: 4267200, cy: 670560 },
+      content: isClosing
+        ? { x: 804672, y: 2164080, cx: 4267200, cy: 914400 }
         : isCover
           ? { x: 804672, y: 2644140, cx: 3505200, cy: 731520 }
           : { x: 804672, y: 1882140, cx: 3505200, cy: 975360 },
@@ -4391,6 +4471,205 @@ function isBudgetAdjustmentVisual(visual) {
   return visual?.layout === "finance-budget-adjustment" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-adjustment");
 }
 
+function riskInspectionDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = riskInspectionSceneFromSlide({ slide, index, role, total });
+  const palette = riskInspectionColorPalette(visual);
+  // 内控合规模板导出端使用审计工作台、风险热力图、清单和闭环路径构成，不使用整页截图背景。
+  const backdrop = rectShapeXml({ id: 1800, name: "Risk Inspection Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1801, name: "Risk Inspection Audit Glow", geom: "ellipse", x: 6400800, y: 304800, cx: 2217420, cy: 1676400, fill: palette.auditWash })
+    + solidShapeXml({ id: 1802, name: "Risk Inspection Control Glow", geom: "ellipse", x: -457200, y: 3657600, cx: 2133600, cy: 1371600, fill: palette.controlWash })
+    + riskInspectionGridXml({ palette });
+  const workspace = solidShapeXml({ id: 1810, name: "Risk Inspection Audit Workspace", geom: "roundRect", x: 493776, y: 563880, cx: 8156448, cy: 4191000, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1811, name: "Risk Inspection Workspace Border", geom: "roundRect", x: 493776, y: 563880, cx: 8156448, cy: 4191000, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 1812, name: "Risk Inspection Header Rail", x: 493776, y: 563880, cx: 8156448, cy: 60960, fill: visual.primary })
+    + rectShapeXml({ id: 1813, name: "Risk Inspection Header Accent", x: 493776, y: 624840, cx: 8156448, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 1814, name: "Risk Inspection Kicker", x: 749808, y: 777240, cx: 2438400, cy: 243840, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1815, name: "Risk Inspection Dedicated Title", x: 749808, y: index === 0 ? 1074420 : 914400, cx: index === 0 ? 3962400 : 4267200, cy: index === 0 ? 883920 : 670560, text: scene.title, size: index === 0 ? 1460 : 1160, bold: true, color: visual.title })
+    + rectShapeXml({ id: 1816, name: "Risk Inspection Title Rule", x: 749808, y: index === 0 ? 2194560 : 1775460, cx: 2834640, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1817, name: "Risk Inspection Secondary Rule", x: 749808, y: index === 0 ? 2247900 : 1828800, cx: 1524000, cy: 15240, fill: visual.secondary || palette.control });
+  const bullets = riskInspectionBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "checklist") return backdrop + workspace + bullets + riskInspectionChecklistXml({ visual, scene, palette });
+  if (scene.role === "finding") return backdrop + workspace + bullets + riskInspectionFindingXml({ visual, scene, palette });
+  if (scene.role === "rating") return backdrop + workspace + bullets + riskInspectionHeatmapXml({ visual, palette }) + riskInspectionLevelBarsXml({ visual, palette });
+  if (scene.role === "remediation") return backdrop + workspace + bullets + riskInspectionRemediationXml({ visual, scene, palette });
+  if (scene.role === "closing") return backdrop + workspace + riskInspectionClosingXml({ visual, scene, palette });
+  return backdrop + workspace + bullets + riskInspectionAuditPanelXml({ visual, palette }) + riskInspectionMetricCardsXml({ visual, metrics: scene.metrics, palette });
+}
+
+function riskInspectionGridXml({ palette }) {
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400]
+    .map((x, index) => rectShapeXml({ id: 1820 + index, name: `Risk Inspection Grid Vertical ${index + 1}`, x, y: 365760, cx: 7620, cy: 4419600, fill: palette.grid })).join("");
+  const horizontal = [914400, 1295400, 1676400, 2057400, 2438400, 2819400, 3200400, 3581400, 3962400, 4343400]
+    .map((y, index) => rectShapeXml({ id: 1840 + index, name: `Risk Inspection Grid Horizontal ${index + 1}`, x: 457200, y, cx: 8229600, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function riskInspectionBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, index) => {
+    const y = (isCover ? 2575560 : 1981200) + index * (isCover ? 281940 : 342900);
+    const accent = [visual.accent, paletteSafe(visual.warning, "F97316"), visual.secondary || "16A34A", visual.primary][index] || visual.accent;
+    return rectShapeXml({ id: 1860 + index * 3, name: `Risk Inspection Bullet Rule ${index + 1}`, x: 749808, y: y + 38100, cx: 45720, cy: 152400, fill: accent })
+      + textShapeXml({ id: 1861 + index * 3, name: `Risk Inspection Bullet Text ${index + 1}`, x: 914400, y, cx: 3505200, cy: isCover ? 198120 : 243840, text: budgetPlanningCompactText(item, scene.title, isCover ? 30 : 26), size: isCover ? 760 : 660, bold: false, color: visual.body });
+  }).join("");
+}
+
+function riskInspectionAuditPanelXml({ visual, palette }) {
+  return solidShapeXml({ id: 1880, name: "Risk Inspection Evidence Panel", geom: "roundRect", x: 5646420, y: 975360, cx: 2590800, cy: 2286000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1881, name: "Risk Inspection Evidence Panel Border", geom: "roundRect", x: 5646420, y: 975360, cx: 2590800, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + solidShapeXml({ id: 1882, name: "Risk Inspection Shield", geom: "pentagon", x: 6370320, y: 1219200, cx: 1143000, cy: 1371600, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1883, name: "Risk Inspection Shield Border", geom: "pentagon", x: 6370320, y: 1219200, cx: 1143000, cy: 1371600, stroke: visual.accent, width: 25400 })
+    + rectShapeXml({ id: 1884, name: "Risk Inspection Shield Tick A", x: 6774180, y: 1836420, cx: 99060, cy: 381000, fill: visual.accent, rotation: -35 })
+    + rectShapeXml({ id: 1885, name: "Risk Inspection Shield Tick B", x: 6926580, y: 2004060, cx: 594360, cy: 99060, fill: visual.accent, rotation: -35 })
+    + textShapeXml({ id: 1886, name: "Risk Inspection Evidence Label", x: 5974080, y: 2956560, cx: 1905000, cy: 182880, text: "Evidence · Control · Closure", size: 620, bold: true, color: visual.body });
+}
+
+function riskInspectionMetricCardsXml({ visual, metrics, palette }) {
+  return metrics.slice(0, 3).map((metric, index) => {
+    const x = 749808 + index * 1219200;
+    const color = [visual.accent, palette.warning, palette.control][index] || visual.accent;
+    return solidShapeXml({ id: 1890 + index * 5, name: `Risk Inspection Metric Card ${index + 1}`, geom: "roundRect", x, y: 3810000, cx: 1066800, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1891 + index * 5, name: `Risk Inspection Metric Border ${index + 1}`, geom: "roundRect", x, y: 3810000, cx: 1066800, cy: 609600, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1892 + index * 5, name: `Risk Inspection Metric Accent ${index + 1}`, x, y: 3810000, cx: 60960, cy: 609600, fill: color })
+      + textShapeXml({ id: 1893 + index * 5, name: `Risk Inspection Metric Value ${index + 1}`, x: x + 152400, y: 3924300, cx: 792480, cy: 198120, text: metric.value, size: 940, bold: true, color: visual.title })
+      + textShapeXml({ id: 1894 + index * 5, name: `Risk Inspection Metric Label ${index + 1}`, x: x + 152400, y: 4175760, cx: 792480, cy: 152400, text: metric.label, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function riskInspectionChecklistXml({ visual, scene, palette }) {
+  const headers = ["检查项", "证据", "等级", "动作"];
+  const rows = riskInspectionChecklistRows(scene.bullets);
+  const headerXml = headers.map((item, index) => textShapeXml({ id: 1910 + index, name: `Risk Inspection Checklist Header ${index + 1}`, x: 891540 + index * 1905000, y: 2263140, cx: 1524000, cy: 198120, text: item, size: 620, bold: true, color: "FFFFFF" })).join("");
+  const rowXml = rows.flatMap((row, rowIndex) => row.map((item, colIndex) => {
+    const x = 822960 + colIndex * 1905000;
+    const y = 2590800 + rowIndex * 365760;
+    const fill = rowIndex % 2 === 0 ? "FFFFFF" : palette.panel;
+    return rectShapeXml({ id: 1930 + rowIndex * 12 + colIndex * 3, name: `Risk Inspection Checklist Cell ${rowIndex + 1}-${colIndex + 1}`, x, y, cx: 1775460, cy: 304800, fill })
+      + textShapeXml({ id: 1931 + rowIndex * 12 + colIndex * 3, name: `Risk Inspection Checklist Text ${rowIndex + 1}-${colIndex + 1}`, x: x + 91440, y: y + 76200, cx: 1524000, cy: 152400, text: item, size: 560, bold: colIndex === 2, color: colIndex === 2 ? palette.warning : visual.body });
+  })).join("");
+  return solidShapeXml({ id: 1900, name: "Risk Inspection Checklist", geom: "roundRect", x: 746760, y: 2186940, cx: 7772400, cy: 1676400, fill: "FFFFFF" })
+    + rectShapeXml({ id: 1901, name: "Risk Inspection Checklist Header Bar", x: 746760, y: 2186940, cx: 7772400, cy: 304800, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1902, name: "Risk Inspection Checklist Border", geom: "roundRect", x: 746760, y: 2186940, cx: 7772400, cy: 1676400, stroke: palette.frame, width: 10160 })
+    + headerXml
+    + rowXml;
+}
+
+function riskInspectionFindingXml({ visual, scene, palette }) {
+  const items = scene.findings;
+  return solidShapeXml({ id: 1980, name: "Risk Inspection Finding Card", geom: "roundRect", x: 5400040, y: 1097280, cx: 3086100, cy: 2514600, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1981, name: "Risk Inspection Finding Card Border", geom: "roundRect", x: 5400040, y: 1097280, cx: 3086100, cy: 2514600, stroke: palette.frame, width: 12700 })
+    + items.slice(0, 3).map((item, index) => {
+      const y = 1371600 + index * 624840;
+      const color = [visual.accent, palette.warning, palette.control][index] || visual.accent;
+      return solidShapeXml({ id: 1990 + index * 4, name: `Risk Inspection Finding Row ${index + 1}`, geom: "roundRect", x: 5704840, y, cx: 2476500, cy: 426720, fill: "FFFFFF" })
+        + rectShapeXml({ id: 1991 + index * 4, name: `Risk Inspection Finding Accent ${index + 1}`, x: 5704840, y, cx: 76200, cy: 426720, fill: color })
+        + textShapeXml({ id: 1992 + index * 4, name: `Risk Inspection Finding Text ${index + 1}`, x: 5913120, y: y + 114300, cx: 2072640, cy: 182880, text: item, size: 640, bold: true, color: visual.title });
+    }).join("");
+}
+
+function riskInspectionHeatmapXml({ visual, palette }) {
+  const cells = Array.from({ length: 9 }, (_, index) => {
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    const fill = index === 2 || index === 5 ? palette.dangerWash : index === 1 || index === 4 || index === 7 ? palette.warnWash : palette.controlWash;
+    return solidShapeXml({ id: 2020 + index, name: `Risk Inspection Heatmap Cell ${index + 1}`, geom: "roundRect", x: 5615940 + col * 792480, y: 1196340 + row * 594360, cx: 670560, cy: 472440, fill });
+  }).join("");
+  return solidShapeXml({ id: 2010, name: "Risk Inspection Heatmap", geom: "roundRect", x: 5400040, y: 975360, cx: 2895600, cy: 2316480, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 2011, name: "Risk Inspection Heatmap Border", geom: "roundRect", x: 5400040, y: 975360, cx: 2895600, cy: 2316480, stroke: palette.frame, width: 12700 })
+    + textShapeXml({ id: 2012, name: "Risk Inspection Heatmap Label", x: 5615940, y: 3307080, cx: 2286000, cy: 198120, text: "Likelihood × Impact", size: 620, bold: true, color: visual.body })
+    + cells;
+}
+
+function riskInspectionLevelBarsXml({ visual, palette }) {
+  return [0.42, 0.68, 0.92].map((height, index) => {
+    const h = Math.round(914400 * height);
+    const x = 5638800 + index * 792480;
+    const y = 4038600 - h;
+    const color = [palette.control, palette.warning, visual.accent][index];
+    return rectShapeXml({ id: 2050 + index, name: `Risk Inspection Level Bar ${index + 1}`, x, y, cx: 533400, cy: h, fill: color });
+  }).join("");
+}
+
+function riskInspectionRemediationXml({ visual, scene, palette }) {
+  return scene.steps.slice(0, 5).map((step, index) => {
+    const x = 822960 + index * 1524000;
+    const connector = index < 4 ? rectShapeXml({ id: 2080 + index, name: `Risk Inspection Remediation Connector ${index + 1}`, x: x + 1066800, y: 3556008, cx: 335280, cy: 22860, fill: visual.primary }) : "";
+    return solidShapeXml({ id: 2060 + index * 4, name: `Risk Inspection Remediation Step ${index + 1}`, geom: "roundRect", x, y: 3169920, cx: 1127760, cy: 792480, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2061 + index * 4, name: `Risk Inspection Remediation Step Border ${index + 1}`, geom: "roundRect", x, y: 3169920, cx: 1127760, cy: 792480, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 2062 + index * 4, name: `Risk Inspection Remediation Dot ${index + 1}`, geom: "ellipse", x: x + 137160, y: 3337560, cx: 213360, cy: 213360, fill: index < 3 ? palette.control : visual.accent })
+      + textShapeXml({ id: 2063 + index * 4, name: `Risk Inspection Remediation Text ${index + 1}`, x: x + 137160, y: 3655068, cx: 853440, cy: 182880, text: step, size: 640, bold: true, color: visual.title })
+      + connector;
+  }).join("");
+}
+
+function riskInspectionClosingXml({ visual, scene, palette }) {
+  return scene.bullets.slice(0, 3).map((item, index) => {
+    const x = 822960 + index * 2514600;
+    return solidShapeXml({ id: 2100 + index * 4, name: `Risk Inspection Closing Card ${index + 1}`, geom: "roundRect", x, y: 2796540, cx: 2194560, cy: 944880, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 2101 + index * 4, name: `Risk Inspection Closing Card Border ${index + 1}`, geom: "roundRect", x, y: 2796540, cx: 2194560, cy: 944880, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 2102 + index * 4, name: `Risk Inspection Closing Accent ${index + 1}`, x: x + 152400, y: 2948940, cx: 45720, cy: 487680, fill: index === 1 ? palette.control : visual.accent })
+      + textShapeXml({ id: 2103 + index * 4, name: `Risk Inspection Closing Text ${index + 1}`, x: x + 289560, y: 3025140, cx: 1584960, cy: 304800, text: budgetPlanningCompactText(item, "", 24), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function riskInspectionSceneFromSlide({ slide, index, role, total }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 24);
+  const resolvedRole = index === 0 ? "cover" : role === "closing" || index === total - 1 ? "closing" : ["checklist", "finding", "rating", "remediation"][(index - 1) % 4];
+  const metrics = [0, 1, 2].map((itemIndex) => riskInspectionMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "INTERNAL CONTROL" : "AUDIT WORKPAPER",
+    title,
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    findings: [
+      budgetPlanningCompactText(bullets[0], "控制缺口", 16),
+      budgetPlanningCompactText(bullets[1], "影响范围", 16),
+      budgetPlanningCompactText(bullets[2], "处置建议", 16),
+    ],
+    steps: ["识别问题", "确认责任", "制定措施", "复核证据", "关闭跟踪"],
+  };
+}
+
+function riskInspectionMetricFromText(text, index) {
+  const fallbackValues = ["32", "8", "100%"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["检查项", "高风险", "闭环率"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|项|个|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function riskInspectionChecklistRows(bullets) {
+  const source = bullets.length ? bullets : ["关键权限复核", "合同审批留痕", "资金支付抽查"];
+  return source.slice(0, 3).map((item, index) => [
+    budgetPlanningCompactText(item, `检查项 ${index + 1}`, 12),
+    ["凭证完整", "留痕待补", "抽样复核"][index] || "待确认",
+    ["低", "中", "高"][index] || "中",
+    ["保持监控", "补充证据", "限期整改"][index] || "跟踪",
+  ]);
+}
+
+function riskInspectionColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.30),
+    auditWash: blendHexColor(visual.accent, visual.background, 0.82),
+    controlWash: blendHexColor(visual.secondary || "16A34A", visual.background, 0.86),
+    warnWash: blendHexColor(visual.warning || "F97316", visual.background, 0.78),
+    dangerWash: blendHexColor(visual.accent, visual.background, 0.76),
+    panel: blendHexColor(visual.background, visual.surface, 0.62),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    grid: blendHexColor(visual.primary, visual.background, 0.92),
+    warning: visual.warning || "F97316",
+    control: visual.secondary || "16A34A",
+  };
+}
+
+function paletteSafe(value, fallback) {
+  return value || fallback;
+}
+
 function financialSolutionDecorationsXml({ visual, index, role, slide }) {
   const scene = financialSolutionSceneFromSlide({ slide, index, role });
   const palette = financialSolutionColorPalette(visual);
@@ -4531,6 +4810,216 @@ function financialSolutionColorPalette(visual) {
 function isFinancialSolutionVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "sales-financial-solution" && (id === "industry-solution" || id === "sales-industry-solution-financial-industry");
+}
+
+function investmentRoiModelDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = investmentRoiModelSceneFromSlide({ slide, index, role, total });
+  const palette = investmentRoiModelColorPalette(visual);
+  // ROI 模板导出端全部用可编辑图形构建模型台、曲线、时间轴和情景测算，不使用整页图片背景。
+  const ruleY = index === 0 ? 2476500 : 1882140;
+  const titleBox = investmentRoiTitleBox({ index, role: scene.role });
+  const backdrop = rectShapeXml({ id: 1320, name: "Investment ROI Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + solidShapeXml({ id: 1321, name: "Investment ROI Growth Glow", geom: "ellipse", x: 6705600, y: 365760, cx: 2057400, cy: 1676400, fill: palette.greenWash })
+    + solidShapeXml({ id: 1322, name: "Investment ROI Payback Glow", geom: "ellipse", x: 6705600, y: 3657600, cx: 2438400, cy: 1676400, fill: palette.goldWash })
+    + investmentRoiGridXml({ palette });
+  const workspace = solidShapeXml({ id: 1330, name: "Investment ROI Workspace", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1331, name: "Investment ROI Workspace Border", geom: "roundRect", x: 566928, y: 591312, cx: 8001000, cy: 4145280, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 1332, name: "Investment ROI Header Bar", x: 0, y: 0, cx: 9144000, cy: 342900, fill: visual.primary })
+    + rectShapeXml({ id: 1333, name: "Investment ROI Header Accent", x: 0, y: 342900, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 1334, name: "Investment ROI Kicker", x: 804672, y: 792480, cx: 2438400, cy: 274320, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 1335, name: "Investment ROI Focus Rule", x: 804672, y: ruleY, cx: index === 0 ? 3200400 : 2590800, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1336, name: "Investment ROI Secondary Rule", x: 804672, y: ruleY + 53340, cx: index === 0 ? 1828800 : 1371600, cy: 15240, fill: visual.secondary || visual.accent })
+    + textShapeXml({ id: 1337, name: "Investment ROI Dedicated Title", ...titleBox, text: scene.title, bold: true, color: visual.title });
+  const bullets = investmentRoiBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "curve") return backdrop + workspace + bullets + investmentRoiCurveXml({ visual, palette });
+  if (scene.role === "payback") return backdrop + workspace + bullets + investmentRoiPaybackXml({ visual, palette, steps: scene.paybackSteps });
+  if (scene.role === "scenario") return backdrop + workspace + bullets + investmentRoiScenarioXml({ visual, palette, scenarios: scene.scenarios });
+  if (scene.role === "decision") return backdrop + workspace + investmentRoiDecisionXml({ visual, palette, items: scene.decisionItems });
+  return backdrop + workspace + bullets + investmentRoiModelPanelXml({ visual, palette, nodes: scene.modelNodes }) + investmentRoiMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function investmentRoiTitleBox({ index, role }) {
+  const isCover = index === 0;
+  if (role === "decision") return { x: 804672, y: 1112520, cx: 5943600, cy: 701040, size: 1460 };
+  if (isCover) return { x: 804672, y: 1127760, cx: 3886200, cy: 944880, size: 1320 };
+  return { x: 804672, y: 944880, cx: 4114800, cy: 609600, size: 1120 };
+}
+
+function investmentRoiGridXml({ palette }) {
+  const vertical = [914400, 1371600, 1828800, 2286000, 2743200, 3200400, 3657600, 4114800, 4572000, 5029200, 5486400, 5943600, 6400800, 6858000, 7315200, 7772400, 8229600]
+    .map((x, itemIndex) => rectShapeXml({ id: 1340 + itemIndex, name: `Investment ROI Grid Vertical ${itemIndex + 1}`, x, y: 365760, cx: 7620, cy: 4419600, fill: palette.grid })).join("");
+  const horizontal = [762000, 1143000, 1524000, 1905000, 2286000, 2667000, 3048000, 3429000, 3810000, 4191000, 4572000]
+    .map((y, itemIndex) => rectShapeXml({ id: 1360 + itemIndex, name: `Investment ROI Grid Horizontal ${itemIndex + 1}`, x: 457200, y, cx: 8229600, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal;
+}
+
+function investmentRoiBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, itemIndex) => {
+    const y = (isCover ? 2674620 : 2164080) + itemIndex * (isCover ? 281940 : 396240);
+    const cardWidth = isCover ? 3352800 : 3505200;
+    const cardHeight = isCover ? 243840 : 304800;
+    const accent = itemIndex % 2 === 1 ? visual.secondary || visual.accent : visual.accent;
+    return solidShapeXml({ id: 1380 + itemIndex * 4, name: `Investment ROI Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 804672, y, cx: cardWidth, cy: cardHeight, fill: blendHexColor(visual.background, visual.surface, 0.76) })
+      + rectShapeXml({ id: 1381 + itemIndex * 4, name: `Investment ROI Bullet Accent ${itemIndex + 1}`, x: 804672, y, cx: 45720, cy: cardHeight, fill: accent })
+      + textShapeXml({ id: 1382 + itemIndex * 4, name: `Investment ROI Bullet Text ${itemIndex + 1}`, x: 990600, y: y + (isCover ? 45720 : 60960), cx: cardWidth - 304800, cy: isCover ? 152400 : 182880, text: budgetPlanningCompactText(item, scene.title, isCover ? 30 : 26), size: isCover ? 660 : 600, bold: true, color: visual.body });
+  }).join("");
+}
+
+function investmentRoiMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 3).map((metric, itemIndex) => {
+    const x = 804672 + itemIndex * 1257300;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.warning || "EF4444"][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1400 + itemIndex * 5, name: `Investment ROI Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1401 + itemIndex * 5, name: `Investment ROI Metric Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1066800, cy: 640080, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1402 + itemIndex * 5, name: `Investment ROI Metric Accent ${itemIndex + 1}`, x, y: 3749040, cx: 1066800, cy: 45720, fill: color })
+      + textShapeXml({ id: 1403 + itemIndex * 5, name: `Investment ROI Metric Value ${itemIndex + 1}`, x: x + 121920, y: 3893820, cx: 822960, cy: 228600, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 1404 + itemIndex * 5, name: `Investment ROI Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4160520, cx: 822960, cy: 182880, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function investmentRoiModelPanelXml({ visual, palette, nodes }) {
+  const nodeLayout = [
+    { x: 5486400, y: 1219200, text: nodes[0], color: visual.primary },
+    { x: 6614160, y: 2057400, text: nodes[1], color: visual.accent },
+    { x: 7741920, y: 1219200, text: nodes[2], color: visual.secondary || visual.accent },
+    { x: 7741920, y: 2743200, text: nodes[3], color: visual.warning || "EF4444" },
+  ];
+  const connectors = rectShapeXml({ id: 1420, name: "Investment ROI Model Flow 1", x: 6484620, y: 1813560, cx: 1325880, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 1421, name: "Investment ROI Model Flow 2", x: 7246620, y: 2423160, cx: 45720, cy: 609600, fill: visual.secondary || visual.accent });
+  const nodesXml = nodeLayout.map((node, itemIndex) => solidShapeXml({ id: 1430 + itemIndex * 4, name: `Investment ROI Model Node ${itemIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 990600, cy: 548640, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1431 + itemIndex * 4, name: `Investment ROI Model Node Border ${itemIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 990600, cy: 548640, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1432 + itemIndex * 4, name: `Investment ROI Model Node Accent ${itemIndex + 1}`, x: node.x, y: node.y, cx: 990600, cy: 53340, fill: node.color })
+    + textShapeXml({ id: 1433 + itemIndex * 4, name: `Investment ROI Model Node Text ${itemIndex + 1}`, x: node.x + 106680, y: node.y + 198120, cx: 777240, cy: 152400, text: budgetPlanningCompactText(node.text, "", 9), size: 700, bold: true, color: visual.title })).join("");
+  return solidShapeXml({ id: 1418, name: "Investment ROI Model Panel", geom: "roundRect", x: 5262880, y: 990600, cx: 3261360, cy: 2743200, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1419, name: "Investment ROI Model Panel Border", geom: "roundRect", x: 5262880, y: 990600, cx: 3261360, cy: 2743200, stroke: palette.frame, width: 10160 })
+    + connectors
+    + nodesXml;
+}
+
+function investmentRoiCurveXml({ visual, palette }) {
+  return solidShapeXml({ id: 1460, name: "Investment ROI Curve Panel", geom: "roundRect", x: 5262880, y: 975360, cx: 3261360, cy: 2590800, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1461, name: "Investment ROI Curve Panel Border", geom: "roundRect", x: 5262880, y: 975360, cx: 3261360, cy: 2590800, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1462, name: "Investment ROI Curve Axis X", x: 5638800, y: 3055620, cx: 2438400, cy: 22860, fill: palette.frame })
+    + rectShapeXml({ id: 1463, name: "Investment ROI Curve Axis Y", x: 5638800, y: 1280160, cx: 22860, cy: 1775460, fill: palette.frame })
+    + rectShapeXml({ id: 1464, name: "Investment ROI Curve Segment 1", x: 5791200, y: 2674620, cx: 762000, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 1465, name: "Investment ROI Curve Segment 2", x: 6400800, y: 2316480, cx: 853440, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 1466, name: "Investment ROI Curve Segment 3", x: 7086600, y: 1973580, cx: 914400, cy: 53340, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: 1467, name: "Investment ROI Break Even Point", geom: "ellipse", x: 6545580, y: 2202180, cx: 243840, cy: 243840, fill: visual.accent })
+    + solidShapeXml({ id: 1468, name: "Investment ROI Target Point", geom: "ellipse", x: 7879080, y: 1813560, cx: 274320, cy: 274320, fill: visual.secondary || visual.accent });
+}
+
+function investmentRoiPaybackXml({ visual, palette, steps }) {
+  const rail = rectShapeXml({ id: 1480, name: "Investment ROI Payback Rail", x: 1036320, y: 3429000, cx: 7010400, cy: 53340, fill: blendHexColor(visual.primary, visual.surface, 0.52) })
+    + rectShapeXml({ id: 1481, name: "Investment ROI Payback Progress", x: 1036320, y: 3429000, cx: 4267200, cy: 53340, fill: visual.accent });
+  const cards = steps.slice(0, 5).map((step, itemIndex) => {
+    const x = 914400 + itemIndex * 1524000;
+    const color = itemIndex === 2 ? visual.secondary || visual.accent : itemIndex === 3 ? visual.accent : visual.primary;
+    return solidShapeXml({ id: 1490 + itemIndex * 5, name: `Investment ROI Payback Step ${itemIndex + 1}`, geom: "roundRect", x, y: 3048000, cx: 1188720, cy: 762000, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1491 + itemIndex * 5, name: `Investment ROI Payback Step Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3048000, cx: 1188720, cy: 762000, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1492 + itemIndex * 5, name: `Investment ROI Payback Step Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 449580, y: 3147060, cx: 289560, cy: 289560, fill: color })
+      + textShapeXml({ id: 1493 + itemIndex * 5, name: `Investment ROI Payback Step Number ${itemIndex + 1}`, x: x + 449580, y: 3223260, cx: 289560, cy: 91440, text: String(itemIndex + 1), size: 520, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 1494 + itemIndex * 5, name: `Investment ROI Payback Step Text ${itemIndex + 1}`, x: x + 137160, y: 3505200, cx: 914400, cy: 152400, text: budgetPlanningCompactText(step, "", 8), size: 660, bold: true, color: visual.title });
+  }).join("");
+  return rail + cards;
+}
+
+function investmentRoiScenarioXml({ visual, palette, scenarios }) {
+  return scenarios.slice(0, 3).map((scenario, itemIndex) => {
+    const x = 5262880 + itemIndex * 1066800;
+    const color = [visual.warning || "EF4444", visual.accent, visual.secondary || visual.accent][itemIndex] || visual.accent;
+    const [label, value] = String(scenario).split("\n");
+    return solidShapeXml({ id: 1520 + itemIndex * 6, name: `Investment ROI Scenario Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1219200 + itemIndex * 76200, cx: 914400, cy: 2133600 - itemIndex * 152400, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1521 + itemIndex * 6, name: `Investment ROI Scenario Border ${itemIndex + 1}`, geom: "roundRect", x, y: 1219200 + itemIndex * 76200, cx: 914400, cy: 2133600 - itemIndex * 152400, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1522 + itemIndex * 6, name: `Investment ROI Scenario Accent ${itemIndex + 1}`, x, y: 1219200 + itemIndex * 76200, cx: 914400, cy: 60960, fill: color })
+      + textShapeXml({ id: 1523 + itemIndex * 6, name: `Investment ROI Scenario Label ${itemIndex + 1}`, x: x + 106680, y: 1600200, cx: 701040, cy: 182880, text: label || `情景 ${itemIndex + 1}`, size: 680, bold: true, color: visual.title })
+      + textShapeXml({ id: 1524 + itemIndex * 6, name: `Investment ROI Scenario Value ${itemIndex + 1}`, x: x + 106680, y: 1981200, cx: 701040, cy: 243840, text: value || "", size: 1180, bold: true, color })
+      + rectShapeXml({ id: 1525 + itemIndex * 6, name: `Investment ROI Scenario Line ${itemIndex + 1}`, x: x + 152400, y: 2499360, cx: 609600, cy: 45720, fill: blendHexColor(color, visual.surface, 0.32) });
+  }).join("");
+}
+
+function investmentRoiDecisionXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 914400 + itemIndex * 2316480;
+    const color = [visual.accent, visual.secondary || visual.accent, visual.primary][itemIndex] || visual.accent;
+    return solidShapeXml({ id: 1550 + itemIndex * 4, name: `Investment ROI Decision Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2796540, cx: 1859280, cy: 975360, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1551 + itemIndex * 4, name: `Investment ROI Decision Card Border ${itemIndex + 1}`, geom: "roundRect", x, y: 2796540, cx: 1859280, cy: 975360, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1552 + itemIndex * 4, name: `Investment ROI Decision Accent ${itemIndex + 1}`, x: x + 182880, y: 3116580, cx: 365760, cy: 30480, fill: color })
+      + textShapeXml({ id: 1553 + itemIndex * 4, name: `Investment ROI Decision Text ${itemIndex + 1}`, x: x + 182880, y: 3246120, cx: 1371600, cy: 274320, text: budgetPlanningCompactText(item, "", 16), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function investmentRoiModelSceneFromSlide({ slide, index, role, total }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const resolvedRole = investmentRoiExportRoleFromSlide({ slide, index, role, total });
+  const metrics = [0, 1, 2].map((itemIndex) => investmentRoiMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "INVESTMENT RETURN" : resolvedRole === "curve" ? "RETURN CURVE" : resolvedRole === "payback" ? "PAYBACK PATH" : resolvedRole === "scenario" ? "SCENARIO BOARD" : resolvedRole === "decision" ? "INVESTMENT DECISION" : "FINANCIAL MODEL",
+    title: budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24),
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    modelNodes: [
+      budgetPlanningCompactText(bullets[0], "投入成本", 8),
+      budgetPlanningCompactText(bullets[1], "收益预测", 8),
+      budgetPlanningCompactText(bullets[2], "净收益", 8),
+      budgetPlanningCompactText(bullets[3], "风险假设", 8),
+    ],
+    paybackSteps: ["投入", "上线", "收益爬坡", "回收点", "扩张"].map((fallback, itemIndex) => budgetPlanningCompactText(bullets[itemIndex], fallback, 8)),
+    scenarios: [
+      investmentRoiScenarioText(bullets[0], "保守情景", metrics[0].value),
+      investmentRoiScenarioText(bullets[1], "基准情景", metrics[1].value),
+      investmentRoiScenarioText(bullets[2], "乐观情景", metrics[2].value),
+    ],
+    decisionItems: [
+      budgetPlanningCompactText(bullets[0], "投资建议与决策结论", 18),
+      budgetPlanningCompactText(bullets[1], "关键前提和约束条件", 18),
+      budgetPlanningCompactText(bullets[2], "下一步验证动作", 18),
+    ],
+  };
+}
+
+function investmentRoiExportRoleFromSlide({ slide, index, role, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  const title = String(slide?.title || "").toLowerCase();
+  if (index === 0 || layout.includes("cover")) return "cover";
+  // 导出阶段优先尊重总页数和页型，再结合标题关键词兜底识别 ROI 的业务页面类型。
+  if (index === total - 1 || role === "closing" || layout.includes("decision") || layout.includes("closing") || /决策|建议|结论|decision|recommendation|conclusion/.test(title)) return "decision";
+  if (layout.includes("curve") || layout.includes("return") || /收益曲线|回报曲线|收益趋势|return|curve|trend/.test(title)) return "curve";
+  if (layout.includes("payback") || layout.includes("timeline") || layout.includes("period") || /回收|周期|时间线|payback|timeline|period/.test(title)) return "payback";
+  if (layout.includes("scenario") || layout.includes("sensitivity") || /情景|测算|敏感|scenario|sensitivity/.test(title)) return "scenario";
+  if (layout.includes("formula") || layout.includes("model") || layout.includes("overview") || /模型|概览|投入产出|roi|overview|formula|model/.test(title)) return "model";
+  return ["model", "curve", "payback", "scenario"][(index - 1) % 4];
+}
+
+function investmentRoiMetricFromText(text, index) {
+  const fallbackValues = ["18%", "14月", "￥2.8M"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["预计回报", "回收周期", "净收益"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m|月|年|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function investmentRoiScenarioText(text, fallback, value) {
+  const label = budgetPlanningCompactText(text, fallback, 9);
+  return `${label}\n${value}`;
+}
+
+function investmentRoiModelColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.26),
+    greenWash: blendHexColor(visual.accent, visual.background, 0.84),
+    goldWash: blendHexColor(visual.secondary || visual.accent, visual.background, 0.82),
+    panel: blendHexColor(visual.background, visual.surface, 0.62),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    grid: blendHexColor(visual.primary, visual.background, 0.92),
+  };
+}
+
+function isInvestmentRoiModelVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-investment-roi-model" && (id === "investment-return-analysis" || id === "finance-investment-return-analysis-roi-model");
 }
 
 function profitBridgeDecorationsXml({ visual, index, role, slide }) {
@@ -8935,6 +9424,212 @@ function isSeedRoundStoryVisual(visual) {
   return visual?.layout === "seed-round-story" && (id === "seed-round-pitch" || id === "pitch-seed-round-pitch-startup-story");
 }
 
+function businessModelValueChainDecorationsXml({ visual, index, role, slide }) {
+  const scene = businessModelValueChainExportScene({ slide, index, role });
+  const palette = businessModelValueChainPalette(visual);
+  const common = businessModelValueChainCanvasXml({ visual, palette })
+    + businessModelValueChainHeaderXml({ visual, palette, scene })
+    + businessModelValueChainBulletXml({ visual, scene });
+  if (scene.role === "cover") {
+    return common
+      + businessModelValueChainNetworkXml({ visual, palette })
+      + businessModelValueChainMetricsXml({ visual, metrics: scene.metrics });
+  }
+  if (scene.role === "flow") {
+    return common
+      + businessModelValueChainFlowXml({ visual, palette, items: scene.flow, bullets: scene.bullets })
+      + businessModelValueChainCardsXml({ visual, palette, cards: scene.cards, bullets: scene.bullets, y: 3657600 });
+  }
+  if (scene.role === "profit") {
+    return common
+      + businessModelValueChainProfitXml({ visual, palette })
+      + businessModelValueChainCardsXml({ visual, palette, cards: scene.cards, bullets: scene.bullets, y: 3657600 });
+  }
+  if (scene.role === "ecosystem") {
+    return common
+      + businessModelValueChainEcosystemXml({ visual, palette, nodes: scene.nodes })
+      + businessModelValueChainCardsXml({ visual, palette, cards: scene.cards, bullets: scene.bullets, y: 3657600 });
+  }
+  if (scene.role === "risk") {
+    return common + businessModelValueChainMatrixXml({ visual, palette, cards: scene.cards, bullets: scene.bullets });
+  }
+  return common + businessModelValueChainRoadmapXml({ visual, palette, steps: scene.steps, bullets: scene.bullets });
+}
+
+function businessModelValueChainCanvasXml({ visual, palette }) {
+  return solidShapeXml({ id: 7200, name: "Business Model System Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 7201, name: "Business Model System Paper", geom: "roundRect", x: 438150, y: 380238, cx: 8267700, cy: 4389120, fill: visual.surface })
+    + lineFrameShapeXml({ id: 7202, name: "Business Model System Paper Frame", geom: "roundRect", x: 438150, y: 380238, cx: 8267700, cy: 4389120, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 7203, name: "Business Model System Top Rule", x: 438150, y: 380238, cx: 8267700, cy: 60960, fill: visual.primary })
+    + rectShapeXml({ id: 7204, name: "Business Model System Flow Rule", x: 3657600, y: 380238, cx: 2438400, cy: 60960, fill: visual.accent })
+    + rectShapeXml({ id: 7205, name: "Business Model System Profit Rule", x: 6096000, y: 380238, cx: 1981200, cy: 60960, fill: visual.secondary || "D6A756" })
+    + solidShapeXml({ id: 7206, name: "Business Model System Orbit", geom: "ellipse", x: 7315200, y: 792480, cx: 929640, cy: 929640, fill: palette.orbit })
+    + lineFrameShapeXml({ id: 7207, name: "Business Model System Soft Grid", x: 731520, y: 914400, cx: 7711440, cy: 3429000, stroke: palette.grid, width: 7620 });
+}
+
+function businessModelValueChainHeaderXml({ visual, palette, scene }) {
+  return textShapeXml({ id: 7210, name: "Business Model System Kicker", x: 685800, y: 685800, cx: 2743200, cy: 152400, text: scene.kicker, size: 700, bold: true, color: visual.accent })
+    + textShapeXml({ id: 7211, name: "Business Model System Title", x: 685800, y: 914400, cx: 3931920, cy: 777240, text: scene.title, size: 1850, bold: true, color: visual.title })
+    + rectShapeXml({ id: 7212, name: "Business Model System Title Underline", x: 685800, y: 1767840, cx: 1066800, cy: 38100, fill: visual.secondary || "D6A756" })
+    + textShapeXml({ id: 7213, name: "Business Model System Summary", x: 685800, y: 1912620, cx: 3505200, cy: 365760, text: scene.summary, size: 760, bold: true, color: visual.body });
+}
+
+function businessModelValueChainBulletXml({ visual, scene }) {
+  return scene.bullets.slice(0, 3).map((item, itemIndex) => {
+    const y = 2392680 + itemIndex * 289560;
+    return solidShapeXml({ id: 7220 + itemIndex * 2, name: `Business Model System Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 701040, y: y + 53340, cx: 68580, cy: 68580, fill: itemIndex === 1 ? (visual.secondary || "D6A756") : visual.accent })
+      + textShapeXml({ id: 7221 + itemIndex * 2, name: `Business Model System Bullet ${itemIndex + 1}`, x: 822960, y, cx: 3352800, cy: 182880, text: businessModelValueChainCompactText(item, "", 34), size: 760, bold: true, color: visual.body });
+  }).join("");
+}
+
+function businessModelValueChainNetworkXml({ visual, palette }) {
+  const nodes = [
+    { x: 5730240, y: 1097280, fill: visual.accent },
+    { x: 7543800, y: 1097280, fill: visual.secondary || "D6A756" },
+    { x: 5730240, y: 2926080, fill: visual.secondary || "D6A756" },
+    { x: 7543800, y: 2926080, fill: visual.accent },
+  ];
+  return solidShapeXml({ id: 7240, name: "Business Model System Network Panel", geom: "roundRect", x: 5105400, y: 975360, cx: 3352800, cy: 2476500, fill: palette.panel })
+    + lineFrameShapeXml({ id: 7241, name: "Business Model System Network Frame", geom: "roundRect", x: 5105400, y: 975360, cx: 3352800, cy: 2476500, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 7242, name: "Business Model System Network Connector", x: 5867400, y: 2133600, cx: 1981200, cy: 38100, fill: visual.accent })
+    + solidShapeXml({ id: 7243, name: "Business Model System Platform Node", geom: "ellipse", x: 6576060, y: 1798320, cx: 670560, cy: 670560, fill: visual.primary })
+    + nodes.map((node, nodeIndex) => solidShapeXml({ id: 7244 + nodeIndex, name: `Business Model System Network Node ${nodeIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 685800, cy: 304800, fill: node.fill })).join("");
+}
+
+function businessModelValueChainMetricsXml({ visual, metrics }) {
+  return metrics.map((metric, metricIndex) => {
+    const x = 731520 + metricIndex * 2590800;
+    return solidShapeXml({ id: 7255 + metricIndex * 3, name: `Business Model System Metric ${metricIndex + 1}`, geom: "roundRect", x, y: 3855720, cx: 2286000, cy: 609600, fill: "FFFFFF" })
+      + textShapeXml({ id: 7256 + metricIndex * 3, name: `Business Model System Metric Value ${metricIndex + 1}`, x: x + 182880, y: 3954780, cx: 914400, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 7257 + metricIndex * 3, name: `Business Model System Metric Label ${metricIndex + 1}`, x: x + 182880, y: 4160520, cx: 1676400, cy: 137160, text: metric.label, size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function businessModelValueChainFlowXml({ visual, palette, items, bullets }) {
+  return items.map((item, itemIndex) => {
+    const x = 716280 + itemIndex * 1363980;
+    const label = businessModelValueChainCompactText(bullets[itemIndex] || item, item, 12);
+    const connector = itemIndex < items.length - 1 ? rectShapeXml({ id: 7290 + itemIndex * 4, name: `Business Model System Connector ${itemIndex + 1}`, x: x + 1043940, y: 2148840, cx: 243840, cy: 38100, fill: visual.accent }) : "";
+    return solidShapeXml({ id: 7270 + itemIndex * 4, name: `Business Model System Flow Node ${itemIndex + 1}`, geom: "roundRect", x, y: 1859280, cx: 1066800, cy: 609600, fill: itemIndex === 3 ? palette.goldSoft : "FFFFFF" })
+      + connector
+      + textShapeXml({ id: 7271 + itemIndex * 4, name: `Business Model System Flow Text ${itemIndex + 1}`, x: x + 91440, y: 2042160, cx: 883920, cy: 152400, text: label, size: 670, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelValueChainProfitXml({ visual, palette }) {
+  const bars = [
+    { x: 5814060, y: 2651760, h: 548640, fill: visual.accent },
+    { x: 6477000, y: 2301240, h: 899160, fill: visual.secondary || "D6A756" },
+    { x: 7139940, y: 1912620, h: 1287780, fill: visual.primary },
+  ];
+  return solidShapeXml({ id: 7310, name: "Business Model System Profit Panel", geom: "roundRect", x: 5273040, y: 1264920, cx: 2857500, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 7311, name: "Business Model System Profit Frame", geom: "roundRect", x: 5273040, y: 1264920, cx: 2857500, cy: 2133600, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 7312, name: "Business Model System Profit Baseline", x: 5669280, y: 3200400, cx: 1981200, cy: 30480, fill: palette.frame })
+    + bars.map((bar, barIndex) => solidShapeXml({ id: 7313 + barIndex, name: `Business Model System Profit Bar ${barIndex + 1}`, geom: "roundRect", x: bar.x, y: bar.y, cx: 365760, cy: bar.h, fill: bar.fill })).join("")
+    + rectShapeXml({ id: 7316, name: "Business Model System Profit Trend", x: 5814060, y: 1988820, cx: 1828800, cy: 45720, fill: visual.warning || "F97316" });
+}
+
+function businessModelValueChainCardsXml({ visual, palette, cards, bullets, y }) {
+  return cards.map((card, cardIndex) => {
+    const x = 914400 + cardIndex * 2438400;
+    const text = businessModelValueChainCompactText(bullets[cardIndex] || card, card, 22);
+    return solidShapeXml({ id: 7330 + cardIndex * 3, name: `Business Model System Card ${cardIndex + 1}`, geom: "roundRect", x, y, cx: 2133600, cy: 609600, fill: "FFFFFF" })
+      + rectShapeXml({ id: 7331 + cardIndex * 3, name: `Business Model System Card Rule ${cardIndex + 1}`, x: x + 152400, y: y + 137160, cx: 533400, cy: 38100, fill: cardIndex === 1 ? (visual.secondary || "D6A756") : visual.accent })
+      + textShapeXml({ id: 7332 + cardIndex * 3, name: `Business Model System Card Text ${cardIndex + 1}`, x: x + 152400, y: y + 259080, cx: 1828800, cy: 182880, text, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelValueChainEcosystemXml({ visual, palette, nodes }) {
+  const positions = [
+    { x: 6629400, y: 914400 },
+    { x: 7726680, y: 1973580 },
+    { x: 6629400, y: 3048000 },
+    { x: 5532120, y: 1973580 },
+  ];
+  return solidShapeXml({ id: 7360, name: "Business Model System Ecosystem Orbit", geom: "ellipse", x: 5410200, y: 1097280, cx: 3048000, cy: 2438400, fill: palette.orbit })
+    + solidShapeXml({ id: 7361, name: "Business Model System Ecosystem Platform", geom: "ellipse", x: 6705600, y: 1981200, cx: 761999, cy: 761999, fill: visual.primary })
+    + textShapeXml({ id: 7362, name: "Business Model System Ecosystem Center", x: 6827520, y: 2232660, cx: 518160, cy: 152400, text: "平台", size: 720, bold: true, color: "FFFFFF" })
+    + nodes.slice(0, 4).map((node, nodeIndex) => {
+      const pos = positions[nodeIndex];
+      return solidShapeXml({ id: 7365 + nodeIndex * 2, name: `Business Model System Ecosystem Node ${nodeIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 777240, cy: 335280, fill: "FFFFFF" })
+        + textShapeXml({ id: 7366 + nodeIndex * 2, name: `Business Model System Ecosystem Text ${nodeIndex + 1}`, x: pos.x + 91440, y: pos.y + 91440, cx: 594360, cy: 137160, text: node, size: 680, bold: true, color: visual.title });
+    }).join("");
+}
+
+function businessModelValueChainMatrixXml({ visual, palette, cards, bullets }) {
+  return cards.slice(0, 4).map((card, cardIndex) => {
+    const col = cardIndex % 2;
+    const row = Math.floor(cardIndex / 2);
+    const x = 5303520 + col * 1447800;
+    const y = 1371600 + row * 899160;
+    return solidShapeXml({ id: 7390 + cardIndex * 3, name: `Business Model System Assumption ${cardIndex + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 716280, fill: cardIndex % 2 === 0 ? "FFFFFF" : palette.soft })
+      + rectShapeXml({ id: 7391 + cardIndex * 3, name: `Business Model System Assumption Rule ${cardIndex + 1}`, x: x + 137160, y: y + 137160, cx: 457200, cy: 38100, fill: cardIndex === 1 ? (visual.secondary || "D6A756") : visual.accent })
+      + textShapeXml({ id: 7392 + cardIndex * 3, name: `Business Model System Assumption Text ${cardIndex + 1}`, x: x + 137160, y: y + 274320, cx: 990600, cy: 228600, text: businessModelValueChainCompactText(bullets[cardIndex] || card, card, 22), size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function businessModelValueChainRoadmapXml({ visual, palette, steps, bullets }) {
+  const line = rectShapeXml({ id: 7420, name: "Business Model System Roadmap Line", x: 914400, y: 3467100, cx: 7162800, cy: 53340, fill: visual.accent });
+  const stepXml = steps.map((step, stepIndex) => {
+    const x = 914400 + stepIndex * 1493520;
+    return solidShapeXml({ id: 7421 + stepIndex * 3, name: `Business Model System Roadmap Step ${stepIndex + 1}`, geom: "roundRect", x, y: 3749040, cx: 1219200, cy: 609600, fill: stepIndex === 2 ? palette.goldSoft : "FFFFFF" })
+      + solidShapeXml({ id: 7422 + stepIndex * 3, name: `Business Model System Roadmap Dot ${stepIndex + 1}`, geom: "ellipse", x: x + 426720, y: 3368040, cx: 228600, cy: 228600, fill: stepIndex === 4 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 7423 + stepIndex * 3, name: `Business Model System Roadmap Text ${stepIndex + 1}`, x: x + 121920, y: 3924300, cx: 975360, cy: 182880, text: businessModelValueChainCompactText(bullets[stepIndex] || step, step, 16), size: 660, bold: true, color: visual.title });
+  }).join("");
+  return line + stepXml;
+}
+
+function businessModelValueChainExportScene({ slide, index, role }) {
+  const bullets = businessModelValueChainBulletTexts(slide);
+  const title = businessModelValueChainCompactText(slide?.title, "商业模式设计", index === 0 ? 28 : 25);
+  const summary = businessModelValueChainCompactText(bullets[0], "围绕关键活动、资源能力、收入结构和生态协同建立商业闭环。", 34);
+  const lowerRole = String(slide?.layout || role || "").toLowerCase();
+  const base = { title, summary, bullets };
+  if (index === 0 || lowerRole.includes("cover")) {
+    return { ...base, role: "cover", kicker: "OPERATING MODEL", metrics: [{ value: "活动", label: "关键业务动作" }, { value: "资源", label: "核心能力资产" }, { value: "利润", label: "可持续收益池" }] };
+  }
+  if (lowerRole.includes("profit") || title.includes("盈利") || title.includes("利润") || index % 5 === 2) {
+    return { ...base, role: "profit", kicker: "PROFIT LOGIC", cards: ["收入来源", "成本结构", "毛利空间"] };
+  }
+  if (lowerRole.includes("ecosystem") || title.includes("生态") || title.includes("平台") || index % 5 === 3) {
+    return { ...base, role: "ecosystem", kicker: "PLATFORM NETWORK", nodes: ["用户", "伙伴", "数据", "渠道"], cards: ["平台机制", "参与角色", "协同收益"] };
+  }
+  if (lowerRole.includes("risk") || title.includes("风险") || title.includes("机会") || index % 5 === 4) {
+    return { ...base, role: "risk", kicker: "ASSUMPTION BOARD", cards: ["关键假设", "能力缺口", "增长机会", "优先动作"] };
+  }
+  if (lowerRole.includes("roadmap") || title.includes("路线") || title.includes("行动")) {
+    return { ...base, role: "roadmap", kicker: "NEXT DECISIONS", steps: ["验证假设", "重构链路", "设计机制", "协同伙伴", "复盘放大"] };
+  }
+  return { ...base, role: "flow", kicker: "BUSINESS SYSTEM", flow: ["供给端", "关键活动", "能力沉淀", "产品服务", "渠道触点", "客户价值"], cards: ["业务链路", "资源能力", "收益抓手"] };
+}
+
+function businessModelValueChainBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => exportTextValue(item).trim()).filter(Boolean) : [];
+  return values.length ? values : ["关键活动与资源能力需要形成闭环", "收入结构和成本结构决定利润空间", "生态伙伴和平台机制影响长期扩张"];
+}
+
+function businessModelValueChainCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function businessModelValueChainPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.background, 0.78),
+    grid: blendHexColor(visual.accent, visual.background, 0.86),
+    soft: blendHexColor(visual.accent, visual.surface, 0.82),
+    goldSoft: blendHexColor(visual.secondary || "D6A756", visual.surface, 0.76),
+    orbit: blendHexColor(visual.accent, visual.background, 0.78),
+    panel: blendHexColor(visual.surface, visual.background, 0.18),
+  };
+}
+
+function isBusinessModelValueChainVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "business-model-value-chain" && (id === "business-model-design" || id === "strategy-business-model-design-value-chain");
+}
+
 function businessModelBpDecorationsXml({ visual, index, layout }) {
   const scene = businessModelBpScene(index);
   const palette = businessModelBpColorPalette(visual);
@@ -12802,6 +13497,179 @@ function competitionMapColorPalette(visual) {
     frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
     axis: blendHexColor(visual.primary, visual.background, 0.34),
     grid: blendHexColor(visual.primary, visual.background, 0.62),
+    mapFill: blendHexColor(visual.background, visual.surface, 0.46),
+  };
+}
+
+function strategyRegionEntryDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = strategyRegionEntryScene({ slide, index, role });
+  const palette = strategyRegionEntryPalette(visual);
+  const isClosing = role === "closing";
+  const surface = solidShapeXml({ id: 1570, name: "Region Entry Consulting Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1571, name: "Region Entry Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1572, name: "Region Entry Top Accent", ...layout.accent, fill: visual.primary })
+    + rectShapeXml({ id: 1573, name: "Region Entry Route Rule", ...layout.secondaryAccent, fill: visual.accent })
+    + textShapeXml({ id: 1574, name: "Region Entry Section Label", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  // 区域进入模板用专属内容层承载标题与要点，避免导出端出现通用文字层叠加。
+  const content = strategyRegionEntryContentXml({ visual, scene, layout, palette, isClosing });
+  if (isClosing) {
+    return surface + content + strategyRegionEntryClosingXml({ visual, palette }) + strategyRegionEntryPathXml({ visual, palette, items: scene.steps, y: 3543300 });
+  }
+  if (scene.kind === "sequence") {
+    return surface + content + strategyRegionEntryMapXml({ visual, palette, compact: true }) + strategyRegionEntryPathXml({ visual, palette, items: scene.cards, y: 3543300 });
+  }
+  if (scene.kind === "segments") {
+    return surface + content + strategyRegionEntrySegmentXml({ visual, palette, items: scene.cards }) + strategyRegionEntryMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.kind === "channel") {
+    return surface + content + strategyRegionEntryChannelXml({ visual, palette, items: scene.cards }) + strategyRegionEntryMetricCardsXml({ visual, palette, metrics: scene.metrics });
+  }
+  if (scene.kind === "risk") {
+    return surface + content + strategyRegionEntryRiskXml({ visual, palette, items: scene.cards }) + strategyRegionEntryPathXml({ visual, palette, items: scene.steps, y: 3657600 });
+  }
+  return surface + content + strategyRegionEntryMapXml({ visual, palette, compact: false }) + strategyRegionEntryMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function strategyRegionEntryContentXml({ visual, scene, layout, palette, isClosing }) {
+  const title = textShapeXml({ id: 1580, name: "Region Entry Dynamic Title", ...layout.title, text: strategyRegionEntryCompactText(scene.title, "", 30), size: layout.titleSize, bold: true, color: visual.title });
+  const summary = textShapeXml({ id: 1581, name: "Region Entry Strategy Summary", x: layout.content.x, y: layout.content.y - 121920, cx: layout.content.cx, cy: 243840, text: strategyRegionEntryCompactText(scene.summary, "", 34), size: 740, bold: true, color: visual.body });
+  const bullets = scene.bullets.slice(0, 3).map((item, itemIndex) => {
+    const y = (isClosing ? layout.content.y + 274320 : layout.content.y + 198120) + itemIndex * 274320;
+    return solidShapeXml({ id: 1582 + itemIndex * 4, name: `Region Entry Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: layout.content.x + 15240, y: y + 68580, cx: 53340, cy: 53340, fill: itemIndex % 2 === 0 ? visual.accent : visual.secondary })
+      + textShapeXml({ id: 1583 + itemIndex * 4, name: `Region Entry Bullet Text ${itemIndex + 1}`, x: layout.content.x + 91440, y, cx: layout.content.cx - 121920, cy: 182880, text: strategyRegionEntryCompactText(item, "", 32), size: 650, bold: false, color: visual.body });
+  }).join("");
+  return solidShapeXml({ id: 1579, name: "Region Entry Content Callout", geom: "roundRect", x: layout.content.x - 60960, y: layout.content.y - 243840, cx: layout.content.cx + 182880, cy: 1280160, fill: palette.callout }) + title + summary + bullets;
+}
+
+function strategyRegionEntryMapXml({ visual, palette, compact }) {
+  const x = compact ? 5638800 : 5334000;
+  const y = compact ? 1066800 : 914400;
+  const w = compact ? 2590800 : 3048000;
+  const h = compact ? 1828800 : 2362200;
+  const panel = solidShapeXml({ id: 1600, name: "Region Entry Map Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: palette.mapFill })
+    + lineFrameShapeXml({ id: 1601, name: "Region Entry Map Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 15240 });
+  const land = solidShapeXml({ id: 1602, name: "Region Entry Market Shape", geom: "arc", x: x + Math.round(w * 0.12), y: y + Math.round(h * 0.15), cx: Math.round(w * 0.72), cy: Math.round(h * 0.60), fill: visual.surface })
+    + lineFrameShapeXml({ id: 1603, name: "Region Entry Market Border", geom: "arc", x: x + Math.round(w * 0.12), y: y + Math.round(h * 0.15), cx: Math.round(w * 0.72), cy: Math.round(h * 0.60), stroke: palette.frame, width: 15240 });
+  const route = rectShapeXml({ id: 1604, name: "Region Entry Route Base", x: x + Math.round(w * 0.18), y: y + Math.round(h * 0.60), cx: Math.round(w * 0.62), cy: 45720, fill: visual.accent })
+    + solidShapeXml({ id: 1605, name: "Region Entry Route Arrow", geom: "triangle", x: x + Math.round(w * 0.75), y: y + Math.round(h * 0.54), cx: 274320, cy: 243840, fill: visual.accent });
+  const nodes = [
+    [0.20, 0.58, visual.accent],
+    [0.42, 0.44, visual.secondary],
+    [0.64, 0.35, visual.accent],
+    [0.78, 0.48, visual.warning],
+  ].map(([px, py, fill], itemIndex) => solidShapeXml({ id: 1610 + itemIndex, name: `Region Entry City Node ${itemIndex + 1}`, geom: "ellipse", x: x + Math.round(w * px), y: y + Math.round(h * py), cx: 137160, cy: 137160, fill })).join("");
+  return panel + land + route + nodes;
+}
+
+function strategyRegionEntryMetricCardsXml({ visual, palette, metrics }) {
+  const x = 731520;
+  const y = 3825240;
+  const width = 1280160;
+  return metrics.slice(0, 3).map((metric, index) => {
+    const offsetX = x + index * 1432560;
+    return solidShapeXml({ id: 1620 + index * 4, name: `Region Entry Metric Card ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: width, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 1621 + index * 4, name: `Region Entry Metric Accent ${index + 1}`, x: offsetX, y, cx: 76200, cy: 518160, fill: index === 1 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 1622 + index * 4, name: `Region Entry Metric Value ${index + 1}`, x: offsetX + 152400, y: y + 121920, cx: width - 304800, cy: 152400, text: metric.value, size: 880, bold: true, color: visual.title })
+      + textShapeXml({ id: 1623 + index * 4, name: `Region Entry Metric Label ${index + 1}`, x: offsetX + 152400, y: y + 304800, cx: width - 304800, cy: 152400, text: metric.label, size: 540, bold: true, color: visual.body });
+  }).join("");
+}
+
+function strategyRegionEntryPathXml({ visual, palette, items, y }) {
+  const x = 731520;
+  return rectShapeXml({ id: 1640, name: "Region Entry Sequence Line", x: x + 228600, y: y - 228600, cx: 7437120, cy: 30480, fill: visual.accent })
+    + items.slice(0, 4).map((item, index) => {
+      const offsetX = x + index * 1981200;
+      return solidShapeXml({ id: 1641 + index * 4, name: `Region Entry Path Step ${index + 1}`, geom: "roundRect", x: offsetX, y, cx: 1676400, cy: 640080, fill: palette.card })
+        + solidShapeXml({ id: 1642 + index * 4, name: `Region Entry Path Dot ${index + 1}`, geom: "ellipse", x: offsetX + 152400, y: y + 137160, cx: 167640, cy: 167640, fill: index === 1 ? visual.secondary : visual.primary })
+        + textShapeXml({ id: 1643 + index * 4, name: `Region Entry Path Number ${index + 1}`, x: offsetX + 205740, y: y + 177800, cx: 76200, cy: 76200, text: String(index + 1), size: 420, bold: true, color: "FFFFFF" })
+        + textShapeXml({ id: 1644 + index * 4, name: `Region Entry Path Text ${index + 1}`, x: offsetX + 396240, y: y + 198120, cx: 1066800, cy: 182880, text: strategyRegionEntryCompactText(item, "", 12), size: 680, bold: true, color: visual.title });
+    }).join("");
+}
+
+function strategyRegionEntrySegmentXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1127760;
+  return items.slice(0, 3).map((item, index) => {
+    const offsetY = y + index * 701040;
+    return solidShapeXml({ id: 1670 + index * 4, name: `Region Entry Customer Segment ${index + 1}`, geom: "roundRect", x, y: offsetY, cx: 2743200, cy: 548640, fill: palette.card })
+      + solidShapeXml({ id: 1671 + index * 4, name: `Region Entry Segment Icon ${index + 1}`, geom: "roundRect", x: x + 152400, y: offsetY + 137160, cx: 274320, cy: 274320, fill: index === 1 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 1672 + index * 4, name: `Region Entry Segment Text ${index + 1}`, x: x + 548640, y: offsetY + 182880, cx: 1981200, cy: 182880, text: strategyRegionEntryCompactText(item, "", 14), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyRegionEntryChannelXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1066800;
+  const width = 1219200;
+  const height = 792480;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetX = x + (index % 2) * 1371600;
+    const offsetY = y + Math.floor(index / 2) * 914400;
+    return solidShapeXml({ id: 1690 + index * 5, name: `Region Entry Channel Card ${index + 1}`, geom: "roundRect", x: offsetX, y: offsetY, cx: width, cy: height, fill: palette.card })
+      + solidShapeXml({ id: 1691 + index * 5, name: `Region Entry Channel Icon ${index + 1}`, geom: "roundRect", x: offsetX + 396240, y: offsetY + 137160, cx: 396240, cy: 274320, fill: index % 2 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 1692 + index * 5, name: `Region Entry Channel Text ${index + 1}`, x: offsetX + 152400, y: offsetY + 487680, cx: width - 304800, cy: 152400, text: strategyRegionEntryCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyRegionEntryRiskXml({ visual, palette, items }) {
+  const x = 5486400;
+  const y = 1066800;
+  return items.slice(0, 4).map((item, index) => {
+    const offsetY = y + index * 487680;
+    return solidShapeXml({ id: 1710 + index * 4, name: `Region Entry Risk Card ${index + 1}`, geom: "roundRect", x, y: offsetY, cx: 2743200, cy: 365760, fill: palette.card })
+      + rectShapeXml({ id: 1711 + index * 4, name: `Region Entry Risk Accent ${index + 1}`, x, y: offsetY, cx: 76200, cy: 365760, fill: index === 0 ? visual.warning : visual.accent })
+      + textShapeXml({ id: 1712 + index * 4, name: `Region Entry Risk Text ${index + 1}`, x: x + 152400, y: offsetY + 106680, cx: 2438400, cy: 152400, text: strategyRegionEntryCompactText(item, "", 18), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyRegionEntryClosingXml({ visual, palette }) {
+  return solidShapeXml({ id: 1730, name: "Region Entry Closing Panel", geom: "roundRect", x: 5486400, y: 1219200, cx: 2743200, cy: 1828800, fill: visual.primary })
+    + rectShapeXml({ id: 1731, name: "Region Entry Closing Route", x: 5791200, y: 1905000, cx: 2133600, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 1732, name: "Region Entry Closing Node A", geom: "ellipse", x: 5791200, y: 1836420, cx: 198120, cy: 198120, fill: visual.accent })
+    + solidShapeXml({ id: 1733, name: "Region Entry Closing Node B", geom: "ellipse", x: 7731600, y: 1836420, cx: 198120, cy: 198120, fill: visual.secondary })
+    + lineFrameShapeXml({ id: 1734, name: "Region Entry Closing Inner Frame", geom: "roundRect", x: 5943600, y: 2133600, cx: 1828800, cy: 609600, stroke: palette.card, width: 12700 });
+}
+
+function strategyRegionEntryScene({ slide, index, role }) {
+  const bullets = strategyRegionEntryBulletTexts(slide);
+  const title = strategyRegionEntryCompactText(slide?.title, "Market entry strategy", index === 0 ? 30 : 28);
+  const cards = ["Pilot market", "Priority region", "Channel partner", "Scale path"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12));
+  const steps = ["Pilot city", "Sample region", "Channel rollout", "Scale review"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12));
+  const metrics = [
+    { value: "TAM", label: "market size" },
+    { value: "3", label: "entry waves" },
+    { value: "90D", label: "pilot window" },
+  ];
+  if (role === "closing") {
+    return { kind: "closing", kicker: "NEXT ENTRY ACTIONS", title, summary: strategyRegionEntryCompactText(bullets[0], "Confirm pilot scope and launch first wave", 34), bullets, cards, steps: ["Confirm region", "Recruit channel", "Launch pilot", "Review metrics"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), metrics };
+  }
+  const scenes = [
+    { kind: "cover", kicker: "MARKET ENTRY MAP", title, summary: strategyRegionEntryCompactText(bullets[0], "Define where to enter first and why", 34), bullets, cards, steps, metrics },
+    { kind: "map", kicker: "REGION PRIORITY", title, summary: strategyRegionEntryCompactText(bullets[0], "Compare regional potential, access and risk", 34), bullets, cards, steps, metrics },
+    { kind: "sequence", kicker: "ENTRY SEQUENCE", title, summary: strategyRegionEntryCompactText(bullets[1], "Convert market judgment into phased rollout", 34), bullets, cards: steps, steps, metrics },
+    { kind: "segments", kicker: "CUSTOMER WEDGE", title, summary: strategyRegionEntryCompactText(bullets[2], "Start from the clearest demand group", 34), bullets, cards: ["Core customer", "Opportunity customer", "Nurture customer"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+    { kind: "channel", kicker: "CHANNEL LAYOUT", title, summary: strategyRegionEntryCompactText(bullets[3], "Balance coverage efficiency with partner leverage", 34), bullets, cards: ["Direct sales", "Distributor", "Key account", "Online channel"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+    { kind: "risk", kicker: "RISK & RESOURCE", title, summary: strategyRegionEntryCompactText(bullets[4], "Match resources and controls to each wave", 34), bullets, cards: ["Demand risk", "Channel risk", "Resource gap", "Local compliance"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function strategyRegionEntryBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  return values.length ? values : ["Target region has clear demand and channel access", "Pilot first and scale after conversion signals", "Core customers need local service proof", "Channel partners accelerate coverage"];
+}
+
+function strategyRegionEntryCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function strategyRegionEntryPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.12),
+    callout: blendHexColor(visual.surface, visual.background, 0.08),
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
     mapFill: blendHexColor(visual.background, visual.surface, 0.46),
   };
 }

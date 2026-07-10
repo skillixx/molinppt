@@ -279,6 +279,28 @@ test("PptService renders synced competition map preview with dedicated layout", 
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders market entry strategy preview with dedicated region layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "华东区域市场进入策略",
+    slideCount: 6,
+    templateId: "market-entry-strategy",
+    theme: "region-entry",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="market-entry-strategy" data-layout="strategy-region-entry"/);
+  assert.match(preview, /region-entry-layer/);
+  assert.match(preview, /region-entry-map/);
+  assert.match(preview, /region-entry-path|region-entry-segments|region-entry-channels/);
+  assert.doesNotMatch(preview, />区域进入</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders enterprise digital blueprint preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -635,6 +657,28 @@ test("PptService renders synced profit bridge preview with dedicated layout", as
   assert.match(preview, /profit-waterfall|profit-margin|profit-factors|profit-actions/);
   assert.match(preview, /profit-surface/);
   assert.doesNotMatch(preview, />利润桥</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders synced investment ROI preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertInvestmentRoiTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "项目投资分析、投入产出测算和回收周期说明",
+    slideCount: 5,
+    templateId: "finance-investment-return-analysis-roi-model",
+    theme: "roi-model",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-investment-return-analysis-roi-model" data-layout="finance-investment-roi-model"/);
+  assert.match(preview, /roi-model|roi-curve|roi-payback|roi-scenarios/);
+  assert.match(preview, /roi-surface/);
+  assert.doesNotMatch(preview, />ROI 模型</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -5535,6 +5579,54 @@ async function insertProfitBridgeTemplate(context) {
       defaultCoverLayout: "finance-profit-bridge-cover",
       defaultContentLayout: "finance-profit-bridge-content",
       allowedLayouts: ["finance-profit-bridge-cover", "finance-profit-bridge-waterfall", "finance-profit-bridge-margin-structure", "finance-profit-bridge-factor-analysis", "finance-profit-bridge-improvement", "finance-profit-bridge-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertInvestmentRoiTemplate(context) {
+  // 测试数据库模拟官方模板同步后的投资回报分析模板，确保生成、预览和导出命中投入产出模型专用布局。
+  await context.database.insert("templates", {
+    id: "finance-investment-return-analysis-roi-model",
+    slug: "finance-investment-return-analysis-roi-model",
+    name: "投资回报分析 - ROI 模型",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "roi-model",
+        name: "ROI 模型",
+        visual: {
+          primary: "0F2742",
+          accent: "16A34A",
+          secondary: "F59E0B",
+          warning: "EF4444",
+          background: "F5F8FB",
+          surface: "FFFFFF",
+          title: "0B1726",
+          body: "334155",
+          layout: "finance-investment-roi-model",
+          variant: "roi-model",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F2742",
+      accent: "16A34A",
+      secondary: "F59E0B",
+      warning: "EF4444",
+      background: "F5F8FB",
+      surface: "FFFFFF",
+      title: "0B1726",
+      body: "334155",
+      layout: "finance-investment-roi-model",
+      variant: "roi-model",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-roi-model-cover",
+      defaultContentLayout: "finance-roi-model-content",
+      allowedLayouts: ["finance-roi-model-cover", "finance-roi-model-overview", "finance-roi-model-formula", "finance-roi-model-return-curve", "finance-roi-model-payback", "finance-roi-model-scenario", "finance-roi-model-decision", "title", "content"],
     },
   });
 }

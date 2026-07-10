@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="收益曲线装饰">
+  <defs>
+    <linearGradient id="curveFill" x1="0" x2="1" y1="1" y2="0">
+      <stop offset="0" stop-color="#16A34A" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="curveStroke" x1="0" x2="1">
+      <stop offset="0" stop-color="#16A34A"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="28" fill="#F5F8FB"/>
+  <path d="M72 286h500M72 286V62" fill="none" stroke="#0F2742" stroke-opacity=".18" stroke-width="6" stroke-linecap="round"/>
+  <path d="M88 278C156 250 190 232 232 210c56-30 96-70 144-74 58-5 90 49 132 30 34-15 49-61 68-96v208H88z" fill="url(#curveFill)"/>
+  <path d="M88 278C156 250 190 232 232 210c56-30 96-70 144-74 58-5 90 49 132 30 34-15 49-61 68-96" fill="none" stroke="url(#curveStroke)" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="376" cy="136" r="14" fill="#fff" stroke="#16A34A" stroke-width="8"/>
+  <circle cx="576" cy="70" r="14" fill="#fff" stroke="#F59E0B" stroke-width="8"/>
+  <path d="M376 136v150" stroke="#0F2742" stroke-opacity=".2" stroke-width="4" stroke-dasharray="9 9"/>
+</svg>

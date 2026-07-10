@@ -326,6 +326,50 @@ test("PptExportService uses competition map decorations", () => {
   assert.doesNotMatch(slide1, /competition-map/);
 });
 
+test("PptExportService uses market entry region decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "market-entry-strategy",
+      theme: "region-entry",
+      templateVisual: {
+        id: "strategy-market-entry-strategy-region-entry",
+        primary: "102A43",
+        accent: "14B8A6",
+        secondary: "F2B84B",
+        warning: "F97316",
+        background: "EEF6F8",
+        surface: "FFFFFF",
+        title: "0B1F33",
+        body: "334155",
+        layout: "strategy-region-entry",
+        variant: "region-entry",
+      },
+      slides: [
+        { title: "华东区域进入优先级判断", bullets: ["目标市场具备渠道基础", "核心客群需求清晰", "先试点再复制"] },
+        { title: "区域潜力与进入门槛", bullets: ["市场容量高", "渠道触达成本可控", "竞争密度中等"] },
+        { title: "进入节奏与试点路径", bullets: ["选择样板城市", "签约渠道伙伴", "复盘转化指标"] },
+        { title: "客群切入与服务证明", bullets: ["核心客户", "机会客户", "培育客户"] },
+        { title: "渠道布局与资源配置", bullets: ["直营", "经销商", "重点客户", "线上触达"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Region Entry Consulting Canvas"/);
+  assert.match(slide1, /name="Region Entry Map Panel"/);
+  assert.match(slide1, /name="Region Entry Metric Card 1"/);
+  assert.match(slide3, /name="Region Entry Path Step 1"/);
+  assert.match(slide5, /name="Region Entry Channel Card 1"/);
+  assert.doesNotMatch(slide1, />区域进入</);
+  assert.doesNotMatch(slide1, /region-entry/);
+});
+
 test("PptExportService uses second curve strategy decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -410,6 +454,57 @@ test("PptExportService uses enterprise digital blueprint decorations", () => {
   assert.match(slide5, /name="Enterprise Blueprint Roadmap Node 1"/);
   assert.match(slide6, /name="Enterprise Blueprint Governance Node 1"/);
   assert.doesNotMatch(slide1, /digital-blueprint/);
+});
+
+test("PptExportService uses business model system decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      title: "Business model redesign",
+      templateId: "strategy-business-model-design-value-chain",
+      theme: "value-chain",
+      templateVisual: {
+        id: "strategy-business-model-design-value-chain",
+        primary: "10233D",
+        accent: "18A999",
+        secondary: "D6A756",
+        warning: "F97316",
+        background: "EEF5F3",
+        surface: "FFFFFF",
+        title: "102033",
+        body: "334155",
+        layout: "business-model-value-chain",
+        variant: "value-chain",
+      },
+      slides: [
+        { title: "Operating model redesign", layout: "business-model-system-cover", bullets: ["Key activities connect resources and profit pools", "Partner roles need incentives", "Platform governance supports growth"] },
+        { title: "Business system map", layout: "business-model-value-flow", bullets: ["Supply side", "Key activities", "Capability assets", "Product service", "Channel touchpoint", "Customer outcome"] },
+        { title: "Profit model logic", layout: "profit-model-map", bullets: ["Recurring revenue source", "Cost structure control", "Gross margin space"] },
+        { title: "Ecosystem platform mechanism", layout: "ecosystem-platform-map", bullets: ["User role", "Partner network", "Data asset", "Channel collaboration"] },
+        { title: "Assumption and opportunity board", layout: "risk-opportunity-matrix", bullets: ["Core assumption", "Capability gap", "Growth opportunity", "Priority action"] },
+        { title: "Execution path", layout: "business-model-roadmap", bullets: ["Validate assumption", "Rebuild process", "Design mechanism", "Align partners", "Review and scale"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Business Model System Paper"/);
+  assert.match(slide1, /name="Business Model System Network Panel"/);
+  assert.match(slide1, /name="Business Model System Metric 1"/);
+  assert.match(slide2, /name="Business Model System Flow Node 1"/);
+  assert.match(slide3, /name="Business Model System Profit Panel"/);
+  assert.match(slide4, /name="Business Model System Ecosystem Node 1"/);
+  assert.match(slide5, /name="Business Model System Assumption 1"/);
+  assert.match(slide6, /name="Business Model System Roadmap Step 1"/);
+  assert.doesNotMatch(slide1, /name="Title 1"/);
+  assert.doesNotMatch(slide1, />value-chain</);
 });
 
 test("PptExportService aligns product pricing strategy PPTX scenes with online preview", () => {
@@ -816,6 +911,114 @@ test("PptExportService uses profit bridge decorations", () => {
   assert.match(slide1, /val="14213D"/);
   assert.match(slide1, /val="C99A2E"/);
   assert.doesNotMatch(slide1, /profit-bridge/);
+});
+
+test("PptExportService uses investment ROI model decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-investment-return-analysis-roi-model",
+      theme: "roi-model",
+      templateVisual: {
+        primary: "0F2742",
+        accent: "16A34A",
+        secondary: "F59E0B",
+        warning: "EF4444",
+        background: "F5F8FB",
+        surface: "FFFFFF",
+        title: "0B1726",
+        body: "334155",
+        layout: "finance-investment-roi-model",
+        variant: "roi-model",
+      },
+      slides: [
+        { title: "项目投资回报分析", bullets: ["预计 ROI 达到 18%", "回收周期约 14 个月", "累计净收益 280 万"] },
+        { title: "投入产出测算模型", bullets: ["初始投入 500 万", "年度收益预测 180 万", "运营成本控制在 60 万", "关键风险假设需验证"] },
+        { title: "收益曲线与盈亏平衡", bullets: ["第 8 个月进入收益爬坡", "第 14 个月达到回收点", "第二年收益进入稳定区间"] },
+        { title: "回收周期路径", bullets: ["投入", "上线", "收益爬坡", "回收点", "扩张"] },
+        { title: "情景测算对比", bullets: ["保守 8%", "基准 18%", "乐观 26%"] },
+        { title: "投资决策建议", bullets: ["建议分阶段投入", "锁定关键前提", "建立月度复盘机制"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Investment ROI Workspace"/);
+  assert.match(slide1, /name="Investment ROI Model Panel"/);
+  assert.match(slide1, /name="Investment ROI Model Node 1"/);
+  assert.match(slide1, /name="Investment ROI Kicker"/);
+  assert.match(slide1, /name="Investment ROI Dedicated Title"/);
+  assert.match(slide1, /name="Investment ROI Bullet Card 1"/);
+  assert.match(slide1, /name="Investment ROI Metric Value 1"/);
+  assert.match(slide2, /name="Investment ROI Background Wash"/);
+  assert.match(slide3, /name="Investment ROI Curve Panel"/);
+  assert.match(slide4, /name="Investment ROI Payback Step 1"/);
+  assert.match(slide5, /name="Investment ROI Scenario Card 1"/);
+  assert.match(slide6, /name="Investment ROI Decision Card 1"/);
+  assert.match(slide1, /val="0F2742"/);
+  assert.match(slide1, /val="16A34A"/);
+  assert.doesNotMatch(slide1, /roi-model/);
+});
+
+test("PptExportService uses internal control compliance risk inspection decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "finance-internal-control-compliance-report-risk-inspection",
+      theme: "risk-inspection",
+      templateVisual: {
+        id: "finance-internal-control-compliance-report-risk-inspection",
+        primary: "14213D",
+        accent: "F97316",
+        secondary: "16A34A",
+        warning: "DC2626",
+        background: "EEF3F7",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "finance-risk-inspection",
+        variant: "risk-inspection",
+      },
+      slides: [
+        { title: "Control review dashboard", bullets: ["32 audit items completed", "8 high risk findings", "100% remediation tracking"] },
+        { title: "Checklist evidence review", bullets: ["Approval authority review", "Payment voucher sampling", "Contract archive trace"] },
+        { title: "Key finding diagnosis", bullets: ["Control gap in approval chain", "Evidence missing for sampling", "Remediation owner confirmed"] },
+        { title: "Risk level matrix", bullets: ["Likelihood and impact mapping", "High risk items prioritized", "Residual risk tracked weekly"] },
+        { title: "Remediation closure path", bullets: ["Identify issue", "Assign owner", "Validate evidence", "Close and archive"] },
+        { title: "Compliance conclusion", bullets: ["Maintain monitoring rhythm", "Complete evidence archive", "Review closure quality"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Risk Inspection Audit Workspace"/);
+  assert.match(slide1, /name="Risk Inspection Shield"/);
+  assert.match(slide1, /name="Risk Inspection Metric Value 1"/);
+  assert.match(slide2, /name="Risk Inspection Checklist"/);
+  assert.match(slide3, /name="Risk Inspection Finding Card"/);
+  assert.match(slide4, /name="Risk Inspection Heatmap"/);
+  assert.match(slide4, /name="Risk Inspection Level Bar 1"/);
+  assert.match(slide5, /name="Risk Inspection Remediation Step 1"/);
+  assert.match(slide6, /name="Risk Inspection Closing Card 1"/);
+  assert.match(slide1, /val="14213D"/);
+  assert.match(slide1, /val="F97316"/);
+  assert.doesNotMatch(slide1, /risk-inspection/);
 });
 
 test("PptExportService uses financial industry solution decorations", () => {

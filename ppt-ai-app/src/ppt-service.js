@@ -1052,6 +1052,7 @@ function renderDeckPreview({ deck, visual }) {
     const investorUpdateScene = typeof isInvestorUpdateProgressVisual === "function" && isInvestorUpdateProgressVisual(visual) ? investorUpdateProgressPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const enterpriseBlueprintScene = isEnterpriseDigitalBlueprintVisual(visual) ? enterpriseDigitalBlueprintPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const businessModelValueChainScene = isBusinessModelValueChainVisual(visual) ? businessModelValueChainPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const socialVideoScene = isSocialVideoGrowthVisual(visual) ? socialVideoGrowthPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1077,14 +1078,19 @@ function renderDeckPreview({ deck, visual }) {
     const industryResearchScene = isIndustryResearchVisual(visual) ? industryResearchPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const industryTrendScene = isIndustryTrendForecastVisual(visual) ? industryTrendForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const competitionMapScene = isCompetitionMapVisual(visual) ? competitionMapPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const regionEntryScene = isStrategyRegionEntryVisual(visual) ? strategyRegionEntryPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const secondCurveScene = isSecondCurveStrategyVisual(visual) ? secondCurvePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const swotMapScene = isSwotMapVisual(visual) ? swotMapPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetPlanningScene = isBudgetPlanningVisual(visual) ? budgetPlanningPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetVarianceScene = isBudgetVarianceVisual(visual) ? budgetVariancePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetAdjustmentScene = isBudgetAdjustmentVisual(visual) ? budgetAdjustmentPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const riskInspectionScene = typeof isRiskInspectionVisual === "function" && typeof riskInspectionPreviewScene === "function" && isRiskInspectionVisual(visual)
+      ? riskInspectionPreviewScene({ slide, index, total: deck.slides.length })
+      : null;
     const costBreakdownScene = isCostBreakdownVisual(visual) ? costBreakdownPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const cashFlowScene = typeof isCashFlowForecastVisual === "function" && isCashFlowForecastVisual(visual) ? cashFlowForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const profitBridgeScene = typeof isProfitBridgeVisual === "function" && isProfitBridgeVisual(visual) ? profitBridgePreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const investmentRoiScene = isInvestmentRoiModelVisual(visual) ? investmentRoiModelPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const statusReportMark = statusReportScene
       ? (
           `${index === 0
@@ -1187,6 +1193,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const businessModelMark = businessModelScene
       ? renderBusinessModelBpPreview(slide, businessModelScene)
+      : "";
+    const businessModelValueChainMark = businessModelValueChainScene
+      ? renderBusinessModelValueChainPreview(slide, businessModelValueChainScene)
       : "";
     const marketingMark = marketingScene
       ? (
@@ -1309,6 +1318,9 @@ function renderDeckPreview({ deck, visual }) {
     const competitionMapMark = competitionMapScene
       ? renderCompetitionMapPreview(slide, competitionMapScene)
       : "";
+    const regionEntryMark = regionEntryScene
+      ? renderStrategyRegionEntryPreview(slide, regionEntryScene)
+      : "";
     const secondCurveMark = secondCurveScene
       ? renderSecondCurvePreview(slide, secondCurveScene)
       : "";
@@ -1324,6 +1336,9 @@ function renderDeckPreview({ deck, visual }) {
     const budgetAdjustmentMark = budgetAdjustmentScene
       ? renderBudgetAdjustmentPreview(slide, budgetAdjustmentScene)
       : "";
+    const riskInspectionMark = riskInspectionScene
+      ? renderRiskInspectionPreview(slide, riskInspectionScene)
+      : "";
     const costBreakdownMark = costBreakdownScene
       ? renderCostBreakdownPreview(slide, costBreakdownScene)
       : "";
@@ -1333,16 +1348,19 @@ function renderDeckPreview({ deck, visual }) {
     const profitBridgeMark = profitBridgeScene
       ? renderProfitBridgePreview(slide, profitBridgeScene)
       : "";
+    const investmentRoiMark = investmentRoiScene
+      ? renderInvestmentRoiModelPreview(slide, investmentRoiScene)
+      : "";
     const topBandHeadingClass = topBandTitleClass ? ` class="${topBandTitleClass}"` : "";
     const domeChrome = isDomeLayout
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || costBreakdownScene || cashFlowScene || profitBridgeScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelMark}${marketingMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -1734,6 +1752,42 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="strategy-competition-map"] .competition-segments span:nth-child(2){border-top:5px solid var(--template-accent);}body[data-layout="strategy-competition-map"] .competition-segments span:nth-child(3){border-top:5px solid var(--template-primary);}
     body[data-layout="strategy-competition-map"] .competition-closing-line{position:absolute;left:8%;right:8%;bottom:24%;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),rgba(16,42,67,.18),transparent);}
     body[data-layout="strategy-competition-map"] .page-number{z-index:4;right:7.1%;bottom:6.2%;background:rgba(255,255,255,.82);border:1px solid rgba(16,42,67,.12);border-radius:999px;padding:5px 10px;color:rgba(7,26,45,.62);}
+    body[data-layout="strategy-region-entry"]{background:#dde9ef;}
+    body[data-layout="strategy-region-entry"] main{width:min(100%,1160px);}
+    body[data-layout="strategy-region-entry"] .slide{padding:0;border:0;background:linear-gradient(135deg,#eef6f8 0%,#ffffff 48%,#e8f7f5 100%);box-shadow:0 24px 58px rgba(12,42,64,.18);}
+    body[data-layout="strategy-region-entry"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 18%,rgba(20,184,166,.18),transparent 26%),radial-gradient(circle at 16% 76%,rgba(242,184,75,.16),transparent 28%),repeating-linear-gradient(90deg,rgba(16,42,67,.05) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(16,42,67,.035) 0 1px,transparent 1px 42px);}
+    body[data-layout="strategy-region-entry"] .slide::after{content:"";position:absolute;left:5.5%;right:5.5%;top:8.4%;bottom:7.8%;z-index:1;border-radius:22px;background:rgba(255,255,255,.93);border:1px solid rgba(16,42,67,.13);box-shadow:0 22px 50px rgba(12,42,64,.12),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="strategy-region-entry"] .slide-content{display:none;}
+    body[data-layout="strategy-region-entry"] .accent{left:5.5%;right:5.5%;top:8.4%;height:7px;border-radius:999px;z-index:4;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));}
+    body[data-layout="strategy-region-entry"] .region-entry-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="strategy-region-entry"] .region-entry-kicker{position:absolute;left:8.2%;top:14%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-accent);}
+    body[data-layout="strategy-region-entry"] .region-entry-title{position:absolute;left:8.2%;top:20.7%;width:43%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="strategy-region-entry"] .region-entry-summary{position:absolute;left:8.25%;top:40%;width:37%;font-size:13px;line-height:1.48;font-weight:800;color:#40536a;overflow-wrap:anywhere;}
+    body[data-layout="strategy-region-entry"] .region-entry-bullets{position:absolute;left:8.35%;top:51%;width:37%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="strategy-region-entry"] .region-entry-bullets li{margin:.18em 0;}
+    body[data-layout="strategy-region-entry"] .region-entry-map{position:absolute;right:8%;top:18%;width:39%;height:47%;border-radius:20px;background:linear-gradient(135deg,#fff,#edf8f7);border:1px solid rgba(16,42,67,.12);box-shadow:0 18px 36px rgba(12,42,64,.12);overflow:hidden;}
+    body[data-layout="strategy-region-entry"] .region-entry-map::before{content:"";position:absolute;left:12%;right:10%;top:18%;bottom:16%;border-radius:48% 42% 46% 40%;background:#fff;border:2px solid rgba(16,42,67,.22);box-shadow:inset 0 0 0 18px rgba(20,184,166,.06);}
+    body[data-layout="strategy-region-entry"] .region-entry-map::after{content:"";position:absolute;left:16%;right:12%;top:58%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));transform:skewY(-10deg);box-shadow:0 0 24px rgba(20,184,166,.24);}
+    body[data-layout="strategy-region-entry"] .region-entry-node{position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;border:4px solid var(--template-accent);box-shadow:0 0 0 8px rgba(20,184,166,.11),0 10px 18px rgba(12,42,64,.16);}
+    body[data-layout="strategy-region-entry"] .region-entry-node:nth-child(1){left:19%;top:61%;}body[data-layout="strategy-region-entry"] .region-entry-node:nth-child(2){left:39%;top:43%;border-color:var(--template-secondary);box-shadow:0 0 0 8px rgba(242,184,75,.13),0 10px 18px rgba(12,42,64,.16);}body[data-layout="strategy-region-entry"] .region-entry-node:nth-child(3){left:62%;top:31%;}body[data-layout="strategy-region-entry"] .region-entry-node:nth-child(4){left:79%;top:23%;border-color:var(--template-warning);}
+    body[data-layout="strategy-region-entry"] .region-entry-metrics{position:absolute;left:8.2%;right:49%;bottom:14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="strategy-region-entry"] .region-entry-metrics span{min-height:58px;border-radius:13px;background:#fff;border:1px solid rgba(16,42,67,.10);box-shadow:0 10px 22px rgba(12,42,64,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:800;color:#52657a;}
+    body[data-layout="strategy-region-entry"] .region-entry-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="strategy-region-entry"] .region-entry-path{position:absolute;left:8.2%;right:8.2%;bottom:15%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="strategy-region-entry"] .region-entry-path span{position:relative;min-height:78px;border-radius:15px;background:#fff;border:1px solid rgba(16,42,67,.10);box-shadow:0 10px 22px rgba(12,42,64,.08);padding:16px 13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-region-entry"] .region-entry-path span::after{content:"";position:absolute;left:14px;right:14px;bottom:12px;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="strategy-region-entry"] .region-entry-segments{position:absolute;right:8%;top:21%;width:39%;height:44%;display:grid;grid-template-columns:1fr;gap:12px;}
+    body[data-layout="strategy-region-entry"] .region-entry-segments span{border-radius:16px;background:#fff;border:1px solid rgba(16,42,67,.10);box-shadow:0 10px 22px rgba(12,42,64,.08);display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-region-entry"] .region-entry-segments span::before{content:"";width:36px;height:36px;border-radius:14px;background:var(--template-accent);box-shadow:inset 0 -10px 0 rgba(16,42,67,.16);}
+    body[data-layout="strategy-region-entry"] .region-entry-channels{position:absolute;right:8%;top:19%;width:39%;height:46%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="strategy-region-entry"] .region-entry-channels span{border-radius:16px;background:#fff;border:1px solid rgba(16,42,67,.10);box-shadow:0 10px 22px rgba(12,42,64,.08);display:grid;align-content:center;justify-items:center;text-align:center;gap:9px;padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="strategy-region-entry"] .region-entry-channels span::before{content:"";width:38px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="strategy-region-entry"] .region-entry-risk{position:absolute;right:8%;top:20%;width:39%;display:grid;gap:11px;}
+    body[data-layout="strategy-region-entry"] .region-entry-risk span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(16,42,67,.10);box-shadow:0 10px 22px rgba(12,42,64,.08);padding:13px 16px;font-size:12px;font-weight:900;color:var(--template-title);border-left:6px solid var(--template-warning);}
+    body[data-layout="strategy-region-entry"] .region-entry-closing{position:absolute;right:8.5%;top:22%;width:36%;height:42%;border-radius:20px;background:linear-gradient(135deg,var(--template-primary),#061525);box-shadow:0 20px 38px rgba(12,42,64,.20);}
+    body[data-layout="strategy-region-entry"] .region-entry-closing::before{content:"";position:absolute;left:13%;right:13%;top:30%;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),var(--template-warning));}
+    body[data-layout="strategy-region-entry"] .region-entry-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:24%;height:32%;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);}
+    body[data-layout="strategy-region-entry"] .page-number{z-index:6;color:rgba(12,42,64,.58);background:rgba(255,255,255,.76);border:1px solid rgba(16,42,67,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="strategy-second-curve"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fcfb 0%,var(--template-bg) 58%,#e4f3ef 100%);}
     body[data-layout="strategy-second-curve"] .slide::before{background:repeating-linear-gradient(90deg,rgba(14,42,71,.05) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(22,184,166,.045) 0 1px,transparent 1px 40px),radial-gradient(circle at 84% 18%,rgba(22,184,166,.18),transparent 25%);}
     body[data-layout="strategy-second-curve"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8.8%;bottom:8.5%;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(14,42,71,.14);box-shadow:0 24px 54px rgba(7,26,45,.13);z-index:1;}
@@ -1969,6 +2023,40 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="finance-profit-bridge"] .profit-closing{position:absolute;left:8.8%;right:8.8%;top:49%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;}
     body[data-layout="finance-profit-bridge"] .profit-closing span{min-height:118px;border-radius:16px;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 12px 24px rgba(20,33,61,.08);padding:18px;font-size:14px;font-weight:800;color:var(--template-body);border-top:5px solid var(--template-accent);}
     body[data-layout="finance-profit-bridge"] .page-number{z-index:4;right:7.1%;bottom:5.5%;background:rgba(255,255,255,.78);border:1px solid rgba(20,33,61,.12);border-radius:999px;padding:5px 10px;color:rgba(11,21,40,.62);}
+    body[data-layout="finance-investment-roi-model"] .slide{padding:0;border:0;background:radial-gradient(circle at 79% 16%,rgba(22,163,74,.16),transparent 24%),radial-gradient(circle at 18% 86%,rgba(245,158,11,.14),transparent 24%),linear-gradient(135deg,#f8fafc 0%,var(--template-bg) 56%,#edf4f0 100%);}
+    body[data-layout="finance-investment-roi-model"] .slide::before{background:repeating-linear-gradient(90deg,rgba(15,39,66,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(15,39,66,.03) 0 1px,transparent 1px 38px);}
+    body[data-layout="finance-investment-roi-model"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9.4%;bottom:7.8%;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(15,39,66,.13);box-shadow:0 24px 58px rgba(15,39,66,.15),inset 0 0 0 1px rgba(255,255,255,.78);}
+    body[data-layout="finance-investment-roi-model"] .accent{left:5.8%;right:5.8%;top:9.4%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));z-index:4;}
+    body[data-layout="finance-investment-roi-model"] .roi-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="finance-investment-roi-model"] .roi-surface{position:absolute;left:6.8%;right:6.8%;top:12%;bottom:9%;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(248,250,252,.9));box-shadow:inset 0 0 0 1px rgba(15,39,66,.08);}
+    body[data-layout="finance-investment-roi-model"] .roi-kicker{position:absolute;left:9%;top:15.2%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="finance-investment-roi-model"] .roi-title{position:absolute;left:9%;top:21.5%;width:43%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="finance-investment-roi-model"] .roi-rule{position:absolute;left:9%;top:41.6%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="finance-investment-roi-model"] .roi-bullets{position:absolute;left:9%;top:47.5%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.46;color:var(--template-body);}
+    body[data-layout="finance-investment-roi-model"] .roi-bullets li{margin:.14em 0;}
+    body[data-layout="finance-investment-roi-model"] .roi-metrics{position:absolute;left:9%;right:47%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="finance-investment-roi-model"] .roi-metrics span{min-height:64px;border-radius:14px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 11px 22px rgba(15,39,66,.08);padding:12px 13px;font-size:11px;font-weight:800;color:var(--template-body);border-top:5px solid var(--template-accent);}
+    body[data-layout="finance-investment-roi-model"] .roi-metrics span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="finance-investment-roi-model"] .roi-metrics span:nth-child(3){border-top-color:var(--template-warning);}
+    body[data-layout="finance-investment-roi-model"] .roi-metrics strong{display:block;margin-bottom:4px;font-size:19px;line-height:1;color:var(--template-title);}
+    body[data-layout="finance-investment-roi-model"] .roi-model{position:absolute;right:8.6%;top:18%;width:36%;height:50%;border-radius:18px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 16px 34px rgba(15,39,66,.1);}
+    body[data-layout="finance-investment-roi-model"] .roi-model::before{content:"";position:absolute;left:16%;right:16%;top:49%;height:4px;border-radius:999px;background:var(--template-accent);box-shadow:0 -72px 0 -1px rgba(245,158,11,.55),0 72px 0 -1px rgba(239,68,68,.36);}
+    body[data-layout="finance-investment-roi-model"] .roi-model span{position:absolute;width:26%;height:20%;border-radius:13px;background:#fff;border:1px solid rgba(15,39,66,.14);box-shadow:0 10px 20px rgba(15,39,66,.08);display:grid;place-items:center;text-align:center;padding:6px;font-size:10px;font-weight:900;color:var(--template-title);}
+    body[data-layout="finance-investment-roi-model"] .roi-model span:nth-child(1){left:9%;top:17%;border-top:5px solid var(--template-primary);}body[data-layout="finance-investment-roi-model"] .roi-model span:nth-child(2){right:9%;top:17%;border-top:5px solid var(--template-accent);}body[data-layout="finance-investment-roi-model"] .roi-model span:nth-child(3){left:9%;bottom:17%;border-top:5px solid var(--template-secondary);}body[data-layout="finance-investment-roi-model"] .roi-model span:nth-child(4){right:9%;bottom:17%;border-top:5px solid var(--template-warning);}
+    body[data-layout="finance-investment-roi-model"] .roi-curve{position:absolute;right:8.6%;top:19%;width:36%;height:48%;border-radius:18px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 16px 34px rgba(15,39,66,.1);overflow:hidden;}
+    body[data-layout="finance-investment-roi-model"] .roi-curve::before{content:"";position:absolute;left:12%;right:10%;bottom:21%;height:2px;background:rgba(15,39,66,.22);box-shadow:-1px -125px 0 -1px rgba(15,39,66,.08);}
+    body[data-layout="finance-investment-roi-model"] .roi-curve i{position:absolute;left:15%;bottom:25%;width:72%;height:42%;border-top:7px solid var(--template-accent);border-right:7px solid var(--template-secondary);border-radius:60% 38% 0 0;transform:skewX(-12deg);}
+    body[data-layout="finance-investment-roi-model"] .roi-curve span{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-secondary);box-shadow:0 0 0 7px rgba(245,158,11,.16);}
+    body[data-layout="finance-investment-roi-model"] .roi-curve span:nth-child(2){left:43%;top:48%;background:var(--template-accent);}body[data-layout="finance-investment-roi-model"] .roi-curve span:nth-child(3){right:15%;top:31%;}
+    body[data-layout="finance-investment-roi-model"] .roi-payback{position:absolute;left:9%;right:9%;bottom:16%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;}
+    body[data-layout="finance-investment-roi-model"] .roi-payback span{position:relative;min-height:78px;border-radius:15px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 10px 20px rgba(15,39,66,.08);padding:14px 12px 12px 44px;font-size:12px;font-weight:900;color:var(--template-title);overflow-wrap:anywhere;}
+    body[data-layout="finance-investment-roi-model"] .roi-payback span::before{content:attr(data-step);position:absolute;left:13px;top:14px;width:24px;height:24px;border-radius:50%;background:var(--template-accent);color:#fff;text-align:center;line-height:24px;font-size:10px;}
+    body[data-layout="finance-investment-roi-model"] .roi-scenarios{position:absolute;right:8.6%;top:19%;width:36%;height:49%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end;}
+    body[data-layout="finance-investment-roi-model"] .roi-scenarios span{border-radius:16px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 12px 24px rgba(15,39,66,.08);padding:16px 12px;font-size:12px;font-weight:900;color:var(--template-title);border-top:7px solid var(--template-warning);min-height:56%;}
+    body[data-layout="finance-investment-roi-model"] .roi-scenarios span:nth-child(2){min-height:72%;border-top-color:var(--template-accent);}body[data-layout="finance-investment-roi-model"] .roi-scenarios span:nth-child(3){min-height:88%;border-top-color:var(--template-secondary);}
+    body[data-layout="finance-investment-roi-model"] .roi-decision{position:absolute;left:9%;right:9%;bottom:16%;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;}
+    body[data-layout="finance-investment-roi-model"] .roi-decision span{min-height:116px;border-radius:17px;background:#fff;border:1px solid rgba(15,39,66,.12);box-shadow:0 12px 24px rgba(15,39,66,.08);padding:18px;font-size:14px;font-weight:850;color:var(--template-body);border-top:6px solid var(--template-accent);}
+    body[data-layout="finance-investment-roi-model"] .roi-decision span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="finance-investment-roi-model"] .roi-decision span:nth-child(3){border-top-color:var(--template-primary);}
+    body[data-layout="finance-investment-roi-model"] .page-number{z-index:6;right:7.1%;bottom:5.5%;background:rgba(255,255,255,.82);border:1px solid rgba(15,39,66,.12);border-radius:999px;padding:5px 10px;color:rgba(15,39,66,.58);}
     body[data-layout="finance-budget-adjustment"] .slide{padding:0;border:0;background:radial-gradient(circle at 84% 20%,rgba(245,158,11,.18) 0 14%,transparent 15% 42%),linear-gradient(135deg,#ffffff 0%,var(--template-bg) 54%,#e9eef7 100%);}
     body[data-layout="finance-budget-adjustment"] .slide::before{background:linear-gradient(110deg,rgba(24,35,63,.075) 0 12%,transparent 12% 100%),repeating-linear-gradient(90deg,rgba(24,35,63,.05) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(20,184,166,.035) 0 1px,transparent 1px 40px);}
     body[data-layout="finance-budget-adjustment"] .slide::after{content:"";position:absolute;right:-7%;bottom:-18%;width:42%;height:44%;border-radius:999px;background:rgba(20,184,166,.14);}
@@ -2003,12 +2091,75 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="finance-budget-adjustment"] .adjustment-closing{position:absolute;left:9%;right:9%;top:49%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
     body[data-layout="finance-budget-adjustment"] .adjustment-closing span{min-height:118px;border-radius:16px;background:#fff;border:1px solid rgba(24,35,63,.12);box-shadow:0 12px 24px rgba(24,35,63,.08);padding:18px;font-size:14px;font-weight:800;color:var(--template-body);border-top:5px solid var(--template-accent);}
     body[data-layout="finance-budget-adjustment"] .page-number{z-index:4;right:7.2%;bottom:5.6%;background:rgba(255,255,255,.78);border:1px solid rgba(24,35,63,.12);border-radius:999px;padding:5px 10px;color:rgba(17,24,39,.62);}
+    body[data-layout="finance-risk-inspection"] .slide{padding:0;border:0;background:linear-gradient(135deg,#edf3f7 0%,#ffffff 52%,#e7eef5 100%);box-shadow:0 24px 58px rgba(15,23,42,.16);}
+    body[data-layout="finance-risk-inspection"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 16%,rgba(249,115,22,.14),transparent 23%),radial-gradient(circle at 12% 82%,rgba(22,163,74,.12),transparent 24%),repeating-linear-gradient(90deg,rgba(20,33,61,.05) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(20,33,61,.035) 0 1px,transparent 1px 42px);}
+    body[data-layout="finance-risk-inspection"] .slide::after{content:"";position:absolute;left:5.4%;right:5.4%;top:8.2%;bottom:7.5%;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(20,33,61,.13);box-shadow:0 22px 48px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.78);}
+    body[data-layout="finance-risk-inspection"] .accent{left:5.4%;right:5.4%;top:8.2%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));z-index:4;}
+    body[data-layout="finance-risk-inspection"] .risk-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="finance-risk-inspection"] .risk-kicker{position:absolute;left:8.2%;top:13.7%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="finance-risk-inspection"] .risk-title{position:absolute;left:8.2%;top:20%;width:43%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="finance-risk-inspection"] .risk-rule{position:absolute;left:8.2%;top:41%;width:31%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="finance-risk-inspection"] .risk-bullets{position:absolute;left:8.2%;top:47%;width:37%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.46;font-weight:760;color:#334155;}
+    body[data-layout="finance-risk-inspection"] .risk-bullets li{margin:.14em 0;}
+    body[data-layout="finance-risk-inspection"] .risk-shield{position:absolute;right:10.6%;top:18%;width:24%;height:42%;clip-path:polygon(50% 0,92% 15%,92% 54%,50% 100%,8% 54%,8% 15%);background:linear-gradient(135deg,var(--template-primary),#26456f);box-shadow:0 18px 36px rgba(20,33,61,.2);}
+    body[data-layout="finance-risk-inspection"] .risk-shield::before{content:"";position:absolute;inset:12%;clip-path:inherit;background:rgba(255,255,255,.08);}
+    body[data-layout="finance-risk-inspection"] .risk-shield::after{content:"";position:absolute;left:35%;top:38%;width:34%;height:18%;border-left:8px solid var(--template-secondary);border-bottom:8px solid var(--template-secondary);transform:rotate(-45deg);}
+    body[data-layout="finance-risk-inspection"] .risk-metrics{position:absolute;left:8.2%;right:50%;bottom:13%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="finance-risk-inspection"] .risk-metrics span{min-height:64px;border-radius:14px;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 11px 22px rgba(15,23,42,.08);padding:12px 14px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="finance-risk-inspection"] .risk-metrics strong{display:block;margin-bottom:5px;font-size:19px;line-height:1;color:var(--template-title);}
+    body[data-layout="finance-risk-inspection"] .risk-file-stack{position:absolute;right:8.2%;top:21%;width:36%;height:48%;border-radius:18px;background:#fff;border:1px solid rgba(20,33,61,.13);box-shadow:0 16px 34px rgba(15,23,42,.12);overflow:hidden;}
+    body[data-layout="finance-risk-inspection"] .risk-file-stack::before{content:"";position:absolute;left:0;right:0;top:0;height:54px;background:var(--template-primary);}
+    body[data-layout="finance-risk-inspection"] .risk-file-stack span{position:absolute;left:11%;right:11%;height:12px;border-radius:999px;background:rgba(20,33,61,.13);}
+    body[data-layout="finance-risk-inspection"] .risk-file-stack span:nth-child(1){top:32%;width:62%;background:rgba(20,33,61,.22);}body[data-layout="finance-risk-inspection"] .risk-file-stack span:nth-child(2){top:46%;width:75%;background:rgba(249,115,22,.45);}body[data-layout="finance-risk-inspection"] .risk-file-stack span:nth-child(3){top:60%;width:56%;background:rgba(22,163,74,.42);}
+    body[data-layout="finance-risk-inspection"] .risk-level-bars{position:absolute;right:10%;bottom:17%;width:24%;height:18%;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end;}
+    body[data-layout="finance-risk-inspection"] .risk-level-bars span{border-radius:14px 14px 5px 5px;background:var(--template-secondary);box-shadow:0 10px 18px rgba(15,23,42,.09);}
+    body[data-layout="finance-risk-inspection"] .risk-level-bars span:nth-child(1){height:48%;}body[data-layout="finance-risk-inspection"] .risk-level-bars span:nth-child(2){height:72%;background:var(--template-accent);}body[data-layout="finance-risk-inspection"] .risk-level-bars span:nth-child(3){height:100%;background:var(--template-warning);}
+    body[data-layout="finance-risk-inspection"] .risk-checklist{position:absolute;left:8.2%;right:8.2%;top:44%;display:grid;grid-template-columns:1.3fr .7fr .7fr .8fr;gap:0;border-radius:16px;overflow:hidden;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 14px 28px rgba(15,23,42,.08);}
+    body[data-layout="finance-risk-inspection"] .risk-checklist span{min-height:44px;padding:12px 14px;border-bottom:1px solid rgba(20,33,61,.08);font-size:12px;font-weight:800;color:var(--template-body);background:#fff;}
+    body[data-layout="finance-risk-inspection"] .risk-checklist span:nth-child(-n+4){background:var(--template-primary);color:#fff;}
+    body[data-layout="finance-risk-inspection"] .risk-heatmap{position:absolute;right:8.2%;top:22%;width:34%;height:43%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    body[data-layout="finance-risk-inspection"] .risk-heatmap span{border-radius:14px;background:rgba(22,163,74,.2);border:1px solid rgba(20,33,61,.08);}
+    body[data-layout="finance-risk-inspection"] .risk-heatmap span:nth-child(2),body[data-layout="finance-risk-inspection"] .risk-heatmap span:nth-child(5){background:rgba(249,115,22,.28);}body[data-layout="finance-risk-inspection"] .risk-heatmap span:nth-child(3),body[data-layout="finance-risk-inspection"] .risk-heatmap span:nth-child(6){background:rgba(220,38,38,.24);}
+    body[data-layout="finance-risk-inspection"] .risk-finding-card{position:absolute;right:8.2%;top:22%;width:36%;height:48%;border-radius:18px;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 16px 32px rgba(15,23,42,.1);padding:18px;display:grid;align-content:center;gap:10px;}
+    body[data-layout="finance-risk-inspection"] .risk-finding-card span{min-height:48px;border-radius:13px;background:#f8fafc;border-left:6px solid var(--template-accent);padding:12px 14px;font-size:12px;font-weight:850;color:var(--template-title);}
+    body[data-layout="finance-risk-inspection"] .risk-finding-card span:nth-child(2){border-left-color:var(--template-warning);}body[data-layout="finance-risk-inspection"] .risk-finding-card span:nth-child(3){border-left-color:var(--template-secondary);}
+    body[data-layout="finance-risk-inspection"] .risk-remediation{position:absolute;left:8.2%;right:8.2%;bottom:16%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;}
+    body[data-layout="finance-risk-inspection"] .risk-remediation span{position:relative;min-height:76px;border-radius:15px;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 10px 20px rgba(15,23,42,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="finance-risk-inspection"] .risk-remediation span::before{content:attr(data-step);display:block;width:26px;height:26px;margin-bottom:7px;border-radius:50%;background:var(--template-accent);color:#fff;text-align:center;line-height:26px;font-size:11px;}
+    body[data-layout="finance-risk-inspection"] .risk-remediation span::after{content:"";position:absolute;right:-17px;top:50%;width:20px;height:3px;border-radius:999px;background:var(--template-primary);}
+    body[data-layout="finance-risk-inspection"] .risk-remediation span:last-child::after{display:none;}
+    body[data-layout="finance-risk-inspection"] .risk-closing{position:absolute;left:8.2%;right:8.2%;top:48%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+    body[data-layout="finance-risk-inspection"] .risk-closing span{min-height:118px;border-radius:17px;background:#fff;border:1px solid rgba(20,33,61,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:18px;font-size:14px;font-weight:850;color:var(--template-body);border-top:6px solid var(--template-secondary);}
+    body[data-layout="finance-risk-inspection"] .page-number{z-index:6;right:7.1%;bottom:5.6%;background:rgba(255,255,255,.82);border:1px solid rgba(20,33,61,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.58);}
     body[data-layout="executive"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 68%);padding:8.2% 10%;border:0;}
     body[data-layout="executive"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(15,23,42,.026) 0 1px,transparent 1px 38px);}
     body[data-layout="executive"] .slide::after{content:"";position:absolute;inset:12% 6% 10%;background:var(--template-surface);box-shadow:0 18px 46px rgba(15,42,67,.12);}
     body[data-layout="executive"] .accent{height:9.8%;background:var(--template-primary);box-shadow:inset 0 -3px 0 var(--template-accent);}
     body[data-layout="executive"] .motif{display:block;right:10%;top:25%;width:8.8%;height:42%;border-radius:8px;background:var(--template-accent);opacity:.82;}
     body[data-layout="executive"] h2{max-width:74%;font-size:44px;}
+    body[data-layout="business-model-value-chain"] .slide{padding:0;border:0;background:linear-gradient(135deg,#edf6f3 0%,var(--template-bg) 52%,#f8fbfa 100%);}
+    body[data-layout="business-model-value-chain"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,35,61,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(24,169,153,.035) 0 1px,transparent 1px 40px);}
+    body[data-layout="business-model-value-chain"] .slide::after{content:"";position:absolute;left:5.2%;right:5.2%;top:8%;bottom:7%;border-radius:20px;background:rgba(255,255,255,.94);border:1px solid rgba(16,35,61,.12);box-shadow:0 22px 50px rgba(16,35,61,.13);}
+    body[data-layout="business-model-value-chain"] .accent{left:5.2%;right:5.2%;top:8%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));z-index:4;}
+    body[data-layout="business-model-value-chain"] .bmvc-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="business-model-value-chain"] .bmvc-kicker{position:absolute;left:8.2%;top:13.8%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="business-model-value-chain"] .bmvc-title{position:absolute;left:8.2%;top:20%;width:43%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="business-model-value-chain"] .bmvc-summary{position:absolute;left:8.2%;top:42.5%;width:39%;font-size:12.5px;font-weight:800;line-height:1.42;color:var(--template-body);}
+    body[data-layout="business-model-value-chain"] .bmvc-bullets{position:absolute;left:8.2%;top:51%;width:38%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.42;}
+    body[data-layout="business-model-value-chain"] .bmvc-hero-network,.bmvc-flow,.bmvc-profit,.bmvc-ecosystem,.bmvc-matrix,.bmvc-roadmap{position:absolute;right:8.2%;top:18%;width:38%;height:50%;border-radius:18px;background:#fff;border:1px solid rgba(16,35,61,.12);box-shadow:0 16px 32px rgba(16,35,61,.1);}
+    body[data-layout="business-model-value-chain"] .bmvc-hero-network::before{content:"";position:absolute;left:18%;right:18%;top:49%;height:4px;background:var(--template-accent);border-radius:999px;}
+    body[data-layout="business-model-value-chain"] .bmvc-hero-network span{position:absolute;width:22%;height:18%;border-radius:12px;background:var(--template-accent);box-shadow:0 10px 20px rgba(16,35,61,.1);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(1){left:14%;top:18%;}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(2){right:14%;top:18%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(3){left:14%;bottom:18%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(4){right:14%;bottom:18%;}
+    body[data-layout="business-model-value-chain"] .bmvc-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:28px;}
+    body[data-layout="business-model-value-chain"] .bmvc-flow span{border-radius:13px;background:#f8fafc;border-top:5px solid var(--template-accent);display:grid;place-items:center;text-align:center;padding:8px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="business-model-value-chain"] .bmvc-profit::before{content:"";position:absolute;left:14%;right:14%;bottom:20%;height:2px;background:rgba(16,35,61,.22);}
+    body[data-layout="business-model-value-chain"] .bmvc-profit span{position:absolute;bottom:22%;width:14%;border-radius:9px 9px 3px 3px;background:var(--template-accent);}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(1){left:25%;height:32%;}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(2){left:45%;height:52%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(3){left:65%;height:70%;background:var(--template-primary);}
+    body[data-layout="business-model-value-chain"] .bmvc-ecosystem{border-radius:50%;background:radial-gradient(circle,#fff 0 24%,rgba(24,169,153,.12) 25% 52%,#fff 53% 100%);}
+    body[data-layout="business-model-value-chain"] .bmvc-ecosystem span{position:absolute;width:28%;height:17%;border-radius:999px;background:#fff;border:1px solid rgba(16,35,61,.12);display:grid;place-items:center;font-size:11px;font-weight:900;color:var(--template-title);}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(1){left:36%;top:8%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(2){right:4%;top:42%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(3){left:36%;bottom:8%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(4){left:4%;top:42%;}
+    body[data-layout="business-model-value-chain"] .bmvc-matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:24px;}
+    body[data-layout="business-model-value-chain"] .bmvc-matrix span{border-radius:14px;background:#f8fafc;border-left:6px solid var(--template-accent);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="business-model-value-chain"] .bmvc-roadmap{left:8.2%;right:8.2%;top:auto;bottom:15%;width:auto;height:20%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:18px;}
+    body[data-layout="business-model-value-chain"] .bmvc-roadmap span{border-radius:13px;background:#fff;border:1px solid rgba(16,35,61,.12);padding:13px 10px;font-size:11px;font-weight:900;color:var(--template-title);border-top:5px solid var(--template-accent);}
+    body[data-layout="business-model-value-chain"] .page-number{z-index:6;right:7%;bottom:5.5%;background:rgba(255,255,255,.82);border:1px solid rgba(16,35,61,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,61,.58);}
     body[data-template="strategy-consulting"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 62%,color-mix(in srgb,var(--template-primary) 10%,var(--template-bg) 90%));}
     body[data-template="strategy-consulting"] .slide::after{inset:10% 5.8% 9%;border-radius:16px;border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);background:rgba(255,255,255,.91);box-shadow:0 22px 54px rgba(15,23,42,.14);}
     body[data-template="strategy-consulting"] .slide-content{padding:2.2% 34% 0 0;}
@@ -4241,6 +4392,87 @@ function isProfitBridgeVisual(visual) {
   return visual?.layout === "finance-profit-bridge" && (id === "profit-analysis-report" || id === "finance-profit-analysis-report-profit-bridge");
 }
 
+function investmentRoiModelPreviewScene({ slide, index, total }) {
+  const bullets = budgetPlanningBulletTexts(slide);
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
+  const role = investmentRoiModelRoleFromSlide({ slide, index, total });
+  const metrics = [0, 1, 2].map((itemIndex) => investmentRoiMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    variant: "investment-return",
+    role,
+    // 页面角标使用投资分析语义，避免把主题风格名称直接展示给用户。
+    kicker: role === "cover" ? "INVESTMENT RETURN" : role === "curve" ? "RETURN CURVE" : role === "payback" ? "PAYBACK PATH" : role === "scenario" ? "SCENARIO BOARD" : role === "decision" ? "INVESTMENT DECISION" : "FINANCIAL MODEL",
+    title,
+    bullets: bullets.slice(0, role === "cover" ? 3 : 4),
+    metrics,
+    modelNodes: [
+      budgetPlanningCompactText(bullets[0], "投入成本", 8),
+      budgetPlanningCompactText(bullets[1], "收益预测", 8),
+      budgetPlanningCompactText(bullets[2], "回收周期", 8),
+      budgetPlanningCompactText(bullets[3], "风险假设", 8),
+    ],
+    paybackSteps: ["投入", "上线", "爬坡", "回收", "扩张"],
+    scenarios: [
+      investmentRoiScenarioText(bullets[0], "保守情景", metrics[0].value),
+      investmentRoiScenarioText(bullets[1], "基准情景", metrics[1].value),
+      investmentRoiScenarioText(bullets[2], "乐观情景", metrics[2].value),
+    ],
+    decisionItems: [
+      budgetPlanningCompactText(bullets[0], "投资建议与决策结论", 18),
+      budgetPlanningCompactText(bullets[1], "关键前提和约束条件", 18),
+      budgetPlanningCompactText(bullets[2], "下一步验证动作", 18),
+    ],
+  };
+}
+
+function investmentRoiModelRoleFromSlide({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  const title = String(slide?.title || "").toLowerCase();
+  // 优先尊重大纲页型，标题关键词用于兼容 AI 生成的大纲，最后按页序兜底。
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (index === total - 1 || layout.includes("decision") || layout.includes("closing") || /决策|建议|结论|decision|recommendation|conclusion/.test(title)) return "decision";
+  if (layout.includes("curve") || layout.includes("return") || /收益曲线|回报曲线|收益趋势|return|curve|trend/.test(title)) return "curve";
+  if (layout.includes("payback") || layout.includes("timeline") || layout.includes("period") || /回收|周期|时间线|payback|timeline|period/.test(title)) return "payback";
+  if (layout.includes("scenario") || layout.includes("sensitivity") || /情景|测算|敏感|scenario|sensitivity/.test(title)) return "scenario";
+  if (layout.includes("formula") || layout.includes("model") || layout.includes("overview") || /模型|概览|投入产出|roi|overview|formula|model/.test(title)) return "model";
+  return ["model", "curve", "payback", "scenario"][(index - 1) % 4];
+}
+
+function renderInvestmentRoiModelPreview(slide, scene) {
+  const bulletItems = scene.bullets.map((item) => `<li>${escapeHtml(budgetPlanningCompactText(item, scene.title, 42))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const visual = scene.role === "curve"
+    ? '<div class="roi-curve"><i></i><span></span><span></span><span></span></div>'
+    : scene.role === "payback"
+      ? `<div class="roi-payback">${scene.paybackSteps.map((step, itemIndex) => `<span data-step="${itemIndex + 1}">${escapeHtml(step)}</span>`).join("")}</div>`
+      : scene.role === "scenario"
+        ? `<div class="roi-scenarios">${scene.scenarios.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : scene.role === "decision"
+          ? `<div class="roi-decision">${scene.decisionItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+          : `<div class="roi-model">${scene.modelNodes.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="roi-metrics">${metrics}</div>`;
+  return `<div class="roi-layer"><div class="roi-surface"></div><div class="roi-kicker">${escapeHtml(scene.kicker)}</div><h2 class="roi-title">${escapeHtml(scene.title)}</h2><div class="roi-rule"></div><ul class="roi-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function investmentRoiMetricFromText(text, index) {
+  const fallbackValues = ["18%", "14月", "￥2.8M"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["预计回报", "回收周期", "净收益"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m|月|年|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function investmentRoiScenarioText(text, fallback, value) {
+  const label = budgetPlanningCompactText(text, fallback, 9);
+  return `${label}\n${value}`;
+}
+
+function isInvestmentRoiModelVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-investment-roi-model" && (!id || id === "investment-return-analysis" || id === "finance-investment-return-analysis-roi-model");
+}
+
 function budgetAdjustmentPreviewScene({ slide, index, total }) {
   const bullets = budgetPlanningBulletTexts(slide);
   const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
@@ -4289,6 +4521,91 @@ function renderBudgetAdjustmentPreview(slide, scene) {
 function isBudgetAdjustmentVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "finance-budget-adjustment" && (id === "budget-management-report" || id === "finance-budget-management-report-budget-adjustment");
+}
+
+function riskInspectionPreviewScene({ slide, index, total }) {
+  const bullets = budgetPlanningBulletTexts(slide);
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
+  const role = riskInspectionRoleFromSlide({ slide, index, total });
+  const metrics = [0, 1, 2].map((itemIndex) => riskInspectionMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    variant: "risk-inspection",
+    role,
+    // 页面角标使用审计业务语义，不直接暴露主题风格名称。
+    kicker: role === "cover" ? "INTERNAL CONTROL" : "AUDIT WORKPAPER",
+    title,
+    bullets: bullets.slice(0, role === "cover" ? 3 : 4),
+    metrics,
+    checklistRows: riskInspectionChecklistRows({ bullets, metrics }),
+    findingCards: [
+      budgetPlanningCompactText(bullets[0], "风险事项与触发条件", 18),
+      budgetPlanningCompactText(bullets[1], "影响范围与证据摘要", 18),
+      budgetPlanningCompactText(bullets[2], "整改责任与复核口径", 18),
+    ],
+    remediationSteps: ["发现", "定级", "分派", "整改", "复核"],
+  };
+}
+
+function riskInspectionRoleFromSlide({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 先尊重大纲里明确的页型，兜底时再按页码轮换，保证预览和导出选择同一套结构。
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (index === total - 1 || layout.includes("closing")) return "closing";
+  if (layout.includes("overview") || layout.includes("summary")) return "overview";
+  if (layout.includes("checklist") || layout.includes("audit")) return "checklist";
+  if (layout.includes("rating") || layout.includes("level") || layout.includes("heat")) return "rating";
+  if (layout.includes("remediation") || layout.includes("loop") || layout.includes("action")) return "remediation";
+  if (layout.includes("finding") || layout.includes("risk")) return "finding";
+  return ["overview", "checklist", "finding", "rating", "remediation"][(index - 1) % 5];
+}
+
+function renderRiskInspectionPreview(slide, scene) {
+  const bulletItems = scene.bullets.map((item) => `<li>${escapeHtml(budgetPlanningCompactText(item, scene.title, 42))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const checklist = scene.checklistRows.map((row) => row.map((cell) => `<span>${escapeHtml(cell)}</span>`).join("")).join("");
+  const heatmap = "<div class=\"risk-heatmap\"><span></span><span></span><span></span><span></span><span></span><span></span></div>";
+  const remediation = `<div class="risk-remediation">${scene.remediationSteps.map((step, itemIndex) => `<span data-step="${itemIndex + 1}">${escapeHtml(step)}</span>`).join("")}</div>`;
+  const roleVisual = scene.role === "checklist"
+    ? `<div class="risk-checklist">${checklist}</div>`
+    : scene.role === "finding"
+      ? `<div class="risk-finding-card">${scene.findingCards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+      : scene.role === "rating"
+        ? `${heatmap}<div class="risk-level-bars"><span></span><span></span><span></span></div>`
+        : scene.role === "remediation"
+          ? remediation
+          : scene.role === "closing"
+            ? `<div class="risk-closing">${scene.findingCards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+            : `<div class="risk-file-stack"><span></span><span></span><span></span></div><div class="risk-level-bars"><span></span><span></span><span></span></div>`;
+  const coverVisual = scene.role === "cover" ? `<div class="risk-shield"></div><div class="risk-metrics">${metrics}</div>` : roleVisual;
+  return `<div class="risk-layer"><div class="risk-kicker">${escapeHtml(scene.kicker)}</div><h2 class="risk-title">${escapeHtml(scene.title)}</h2><div class="risk-rule"></div><ul class="risk-bullets">${bulletItems}</ul>${coverVisual}</div>`;
+}
+
+function riskInspectionChecklistRows({ bullets, metrics }) {
+  const rows = [["检查项", "等级", "证据", "动作"]];
+  for (let index = 0; index < 3; index += 1) {
+    rows.push([
+      budgetPlanningCompactText(bullets[index], `检查项 ${index + 1}`, 12),
+      ["低", "中", "高"][index],
+      metrics[index]?.value || `E${index + 1}`,
+      ["通过", "复核", "整改"][index],
+    ]);
+  }
+  return rows;
+}
+
+function riskInspectionMetricFromText(text, index) {
+  const fallbackValues = ["24", "6", "92%"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: ["检查项", "风险点", "闭环率"][index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|项|个|天)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function isRiskInspectionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-risk-inspection" && (id === "internal-control-compliance-report" || id === "finance-internal-control-compliance-report-risk-inspection");
 }
 
 function quarterlyDashboardPreviewScene({ visual, slide, index }) {
@@ -5014,6 +5331,73 @@ function isCompetitionMapVisual(visual) {
   return visual?.layout === "strategy-competition-map" && (id === "industry-research" || id === "strategy-industry-research-competition-map");
 }
 
+function renderStrategyRegionEntryPreview(slide, scene) {
+  const title = escapeHtml(scene.title || slide?.title || "Market entry decision");
+  const bulletItems = scene.bullets.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const common = `<div class="region-entry-kicker">${escapeHtml(scene.kicker)}</div><h2 class="region-entry-title">${title}</h2><div class="region-entry-summary">${escapeHtml(scene.summary)}</div><ul class="region-entry-bullets">${bulletItems}</ul>`;
+  const map = `<div class="region-entry-map"><i class="region-entry-node"></i><i class="region-entry-node"></i><i class="region-entry-node"></i><i class="region-entry-node"></i></div>`;
+  const metrics = `<div class="region-entry-metrics">${scene.metrics.map((item) => `<span><strong>${escapeHtml(item.value)}</strong>${escapeHtml(item.label)}</span>`).join("")}</div>`;
+  if (scene.kind === "sequence") {
+    return `<div class="region-entry-layer">${common}<div class="region-entry-path">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${map}</div>`;
+  }
+  if (scene.kind === "segments") {
+    return `<div class="region-entry-layer">${common}<div class="region-entry-segments">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "channel") {
+    return `<div class="region-entry-layer">${common}<div class="region-entry-channels">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "risk") {
+    return `<div class="region-entry-layer">${common}<div class="region-entry-risk">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="region-entry-path">${scene.steps.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="region-entry-layer">${common}<div class="region-entry-closing"></div><div class="region-entry-path">${scene.steps.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="region-entry-layer">${common}${map}${metrics}</div>`;
+}
+
+function strategyRegionEntryPreviewScene({ slide, index, total }) {
+  const bullets = strategyRegionEntryBulletTexts(slide);
+  const title = strategyRegionEntryCompactText(slide?.title, "Market entry strategy", index === 0 ? 30 : 28);
+  const cards = ["Pilot market", "Priority region", "Channel partner", "Scale path"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12));
+  const steps = ["Pilot city", "Sample region", "Channel rollout", "Scale review"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12));
+  const metrics = [
+    { value: "TAM", label: "market size" },
+    { value: "3", label: "entry waves" },
+    { value: "90D", label: "pilot window" },
+  ];
+  const scenes = [
+    { kind: "cover", variant: "region-entry", kicker: "MARKET ENTRY MAP", title, summary: strategyRegionEntryCompactText(bullets[0], "Define where to enter first and why", 34), bullets, cards, steps, metrics },
+    { kind: "map", variant: "region-entry", kicker: "REGION PRIORITY", title, summary: strategyRegionEntryCompactText(bullets[0], "Compare regional potential, access and risk", 34), bullets, cards, steps, metrics },
+    { kind: "sequence", variant: "region-entry", kicker: "ENTRY SEQUENCE", title, summary: strategyRegionEntryCompactText(bullets[1], "Convert market judgment into phased rollout", 34), bullets, cards: steps, steps, metrics },
+    { kind: "segments", variant: "region-entry", kicker: "CUSTOMER WEDGE", title, summary: strategyRegionEntryCompactText(bullets[2], "Start from the customer group with clearest demand", 34), bullets, cards: ["Core customer", "Opportunity customer", "Nurture customer"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+    { kind: "channel", variant: "region-entry", kicker: "CHANNEL LAYOUT", title, summary: strategyRegionEntryCompactText(bullets[3], "Balance coverage efficiency with partner leverage", 34), bullets, cards: ["Direct sales", "Distributor", "Key account", "Online channel"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+    { kind: "risk", variant: "region-entry", kicker: "RISK & RESOURCE", title, summary: strategyRegionEntryCompactText(bullets[4], "Match resources and controls to each rollout wave", 34), bullets, cards: ["Demand risk", "Channel risk", "Resource gap", "Local compliance"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), steps, metrics },
+  ];
+  if (index === total - 1) {
+    return { kind: "closing", variant: "region-entry", kicker: "NEXT ENTRY ACTIONS", title, summary: strategyRegionEntryCompactText(bullets[0], "Confirm pilot scope and launch the first regional wave", 34), bullets, cards, steps: ["Confirm region", "Recruit channel", "Launch pilot", "Review metrics"].map((fallback, itemIndex) => strategyRegionEntryCompactText(bullets[itemIndex], fallback, 12)), metrics };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function strategyRegionEntryBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["Target region has clear demand and channel access", "Pilot first and scale after conversion signals", "Core customers need local service proof", "Channel partners accelerate coverage"];
+}
+
+function strategyRegionEntryCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isStrategyRegionEntryVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "strategy-region-entry" && (id === "market-entry-strategy" || id === "strategy-market-entry-strategy-region-entry");
+}
 function renderSecondCurvePreview(slide, scene) {
   const title = escapeHtml(scene.title || slide?.title || "增长战略阶段判断");
   const bulletItems = scene.bullets.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
@@ -7287,6 +7671,76 @@ function isSeedRoundStoryVisual(visual) {
   return visual?.layout === "seed-round-story" && (id === "seed-round-pitch" || id === "pitch-seed-round-pitch-startup-story");
 }
 
+function renderBusinessModelValueChainPreview(slide, scene) {
+  // 价值链模板在线预览使用独立 bmvc 层，保证和导出端一样隐藏默认正文层。
+  const title = escapeHtml(businessModelValueChainCompactText(slide?.title, scene.title, scene.role === "cover" ? 34 : 30));
+  const bullets = businessModelValueChainBulletTexts(slide);
+  const bulletList = bullets.slice(0, 3).map((item) => `<li>${escapeHtml(businessModelValueChainCompactText(item, "", 34))}</li>`).join("");
+  const common = `<div class="bmvc-layer"><div class="bmvc-kicker">${escapeHtml(scene.kicker)}</div><h2 class="bmvc-title">${title}</h2><p class="bmvc-summary">${escapeHtml(scene.summary)}</p><ul class="bmvc-bullets">${bulletList}</ul>`;
+  if (scene.role === "cover") {
+    return `${common}<div class="bmvc-hero-network">${scene.nodes.map((node) => `<span>${escapeHtml(node)}</span>`).join("")}</div><div class="bmvc-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "flow") {
+    return `${common}<div class="bmvc-flow">${scene.flow.map((item, itemIndex) => `<span>${escapeHtml(businessModelValueChainCompactText(bullets[itemIndex], item, 12))}</span>`).join("")}</div><div class="bmvc-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "profit") {
+    return `${common}<div class="bmvc-profit"><span></span><span></span><span></span><i></i></div><div class="bmvc-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "ecosystem") {
+    return `${common}<div class="bmvc-ecosystem">${scene.nodes.map((node) => `<span>${escapeHtml(node)}</span>`).join("")}</div><div class="bmvc-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "risk") {
+    return `${common}<div class="bmvc-matrix">${scene.cards.map((item, itemIndex) => `<span><b>${escapeHtml(String(itemIndex + 1).padStart(2, "0"))}</b>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `${common}<div class="bmvc-roadmap">${scene.steps.map((step, itemIndex) => `<span data-step="${itemIndex + 1}">${escapeHtml(step)}</span>`).join("")}</div></div>`;
+}
+
+function businessModelValueChainPreviewScene({ slide, index }) {
+  const bullets = businessModelValueChainBulletTexts(slide);
+  const title = businessModelValueChainCompactText(slide?.title, "Business model design", index === 0 ? 34 : 30);
+  const summary = businessModelValueChainCompactText(bullets[0], "Connect activities, resources, revenue and ecosystem leverage into one operating system.", 60);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const base = { variant: "business-model-system", title, summary };
+  if (index === 0 || layout.includes("cover")) {
+    return {
+      ...base,
+      role: "cover",
+      kicker: "OPERATING MODEL",
+      nodes: ["Activity", "Resource", "Profit", "Partner"],
+      metrics: [
+        { value: "A", label: "Activity loop" },
+        { value: "R", label: "Resource asset" },
+        { value: "P", label: "Profit pool" },
+      ],
+    };
+  }
+  if (layout.includes("profit")) return { ...base, role: "profit", kicker: "PROFIT LOGIC", cards: ["Revenue source", "Cost structure", "Margin space"] };
+  if (layout.includes("ecosystem") || layout.includes("platform")) return { ...base, role: "ecosystem", kicker: "PLATFORM NETWORK", nodes: ["User", "Partner", "Data", "Channel"], cards: ["Platform rule", "Role incentive", "Network effect"] };
+  if (layout.includes("risk") || layout.includes("opportunity")) return { ...base, role: "risk", kicker: "ASSUMPTION BOARD", cards: ["Core assumption", "Capability gap", "Growth opportunity", "Priority action"] };
+  if (layout.includes("roadmap") || layout.includes("execution")) return { ...base, role: "roadmap", kicker: "NEXT DECISIONS", steps: ["Validate", "Rebuild", "Design", "Align", "Scale"] };
+  return { ...base, role: "flow", kicker: "BUSINESS SYSTEM", flow: ["Supply", "Activity", "Asset", "Offer", "Channel", "Outcome"], cards: ["Value flow", "Capability asset", "Profit lever"] };
+}
+
+function businessModelValueChainBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["Key activities and resources need to form a closed loop", "Revenue and cost structure determine profit space", "Ecosystem partners influence scalable growth"];
+}
+
+function businessModelValueChainCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isBusinessModelValueChainVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "business-model-value-chain" && (!id || id === "business-model-design" || id === "strategy-business-model-design-value-chain");
+}
+
 /**
  * 渲染商业计划书商业模式主题的在线预览层，所有文字来自当前 slide，避免模板固定业务内容外露。
  * @param {object} slide
@@ -8144,6 +8598,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "capability-radar-map") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "enterprise-digital-blueprint") return false;
+  if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "market-trend-radar") return false;
@@ -8152,6 +8607,8 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
+  if (visual.layout === "finance-risk-inspection") return false;
+  if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
