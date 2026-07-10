@@ -5,6 +5,136 @@ import { PptExportService } from "../../src/ppt-exporter.js";
 import { PptService } from "../../src/ppt-service.js";
 import { TemplateManager } from "../../src/templates.js";
 
+test("internal control compliance preview uses dedicated risk inspection scenes", async () => {
+  const deck = {
+    id: "deck-risk-inspection-preview",
+    ownerUserId: 7,
+    title: "Internal control compliance review",
+    templateId: "finance-internal-control-compliance-report-risk-inspection",
+    theme: "risk-inspection",
+    templateVisual: {
+      id: "finance-internal-control-compliance-report-risk-inspection",
+      primary: "14213D",
+      accent: "F97316",
+      secondary: "16A34A",
+      warning: "DC2626",
+      background: "EEF3F7",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "finance-risk-inspection",
+      variant: "risk-inspection",
+    },
+    status: "ready",
+    slides: [
+      { title: "Control review dashboard", layout: "finance-risk-inspection-cover", bullets: ["32 audit items completed", "8 high risk findings", "100% remediation tracking"] },
+      { title: "Checklist evidence review", layout: "finance-risk-inspection-checklist", bullets: ["Approval authority review", "Payment voucher sampling", "Contract archive trace"] },
+      { title: "Key finding diagnosis", layout: "finance-risk-inspection-finding", bullets: ["Control gap in approval chain", "Evidence missing for sampling", "Remediation owner confirmed"] },
+      { title: "Risk level matrix", layout: "finance-risk-inspection-rating", bullets: ["Likelihood and impact mapping", "High risk items prioritized", "Residual risk tracked weekly"] },
+      { title: "Remediation closure path", layout: "finance-risk-inspection-remediation", bullets: ["Identify issue", "Assign owner", "Validate evidence", "Close and archive"] },
+      { title: "Compliance conclusion", layout: "finance-risk-inspection-closing", bullets: ["Maintain monitoring rhythm", "Complete evidence archive", "Review closure quality"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager({
+      templates: [{
+        id: "finance-internal-control-compliance-report-risk-inspection",
+        name: "Internal Control Compliance Report",
+        categoryId: "finance",
+        scope: "official",
+        official: true,
+        status: "active",
+        themes: [{ id: "risk-inspection", visual: deck.templateVisual }],
+        visual: deck.templateVisual,
+      }],
+    }),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="finance-risk-inspection"/);
+  assert.match(html, /risk-layer/);
+  assert.match(html, /risk-checklist/);
+  assert.match(html, /risk-finding-card/);
+  assert.match(html, /risk-heatmap/);
+  assert.match(html, /risk-remediation/);
+  assert.match(html, /risk-closing/);
+  assert.doesNotMatch(html, />风险检查</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
+test("business model system preview uses dedicated consulting scenes", async () => {
+  const deck = {
+    id: "deck-business-model-system-preview",
+    ownerUserId: 7,
+    title: "Business model redesign",
+    templateId: "strategy-business-model-design-value-chain",
+    theme: "value-chain",
+    templateVisual: {
+      id: "strategy-business-model-design-value-chain",
+      primary: "10233D",
+      accent: "18A999",
+      secondary: "D6A756",
+      warning: "F97316",
+      background: "EEF5F3",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "334155",
+      layout: "business-model-value-chain",
+      variant: "value-chain",
+    },
+    status: "ready",
+    slides: [
+      { title: "Operating model redesign", layout: "business-model-system-cover", bullets: ["Key activities need to connect resources and profit pools", "Partner roles require clearer incentives", "Platform governance should support repeatable growth"] },
+      { title: "Business system map", layout: "business-model-value-flow", bullets: ["Supply side", "Key activities", "Capability assets", "Product service", "Channel touchpoint", "Customer outcome"] },
+      { title: "Profit model logic", layout: "profit-model-map", bullets: ["Recurring revenue source", "Cost structure control", "Gross margin space"] },
+      { title: "Ecosystem platform mechanism", layout: "ecosystem-platform-map", bullets: ["User role", "Partner network", "Data asset", "Channel collaboration"] },
+      { title: "Assumption and opportunity board", layout: "risk-opportunity-matrix", bullets: ["Core assumption", "Capability gap", "Growth opportunity", "Priority action"] },
+      { title: "Execution path", layout: "business-model-roadmap", bullets: ["Validate assumption", "Rebuild process", "Design mechanism", "Align partners", "Review and scale"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager({
+      templates: [{
+        id: "strategy-business-model-design-value-chain",
+        name: "Business Model Design",
+        categoryId: "strategy",
+        scope: "official",
+        official: true,
+        status: "active",
+        themes: [{ id: "value-chain", visual: deck.templateVisual }],
+        visual: deck.templateVisual,
+      }],
+    }),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="business-model-value-chain"/);
+  assert.match(html, /bmvc-hero-network/);
+  assert.match(html, /bmvc-flow/);
+  assert.match(html, /bmvc-profit/);
+  assert.match(html, /bmvc-ecosystem/);
+  assert.match(html, /bmvc-matrix/);
+  assert.match(html, /bmvc-roadmap/);
+  assert.doesNotMatch(html, />value-chain</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
 test("product pricing strategy online preview uses dedicated scenes", async () => {
   const deck = {
     id: "deck-product-pricing-preview",

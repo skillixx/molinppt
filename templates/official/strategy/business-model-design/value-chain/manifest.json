@@ -1,0 +1,20 @@
+{
+  "slug": "strategy-business-model-design-value-chain",
+  "name": "商业模式设计 - 价值链",
+  "description": "适合战略咨询场景下的商业模式设计、业务链路拆解、盈利模型说明和生态平台规划，强调价值流、利润池和多方协同关系的官方模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "business-model-design",
+    "value-chain-analysis",
+    "profit-model",
+    "ecosystem-platform",
+    "consulting-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

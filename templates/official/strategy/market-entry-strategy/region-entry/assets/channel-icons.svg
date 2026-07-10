@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="220" viewBox="0 0 640 220" role="img" aria-label="Channel layout icons">
+  <rect width="640" height="220" rx="24" fill="#ffffff"/>
+  <g transform="translate(54 46)">
+    <rect width="100" height="100" rx="22" fill="#102a43"/>
+    <rect x="28" y="26" width="44" height="52" rx="8" fill="#14b8a6"/>
+    <rect x="38" y="36" width="24" height="6" rx="3" fill="#ffffff"/>
+    <rect x="38" y="52" width="24" height="6" rx="3" fill="#ffffff"/>
+  </g>
+  <g transform="translate(205 46)">
+    <rect width="100" height="100" rx="22" fill="#e8f7f5"/>
+    <circle cx="35" cy="45" r="16" fill="#14b8a6"/>
+    <circle cx="66" cy="45" r="16" fill="#f2b84b"/>
+    <path d="M27 73 C45 58 57 58 75 73" fill="none" stroke="#102a43" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(356 46)">
+    <rect width="100" height="100" rx="22" fill="#fff6df"/>
+    <path d="M25 70 L50 30 L75 70 Z" fill="#f2b84b"/>
+    <rect x="31" y="75" width="38" height="8" rx="4" fill="#102a43"/>
+  </g>
+  <g transform="translate(507 46)">
+    <rect width="100" height="100" rx="22" fill="#f1f5f9"/>
+    <circle cx="50" cy="50" r="28" fill="none" stroke="#102a43" stroke-width="8"/>
+    <path d="M29 50 H71 M50 29 V71" stroke="#14b8a6" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

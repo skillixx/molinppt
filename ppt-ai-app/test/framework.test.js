@@ -1183,6 +1183,41 @@ test("resolveTemplateVisual applies Pre-A market validation official visual", ()
   assert.equal(visual.accent, "14B8A6");
 });
 
+test("resolveTemplateVisual applies business model system official visual", () => {
+  const template = {
+    id: "strategy-business-model-design-value-chain",
+    visual: {
+      primary: "10233D",
+      secondary: "D6A756",
+      accent: "18A999",
+      warning: "F97316",
+      background: "EEF5F3",
+      surface: "FFFFFF",
+      title: "102033",
+      body: "334155",
+      layout: "business-model-value-chain",
+      variant: "value-chain",
+    },
+    themes: [
+      {
+        id: "value-chain",
+        visual: {
+          layout: "business-model-value-chain",
+          variant: "value-chain",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "value-chain", template });
+
+  assert.equal(visual.id, "strategy-business-model-design-value-chain");
+  assert.equal(visual.layout, "business-model-value-chain");
+  assert.equal(visual.variant, "value-chain");
+  assert.equal(visual.primary, "10233D");
+  assert.equal(visual.accent, "18A999");
+});
+
 test("resolveTemplateVisual applies operating problem diagnosis official visual", () => {
   const template = {
     id: "business-operating-problem-diagnosis-problem-tree",

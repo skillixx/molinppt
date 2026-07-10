@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" fill="none">
+  <circle cx="180" cy="180" r="132" stroke="#18A999" stroke-width="8" stroke-dasharray="18 18" opacity=".45"/>
+  <circle cx="180" cy="180" r="74" fill="#10233D"/>
+  <circle cx="180" cy="180" r="46" fill="#18A999" opacity=".22"/>
+  <circle cx="180" cy="42" r="24" fill="#D6A756"/>
+  <circle cx="306" cy="180" r="24" fill="#18A999"/>
+  <circle cx="180" cy="318" r="24" fill="#10233D"/>
+  <circle cx="54" cy="180" r="24" fill="#18A999"/>
+</svg>

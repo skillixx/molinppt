@@ -1,0 +1,19 @@
+{
+  "slug": "finance-internal-control-compliance-report-risk-inspection",
+  "name": "内控合规报告 - 风险检查",
+  "description": "适合内控检查、合规评估、风险等级说明和整改闭环追踪的审计风财务经营模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "internal-control",
+    "compliance",
+    "risk-inspection",
+    "audit"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
