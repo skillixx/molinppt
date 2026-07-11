@@ -3,6 +3,12 @@
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
 import {
+  resolveBrandStoryScene,
+  resolveDataInsightScene,
+  resolveMarketingCampaignScene,
+  resolvePitchDeckScene,
+} from "./template-scenes/commercial-template-scenes.js";
+import {
   masterBackgroundFile,
   masterBusinessMedia,
   masterCanvasMetrics,
@@ -1361,6 +1367,7 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       : marketingCampaignChannelCardsXml({ visual, palette });
     return base
       + coverWash
+      + marketingCampaignVariantShellXml({ visual, palette, scene, isCover })
       + solidShapeXml({ id: 302, name: "Marketing Primary Strip", x: 0, y: 0, cx: 9144000, cy: isCover ? 609600 : 342900, fill: visual.primary })
       + solidShapeXml({ id: 303, name: "Marketing Accent Beam", geom: "parallelogram", x: isCover ? 5486400 : 6096000, y: isCover ? 914400 : 609600, cx: 2133600, cy: 304800, fill: visual.accent })
       + lineFrameShapeXml({ id: 304, name: "Marketing Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
@@ -1384,6 +1391,7 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       : brandStoryIndexCardsXml({ visual, palette });
     return base
       + surface
+      + brandStoryVariantShellXml({ visual, palette, scene, isCover })
       + solidShapeXml({ id: 402, name: "Brand Story Spine", x: 0, y: 0, cx: 1158240, cy: 5143500, fill: visual.primary })
       + rectShapeXml({ id: 403, name: "Brand Story Header Rule", x: 685800, y: isCover ? 708660 : 609600, cx: 7772400, cy: 30480, fill: visual.accent })
       + lineFrameShapeXml({ id: 404, name: "Brand Story Editorial Frame", ...layout.surface, stroke: palette.frame, width: 15240 })
@@ -1408,6 +1416,7 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       : dataInsightSignalCardsXml({ visual, palette });
     return base
       + surface
+      + dataInsightVariantShellXml({ visual, palette, scene, isCover })
       + solidShapeXml({ id: 502, name: "Data Insight Top Bar", x: 0, y: 0, cx: 9144000, cy: isCover ? 609600 : 365760, fill: visual.primary })
       + rectShapeXml({ id: 503, name: "Data Insight Accent Rule", x: 685800, y: isCover ? 708660 : 609600, cx: 7772400, cy: 30480, fill: visual.accent })
       + lineFrameShapeXml({ id: 504, name: "Data Insight Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
@@ -9227,6 +9236,7 @@ function pitchDeckDecorationsXml({ visual, index, layout }) {
   return surface
     + stage
     + paper
+    + pitchDeckVariantShellXml({ visual, palette, scene, isCover })
     + lineFrameShapeXml({ id: 705, name: "Pitch Sheet Hairline", geom: "roundRect", x: isCover ? 685800 : 685800, y: isCover ? 762000 : 685800, cx: isCover ? 5334000 : 5334000, cy: isCover ? 3124200 : 3505200, stroke: palette.frame, width: 11430 })
     + rectShapeXml({ id: 706, name: "Pitch Focus Rule", x: 914400, y: isCover ? 3345180 : 1577340, cx: 3657600, cy: 22860, fill: visual.accent })
     + textShapeXml({ id: 707, name: "Pitch Kicker", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 880, bold: true, color: visual.accent })
@@ -9235,6 +9245,18 @@ function pitchDeckDecorationsXml({ visual, index, layout }) {
     + pitchDeckVisualXml({ visual, palette, scene, isCover })
     + lowerItems
     + textShapeXml({ id: 750, name: "Pitch Caption", x: isCover ? 6248400 : 6248400, y: isCover ? 3505200 : 3230880, cx: 2133600, cy: 182880, text: scene.caption, size: isCover ? 800 : 740, bold: true, color: visual.body });
+}
+
+function pitchDeckVariantShellXml({ visual, palette, scene, isCover }) {
+  // 投资人版强调资本备忘录和量化刻度，创业故事强调叙事路径和舞台节点。
+  if (scene.variant === "investor") {
+    return rectShapeXml({ id: 710, name: "Pitch Investor Memo Rule", x: 6553200, y: 609600, cx: 2286000, cy: 30480, fill: visual.accent })
+      + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 711 + itemIndex, name: `Pitch Investor Ledger Line ${itemIndex + 1}`, x: 6553200, y: 1219200 + itemIndex * 609600, cx: 2057400, cy: 15240, fill: palette.line })).join("")
+      + textShapeXml({ id: 716, name: "Pitch Investor Memo Code", x: 7924800, y: 4267200, cx: 762000, cy: 243840, text: "IC / 01", size: 720, bold: true, color: visual.accent });
+  }
+  return arcLineShapeXml({ id: 710, name: "Pitch Founder Narrative Arc", x: 5791200, y: 914400, cx: 2590800, cy: 2743200, stroke: visual.accent, width: 38100 })
+    + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 711 + itemIndex, name: `Pitch Founder Milestone ${itemIndex + 1}`, geom: "ellipse", x: 6248400 + itemIndex * 762000, y: 1676400 + itemIndex * 548640, cx: 152400, cy: 152400, fill: itemIndex === 1 ? visual.accent : palette.soft })).join("")
+    + textShapeXml({ id: 716, name: "Pitch Founder Chapter", x: 7010400, y: isCover ? 4267200 : 4420000, cx: 1371600, cy: 243840, text: "FROM INSIGHT TO SCALE", size: 620, bold: true, color: palette.chipText });
 }
 
 function pitchDeckVisualXml({ visual, palette, scene, isCover }) {
@@ -9305,46 +9327,7 @@ function pitchDeckColorPalette(visual) {
 }
 
 function pitchDeckScene(visual) {
-  const variant = pitchDeckVariant(visual);
-  const scenes = {
-    startup: {
-      variant: "startup",
-      kicker: "FOUNDER STORY",
-      section: "TRACTION PATH",
-      chip: "创业故事",
-      caption: "从用户痛点到可规模化增长的融资叙事",
-      metrics: [
-        { value: "痛点", label: "创始洞察" },
-        { value: "PMF", label: "验证路径" },
-        { value: "增长", label: "规模化机会" },
-      ],
-    },
-    investor: {
-      variant: "investor",
-      kicker: "INVESTOR MEMO",
-      section: "CAPITAL PLAN",
-      chip: "投资人版",
-      caption: "市场空间、商业模型和资金用途的决策视图",
-      metrics: [
-        { value: "TAM", label: "市场空间" },
-        { value: "ARR", label: "收入模型" },
-        { value: "Runway", label: "资金计划" },
-      ],
-    },
-    product: {
-      variant: "product",
-      kicker: "PRODUCT EDGE",
-      section: "VALUE PROOF",
-      chip: "产品亮点",
-      caption: "核心能力、场景价值和差异化证据",
-      metrics: [
-        { value: "01", label: "核心功能" },
-        { value: "3X", label: "效率提升" },
-        { value: "NPS", label: "用户口碑" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.startup;
+  return resolvePitchDeckScene(visual);
 }
 
 function pitchDeckVariant(visual) {
@@ -11629,6 +11612,31 @@ function marketingCampaignVisualXml({ visual, palette, scene, isCover }) {
     + solidShapeXml({ id: 325, name: "Marketing Launch Tile", geom: "roundRect", x: panel.x + 274320, y: panel.y + 1257300, cx: 335280, cy: 274320, fill: palette.card });
 }
 
+function marketingCampaignVariantShellXml({ visual, palette, scene, isCover }) {
+  // 三个营销主题使用不同的整页构图语言，而不只是替换右侧小图和颜色。
+  if (scene.variant === "brand") {
+    return solidShapeXml({ id: 310, name: "Marketing Brand Identity Circle A", geom: "ellipse", x: 7162800, y: -396240, cx: 1676400, cy: 1676400, fill: palette.soft })
+      + lineFrameShapeXml({ id: 311, name: "Marketing Brand Identity Circle B", geom: "ellipse", x: 7543800, y: 182880, cx: 1219200, cy: 1219200, stroke: visual.accent, width: 30480, transparency: 18000 })
+      + rectShapeXml({ id: 312, name: "Marketing Brand Side Code", x: 8382000, y: 1219200, cx: 152400, cy: 2590800, fill: visual.primary });
+  }
+  if (scene.variant === "growth") {
+    const bars = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({
+      id: 310 + itemIndex,
+      name: `Marketing Growth Grid Line ${itemIndex + 1}`,
+      x: 5943600,
+      y: 1066800 + itemIndex * 609600,
+      cx: 2438400,
+      cy: 15240,
+      fill: palette.line,
+    })).join("");
+    return bars
+      + arcLineShapeXml({ id: 315, name: "Marketing Growth Momentum Curve", x: 5943600, y: 1066800, cx: 2438400, cy: 2133600, stroke: visual.accent, width: 45720 })
+      + solidShapeXml({ id: 316, name: "Marketing Growth Signal", geom: "ellipse", x: 8046720, y: 1219200, cx: 182880, cy: 182880, fill: visual.accent });
+  }
+  return solidShapeXml({ id: 310, name: "Marketing Launch Spotlight", geom: "ellipse", x: 6858000, y: isCover ? 381000 : 548640, cx: 1828800, cy: 1828800, fill: palette.soft })
+    + solidShapeXml({ id: 311, name: "Marketing Launch Stage", geom: "trapezoid", x: 6172200, y: 2895600, cx: 2133600, cy: 609600, fill: palette.card });
+}
+
 function marketingCampaignMetricCardsXml({ visual, palette, metrics }) {
   return metrics.map((metric, index) => {
     const x = 1066800 + index * 1219200;
@@ -11659,46 +11667,7 @@ function marketingCampaignColorPalette(visual) {
 }
 
 function marketingCampaignScene(visual) {
-  const variant = marketingCampaignVariant(visual);
-  const scenes = {
-    launch: {
-      variant: "launch",
-      kicker: "PRODUCT LAUNCH",
-      section: "GO TO MARKET",
-      chip: "新品首发",
-      caption: "首发卖点、场景化素材与发布节奏",
-      metrics: [
-        { value: "01", label: "首发卖点" },
-        { value: "3", label: "核心场景" },
-        { value: "7D", label: "发布节奏" },
-      ],
-    },
-    brand: {
-      variant: "brand",
-      kicker: "BRAND VOICE",
-      section: "CONTENT MATRIX",
-      chip: "品牌声量",
-      caption: "品牌识别、传播主张与内容矩阵",
-      metrics: [
-        { value: "VI", label: "识别系统" },
-        { value: "3", label: "传播主张" },
-        { value: "全域", label: "内容触点" },
-      ],
-    },
-    growth: {
-      variant: "growth",
-      kicker: "GROWTH LOOP",
-      section: "CHANNEL FUNNEL",
-      chip: "增长转化",
-      caption: "渠道漏斗、转化路径与复购闭环",
-      metrics: [
-        { value: "AARRR", label: "增长模型" },
-        { value: "5", label: "关键触点" },
-        { value: "ROI", label: "投放复盘" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.launch;
+  return resolveMarketingCampaignScene(visual);
 }
 
 function marketingCampaignVariant(visual) {
@@ -12766,6 +12735,21 @@ function dataInsightVisualXml({ visual, palette, scene, isCover }) {
     + solidShapeXml({ id: 525, name: "Data Insight Dashboard Bar 3", geom: "roundRect", x: panel.x + 1005840, y: panel.y + 762000, cx: 167640, cy: 457200, fill: visual.accent })
     + solidShapeXml({ id: 526, name: "Data Insight Dashboard Bar 4", geom: "roundRect", x: panel.x + 1310640, y: panel.y + 426720, cx: 167640, cy: 792480, fill: visual.primary })
     + solidShapeXml({ id: 527, name: "Data Insight Dashboard Alert Dot", geom: "ellipse", x: panel.x + 1478280, y: panel.y + 365760, cx: 243840, cy: 243840, fill: palette.alert });
+}
+
+function dataInsightVariantShellXml({ visual, palette, scene, isCover }) {
+  // 数据主题分别采用控制台网格、信号路径和研究页索引，保证整页结构可辨识。
+  if (scene.variant === "insight") {
+    return arcLineShapeXml({ id: 510, name: "Data Insight Signal Path", x: 5638800, y: 640080, cx: 2895600, cy: 3200400, stroke: visual.accent, width: 30480 })
+      + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 511 + itemIndex, name: `Data Insight Signal Node ${itemIndex + 1}`, geom: "ellipse", x: 6019800 + itemIndex * 762000, y: 1219200 + itemIndex * 548640, cx: 137160, cy: 137160, fill: itemIndex === 1 ? visual.primary : visual.accent })).join("");
+  }
+  if (scene.variant === "research") {
+    return rectShapeXml({ id: 510, name: "Data Research Left Margin", x: 1219200, y: 609600, cx: 30480, cy: 3962400, fill: visual.accent })
+      + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 511 + itemIndex, name: `Data Research Evidence Rule ${itemIndex + 1}`, x: 5943600, y: 914400 + itemIndex * 609600, cx: 2438400 - itemIndex * 152400, cy: 15240, fill: palette.line })).join("")
+      + textShapeXml({ id: 516, name: "Data Research Folio", x: 7772400, y: 4267200, cx: 762000, cy: 243840, text: isCover ? "ABSTRACT" : "EVIDENCE", size: 680, bold: true, color: visual.accent });
+  }
+  const vertical = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 510 + itemIndex, name: `Data Dashboard Grid ${itemIndex + 1}`, x: 5791200 + itemIndex * 609600, y: 762000, cx: 7620, cy: 3048000, fill: palette.line })).join("");
+  return vertical + rectShapeXml({ id: 516, name: "Data Dashboard Pulse", x: 5791200, y: 3810000, cx: 2590800, cy: 30480, fill: visual.accent });
 }
 
 function biExecutiveCockpitDecorationsXml({ visual, index, role, slide }) {
@@ -14240,46 +14224,7 @@ function dataInsightColorPalette(visual) {
 }
 
 function dataInsightScene(visual) {
-  const variant = dataInsightVariant(visual);
-  const scenes = {
-    dashboard: {
-      variant: "dashboard",
-      kicker: "DATA COMMAND CENTER",
-      section: "KPI DASHBOARD",
-      chip: "仪表盘",
-      caption: "核心指标、异常波动与经营信号",
-      metrics: [
-        { value: "KPI", label: "指标总览" },
-        { value: "24H", label: "数据刷新" },
-        { value: "3", label: "异常信号" },
-      ],
-    },
-    insight: {
-      variant: "insight",
-      kicker: "INSIGHT FINDINGS",
-      section: "SIGNAL ANALYSIS",
-      chip: "洞察分析",
-      caption: "趋势拆解、原因定位与行动优先级",
-      metrics: [
-        { value: "01", label: "关键发现" },
-        { value: "4", label: "影响因子" },
-        { value: "Next", label: "行动建议" },
-      ],
-    },
-    research: {
-      variant: "research",
-      kicker: "RESEARCH NOTE",
-      section: "EVIDENCE REVIEW",
-      chip: "研究报告",
-      caption: "样本、结论和可追溯的研究证据",
-      metrics: [
-        { value: "N", label: "样本说明" },
-        { value: "CI", label: "置信区间" },
-        { value: "Ref", label: "证据索引" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.dashboard;
+  return resolveDataInsightScene(visual);
 }
 
 function dataInsightVariant(visual) {
@@ -14422,6 +14367,32 @@ function brandStoryVisualXml({ visual, palette, scene, isCover }) {
     + solidShapeXml({ id: 425, name: "Brand Story Editorial Color Field", x: panel.x + 1249680, y: panel.y + 899160, cx: 426720, cy: 548640, fill: palette.chip });
 }
 
+function brandStoryVariantShellXml({ visual, palette, scene, isCover }) {
+  // 编辑叙事、黑金质感和品牌识别分别使用出版物、材质展台和识别网格语义。
+  if (scene.variant === "premium") {
+    return rectShapeXml({ id: 410, name: "Brand Story Premium Top Plate", x: 1158240, y: 0, cx: 7985760, cy: 304800, fill: visual.primary })
+      + rectShapeXml({ id: 411, name: "Brand Story Premium Gold Rule", x: 1371600, y: 396240, cx: 7315200, cy: 30480, fill: visual.accent })
+      + solidShapeXml({ id: 412, name: "Brand Story Premium Seal", geom: "ellipse", x: 7924800, y: 4114800, cx: 457200, cy: 457200, fill: palette.chip });
+  }
+  if (scene.variant === "identity") {
+    const modules = [0, 1, 2].map((itemIndex) => lineFrameShapeXml({
+      id: 410 + itemIndex,
+      name: `Brand Story Identity Module ${itemIndex + 1}`,
+      geom: itemIndex === 1 ? "ellipse" : "roundRect",
+      x: 6858000 + itemIndex * 457200,
+      y: 396240 + itemIndex * 152400,
+      cx: 609600,
+      cy: 609600,
+      stroke: itemIndex === 1 ? visual.accent : visual.primary,
+      width: 22860,
+      transparency: 12000,
+    })).join("");
+    return modules + rectShapeXml({ id: 414, name: "Brand Story Identity Baseline", x: 1371600, y: 4495800, cx: 7010400, cy: 30480, fill: visual.accent });
+  }
+  return textShapeXml({ id: 410, name: "Brand Story Editorial Folio", x: 7772400, y: 426720, cx: 609600, cy: 243840, text: isCover ? "01" : "STORY", size: 920, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 411, name: "Brand Story Editorial Margin Rule", x: 1371600, y: 457200, cx: 30480, cy: 3962400, fill: palette.line });
+}
+
 function brandStoryPointCardsXml({ visual, palette, scene }) {
   return scene.points.map((point, index) => {
     const x = 1066800 + index * 1219200;
@@ -14454,37 +14425,7 @@ function brandStoryColorPalette(visual) {
 }
 
 function brandStoryScene(visual) {
-  const variant = brandStoryVariant(visual);
-  const scenes = {
-    editorial: {
-      variant: "editorial",
-      kicker: "EDITORIAL STORY",
-      section: "NARRATIVE ARC",
-      chip: "编辑叙事",
-      caption: "品牌主张、故事线与传播语境",
-      mark: "ST",
-      points: ["品牌起点", "核心主张", "传播语境"],
-    },
-    premium: {
-      variant: "premium",
-      kicker: "PREMIUM MOOD",
-      section: "TEXTURE SYSTEM",
-      chip: "高端质感",
-      caption: "材质、影调与高级视觉秩序",
-      mark: "PR",
-      points: ["品质证据", "高级影调", "信任资产"],
-    },
-    identity: {
-      variant: "identity",
-      kicker: "BRAND IDENTITY",
-      section: "VISUAL CODES",
-      chip: "品牌识别",
-      caption: "识别符号、色彩系统与触点一致性",
-      mark: "ID",
-      points: ["识别符号", "色彩系统", "触点规范"],
-    },
-  };
-  return scenes[variant] || scenes.editorial;
+  return resolveBrandStoryScene(visual);
 }
 
 function brandStoryVariant(visual) {

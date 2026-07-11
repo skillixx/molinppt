@@ -2,6 +2,12 @@
 
 import { AppError } from "./errors.js";
 import { resolveTemplateVisual } from "./templates.js";
+import {
+  resolveBrandStoryScene,
+  resolveDataInsightScene,
+  resolveMarketingCampaignScene,
+  resolvePitchDeckScene,
+} from "./template-scenes/commercial-template-scenes.js";
 
 const DOME_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const DOME_PREVIEW_ASSETS = {
@@ -4620,6 +4626,42 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="red-gold"] .slide[data-dome-role="agenda"] .slide-content{justify-items:center;text-align:center;}
     body[data-layout="red-gold"] .slide[data-dome-role="section-divider"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
     body[data-layout="red-gold"] .slide[data-dome-role="closing"] .slide-content{align-content:center;justify-items:center;text-align:center;color:var(--dome-surface-text);}
+    /* 数据洞察三主题分别对应控制台、信号分析和研究页，保持与导出端的结构语义一致。 */
+    body[data-template="data-insight"] .slide[data-template-variant="dashboard"]::before{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 7%,transparent) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 22%);}
+    body[data-template="data-insight"] .slide[data-template-variant="dashboard"] .data-insight-visual{border-radius:8px;background:linear-gradient(145deg,color-mix(in srgb,var(--template-primary) 92%,#000 8%),color-mix(in srgb,var(--template-primary) 72%,var(--template-accent) 28%));}
+    body[data-template="data-insight"] .slide[data-template-variant="insight"]::before{background:radial-gradient(circle at 80% 24%,color-mix(in srgb,var(--template-accent) 26%,transparent),transparent 20%),radial-gradient(circle at 70% 56%,color-mix(in srgb,var(--template-primary) 12%,transparent),transparent 18%);}
+    body[data-template="data-insight"] .slide[data-template-variant="insight"] .data-insight-scanline{height:22%;border:0;border-top:3px solid var(--template-accent);border-radius:50%;transform:rotate(-8deg);}
+    body[data-template="data-insight"] .slide[data-template-variant="research"]{background:linear-gradient(135deg,#ece9e1,var(--template-bg) 48%,#fffefa);}
+    body[data-template="data-insight"] .slide[data-template-variant="research"]::before{background:repeating-linear-gradient(0deg,rgba(47,58,74,.045) 0 1px,transparent 1px 31px),linear-gradient(90deg,transparent 0 13%,color-mix(in srgb,var(--template-accent) 30%,transparent) 13% 13.3%,transparent 13.3%);}
+    body[data-template="data-insight"] .slide[data-template-variant="research"]::after{border-radius:1px;box-shadow:10px 14px 0 rgba(47,58,74,.06),0 24px 48px rgba(27,36,48,.12);}
+    body[data-template="data-insight"] .slide[data-template-variant="research"] .data-insight-visual{border-radius:2px;background:#fffefa;}
+    /* 融资路演两主题分别使用创始人叙事舞台和投资备忘录，不复用同一张装饰皮肤。 */
+    body[data-template="pitch"] .slide[data-template-variant="startup"]::before{background:radial-gradient(circle at 76% 18%,color-mix(in srgb,var(--template-accent) 38%,transparent),transparent 21%),linear-gradient(115deg,rgba(255,255,255,.06) 0 12%,transparent 12% 62%,rgba(255,255,255,.08) 62%),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 44px);}
+    body[data-template="pitch"] .slide[data-template-variant="startup"] .pitch-arc{height:34%;border-top-width:5px;transform:rotate(-8deg);}
+    body[data-template="pitch"] .slide[data-template-variant="investor"]{background:linear-gradient(135deg,#071a22,var(--template-primary) 54%,#174c54);}
+    body[data-template="pitch"] .slide[data-template-variant="investor"]::before{background:repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 42px),linear-gradient(90deg,transparent 0 68%,rgba(25,160,165,.12) 68% 100%);}
+    body[data-template="pitch"] .slide[data-template-variant="investor"]::after{border-radius:2px;background:linear-gradient(135deg,#fff,#eff7f7);box-shadow:0 30px 64px rgba(0,0,0,.30);}
+    body[data-template="pitch"] .slide[data-template-variant="investor"] .pitch-visual{border-radius:3px;background:linear-gradient(180deg,#fff,#e6f2f2);}
+    body[data-template="pitch"] .slide[data-template-variant="investor"] .pitch-arc{border-radius:0;border:0;border-top:1px solid color-mix(in srgb,var(--template-accent) 55%,transparent);border-bottom:1px solid color-mix(in srgb,var(--template-accent) 28%,transparent);}
+    /* 营销活动三主题采用不同的整页视觉语法，与 PPTX 端的舞台、识别圆和增长网格一一对应。 */
+    body[data-template="marketing-campaign"] .slide[data-template-variant="launch"]::before{background:radial-gradient(circle at 78% 24%,color-mix(in srgb,var(--template-accent) 38%,transparent),transparent 22%),repeating-linear-gradient(110deg,rgba(255,255,255,.08) 0 1px,transparent 1px 34px);}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="launch"] .marketing-orbit{border-radius:50% 50% 14% 14%;border:1px solid color-mix(in srgb,var(--template-accent) 48%,transparent);background:linear-gradient(180deg,transparent 58%,color-mix(in srgb,var(--template-accent) 18%,transparent));}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="brand"]::before{background:radial-gradient(circle at 84% 13%,color-mix(in srgb,var(--template-accent) 30%,transparent) 0 10%,transparent 10.4%),radial-gradient(circle at 77% 18%,color-mix(in srgb,var(--template-primary) 26%,transparent) 0 14%,transparent 14.4%),linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 8%,transparent) 0 18%,transparent 18%);}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="brand"]::after{border-radius:28px 5px 28px 5px;}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="brand"] .marketing-orbit{right:4.7%;top:17%;width:31%;height:58%;border-radius:50%;border:2px solid color-mix(in srgb,var(--template-accent) 38%,transparent);}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="growth"]::before{background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 7%,transparent) 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 48px),radial-gradient(circle at 82% 18%,color-mix(in srgb,var(--template-accent) 24%,transparent),transparent 24%);}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="growth"]::after{border-radius:7px;box-shadow:0 26px 58px color-mix(in srgb,var(--template-primary) 18%,transparent);}
+    body[data-template="marketing-campaign"] .slide[data-template-variant="growth"] .marketing-orbit{right:7.5%;top:20%;width:30%;height:48%;border:0;border-left:1px solid color-mix(in srgb,var(--template-primary) 18%,transparent);border-bottom:1px solid color-mix(in srgb,var(--template-primary) 18%,transparent);border-radius:0;transform:skewY(-8deg);}
+    /* 品牌故事三主题分别对应杂志页、黑金展台和识别系统网格。 */
+    body[data-template="brand-story"] .slide[data-template-variant="editorial"]::after{border-radius:0;box-shadow:12px 18px 0 color-mix(in srgb,var(--template-accent) 14%,transparent),0 24px 54px rgba(23,27,38,.13);}
+    body[data-template="brand-story"] .slide[data-template-variant="editorial"] .brand-story-image{border-radius:0;transform:rotate(-1.2deg);}
+    body[data-template="brand-story"] .slide[data-template-variant="premium"]{background:linear-gradient(135deg,#0b0d12,var(--template-primary) 58%,#30271b);}
+    body[data-template="brand-story"] .slide[data-template-variant="premium"]::before{background:linear-gradient(115deg,rgba(191,160,106,.08) 0 1px,transparent 1px 36px),radial-gradient(circle at 81% 19%,rgba(191,160,106,.22),transparent 22%);}
+    body[data-template="brand-story"] .slide[data-template-variant="premium"]::after{background:linear-gradient(135deg,#fffefa,#f2efe8);border:1px solid color-mix(in srgb,var(--template-accent) 34%,transparent);box-shadow:0 30px 70px rgba(0,0,0,.32);}
+    body[data-template="brand-story"] .slide[data-template-variant="premium"] .brand-story-image{border-radius:2px;background:linear-gradient(145deg,#171b22,#3d3428);border:1px solid color-mix(in srgb,var(--template-accent) 56%,transparent);}
+    body[data-template="brand-story"] .slide[data-template-variant="identity"]::before{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 7%,transparent) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 48px),radial-gradient(circle at 80% 17%,color-mix(in srgb,var(--template-accent) 22%,transparent),transparent 20%);}
+    body[data-template="brand-story"] .slide[data-template-variant="identity"]::after{border-radius:24px 4px 24px 4px;}
+    body[data-template="brand-story"] .slide[data-template-variant="identity"] .brand-story-image{border-radius:50%;box-shadow:0 0 0 16px color-mix(in srgb,var(--template-primary) 7%,transparent),0 18px 34px rgba(17,24,39,.12);}
     @media (max-width:720px){body{padding:14px;}main{gap:18px;}.slide{padding:8% 7%;}h2{font-size:26px;}ul{max-width:94%;font-size:16px;line-height:1.48;}body[data-layout="hero"] .slide-cover h2,body[data-layout="executive"] h2,body[data-layout="academy"] h2,body[data-layout="venture"] h2,body[data-layout="marketing"] h2,body[data-layout="data-insight"] h2,body[data-layout="education-course"] h2,body[data-layout="corporate-training"] .training-title,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="concept-breakdown-courseware"] .concept-title,body[data-layout="status-report"] h2,body[data-layout="red-gold"] .slide-cover h2{font-size:30px;}body[data-layout="status-report"] .slide-content{padding-right:0;}body[data-layout="status-report"] .status-report-photo,body[data-layout="status-report"] .status-report-photo-frame,body[data-layout="status-report"] .status-report-checklist{display:none;}body[data-layout="status-report"] ul{max-width:92%;}body[data-layout="marketing"] .slide-content,body[data-layout="data-insight"] .slide-content,body[data-layout="education-course"] .slide-content{padding-right:0;}body[data-layout="marketing"] .marketing-visual,body[data-layout="marketing"] .marketing-metrics,body[data-layout="marketing"] .marketing-channel-row,body[data-layout="marketing"] .marketing-caption,body[data-layout="marketing"] .marketing-orbit,body[data-layout="data-insight"] .data-insight-visual,body[data-layout="data-insight"] .data-insight-hero-grid,body[data-layout="data-insight"] .data-insight-mini-row,body[data-layout="data-insight"] .data-insight-caption,body[data-layout="data-insight"] .data-insight-scanline,body[data-layout="education-course"] .education-visual,body[data-layout="education-course"] .education-outcomes,body[data-layout="education-course"] .education-note-row,body[data-layout="education-course"] .education-caption,body[data-layout="corporate-training"] .training-board,body[data-layout="corporate-training"] .training-model,body[data-layout="corporate-training"] .training-case,body[data-layout="onboarding-guide"] .onboarding-badge,body[data-layout="onboarding-guide"] .onboarding-handbook,body[data-layout="onboarding-guide"] .onboarding-culture,body[data-layout="knowledge-blackboard"] .blackboard-note,body[data-layout="knowledge-blackboard"] .blackboard-formula,body[data-layout="knowledge-blackboard"] .blackboard-summary,body[data-layout="concept-breakdown-courseware"] .concept-board,body[data-layout="concept-breakdown-courseware"] .concept-map,body[data-layout="concept-breakdown-courseware"] .concept-case-panel,body[data-layout="concept-breakdown-courseware"] .concept-practice,body[data-layout="concept-breakdown-courseware"] .concept-summary{display:none;}body[data-layout="marketing"] h2,body[data-layout="marketing"] ul,body[data-layout="data-insight"] h2,body[data-layout="data-insight"] ul,body[data-layout="education-course"] h2,body[data-layout="education-course"] ul,body[data-layout="corporate-training"] .training-title,body[data-layout="corporate-training"] .training-bullets,body[data-layout="onboarding-guide"] .onboarding-title,body[data-layout="onboarding-guide"] .onboarding-bullets,body[data-layout="knowledge-blackboard"] .blackboard-title,body[data-layout="knowledge-blackboard"] .blackboard-bullets,body[data-layout="concept-breakdown-courseware"] .concept-title,body[data-layout="concept-breakdown-courseware"] .concept-bullets{max-width:92%;width:82%;}body[data-layout="red-gold"] .slide:not(.slide-cover) h2{font-size:26px;}body[data-layout="red-gold"] .slide:not(.slide-cover) ul{font-size:15px;max-width:74%;}}
   </style></head><body data-template="${escapeHtml(visual.id)}" data-layout="${escapeHtml(visual.layout)}"><main>${slides}</main></body></html>`;
 }
@@ -8445,46 +8487,7 @@ function isMarketTrendRadarVisual(visual) {
 }
 
 function pitchDeckPreviewScene(visual) {
-  const variant = pitchDeckVariant(visual);
-  const scenes = {
-    startup: {
-      variant: "startup",
-      kicker: "FOUNDER STORY",
-      section: "TRACTION PATH",
-      chip: "创业故事",
-      caption: "从用户痛点到可规模化增长的融资叙事",
-      metrics: [
-        { value: "痛点", label: "创始洞察" },
-        { value: "PMF", label: "验证路径" },
-        { value: "增长", label: "规模化机会" },
-      ],
-    },
-    investor: {
-      variant: "investor",
-      kicker: "INVESTOR MEMO",
-      section: "CAPITAL PLAN",
-      chip: "投资人版",
-      caption: "市场空间、商业模型和资金用途的决策视图",
-      metrics: [
-        { value: "TAM", label: "市场空间" },
-        { value: "ARR", label: "收入模型" },
-        { value: "Runway", label: "资金计划" },
-      ],
-    },
-    product: {
-      variant: "product",
-      kicker: "PRODUCT EDGE",
-      section: "VALUE PROOF",
-      chip: "产品亮点",
-      caption: "核心能力、场景价值和差异化证据",
-      metrics: [
-        { value: "01", label: "核心功能" },
-        { value: "3X", label: "效率提升" },
-        { value: "NPS", label: "用户口碑" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.startup;
+  return resolvePitchDeckScene(visual);
 }
 
 function pitchDeckVariant(visual) {
@@ -9171,46 +9174,7 @@ function isBusinessModelBpVisual(visual) {
 }
 
 function marketingCampaignPreviewScene(visual) {
-  const variant = marketingCampaignVariant(visual);
-  const scenes = {
-    launch: {
-      variant: "launch",
-      kicker: "PRODUCT LAUNCH",
-      section: "GO TO MARKET",
-      chip: "新品首发",
-      caption: "首发卖点、场景化素材与发布节奏",
-      metrics: [
-        { value: "01", label: "首发卖点" },
-        { value: "3", label: "核心场景" },
-        { value: "7D", label: "发布节奏" },
-      ],
-    },
-    brand: {
-      variant: "brand",
-      kicker: "BRAND VOICE",
-      section: "CONTENT MATRIX",
-      chip: "品牌声量",
-      caption: "品牌识别、传播主张与内容矩阵",
-      metrics: [
-        { value: "VI", label: "识别系统" },
-        { value: "3", label: "传播主张" },
-        { value: "全域", label: "内容触点" },
-      ],
-    },
-    growth: {
-      variant: "growth",
-      kicker: "GROWTH LOOP",
-      section: "CHANNEL FUNNEL",
-      chip: "增长转化",
-      caption: "渠道漏斗、转化路径与复购闭环",
-      metrics: [
-        { value: "AARRR", label: "增长模型" },
-        { value: "5", label: "关键触点" },
-        { value: "ROI", label: "投放复盘" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.launch;
+  return resolveMarketingCampaignScene(visual);
 }
 
 function marketingCampaignVariant(visual) {
@@ -9710,37 +9674,7 @@ function isDepartmentTeamPerformanceVisual(visual) {
 }
 
 function brandStoryPreviewScene(visual) {
-  const variant = brandStoryVariant(visual);
-  const scenes = {
-    editorial: {
-      variant: "editorial",
-      kicker: "EDITORIAL STORY",
-      section: "NARRATIVE ARC",
-      chip: "编辑叙事",
-      caption: "品牌主张、故事线与传播语境",
-      mark: "ST",
-      points: ["品牌起点", "核心主张", "传播语境"],
-    },
-    premium: {
-      variant: "premium",
-      kicker: "PREMIUM MOOD",
-      section: "TEXTURE SYSTEM",
-      chip: "高端质感",
-      caption: "材质、影调与高级视觉秩序",
-      mark: "PR",
-      points: ["品质证据", "高级影调", "信任资产"],
-    },
-    identity: {
-      variant: "identity",
-      kicker: "BRAND IDENTITY",
-      section: "VISUAL CODES",
-      chip: "品牌识别",
-      caption: "识别符号、色彩系统与触点一致性",
-      mark: "ID",
-      points: ["识别符号", "色彩系统", "触点规范"],
-    },
-  };
-  return scenes[variant] || scenes.editorial;
+  return resolveBrandStoryScene(visual);
 }
 
 function brandStoryVariant(visual) {
@@ -9998,46 +9932,7 @@ function isExperimentAbTestVisual(visual) {
 }
 
 function dataInsightPreviewScene(visual) {
-  const variant = dataInsightVariant(visual);
-  const scenes = {
-    dashboard: {
-      variant: "dashboard",
-      kicker: "DATA COMMAND CENTER",
-      section: "KPI DASHBOARD",
-      chip: "仪表盘",
-      caption: "核心指标、异常波动与经营信号",
-      metrics: [
-        { value: "KPI", label: "指标总览" },
-        { value: "24H", label: "数据刷新" },
-        { value: "3", label: "异常信号" },
-      ],
-    },
-    insight: {
-      variant: "insight",
-      kicker: "INSIGHT FINDINGS",
-      section: "SIGNAL ANALYSIS",
-      chip: "洞察分析",
-      caption: "趋势拆解、原因定位与行动优先级",
-      metrics: [
-        { value: "01", label: "关键发现" },
-        { value: "4", label: "影响因子" },
-        { value: "Next", label: "行动建议" },
-      ],
-    },
-    research: {
-      variant: "research",
-      kicker: "RESEARCH NOTE",
-      section: "EVIDENCE REVIEW",
-      chip: "研究报告",
-      caption: "样本、结论和可追溯的研究证据",
-      metrics: [
-        { value: "N", label: "样本说明" },
-        { value: "CI", label: "置信区间" },
-        { value: "Ref", label: "证据索引" },
-      ],
-    },
-  };
-  return scenes[variant] || scenes.dashboard;
+  return resolveDataInsightScene(visual);
 }
 
 function dataInsightVariant(visual) {
