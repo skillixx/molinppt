@@ -1,0 +1,67 @@
+{
+  "id": "marketing-integrated-campaign-media-mix",
+  "slug": "marketing-integrated-campaign-media-mix",
+  "name": "整合营销传播 - 媒介组合",
+  "description": "围绕媒介矩阵、预算分配、覆盖频次和传播节奏设计的整合营销传播模板。",
+  "category": "市场营销",
+  "categorySlug": "marketing",
+  "baseTemplateId": "integrated-campaign",
+  "themeId": "media-mix",
+  "style": "integrated-media-mix",
+  "status": "active",
+  "sortOrder": 68,
+  "tags": [
+    "市场营销",
+    "整合营销",
+    "媒介矩阵",
+    "预算分配",
+    "传播节奏"
+  ],
+  "themes": [
+    {
+      "id": "media-mix",
+      "name": "媒介组合",
+      "description": "面向整合营销传播、媒介矩阵规划、预算分配和覆盖频次评估。",
+      "visual": {
+        "id": "marketing-integrated-campaign-media-mix",
+        "layout": "integrated-media-mix",
+        "variant": "media-mix",
+        "primary": "12355B",
+        "secondary": "1D9BF0",
+        "accent": "F59E0B",
+        "warning": "EF4444",
+        "background": "F3F7FB",
+        "surface": "FFFFFF",
+        "title": "10233F",
+        "body": "334155"
+      }
+    }
+  ],
+  "visual": {
+    "id": "marketing-integrated-campaign-media-mix",
+    "layout": "integrated-media-mix",
+    "variant": "media-mix",
+    "primary": "12355B",
+    "secondary": "1D9BF0",
+    "accent": "F59E0B",
+    "warning": "EF4444",
+    "background": "F3F7FB",
+    "surface": "FFFFFF",
+    "title": "10233F",
+    "body": "334155"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "integrated-media-mix-cover",
+    "defaultContentLayout": "integrated-media-mix-content",
+    "allowedLayouts": [
+      "integrated-media-mix-cover",
+      "integrated-media-mix-matrix",
+      "integrated-media-mix-budget",
+      "integrated-media-mix-rhythm",
+      "integrated-media-mix-effect",
+      "integrated-media-mix-closing",
+      "title",
+      "content"
+    ]
+  }
+}

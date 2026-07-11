@@ -1,0 +1,20 @@
+{
+  "slug": "sales-presales-technical-plan-architecture-solution",
+  "name": "售前技术方案 - 架构方案",
+  "description": "适合售前方案、客户需求匹配、技术架构说明、系统集成说明和交付保障汇报的官方 AI-PPT 模板。",
+  "category_slug": "sales",
+  "category_name": "销售方案",
+  "category_sort_order": 40,
+  "status": "active",
+  "tags": [
+    "sales",
+    "presales",
+    "technical-plan",
+    "architecture",
+    "solution-design",
+    "delivery-assurance"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

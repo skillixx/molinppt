@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "sales-training-course",
+  "themeId": "objection-handling",
+  "style": "sales-roleplay-training",
+  "themes": [
+    {
+      "id": "objection-handling",
+      "name": "异议处理",
+      "visual": {
+        "primary": "17324D",
+        "accent": "FF8A3D",
+        "secondary": "2AB7A9",
+        "warning": "E94B5F",
+        "background": "F2F7FA",
+        "surface": "FFFFFF",
+        "title": "10233B",
+        "body": "34445C",
+        "layout": "sales-training-objection-handling",
+        "variant": "roleplay"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "17324D",
+    "accent": "FF8A3D",
+    "secondary": "2AB7A9",
+    "warning": "E94B5F",
+    "background": "F2F7FA",
+    "surface": "FFFFFF",
+    "title": "10233B",
+    "body": "34445C",
+    "layout": "sales-training-objection-handling",
+    "variant": "roleplay"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "sales-training-objection-cover",
+    "defaultContentLayout": "sales-training-objection-content",
+    "allowedLayouts": [
+      "sales-training-objection-cover",
+      "sales-training-objection-map",
+      "sales-training-objection-path",
+      "sales-training-objection-roleplay",
+      "sales-training-objection-checklist",
+      "sales-training-objection-closing",
+      "title",
+      "content"
+    ]
+  }
+}

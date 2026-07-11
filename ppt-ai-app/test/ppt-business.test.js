@@ -528,6 +528,29 @@ test("PptService renders synced capability radar preview with dedicated layout",
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced experience gap preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertExperienceGapTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "竞品体验差距分析",
+    slideCount: 6,
+    templateId: "product-competitor-analysis-report-experience-gap",
+    theme: "experience-gap",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-competitor-analysis-report-experience-gap" data-layout="experience-gap-map"/);
+  assert.match(preview, /gap-layer/);
+  assert.match(preview, /gap-browser-pair/);
+  assert.match(preview, /gap-matrix|gap-path|gap-opportunities|gap-roadmap|gap-closing-loop/);
+  assert.doesNotMatch(preview, />体验差距</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced budget planning preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -5247,6 +5270,52 @@ async function insertCapabilityRadarTemplate(context) {
       defaultCoverLayout: "capability-radar-cover",
       defaultContentLayout: "capability-radar-content",
       allowedLayouts: ["capability-radar-cover", "capability-radar-comparison", "capability-radar-analysis", "capability-radar-gap", "capability-radar-roadmap", "capability-radar-summary", "title", "content", "closing"],
+    },
+  });
+}
+
+async function insertExperienceGapTemplate(context) {
+  // 测试数据库模拟官方模板同步后的竞品体验差距模板，确保生成后预览不退回通用版式。
+  await context.database.insert("templates", {
+    id: "product-competitor-analysis-report-experience-gap",
+    slug: "product-competitor-analysis-report-experience-gap",
+    name: "竞品分析报告 - 体验差距",
+    categoryId: "product",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "experience-gap",
+        name: "体验差距",
+        visual: {
+          primary: "18233F",
+          accent: "2F80ED",
+          secondary: "F9735B",
+          background: "EEF4FA",
+          surface: "FFFFFF",
+          title: "101828",
+          body: "405166",
+          layout: "experience-gap-map",
+          variant: "experience-gap",
+        },
+      },
+    ],
+    visual: {
+      primary: "18233F",
+      accent: "2F80ED",
+      secondary: "F9735B",
+      background: "EEF4FA",
+      surface: "FFFFFF",
+      title: "101828",
+      body: "405166",
+      layout: "experience-gap-map",
+      variant: "experience-gap",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "experience-gap-cover",
+      defaultContentLayout: "experience-gap-content",
+      allowedLayouts: ["experience-gap-cover", "experience-gap-comparison", "experience-gap-path", "experience-gap-diagnosis", "experience-gap-opportunity", "experience-gap-summary", "title", "content", "closing"],
     },
   });
 }

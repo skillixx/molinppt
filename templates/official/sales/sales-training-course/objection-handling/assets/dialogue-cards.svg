@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Sales training dialogue cards">
+  <rect width="960" height="540" rx="38" fill="#F2F7FA"/>
+  <path d="M70 96h390c31 0 56 25 56 56v98c0 31-25 56-56 56H205l-74 58 22-58H70c-31 0-56-25-56-56v-98c0-31 25-56 56-56Z" fill="#FFFFFF" stroke="#D8E5EF" stroke-width="4"/>
+  <path d="M500 238h390c31 0 56 25 56 56v98c0 31-25 56-56 56h-90l22 58-74-58H500c-31 0-56-25-56-56v-98c0-31 25-56 56-56Z" fill="#17324D"/>
+  <rect x="92" y="146" width="232" height="22" rx="11" fill="#FF8A3D"/>
+  <rect x="92" y="193" width="338" height="18" rx="9" fill="#C9D8E4"/>
+  <rect x="92" y="231" width="270" height="18" rx="9" fill="#D8E5EF"/>
+  <rect x="548" y="295" width="262" height="22" rx="11" fill="#2AB7A9"/>
+  <rect x="548" y="342" width="290" height="18" rx="9" fill="#FFFFFF" opacity=".78"/>
+  <rect x="548" y="380" width="220" height="18" rx="9" fill="#FFFFFF" opacity=".58"/>
+  <circle cx="808" cy="142" r="54" fill="#FF8A3D" opacity=".92"/>
+  <circle cx="150" cy="420" r="46" fill="#2AB7A9" opacity=".9"/>
+</svg>

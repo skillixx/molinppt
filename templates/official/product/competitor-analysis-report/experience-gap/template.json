@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "competitor-analysis-report",
+  "themeId": "experience-gap",
+  "style": "experience-gap-map",
+  "themes": [
+    {
+      "id": "experience-gap",
+      "name": "体验差距",
+      "visual": {
+        "primary": "18233F",
+        "accent": "2F80ED",
+        "secondary": "F9735B",
+        "background": "EEF4FA",
+        "surface": "FFFFFF",
+        "title": "101828",
+        "body": "405166",
+        "layout": "experience-gap-map",
+        "variant": "experience-gap"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "18233F",
+    "accent": "2F80ED",
+    "secondary": "F9735B",
+    "background": "EEF4FA",
+    "surface": "FFFFFF",
+    "title": "101828",
+    "body": "405166",
+    "layout": "experience-gap-map",
+    "variant": "experience-gap"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "experience-gap-cover",
+    "defaultContentLayout": "experience-gap-content",
+    "allowedLayouts": [
+      "experience-gap-cover",
+      "experience-gap-comparison",
+      "experience-gap-path",
+      "experience-gap-diagnosis",
+      "experience-gap-opportunity",
+      "experience-gap-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

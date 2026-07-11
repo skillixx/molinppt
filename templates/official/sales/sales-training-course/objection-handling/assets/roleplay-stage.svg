@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Sales roleplay stage">
+  <rect width="960" height="540" rx="34" fill="#17324D"/>
+  <path d="M70 418h820" stroke="#FF8A3D" stroke-width="10" stroke-linecap="round"/>
+  <rect x="110" y="116" width="260" height="214" rx="30" fill="#FFFFFF"/>
+  <rect x="590" y="116" width="260" height="214" rx="30" fill="#FFFFFF"/>
+  <circle cx="240" cy="194" r="48" fill="#2AB7A9"/>
+  <path d="M168 292c22-48 122-48 144 0" fill="none" stroke="#17324D" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="720" cy="194" r="48" fill="#FF8A3D"/>
+  <path d="M648 292c22-48 122-48 144 0" fill="none" stroke="#17324D" stroke-width="18" stroke-linecap="round"/>
+  <path d="M408 215h144" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M528 190l34 29-34 29" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="384" y="286" width="192" height="62" rx="31" fill="#E94B5F"/>
+  <rect x="420" y="310" width="120" height="14" rx="7" fill="#FFFFFF" opacity=".78"/>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "slug": "marketing-integrated-campaign-media-mix",
+  "name": "整合营销传播 - 媒介组合",
+  "description": "适合整合营销、媒介矩阵规划、传播节奏设计和预算分配汇报的商业化市场营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "integrated-campaign",
+    "media-mix",
+    "media-matrix",
+    "budget-allocation",
+    "communication-rhythm"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

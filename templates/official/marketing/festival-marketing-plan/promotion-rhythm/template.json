@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "festival-marketing-plan",
+  "themeId": "promotion-rhythm",
+  "style": "promotion-rhythm",
+  "themes": [
+    {
+      "id": "promotion-rhythm",
+      "name": "促销节奏",
+      "visual": {
+        "primary": "8F1D2C",
+        "secondary": "FF8A00",
+        "accent": "F43F5E",
+        "warning": "FBBF24",
+        "background": "FFF4EC",
+        "surface": "FFFFFF",
+        "title": "2A1018",
+        "body": "69313D",
+        "layout": "marketing-festival-promotion-rhythm",
+        "variant": "promotion-rhythm"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "8F1D2C",
+    "secondary": "FF8A00",
+    "accent": "F43F5E",
+    "warning": "FBBF24",
+    "background": "FFF4EC",
+    "surface": "FFFFFF",
+    "title": "2A1018",
+    "body": "69313D",
+    "layout": "marketing-festival-promotion-rhythm",
+    "variant": "promotion-rhythm"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "marketing-festival-promotion-cover",
+    "defaultContentLayout": "marketing-festival-promotion-content",
+    "allowedLayouts": [
+      "marketing-festival-promotion-cover",
+      "marketing-festival-promotion-timeline",
+      "marketing-festival-promotion-benefits",
+      "marketing-festival-promotion-channel",
+      "marketing-festival-promotion-funnel",
+      "marketing-festival-promotion-review",
+      "marketing-festival-promotion-closing",
+      "title",
+      "content"
+    ]
+  }
+}

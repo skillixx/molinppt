@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" role="img" aria-label="channel matrix">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3f7fb"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="44" width="544" height="330" rx="30" fill="#fff" stroke="#d7e3f0" stroke-width="2"/>
+  <path d="M112 322h420M112 94v228" stroke="#12355b" stroke-width="6" stroke-linecap="round" opacity=".18"/>
+  <g fill="url(#tile)" stroke="#d7e3f0" stroke-width="2">
+    <rect x="142" y="104" width="132" height="82" rx="18"/>
+    <rect x="318" y="104" width="132" height="82" rx="18"/>
+    <rect x="142" y="220" width="132" height="82" rx="18"/>
+    <rect x="318" y="220" width="132" height="82" rx="18"/>
+  </g>
+  <g fill="#1d9bf0">
+    <rect x="168" y="130" width="52" height="10" rx="5"/>
+    <rect x="344" y="130" width="52" height="10" rx="5"/>
+    <rect x="168" y="246" width="52" height="10" rx="5"/>
+    <rect x="344" y="246" width="52" height="10" rx="5"/>
+  </g>
+  <g fill="#f59e0b">
+    <circle cx="236" cy="150" r="13"/>
+    <circle cx="412" cy="150" r="13"/>
+    <circle cx="236" cy="266" r="13"/>
+    <circle cx="412" cy="266" r="13"/>
+  </g>
+</svg>

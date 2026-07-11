@@ -1,0 +1,20 @@
+{
+  "slug": "marketing-festival-marketing-plan-promotion-rhythm",
+  "name": "节日营销方案 - 促销节奏",
+  "description": "适合节日 campaign、促销节奏规划、权益设计和活动转化复盘的商业化市场营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 50,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "festival-marketing",
+    "campaign",
+    "promotion",
+    "rhythm",
+    "conversion-review"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

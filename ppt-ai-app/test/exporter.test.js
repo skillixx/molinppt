@@ -498,6 +498,10 @@ test("PptExportService uses business model system decorations", () => {
   assert.match(slide1, /name="Business Model System Paper"/);
   assert.match(slide1, /name="Business Model System Network Panel"/);
   assert.match(slide1, /name="Business Model System Metric 1"/);
+  assert.match(slide1, /<p:cNvPr id="7201" name="Business Model System Paper"\/>[\s\S]*?<a:off x="475488" y="411480"\/><a:ext cx="8193024" cy="4371975"\/>/);
+  assert.match(slide1, /<p:cNvPr id="7211" name="Business Model System Title"\/>[\s\S]*?<a:off x="749808" y="1028700"\/><a:ext cx="3931920" cy="716280"\/>/);
+  assert.match(slide1, /<p:cNvPr id="7240" name="Business Model System Network Panel"\/>[\s\S]*?<a:off x="4919472" y="925830"\/><a:ext cx="3474720" cy="2571750"\/>/);
+  assert.match(slide1, /<p:cNvPr id="7255" name="Business Model System Metric 1"\/>[\s\S]*?<a:off x="749808" y="3806190"\/><a:ext cx="2286000" cy="609600"\/>/);
   assert.match(slide2, /name="Business Model System Flow Node 1"/);
   assert.match(slide3, /name="Business Model System Profit Panel"/);
   assert.match(slide4, /name="Business Model System Ecosystem Node 1"/);
@@ -567,6 +571,56 @@ test("PptExportService aligns product pricing strategy PPTX scenes with online p
   assert.match(slide6, /name="Product Pricing Closing Action Card 1"/);
   assert.match(slide6, /<a:t>确认价格假设<\/a:t>/);
   assert.doesNotMatch(slide5, /name="Product Pricing Closing Panel"/);
+});
+
+test("PptExportService uses sales training objection handling decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-sales-training-course-objection-handling",
+      theme: "objection-handling",
+      templateVisual: {
+        id: "sales-sales-training-course-objection-handling",
+        primary: "17324D",
+        accent: "FF8A3D",
+        secondary: "2AB7A9",
+        warning: "E94B5F",
+        background: "F2F7FA",
+        surface: "FFFFFF",
+        title: "10233B",
+        body: "34445C",
+        layout: "sales-training-objection-handling",
+        variant: "roleplay",
+      },
+      slides: [
+        { title: "客户异议回应训练", layout: "sales-training-objection-cover", bullets: ["识别客户真实顾虑", "复述并确认问题", "证据化回应价值"] },
+        { title: "常见顾虑分类", layout: "sales-training-objection-map", bullets: ["预算压力", "效果怀疑", "决策延迟", "竞品比较"] },
+        { title: "回应路径拆解", layout: "sales-training-objection-path", bullets: ["倾听确认", "复述问题", "价值回应", "推进下一步"] },
+        { title: "场景对练安排", layout: "sales-training-objection-roleplay", bullets: ["客户提出疑问", "销售复述确认", "给出案例证据"] },
+        { title: "复盘检查清单", layout: "sales-training-objection-checklist", bullets: ["回应有证据", "追问有层次", "收口有动作"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = Buffer.from(pptPartText(text, "ppt/slides/slide1.xml"), "latin1").toString("utf8");
+  const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
+  const slide3 = Buffer.from(pptPartText(text, "ppt/slides/slide3.xml"), "latin1").toString("utf8");
+  const slide4 = Buffer.from(pptPartText(text, "ppt/slides/slide4.xml"), "latin1").toString("utf8");
+  const slide5 = Buffer.from(pptPartText(text, "ppt/slides/slide5.xml"), "latin1").toString("utf8");
+
+  assert.match(slide1, /name="Sales Training Paper"/);
+  assert.match(slide1, /name="Sales Training Dialogue Board"/);
+  assert.match(slide1, /name="Sales Training Focus Card 1"/);
+  assert.match(slide2, /name="Sales Training Map Panel"/);
+  assert.match(slide2, /<a:t>预算压力<\/a:t>/);
+  assert.match(slide3, /name="Sales Training Path Step 1"/);
+  assert.match(slide3, /<a:t>倾听确认<\/a:t>/);
+  assert.match(slide4, /name="Sales Training Roleplay Stage"/);
+  assert.match(slide5, /name="Sales Training Checklist Card 1"/);
+  assert.doesNotMatch(slide1, /异议处理/);
+  assert.doesNotMatch(slide1, /name="Title 1"/);
 });
 
 test("PptExportService uses competitor SWOT map decorations", () => {
@@ -1679,6 +1733,57 @@ test("PptExportService uses capability radar comparison decorations", () => {
   assert.doesNotMatch(slide1, /capability-radar/);
 });
 
+test("PptExportService uses experience gap comparison decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-competitor-analysis-report-experience-gap",
+      theme: "experience-gap",
+      templateVisual: {
+        primary: "18233F",
+        accent: "2F80ED",
+        secondary: "F9735B",
+        background: "EEF4FA",
+        surface: "FFFFFF",
+        title: "101828",
+        body: "405166",
+        layout: "experience-gap-map",
+        variant: "experience-gap",
+      },
+      slides: [
+        {
+          title: "竞品体验差距与优化方向",
+          bullets: ["拆解竞品在核心任务路径上的体验差异", "识别用户理解成本、操作摩擦和反馈缺口", "输出可进入产品优化排期的机会建议"],
+        },
+        {
+          title: "关键体验路径对比",
+          bullets: ["竞品在首屏理解上更直接", "我方在任务入口层级上偏深", "反馈提示和成功状态需要加强"],
+        },
+        {
+          title: "问题触点与机会判断",
+          bullets: ["转化阻塞集中在配置步骤", "竞品提供更明确的进度反馈", "可通过默认推荐降低选择成本"],
+        },
+        {
+          title: "优化行动排期",
+          bullets: ["确认高频任务样本", "复盘核心触点", "设计改版方案", "灰度验证体验指标"],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Product Gap Canvas"/);
+  assert.match(slide1, /name="Product Gap App Window 2170"/);
+  assert.match(slide2, /name="Product Gap Matrix Cell 1"|name="Product Gap Path Panel"/);
+  assert.match(slide4, /name="Product Gap Opportunity Card 1"|name="Product Gap Roadmap Panel"|name="Product Gap Next Action 1"/);
+  assert.doesNotMatch(slide1, /experience-gap/);
+});
+
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1857,6 +1962,52 @@ test("PptExportService uses private domain member layering decorations", () => {
   assert.match(slide4, /name="Private Domain Repurchase Loop"/);
   assert.match(slide5, /name="Private Domain Dashboard Panel"/);
   assert.doesNotMatch(slide1, /会员分层/);
+});
+
+test("PptExportService uses integrated campaign media mix decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-integrated-campaign-media-mix",
+      theme: "media-mix",
+      templateVisual: {
+        id: "marketing-integrated-campaign-media-mix",
+        primary: "12355B",
+        secondary: "1D9BF0",
+        accent: "F59E0B",
+        warning: "EF4444",
+        background: "F3F7FB",
+        surface: "FFFFFF",
+        title: "10233F",
+        body: "334155",
+        layout: "integrated-media-mix",
+        variant: "media-mix",
+      },
+      slides: [
+        { title: "整合传播控制台", layout: "integrated-media-mix-cover", bullets: ["明确目标人群与传播目标", "规划公域私域媒介矩阵", "分配预算和覆盖频次"] },
+        { title: "媒介矩阵规划", layout: "integrated-media-mix-matrix", bullets: ["社媒触达", "搜索承接", "内容种草", "线下引爆"] },
+        { title: "预算分配建议", layout: "integrated-media-mix-budget", bullets: ["品牌广告", "效果投放", "达人合作", "内容制作"] },
+        { title: "传播节奏设计", layout: "integrated-media-mix-rhythm", bullets: ["预热种草", "集中爆发", "转化承接", "复盘优化"] },
+        { title: "覆盖频次评估", layout: "integrated-media-mix-effect", bullets: ["覆盖人群", "触达频次", "转化效率", "复购线索"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Integrated Media Mix Paper"/);
+  assert.match(slide1, /name="Integrated Media Mix Matrix Card 1"/);
+  assert.match(slide1, /name="Integrated Media Mix Metric Card 1"/);
+  assert.match(slide3, /name="Integrated Media Mix Budget Bar 1"/);
+  assert.match(slide4, /name="Integrated Media Mix Rhythm Stage 1"/);
+  assert.match(slide5, /name="Integrated Media Mix Radar Panel"/);
+  assert.doesNotMatch(slide2, /媒介组合/);
 });
 
 test("PptExportService uses department performance team decorations", () => {
@@ -2579,6 +2730,53 @@ test("PptExportService uses user behavior path funnel decorations", () => {
   assert.match(slide1, /val="F6FAFF"/);
   assert.match(slide1, /val="06B6D4"/);
   assert.doesNotMatch(slide1, /路径漏斗/);
+});
+
+test("PptExportService uses product retention path decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-growth-plan-retention-path",
+      theme: "retention-path",
+      templateVisual: {
+        id: "product-product-growth-plan-retention-path",
+        primary: "111827",
+        accent: "16A3A6",
+        secondary: "7C3AED",
+        warning: "F97316",
+        background: "EFF6FF",
+        surface: "FFFFFF",
+        title: "0B1220",
+        body: "334155",
+        layout: "product-retention-path",
+        variant: "retention-path",
+      },
+      slides: [
+        { title: "User retention growth plan", layout: "product-retention-path-cover", bullets: ["D1 retention reached 42%", "D7 retention improved to 28%", "Key behavior trigger rate +18%"] },
+        { title: "Lifecycle path overview", layout: "product-retention-path-lifecycle", bullets: ["Activate first session", "Guide key behavior", "Create revisit moment", "Build habit loop"] },
+        { title: "Retention curve diagnosis", layout: "product-retention-path-analysis", bullets: ["Early churn concentrated in first day", "Feature value not fully perceived", "Message touchpoint timing needs tuning"] },
+        { title: "Touchpoint action matrix", layout: "product-retention-path-actions", bullets: ["New user task", "Benefit reminder", "Dormant user recall", "Experiment review"] },
+        { title: "Next growth loop", layout: "product-retention-path-summary", bullets: ["Locate churn point", "Design touchpoint", "Launch experiment", "Review retention metrics"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Product Retention Canvas"/);
+  assert.match(slide1, /name="Product Retention Curve Panel"/);
+  assert.match(slide1, /name="Product Retention Metric Card 1"/);
+  assert.match(slide2, /name="Product Retention Lifecycle Ring"/);
+  assert.match(slide4, /name="Product Retention Action Card 1"/);
+  assert.match(slide5, /name="Product Retention Roadmap Step 1"/);
+  assert.match(slide1, /val="EFF6FF"/);
+  assert.match(slide1, /val="16A3A6"/);
+  assert.doesNotMatch(slide1, /留存路径/);
 });
 
 test("PptExportService uses market trend radar decorations", () => {

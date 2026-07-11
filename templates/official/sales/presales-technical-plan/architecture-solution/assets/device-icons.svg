@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="180" viewBox="0 0 520 180" role="img" aria-label="设备与接口图标装饰">
+  <rect width="520" height="180" rx="24" fill="#F8FBFF"/>
+  <g fill="none" stroke="#0B1F3A" stroke-width="8" stroke-linejoin="round">
+    <rect x="40" y="48" width="96" height="64" rx="10"/>
+    <path d="M64 132h48M88 112v20"/>
+    <rect x="212" y="38" width="96" height="104" rx="16"/>
+    <path d="M232 66h56M232 90h56M232 114h40"/>
+    <rect x="384" y="52" width="88" height="72" rx="14"/>
+    <path d="M404 84h48M428 124v28"/>
+  </g>
+  <path d="M148 84h52M320 84h52" stroke="#22D3EE" stroke-width="8" stroke-linecap="round" stroke-dasharray="14 12"/>
+  <circle cx="176" cy="84" r="10" fill="#22D3EE"/>
+  <circle cx="344" cy="84" r="10" fill="#38BDF8"/>
+  <rect x="226" y="142" width="68" height="12" rx="6" fill="#F59E0B"/>
+</svg>

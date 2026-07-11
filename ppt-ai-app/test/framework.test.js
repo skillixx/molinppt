@@ -579,6 +579,24 @@ test("resolveTemplateVisual maps key account official slug to dedicated visual",
   assert.equal(visual.variant, "decision-chain");
 });
 
+test("resolveTemplateVisual applies sales training objection handling official visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "sales-training-course", theme: "objection-handling" });
+
+  assert.equal(visual.primary, "17324D");
+  assert.equal(visual.accent, "FF8A3D");
+  assert.equal(visual.secondary, "2AB7A9");
+  assert.equal(visual.background, "F2F7FA");
+  assert.equal(visual.layout, "sales-training-objection-handling");
+  assert.equal(visual.variant, "roleplay");
+});
+
+test("resolveTemplateVisual maps sales training official slug to dedicated visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "sales-sales-training-course-objection-handling", theme: "objection-handling" });
+
+  assert.equal(visual.layout, "sales-training-objection-handling");
+  assert.equal(visual.variant, "roleplay");
+});
+
 test("resolveTemplateVisual applies product roadmap commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "roadmap" });
 
@@ -1335,7 +1353,7 @@ test("TemplateManager lists official active templates and the owner user templat
   const catalog = await templates.listTemplates({ ownerUserId: 7, categoryId: "sales" });
   const categories = templates.listCategories({ ownerUserId: 7 });
 
-  assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "key-account-plan", "official-sales", "user-sales"]);
+  assert.deepEqual(catalog.map((template) => template.id), ["sales-proposal", "key-account-plan", "presales-technical-plan", "sales-training-course", "official-sales", "user-sales"]);
   assert.equal(categories.some((category) => category.id === "sales"), true);
   assert.equal(categories.some((category) => category.id === "empty"), false);
   assert.equal(catalog[0].category.id, "sales");

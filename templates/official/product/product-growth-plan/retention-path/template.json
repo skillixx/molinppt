@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "product-growth-plan",
+  "themeId": "retention-path",
+  "style": "product-retention-path",
+  "themes": [
+    {
+      "id": "retention-path",
+      "name": "留存路径",
+      "visual": {
+        "primary": "111827",
+        "accent": "16A3A6",
+        "secondary": "7C3AED",
+        "warning": "F97316",
+        "background": "EFF6FF",
+        "surface": "FFFFFF",
+        "title": "0B1220",
+        "body": "334155",
+        "layout": "product-retention-path",
+        "variant": "retention-path"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "111827",
+    "accent": "16A3A6",
+    "secondary": "7C3AED",
+    "warning": "F97316",
+    "background": "EFF6FF",
+    "surface": "FFFFFF",
+    "title": "0B1220",
+    "body": "334155",
+    "layout": "product-retention-path",
+    "variant": "retention-path"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-retention-path-cover",
+    "defaultContentLayout": "product-retention-path-content",
+    "allowedLayouts": [
+      "product-retention-path-cover",
+      "product-retention-path-content",
+      "product-retention-path-lifecycle",
+      "product-retention-path-analysis",
+      "product-retention-path-actions",
+      "product-retention-path-summary"
+    ]
+  }
+}

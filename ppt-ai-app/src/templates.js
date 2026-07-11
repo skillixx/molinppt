@@ -106,6 +106,37 @@ const KEY_ACCOUNT_DECISION_LAYOUT_SCHEMA = {
   ],
 };
 
+const PRESALES_ARCHITECTURE_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "presales-architecture-cover",
+  defaultContentLayout: "presales-architecture-content",
+  allowedLayouts: [
+    "presales-architecture-cover",
+    "presales-requirement-map",
+    "presales-architecture-blueprint",
+    "presales-module-capability",
+    "presales-deployment-topology",
+    "presales-delivery-assurance",
+    "presales-next-step",
+    "title",
+    "content",
+  ],
+};
+
+const SALES_TRAINING_OBJECTION_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "sales-training-objection-cover",
+  defaultContentLayout: "sales-training-objection-content",
+  allowedLayouts: [
+    "sales-training-objection-cover",
+    "sales-training-objection-map",
+    "sales-training-objection-path",
+    "sales-training-objection-roleplay",
+    "sales-training-objection-checklist",
+    "sales-training-objection-closing",
+    "title",
+    "content",
+  ],
+};
+
 const PRODUCT_COMMERCIALIZATION_LAYOUT_SCHEMA = {
   defaultCoverLayout: "product-pricing-cover",
   defaultContentLayout: "product-pricing-content",
@@ -751,6 +782,86 @@ export const DEFAULT_TEMPLATES = [
       variant: "decision-chain",
     },
     layoutSchema: KEY_ACCOUNT_DECISION_LAYOUT_SCHEMA,
+  },
+  {
+    id: "presales-technical-plan",
+    name: "售前技术方案",
+    categoryId: "sales",
+    scope: "official",
+    status: "active",
+    style: "technical-blueprint",
+    description: "适合售前方案、客户需求匹配、技术架构说明和交付保障汇报的技术型销售方案模板。",
+    themes: [
+      {
+        id: "architecture-solution",
+        name: "架构方案",
+        visual: {
+          primary: "0B1F3A",
+          accent: "22D3EE",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          background: "EAF3FB",
+          surface: "FFFFFF",
+          title: "071827",
+          body: "334155",
+          layout: "presales-architecture-solution",
+          variant: "architecture-solution",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1F3A",
+      accent: "22D3EE",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "EAF3FB",
+      surface: "FFFFFF",
+      title: "071827",
+      body: "334155",
+      layout: "presales-architecture-solution",
+      variant: "architecture-solution",
+    },
+    layoutSchema: PRESALES_ARCHITECTURE_LAYOUT_SCHEMA,
+  },
+  {
+    id: "sales-training-course",
+    name: "销售培训课件",
+    categoryId: "sales",
+    scope: "official",
+    status: "active",
+    style: "sales-roleplay-training",
+    description: "适合销售培训、客户异议处理、话术框架拆解和场景演练的实战训练课件模板。",
+    themes: [
+      {
+        id: "objection-handling",
+        name: "异议处理",
+        visual: {
+          primary: "17324D",
+          accent: "FF8A3D",
+          secondary: "2AB7A9",
+          warning: "E94B5F",
+          background: "F2F7FA",
+          surface: "FFFFFF",
+          title: "10233B",
+          body: "34445C",
+          layout: "sales-training-objection-handling",
+          variant: "roleplay",
+        },
+      },
+    ],
+    visual: {
+      primary: "17324D",
+      accent: "FF8A3D",
+      secondary: "2AB7A9",
+      warning: "E94B5F",
+      background: "F2F7FA",
+      surface: "FFFFFF",
+      title: "10233B",
+      body: "34445C",
+      layout: "sales-training-objection-handling",
+      variant: "roleplay",
+    },
+    layoutSchema: SALES_TRAINING_OBJECTION_LAYOUT_SCHEMA,
   },
   {
     id: "product-roadmap",
@@ -1441,6 +1552,8 @@ function normalizeTemplateLookupId(templateId) {
     "finance-cost-control-plan-cost-breakdown": "cost-control-plan",
     "finance-cash-flow-analysis-report-cash-flow-forecast": "cash-flow-analysis-report",
     "sales-key-account-plan-decision-chain": "key-account-plan",
+    "sales-presales-technical-plan-architecture-solution": "presales-technical-plan",
+    "sales-sales-training-course-objection-handling": "sales-training-course",
     "product-product-commercialization-plan-pricing-strategy": "product-commercialization-plan",
     "product-user-research-report-interview-insight": "user-research-report",
   };

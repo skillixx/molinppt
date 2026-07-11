@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320" role="img" aria-label="budget rhythm">
+  <defs>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#12355b"/>
+      <stop offset=".62" stop-color="#1d9bf0"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect x="56" y="62" width="608" height="198" rx="28" fill="#fff" stroke="#d7e3f0" stroke-width="2"/>
+  <path d="M112 206h496" stroke="#d7e3f0" stroke-width="6" stroke-linecap="round"/>
+  <path d="M112 206h352" stroke="url(#bar)" stroke-width="12" stroke-linecap="round"/>
+  <g fill="#fff" stroke="#1d9bf0" stroke-width="5">
+    <circle cx="152" cy="206" r="18"/>
+    <circle cx="272" cy="206" r="18"/>
+    <circle cx="404" cy="206" r="18"/>
+    <circle cx="526" cy="206" r="18"/>
+  </g>
+  <g fill="#12355b">
+    <rect x="128" y="116" width="84" height="14" rx="7"/>
+    <rect x="248" y="102" width="110" height="14" rx="7"/>
+    <rect x="382" y="124" width="90" height="14" rx="7"/>
+    <rect x="504" y="108" width="76" height="14" rx="7"/>
+  </g>
+  <g fill="#f59e0b" opacity=".9">
+    <rect x="128" y="146" width="54" height="10" rx="5"/>
+    <rect x="248" y="132" width="72" height="10" rx="5"/>
+    <rect x="382" y="154" width="62" height="10" rx="5"/>
+    <rect x="504" y="138" width="50" height="10" rx="5"/>
+  </g>
+</svg>

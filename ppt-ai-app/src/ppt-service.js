@@ -1030,6 +1030,10 @@ function renderDeckPreview({ deck, visual }) {
     const manufacturingSolutionScene = isManufacturingSolutionVisual(visual) ? manufacturingSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationSolutionScene = isEducationSolutionVisual(visual) ? educationSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const keyAccountScene = isKeyAccountDecisionVisual(visual) ? keyAccountDecisionPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const presalesArchitectureScene = typeof isPresalesArchitectureVisual === "function" && typeof presalesArchitecturePreviewScene === "function" && isPresalesArchitectureVisual(visual)
+      ? presalesArchitecturePreviewScene({ slide, index, total: deck.slides.length })
+      : null;
+    const salesTrainingScene = isSalesTrainingObjectionVisual(visual) ? salesTrainingObjectionPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const corporateTrainingScene = isCorporateTrainingVisual(visual) ? corporateTrainingPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const onboardingScene = isOnboardingGuideVisual(visual) ? onboardingGuidePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const blackboardScene = typeof isKnowledgeBlackboardVisual === "function" && isKnowledgeBlackboardVisual(visual) ? knowledgeBlackboardPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1043,7 +1047,9 @@ function renderDeckPreview({ deck, visual }) {
     const interviewInsightScene = typeof isProductInterviewInsightVisual === "function" && isProductInterviewInsightVisual(visual) ? productInterviewInsightPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const priorityMatrixScene = typeof isFeaturePriorityMatrixVisual === "function" && isFeaturePriorityMatrixVisual(visual) ? featurePriorityMatrixPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const experienceJourneyScene = isExperienceJourneyVisual(visual) ? experienceJourneyPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const experienceGapScene = isExperienceGapVisual(visual) ? experienceGapPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const capabilityRadarScene = isCapabilityRadarVisual(visual) ? capabilityRadarPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const productRetentionScene = isProductRetentionPathVisual(visual) ? productRetentionPathPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pitchScene = isPitchDeckVisual(visual) ? pitchDeckPreviewScene(visual) : null;
     const seedStoryScene = isSeedRoundStoryVisual(visual) ? seedRoundStoryPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const growthFundingScene = isGrowthFundingFlywheelVisual(visual) ? growthFundingFlywheelPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1054,6 +1060,10 @@ function renderDeckPreview({ deck, visual }) {
     const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelValueChainScene = isBusinessModelValueChainVisual(visual) ? businessModelValueChainPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
+    const integratedMediaScene = isIntegratedMediaMixVisual(visual) ? integratedMediaMixPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const festivalPromotionScene = typeof isFestivalPromotionRhythmVisual === "function" && typeof festivalPromotionRhythmPreviewScene === "function" && isFestivalPromotionRhythmVisual(visual)
+      ? festivalPromotionRhythmPreviewScene({ slide, index, total: deck.slides.length })
+      : null;
     const launchRhythmScene = isLaunchRhythmVisual(visual) ? launchRhythmPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const socialVideoScene = isSocialVideoGrowthVisual(visual) ? socialVideoGrowthPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const privateDomainScene = isPrivateDomainMemberLayeringVisual(visual) ? privateDomainMemberLayeringPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1123,6 +1133,12 @@ function renderDeckPreview({ deck, visual }) {
     const keyAccountMark = keyAccountScene
       ? renderKeyAccountDecisionPreview(slide, keyAccountScene)
       : "";
+    const presalesArchitectureMark = presalesArchitectureScene && typeof renderPresalesArchitecturePreview === "function"
+      ? renderPresalesArchitecturePreview(slide, presalesArchitectureScene)
+      : "";
+    const salesTrainingMark = salesTrainingScene
+      ? renderSalesTrainingObjectionPreview(slide, salesTrainingScene)
+      : "";
     const corporateTrainingMark = corporateTrainingScene
       ? renderCorporateTrainingPreview(slide, corporateTrainingScene)
       : "";
@@ -1162,8 +1178,14 @@ function renderDeckPreview({ deck, visual }) {
     const experienceJourneyMark = experienceJourneyScene
       ? renderExperienceJourneyPreview(slide, experienceJourneyScene)
       : "";
+    const experienceGapMark = experienceGapScene
+      ? renderExperienceGapPreview(slide, experienceGapScene)
+      : "";
     const capabilityRadarMark = capabilityRadarScene
       ? renderCapabilityRadarPreview(slide, capabilityRadarScene)
+      : "";
+    const productRetentionMark = productRetentionScene
+      ? renderProductRetentionPathPreview(slide, productRetentionScene)
       : "";
     const pitchMark = pitchScene
       ? (
@@ -1204,6 +1226,12 @@ function renderDeckPreview({ deck, visual }) {
             : `<div class="marketing-kicker">${escapeHtml(marketingScene.section)}</div><div class="marketing-channel-row"><span></span><span></span><span></span></div>`}`
           + `<div class="marketing-chip" aria-hidden="true"></div><div class="marketing-visual"><span></span><span></span><span></span><span></span></div><div class="marketing-caption">${escapeHtml(marketingScene.caption)}</div><div class="marketing-orbit"></div>`
         )
+      : "";
+    const integratedMediaMark = integratedMediaScene
+      ? renderIntegratedMediaMixPreview(slide, integratedMediaScene)
+      : "";
+    const festivalPromotionMark = festivalPromotionScene
+      ? renderFestivalPromotionRhythmPreview(slide, festivalPromotionScene)
       : "";
     const launchRhythmMark = launchRhythmScene
       ? renderLaunchRhythmPreview(slide, launchRhythmScene)
@@ -1356,11 +1384,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || capabilityRadarScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || integratedMediaScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || capabilityRadarScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${capabilityRadarMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || integratedMediaScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${integratedMediaMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -2149,12 +2177,19 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="business-model-value-chain"] .bmvc-hero-network,.bmvc-flow,.bmvc-profit,.bmvc-ecosystem,.bmvc-matrix,.bmvc-roadmap{position:absolute;right:8.2%;top:18%;width:38%;height:50%;border-radius:18px;background:#fff;border:1px solid rgba(16,35,61,.12);box-shadow:0 16px 32px rgba(16,35,61,.1);}
     body[data-layout="business-model-value-chain"] .bmvc-hero-network::before{content:"";position:absolute;left:18%;right:18%;top:49%;height:4px;background:var(--template-accent);border-radius:999px;}
     body[data-layout="business-model-value-chain"] .bmvc-hero-network span{position:absolute;width:22%;height:18%;border-radius:12px;background:var(--template-accent);box-shadow:0 10px 20px rgba(16,35,61,.1);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(1){left:14%;top:18%;}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(2){right:14%;top:18%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(3){left:14%;bottom:18%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-hero-network span:nth-child(4){right:14%;bottom:18%;}
+    body[data-layout="business-model-value-chain"] .bmvc-metrics{position:absolute;left:8.2%;right:8.2%;bottom:12%;height:14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="business-model-value-chain"] .bmvc-metrics span{border-radius:14px;background:#fff;border:1px solid rgba(16,35,61,.12);box-shadow:0 12px 24px rgba(16,35,61,.08);padding:13px 16px;font-size:11px;font-weight:850;color:var(--template-body);border-top:5px solid var(--template-accent);}
+    body[data-layout="business-model-value-chain"] .bmvc-metrics span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-metrics span:nth-child(3){border-top-color:var(--template-primary);}
+    body[data-layout="business-model-value-chain"] .bmvc-metrics strong{display:block;margin-bottom:5px;font-size:19px;line-height:1;color:var(--template-title);}
     body[data-layout="business-model-value-chain"] .bmvc-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:28px;}
     body[data-layout="business-model-value-chain"] .bmvc-flow span{border-radius:13px;background:#f8fafc;border-top:5px solid var(--template-accent);display:grid;place-items:center;text-align:center;padding:8px;font-size:11px;font-weight:900;color:var(--template-title);}
     body[data-layout="business-model-value-chain"] .bmvc-profit::before{content:"";position:absolute;left:14%;right:14%;bottom:20%;height:2px;background:rgba(16,35,61,.22);}
     body[data-layout="business-model-value-chain"] .bmvc-profit span{position:absolute;bottom:22%;width:14%;border-radius:9px 9px 3px 3px;background:var(--template-accent);}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(1){left:25%;height:32%;}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(2){left:45%;height:52%;background:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-profit span:nth-child(3){left:65%;height:70%;background:var(--template-primary);}
     body[data-layout="business-model-value-chain"] .bmvc-ecosystem{border-radius:50%;background:radial-gradient(circle,#fff 0 24%,rgba(24,169,153,.12) 25% 52%,#fff 53% 100%);}
     body[data-layout="business-model-value-chain"] .bmvc-ecosystem span{position:absolute;width:28%;height:17%;border-radius:999px;background:#fff;border:1px solid rgba(16,35,61,.12);display:grid;place-items:center;font-size:11px;font-weight:900;color:var(--template-title);}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(1){left:36%;top:8%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(2){right:4%;top:42%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(3){left:36%;bottom:8%;}body[data-layout="business-model-value-chain"] .bmvc-ecosystem span:nth-child(4){left:4%;top:42%;}
+    body[data-layout="business-model-value-chain"] .bmvc-cards{position:absolute;left:8.2%;right:8.2%;bottom:12%;height:14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="business-model-value-chain"] .bmvc-cards span{border-radius:14px;background:#fff;border:1px solid rgba(16,35,61,.12);box-shadow:0 12px 24px rgba(16,35,61,.08);padding:17px 16px 12px;font-size:12px;font-weight:900;color:var(--template-title);border-top:5px solid var(--template-accent);overflow-wrap:anywhere;}
+    body[data-layout="business-model-value-chain"] .bmvc-cards span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="business-model-value-chain"] .bmvc-cards span:nth-child(3){border-top-color:var(--template-primary);}
     body[data-layout="business-model-value-chain"] .bmvc-matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:24px;}
     body[data-layout="business-model-value-chain"] .bmvc-matrix span{border-radius:14px;background:#f8fafc;border-left:6px solid var(--template-accent);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="business-model-value-chain"] .bmvc-roadmap{left:8.2%;right:8.2%;top:auto;bottom:15%;width:auto;height:20%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:18px;}
@@ -2415,6 +2450,73 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="sales-key-account-decision-chain"] .key-account-closing{position:absolute;left:8.5%;right:8.5%;bottom:17%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
     body[data-layout="sales-key-account-decision-chain"] .key-account-closing span{min-height:100px;border-radius:16px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(16,42,67,.08);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="sales-key-account-decision-chain"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.84);border:1px solid rgba(16,42,67,.12);border-radius:999px;padding:5px 10px;color:rgba(11,31,51,.62);}
+    body[data-layout="presales-architecture-solution"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 50%,#dcecf6 100%);box-shadow:0 22px 56px rgba(11,31,58,.18);}
+    body[data-layout="presales-architecture-solution"] .slide::before{background:repeating-linear-gradient(90deg,rgba(11,31,58,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,211,238,.05) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(34,211,238,.22),transparent 25%),radial-gradient(circle at 15% 76%,rgba(56,189,248,.16),transparent 26%);}
+    body[data-layout="presales-architecture-solution"] .slide::after{content:"";position:absolute;left:5.6%;right:5.6%;top:9.2%;bottom:8.2%;z-index:1;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(11,31,58,.14);box-shadow:0 24px 54px rgba(11,31,58,.13),inset 0 0 0 1px rgba(255,255,255,.76);}
+    body[data-layout="presales-architecture-solution"] .accent{height:7.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#123b5a 58%,#0e7490);box-shadow:inset 0 -4px 0 var(--template-accent);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-kicker{position:absolute;left:8.4%;top:14.4%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-secondary);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-title{position:absolute;left:8.4%;top:20.8%;width:42%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-rule{position:absolute;left:8.4%;top:42.5%;width:33%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-bullets{position:absolute;left:8.5%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.46;color:var(--template-body);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-bullets li{margin:.12em 0;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-canvas{position:absolute;right:7.6%;top:17.4%;width:41%;height:46%;border-radius:22px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(11,31,58,.13);box-shadow:0 18px 36px rgba(11,31,58,.12);overflow:hidden;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-canvas::before{content:"";position:absolute;left:9%;right:9%;top:51%;height:5px;border-radius:999px;background:var(--template-accent);box-shadow:0 -72px 0 rgba(11,31,58,.1),0 72px 0 rgba(56,189,248,.14);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-canvas::after{content:"";position:absolute;left:42%;top:36%;width:62px;height:62px;border-radius:16px;background:var(--template-primary);box-shadow:0 0 0 12px rgba(34,211,238,.12),-145px -70px 0 -14px var(--template-secondary),150px -70px 0 -14px var(--template-warning),-145px 80px 0 -14px var(--template-accent),150px 80px 0 -14px var(--template-secondary);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-canvas i{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--template-accent);box-shadow:0 0 0 7px rgba(34,211,238,.12);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-canvas i:nth-child(1){left:18%;top:22%;}body[data-layout="presales-architecture-solution"] .presales-arch-canvas i:nth-child(2){right:18%;top:22%;border-color:var(--template-warning);}body[data-layout="presales-architecture-solution"] .presales-arch-canvas i:nth-child(3){left:18%;bottom:22%;border-color:var(--template-secondary);}body[data-layout="presales-architecture-solution"] .presales-arch-canvas i:nth-child(4){right:18%;bottom:22%;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-tags{position:absolute;left:8.4%;right:48%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-tags span{min-height:60px;border-radius:14px;background:#fff;border:1px solid rgba(11,31,58,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(11,31,58,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-map{position:absolute;right:7.8%;top:19%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-map span{min-height:92px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-map span::before{content:"";display:block;width:22px;height:22px;margin-bottom:9px;border-radius:7px;background:var(--template-accent);box-shadow:0 0 0 7px rgba(34,211,238,.12);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-blueprint{position:absolute;left:8.4%;right:8.4%;bottom:14.6%;height:28%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-blueprint span{position:relative;border-radius:15px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 10px 20px rgba(11,31,58,.08);padding:14px 10px 10px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-blueprint span::before{content:"";display:block;width:26px;height:26px;margin-bottom:9px;border-radius:8px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="presales-architecture-solution"] .presales-arch-blueprint span:not(:last-child)::after{content:"";position:absolute;right:-16px;top:45%;width:22px;height:4px;border-radius:999px;background:var(--template-accent);z-index:2;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-modules{position:absolute;right:7.8%;top:18.5%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-modules span{min-height:88px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:14px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-modules span:nth-child(2n){border-top:5px solid var(--template-secondary);}body[data-layout="presales-architecture-solution"] .presales-arch-modules span:nth-child(2n+1){border-top:5px solid var(--template-accent);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-topology{position:absolute;left:8.4%;right:8.4%;bottom:15.5%;height:25%;border-radius:18px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-topology::before{content:"";position:absolute;left:10%;right:10%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));}
+    body[data-layout="presales-architecture-solution"] .presales-arch-topology span{position:absolute;top:32%;width:18%;height:44%;border-radius:16px;background:color-mix(in srgb,var(--template-bg) 76%,#fff 24%);border:1px solid rgba(11,31,58,.12);display:grid;place-items:center;text-align:center;padding:8px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-topology span:nth-child(1){left:8%;}body[data-layout="presales-architecture-solution"] .presales-arch-topology span:nth-child(2){left:30%;}body[data-layout="presales-architecture-solution"] .presales-arch-topology span:nth-child(3){left:52%;}body[data-layout="presales-architecture-solution"] .presales-arch-topology span:nth-child(4){left:74%;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-timeline{position:absolute;left:8.4%;right:8.4%;bottom:16%;display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:12px;}
+    body[data-layout="presales-architecture-solution"] .presales-arch-timeline span{min-height:92px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="presales-architecture-solution"] .presales-arch-timeline span::before{content:"";display:block;width:30px;height:6px;margin-bottom:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="presales-architecture-solution"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.84);border:1px solid rgba(11,31,58,.12);border-radius:999px;padding:5px 10px;color:rgba(7,24,39,.62);}
+    body[data-layout="sales-training-objection-handling"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 54%,#e7f2f3 100%);box-shadow:0 22px 56px rgba(23,50,77,.18);}
+    body[data-layout="sales-training-objection-handling"] .slide::before{background:radial-gradient(circle at 82% 16%,rgba(255,138,61,.20),transparent 25%),radial-gradient(circle at 16% 76%,rgba(42,183,169,.18),transparent 26%),repeating-linear-gradient(90deg,rgba(23,50,77,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(23,50,77,.026) 0 1px,transparent 1px 38px);}
+    body[data-layout="sales-training-objection-handling"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9.4%;bottom:8.4%;z-index:1;border-radius:24px;background:rgba(255,255,255,.94);border:1px solid rgba(23,50,77,.12);box-shadow:0 24px 54px rgba(23,50,77,.13),inset 0 0 0 1px rgba(255,255,255,.74);}
+    body[data-layout="sales-training-objection-handling"] .accent{height:7%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#204c72 58%,var(--template-secondary));box-shadow:inset 0 -4px 0 var(--template-accent);}
+    body[data-layout="sales-training-objection-handling"] .training-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="sales-training-objection-handling"] .training-kicker{position:absolute;left:8.5%;top:14.6%;font-size:12px;font-weight:900;letter-spacing:.15em;color:var(--template-secondary);}
+    body[data-layout="sales-training-objection-handling"] .training-title{position:absolute;left:8.5%;top:21%;width:42%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="sales-training-objection-handling"] .training-rule{position:absolute;left:8.5%;top:42.8%;width:33%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="sales-training-objection-handling"] .training-bullets{position:absolute;left:8.6%;top:49.4%;width:38%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.47;color:var(--template-body);}
+    body[data-layout="sales-training-objection-handling"] .training-bullets li{margin:.14em 0;}
+    body[data-layout="sales-training-objection-handling"] .training-dialogue{position:absolute;right:8.1%;top:17.2%;width:39%;height:45%;border-radius:22px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(23,50,77,.12);box-shadow:0 18px 36px rgba(23,50,77,.12);overflow:hidden;}
+    body[data-layout="sales-training-objection-handling"] .training-dialogue::before{content:"";position:absolute;left:10%;top:15%;width:68%;height:30%;border-radius:18px 18px 18px 4px;background:#fff;border:1px solid rgba(23,50,77,.12);box-shadow:0 12px 22px rgba(23,50,77,.08);}
+    body[data-layout="sales-training-objection-handling"] .training-dialogue::after{content:"";position:absolute;right:10%;bottom:14%;width:70%;height:30%;border-radius:18px 18px 4px 18px;background:var(--template-primary);box-shadow:0 12px 22px rgba(23,50,77,.12);}
+    body[data-layout="sales-training-objection-handling"] .training-dialogue span{position:absolute;height:7px;border-radius:999px;background:var(--template-accent);z-index:2;}
+    body[data-layout="sales-training-objection-handling"] .training-dialogue span:nth-child(1){left:16%;top:25%;width:42%;}body[data-layout="sales-training-objection-handling"] .training-dialogue span:nth-child(2){left:16%;top:34%;width:52%;background:rgba(23,50,77,.18);}body[data-layout="sales-training-objection-handling"] .training-dialogue span:nth-child(3){right:16%;bottom:28%;width:44%;background:var(--template-secondary);}body[data-layout="sales-training-objection-handling"] .training-dialogue span:nth-child(4){right:16%;bottom:20%;width:54%;background:rgba(255,255,255,.78);}
+    body[data-layout="sales-training-objection-handling"] .training-tags{position:absolute;left:8.5%;right:48%;bottom:14.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-training-objection-handling"] .training-tags span{min-height:60px;border-radius:14px;background:#fff;border:1px solid rgba(23,50,77,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(23,50,77,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-training-objection-handling"] .training-path{position:absolute;left:8.5%;right:8.5%;bottom:15.2%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-training-objection-handling"] .training-path span{position:relative;min-height:82px;border-radius:16px;background:#fff;border:1px solid rgba(23,50,77,.12);box-shadow:0 12px 24px rgba(23,50,77,.08);padding:14px 12px 10px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-training-objection-handling"] .training-path span::before{content:"";display:block;width:26px;height:26px;margin-bottom:9px;border-radius:50%;background:var(--template-secondary);box-shadow:0 0 0 8px rgba(42,183,169,.12);}
+    body[data-layout="sales-training-objection-handling"] .training-path span:not(:last-child)::after{content:"";position:absolute;right:-18px;top:43px;width:24px;height:4px;border-radius:999px;background:var(--template-accent);z-index:2;}
+    body[data-layout="sales-training-objection-handling"] .training-map{position:absolute;right:8.2%;top:20%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="sales-training-objection-handling"] .training-map span{min-height:92px;border-radius:16px;background:#fff;border:1px solid rgba(23,50,77,.12);box-shadow:0 12px 24px rgba(23,50,77,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-training-objection-handling"] .training-map span::before{content:"";display:block;width:20px;height:20px;margin-bottom:9px;border-radius:6px;background:var(--template-accent);box-shadow:0 0 0 7px rgba(255,138,61,.13);}
+    body[data-layout="sales-training-objection-handling"] .training-roleplay{position:absolute;right:7.7%;top:17.5%;width:40%;height:47%;border-radius:22px;background:var(--template-primary);box-shadow:0 18px 36px rgba(23,50,77,.16);overflow:hidden;}
+    body[data-layout="sales-training-objection-handling"] .training-roleplay::before{content:"";position:absolute;left:12%;top:18%;width:28%;height:42%;border-radius:18px;background:#fff;box-shadow:210px 0 0 #fff;}
+    body[data-layout="sales-training-objection-handling"] .training-roleplay::after{content:"";position:absolute;left:45%;top:35%;width:12%;height:5px;border-radius:999px;background:#fff;box-shadow:22px 0 0 #fff,44px 0 0 var(--template-accent);}
+    body[data-layout="sales-training-objection-handling"] .training-roleplay span{position:absolute;bottom:18%;height:9px;border-radius:999px;background:var(--template-accent);}body[data-layout="sales-training-objection-handling"] .training-roleplay span:nth-child(1){left:13%;width:26%;}body[data-layout="sales-training-objection-handling"] .training-roleplay span:nth-child(2){left:43%;width:18%;background:var(--template-secondary);}body[data-layout="sales-training-objection-handling"] .training-roleplay span:nth-child(3){right:13%;width:26%;}
+    body[data-layout="sales-training-objection-handling"] .training-checklist{position:absolute;left:8.5%;right:8.5%;bottom:16.5%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
+    body[data-layout="sales-training-objection-handling"] .training-checklist span{min-height:98px;border-radius:16px;background:#fff;border:1px solid rgba(23,50,77,.12);box-shadow:0 12px 24px rgba(23,50,77,.08);padding:17px 15px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-training-objection-handling"] .training-checklist span::before{content:"";display:block;width:28px;height:28px;margin-bottom:10px;border-radius:50%;background:linear-gradient(135deg,var(--template-secondary),var(--template-accent));}
+    body[data-layout="sales-training-objection-handling"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.84);border:1px solid rgba(23,50,77,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,59,.62);}
     body[data-layout="product-release-cadence"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 58%,#dbeafe 100%);box-shadow:0 22px 56px rgba(11,31,58,.18);}
     body[data-layout="product-release-cadence"] .slide::before{background:repeating-linear-gradient(90deg,rgba(11,31,58,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,211,238,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(34,211,238,.18),transparent 25%);}
     body[data-layout="product-release-cadence"] .slide::after{content:"";position:absolute;left:5.6%;right:5.6%;top:9%;bottom:8.2%;z-index:1;border-radius:24px;background:rgba(255,255,255,.93);border:1px solid rgba(11,31,58,.12);box-shadow:0 24px 54px rgba(11,31,58,.13),inset 0 0 0 1px rgba(255,255,255,.72);}
@@ -2649,6 +2751,42 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="experience-journey-map"] .journey-actions span{min-height:70px;border-radius:14px;background:#fff;border:1px solid rgba(24,183,166,.18);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="experience-journey-map"] .journey-actions span::before{content:"";display:block;width:22px;height:22px;margin-bottom:8px;border-radius:8px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent));}
     body[data-layout="experience-journey-map"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(30,42,90,.12);border-radius:999px;padding:5px 10px;color:rgba(16,32,51,.62);}
+    body[data-layout="experience-gap-map"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbff 0%,var(--template-bg) 56%,#edf6ff 100%);}
+    body[data-layout="experience-gap-map"] .slide::before{background:radial-gradient(circle at 86% 18%,rgba(47,128,237,.18),transparent 24%),radial-gradient(circle at 14% 84%,rgba(249,115,91,.13),transparent 22%),repeating-linear-gradient(90deg,rgba(24,35,63,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(47,128,237,.035) 0 1px,transparent 1px 38px);}
+    body[data-layout="experience-gap-map"] .slide::after{content:"";position:absolute;left:5.9%;right:5.9%;top:8.8%;bottom:8.7%;z-index:1;border-radius:30px;background:rgba(255,255,255,.95);border:1px solid rgba(24,35,63,.13);box-shadow:0 24px 58px rgba(16,32,51,.13);}
+    body[data-layout="experience-gap-map"] .accent{height:5.8%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#17436F 62%,var(--template-accent));box-shadow:inset 0 -3px 0 rgba(249,115,91,.48);}
+    body[data-layout="experience-gap-map"] .gap-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="experience-gap-map"] .gap-kicker{position:absolute;left:8.4%;top:13.4%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="experience-gap-map"] .gap-title{position:absolute;left:8.4%;top:20.3%;width:42%;margin:0;color:var(--template-title);font-size:31px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="experience-gap-map"] .gap-summary{position:absolute;left:8.5%;top:42.3%;width:38%;font-size:13px;line-height:1.46;font-weight:800;color:var(--template-body);}
+    body[data-layout="experience-gap-map"] .gap-bullets{position:absolute;left:8.6%;top:51%;width:38%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="experience-gap-map"] .gap-bullets li{margin:.08em 0;}
+    body[data-layout="experience-gap-map"] .gap-browser-pair{position:absolute;right:7.8%;top:17.8%;width:39%;height:43%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="experience-gap-map"] .gap-window{position:relative;border-radius:18px;background:#f8fbff;border:1px solid rgba(24,35,63,.14);box-shadow:0 16px 32px rgba(16,32,51,.10);overflow:hidden;}
+    body[data-layout="experience-gap-map"] .gap-window::before{content:"";position:absolute;left:0;right:0;top:0;height:28px;background:var(--template-primary);}
+    body[data-layout="experience-gap-map"] .gap-window::after{content:"";position:absolute;left:18px;top:42px;width:42%;height:12px;border-radius:999px;background:var(--template-accent);box-shadow:0 34px 0 #d9e4f2,0 60px 0 #e7eef7;}
+    body[data-layout="experience-gap-map"] .gap-window b{position:absolute;right:16px;bottom:18px;width:48px;height:48px;border-radius:16px;background:rgba(47,128,237,.14);}
+    body[data-layout="experience-gap-map"] .gap-window.alt::after{background:var(--template-secondary);box-shadow:0 34px 0 #d9e4f2,0 60px 0 #e7eef7;}
+    body[data-layout="experience-gap-map"] .gap-path{position:absolute;right:8.2%;top:22%;width:37.8%;height:38%;border-radius:24px;background:linear-gradient(135deg,#fff,#f5f9ff);border:1px solid rgba(24,35,63,.12);box-shadow:0 18px 36px rgba(16,32,51,.10);overflow:hidden;}
+    body[data-layout="experience-gap-map"] .gap-path::before{content:"";position:absolute;left:8%;right:8%;top:49%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#9ec5ff,var(--template-secondary));transform:rotate(-8deg);}
+    body[data-layout="experience-gap-map"] .gap-path i{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 8px rgba(47,128,237,.12);}
+    body[data-layout="experience-gap-map"] .gap-path i:nth-child(1){left:12%;top:55%;}body[data-layout="experience-gap-map"] .gap-path i:nth-child(2){left:31%;top:32%;background:var(--template-primary);}body[data-layout="experience-gap-map"] .gap-path i:nth-child(3){left:50%;top:58%;background:var(--template-secondary);}body[data-layout="experience-gap-map"] .gap-path i:nth-child(4){left:68%;top:34%;}body[data-layout="experience-gap-map"] .gap-path i:nth-child(5){left:84%;top:42%;background:var(--template-primary);}
+    body[data-layout="experience-gap-map"] .gap-scorecards{position:absolute;left:8.4%;right:8.4%;bottom:13.8%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="experience-gap-map"] .gap-scorecards span{min-height:68px;border-radius:15px;background:#fff;border:1px solid rgba(24,35,63,.12);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:12px 13px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experience-gap-map"] .gap-scorecards span::before{content:"";display:block;width:26px;height:6px;margin-bottom:9px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="experience-gap-map"] .gap-matrix{position:absolute;right:8%;top:18.5%;width:38.4%;height:42%;display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:10px;}
+    body[data-layout="experience-gap-map"] .gap-matrix span{border-radius:15px;background:#fff;border:1px solid rgba(24,35,63,.12);box-shadow:0 10px 22px rgba(16,32,51,.08);padding:13px 11px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experience-gap-map"] .gap-matrix span:nth-child(3n){border-color:rgba(249,115,91,.25);}
+    body[data-layout="experience-gap-map"] .gap-matrix span::after{content:"";display:block;height:7px;margin-top:13px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent) 0 62%,rgba(24,35,63,.11) 62%);}
+    body[data-layout="experience-gap-map"] .gap-opportunities{position:absolute;right:8%;top:18.7%;width:38.4%;height:42%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="experience-gap-map"] .gap-opportunities span{position:relative;border-radius:18px;background:linear-gradient(135deg,#fff,#f8fbff);border:1px solid rgba(47,128,237,.18);box-shadow:0 12px 24px rgba(16,32,51,.08);padding:16px 13px 13px 48px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experience-gap-map"] .gap-opportunities span::before{content:"";position:absolute;left:15px;top:16px;width:20px;height:20px;border-radius:8px;background:var(--template-secondary);box-shadow:0 0 0 7px rgba(249,115,91,.12);}
+    body[data-layout="experience-gap-map"] .gap-roadmap{position:absolute;right:8.5%;top:21.5%;width:36.5%;height:37%;border-radius:22px;background:#fff;border:1px solid rgba(24,35,63,.12);box-shadow:0 16px 32px rgba(16,32,51,.09);padding:24px 22px;}
+    body[data-layout="experience-gap-map"] .gap-roadmap::before{content:"";position:absolute;left:31px;top:34px;bottom:34px;width:2px;background:rgba(24,35,63,.16);}
+    body[data-layout="experience-gap-map"] .gap-roadmap span{display:block;position:relative;margin:0 0 17px 30px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="experience-gap-map"] .gap-roadmap span::before{content:"";position:absolute;left:-30px;top:1px;width:15px;height:15px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 6px rgba(47,128,237,.12);}
+    body[data-layout="experience-gap-map"] .gap-closing-loop{position:absolute;right:11%;top:21%;width:30%;height:38%;border-radius:50%;border:15px solid rgba(47,128,237,.18);border-left-color:var(--template-primary);border-bottom-color:var(--template-secondary);}
+    body[data-layout="experience-gap-map"] .page-number{z-index:4;right:7.2%;bottom:6.1%;background:rgba(255,255,255,.86);border:1px solid rgba(24,35,63,.12);border-radius:999px;padding:5px 10px;color:rgba(16,32,51,.62);}
     body[data-layout="capability-radar-map"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 56%,#e9f7f4 100%);}
     body[data-layout="capability-radar-map"] .slide::before{background:repeating-linear-gradient(90deg,rgba(23,35,63,.05) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(22,184,166,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(22,184,166,.18),transparent 26%);}
     body[data-layout="capability-radar-map"] .slide::after{content:"";position:absolute;left:6.4%;right:6.4%;top:9.5%;bottom:9.2%;z-index:1;border-radius:26px;background:rgba(255,255,255,.95);border:1px solid rgba(23,35,63,.13);box-shadow:0 24px 54px rgba(13,27,42,.13);}
@@ -2775,6 +2913,37 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="user-path-funnel"] .path-actions span{min-height:86px;border-radius:16px;background:#fff;border:1px solid rgba(23,37,84,.12);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="user-path-funnel"] .path-actions span::before{content:"";display:block;width:28px;height:6px;margin-bottom:12px;border-radius:999px;background:#22c55e;}
     body[data-layout="user-path-funnel"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.84);border:1px solid rgba(23,37,84,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.62);}
+    body[data-layout="product-retention-path"]{background:#e8f3ff;}
+    body[data-layout="product-retention-path"] main{width:min(100%,1160px);}
+    body[data-layout="product-retention-path"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 54%,#f5f3ff 100%);box-shadow:0 24px 58px rgba(15,23,42,.15);}
+    body[data-layout="product-retention-path"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 18%,rgba(22,163,166,.16),transparent 25%),radial-gradient(circle at 17% 82%,rgba(124,58,237,.13),transparent 28%),repeating-linear-gradient(90deg,rgba(15,23,42,.042) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(15,23,42,.026) 0 1px,transparent 1px 40px);}
+    body[data-layout="product-retention-path"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8.6%;bottom:8.2%;z-index:1;border-radius:26px;background:rgba(255,255,255,.94);border:1px solid rgba(15,23,42,.10);box-shadow:0 22px 52px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.78);}
+    body[data-layout="product-retention-path"] .accent{left:5.8%;right:5.8%;top:8.6%;height:6px;z-index:4;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));}
+    body[data-layout="product-retention-path"] .retention-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="product-retention-path"] .retention-kicker{position:absolute;left:8.4%;top:14.4%;font-size:12px;font-weight:900;letter-spacing:.13em;color:var(--template-accent);}
+    body[data-layout="product-retention-path"] .retention-title{position:absolute;left:8.4%;top:20.6%;width:42%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="product-retention-path"] .retention-summary{position:absolute;left:8.5%;top:39.8%;width:35%;font-size:12.5px;line-height:1.46;font-weight:800;color:#40566b;overflow-wrap:anywhere;}
+    body[data-layout="product-retention-path"] .retention-bullets{position:absolute;left:8.7%;top:50.2%;width:37%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="product-retention-path"] .retention-bullets li{margin:.16em 0;}
+    body[data-layout="product-retention-path"] .retention-metrics{position:absolute;left:8.4%;right:49%;bottom:13.8%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="product-retention-path"] .retention-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:800;color:#587083;border-top:5px solid var(--template-accent);}
+    body[data-layout="product-retention-path"] .retention-metrics span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="product-retention-path"] .retention-metrics span:nth-child(3){border-top-color:var(--template-warning);}
+    body[data-layout="product-retention-path"] .retention-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="product-retention-path"] .retention-curve{position:absolute;right:8.2%;top:18.4%;width:39%;height:43%;border-radius:22px;background:linear-gradient(135deg,#fff,#eef9fb);border:1px solid rgba(15,23,42,.10);box-shadow:0 18px 36px rgba(15,23,42,.11);overflow:hidden;}
+    body[data-layout="product-retention-path"] .retention-curve::before{content:"";position:absolute;left:10%;right:10%;bottom:24%;height:3px;border-radius:999px;background:rgba(15,23,42,.14);box-shadow:0 -42px 0 rgba(22,163,166,.08),0 -84px 0 rgba(124,58,237,.07);}
+    body[data-layout="product-retention-path"] .retention-curve::after{content:"";position:absolute;left:11%;right:10%;top:25%;height:42%;border-radius:50%;border-top:9px solid var(--template-accent);border-right:9px solid var(--template-secondary);transform:skewX(-11deg);box-shadow:0 10px 24px rgba(22,163,166,.14);}
+    body[data-layout="product-retention-path"] .retention-curve i{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--template-accent);box-shadow:0 0 0 7px rgba(22,163,166,.12);}
+    body[data-layout="product-retention-path"] .retention-curve i:nth-child(1){left:16%;top:52%;}.retention-curve i:nth-child(2){left:36%;top:38%;border-color:var(--template-secondary);box-shadow:0 0 0 7px rgba(124,58,237,.12);}.retention-curve i:nth-child(3){left:58%;top:34%;}.retention-curve i:nth-child(4){left:78%;top:24%;border-color:var(--template-warning);box-shadow:0 0 0 7px rgba(249,115,22,.12);}
+    body[data-layout="product-retention-path"] .retention-lifecycle{position:absolute;right:8.1%;top:18.5%;width:39%;height:43%;border-radius:50%;background:radial-gradient(circle,#fff 0 24%,rgba(22,163,166,.12) 25% 50%,rgba(124,58,237,.10) 51% 72%,#fff 73%);border:1px solid rgba(15,23,42,.10);box-shadow:0 18px 36px rgba(15,23,42,.10);}
+    body[data-layout="product-retention-path"] .retention-lifecycle span{position:absolute;width:29%;height:18%;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.10);display:grid;place-items:center;text-align:center;padding:0 8px;font-size:11px;font-weight:900;color:var(--template-title);box-shadow:0 10px 20px rgba(15,23,42,.08);}
+    body[data-layout="product-retention-path"] .retention-lifecycle span:nth-child(1){left:35%;top:7%;}.retention-lifecycle span:nth-child(2){right:4%;top:40%;}.retention-lifecycle span:nth-child(3){left:35%;bottom:7%;}.retention-lifecycle span:nth-child(4){left:4%;top:40%;}
+    body[data-layout="product-retention-path"] .retention-actions{position:absolute;right:8.2%;top:19%;width:39%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;}
+    body[data-layout="product-retention-path"] .retention-actions span{min-height:106px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);overflow-wrap:anywhere;}
+    body[data-layout="product-retention-path"] .retention-actions span::before{content:"";display:block;width:34px;height:8px;margin-bottom:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="product-retention-path"] .retention-roadmap{position:absolute;left:8.4%;right:8.4%;bottom:14%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-retention-path"] .retention-roadmap span{min-height:78px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-retention-path"] .retention-roadmap span::after{content:"";display:block;width:48%;height:5px;margin-top:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="product-retention-path"] .page-number{z-index:6;right:7%;bottom:6.3%;color:rgba(15,23,42,.58);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="customer-segmentation-layering"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fcff 0%,var(--template-bg) 54%,#eefaf8 100%);box-shadow:0 22px 58px rgba(15,23,42,.15);}
     body[data-layout="customer-segmentation-layering"] .slide::before{background:repeating-linear-gradient(90deg,rgba(15,23,42,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(20,184,166,.035) 0 1px,transparent 1px 38px),radial-gradient(circle at 84% 18%,rgba(20,184,166,.16),transparent 26%),radial-gradient(circle at 18% 78%,rgba(168,85,247,.11),transparent 24%);}
     body[data-layout="customer-segmentation-layering"] .slide::after{content:"";position:absolute;left:6.2%;right:6.2%;top:9.4%;bottom:9.6%;z-index:1;border-radius:28px;background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.11);box-shadow:0 24px 56px rgba(15,23,42,.11),inset 0 0 0 1px rgba(255,255,255,.8);}
@@ -3068,6 +3237,89 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="marketing"] .marketing-channel-row{position:absolute;left:9.2%;right:42%;bottom:16.8%;z-index:4;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
     body[data-layout="marketing"] .marketing-channel-row span{height:44px;border-radius:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-primary) 14%,#fff 86%),color-mix(in srgb,var(--template-accent) 18%,#fff 82%));border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);box-shadow:0 10px 20px rgba(15,23,42,.08);}
     body[data-layout="marketing"] .page-number{z-index:5;color:color-mix(in srgb,var(--template-title) 64%,transparent);background:rgba(255,255,255,.72);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="integrated-media-mix"]{background:#e8f0f8;}
+    body[data-layout="integrated-media-mix"] main{width:min(100%,1160px);}
+    body[data-layout="integrated-media-mix"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbff 0%,#fff 48%,#edf7ff 100%);box-shadow:0 24px 58px rgba(18,53,91,.16);}
+    body[data-layout="integrated-media-mix"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(29,155,240,.18),transparent 28%),radial-gradient(circle at 13% 78%,rgba(245,158,11,.17),transparent 26%),repeating-linear-gradient(90deg,rgba(18,53,91,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(18,53,91,.028) 0 1px,transparent 1px 42px);pointer-events:none;}
+    body[data-layout="integrated-media-mix"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8.4%;bottom:8%;z-index:1;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(18,53,91,.10);box-shadow:0 22px 48px rgba(18,53,91,.10),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="integrated-media-mix"] .accent{left:5.8%;right:5.8%;top:8.4%;height:7px;z-index:4;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary),var(--template-accent));}
+    body[data-layout="integrated-media-mix"] .slide-content{display:none;}
+    body[data-layout="integrated-media-mix"] .integrated-media-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="integrated-media-mix"] .integrated-media-kicker{position:absolute;left:8.6%;top:14.2%;font-size:12px;font-weight:900;letter-spacing:.13em;color:var(--template-secondary);}
+    body[data-layout="integrated-media-mix"] .integrated-media-title{position:absolute;left:8.6%;top:20%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="integrated-media-mix"] .integrated-media-summary{position:absolute;left:8.6%;top:40.8%;width:39%;font-size:13px;line-height:1.5;color:#475569;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="integrated-media-mix"] .integrated-media-bullets{position:absolute;left:8.7%;top:51%;width:39%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.48;font-weight:800;color:#334155;}
+    body[data-layout="integrated-media-mix"] .integrated-media-bullets li{margin:.18em 0;}
+    body[data-layout="integrated-media-mix"] .integrated-media-metrics{position:absolute;left:8.6%;right:48%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="integrated-media-mix"] .integrated-media-metrics span{min-height:58px;border-radius:16px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(18,53,91,.08);display:grid;align-content:center;gap:3px;padding:11px 12px;font-size:10px;font-weight:800;color:#64748b;}
+    body[data-layout="integrated-media-mix"] .integrated-media-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="integrated-media-mix"] .integrated-media-hero{position:absolute;right:7.8%;top:15.5%;width:42%;height:54%;}
+    body[data-layout="integrated-media-mix"] .integrated-media-hero .integrated-media-matrix{left:0;right:0;top:4%;width:auto;height:66%;}
+    body[data-layout="integrated-media-mix"] .integrated-media-wave{position:absolute;left:4%;right:4%;bottom:1%;height:27%;border-radius:50%;border-top:8px solid rgba(29,155,240,.34);border-bottom:4px solid rgba(245,158,11,.22);}
+    body[data-layout="integrated-media-mix"] .integrated-media-matrix{position:absolute;right:8.2%;top:18%;width:41%;height:47%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="integrated-media-mix"] .integrated-media-matrix span{position:relative;border-radius:20px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 14px 26px rgba(18,53,91,.09);padding:16px 14px 12px 48px;font-size:12px;font-weight:900;color:var(--template-title);overflow:hidden;}
+    body[data-layout="integrated-media-mix"] .integrated-media-matrix span::before{content:"";position:absolute;left:14px;top:16px;width:22px;height:22px;border-radius:8px;background:linear-gradient(135deg,var(--template-secondary),var(--template-primary));}
+    body[data-layout="integrated-media-mix"] .integrated-media-matrix span::after{content:"";position:absolute;left:48px;right:16px;bottom:16px;height:5px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),rgba(245,158,11,.18));}
+    body[data-layout="integrated-media-mix"] .integrated-media-budget{position:absolute;right:8.2%;top:20%;width:40%;display:grid;gap:14px;}
+    body[data-layout="integrated-media-mix"] .integrated-media-budget span{position:relative;height:50px;border-radius:999px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 12px 24px rgba(18,53,91,.08);padding:16px 18px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="integrated-media-mix"] .integrated-media-budget span::after{content:"";position:absolute;left:132px;top:18px;width:var(--w);max-width:52%;height:14px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary),var(--template-accent));}
+    body[data-layout="integrated-media-mix"] .integrated-media-rhythm{position:absolute;right:7.8%;top:20%;width:42%;height:44%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:end;}
+    body[data-layout="integrated-media-mix"] .integrated-media-rhythm span{position:relative;min-height:150px;border-radius:22px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 14px 26px rgba(18,53,91,.09);padding:42px 12px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="integrated-media-mix"] .integrated-media-rhythm span::before{content:attr(data-step);position:absolute;left:12px;top:12px;color:var(--template-secondary);font-size:14px;}
+    body[data-layout="integrated-media-mix"] .integrated-media-rhythm span::after{content:"";position:absolute;left:18px;right:18px;bottom:16px;height:6px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar{position:absolute;right:10%;top:18%;width:34%;height:48%;border-radius:50%;border:14px solid rgba(29,155,240,.16);box-shadow:inset 0 0 0 1px rgba(18,53,91,.10);}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar::before{content:"";position:absolute;inset:18%;border-radius:50%;border:2px dashed rgba(18,53,91,.20);}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar::after{content:"";position:absolute;left:50%;top:8%;bottom:8%;width:2px;background:rgba(18,53,91,.12);}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar i{position:absolute;width:70px;height:36px;border-radius:999px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 10px 22px rgba(18,53,91,.08);}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar i:nth-child(1){left:38%;top:-6%;}body[data-layout="integrated-media-mix"] .integrated-media-radar i:nth-child(2){right:-10%;top:42%;}body[data-layout="integrated-media-mix"] .integrated-media-radar i:nth-child(3){left:38%;bottom:-6%;}body[data-layout="integrated-media-mix"] .integrated-media-radar i:nth-child(4){left:-10%;top:42%;}
+    body[data-layout="integrated-media-mix"] .integrated-media-radar b{position:absolute;left:42%;top:42%;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--template-secondary),var(--template-accent));}
+    body[data-layout="integrated-media-mix"] .integrated-media-actions{position:absolute;left:8.6%;right:8.6%;bottom:16%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="integrated-media-mix"] .integrated-media-actions span{min-height:92px;border-radius:20px;background:#fff;border:1px solid rgba(18,53,91,.10);box-shadow:0 12px 24px rgba(18,53,91,.08);padding:18px 16px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="integrated-media-mix"] .integrated-media-actions span::after{content:"";display:block;width:42px;height:5px;margin-top:14px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent));}
+    body[data-layout="integrated-media-mix"] .page-number{z-index:6;color:#64748b;background:rgba(255,255,255,.78);border:1px solid rgba(18,53,91,.10);border-radius:999px;padding:5px 10px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .slide{padding:0;border:0;background:linear-gradient(135deg,#fff7ed 0%,#ffe4e6 54%,#fff1b8 100%);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .slide::before{background:radial-gradient(circle at 84% 18%,rgba(244,63,94,.20),transparent 25%),radial-gradient(circle at 14% 82%,rgba(255,138,0,.22),transparent 29%),repeating-linear-gradient(90deg,rgba(143,29,44,.045) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(143,29,44,.035) 0 1px,transparent 1px 42px);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9%;bottom:8%;z-index:1;border-radius:28px;background:rgba(255,255,255,.88);border:1px solid rgba(143,29,44,.12);box-shadow:0 24px 58px rgba(143,29,44,.14);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .accent{height:0;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-kicker{position:absolute;left:8.7%;top:13.2%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-secondary);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-title{position:absolute;left:8.7%;top:20%;width:42%;margin:0;color:var(--template-title);font-size:35px;line-height:1.1;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-summary{position:absolute;left:8.8%;top:43.5%;width:38%;font-size:13px;line-height:1.45;font-weight:800;color:var(--template-body);overflow-wrap:anywhere;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-bullets{position:absolute;left:8.8%;top:54%;width:39%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.45;font-weight:800;color:#69313d;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-bullets li{margin:.16em 0;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card{position:absolute;right:9%;top:17%;width:34%;height:45%;border-radius:28px;background:linear-gradient(135deg,var(--template-primary),var(--template-accent) 62%,var(--template-secondary));box-shadow:0 26px 50px rgba(143,29,44,.22);overflow:hidden;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card::before{content:"";position:absolute;left:9%;top:12%;width:54%;height:14%;border-radius:999px;background:rgba(255,255,255,.88);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card::after{content:"";position:absolute;right:9%;bottom:12%;width:30%;height:34%;border-radius:22px;background:#fff1b8;box-shadow:-18px -20px 0 rgba(255,255,255,.28);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card span{position:absolute;display:block;border-radius:999px;background:#fff;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card span:nth-child(1){left:10%;bottom:18%;width:38%;height:8px;opacity:.8;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card span:nth-child(2){left:10%;bottom:29%;width:24%;height:8px;opacity:.56;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-hero-card span:nth-child(3){right:12%;top:15%;width:42px;height:42px;border-radius:50%;background:#fbbf24;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-countdown{position:absolute;right:12%;top:66%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:28%;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-countdown span{height:54px;border-radius:16px;background:#fff;border:1px solid rgba(143,29,44,.12);box-shadow:0 10px 24px rgba(143,29,44,.10);display:grid;place-items:center;font-size:18px;font-weight:900;color:var(--template-primary);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-timeline{position:absolute;left:8%;right:8%;bottom:14%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-timeline span{min-height:82px;border-radius:18px;background:#fff;border:1px solid rgba(143,29,44,.11);box-shadow:0 12px 24px rgba(143,29,44,.09);padding:13px 12px;font-size:11px;line-height:1.35;font-weight:900;color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-timeline span::before{content:attr(data-step);display:block;margin-bottom:7px;color:var(--template-accent);font-size:15px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-benefits{position:absolute;right:8.6%;top:19%;width:40%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-benefits span{min-height:112px;border-radius:22px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px dashed rgba(244,63,94,.34);box-shadow:0 14px 28px rgba(143,29,44,.10);padding:18px 16px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-benefits span::after{content:"";display:block;width:48px;height:8px;margin-top:16px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-channel{position:absolute;right:9%;top:21%;width:38%;height:44%;display:grid;gap:12px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-channel span{border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;box-shadow:0 14px 26px rgba(143,29,44,.16);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-channel span:nth-child(2){margin-left:7%;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-channel span:nth-child(3){margin-left:14%;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-channel span:nth-child(4){margin-left:21%;background:linear-gradient(90deg,var(--template-secondary),var(--template-warning));color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel{position:absolute;right:9%;top:19%;width:38%;height:48%;display:grid;align-content:center;gap:10px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel span{height:52px;border-radius:16px;background:#fff;border:1px solid rgba(143,29,44,.10);box-shadow:0 12px 24px rgba(143,29,44,.09);display:grid;place-items:center;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel span:nth-child(1){margin:0 0;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel span:nth-child(2){margin:0 8%;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel span:nth-child(3){margin:0 16%;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-funnel span:nth-child(4){margin:0 24%;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));color:#fff;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-review{position:absolute;right:8.6%;top:19%;width:40%;height:48%;border-radius:24px;background:#fff;border:1px solid rgba(143,29,44,.11);box-shadow:0 16px 34px rgba(143,29,44,.10);padding:7% 6%;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-review i{display:inline-block;width:14%;margin:0 4% 0 0;vertical-align:bottom;border-radius:10px 10px 0 0;background:linear-gradient(180deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-review i:nth-child(1){height:34%;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-review i:nth-child(2){height:58%;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-review i:nth-child(3){height:78%;}body[data-layout="marketing-festival-promotion-rhythm"] .festival-review i:nth-child(4){height:48%;background:var(--template-warning);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-actions{position:absolute;left:8.7%;right:8.7%;bottom:13%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-actions span{min-height:78px;border-radius:20px;background:#fff;border:1px solid rgba(143,29,44,.10);box-shadow:0 12px 24px rgba(143,29,44,.09);padding:16px 15px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-actions span::after{content:"";display:block;width:42px;height:6px;margin-top:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-metrics{position:absolute;left:8.8%;right:48%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-metrics span{min-height:58px;border-radius:16px;background:#fff;border:1px solid rgba(143,29,44,.10);box-shadow:0 10px 22px rgba(143,29,44,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:800;color:var(--template-body);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .festival-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="marketing-festival-promotion-rhythm"] .page-number{z-index:6;color:var(--template-body);background:rgba(255,255,255,.78);border:1px solid rgba(143,29,44,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="marketing-launch-rhythm"] .slide{padding:0;border:0;background:radial-gradient(circle at 84% 18%,rgba(255,90,61,.28) 0 17%,transparent 18% 42%),radial-gradient(circle at 18% 78%,rgba(124,58,237,.26) 0 18%,transparent 19% 42%),linear-gradient(135deg,#101828 0%,#161B2E 54%,#24122C 100%);}
     body[data-layout="marketing-launch-rhythm"] .slide::before{background:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 54px),repeating-linear-gradient(0deg,rgba(34,211,238,.05) 0 1px,transparent 1px 44px);}
     body[data-layout="marketing-launch-rhythm"] .slide::after{content:"";position:absolute;right:7%;top:15%;width:28%;height:54%;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);clip-path:polygon(28% 0,72% 0,100% 100%,0 100%);}
@@ -5868,6 +6120,144 @@ function isKeyAccountDecisionVisual(visual) {
   return visual?.layout === "sales-key-account-decision-chain" && (id === "key-account-plan" || id === "sales-key-account-plan-decision-chain");
 }
 
+function presalesArchitecturePreviewScene({ slide, index, total }) {
+  const bullets = presalesArchitectureBulletTexts(slide);
+  const title = presalesArchitectureCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = presalesArchitecturePreviewRole({ slide, index, total });
+  return {
+    variant: "architecture-solution",
+    role,
+    // 页面角标使用业务语义，避免直接把主题风格名称写进 PPT 页面。
+    kicker: role === "cover" ? "TECHNICAL BLUEPRINT" : role === "requirement" ? "CLIENT FIT MAP" : role === "blueprint" ? "SYSTEM LAYERS" : role === "module" ? "CAPABILITY MODULES" : role === "topology" ? "DEPLOYMENT VIEW" : role === "delivery" ? "DELIVERY ASSURANCE" : "NEXT STEP",
+    title,
+    bullets,
+    tags: ["需求匹配", "系统集成", "交付保障"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    map: ["业务诉求", "技术能力", "集成边界", "业务收益"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 12)),
+    layers: ["用户入口", "业务应用", "平台能力", "数据服务", "基础资源"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    modules: ["身份权限", "流程编排", "数据集成", "安全审计"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 12)),
+    topology: ["客户系统", "接口网关", "数据服务", "云资源"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    timeline: ["范围确认", "技术评审", "POC 验证", "上线交付"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function presalesArchitecturePreviewRole({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  if (layout.includes("closing") || layout.includes("next")) return "next";
+  if (layout.includes("requirement") || layout.includes("map")) return "requirement";
+  if (layout.includes("blueprint") || layout.includes("architecture")) return "blueprint";
+  if (layout.includes("module") || layout.includes("capability")) return "module";
+  if (layout.includes("deployment") || layout.includes("topology")) return "topology";
+  if (layout.includes("delivery") || layout.includes("assurance") || layout.includes("roadmap")) return "delivery";
+  if (index === 0) return "cover";
+  if (index === total - 1) return "next";
+  return ["requirement", "blueprint", "module", "topology", "delivery"][(index - 1) % 5];
+}
+
+function renderPresalesArchitecturePreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(presalesArchitectureCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="presales-arch-kicker">${escapeHtml(scene.kicker)}</div><h2 class="presales-arch-title">${escapeHtml(scene.title)}</h2><div class="presales-arch-rule"></div><ul class="presales-arch-bullets">${bulletItems}</ul>`;
+  const canvas = '<div class="presales-arch-canvas"><i></i><i></i><i></i><i></i></div>';
+  const tags = `<div class="presales-arch-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const map = `<div class="presales-arch-map">${scene.map.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const blueprint = `<div class="presales-arch-blueprint">${scene.layers.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const modules = `<div class="presales-arch-modules">${scene.modules.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const topology = `<div class="presales-arch-topology">${scene.topology.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const timeline = `<div class="presales-arch-timeline">${scene.timeline.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const visual = scene.role === "requirement"
+    ? map
+    : scene.role === "blueprint"
+      ? `${canvas}${blueprint}`
+      : scene.role === "module"
+        ? modules
+        : scene.role === "topology"
+          ? topology
+          : scene.role === "delivery" || scene.role === "next"
+            ? timeline
+            : `${canvas}${tags}`;
+  return `<div class="presales-arch-layer">${common}${visual}</div>`;
+}
+
+function presalesArchitectureBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["梳理客户核心诉求与现有系统边界", "设计分层架构、接口集成和数据流转", "明确交付计划、风险控制和验收标准"];
+}
+
+function presalesArchitectureCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isPresalesArchitectureVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "presales-architecture-solution" && (id === "presales-technical-plan" || id === "sales-presales-technical-plan-architecture-solution");
+}
+
+function salesTrainingObjectionPreviewScene({ slide, index, total }) {
+  const bullets = salesTrainingObjectionBulletTexts(slide);
+  const title = salesTrainingObjectionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = salesTrainingObjectionPreviewRole({ slide, index, total });
+  const tags = ["价格疑问", "信任顾虑", "需求不清"].map((fallback, itemIndex) => salesTrainingObjectionCompactText(bullets[itemIndex], fallback, 10));
+  return {
+    variant: role,
+    role,
+    kicker: role === "cover" ? "SALES PRACTICE" : role === "map" ? "CUSTOMER QUESTION MAP" : role === "path" ? "RESPONSE PATH" : role === "roleplay" ? "SCENE DRILL" : role === "closing" ? "ACTION CHECK" : "CALL REVIEW",
+    title,
+    bullets,
+    tags,
+    path: ["倾听确认", "复述问题", "价值回应", "推进下一步"].map((fallback, itemIndex) => salesTrainingObjectionCompactText(bullets[itemIndex], fallback, 10)),
+    map: ["预算压力", "效果怀疑", "决策延迟", "竞品比较"].map((fallback, itemIndex) => salesTrainingObjectionCompactText(bullets[itemIndex], fallback, 12)),
+    checklist: ["回应有证据", "追问有层次", "收口有动作"].map((fallback, itemIndex) => salesTrainingObjectionCompactText(bullets[itemIndex], fallback, 14)),
+  };
+}
+
+function salesTrainingObjectionPreviewRole({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  if (layout.includes("closing") || layout.includes("checklist")) return "closing";
+  if (layout.includes("map") || layout.includes("class")) return "map";
+  if (layout.includes("path") || layout.includes("process")) return "path";
+  if (layout.includes("roleplay") || layout.includes("drill")) return "roleplay";
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  return ["map", "path", "roleplay", "checklist"][(index - 1) % 4];
+}
+
+function renderSalesTrainingObjectionPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(salesTrainingObjectionCompactText(item, scene.title, 42))}</li>`).join("");
+  const tags = scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const map = scene.map.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const path = scene.path.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const checklist = scene.checklist.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const dialogue = '<div class="training-dialogue"><span></span><span></span><span></span><span></span></div>';
+  const roleplay = '<div class="training-roleplay"><span></span><span></span><span></span></div>';
+  const visual = scene.role === "map"
+    ? `<div class="training-map">${map}</div>`
+    : scene.role === "path"
+      ? `<div class="training-path">${path}</div>`
+      : scene.role === "roleplay"
+        ? roleplay
+        : scene.role === "closing" || scene.role === "checklist"
+          ? `<div class="training-checklist">${checklist}</div>`
+          : `${dialogue}<div class="training-tags">${tags}</div>`;
+  return `<div class="training-layer"><div class="training-kicker">${escapeHtml(scene.kicker)}</div><h2 class="training-title">${escapeHtml(scene.title)}</h2><div class="training-rule"></div><ul class="training-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function salesTrainingObjectionBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["识别客户真实顾虑与触发场景", "用问题复述建立信任和确认", "用证据与案例完成价值回应"];
+}
+
+function salesTrainingObjectionCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isSalesTrainingObjectionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-training-objection-handling" && (id === "sales-training-course" || id === "sales-sales-training-course-objection-handling");
+}
+
 function manufacturingSolutionPreviewScene({ slide, index, total }) {
   const bullets = manufacturingSolutionBulletTexts(slide);
   const title = financialSolutionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
@@ -6618,6 +7008,72 @@ function isExperienceJourneyVisual(visual) {
   return visual?.layout === "experience-journey-map" && (id === "user-experience-redesign" || id === "product-user-experience-redesign-experience-journey");
 }
 
+function renderExperienceGapPreview(slide, scene) {
+  // 竞品体验差距模板使用专属图层承载可变标题、路径、矩阵和机会卡，避免默认正文层覆盖体验路径结构。
+  const title = escapeHtml(scene.title || slide?.title || "竞品体验分析");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(experienceGapCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="gap-kicker">${escapeHtml(scene.kicker)}</div><h2 class="gap-title">${title}</h2><div class="gap-summary">${escapeHtml(scene.summary)}</div><ul class="gap-bullets">${bulletItems}</ul>`;
+  const scorecards = `<div class="gap-scorecards">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover") {
+    return `<div class="gap-layer">${common}<div class="gap-browser-pair"><div class="gap-window"><b></b></div><div class="gap-window alt"><b></b></div></div>${scorecards}</div>`;
+  }
+  if (scene.kind === "path") {
+    return `<div class="gap-layer">${common}<div class="gap-path"><i></i><i></i><i></i><i></i><i></i></div>${scorecards}</div>`;
+  }
+  if (scene.kind === "matrix") {
+    return `<div class="gap-layer">${common}<div class="gap-matrix">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${scorecards}</div>`;
+  }
+  if (scene.kind === "opportunity") {
+    return `<div class="gap-layer">${common}<div class="gap-opportunities">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${scorecards}</div>`;
+  }
+  if (scene.kind === "roadmap") {
+    return `<div class="gap-layer">${common}<div class="gap-roadmap">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${scorecards}</div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="gap-layer">${common}<div class="gap-closing-loop"></div><div class="gap-scorecards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="gap-layer">${common}<div class="gap-path"><i></i><i></i><i></i><i></i><i></i></div>${scorecards}</div>`;
+}
+
+function experienceGapPreviewScene({ slide, index, total }) {
+  const bullets = experienceGapBulletTexts(slide);
+  const title = experienceGapCompactText(slide?.title, "竞品体验分析", index === 0 ? 30 : 28);
+  const summary = experienceGapCompactText(bullets[0], "从关键路径、问题触点和机会空间定位优化方向", 36);
+  const tags = ["路径效率", "触点摩擦", "优化机会", "验证节奏"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex], fallback, 10));
+  const cards = ["核心入口", "关键任务", "竞品亮点", "摩擦节点", "机会切口", "优化动作"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex % bullets.length], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "experience-gap", kicker: "PRODUCT EXPERIENCE", title, summary, bullets, tags, cards },
+    { kind: "matrix", variant: "experience-gap", kicker: "COMPARISON BOARD", title, summary, bullets, tags, cards },
+    { kind: "path", variant: "experience-gap", kicker: "USER PATH REVIEW", title, summary, bullets, tags, cards: ["进入", "理解", "行动", "转化", "反馈"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex], fallback, 10)) },
+    { kind: "opportunity", variant: "experience-gap", kicker: "OPPORTUNITY INSIGHT", title, summary, bullets, tags, cards: ["降低理解成本", "缩短任务路径", "补强反馈机制", "形成记忆点"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex], fallback, 12)) },
+    { kind: "roadmap", variant: "experience-gap", kicker: "OPTIMIZATION ROADMAP", title, summary, bullets, tags, cards: ["确认样本", "复盘触点", "设计改版", "灰度验证"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex], fallback, 12)) },
+  ];
+  if (index === total - 1) {
+    return { kind: "closing", variant: "experience-gap", kicker: "NEXT PRODUCT MOVES", title, summary, bullets, tags, cards: ["锁定差距", "拆解机会", "进入需求池", "跟踪体验指标"].map((fallback, itemIndex) => experienceGapCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function experienceGapBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["拆解竞品在核心任务路径上的体验差异", "识别用户理解成本、操作摩擦和反馈缺口", "输出可进入产品优化排期的机会建议"];
+}
+
+function experienceGapCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isExperienceGapVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "experience-gap-map" && (id === "competitor-analysis-report" || id === "product-competitor-analysis-report-experience-gap");
+}
+
 function renderCapabilityRadarPreview(slide, scene) {
   // 能力雷达模板用独立图层承载动态标题、要点、雷达和矩阵，避免默认正文层与图形叠加。
   const title = escapeHtml(scene.title || slide?.title || "竞品功能对比");
@@ -7072,6 +7528,78 @@ function customerSegmentationCompactText(text, fallback, maxLength) {
 
 function isCustomerSegmentationLayeringVisual(visual) {
   return visual?.layout === "customer-segmentation-layering";
+}
+
+/**
+ * 渲染产品增长留存路径模板的在线预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderProductRetentionPathPreview(slide, scene) {
+  // 留存模板的标题和正文由专属层绘制，避免通用内容层与路径/曲线图发生叠加。
+  const title = escapeHtml(scene.title || slide?.title || "用户留存增长方案");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(productRetentionPathCompactText(item, scene.title, 40))}</li>`).join("");
+  const common = `<div class="retention-kicker">${escapeHtml(scene.kicker)}</div><h2 class="retention-title">${title}</h2><div class="retention-summary">${escapeHtml(scene.summary)}</div><ul class="retention-bullets">${bulletItems}</ul>`;
+  const metrics = `<div class="retention-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.kind === "lifecycle") {
+    return `<div class="retention-layer">${common}<div class="retention-lifecycle">${scene.stages.map((stage) => `<span>${escapeHtml(stage)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "actions") {
+    return `<div class="retention-layer">${common}<div class="retention-actions">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "closing") {
+    return `<div class="retention-layer">${common}<div class="retention-curve"><i></i><i></i><i></i><i></i></div><div class="retention-roadmap">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="retention-layer">${common}<div class="retention-curve"><i></i><i></i><i></i><i></i></div>${metrics}</div>`;
+}
+
+function productRetentionPathPreviewScene({ slide, index, total }) {
+  const bullets = productRetentionPathBulletTexts(slide);
+  const title = productRetentionPathCompactText(slide?.title, "用户留存增长方案", index === 0 ? 28 : 30);
+  const values = productRetentionPathMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: productRetentionPathCompactText(bullets[0], "D1 留存", 8) },
+    { value: values[1], label: productRetentionPathCompactText(bullets[1], "D7 留存", 8) },
+    { value: values[2], label: productRetentionPathCompactText(bullets[2], "复访提升", 8) },
+  ];
+  const summary = productRetentionPathCompactText(bullets[0], "围绕激活、复访、触达和长期价值搭建留存提升路径", 36);
+  const stages = ["激活", "首日体验", "关键行为", "复访留存"].map((fallback, itemIndex) => productRetentionPathCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["新手任务", "触达机制", "权益召回", "复盘实验"].map((fallback, itemIndex) => productRetentionPathCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "retention-path", kicker: "RETENTION GROWTH", title, summary, bullets, metrics, stages, cards },
+    { kind: "lifecycle", variant: "retention-path", kicker: "USER LIFECYCLE", title, summary, bullets, metrics, stages, cards },
+    { kind: "analysis", variant: "retention-path", kicker: "RETENTION CURVE", title, summary, bullets, metrics, stages, cards },
+    { kind: "actions", variant: "retention-path", kicker: "TOUCHPOINT ACTIONS", title, summary, bullets, metrics, stages, cards },
+  ];
+  if (index === total - 1) {
+    return { kind: "closing", variant: "retention-path", kicker: "NEXT GROWTH LOOP", title, summary, bullets, metrics, stages, cards: ["定位流失点", "设计触达", "上线实验", "复盘迭代"].map((fallback, itemIndex) => productRetentionPathCompactText(bullets[itemIndex], fallback, 12)) };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productRetentionPathBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["D1 留存率稳定在 42%", "D7 留存提升至 28%", "关键行为触发率提升 18%", "召回触达转化率提升 12%"];
+}
+
+function productRetentionPathMetricValues(bullets) {
+  const matches = bullets.flatMap((item) => String(item).match(/\d+(?:\.\d+)?%|\+\d+(?:\.\d+)?%|\d+(?:\.\d+)?[万千]?/g) || []);
+  return [matches[0] || "42%", matches[1] || "28%", matches[2] || "+18%"];
+}
+
+function productRetentionPathCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isProductRetentionPathVisual(visual) {
+  return visual?.layout === "product-retention-path";
 }
 
 /**
@@ -7858,6 +8386,158 @@ function isMarketingCampaignVisual(visual) {
   return visual?.id === "marketing-campaign" && visual?.layout === "marketing";
 }
 
+function integratedMediaMixPreviewScene({ slide, index, total }) {
+  const bullets = integratedMediaMixBulletTexts(slide);
+  const title = integratedMediaMixCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 26);
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 允许大纲显式指定页面类型；未指定时按页码分配，保证封面、矩阵、预算、节奏、效果和结尾结构明显不同。
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("budget")
+      ? "budget"
+      : layout.includes("rhythm") || layout.includes("timeline")
+        ? "rhythm"
+        : layout.includes("effect") || layout.includes("kpi")
+          ? "effect"
+          : layout.includes("closing") || index === total - 1
+            ? "closing"
+            : layout.includes("matrix") || layout.includes("channel")
+              ? "matrix"
+              : ["matrix", "budget", "rhythm", "effect"][(index - 1) % 4];
+  const labels = ["社媒触达", "搜索承接", "内容种草", "线下引爆"].map((fallback, itemIndex) => integratedMediaMixCompactText(bullets[itemIndex], fallback, 16));
+  return {
+    variant: "integrated-media-mix",
+    role,
+    kicker: role === "cover" ? "IMC CONTROL ROOM" : role === "matrix" ? "CHANNEL MATRIX" : role === "budget" ? "BUDGET SPLIT" : role === "rhythm" ? "MEDIA RHYTHM" : role === "effect" ? "REACH & FREQUENCY" : "NEXT FLIGHT",
+    title,
+    summary: integratedMediaMixCompactText(bullets[0], "围绕目标人群、媒介触点、预算分配和传播节奏建立一体化投放方案。", 44),
+    bullets,
+    labels,
+    metrics: [
+      { value: "6", label: "核心触点" },
+      { value: "4W", label: "传播周期" },
+      { value: "ROI", label: "复盘指标" },
+    ],
+  };
+}
+
+function renderIntegratedMediaMixPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(integratedMediaMixCompactText(item, scene.title, 38))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const common = `<div class="integrated-media-kicker">${escapeHtml(scene.kicker)}</div><h2 class="integrated-media-title">${escapeHtml(scene.title)}</h2><div class="integrated-media-summary">${escapeHtml(scene.summary)}</div><ul class="integrated-media-bullets">${bulletItems}</ul>`;
+  const matrix = `<div class="integrated-media-matrix">${scene.labels.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const budget = `<div class="integrated-media-budget">${scene.labels.map((item, itemIndex) => `<span style="--w:${[72, 58, 48, 36][itemIndex]}%">${escapeHtml(item)}</span>`).join("")}</div>`;
+  const rhythm = `<div class="integrated-media-rhythm">${["预热", "放大", "转化", "复盘"].map((step, itemIndex) => `<span data-step="${escapeHtml(step)}">${escapeHtml(scene.labels[itemIndex])}</span>`).join("")}</div>`;
+  const effect = `<div class="integrated-media-radar"><i></i><i></i><i></i><i></i><b></b></div>`;
+  const closing = `<div class="integrated-media-actions">${scene.labels.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  const visual = scene.role === "matrix"
+    ? `${matrix}<div class="integrated-media-metrics">${metrics}</div>`
+    : scene.role === "budget"
+      ? `${budget}<div class="integrated-media-metrics">${metrics}</div>`
+      : scene.role === "rhythm"
+        ? `${rhythm}<div class="integrated-media-metrics">${metrics}</div>`
+        : scene.role === "effect"
+          ? `${effect}<div class="integrated-media-metrics">${metrics}</div>`
+          : scene.role === "closing"
+            ? closing
+            : `<div class="integrated-media-hero">${matrix}<div class="integrated-media-wave"></div></div><div class="integrated-media-metrics">${metrics}</div>`;
+  return `<div class="integrated-media-layer">${common}${visual}</div>`;
+}
+
+function integratedMediaMixBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确目标人群与传播目标", "规划公域私域媒介矩阵", "分配预算和覆盖频次", "设计预热爆发复盘节奏"];
+}
+
+function integratedMediaMixCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function isIntegratedMediaMixVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "integrated-media-mix" && (id === "integrated-campaign" || id === "marketing-integrated-campaign-media-mix");
+}
+
+function festivalPromotionRhythmPreviewScene({ slide, index, total }) {
+  const bullets = festivalPromotionRhythmBulletTexts(slide);
+  const title = festivalPromotionRhythmCompactText(slide?.title, index === 0 ? "节日 campaign 增长作战图" : `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 显式 layout 优先，方便后续 AI 大纲把权益、渠道、漏斗和复盘页精准映射到不同页面。
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("benefit") || layout.includes("rights") || layout.includes("coupon")
+      ? "benefits"
+      : layout.includes("channel") || layout.includes("media")
+        ? "channel"
+        : layout.includes("funnel") || layout.includes("convert")
+          ? "funnel"
+          : layout.includes("review") || layout.includes("data") || layout.includes("result")
+            ? "review"
+            : index === total - 1 || layout.includes("closing") || layout.includes("action")
+              ? "closing"
+              : ["timeline", "benefits", "channel", "funnel", "review"][(index - 1) % 5];
+  const timeline = ["T-21", "T-7", "DAY", "T+3", "T+7"].map((step, itemIndex) => ({
+    step,
+    text: festivalPromotionRhythmCompactText(bullets[itemIndex], ["预热蓄水", "权益预告", "爆发转化", "返场追单", "复盘沉淀"][itemIndex], 12),
+  }));
+  const labels = ["满减门槛", "会员券包", "爆品秒杀", "返场礼包"].map((fallback, itemIndex) => festivalPromotionRhythmCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    variant: "promotion-rhythm",
+    role,
+    kicker: role === "cover" ? "FESTIVAL CAMPAIGN" : role === "timeline" ? "CAMPAIGN CALENDAR" : role === "benefits" ? "BENEFIT DESIGN" : role === "channel" ? "CHANNEL ROUTE" : role === "funnel" ? "CONVERSION PATH" : role === "review" ? "DATA REVIEW" : "NEXT CAMPAIGN",
+    title,
+    summary: festivalPromotionRhythmCompactText(bullets[0], "围绕节日节点、权益机制、触达渠道和转化复盘搭建可执行的活动方案。", 44),
+    bullets,
+    timeline,
+    labels,
+    metrics: [
+      { value: "5", label: "活动阶段" },
+      { value: "4", label: "权益组合" },
+      { value: "ROI", label: "复盘指标" },
+    ],
+  };
+}
+
+function renderFestivalPromotionRhythmPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(festivalPromotionRhythmCompactText(item, scene.title, 36))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const common = `<div class="festival-kicker">${escapeHtml(scene.kicker)}</div><h2 class="festival-title">${escapeHtml(scene.title)}</h2><div class="festival-summary">${escapeHtml(scene.summary)}</div><ul class="festival-bullets">${bulletItems}</ul>`;
+  const visual = scene.role === "timeline"
+    ? `<div class="festival-timeline">${scene.timeline.map((item) => `<span data-step="${escapeHtml(item.step)}">${escapeHtml(item.text)}</span>`).join("")}</div>`
+    : scene.role === "benefits"
+      ? `<div class="festival-benefits">${scene.labels.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="festival-metrics">${metrics}</div>`
+      : scene.role === "channel"
+        ? `<div class="festival-channel">${["站内会场", "社媒种草", "私域触达", "直播承接"].map((item, itemIndex) => `<span>${escapeHtml(scene.labels[itemIndex] || item)}</span>`).join("")}</div><div class="festival-metrics">${metrics}</div>`
+        : scene.role === "funnel"
+          ? `<div class="festival-funnel">${["曝光触达", "权益领取", "加购转化", "订单复购"].map((item, itemIndex) => `<span>${escapeHtml(scene.labels[itemIndex] || item)}</span>`).join("")}</div><div class="festival-metrics">${metrics}</div>`
+          : scene.role === "review"
+            ? `<div class="festival-review"><i></i><i></i><i></i><i></i></div><div class="festival-metrics">${metrics}</div>`
+            : scene.role === "closing"
+              ? `<div class="festival-actions">${scene.labels.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+              : `<div class="festival-hero-card"><span></span><span></span><span></span></div><div class="festival-countdown"><span>T-7</span><span>D</span><span>+7</span></div><div class="festival-metrics">${metrics}</div>`;
+  return `<div class="festival-layer">${common}${visual}</div>`;
+}
+
+function festivalPromotionRhythmBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["拆解节日节点与活动目标", "规划预热、爆发和返场动作", "设计满减、券包和爆品权益", "复盘转化数据和下次优化"];
+}
+
+function festivalPromotionRhythmCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function isFestivalPromotionRhythmVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "marketing-festival-promotion-rhythm" && (id === "festival-marketing-plan" || id === "marketing-festival-marketing-plan-promotion-rhythm");
+}
+
 function launchRhythmPreviewScene({ slide, index, total }) {
   const bullets = launchRhythmBulletTexts(slide);
   const title = launchRhythmCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
@@ -8596,6 +9276,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "feature-priority-matrix") return false;
   if (visual.layout === "experience-journey-map") return false;
   if (visual.layout === "capability-radar-map") return false;
+  if (visual.layout === "product-retention-path") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "business-model-value-chain") return false;
@@ -8614,15 +9295,19 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
   if (visual.layout === "sales-key-account-decision-chain") return false;
+  if (visual.layout === "presales-architecture-solution") return false;
+  if (visual.layout === "sales-training-objection-handling") return false;
   if (visual.layout === "corporate-training") return false;
   if (visual.layout === "onboarding-guide") return false;
   if (visual.layout === "knowledge-blackboard") return false;
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
+  if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "private-domain-member-layering") return false;
+  if (visual.layout === "integrated-media-mix") return false;
   if (visual.layout === "department-team-performance") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }

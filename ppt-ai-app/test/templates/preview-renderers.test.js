@@ -126,12 +126,77 @@ test("business model system preview uses dedicated consulting scenes", async () 
 
   assert.match(html, /data-layout="business-model-value-chain"/);
   assert.match(html, /bmvc-hero-network/);
+  assert.match(html, /\.bmvc-metrics\{position:absolute;left:8\.2%;right:8\.2%;bottom:12%;height:14%;/);
   assert.match(html, /bmvc-flow/);
   assert.match(html, /bmvc-profit/);
   assert.match(html, /bmvc-ecosystem/);
+  assert.match(html, /\.bmvc-cards\{position:absolute;left:8\.2%;right:8\.2%;bottom:12%;height:14%;/);
   assert.match(html, /bmvc-matrix/);
   assert.match(html, /bmvc-roadmap/);
   assert.doesNotMatch(html, />value-chain</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
+test("sales training objection handling preview uses dedicated roleplay scenes", async () => {
+  const deck = {
+    id: "deck-sales-training-objection-preview",
+    ownerUserId: 7,
+    title: "Sales training workshop",
+    templateId: "sales-sales-training-course-objection-handling",
+    theme: "objection-handling",
+    templateVisual: {
+      id: "sales-sales-training-course-objection-handling",
+      primary: "17324D",
+      accent: "FF8A3D",
+      secondary: "2AB7A9",
+      warning: "E94B5F",
+      background: "F2F7FA",
+      surface: "FFFFFF",
+      title: "10233B",
+      body: "34445C",
+      layout: "sales-training-objection-handling",
+      variant: "roleplay",
+    },
+    status: "ready",
+    slides: [
+      { title: "客户异议回应训练", layout: "sales-training-objection-cover", bullets: ["识别客户真实顾虑", "复述并确认问题", "证据化回应价值"] },
+      { title: "常见顾虑分类", layout: "sales-training-objection-map", bullets: ["预算压力", "效果怀疑", "决策延迟", "竞品比较"] },
+      { title: "回应路径拆解", layout: "sales-training-objection-path", bullets: ["倾听确认", "复述问题", "价值回应", "推进下一步"] },
+      { title: "场景对练安排", layout: "sales-training-objection-roleplay", bullets: ["客户提出疑问", "销售复述确认", "给出案例证据"] },
+      { title: "复盘检查清单", layout: "sales-training-objection-checklist", bullets: ["回应有证据", "追问有层次", "收口有动作"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager({
+      templates: [{
+        id: "sales-sales-training-course-objection-handling",
+        name: "Sales Training Course",
+        categoryId: "sales",
+        scope: "official",
+        official: true,
+        status: "active",
+        themes: [{ id: "objection-handling", visual: deck.templateVisual }],
+        visual: deck.templateVisual,
+      }],
+    }),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="sales-training-objection-handling"/);
+  assert.match(html, /training-dialogue/);
+  assert.match(html, /training-map/);
+  assert.match(html, /training-path/);
+  assert.match(html, /training-roleplay/);
+  assert.match(html, /training-checklist/);
+  assert.doesNotMatch(html, />异议处理</);
   assert.doesNotMatch(html, /<div class="slide-content"><h2/);
 });
 
@@ -174,6 +239,58 @@ test("product pricing strategy online preview uses dedicated scenes", async () =
   assert.match(html, /客户价值提升/);
   assert.match(html, /确认价格假设/);
   assert.doesNotMatch(html, /<body[^>]*data-layout="top-band"/);
+});
+
+test("product retention path preview uses dedicated growth scenes", async () => {
+  const deck = {
+    id: "deck-product-retention-preview",
+    ownerUserId: 7,
+    title: "Product growth retention plan",
+    templateId: "product-product-growth-plan-retention-path",
+    theme: "retention-path",
+    templateVisual: {
+      id: "product-product-growth-plan-retention-path",
+      primary: "111827",
+      accent: "16A3A6",
+      secondary: "7C3AED",
+      warning: "F97316",
+      background: "EFF6FF",
+      surface: "FFFFFF",
+      title: "0B1220",
+      body: "334155",
+      layout: "product-retention-path",
+      variant: "retention-path",
+    },
+    status: "ready",
+    slides: [
+      { title: "User retention growth plan", layout: "product-retention-path-cover", bullets: ["D1 retention reached 42%", "D7 retention improved to 28%", "Key behavior trigger rate +18%"] },
+      { title: "Lifecycle path overview", layout: "product-retention-path-lifecycle", bullets: ["Activate first session", "Guide key behavior", "Create revisit moment", "Build habit loop"] },
+      { title: "Retention curve diagnosis", layout: "product-retention-path-analysis", bullets: ["Early churn concentrated in first day", "Feature value not fully perceived", "Message touchpoint timing needs tuning"] },
+      { title: "Touchpoint action matrix", layout: "product-retention-path-actions", bullets: ["New user task", "Benefit reminder", "Dormant user recall", "Experiment review"] },
+      { title: "Next growth loop", layout: "product-retention-path-summary", bullets: ["Locate churn point", "Design touchpoint", "Launch experiment", "Review retention metrics"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="product-retention-path"/);
+  assert.match(html, /retention-layer/);
+  assert.match(html, /retention-curve/);
+  assert.match(html, /retention-lifecycle/);
+  assert.match(html, /retention-actions/);
+  assert.match(html, /retention-roadmap/);
+  assert.doesNotMatch(html, />留存路径</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
 });
 
 test("product pricing strategy preview respects explicit page layouts after structure changes", async () => {
@@ -258,6 +375,57 @@ test("private domain operation member layering preview uses dedicated scenes", a
   assert.match(html, /class="private-domain-path"/);
   assert.match(html, /class="private-domain-loop"/);
   assert.doesNotMatch(html, />会员分层</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
+test("integrated campaign media mix preview uses dedicated scenes", async () => {
+  const deck = {
+    id: "deck-integrated-media-mix",
+    ownerUserId: 7,
+    title: "整合营销传播方案",
+    templateId: "marketing-integrated-campaign-media-mix",
+    theme: "media-mix",
+    templateVisual: {
+      id: "marketing-integrated-campaign-media-mix",
+      primary: "12355B",
+      secondary: "1D9BF0",
+      accent: "F59E0B",
+      warning: "EF4444",
+      background: "F3F7FB",
+      surface: "FFFFFF",
+      title: "10233F",
+      body: "334155",
+      layout: "integrated-media-mix",
+      variant: "media-mix",
+    },
+    status: "ready",
+    slides: [
+      { title: "整合传播控制台", layout: "integrated-media-mix-cover", bullets: ["明确目标人群与传播目标", "规划公域私域媒介矩阵", "分配预算和覆盖频次"] },
+      { title: "媒介矩阵规划", layout: "integrated-media-mix-matrix", bullets: ["社媒触达", "搜索承接", "内容种草", "线下引爆"] },
+      { title: "预算分配建议", layout: "integrated-media-mix-budget", bullets: ["品牌广告", "效果投放", "达人合作", "内容制作"] },
+      { title: "传播节奏设计", layout: "integrated-media-mix-rhythm", bullets: ["预热种草", "集中爆发", "转化承接", "复盘优化"] },
+      { title: "覆盖频次评估", layout: "integrated-media-mix-effect", bullets: ["覆盖人群", "触达频次", "转化效率", "复购线索"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="integrated-media-mix"/);
+  assert.match(html, /class="integrated-media-matrix"/);
+  assert.match(html, /class="integrated-media-budget"/);
+  assert.match(html, /class="integrated-media-rhythm"/);
+  assert.match(html, /class="integrated-media-radar"/);
+  assert.doesNotMatch(html, />媒介组合</);
   assert.doesNotMatch(html, /<div class="slide-content"><h2/);
 });
 
