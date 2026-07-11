@@ -1521,19 +1521,32 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .empty-slide h3 { margin: 0 0 14px; font-size: 30px; line-height: 1.16; color: #173b8f; letter-spacing: 0; }
     .empty-slide p { margin: 0; color: var(--muted); line-height: 1.7; }
     .empty-line { width: 58px; height: 4px; margin: 28px 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--teal)); }
-    .deck-loading { display: grid; gap: 18px; min-height: 584px; }
-    .deck-loading-head {
-      display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center;
-      padding: 16px; border: 1px dashed #bfd0e6; border-radius: 8px; background: linear-gradient(135deg, #fff 0%, #f5f9ff 100%);
-    }
-    .deck-loading-head strong { display: block; margin-bottom: 4px; color: #1e3a8a; font-size: 18px; }
-    .deck-loading-head span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .deck-progress { height: 8px; margin-top: 10px; border-radius: 999px; overflow: hidden; background: #dbeafe; }
-    .deck-progress-bar { display: block; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: var(--primary); transition: width .24s ease; }
-    .deck-loading-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .deck-loading-step { padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: #64748b; font-size: 12px; font-weight: 800; }
-    .deck-loading-step.is-active { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
-    .deck-loading-grid { display: grid; gap: 12px; }
+    .deck-loading { position: relative; display: grid; gap: 18px; min-height: 584px; overflow: hidden; padding: 24px; border: 1px solid #cbd8ea; background: #f8fbff; isolation: isolate; }
+    .deck-loading::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(rgba(37,99,235,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.055) 1px, transparent 1px); background-size: 34px 34px; }
+    .deck-loading::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, rgba(255,255,255,.96) 0 32%, rgba(235,244,255,.82) 58%, rgba(232,250,247,.84) 100%); }
+    .deck-progress-scan { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: #22d3ee; box-shadow: 0 0 18px rgba(34,211,238,.9); animation: deck-scan 2.8s linear infinite; }
+    .deck-loading-dashboard { display: grid; grid-template-columns: 176px minmax(0, 1fr); align-items: center; gap: 26px; min-height: 188px; padding: 22px 26px; border: 1px solid rgba(37,99,235,.18); background: rgba(255,255,255,.88); box-shadow: 0 18px 44px rgba(30,64,175,.10); }
+    .deck-progress-ring { position: relative; width: 148px; height: 148px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 8) * 1%), #dbeafe 0); transition: background .45s ease; box-shadow: 0 0 0 8px rgba(219,234,254,.72), 0 16px 32px rgba(37,99,235,.18); }
+    .deck-progress-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #fff; border: 1px solid #dbeafe; }
+    .deck-progress-ring::after { content: ""; position: absolute; inset: -7px; border: 1px dashed rgba(15,118,110,.48); border-radius: 50%; animation: deck-orbit 7s linear infinite; }
+    .deck-progress-core { position: relative; z-index: 1; text-align: center; }
+    .deck-progress-value { display: block; color: #163b8f; font-size: 34px; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .deck-progress-unit { display: block; margin-top: 7px; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+    .deck-loading-head { min-width: 0; }
+    .deck-loading-head strong { display: block; margin-bottom: 7px; color: #172554; font-size: 21px; }
+    .deck-loading-head > span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .deck-progress-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: #334155; font-size: 12px; font-weight: 800; }
+    .deck-progress-stage { color: #1d4ed8; }
+    .deck-progress-count { font-variant-numeric: tabular-nums; }
+    .deck-progress { height: 10px; margin-top: 9px; border-radius: 999px; overflow: hidden; background: #dbeafe; box-shadow: inset 0 1px 3px rgba(30,64,175,.14); }
+    .deck-progress-bar { display: block; position: relative; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #06b6d4, #0f766e); transition: width .45s ease; }
+    .deck-progress-bar::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(120deg, transparent 0 12px, rgba(255,255,255,.35) 12px 20px); animation: deck-flow 1.1s linear infinite; }
+    .deck-loading-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .deck-loading-step { position: relative; padding: 11px 12px 11px 34px; border: 1px solid var(--line); border-radius: 6px; background: rgba(255,255,255,.82); color: #64748b; font-size: 12px; font-weight: 800; transition: border-color .25s ease, color .25s ease, transform .25s ease; }
+    .deck-loading-step::before { content: ""; position: absolute; left: 13px; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transform: translateY(-50%); }
+    .deck-loading-step.is-active { border-color: #93c5fd; color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(37,99,235,.08); }
+    .deck-loading-step.is-active::before { background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.14), 0 0 12px rgba(34,211,238,.8); animation: deck-pulse 1.25s ease-in-out infinite; }
+    .deck-loading-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .deck-loading-slide {
       display: grid; gap: 10px; aspect-ratio: 16 / 9; padding: 8.5% 9%; border-radius: 8px;
       border: 1px solid #d9e5f5; background: #fff; box-shadow: 0 18px 46px rgba(23,32,51,.10); animation: deckReveal .28s ease-out both;
@@ -1542,6 +1555,17 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line { height: 9px; border-radius: 999px; background: #cbd5e1; }
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
+    .deck-preview-progress { position: absolute; top: 14px; right: 18px; z-index: 8; width: 210px; padding: 12px 14px; pointer-events: none; border: 1px solid rgba(37,99,235,.24); background: rgba(255,255,255,.94); box-shadow: 0 16px 34px rgba(15,23,42,.16); backdrop-filter: blur(10px); }
+    .deck-preview-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #334155; font-size: 11px; font-weight: 800; }
+    .deck-preview-progress-head strong { color: #1d4ed8; font-size: 18px; font-variant-numeric: tabular-nums; }
+    .deck-preview-progress .deck-progress { height: 6px; margin-top: 8px; }
+    .deck-preview-progress .deck-progress-stage { display: block; margin-top: 7px; font-size: 10px; }
+    @keyframes deck-scan { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translateY(580px); opacity: 0; } }
+    @keyframes deck-orbit { to { transform: rotate(360deg); } }
+    @keyframes deck-flow { to { transform: translateX(32px); } }
+    @keyframes deck-pulse { 50% { transform: translateY(-50%) scale(1.35); } }
+    @media (max-width: 720px) { .deck-loading { padding: 16px; } .deck-loading-dashboard { grid-template-columns: 1fr; text-align: center; } .deck-progress-ring { margin: 0 auto; } .deck-progress-meta { flex-direction: column; } .deck-loading-grid { grid-template-columns: 1fr; } .preview.is-deck-loaded.has-generation-progress { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 8px; } .preview.is-deck-loaded.has-generation-progress .preview-frame { grid-row: 2; min-height: 0; } .deck-preview-progress { position: relative; inset: auto; grid-row: 1; width: auto; padding: 9px 12px; } }
+    @media (prefers-reduced-motion: reduce) { .deck-progress-scan, .deck-progress-ring::after, .deck-progress-bar::after, .deck-loading-step.is-active::before, .deck-loading-slide { animation: none; } .deck-progress-ring, .deck-progress-bar, .deck-loading-step { transition: none; } }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 92px; }
     .outline-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fbfdff); }
@@ -2790,6 +2814,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       stopDeckRevealTimer();
       if (options.bustCache) state.previewRevision += 1;
       previewEl.classList.add("is-deck-loaded");
+      previewEl.classList.remove("has-generation-progress");
       previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览" src="/api/ppt/decks/'
         + encodeURIComponent(deckId)
         + '/preview?v=' + encodeURIComponent(state.previewRevision) + '"></iframe>';
@@ -2807,6 +2832,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         return text;
       });
       previewEl.classList.add("is-deck-loaded");
+      previewEl.classList.remove("has-generation-progress");
       previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
       const frame = previewEl.querySelector(".preview-frame");
       frame.addEventListener("load", attachPreviewSlidePicker);
@@ -3063,12 +3089,16 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       previewEl.classList.remove("is-deck-loaded");
       previewEl.innerHTML = ''
         + '<div class="deck-loading" role="status" aria-live="polite" data-deck-loading>'
-        + '<div class="deck-loading-head">'
-        + '<div class="loading-spinner" aria-hidden="true"></div>'
-        + '<div><strong>正在应用当前模板生成 PPT</strong>'
+        + '<div class="deck-progress-scan" aria-hidden="true"></div>'
+        + '<div class="deck-loading-dashboard">'
+        + '<div class="deck-progress-ring" aria-hidden="true"><div class="deck-progress-core">'
+        + '<strong class="deck-progress-value" data-deck-progress-value>0%</strong>'
+        + '<span class="deck-progress-unit">AI RENDERING</span></div></div>'
+        + '<div class="deck-loading-head"><strong>正在生成专业 PPT</strong>'
         + '<span>系统正在把确认后的大纲转换为页面内容、版式和预览文件。</span>'
-        + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div></div>'
-        + '</div>'
+        + '<div class="deck-progress-meta"><span class="deck-progress-stage" data-deck-progress-stage>正在解析模板结构</span>'
+        + '<span class="deck-progress-count" data-deck-progress-count>已完成 0 / ' + normalized.length + ' 页</span></div>'
+        + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div></div></div>'
         + '<div class="deck-loading-steps">'
         + '<div class="deck-loading-step is-active" data-deck-step="template">应用模板和主题</div>'
         + '<div class="deck-loading-step" data-deck-step="slides">生成页面内容</div>'
@@ -3076,22 +3106,64 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         + '</div>'
         + '<div class="deck-loading-grid" data-deck-loading-grid></div>'
         + '</div>';
-      updateDeckGeneratingPreview({ progress: 8, slides: normalized });
+      updateDeckGeneratingPreview({ progress: 0, slides: normalized, completedSlides: 0, totalSlides: normalized.length });
     }
 
-    function updateDeckGeneratingPreview({ progress = 0, slides = state.outlineSlides } = {}) {
+    function updateDeckGeneratingPreview({ progress = 0, slides = state.outlineSlides, completedSlides = state.previewedSlideCount || 0, totalSlides } = {}) {
       const loadingEl = previewEl.querySelector("[data-deck-loading]");
-      if (!loadingEl) return;
-      const safeProgress = Math.max(8, Math.min(96, Number(progress) || 0));
-      loadingEl.style.setProperty("--deck-progress", safeProgress + "%");
-      loadingEl.querySelectorAll("[data-deck-step]").forEach((step) => {
+      const progressSurface = loadingEl || previewEl.querySelector("[data-deck-preview-progress]");
+      if (!progressSurface) return;
+      // 加载页和真实预览浮层共用同一组后端进度；阶段阈值只影响文案，不修改真实百分比。
+      const safeProgress = Math.max(0, Math.min(100, Number(progress) || 0));
+      progressSurface.style.setProperty("--deck-progress", safeProgress + "%");
+      progressSurface.style.setProperty("--deck-progress-number", safeProgress);
+      const normalized = normalizeOutlineSlides(slides);
+      const safeTotalSlides = Math.max(0, Number(totalSlides ?? normalized.length) || 0);
+      const safeCompletedSlides = Math.max(0, Math.min(safeTotalSlides, Number(completedSlides) || 0));
+      const valueEl = progressSurface.querySelector("[data-deck-progress-value]");
+      const stageEl = progressSurface.querySelector("[data-deck-progress-stage]");
+      const countEl = progressSurface.querySelector("[data-deck-progress-count]");
+      if (valueEl) valueEl.textContent = Math.round(safeProgress) + "%";
+      if (countEl) countEl.textContent = "已完成 " + safeCompletedSlides + " / " + safeTotalSlides + " 页";
+      if (stageEl) {
+        stageEl.textContent = safeProgress >= 72
+          ? "正在同步在线预览"
+          : safeProgress >= 34
+            ? "正在生成页面内容"
+            : "正在解析模板结构";
+      }
+      progressSurface.querySelectorAll("[data-deck-step]").forEach((step) => {
         const key = step.dataset.deckStep;
         const active = key === "template" || (key === "slides" && safeProgress >= 34) || (key === "preview" && safeProgress >= 72);
         step.classList.toggle("is-active", active);
       });
-      const normalized = normalizeOutlineSlides(slides);
-      const visibleCount = Math.max(1, Math.min(normalized.length || 1, Math.ceil(((safeProgress || 8) / 100) * Math.max(normalized.length || 1, 3))));
-      scheduleDeckLoadingSlides({ targetCount: visibleCount, slides: normalized });
+      if (loadingEl) {
+        const visibleCount = Math.max(1, Math.min(normalized.length || 1, Math.ceil(((safeProgress || 8) / 100) * Math.max(normalized.length || 1, 3))));
+        scheduleDeckLoadingSlides({ targetCount: visibleCount, slides: normalized });
+      }
+    }
+
+    function ensureDeckPreviewProgress({ progress, completedSlides, totalSlides }) {
+      if (!previewEl.querySelector("[data-deck-preview-progress]")) {
+        previewEl.insertAdjacentHTML("beforeend", ''
+          + '<div class="deck-preview-progress" data-deck-preview-progress role="status" aria-live="polite">'
+          + '<div class="deck-preview-progress-head"><span data-deck-progress-count>已完成 0 / 0 页</span>'
+          + '<strong data-deck-progress-value>0%</strong></div>'
+          + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div>'
+          + '<span class="deck-progress-stage" data-deck-progress-stage>正在生成页面内容</span></div>');
+      }
+      previewEl.classList.add("has-generation-progress");
+      updateDeckGeneratingPreview({ progress, slides: state.outlineSlides, completedSlides, totalSlides });
+    }
+
+    function clearDeckGenerationProgress(errorMessage = "") {
+      previewEl.classList.remove("has-generation-progress");
+      previewEl.querySelector("[data-deck-preview-progress]")?.remove();
+      if (errorMessage) {
+        previewEl.classList.remove("is-deck-loaded");
+        previewEl.innerHTML = '<div class="empty-preview"><div class="empty-slide"><h3>生成 PPT 失败</h3><p>'
+          + escapeHtml(errorMessage) + '</p><div class="empty-line"></div></div></div>';
+      }
     }
 
     function scheduleDeckLoadingSlides({ targetCount, slides }) {
@@ -3135,7 +3207,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 
     async function waitForDeckLoadingRhythm(slides = state.outlineSlides) {
       const normalized = normalizeOutlineSlides(slides);
-      updateDeckGeneratingPreview({ progress: 96, slides: normalized });
+      updateDeckGeneratingPreview({ progress: 100, slides: normalized });
       const targetCount = Math.max(1, normalized.length || 1);
       const startedAt = deckLoadingStartedAt || Date.now();
       while (previewEl.querySelector("[data-deck-loading]")) {
@@ -3329,15 +3401,16 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         state.taskPollFailures = 0;
 
         const task = payload.task;
-        updateDeckGeneratingPreview({ progress: task.progress, slides: state.outlineSlides });
         const completedSlides = Number(task.completedSlides || 0);
         const totalSlides = Number(task.totalSlides || state.outlineSlides.length || 0);
+        updateDeckGeneratingPreview({ progress: task.progress, slides: state.outlineSlides, completedSlides, totalSlides });
         if (task.deckId) state.deckId = task.deckId;
         // 只在新增页面到达时刷新当前 iframe，用户始终停留在同一个在线预览区域。
         if (state.deckId && completedSlides > Number(state.previewedSlideCount || 0)) {
           state.previewedSlideCount = completedSlides;
           renderDeckPreviewFrame(state.deckId, { bustCache: true });
           setFlowStage("preview");
+          ensureDeckPreviewProgress({ progress: task.progress, completedSlides, totalSlides });
         }
         statusEl.textContent = "任务状态: " + task.status + "\\n"
           + "进度: " + task.progress + "%\\n"
@@ -3363,6 +3436,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           }
           return;
         }
+        clearDeckGenerationProgress(task.error || "生成任务未能完成");
         setDeckGenerationBusy(false);
       } catch (error) {
         state.taskPollFailures = Number(state.taskPollFailures || 0) + 1;
@@ -3371,6 +3445,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           taskPollTimeout = setTimeout(() => pollTaskProgress(taskId), 1500);
           return;
         }
+        clearDeckGenerationProgress(error.message);
         setDeckGenerationBusy(false);
         statusEl.textContent = error.message;
       }
@@ -3571,7 +3646,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         state.taskId = data.task.id;
         state.previewedSlideCount = 0;
         showTaskStatus(data.task);
-        updateDeckGeneratingPreview({ progress: data.task.progress, slides: state.outlineSlides });
+        updateDeckGeneratingPreview({
+          progress: data.task.progress,
+          slides: state.outlineSlides,
+          completedSlides: data.task.completedSlides || 0,
+          totalSlides: data.task.totalSlides || state.outlineSlides.length,
+        });
         pollTaskProgress(state.taskId);
         if (data.task.status === "succeeded" && state.deckId) {
           await waitForDeckLoadingRhythm(state.outlineSlides);

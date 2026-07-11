@@ -3988,6 +3988,15 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /deck-loading/);
     assert.match(html, /正在应用当前模板生成 PPT/);
     assert.match(html, /deck-progress-bar/);
+    assert.match(html, /deck-progress-ring/);
+    assert.match(html, /data-deck-progress-value/);
+    assert.match(html, /data-deck-progress-stage/);
+    assert.match(html, /data-deck-progress-count/);
+    assert.match(html, /deck-progress-scan/);
+    assert.match(html, /Math\.max\(0, Math\.min\(100,/);
+    assert.match(html, /ensureDeckPreviewProgress/);
+    assert.match(html, /clearDeckGenerationProgress/);
+    assert.match(html, /has-generation-progress/);
     assert.match(html, /deck-loading-slide/);
     assert.match(html, /renderDeckGeneratingPreview/);
     assert.match(html, /updateDeckGeneratingPreview/);
