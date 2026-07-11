@@ -37,6 +37,45 @@ test("PptExportService creates a PPTX zip package with presentation parts", () =
   assert.match(text, /Revenue grew/);
 });
 
+test("PptExportService uses festival marketing promotion rhythm decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-festival-marketing-plan-promotion-rhythm",
+      theme: "promotion-rhythm",
+      templateVisual: {
+        id: "marketing-festival-marketing-plan-promotion-rhythm",
+        primary: "8F1D2C",
+        secondary: "FF8A00",
+        accent: "F43F5E",
+        warning: "FBBF24",
+        background: "FFF4EC",
+        surface: "FFFFFF",
+        title: "2A1018",
+        body: "69313D",
+        layout: "marketing-festival-promotion-rhythm",
+        variant: "promotion-rhythm",
+      },
+      slides: [
+        { title: "Festival growth command center", layout: "marketing-festival-promotion-cover", bullets: ["Build campaign goal", "Set benefit package", "Review conversion result"] },
+        { title: "Campaign calendar", layout: "marketing-festival-promotion-timeline", bullets: ["Warm up audience pool", "Release coupon preview", "Launch peak conversion", "Return sale follow up", "Review next campaign"] },
+        { title: "Benefit package design", layout: "marketing-festival-promotion-benefits", bullets: ["Threshold discount", "Member coupon pack", "Hero product flash sale", "Return gift bundle"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+
+  assert.match(slide1, /name="Festival Promotion Hero Coupon"/);
+  assert.match(slide2, /name="Festival Promotion Timeline Card 1"/);
+  assert.match(slide3, /name="Festival Promotion Benefit Card 1"/);
+  assert.doesNotMatch(slide1, /促销节奏/);
+});
+
 test("PptExportService creates PPTX relationship, layout, master, and theme parts required by Office apps", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({ deck, format: "pptx" });
@@ -1299,6 +1338,58 @@ test("PptExportService uses key account decision chain decorations", () => {
   assert.match(slide1, /val="102A43"/);
   assert.match(slide1, /val="F59E0B"/);
   assert.doesNotMatch(slide1, /decision-chain/);
+});
+
+test("PptExportService uses presales technical architecture decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "sales-presales-technical-plan-architecture-solution",
+      theme: "architecture-solution",
+      templateVisual: {
+        id: "sales-presales-technical-plan-architecture-solution",
+        primary: "0B1F3A",
+        accent: "22D3EE",
+        secondary: "38BDF8",
+        warning: "F59E0B",
+        background: "EAF3FB",
+        surface: "FFFFFF",
+        title: "071827",
+        body: "334155",
+        layout: "presales-architecture-solution",
+        variant: "architecture-solution",
+      },
+      slides: [
+        { title: "Client technical solution overview", layout: "presales-architecture-cover", bullets: ["Match client requirements", "Design integration architecture", "Define delivery assurance"] },
+        { title: "Requirement and capability fit", layout: "presales-requirement-map", bullets: ["Business goal", "Technical capability", "Integration boundary", "Expected value"] },
+        { title: "Layered system architecture", layout: "presales-architecture-blueprint", bullets: ["User portal", "Business apps", "Platform services", "Data services", "Cloud resources"] },
+        { title: "Capability module design", layout: "presales-module-capability", bullets: ["Identity access", "Workflow orchestration", "Data integration", "Security audit"] },
+        { title: "Deployment topology", layout: "presales-deployment-topology", bullets: ["Client systems", "API gateway", "Data service", "Cloud resources"] },
+        { title: "Delivery assurance path", layout: "presales-delivery-assurance", bullets: ["Scope confirmation", "Technical review", "POC validation", "Production handover"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Presales Architecture Workspace"/);
+  assert.match(slide1, /name="Presales Architecture Blueprint Panel"/);
+  assert.match(slide1, /name="Presales Architecture Core Node"/);
+  assert.match(slide2, /name="Presales Architecture Requirement Card 1"/);
+  assert.match(slide3, /name="Presales Architecture Layer Card 1"/);
+  assert.match(slide4, /name="Presales Architecture Module Card 1"/);
+  assert.match(slide5, /name="Presales Architecture Deployment Topology"/);
+  assert.match(slide6, /name="Presales Architecture Delivery Step 1"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.match(slide1, /val="22D3EE"/);
+  assert.doesNotMatch(slide1, /architecture-solution/);
 });
 
 test("PptExportService uses commercial sales enterprise decorations", () => {

@@ -307,6 +307,58 @@ test("product pricing strategy online preview uses dedicated scenes", async () =
   assert.doesNotMatch(html, /<body[^>]*data-layout="top-band"/);
 });
 
+test("festival marketing promotion rhythm preview uses dedicated campaign scenes", async () => {
+  const deck = {
+    id: "deck-festival-promotion-preview",
+    ownerUserId: 7,
+    title: "Festival campaign plan",
+    templateId: "marketing-festival-marketing-plan-promotion-rhythm",
+    theme: "promotion-rhythm",
+    templateVisual: {
+      id: "marketing-festival-marketing-plan-promotion-rhythm",
+      primary: "8F1D2C",
+      secondary: "FF8A00",
+      accent: "F43F5E",
+      warning: "FBBF24",
+      background: "FFF4EC",
+      surface: "FFFFFF",
+      title: "2A1018",
+      body: "69313D",
+      layout: "marketing-festival-promotion-rhythm",
+      variant: "promotion-rhythm",
+    },
+    status: "ready",
+    slides: [
+      { title: "Festival growth command center", layout: "marketing-festival-promotion-cover", bullets: ["Build campaign goal", "Set benefit package", "Review conversion result"] },
+      { title: "Campaign calendar", layout: "marketing-festival-promotion-timeline", bullets: ["Warm up audience pool", "Release coupon preview", "Launch peak conversion", "Return sale follow up", "Review next campaign"] },
+      { title: "Benefit package design", layout: "marketing-festival-promotion-benefits", bullets: ["Threshold discount", "Member coupon pack", "Hero product flash sale", "Return gift bundle"] },
+      { title: "Channel route", layout: "marketing-festival-promotion-channel", bullets: ["Mall landing page", "Social seeding", "Private message", "Live room close"] },
+      { title: "Conversion funnel", layout: "marketing-festival-promotion-funnel", bullets: ["Reach", "Claim benefit", "Add to cart", "Repurchase"] },
+      { title: "Data review", layout: "marketing-festival-promotion-review", bullets: ["Traffic efficiency", "Coupon usage", "Order conversion", "ROI review"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="marketing-festival-promotion-rhythm"/);
+  assert.match(html, /class="festival-hero-card"/);
+  assert.match(html, /class="festival-timeline"/);
+  assert.match(html, /class="festival-benefits"/);
+  assert.match(html, /class="festival-funnel"/);
+  assert.match(html, /Festival growth command center/);
+  assert.doesNotMatch(html, /促销节奏/);
+});
+
 test("product retention path preview uses dedicated growth scenes", async () => {
   const deck = {
     id: "deck-product-retention-preview",
