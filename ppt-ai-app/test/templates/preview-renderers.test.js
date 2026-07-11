@@ -359,6 +359,60 @@ test("festival marketing promotion rhythm preview uses dedicated campaign scenes
   assert.doesNotMatch(html, /促销节奏/);
 });
 
+test("workshop practice review preview uses dedicated review canvas scenes", async () => {
+  const deck = {
+    id: "deck-workshop-practice-preview",
+    ownerUserId: 7,
+    title: "Workshop practice review",
+    templateId: "education-workshop-seminar-practice-review",
+    theme: "practice-review",
+    templateVisual: {
+      id: "education-workshop-seminar-practice-review",
+      primary: "14505A",
+      accent: "18A999",
+      secondary: "F6C85F",
+      warning: "EF8354",
+      background: "F7F5EE",
+      surface: "FFFFFF",
+      title: "12263A",
+      body: "435466",
+      layout: "education-workshop-practice-review",
+      variant: "practice-review",
+    },
+    status: "ready",
+    slides: [
+      { title: "研修工作坊复盘", layout: "education-workshop-practice-cover", bullets: ["梳理实践结果", "归纳关键发现", "形成改进行动"] },
+      { title: "复盘流程画布", layout: "education-workshop-practice-flow", bullets: ["输入材料", "观察现象", "提炼洞察", "制定行动"] },
+      { title: "小组共创成果", layout: "education-workshop-practice-cocreation", bullets: ["A 组共识", "B 组问题", "C 组建议", "D 组行动"] },
+      { title: "练习反馈矩阵", layout: "education-workshop-practice-feedback", bullets: ["做得好", "待改进", "风险点", "下次尝试"] },
+      { title: "问题原因复盘", layout: "education-workshop-practice-retro", bullets: ["现象", "原因", "改进"] },
+      { title: "行动计划看板", layout: "education-workshop-practice-actions", bullets: ["责任人确认", "截止时间", "验收标准", "跟进节奏"] },
+      { title: "Workshop review summary", layout: "education-workshop-practice-summary", bullets: ["Capture methods", "Align consensus", "Track actions"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="education-workshop-practice-review"/);
+  assert.match(html, /class="workshop-board"/);
+  assert.match(html, /class="workshop-flow"/);
+  assert.match(html, /class="workshop-sticky-wall"/);
+  assert.match(html, /class="workshop-feedback-matrix"/);
+  assert.match(html, /class="workshop-action-kanban"/);
+  assert.match(html, /研修工作坊复盘/);
+  assert.doesNotMatch(html, />实践复盘</);
+});
+
 test("product retention path preview uses dedicated growth scenes", async () => {
   const deck = {
     id: "deck-product-retention-preview",
@@ -544,6 +598,61 @@ test("integrated campaign media mix preview uses dedicated scenes", async () => 
   assert.match(html, /class="integrated-media-rhythm"/);
   assert.match(html, /class="integrated-media-radar"/);
   assert.doesNotMatch(html, />媒介组合</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
+test("public courseware enrollment conversion preview uses dedicated scenes", async () => {
+  const deck = {
+    id: "deck-public-course-enrollment",
+    ownerUserId: 7,
+    title: "公开课招生转化方案",
+    templateId: "education-public-courseware-enrollment-conversion",
+    theme: "enrollment-conversion",
+    templateVisual: {
+      id: "education-public-courseware-enrollment-conversion",
+      primary: "173A6A",
+      secondary: "24C6DC",
+      accent: "FF6B3D",
+      success: "20B486",
+      warning: "F7B731",
+      background: "F2F7FB",
+      surface: "FFFFFF",
+      title: "10233B",
+      body: "34445C",
+      layout: "public-course-enrollment",
+      variant: "enrollment-conversion",
+    },
+    status: "ready",
+    slides: [
+      { title: "公开课价值课", layout: "public-course-enrollment-cover", bullets: ["明确目标学员与课程承诺", "展示课程亮点与即时收益", "承接资料领取和预约动作"] },
+      { title: "学员痛点引导", layout: "public-course-enrollment-hook", bullets: ["学习目标不清晰", "课程选择成本高", "缺少可执行方法", "需要老师答疑"] },
+      { title: "课程价值说明", layout: "public-course-enrollment-value", bullets: ["核心框架拆解", "案例带练", "资料包领取", "课后行动清单"] },
+      { title: "直播课程流程", layout: "public-course-enrollment-agenda", bullets: ["破冰导入", "知识讲解", "互动答疑", "行动布置"] },
+      { title: "报名承接路径", layout: "public-course-enrollment-path", bullets: ["预约听课", "领取资料", "顾问咨询", "完成报名"] },
+      { title: "下一步行动", layout: "public-course-enrollment-action", bullets: ["预约直播", "加入社群", "领取试听权益"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager(),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="public-course-enrollment"/);
+  assert.match(html, /class="public-course-live"/);
+  assert.match(html, /class="public-course-hook"/);
+  assert.match(html, /class="public-course-value"/);
+  assert.match(html, /class="public-course-agenda"/);
+  assert.match(html, /class="public-course-path"/);
+  assert.match(html, /class="public-course-action"/);
+  assert.doesNotMatch(html, />招生转化</);
   assert.doesNotMatch(html, /<div class="slide-content"><h2/);
 });
 

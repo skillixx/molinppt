@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "data-governance-report",
+  "themeId": "metric-standard",
+  "style": "data-governance-standard",
+  "themes": [
+    {
+      "id": "metric-standard",
+      "name": "指标口径",
+      "visual": {
+        "primary": "102A43",
+        "accent": "00A7B5",
+        "secondary": "D9A441",
+        "background": "F3F7FA",
+        "surface": "FFFFFF",
+        "title": "0B1826",
+        "body": "32465A",
+        "layout": "data-governance-standard",
+        "variant": "metric-standard"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "00A7B5",
+    "secondary": "D9A441",
+    "background": "F3F7FA",
+    "surface": "FFFFFF",
+    "title": "0B1826",
+    "body": "32465A",
+    "layout": "data-governance-standard",
+    "variant": "metric-standard"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "data-governance-standard-cover",
+    "defaultContentLayout": "data-governance-standard-dictionary",
+    "allowedLayouts": [
+      "data-governance-standard-cover",
+      "data-governance-standard-overview",
+      "data-governance-standard-diagnosis",
+      "data-governance-standard-dictionary",
+      "data-governance-standard-closed-loop",
+      "data-governance-standard-roadmap",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

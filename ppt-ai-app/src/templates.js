@@ -169,6 +169,22 @@ const PRODUCT_INTERVIEW_INSIGHT_LAYOUT_SCHEMA = {
   ],
 };
 
+const CHANNEL_TRAFFIC_QUALITY_LAYOUT_SCHEMA = {
+  defaultCoverLayout: "channel-quality-cover",
+  defaultContentLayout: "channel-quality-diagnosis",
+  allowedLayouts: [
+    "channel-quality-cover",
+    "channel-quality-source",
+    "channel-quality-scorecard",
+    "channel-quality-conversion",
+    "channel-quality-actions",
+    "channel-quality-closing",
+    "title",
+    "content",
+    "closing",
+  ],
+};
+
 /**
  * Built-in template catalog used when no external catalog is configured.
  */
@@ -1133,6 +1149,48 @@ export const DEFAULT_TEMPLATES = [
     layoutSchema: EXECUTIVE_LAYOUT_SCHEMA,
   },
   {
+    id: "channel-data-analysis",
+    name: "渠道数据分析",
+    categoryId: "data",
+    scope: "official",
+    status: "active",
+    style: "channel-quality-diagnosis",
+    description: "适合渠道来源分析、投放质量评估、转化链路诊断和渠道优化建议的数据洞悉官方模板。",
+    themes: [
+      {
+        id: "traffic-quality",
+        name: "流量质量",
+        visual: {
+          primary: "172554",
+          accent: "22C55E",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          danger: "EF4444",
+          background: "F3F7FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "channel-traffic-quality",
+          variant: "traffic-quality",
+        },
+      },
+    ],
+    visual: {
+      primary: "172554",
+      accent: "22C55E",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      danger: "EF4444",
+      background: "F3F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "channel-traffic-quality",
+      variant: "traffic-quality",
+    },
+    layoutSchema: CHANNEL_TRAFFIC_QUALITY_LAYOUT_SCHEMA,
+  },
+  {
     id: "education",
     name: "教育培训课件",
     categoryId: "education",
@@ -1259,6 +1317,58 @@ export const DEFAULT_TEMPLATES = [
       variant: "startup",
     },
     layoutSchema: VENTURE_LAYOUT_SCHEMA,
+  },
+  {
+    id: "investment-attraction-financing-plan",
+    name: "招商融资方案",
+    categoryId: "pitch",
+    scope: "official",
+    status: "active",
+    style: "pitch-project-return",
+    description: "适合项目招商、收益测算、合作模式说明和融资方案汇报。",
+    themes: [
+      {
+        id: "project-return",
+        name: "项目收益",
+        visual: {
+          primary: "111827",
+          accent: "D6A84F",
+          secondary: "1FB6A6",
+          warning: "F59E0B",
+          background: "E8EEF3",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "3A4656",
+          layout: "pitch-project-return",
+          variant: "project-return",
+        },
+      },
+    ],
+    visual: {
+      primary: "111827",
+      accent: "D6A84F",
+      secondary: "1FB6A6",
+      warning: "F59E0B",
+      background: "E8EEF3",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "3A4656",
+      layout: "pitch-project-return",
+      variant: "project-return",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "pitch-project-return-cover",
+      defaultContentLayout: "project-value-map",
+      allowedLayouts: [
+        "pitch-project-return-cover",
+        "project-value-map",
+        "return-calculation-model",
+        "partner-rights-matrix",
+        "cooperation-path",
+        "funding-use-plan",
+        "pitch-project-return-closing",
+      ],
+    },
   },
   {
     id: "brand-story",
@@ -1556,6 +1666,7 @@ function normalizeTemplateLookupId(templateId) {
     "sales-sales-training-course-objection-handling": "sales-training-course",
     "product-product-commercialization-plan-pricing-strategy": "product-commercialization-plan",
     "product-user-research-report-interview-insight": "user-research-report",
+    "data-channel-data-analysis-traffic-quality": "channel-data-analysis",
   };
   return officialTemplateAliases[id] || id;
 }

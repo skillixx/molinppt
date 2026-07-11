@@ -1,0 +1,52 @@
+{
+  "baseTemplateId": "channel-data-analysis",
+  "themeId": "traffic-quality",
+  "style": "channel-quality-diagnosis",
+  "themes": [
+    {
+      "id": "traffic-quality",
+      "name": "流量质量",
+      "visual": {
+        "primary": "172554",
+        "accent": "22C55E",
+        "secondary": "38BDF8",
+        "warning": "F59E0B",
+        "danger": "EF4444",
+        "background": "F3F7FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "channel-traffic-quality",
+        "variant": "traffic-quality"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "172554",
+    "accent": "22C55E",
+    "secondary": "38BDF8",
+    "warning": "F59E0B",
+    "danger": "EF4444",
+    "background": "F3F7FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "channel-traffic-quality",
+    "variant": "traffic-quality"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "channel-quality-cover",
+    "defaultContentLayout": "channel-quality-diagnosis",
+    "allowedLayouts": [
+      "channel-quality-cover",
+      "channel-quality-source",
+      "channel-quality-scorecard",
+      "channel-quality-conversion",
+      "channel-quality-actions",
+      "channel-quality-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

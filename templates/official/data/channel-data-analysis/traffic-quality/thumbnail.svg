@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" fill="none">
+  <rect width="1280" height="720" rx="34" fill="#F3F7FB"/>
+  <path d="M0 0H1280V118H0z" fill="#172554"/>
+  <path d="M0 118H1280V128H0z" fill="#22C55E"/>
+  <path d="M90 176H1190V635H90z" fill="#FFFFFF" stroke="#D7E3F2" stroke-width="3"/>
+  <text x="138" y="246" font-family="Microsoft YaHei, Arial, sans-serif" font-size="54" font-weight="900" fill="#0F172A">渠道质量诊断报告</text>
+  <text x="142" y="295" font-family="Microsoft YaHei, Arial, sans-serif" font-size="24" font-weight="700" fill="#64748B">来源结构 · 投放质量 · 转化链路 · 优化动作</text>
+  <rect x="140" y="350" width="210" height="118" rx="24" fill="#ECFDF5" stroke="#B9EBD0"/>
+  <text x="168" y="400" font-family="Arial, sans-serif" font-size="36" font-weight="900" fill="#172554">82</text>
+  <text x="168" y="438" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="800" fill="#334155">质量评分</text>
+  <rect x="378" y="350" width="210" height="118" rx="24" fill="#EFF6FF" stroke="#BFD7FF"/>
+  <text x="406" y="400" font-family="Arial, sans-serif" font-size="36" font-weight="900" fill="#172554">38%</text>
+  <text x="406" y="438" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="800" fill="#334155">有效转化</text>
+  <rect x="616" y="350" width="210" height="118" rx="24" fill="#FFF7ED" stroke="#FED7AA"/>
+  <text x="644" y="400" font-family="Arial, sans-serif" font-size="36" font-weight="900" fill="#172554">5</text>
+  <text x="644" y="438" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="800" fill="#334155">核心渠道</text>
+  <rect x="830" y="190" width="300" height="300" rx="42" fill="#F8FBFF" stroke="#D8E5F3"/>
+  <circle cx="980" cy="340" r="92" stroke="#E3ECF6" stroke-width="30"/>
+  <path d="M980 248A92 92 0 1 1 907 396" stroke="#22C55E" stroke-width="30" stroke-linecap="round"/>
+  <path d="M907 396A92 92 0 0 1 936 260" stroke="#F59E0B" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="980" cy="340" r="44" fill="#FFFFFF"/>
+  <path d="M190 550C304 492 426 496 536 550C668 616 796 600 1052 508" stroke="#38BDF8" stroke-width="10" stroke-linecap="round" opacity=".65"/>
+  <path d="M190 590C346 610 444 642 560 596C710 536 830 548 1052 588" stroke="#22C55E" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+  <circle cx="190" cy="550" r="22" fill="#172554"/>
+  <circle cx="430" cy="506" r="22" fill="#38BDF8"/>
+  <circle cx="650" cy="574" r="22" fill="#22C55E"/>
+  <circle cx="870" cy="548" r="22" fill="#F59E0B"/>
+</svg>

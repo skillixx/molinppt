@@ -1,0 +1,21 @@
+{
+  "slug": "data-data-governance-report-metric-standard",
+  "name": "数据治理汇报 - 指标口径",
+  "description": "适合数据治理、指标体系建设、口径统一、责任归属和治理路线规划的商业化数据洞悉模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 100,
+  "status": "active",
+  "tags": [
+    "data",
+    "data-governance-report",
+    "metric-standard",
+    "data-governance",
+    "metric-dictionary",
+    "data-quality",
+    "data-lineage"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

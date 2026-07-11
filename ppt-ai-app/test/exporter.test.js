@@ -399,6 +399,7 @@ test("PptExportService uses market entry region decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
   const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
 
   assert.match(slide1, /name="Region Entry Consulting Canvas"/);
   assert.match(slide1, /name="Region Entry Map Panel"/);
@@ -2686,6 +2687,101 @@ test("PptExportService uses product funding highlights decorations", () => {
   assert.doesNotMatch(slide1, /product-highlights/);
 });
 
+test("PptExportService uses AI SaaS technology pitch decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-tech-startup-pitch-ai-saas",
+      theme: "ai-saas",
+      templateVisual: {
+        id: "pitch-tech-startup-pitch-ai-saas",
+        primary: "07111F",
+        accent: "2DD4BF",
+        secondary: "60A5FA",
+        warning: "F59E0B",
+        background: "EAF4FF",
+        surface: "F8FBFF",
+        title: "0B1220",
+        body: "334155",
+        layout: "pitch-ai-saas",
+        variant: "ai-saas",
+      },
+      slides: [
+        { title: "智能产品平台融资路演", bullets: ["企业客户正在把智能能力嵌入核心工作流", "产品架构覆盖数据模型流程和交付", "融资将用于技术壁垒和商业增长"] },
+        { title: "行业需求进入产品化窗口", bullets: ["预算迁移", "效率缺口", "垂直场景", "付费意愿"] },
+        { title: "产品架构形成平台闭环", bullets: ["数据接入", "模型编排", "工作流引擎", "交付集成"] },
+        { title: "技术壁垒来自场景闭环", bullets: ["行业数据", "推理能力", "流程资产", "部署经验"] },
+        { title: "商业增长可持续复用", bullets: ["收入增长", "核心留存", "试点转化"] },
+        { title: "资金投向绑定里程碑", bullets: ["模型研发", "行业方案", "交付团队", "生态渠道"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Pitch AI SaaS Content Surface"/);
+  assert.match(slide1, /name="Pitch AI SaaS Product Console"/);
+  assert.match(slide1, /name="Pitch AI SaaS Metric Card 1"/);
+  assert.match(slide3, /name="Pitch AI SaaS Architecture Node 1"/);
+  assert.match(slide4, /name="Pitch AI SaaS Moat Layer 1"/);
+  assert.match(slide5, /name="Pitch AI SaaS Growth Dashboard"/);
+  assert.doesNotMatch(slide1, /ai-saas/);
+});
+
+test("PptExportService uses investment attraction project return decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-investment-attraction-financing-plan-project-return",
+      theme: "project-return",
+      templateVisual: {
+        id: "pitch-investment-attraction-financing-plan-project-return",
+        primary: "111827",
+        accent: "D6A84F",
+        secondary: "1FB6A6",
+        warning: "F59E0B",
+        background: "E8EEF3",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "3A4656",
+        layout: "pitch-project-return",
+        variant: "project-return",
+      },
+      slides: [
+        { title: "产业园项目招商融资汇报", bullets: ["项目具备清晰区位资源和稳定现金流基础", "收益测算围绕投入产出和回收周期展开", "合作路径覆盖签约建设运营分润"] },
+        { title: "项目价值拆解", bullets: ["区位资源", "稳定客群", "运营能力", "现金流基础"] },
+        { title: "投入产出测算", bullets: ["投入金额", "收益来源", "回收周期", "分润机制"] },
+        { title: "合作权益矩阵", bullets: ["资源支持", "收益分配", "运营协同", "风险共担"] },
+        { title: "合作推进路径", bullets: ["接洽", "评估", "签约", "建设", "运营分润"] },
+        { title: "资金用途计划", bullets: ["空间建设", "招商拓展", "运营启动", "品牌推广"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Project Return Investor Canvas"/);
+  assert.match(slide1, /name="Project Return Site Illustration"/);
+  assert.match(slide1, /name="Project Return Metric Card 1"/);
+  assert.match(slide1, /name="Project Return Planned Content"/);
+  assert.match(slide3, /name="Project Return Curve Panel"/);
+  assert.match(slide4, /name="Project Return Rights Card 1"/);
+  assert.match(slide5, /name="Project Return Cooperation Step 1"/);
+  assert.match(slide6, /name="Project Return Capital Plan"/);
+  assert.doesNotMatch(slide1, /项目收益/);
+});
+
 test("PptExportService uses investor update progress sync decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -2821,6 +2917,55 @@ test("PptExportService uses user behavior path funnel decorations", () => {
   assert.match(slide1, /val="F6FAFF"/);
   assert.match(slide1, /val="06B6D4"/);
   assert.doesNotMatch(slide1, /路径漏斗/);
+});
+
+test("PptExportService uses channel traffic quality decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-channel-data-analysis-traffic-quality",
+      theme: "traffic-quality",
+      templateVisual: {
+        id: "data-channel-data-analysis-traffic-quality",
+        primary: "172554",
+        accent: "22C55E",
+        secondary: "38BDF8",
+        warning: "F59E0B",
+        danger: "EF4444",
+        background: "F3F7FB",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "channel-traffic-quality",
+        variant: "traffic-quality",
+      },
+      slides: [
+        { title: "渠道质量诊断报告", layout: "channel-quality-cover", bullets: ["有效流量占比提升至 82%", "核心渠道转化率达到 38%", "低质线索占比下降 12%"] },
+        { title: "渠道来源结构总览", layout: "channel-quality-source", bullets: ["搜索渠道贡献 42%", "信息流线索成本下降 8%", "私域复访率提升 16%"] },
+        { title: "投放质量评分", layout: "channel-quality-scorecard", bullets: ["优质渠道保持放量", "观察渠道进入调价实验", "低质渠道暂停预算"] },
+        { title: "转化链路诊断", layout: "channel-quality-conversion", bullets: ["曝光到点击转化 62%", "到站留资转化 38%", "成交转化 24%"] },
+        { title: "渠道优化行动", layout: "channel-quality-closing", bullets: ["放量名单", "降本实验", "链路修复", "周度复盘"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+
+  assert.match(slide1, /name="Channel Quality Canvas"/);
+  assert.match(slide1, /name="Channel Quality Network Panel"/);
+  assert.match(slide1, /name="Channel Quality Source Node 1"/);
+  assert.match(slide1, /name="Channel Quality Metric Card 1"/);
+  assert.match(slide3, /name="Channel Quality Score Ring Outer"/);
+  assert.match(slide4, /name="Channel Quality Conversion Step 1"/);
+  assert.match(slide5, /name="Channel Quality Roadmap Card 1"/);
+  assert.match(slide1, /val="F3F7FB"/);
+  assert.match(slide1, /val="22C55E"/);
+  assert.doesNotMatch(slide1, /traffic-quality/);
 });
 
 test("PptExportService uses product retention path decorations", () => {
@@ -3007,6 +3152,55 @@ test("PptExportService uses metric anomaly attribution decorations", () => {
   assert.match(slide1, /val="F4F8FB"/);
   assert.match(slide1, /val="06B6D4"/);
   assert.doesNotMatch(slide1, /归因分析/);
+});
+
+test("PptExportService uses data governance standard decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-data-governance-report-metric-standard",
+      theme: "metric-standard",
+      templateVisual: {
+        id: "data-data-governance-report-metric-standard",
+        primary: "102A43",
+        accent: "00A7B5",
+        secondary: "D9A441",
+        background: "F3F7FA",
+        surface: "FFFFFF",
+        title: "0B1826",
+        body: "32465A",
+        layout: "data-governance-standard",
+        variant: "metric-standard",
+      },
+      slides: [
+        { title: "统一指标定义，建立可信数据底座", layout: "data-governance-standard-cover", bullets: ["核心指标定义统一", "计算规则可追溯", "责任人明确"] },
+        { title: "指标体系总览", layout: "data-governance-standard-overview", bullets: ["业务域覆盖", "系统表映射", "指标归属明确"] },
+        { title: "口径差异诊断", layout: "data-governance-standard-diagnosis", bullets: ["同名指标存在差异", "统一计算规则", "确认机制上线"] },
+        { title: "指标字典与责任机制", layout: "data-governance-standard-dictionary", bullets: ["指标定义", "计算逻辑", "数据来源", "责任归属"] },
+        { title: "治理闭环", layout: "data-governance-standard-closed-loop", bullets: ["发现差异", "确认标准", "系统落地", "监控复盘"] },
+        { title: "治理路线规划", layout: "data-governance-standard-roadmap", bullets: ["标准梳理", "系统固化", "持续运营"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Data Governance Canvas"/);
+  assert.match(slide1, /name="Data Governance Map Panel"/);
+  assert.match(slide1, /name="Data Governance Standard Card 1"/);
+  assert.match(slide3, /name="Data Governance Current Definition"/);
+  assert.match(slide4, /name="Data Governance Dictionary Panel"/);
+  assert.match(slide5, /name="Data Governance Loop Ring"/);
+  assert.match(slide6, /name="Data Governance Roadmap Panel"/);
+  assert.match(slide1, /val="F3F7FA"/);
+  assert.match(slide1, /val="00A7B5"/);
+  assert.doesNotMatch(slide1, /指标口径/);
 });
 
 test("PptExportService uses market survey analysis decorations", () => {
@@ -3746,6 +3940,58 @@ test("PptExportService uses teaching achievement showcase decorations", () => {
   assert.doesNotMatch(slide1, /成果展示/);
 });
 
+test("PptExportService uses workshop practice review decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-workshop-seminar-practice-review",
+      theme: "practice-review",
+      templateVisual: {
+        id: "education-workshop-seminar-practice-review",
+        primary: "14505A",
+        accent: "18A999",
+        secondary: "F6C85F",
+        warning: "EF8354",
+        background: "F7F5EE",
+        surface: "FFFFFF",
+        title: "12263A",
+        body: "435466",
+        layout: "education-workshop-practice-review",
+        variant: "practice-review",
+      },
+      slides: [
+        { title: "研修工作坊复盘", layout: "education-workshop-practice-cover", bullets: ["梳理实践结果", "归纳关键发现", "形成改进行动"] },
+        { title: "复盘流程画布", layout: "education-workshop-practice-flow", bullets: ["输入材料", "观察现象", "提炼洞察", "制定行动"] },
+        { title: "小组共创成果", layout: "education-workshop-practice-cocreation", bullets: ["A 组共识", "B 组问题", "C 组建议", "D 组行动"] },
+        { title: "练习反馈矩阵", layout: "education-workshop-practice-feedback", bullets: ["做得好", "待改进", "风险点", "下次尝试"] },
+        { title: "行动计划看板", layout: "education-workshop-practice-actions", bullets: ["责任人确认", "截止时间", "验收标准", "跟进节奏"] },
+        { title: "Workshop review summary", layout: "education-workshop-practice-summary", bullets: ["Capture methods", "Align consensus", "Track actions"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Workshop Review Canvas"/);
+  assert.match(slide1, /name="Workshop Review Whiteboard"/);
+  assert.match(slide1, /name="Workshop Review Outcome Card 1"/);
+  assert.match(slide2, /name="Workshop Review Flow Card 1"/);
+  assert.match(slide3, /name="Workshop Review Sticky 1"/);
+  assert.match(slide4, /name="Workshop Review Feedback Cell 1"/);
+  assert.match(slide5, /name="Workshop Review Action Card 1"/);
+  assert.match(slide6, /name="Workshop Review Summary Panel"/);
+  assert.match(slide1, /val="14505A"/);
+  assert.match(slide1, /val="18A999"/);
+  assert.doesNotMatch(slide1, /实践复盘/);
+});
+
 test("PptExportService applies template-specific visual colors to PDF output", () => {
   const exporter = new PptExportService();
   const business = exporter.exportDeck({ deck: { ...deck, templateId: "business", theme: "modern" }, format: "pdf" });
@@ -3756,6 +4002,53 @@ test("PptExportService applies template-specific visual colors to PDF output", (
   assert.match(businessText, /0\.725 0\.110 0\.110 rg|0\.725 0\.11 0\.11 rg/);
   assert.match(pitchText, /0\.086 0\.129 0\.243 rg/);
   assert.notEqual(businessText, pitchText);
+});
+
+test("PptExportService uses public courseware enrollment conversion decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "education-public-courseware-enrollment-conversion",
+      theme: "enrollment-conversion",
+      templateVisual: {
+        id: "education-public-courseware-enrollment-conversion",
+        primary: "173A6A",
+        secondary: "24C6DC",
+        accent: "FF6B3D",
+        success: "20B486",
+        warning: "F7B731",
+        background: "F2F7FB",
+        surface: "FFFFFF",
+        title: "10233B",
+        body: "34445C",
+        layout: "public-course-enrollment",
+        variant: "enrollment-conversion",
+      },
+      slides: [
+        { title: "公开课价值课", layout: "public-course-enrollment-cover", bullets: ["明确目标学员与课程承诺", "展示课程亮点与即时收益", "承接资料领取和预约动作"] },
+        { title: "学员痛点引导", layout: "public-course-enrollment-hook", bullets: ["学习目标不清晰", "课程选择成本高", "缺少可执行方法", "需要老师答疑"] },
+        { title: "课程价值说明", layout: "public-course-enrollment-value", bullets: ["核心框架拆解", "案例带练", "资料包领取", "课后行动清单"] },
+        { title: "直播课程流程", layout: "public-course-enrollment-agenda", bullets: ["破冰导入", "知识讲解", "互动答疑", "行动布置"] },
+        { title: "报名承接路径", layout: "public-course-enrollment-path", bullets: ["预约听课", "领取资料", "顾问咨询", "完成报名"] },
+        { title: "下一步行动", layout: "public-course-enrollment-action", bullets: ["预约直播", "加入社群", "领取试听权益"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Public Course Live Window"/);
+  assert.match(slide2, /name="Public Course Hook Card 1"/);
+  assert.match(slide4, /name="Public Course Agenda Step 1"/);
+  assert.match(slide5, /name="Public Course Path Node 1"/);
+  assert.match(slide6, /name="Public Course Action Card 1"/);
+  assert.doesNotMatch(text, /招生转化/);
 });
 
 test("PptExportService creates a minimal PDF document with xref and trailer", () => {

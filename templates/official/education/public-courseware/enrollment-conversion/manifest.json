@@ -1,0 +1,20 @@
+{
+  "slug": "education-public-courseware-enrollment-conversion",
+  "name": "公开课课件 - 招生转化",
+  "description": "适合公开课展示、课程价值说明、招生转化路径和直播课程运营的公开课课件模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "public-courseware",
+    "open-class",
+    "live-course",
+    "course-value",
+    "enrollment-path"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

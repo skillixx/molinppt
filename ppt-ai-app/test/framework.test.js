@@ -869,6 +869,42 @@ test("resolveTemplateVisual applies teaching achievement showcase official visua
   assert.equal(visual.variant, "showcase");
 });
 
+test("resolveTemplateVisual applies workshop practice review official visual", () => {
+  const template = {
+    id: "education-workshop-seminar-practice-review",
+    visual: {
+      primary: "14505A",
+      accent: "18A999",
+      secondary: "F6C85F",
+      warning: "EF8354",
+      background: "F7F5EE",
+      surface: "FFFFFF",
+      title: "12263A",
+      body: "435466",
+      layout: "education-workshop-practice-review",
+      variant: "practice-review",
+    },
+    themes: [
+      {
+        id: "practice-review",
+        visual: {
+          layout: "education-workshop-practice-review",
+          variant: "practice-review",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "practice-review", template });
+
+  assert.equal(visual.id, "education-workshop-seminar-practice-review");
+  assert.equal(visual.primary, "14505A");
+  assert.equal(visual.accent, "18A999");
+  assert.equal(visual.background, "F7F5EE");
+  assert.equal(visual.layout, "education-workshop-practice-review");
+  assert.equal(visual.variant, "practice-review");
+});
+
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
@@ -1006,6 +1042,75 @@ test("resolveTemplateVisual applies user behavior path funnel official visual", 
   assert.equal(visual.variant, "path-funnel");
   assert.equal(visual.primary, "172554");
   assert.equal(visual.accent, "06B6D4");
+});
+
+test("resolveTemplateVisual applies channel traffic quality official visual", () => {
+  const template = {
+    id: "data-channel-data-analysis-traffic-quality",
+    visual: {
+      primary: "172554",
+      accent: "22C55E",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "F3F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "channel-traffic-quality",
+      variant: "traffic-quality",
+    },
+    themes: [
+      {
+        id: "traffic-quality",
+        visual: {
+          layout: "channel-traffic-quality",
+          variant: "traffic-quality",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "traffic-quality", template });
+
+  assert.equal(visual.id, "data-channel-data-analysis-traffic-quality");
+  assert.equal(visual.layout, "channel-traffic-quality");
+  assert.equal(visual.variant, "traffic-quality");
+  assert.equal(visual.primary, "172554");
+  assert.equal(visual.accent, "22C55E");
+});
+
+test("resolveTemplateVisual applies data governance standard official visual", () => {
+  const template = {
+    id: "data-data-governance-report-metric-standard",
+    visual: {
+      primary: "102A43",
+      accent: "00A7B5",
+      secondary: "D9A441",
+      background: "F3F7FA",
+      surface: "FFFFFF",
+      title: "0B1826",
+      body: "32465A",
+      layout: "data-governance-standard",
+      variant: "metric-standard",
+    },
+    themes: [
+      {
+        id: "metric-standard",
+        visual: {
+          layout: "data-governance-standard",
+          variant: "metric-standard",
+        },
+      },
+    ],
+  };
+
+  const visual = resolveTemplateVisual({ templateId: template.id, theme: "metric-standard", template });
+
+  assert.equal(visual.id, "data-data-governance-report-metric-standard");
+  assert.equal(visual.layout, "data-governance-standard");
+  assert.equal(visual.variant, "metric-standard");
+  assert.equal(visual.primary, "102A43");
+  assert.equal(visual.accent, "00A7B5");
 });
 
 test("resolveTemplateVisual applies market trend radar official visual", () => {

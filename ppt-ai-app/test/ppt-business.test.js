@@ -1009,6 +1009,54 @@ test("PptService renders product funding highlights preview with dedicated layou
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders AI SaaS technology pitch preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertPitchAiSaasTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "智能软件平台融资路演",
+    slideCount: 6,
+    templateId: "pitch-tech-startup-pitch-ai-saas",
+    theme: "ai-saas",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-tech-startup-pitch-ai-saas" data-layout="pitch-ai-saas"/);
+  assert.match(preview, /ai-saas-layer/);
+  assert.match(preview, /ai-saas-console/);
+  assert.match(preview, /ai-saas-architecture|ai-saas-moat|ai-saas-growth|ai-saas-capital/);
+  assert.match(preview, /INTELLIGENT PRODUCT PLATFORM|PRODUCT ARCHITECTURE|TECHNICAL MOAT|GROWTH DASHBOARD/);
+  assert.doesNotMatch(preview, />AI SaaS</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders investment attraction project return preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertInvestmentAttractionProjectReturnTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产业园项目招商融资汇报",
+    slideCount: 6,
+    templateId: "pitch-investment-attraction-financing-plan-project-return",
+    theme: "project-return",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-investment-attraction-financing-plan-project-return" data-layout="pitch-project-return"/);
+  assert.match(preview, /project-return-layer/);
+  assert.match(preview, /project-return-site/);
+  assert.match(preview, /project-return-curve|project-return-cards|project-return-path|project-return-capital/);
+  assert.match(preview, /INVESTMENT ATTRACTION BRIEF|RETURN MODEL|PARTNER RIGHTS|COOPERATION PATH/);
+  assert.doesNotMatch(preview, />项目收益</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders investor update progress sync preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -1102,6 +1150,29 @@ test("PptService renders market trend radar preview with dedicated layout", asyn
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders channel data analysis traffic quality preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertChannelTrafficQualityTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "渠道数据质量复盘",
+    slideCount: 5,
+    templateId: "data-channel-data-analysis-traffic-quality",
+    theme: "traffic-quality",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-channel-data-analysis-traffic-quality" data-layout="channel-traffic-quality"/);
+  assert.match(preview, /channel-quality-layer/);
+  assert.match(preview, /channel-network|channel-score-ring|channel-funnel|channel-matrix|channel-action-grid/);
+  assert.match(preview, /CHANNEL QUALITY LAB|SOURCE MIX REVIEW|QUALITY SCORECARD|CONVERSION PATH/);
+  assert.doesNotMatch(preview, />流量质量</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders customer segmentation layering preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -1145,6 +1216,29 @@ test("PptService renders metric anomaly attribution preview with dedicated layou
   assert.match(preview, /anomaly-signal|anomaly-cause-map|anomaly-impact|anomaly-loop/);
   assert.match(preview, /ANOMALY SIGNAL|THRESHOLD REVIEW|CAUSE NETWORK|IMPACT MATRIX/);
   assert.doesNotMatch(preview, />归因分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders data governance standard preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertDataGovernanceStandardTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "数据治理指标体系建设",
+    slideCount: 6,
+    templateId: "data-data-governance-report-metric-standard",
+    theme: "metric-standard",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-data-governance-report-metric-standard" data-layout="data-governance-standard"/);
+  assert.match(preview, /governance-layer/);
+  assert.match(preview, /governance-map|governance-dictionary|governance-compare|governance-loop|governance-roadmap/);
+  assert.match(preview, /METRIC STANDARD|METRIC MAP|DEFINITION REVIEW|METRIC DICTIONARY/);
+  assert.doesNotMatch(preview, />指标口径</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -6202,6 +6296,102 @@ async function insertProductFundingHighlightsTemplate(context) {
   });
 }
 
+async function insertPitchAiSaasTemplate(context) {
+  // 测试数据库模拟官方模板同步后的科技创业路演模板，主题名称只用于选择器，不直接出现在 PPT 页面里。
+  await context.database.insert("templates", {
+    id: "pitch-tech-startup-pitch-ai-saas",
+    slug: "pitch-tech-startup-pitch-ai-saas",
+    name: "科技创业路演 - AI SaaS",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "ai-saas",
+        name: "AI SaaS",
+        visual: {
+          primary: "07111F",
+          accent: "2DD4BF",
+          secondary: "60A5FA",
+          warning: "F59E0B",
+          background: "EAF4FF",
+          surface: "F8FBFF",
+          title: "0B1220",
+          body: "334155",
+          layout: "pitch-ai-saas",
+          variant: "ai-saas",
+        },
+      },
+    ],
+    visual: {
+      primary: "07111F",
+      accent: "2DD4BF",
+      secondary: "60A5FA",
+      warning: "F59E0B",
+      background: "EAF4FF",
+      surface: "F8FBFF",
+      title: "0B1220",
+      body: "334155",
+      layout: "pitch-ai-saas",
+      variant: "ai-saas",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "pitch-ai-saas-cover",
+      defaultContentLayout: "pitch-ai-saas-product-architecture",
+      allowedLayouts: ["pitch-ai-saas-cover", "pitch-ai-saas-market-opportunity", "pitch-ai-saas-product-architecture", "pitch-ai-saas-technical-moat", "pitch-ai-saas-growth-dashboard", "pitch-ai-saas-capital-plan", "pitch-ai-saas-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertInvestmentAttractionProjectReturnTemplate(context) {
+  // 测试数据库模拟官方模板同步后的招商融资方案模板，确保项目收益主题只用于选择器，不直接写进 PPT 页面。
+  await context.database.insert("templates", {
+    id: "pitch-investment-attraction-financing-plan-project-return",
+    slug: "pitch-investment-attraction-financing-plan-project-return",
+    name: "招商融资方案 - 项目收益",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "project-return",
+        name: "项目收益",
+        visual: {
+          primary: "111827",
+          accent: "D6A84F",
+          secondary: "1FB6A6",
+          warning: "F59E0B",
+          background: "E8EEF3",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "3A4656",
+          layout: "pitch-project-return",
+          variant: "project-return",
+        },
+      },
+    ],
+    visual: {
+      primary: "111827",
+      accent: "D6A84F",
+      secondary: "1FB6A6",
+      warning: "F59E0B",
+      background: "E8EEF3",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "3A4656",
+      layout: "pitch-project-return",
+      variant: "project-return",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "pitch-project-return-cover",
+      defaultContentLayout: "project-value-map",
+      allowedLayouts: ["pitch-project-return-cover", "project-value-map", "return-calculation-model", "partner-rights-matrix", "cooperation-path", "funding-use-plan", "pitch-project-return-closing", "title", "content"],
+    },
+  });
+}
+
 async function insertInvestorUpdateProgressTemplate(context) {
   // 测试数据库模拟官方模板同步后的投资人更新报告，确保进展同步主题只用于选择器，不直接写进 PPT 页面。
   await context.database.insert("templates", {
@@ -6392,6 +6582,56 @@ async function insertMarketTrendRadarTemplate(context) {
   });
 }
 
+async function insertChannelTrafficQualityTemplate(context) {
+  // 测试数据库模拟官方模板同步后的渠道数据分析模板，确保预览进入流量质量专属布局。
+  await context.database.insert("templates", {
+    id: "data-channel-data-analysis-traffic-quality",
+    slug: "data-channel-data-analysis-traffic-quality",
+    name: "渠道数据分析 - 流量质量",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "traffic-quality",
+        name: "流量质量",
+        visual: {
+          primary: "172554",
+          accent: "22C55E",
+          secondary: "38BDF8",
+          warning: "F59E0B",
+          danger: "EF4444",
+          background: "F3F7FB",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "channel-traffic-quality",
+          variant: "traffic-quality",
+        },
+      },
+    ],
+    visual: {
+      primary: "172554",
+      accent: "22C55E",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      danger: "EF4444",
+      background: "F3F7FB",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "channel-traffic-quality",
+      variant: "traffic-quality",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "channel-quality-cover",
+      defaultContentLayout: "channel-quality-diagnosis",
+      allowedLayouts: ["channel-quality-cover", "channel-quality-source", "channel-quality-scorecard", "channel-quality-conversion", "channel-quality-actions", "channel-quality-closing", "title", "content", "closing"],
+    },
+  });
+}
+
 async function insertCustomerSegmentationLayeringTemplate(context) {
   // 测试数据库模拟官方模板同步后的客户分群画像模板，覆盖人群分层预览和动态版式解析。
   await context.database.insert("templates", {
@@ -6502,6 +6742,62 @@ async function insertMetricAnomalyAttributionTemplate(context) {
         "metric-anomaly-attribution-impact",
         "metric-anomaly-attribution-action",
         "metric-anomaly-attribution-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertDataGovernanceStandardTemplate(context) {
+  // 测试数据库模拟官方模板同步后的数据治理汇报模板，覆盖指标标准化专属预览和动态版式解析。
+  await context.database.insert("templates", {
+    id: "data-data-governance-report-metric-standard",
+    slug: "data-data-governance-report-metric-standard",
+    name: "数据治理汇报 - 指标口径",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "metric-standard",
+        name: "指标口径",
+        visual: {
+          primary: "102A43",
+          accent: "00A7B5",
+          secondary: "D9A441",
+          background: "F3F7FA",
+          surface: "FFFFFF",
+          title: "0B1826",
+          body: "32465A",
+          layout: "data-governance-standard",
+          variant: "metric-standard",
+        },
+      },
+    ],
+    visual: {
+      primary: "102A43",
+      accent: "00A7B5",
+      secondary: "D9A441",
+      background: "F3F7FA",
+      surface: "FFFFFF",
+      title: "0B1826",
+      body: "32465A",
+      layout: "data-governance-standard",
+      variant: "metric-standard",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "data-governance-standard-cover",
+      defaultContentLayout: "data-governance-standard-dictionary",
+      allowedLayouts: [
+        "data-governance-standard-cover",
+        "data-governance-standard-overview",
+        "data-governance-standard-diagnosis",
+        "data-governance-standard-dictionary",
+        "data-governance-standard-closed-loop",
+        "data-governance-standard-roadmap",
         "title",
         "content",
         "closing",

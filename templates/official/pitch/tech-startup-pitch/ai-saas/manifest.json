@@ -1,0 +1,23 @@
+{
+  "slug": "pitch-tech-startup-pitch-ai-saas",
+  "name": "科技创业路演 - AI SaaS",
+  "description": "适合 AI SaaS 融资、技术壁垒说明、产品架构展示和商业增长汇报的官方融资路演模板，突出产品控制台、模型能力栈、架构链路、增长指标与资金用途。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "tech-startup-pitch",
+    "ai-saas",
+    "technology-startup",
+    "saas-product",
+    "ai-platform",
+    "technical-moat",
+    "growth-metrics",
+    "fundraising"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1040,6 +1040,7 @@ function renderDeckPreview({ deck, visual }) {
     const conceptBreakdownScene = isConceptBreakdownCoursewareVisual(visual) ? conceptBreakdownCoursewarePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const examReviewScene = isExamReviewKeypointsVisual(visual) ? examReviewKeypointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const teachingAchievementScene = isTeachingAchievementShowcaseVisual(visual) ? teachingAchievementPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const workshopPracticeScene = isWorkshopPracticeReviewVisual(visual) ? workshopPracticeReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const releaseCadenceScene = isProductReleaseCadenceVisual(visual) ? productReleaseCadencePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1055,12 +1056,15 @@ function renderDeckPreview({ deck, visual }) {
     const growthFundingScene = isGrowthFundingFlywheelVisual(visual) ? growthFundingFlywheelPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const preAMarketScene = isPreAMarketValidationVisual(visual) ? preAMarketValidationPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productFundingScene = isProductFundingHighlightsVisual(visual) ? productFundingHighlightsPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const pitchAiSaasScene = isPitchAiSaasVisual(visual) ? pitchAiSaasPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const investorUpdateScene = typeof isInvestorUpdateProgressVisual === "function" && isInvestorUpdateProgressVisual(visual) ? investorUpdateProgressPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const projectReturnScene = typeof isPitchProjectReturnVisual === "function" && isPitchProjectReturnVisual(visual) ? pitchProjectReturnPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const enterpriseBlueprintScene = isEnterpriseDigitalBlueprintVisual(visual) ? enterpriseDigitalBlueprintPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelScene = isBusinessModelBpVisual(visual) ? businessModelBpPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const businessModelValueChainScene = isBusinessModelValueChainVisual(visual) ? businessModelValueChainPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const marketingScene = isMarketingCampaignVisual(visual) ? marketingCampaignPreviewScene(visual) : null;
     const integratedMediaScene = isIntegratedMediaMixVisual(visual) ? integratedMediaMixPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const publicCourseScene = isPublicCourseEnrollmentVisual(visual) ? publicCourseEnrollmentPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const festivalPromotionScene = typeof isFestivalPromotionRhythmVisual === "function" && typeof festivalPromotionRhythmPreviewScene === "function" && isFestivalPromotionRhythmVisual(visual)
       ? festivalPromotionRhythmPreviewScene({ slide, index, total: deck.slides.length })
       : null;
@@ -1072,9 +1076,11 @@ function renderDeckPreview({ deck, visual }) {
     const dataInsightScene = isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const biCockpitScene = isBiExecutiveCockpitVisual(visual) ? biExecutiveCockpitPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const userPathScene = isUserPathFunnelVisual(visual) ? userPathFunnelPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const channelQualityScene = isChannelTrafficQualityVisual(visual) ? channelTrafficQualityPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const trendRadarScene = typeof isMarketTrendRadarVisual === "function" && isMarketTrendRadarVisual(visual) ? marketTrendRadarPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const segmentationScene = typeof isCustomerSegmentationLayeringVisual === "function" && isCustomerSegmentationLayeringVisual(visual) ? customerSegmentationLayeringPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const anomalyScene = typeof isMetricAnomalyAttributionVisual === "function" && isMetricAnomalyAttributionVisual(visual) ? metricAnomalyAttributionPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const governanceScene = typeof isDataGovernanceStandardVisual === "function" && isDataGovernanceStandardVisual(visual) ? dataGovernanceStandardPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const surveyScene = typeof isMarketSurveyAnalysisVisual === "function" && isMarketSurveyAnalysisVisual(visual) ? marketSurveyAnalysisPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const experimentScene = typeof isExperimentAbTestVisual === "function" && isExperimentAbTestVisual(visual) ? experimentAbTestPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const educationScene = isEducationCourseVisual(visual) ? educationCoursePreviewScene(visual) : null;
@@ -1157,6 +1163,9 @@ function renderDeckPreview({ deck, visual }) {
     const teachingAchievementMark = teachingAchievementScene
       ? renderTeachingAchievementPreview(slide, teachingAchievementScene)
       : "";
+    const workshopPracticeMark = workshopPracticeScene
+      ? renderWorkshopPracticeReviewPreview(slide, workshopPracticeScene)
+      : "";
     const productMark = productScene
       ? `<div class="product-label">${escapeHtml(productScene.label)}</div><div class="product-chip" aria-hidden="true"></div><div class="product-visual"><span></span><span></span><span></span><span></span></div><div class="product-caption">${escapeHtml(productScene.caption)}</div>`
       : "";
@@ -1207,8 +1216,14 @@ function renderDeckPreview({ deck, visual }) {
     const productFundingMark = productFundingScene
       ? renderProductFundingHighlightsPreview(slide, productFundingScene)
       : "";
+    const pitchAiSaasMark = pitchAiSaasScene
+      ? renderPitchAiSaasPreview(slide, pitchAiSaasScene)
+      : "";
     const investorUpdateMark = investorUpdateScene
       ? renderInvestorUpdateProgressPreview(slide, investorUpdateScene)
+      : "";
+    const projectReturnMark = projectReturnScene
+      ? renderPitchProjectReturnPreview(slide, projectReturnScene)
       : "";
     const enterpriseBlueprintMark = enterpriseBlueprintScene
       ? renderEnterpriseDigitalBlueprintPreview(slide, enterpriseBlueprintScene)
@@ -1229,6 +1244,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const integratedMediaMark = integratedMediaScene
       ? renderIntegratedMediaMixPreview(slide, integratedMediaScene)
+      : "";
+    const publicCourseMark = publicCourseScene
+      ? renderPublicCourseEnrollmentPreview(slide, publicCourseScene)
       : "";
     const festivalPromotionMark = festivalPromotionScene
       ? renderFestivalPromotionRhythmPreview(slide, festivalPromotionScene)
@@ -1267,6 +1285,9 @@ function renderDeckPreview({ deck, visual }) {
     const userPathMark = userPathScene
       ? renderUserPathFunnelPreview(slide, userPathScene)
       : "";
+    const channelQualityMark = channelQualityScene
+      ? renderChannelTrafficQualityPreview(slide, channelQualityScene)
+      : "";
     const trendRadarMark = trendRadarScene
       ? renderMarketTrendRadarPreview(slide, trendRadarScene)
       : "";
@@ -1276,11 +1297,14 @@ function renderDeckPreview({ deck, visual }) {
     const anomalyMark = anomalyScene
       ? renderMetricAnomalyAttributionPreview(slide, anomalyScene)
       : "";
-    const surveyMark = surveyScene
+    const governanceMark = governanceScene
+      ? renderDataGovernanceStandardPreview(slide, governanceScene)
+      : "";
+    const surveyMark = governanceMark + (surveyScene
       ? renderMarketSurveyAnalysisPreview(slide, surveyScene)
       : experimentScene
         ? renderExperimentAbTestPreview(slide, experimentScene)
-        : "";
+        : "");
     const educationMark = educationScene
       ? (
           `${index === 0
@@ -1384,17 +1408,17 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || integratedMediaScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || investorUpdateScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || investorUpdateScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || integratedMediaScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${investorUpdateMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${integratedMediaMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || departmentTeamScene?.variant || brandStoryScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandStoryMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
   const strategyPreviewVars = isStrategyConsultingVisual(visual) ? strategyConsultingPreviewVars(visual) : "";
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(deck.title)}</title><style>
-    :root{--template-primary:#${visual.primary};--template-accent:#${visual.accent};--template-secondary:#${visual.secondary || visual.accent};--template-warning:#${visual.warning || visual.secondary || visual.accent};--template-bg:#${visual.background};--template-surface:#${visual.surface};--template-title:#${visual.title};--template-body:#${visual.body};${domePreviewVars}${statusReportVars}${strategyPreviewVars}}
+    :root{--template-primary:#${visual.primary};--template-accent:#${visual.accent};--template-secondary:#${visual.secondary || visual.accent};--template-success:#${visual.success || visual.secondary || visual.accent};--template-warning:#${visual.warning || visual.secondary || visual.accent};--template-bg:#${visual.background};--template-surface:#${visual.surface};--template-title:#${visual.title};--template-body:#${visual.body};${domePreviewVars}${statusReportVars}${strategyPreviewVars}}
     *{box-sizing:border-box} html{background:var(--template-bg);} body{margin:0;padding:28px;background:linear-gradient(135deg,var(--template-bg),#ffffff 58%,var(--template-bg));color:var(--template-body);font-family:Arial,"Microsoft YaHei",sans-serif;}
     main{display:grid;gap:34px;width:min(100%,1120px);margin:0 auto;}
     .preview-page{display:grid;gap:10px;}
@@ -1553,6 +1577,37 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="growth-funding-flywheel"] .growth-funding-closing::before{content:"";position:absolute;left:13%;right:13%;top:27%;height:8px;border-radius:999px;background:linear-gradient(90deg,#22c55e,#38bdf8,#f59e0b);}
     body[data-layout="growth-funding-flywheel"] .growth-funding-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:24%;height:34%;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);}
     body[data-layout="growth-funding-flywheel"] .page-number{z-index:6;color:rgba(15,23,42,.58);background:rgba(255,255,255,.76);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="pitch-project-return"]{background:#dfe7ef;}
+    body[data-layout="pitch-project-return"] main{width:min(100%,1160px);}
+    body[data-layout="pitch-project-return"] .slide{padding:0;border:0;background:linear-gradient(135deg,#0b1220 0%,#111827 52%,#202a3c 100%);box-shadow:0 24px 58px rgba(7,17,31,.28);}
+    body[data-layout="pitch-project-return"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 16%,rgba(214,168,79,.28),transparent 26%),radial-gradient(circle at 18% 80%,rgba(31,182,166,.16),transparent 30%),repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 1px,transparent 1px 52px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 44px);pointer-events:none;}
+    body[data-layout="pitch-project-return"] .slide::after{content:"";position:absolute;left:5.3%;right:5.3%;top:8.6%;bottom:8%;z-index:1;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(243,247,250,.93));border:1px solid rgba(214,168,79,.28);box-shadow:0 24px 52px rgba(7,17,31,.24);}
+    body[data-layout="pitch-project-return"] .accent{left:5.3%;right:5.3%;top:8.6%;height:6px;z-index:5;border-radius:999px;background:linear-gradient(90deg,#d6a84f,#1fb6a6,#f59e0b);}
+    body[data-layout="pitch-project-return"] .project-return-layer{position:absolute;inset:0;z-index:8;color:#3a4656;pointer-events:none;}
+    body[data-layout="pitch-project-return"] .project-return-kicker{position:absolute;left:8%;top:14%;font-size:12px;font-weight:900;letter-spacing:.16em;color:#b88932;}
+    body[data-layout="pitch-project-return"] .project-return-title{position:absolute;left:8%;top:20.2%;width:42%;margin:0;color:#0f172a;font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="pitch-project-return"] .project-return-summary{position:absolute;left:8%;top:40.5%;width:37%;font-size:13px;line-height:1.48;color:#475569;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="pitch-project-return"] .project-return-bullets{position:absolute;left:8.1%;top:51%;width:36%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="pitch-project-return"] .project-return-bullets li{margin:.18em 0;}
+    body[data-layout="pitch-project-return"] .project-return-metrics{position:absolute;left:8%;right:50%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="pitch-project-return"] .project-return-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.09);box-shadow:0 12px 24px rgba(15,23,42,.09);display:grid;align-content:center;gap:3px;padding:11px 12px;font-size:10px;font-weight:800;color:#64748b;}
+    body[data-layout="pitch-project-return"] .project-return-metrics strong{font-size:18px;line-height:1;color:#0f172a;}
+    body[data-layout="pitch-project-return"] .project-return-site{position:absolute;right:7.4%;top:17.2%;width:39%;height:48%;border-radius:22px;background:linear-gradient(135deg,#fff,#edf4f7);border:1px solid rgba(15,23,42,.10);box-shadow:0 18px 36px rgba(15,23,42,.13);overflow:hidden;}
+    body[data-layout="pitch-project-return"] .project-return-site::before{content:"";position:absolute;inset:10%;background:linear-gradient(135deg,transparent 0 46%,rgba(214,168,79,.22) 47% 51%,transparent 52%),repeating-linear-gradient(90deg,rgba(15,23,42,.06) 0 1px,transparent 1px 38px),repeating-linear-gradient(0deg,rgba(15,23,42,.045) 0 1px,transparent 1px 34px);}
+    body[data-layout="pitch-project-return"] .project-return-site::after{content:"";position:absolute;left:12%;right:10%;bottom:17%;height:7px;border-radius:999px;background:linear-gradient(90deg,#d6a84f,#1fb6a6,#f59e0b);transform:skewY(-8deg);box-shadow:0 0 24px rgba(214,168,79,.2);}
+    body[data-layout="pitch-project-return"] .project-return-curve{position:absolute;right:7.6%;top:20%;width:39%;height:43%;border-radius:20px;background:linear-gradient(135deg,#fff,#f6fafc);border:1px solid rgba(15,23,42,.10);box-shadow:0 18px 36px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="pitch-project-return"] .project-return-curve::before{content:"";position:absolute;left:9%;right:8%;bottom:18%;height:52%;background:linear-gradient(135deg,transparent 0 16%,rgba(214,168,79,.20) 17% 31%,transparent 32% 45%,rgba(31,182,166,.20) 46% 63%,transparent 64% 76%,rgba(245,158,11,.20) 77% 90%,transparent 91%);clip-path:polygon(0 84%,16% 66%,31% 70%,48% 42%,66% 48%,83% 16%,100% 4%,100% 100%,0 100%);}
+    body[data-layout="pitch-project-return"] .project-return-curve::after{content:"";position:absolute;left:10%;right:9%;top:24%;height:50%;border-bottom:6px solid #d6a84f;border-right:6px solid #1fb6a6;border-radius:50%;transform:rotate(-13deg);}
+    body[data-layout="pitch-project-return"] .project-return-cards{position:absolute;right:7.6%;top:21%;width:39%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="pitch-project-return"] .project-return-cards span{min-height:84px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:15px 14px;font-size:12px;line-height:1.34;font-weight:900;color:#0f172a;}
+    body[data-layout="pitch-project-return"] .project-return-cards span::before{content:"";display:block;width:34px;height:5px;border-radius:999px;margin-bottom:10px;background:linear-gradient(90deg,#d6a84f,#1fb6a6);}
+    body[data-layout="pitch-project-return"] .project-return-path{position:absolute;left:8%;right:8%;bottom:15%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;}
+    body[data-layout="pitch-project-return"] .project-return-path span{position:relative;min-height:76px;border-radius:15px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:16px 12px 12px;font-size:11.5px;font-weight:900;color:#0f172a;}
+    body[data-layout="pitch-project-return"] .project-return-path span::after{content:"";position:absolute;left:13px;right:13px;bottom:12px;height:4px;border-radius:999px;background:linear-gradient(90deg,#d6a84f,#1fb6a6);}
+    body[data-layout="pitch-project-return"] .project-return-capital{position:absolute;right:8%;top:20%;width:37%;height:45%;border-radius:22px;background:#111827;box-shadow:0 22px 42px rgba(15,23,42,.18);overflow:hidden;}
+    body[data-layout="pitch-project-return"] .project-return-capital::before{content:"";position:absolute;left:13%;right:13%;top:28%;height:8px;border-radius:999px;background:linear-gradient(90deg,#d6a84f,#1fb6a6,#f59e0b);}
+    body[data-layout="pitch-project-return"] .project-return-capital::after{content:"";position:absolute;left:18%;right:18%;bottom:20%;height:36%;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);}
+    body[data-layout="pitch-project-return"] .page-number{z-index:9;color:rgba(15,23,42,.58);background:rgba(255,255,255,.80);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
     body[data-layout="pre-a-market-validation"]{background:#dbe8f1;}
     body[data-layout="pre-a-market-validation"] main{width:min(100%,1160px);}
     body[data-layout="pre-a-market-validation"] .slide{padding:0;border:0;background:linear-gradient(135deg,#07111f 0%,#0b1220 48%,#123044 100%);box-shadow:0 24px 58px rgba(7,17,31,.28);}
@@ -1592,6 +1647,46 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="pre-a-market-validation"] .pre-a-closing::before{content:"";position:absolute;left:14%;right:14%;top:28%;height:8px;border-radius:999px;background:linear-gradient(90deg,#14b8a6,#38bdf8,#f59e0b);}
     body[data-layout="pre-a-market-validation"] .pre-a-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:23%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.08);}
     body[data-layout="pre-a-market-validation"] .page-number{z-index:9;color:rgba(15,23,42,.58);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="pitch-ai-saas"]{background:#dceafe;}
+    body[data-layout="pitch-ai-saas"] main{width:min(100%,1160px);}
+    body[data-layout="pitch-ai-saas"] .slide{padding:0;border:0;background:#07111f;box-shadow:0 26px 62px rgba(7,17,31,.28);}
+    body[data-layout="pitch-ai-saas"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(45,212,191,.26),transparent 25%),radial-gradient(circle at 14% 80%,rgba(96,165,250,.18),transparent 30%),repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 42px);pointer-events:none;}
+    body[data-layout="pitch-ai-saas"] .slide::after{content:"";position:absolute;left:5%;right:5%;top:8%;bottom:8%;z-index:1;border-radius:24px;background:linear-gradient(135deg,rgba(248,251,255,.96),rgba(235,246,255,.88));border:1px solid rgba(148,163,184,.26);box-shadow:0 24px 52px rgba(7,17,31,.24),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="pitch-ai-saas"] .accent{left:5%;right:5%;top:8%;height:7px;border-radius:999px;z-index:4;background:linear-gradient(90deg,#2dd4bf,#60a5fa,#8b5cf6);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-layer{position:absolute;inset:0;z-index:6;color:#334155;pointer-events:none;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-kicker{position:absolute;left:8%;top:14%;font-size:11px;font-weight:900;letter-spacing:.15em;color:#0f766e;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-title{position:absolute;left:8%;top:20%;width:40%;margin:0;color:#07111f;font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-summary{position:absolute;left:8%;top:39.5%;width:37%;font-size:12.5px;line-height:1.46;font-weight:800;color:#475569;overflow-wrap:anywhere;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-bullets{position:absolute;left:8.1%;top:50%;width:36%;margin:0;padding-left:1.05em;font-size:11.2px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-bullets li{margin:.18em 0;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console{position:absolute;right:7.5%;top:17%;width:40%;height:45%;border-radius:22px;background:#07111f;box-shadow:0 24px 44px rgba(7,17,31,.20);overflow:hidden;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console::before{content:"";position:absolute;left:6%;right:6%;top:11%;height:10%;border-radius:999px;background:linear-gradient(90deg,#2dd4bf,#60a5fa,rgba(255,255,255,.18));}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console::after{content:"";position:absolute;left:8%;bottom:12%;width:34%;height:42%;border-radius:18px;background:#f8fbff;box-shadow:150px 0 0 rgba(45,212,191,.22);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console i{position:absolute;display:block;border-radius:14px;background:rgba(96,165,250,.22);border:1px solid rgba(45,212,191,.26);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console i:nth-child(1){right:9%;top:30%;width:39%;height:10%;}body[data-layout="pitch-ai-saas"] .ai-saas-console i:nth-child(2){right:9%;top:47%;width:28%;height:10%;background:rgba(45,212,191,.28);}body[data-layout="pitch-ai-saas"] .ai-saas-console i:nth-child(3){right:9%;top:64%;width:34%;height:10%;background:rgba(245,158,11,.28);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-console b{position:absolute;right:18%;bottom:15%;width:76px;height:76px;border-radius:50%;border:10px solid #2dd4bf;border-left-color:#60a5fa;box-shadow:0 0 0 14px rgba(45,212,191,.10);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-metrics{position:absolute;left:8%;right:49%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 12px 24px rgba(15,23,42,.10);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10px;font-weight:900;color:#64748b;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-metrics strong{font-size:17px;line-height:1;color:#07111f;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-opportunity{position:absolute;right:7.7%;top:18%;width:39%;height:49%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-opportunity span{border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 14px 26px rgba(15,23,42,.10);padding:17px 15px;font-size:13px;line-height:1.25;font-weight:900;color:#07111f;display:grid;align-content:center;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-opportunity span::before{content:"";width:44px;height:5px;border-radius:999px;background:linear-gradient(90deg,#2dd4bf,#60a5fa);margin-bottom:10px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-architecture{position:absolute;right:7%;top:21%;width:41%;height:48%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:10px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-architecture::before{content:"";position:absolute;left:8%;right:8%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,#2dd4bf,#60a5fa,#8b5cf6);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-architecture span{position:relative;z-index:1;min-height:104px;border-radius:18px;background:#07111f;color:#fff;box-shadow:0 18px 32px rgba(7,17,31,.20);display:grid;place-items:center;text-align:center;padding:12px;font-size:12px;font-weight:900;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-moat{position:absolute;right:8%;top:17%;width:38%;display:grid;gap:12px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-moat span{min-height:70px;border-radius:18px;background:linear-gradient(90deg,#07111f,#123252);color:#fff;box-shadow:0 14px 26px rgba(7,17,31,.18);display:grid;align-content:center;padding:0 22px;font-size:13px;font-weight:900;border-left:7px solid #2dd4bf;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-growth{position:absolute;right:7.5%;top:18%;width:40%;height:42%;border-radius:22px;background:#07111f;box-shadow:0 22px 42px rgba(7,17,31,.22);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-growth::before{content:"";position:absolute;left:9%;right:9%;bottom:18%;height:2px;background:rgba(255,255,255,.22);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-growth i{position:absolute;bottom:18%;width:12%;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#2dd4bf,#60a5fa);display:block;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-growth i:nth-child(1){left:14%;height:28%;}body[data-layout="pitch-ai-saas"] .ai-saas-growth i:nth-child(2){left:34%;height:42%;}body[data-layout="pitch-ai-saas"] .ai-saas-growth i:nth-child(3){left:54%;height:56%;}body[data-layout="pitch-ai-saas"] .ai-saas-growth i:nth-child(4){left:74%;height:70%;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-capital{position:absolute;right:8%;top:23%;width:38%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-capital span{min-height:116px;border-radius:20px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 16px 30px rgba(15,23,42,.10);display:grid;place-items:center;text-align:center;padding:14px;font-size:13px;font-weight:900;color:#07111f;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-capital span:nth-child(2),body[data-layout="pitch-ai-saas"] .ai-saas-capital span:nth-child(3){background:#ecfeff;}
+    body[data-layout="pitch-ai-saas"] .ai-saas-closing{position:absolute;right:8%;top:21%;width:37%;height:43%;border-radius:24px;background:linear-gradient(135deg,#07111f,#0f766e);box-shadow:0 24px 44px rgba(7,17,31,.22);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-closing::before{content:"";position:absolute;left:15%;right:15%;top:30%;height:8px;border-radius:999px;background:linear-gradient(90deg,#2dd4bf,#60a5fa,#f59e0b);}
+    body[data-layout="pitch-ai-saas"] .ai-saas-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:22%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
+    body[data-layout="pitch-ai-saas"] .page-number{z-index:7;color:rgba(15,23,42,.60);background:rgba(255,255,255,.80);border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:5px 10px;}
     body[data-layout="product-funding-highlights"]{background:#dfe9f4;}
     body[data-layout="product-funding-highlights"] main{width:min(100%,1160px);}
     body[data-layout="product-funding-highlights"] .slide{background:linear-gradient(135deg,#eaf2f8 0%,#ffffff 42%,#edf7fb 100%);padding:0;border:0;box-shadow:0 24px 58px rgba(15,23,42,.18);}
@@ -2885,6 +2980,40 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="bi-executive-cockpit"] .cockpit-actions{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;}
     body[data-layout="bi-executive-cockpit"] .cockpit-actions span{min-height:90px;border-radius:16px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(8,17,31,.82));border:1px solid rgba(34,211,238,.2);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="bi-executive-cockpit"] .page-number{z-index:5;right:6.2%;bottom:5.4%;background:rgba(8,17,31,.72);border:1px solid rgba(34,211,238,.18);border-radius:999px;padding:5px 10px;color:rgba(230,247,255,.66);}
+    body[data-layout="channel-traffic-quality"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbff 0%,var(--template-bg) 55%,#eefdf6 100%);box-shadow:0 24px 58px rgba(15,23,42,.16);}
+    body[data-layout="channel-traffic-quality"] .slide::before{background:radial-gradient(circle at 78% 20%,rgba(34,197,94,.17),transparent 24%),radial-gradient(circle at 18% 82%,rgba(56,189,248,.16),transparent 26%),repeating-linear-gradient(90deg,rgba(23,37,84,.052) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,197,94,.040) 0 1px,transparent 1px 38px);}
+    body[data-layout="channel-traffic-quality"] .slide::after{content:"";position:absolute;left:5.5%;right:5.5%;top:8.8%;bottom:8.2%;z-index:1;border-radius:26px;background:rgba(255,255,255,.95);border:1px solid rgba(23,37,84,.12);box-shadow:0 24px 54px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.78);}
+    body[data-layout="channel-traffic-quality"] .accent{left:5.5%;right:5.5%;top:8.8%;height:7px;z-index:4;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary),var(--template-accent),var(--template-warning));}
+    body[data-layout="channel-traffic-quality"] .channel-quality-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-kicker{position:absolute;left:8.2%;top:14.2%;font-size:11.5px;font-weight:900;letter-spacing:.15em;color:var(--template-accent);}
+    body[data-layout="channel-traffic-quality"] .channel-quality-title{position:absolute;left:8.2%;top:20.2%;width:42%;margin:0;color:var(--template-title);font-size:34px;line-height:1.1;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-summary{position:absolute;left:8.3%;top:39.5%;width:37%;font-size:12px;line-height:1.48;font-weight:800;color:#475569;overflow-wrap:anywhere;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-bullets{position:absolute;left:8.5%;top:50.2%;width:37%;margin:0;padding-left:1.05em;font-size:11.5px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-bullets li{margin:.16em 0;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-metrics{position:absolute;left:8.2%;right:48.8%;bottom:13.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-metrics span{min-height:62px;border-radius:14px;background:#fff;border:1px solid rgba(23,37,84,.11);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(15,23,42,.08);display:grid;align-content:center;gap:3px;padding:10px 12px;font-size:10.5px;font-weight:850;color:#587083;}
+    body[data-layout="channel-traffic-quality"] .channel-quality-metrics span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="channel-traffic-quality"] .channel-quality-metrics span:nth-child(3){border-top-color:var(--template-warning);}
+    body[data-layout="channel-traffic-quality"] .channel-quality-metrics strong{font-size:19px;line-height:1;color:var(--template-title);}
+    body[data-layout="channel-traffic-quality"] .channel-network{position:absolute;right:8.2%;top:17.5%;width:38.5%;height:44%;border-radius:22px;background:linear-gradient(135deg,#fff,#eef8ff);border:1px solid rgba(23,37,84,.12);box-shadow:0 18px 36px rgba(15,23,42,.10);overflow:hidden;}
+    body[data-layout="channel-traffic-quality"] .channel-network::before{content:"";position:absolute;left:10%;right:10%;top:48%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent),var(--template-warning));transform:skewY(-8deg);box-shadow:0 0 22px rgba(34,197,94,.22);}
+    body[data-layout="channel-traffic-quality"] .channel-network::after{content:"";position:absolute;left:16%;right:16%;top:24%;height:36%;border-radius:50%;border-top:7px solid rgba(56,189,248,.22);}
+    body[data-layout="channel-traffic-quality"] .channel-network i{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--template-secondary);box-shadow:0 0 0 7px rgba(56,189,248,.12);}
+    body[data-layout="channel-traffic-quality"] .channel-network i:nth-child(1){left:16%;top:57%;}body[data-layout="channel-traffic-quality"] .channel-network i:nth-child(2){left:33%;top:39%;border-color:var(--template-accent);box-shadow:0 0 0 7px rgba(34,197,94,.12);}body[data-layout="channel-traffic-quality"] .channel-network i:nth-child(3){left:54%;top:34%;}body[data-layout="channel-traffic-quality"] .channel-network i:nth-child(4){left:75%;top:24%;border-color:var(--template-warning);box-shadow:0 0 0 7px rgba(245,158,11,.13);}
+    body[data-layout="channel-traffic-quality"] .channel-score-ring{position:absolute;right:12%;top:18.5%;width:29%;height:42%;border-radius:50%;background:radial-gradient(circle,#fff 0 35%,transparent 36%),conic-gradient(var(--template-accent) 0 72%,var(--template-warning) 72% 86%,#e2e8f0 86%);box-shadow:0 18px 36px rgba(15,23,42,.10);}
+    body[data-layout="channel-traffic-quality"] .channel-score-ring::after{content:"82";position:absolute;inset:34%;display:grid;place-items:center;border-radius:50%;background:#fff;color:var(--template-primary);font-size:30px;font-weight:900;box-shadow:inset 0 0 0 1px rgba(23,37,84,.10);}
+    body[data-layout="channel-traffic-quality"] .channel-score-grid{position:absolute;right:8.3%;top:61.5%;width:38%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="channel-traffic-quality"] .channel-score-grid span,.channel-action-grid span{min-height:72px;border-radius:15px;background:#fff;border:1px solid rgba(23,37,84,.11);box-shadow:0 12px 24px rgba(15,23,42,.08);padding:13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="channel-traffic-quality"] .channel-score-grid span::before,.channel-action-grid span::before{content:"";display:block;width:28px;height:6px;margin-bottom:10px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="channel-traffic-quality"] .channel-funnel{position:absolute;right:8.2%;top:19%;width:39%;display:grid;gap:12px;align-content:start;}
+    body[data-layout="channel-traffic-quality"] .channel-funnel span{height:48px;border-radius:15px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary));box-shadow:0 12px 24px rgba(15,23,42,.10);display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#fff;font-size:12px;font-weight:900;}
+    body[data-layout="channel-traffic-quality"] .channel-funnel span:nth-child(2){margin-left:7%;width:86%;background:linear-gradient(90deg,#0ea5e9,#22c55e);}body[data-layout="channel-traffic-quality"] .channel-funnel span:nth-child(3){margin-left:16%;width:68%;background:linear-gradient(90deg,#059669,#22c55e);}body[data-layout="channel-traffic-quality"] .channel-funnel span:nth-child(4){margin-left:27%;width:50%;background:linear-gradient(90deg,#f59e0b,#f97316);}
+    body[data-layout="channel-traffic-quality"] .channel-matrix{position:absolute;right:8.2%;top:18.5%;width:38.5%;height:43%;border-radius:20px;background:#fff;border:1px solid rgba(23,37,84,.12);box-shadow:0 16px 32px rgba(15,23,42,.09);overflow:hidden;}
+    body[data-layout="channel-traffic-quality"] .channel-matrix::before{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:2px;background:rgba(23,37,84,.18);}body[data-layout="channel-traffic-quality"] .channel-matrix::after{content:"";position:absolute;left:12%;right:12%;top:50%;height:2px;background:rgba(23,37,84,.18);}
+    body[data-layout="channel-traffic-quality"] .channel-matrix i{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 8px rgba(34,197,94,.12);}body[data-layout="channel-traffic-quality"] .channel-matrix i:nth-child(1){left:68%;top:24%;}body[data-layout="channel-traffic-quality"] .channel-matrix i:nth-child(2){left:30%;top:36%;background:var(--template-secondary);box-shadow:0 0 0 8px rgba(56,189,248,.12);}body[data-layout="channel-traffic-quality"] .channel-matrix i:nth-child(3){left:58%;top:68%;background:var(--template-warning);box-shadow:0 0 0 8px rgba(245,158,11,.13);}body[data-layout="channel-traffic-quality"] .channel-matrix i:nth-child(4){left:24%;top:70%;background:#ef4444;box-shadow:0 0 0 8px rgba(239,68,68,.11);}
+    body[data-layout="channel-traffic-quality"] .channel-action-grid{position:absolute;left:8.2%;right:8.2%;bottom:13.5%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="channel-traffic-quality"] .channel-roadmap{position:absolute;right:9%;top:22%;width:34%;height:36%;border-radius:50%;border:16px solid rgba(56,189,248,.18);border-left-color:var(--template-accent);border-bottom-color:var(--template-secondary);box-shadow:inset 0 0 0 13px rgba(245,158,11,.08);}
+    body[data-layout="channel-traffic-quality"] .channel-roadmap::after{content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;border-radius:22px;background:var(--template-primary);transform:translate(-50%,-50%);box-shadow:0 16px 30px rgba(15,23,42,.18);}
+    body[data-layout="channel-traffic-quality"] .page-number{z-index:6;right:6.7%;bottom:5.6%;background:rgba(255,255,255,.86);border:1px solid rgba(23,37,84,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.62);}
     body[data-layout="user-path-funnel"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbff 0%,var(--template-bg) 56%,#eef7ff 100%);box-shadow:0 22px 58px rgba(15,23,42,.16);}
     body[data-layout="user-path-funnel"] .slide::before{background:repeating-linear-gradient(90deg,rgba(23,37,84,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(6,182,212,.045) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(6,182,212,.18),transparent 25%);}
     body[data-layout="user-path-funnel"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9%;bottom:8.5%;z-index:1;border-radius:24px;background:rgba(255,255,255,.94);border:1px solid rgba(23,37,84,.11);box-shadow:0 24px 54px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.74);}
@@ -2972,6 +3101,36 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="customer-segmentation-layering"] .segment-action{position:absolute;right:9%;top:23%;width:34%;height:36%;border-radius:50%;border:16px solid rgba(20,184,166,.18);border-left-color:var(--template-primary);border-bottom-color:var(--template-secondary);box-shadow:inset 0 0 0 14px rgba(168,85,247,.10);}
     body[data-layout="customer-segmentation-layering"] .segment-action::after{content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;border-radius:22px;background:var(--template-primary);transform:translate(-50%,-50%);box-shadow:0 16px 30px rgba(15,23,42,.18);}
     body[data-layout="customer-segmentation-layering"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(15,23,42,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.62);}
+    body[data-layout="data-governance-standard"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbfd 0%,var(--template-bg) 56%,#eef7fa 100%);box-shadow:0 24px 60px rgba(16,42,67,.16);}
+    body[data-layout="data-governance-standard"] .slide::before{background:repeating-linear-gradient(90deg,rgba(16,42,67,.045) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(0,167,181,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 20%,rgba(0,167,181,.14),transparent 24%),radial-gradient(circle at 16% 82%,rgba(217,164,65,.14),transparent 25%);}
+    body[data-layout="data-governance-standard"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8.8%;bottom:8.7%;z-index:1;border-radius:28px;background:rgba(255,255,255,.95);border:1px solid rgba(16,42,67,.12);box-shadow:0 24px 58px rgba(16,42,67,.12),inset 0 0 0 1px rgba(255,255,255,.82);}
+    body[data-layout="data-governance-standard"] .accent{left:5.8%;right:5.8%;top:8.8%;height:6px;z-index:3;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="data-governance-standard"] .governance-layer{position:absolute;inset:0;z-index:4;color:var(--template-body);pointer-events:none;}
+    body[data-layout="data-governance-standard"] .governance-kicker{position:absolute;left:8.3%;top:13.7%;font-size:11px;font-weight:900;letter-spacing:.17em;color:var(--template-accent);}
+    body[data-layout="data-governance-standard"] .governance-title{position:absolute;left:8.3%;top:20.4%;width:42%;margin:0;color:var(--template-title);font-size:32px;line-height:1.1;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="data-governance-standard"] .governance-summary{position:absolute;left:8.5%;top:43%;width:38%;font-size:13px;line-height:1.45;font-weight:800;color:var(--template-body);}
+    body[data-layout="data-governance-standard"] .governance-bullets{position:absolute;left:8.6%;top:52%;width:38%;margin:0;padding-left:1.05em;font-size:12px;line-height:1.45;color:var(--template-body);}
+    body[data-layout="data-governance-standard"] .governance-bullets li{margin:.08em 0;}
+    body[data-layout="data-governance-standard"] .governance-map{position:absolute;right:8%;top:17.2%;width:39%;height:43%;border-radius:24px;background:linear-gradient(135deg,#fff,#f4fbfc);border:1px solid rgba(16,42,67,.12);box-shadow:0 18px 36px rgba(16,42,67,.10);}
+    body[data-layout="data-governance-standard"] .governance-map::before{content:"";position:absolute;left:50%;top:50%;width:88px;height:88px;border-radius:50%;background:var(--template-primary);transform:translate(-50%,-50%);box-shadow:0 0 0 16px rgba(0,167,181,.10),0 0 38px rgba(16,42,67,.18);}
+    body[data-layout="data-governance-standard"] .governance-map::after{content:"标准";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:900;color:#fff;}
+    body[data-layout="data-governance-standard"] .governance-map i{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 8px rgba(0,167,181,.12);}
+    body[data-layout="data-governance-standard"] .governance-map i:nth-child(1){left:18%;top:22%;}body[data-layout="data-governance-standard"] .governance-map i:nth-child(2){right:18%;top:20%;background:var(--template-secondary);box-shadow:0 0 0 8px rgba(217,164,65,.13);}body[data-layout="data-governance-standard"] .governance-map i:nth-child(3){left:17%;bottom:23%;background:var(--template-primary);}body[data-layout="data-governance-standard"] .governance-map i:nth-child(4){right:17%;bottom:22%;}body[data-layout="data-governance-standard"] .governance-map i:nth-child(5){left:49%;top:11%;background:var(--template-secondary);box-shadow:0 0 0 8px rgba(217,164,65,.13);}
+    body[data-layout="data-governance-standard"] .governance-cards{position:absolute;left:8.4%;right:8.4%;bottom:13.6%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="data-governance-standard"] .governance-cards span{min-height:72px;border-radius:15px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 12px 24px rgba(16,42,67,.08);padding:13px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="data-governance-standard"] .governance-cards span::before{content:"";display:block;width:26px;height:6px;margin-bottom:9px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="data-governance-standard"] .governance-dictionary{position:absolute;right:8%;top:17.5%;width:42%;height:45%;border-radius:20px;background:#fff;border:1px solid rgba(16,42,67,.13);box-shadow:0 16px 32px rgba(16,42,67,.10);overflow:hidden;}
+    body[data-layout="data-governance-standard"] .governance-dictionary::before{content:"";position:absolute;left:0;right:0;top:0;height:38px;background:var(--template-primary);}
+    body[data-layout="data-governance-standard"] .governance-dictionary span{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:49px 18px -37px;padding:8px 10px;border-radius:10px;background:#f7fbfc;font-size:10px;font-weight:900;color:var(--template-title);}
+    body[data-layout="data-governance-standard"] .governance-compare{position:absolute;right:8%;top:18.2%;width:41%;height:42%;display:grid;grid-template-columns:1fr 44px 1fr;gap:10px;align-items:stretch;}
+    body[data-layout="data-governance-standard"] .governance-compare span{border-radius:18px;background:#fff;border:1px solid rgba(16,42,67,.13);box-shadow:0 12px 26px rgba(16,42,67,.08);padding:18px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="data-governance-standard"] .governance-compare b{align-self:center;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));box-shadow:0 0 0 9px rgba(0,167,181,.10);}
+    body[data-layout="data-governance-standard"] .governance-loop{position:absolute;right:10.5%;top:20.5%;width:31%;height:38%;border-radius:50%;border:16px solid rgba(0,167,181,.16);border-left-color:var(--template-primary);border-bottom-color:var(--template-secondary);}
+    body[data-layout="data-governance-standard"] .governance-loop::after{content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;border-radius:22px;background:var(--template-primary);transform:translate(-50%,-50%);box-shadow:0 16px 30px rgba(16,42,67,.18);}
+    body[data-layout="data-governance-standard"] .governance-roadmap{position:absolute;right:8.5%;top:21%;width:37%;height:38%;border-radius:22px;background:#fff;border:1px solid rgba(16,42,67,.12);box-shadow:0 16px 32px rgba(16,42,67,.09);padding:24px 22px;}
+    body[data-layout="data-governance-standard"] .governance-roadmap::before{content:"";position:absolute;left:32px;right:32px;top:50%;height:3px;background:rgba(16,42,67,.16);}
+    body[data-layout="data-governance-standard"] .governance-roadmap span{position:relative;display:inline-grid;place-items:center;width:30%;height:72px;margin-right:3%;border-radius:18px;background:#f7fbfc;border:1px solid rgba(16,42,67,.10);font-size:11px;font-weight:900;color:var(--template-title);text-align:center;}
+    body[data-layout="data-governance-standard"] .page-number{z-index:5;right:7%;bottom:5.9%;background:rgba(255,255,255,.88);border:1px solid rgba(16,42,67,.12);border-radius:999px;padding:5px 10px;color:rgba(16,42,67,.62);}
     body[data-layout="metric-anomaly-attribution"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 55%,#eef7fb 100%);box-shadow:0 24px 60px rgba(15,23,42,.16);}
     body[data-layout="metric-anomaly-attribution"] .slide::before{background:repeating-linear-gradient(90deg,rgba(15,23,42,.045) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(6,182,212,.035) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(239,68,68,.12),transparent 25%),radial-gradient(circle at 17% 82%,rgba(6,182,212,.12),transparent 25%);}
     body[data-layout="metric-anomaly-attribution"] .slide::after{content:"";position:absolute;left:5.7%;right:5.7%;top:9%;bottom:8.6%;z-index:1;border-radius:24px;background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.11);box-shadow:0 25px 58px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.82);}
@@ -3655,6 +3814,50 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="teaching-achievement-showcase"] .achievement-summary{position:absolute;right:8%;top:18%;width:34%;height:44%;display:grid;gap:12px;}
     body[data-layout="teaching-achievement-showcase"] .achievement-summary span{border-radius:16px;background:#fff;border-left:6px solid var(--template-accent);box-shadow:0 12px 24px rgba(23,37,84,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="teaching-achievement-showcase"] .page-number{z-index:5;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.86);border:1px solid rgba(30,58,138,.12);border-radius:999px;padding:5px 10px;color:rgba(23,37,84,.66);}
+    body[data-layout="education-workshop-practice-review"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7f5ee 0%,#ffffff 48%,#edf7f4 100%);box-shadow:0 22px 58px rgba(18,38,58,.14);}
+    body[data-layout="education-workshop-practice-review"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(246,200,95,.22),transparent 25%),radial-gradient(circle at 12% 80%,rgba(24,169,153,.14),transparent 28%),repeating-linear-gradient(90deg,rgba(20,80,90,.045) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(20,80,90,.03) 0 1px,transparent 1px 40px);pointer-events:none;}
+    body[data-layout="education-workshop-practice-review"] .slide::after{content:"";position:absolute;left:5.5%;right:5.5%;top:8%;bottom:8%;z-index:1;border-radius:24px;background:rgba(255,255,255,.94);border:1px solid rgba(20,80,90,.12);box-shadow:0 24px 52px rgba(18,38,58,.10),inset 0 0 0 1px rgba(255,255,255,.72);}
+    body[data-layout="education-workshop-practice-review"] .accent{left:5.5%;right:5.5%;top:8%;height:7px;z-index:3;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary),var(--template-warning));}
+    body[data-layout="education-workshop-practice-review"] .slide-content{display:none;}
+    body[data-layout="education-workshop-practice-review"] .workshop-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="education-workshop-practice-review"] .workshop-kicker{position:absolute;left:8.4%;top:13.4%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="education-workshop-practice-review"] .workshop-title{position:absolute;left:8.4%;top:19.5%;width:41%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="education-workshop-practice-review"] .workshop-rule{position:absolute;left:8.4%;top:39.8%;width:31%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="education-workshop-practice-review"] .workshop-bullets{position:absolute;left:8.6%;top:46.8%;width:37%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.48;font-weight:800;color:var(--template-body);}
+    body[data-layout="education-workshop-practice-review"] .workshop-bullets li{margin:.08em 0;}
+    body[data-layout="education-workshop-practice-review"] .workshop-board{position:absolute;right:8%;top:16%;width:37%;height:48%;border-radius:22px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 18px 38px rgba(18,38,58,.10);overflow:hidden;}
+    body[data-layout="education-workshop-practice-review"] .workshop-board::before{content:"";position:absolute;left:9%;right:9%;top:14%;height:9%;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));}
+    body[data-layout="education-workshop-practice-review"] .workshop-board::after{content:"";position:absolute;left:11%;right:11%;bottom:15%;height:48%;border-radius:16px;background:linear-gradient(135deg,rgba(24,169,153,.13),rgba(246,200,95,.22));}
+    body[data-layout="education-workshop-practice-review"] .workshop-board i{position:absolute;display:block;border-radius:12px;box-shadow:0 8px 16px rgba(18,38,58,.08);}
+    body[data-layout="education-workshop-practice-review"] .workshop-board i:nth-child(1){left:15%;top:37%;width:24%;height:22%;background:#fff3c4;transform:rotate(-4deg);}body[data-layout="education-workshop-practice-review"] .workshop-board i:nth-child(2){left:43%;top:42%;width:24%;height:22%;background:#e6f7f4;transform:rotate(3deg);}body[data-layout="education-workshop-practice-review"] .workshop-board i:nth-child(3){right:12%;top:34%;width:20%;height:30%;background:#ffe7da;transform:rotate(-2deg);}
+    body[data-layout="education-workshop-practice-review"] .workshop-outcomes{position:absolute;left:8.4%;right:48%;bottom:14.2%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-outcomes span{min-height:72px;border-radius:16px;background:#fff;border:1px solid rgba(20,80,90,.12);border-top:6px solid var(--template-accent);box-shadow:0 10px 22px rgba(18,38,58,.08);padding:13px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-flow{position:absolute;right:8%;top:21%;width:40%;height:36%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:center;}
+    body[data-layout="education-workshop-practice-review"] .workshop-flow span{position:relative;min-height:112px;border-radius:18px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 12px 26px rgba(18,38,58,.09);padding:48px 12px 12px;font-size:12px;font-weight:900;text-align:center;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-flow span::before{content:attr(data-step);position:absolute;left:50%;top:14px;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--template-accent);color:#fff;font-size:10px;box-shadow:0 0 0 7px rgba(24,169,153,.12);}
+    body[data-layout="education-workshop-practice-review"] .workshop-canvas-line{position:absolute;right:9%;bottom:17%;width:37%;height:10%;border-bottom:4px dashed rgba(20,80,90,.28);border-radius:50%;}
+    body[data-layout="education-workshop-practice-review"] .workshop-sticky-wall{position:absolute;right:8%;top:17%;width:39%;height:43%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-sticky-wall span{border-radius:14px;background:#fff3c4;border:1px solid rgba(246,200,95,.45);box-shadow:0 12px 24px rgba(18,38,58,.09);padding:16px 14px;font-size:12px;font-weight:900;color:var(--template-title);transform:rotate(-2deg);}
+    body[data-layout="education-workshop-practice-review"] .workshop-sticky-wall span:nth-child(2n){background:#e6f7f4;border-color:rgba(24,169,153,.28);transform:rotate(2deg);}body[data-layout="education-workshop-practice-review"] .workshop-sticky-wall span:nth-child(3){background:#ffe7da;border-color:rgba(239,131,84,.28);}
+    body[data-layout="education-workshop-practice-review"] .workshop-group-row{position:absolute;left:8.5%;right:8.5%;bottom:14%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-group-row span{min-height:54px;border-radius:999px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 8px 18px rgba(18,38,58,.07);display:grid;place-items:center;font-size:12px;font-weight:900;color:var(--template-primary);}
+    body[data-layout="education-workshop-practice-review"] .workshop-feedback-matrix{position:absolute;right:8%;top:17%;width:39%;height:47%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-feedback-matrix span{position:relative;border-radius:18px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 12px 24px rgba(18,38,58,.08);padding:38px 15px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-feedback-matrix span::before{content:"";position:absolute;left:15px;top:15px;width:34px;height:7px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="education-workshop-practice-review"] .workshop-vote-row{position:absolute;left:8.5%;right:52%;bottom:14.5%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-vote-row i{height:44px;border-radius:12px;background:#fff3c4;border:1px solid rgba(246,200,95,.38);box-shadow:0 8px 18px rgba(18,38,58,.07);}
+    body[data-layout="education-workshop-practice-review"] .workshop-vote-row i:nth-child(2){background:#e6f7f4;}body[data-layout="education-workshop-practice-review"] .workshop-vote-row i:nth-child(3){background:#ffe7da;}body[data-layout="education-workshop-practice-review"] .workshop-vote-row i:nth-child(4){background:#f8fafb;}
+    body[data-layout="education-workshop-practice-review"] .workshop-retro-board{position:absolute;right:8%;top:18%;width:39%;height:46%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-retro-board span{border-radius:18px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 12px 24px rgba(18,38,58,.08);padding:18px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-retro-board span::before{content:"";display:block;width:28px;height:28px;margin-bottom:12px;border-radius:9px;background:var(--template-secondary);}
+    body[data-layout="education-workshop-practice-review"] .workshop-retro-arrow{position:absolute;right:11%;bottom:16%;width:31%;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--template-warning),var(--template-accent));}
+    body[data-layout="education-workshop-practice-review"] .workshop-action-kanban{position:absolute;right:7.8%;top:16.5%;width:40%;height:50%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-action-kanban span{position:relative;border-radius:18px;background:#fff;border:1px solid rgba(20,80,90,.12);box-shadow:0 12px 24px rgba(18,38,58,.08);padding:42px 14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-action-kanban span::before{content:"负责人 " attr(data-owner);position:absolute;left:14px;top:13px;border-radius:999px;background:rgba(24,169,153,.12);color:var(--template-primary);padding:5px 10px;font-size:10px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-summary-stack{position:absolute;right:8%;top:18%;width:37%;display:grid;gap:12px;}
+    body[data-layout="education-workshop-practice-review"] .workshop-summary-stack span{min-height:82px;border-radius:18px;background:#fff;border-left:7px solid var(--template-accent);box-shadow:0 12px 24px rgba(18,38,58,.08);padding:18px 16px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="education-workshop-practice-review"] .workshop-flow-summary{left:8.5%;right:auto;top:auto;bottom:14%;width:38%;height:auto;}
+    body[data-layout="education-workshop-practice-review"] .page-number{z-index:6;right:7.2%;bottom:6.1%;background:rgba(255,255,255,.84);border:1px solid rgba(20,80,90,.12);border-radius:999px;padding:5px 10px;color:rgba(18,38,58,.62);}
     body[data-layout="education-course"] .slide{background:linear-gradient(135deg,var(--template-bg),#fff 54%,color-mix(in srgb,var(--template-accent) 9%,var(--template-bg) 91%));padding:7% 8.5% 6.6%;border:0;}
     body[data-layout="education-course"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--template-primary) 6%,transparent) 0 1px,transparent 1px 30px),radial-gradient(circle at 12% 16%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 22%);pointer-events:none;}
     body[data-layout="education-course"] .slide::after{content:"";position:absolute;left:8.8%;right:8.2%;top:13.5%;bottom:11%;border-radius:2px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.90));border-left:8px solid color-mix(in srgb,var(--template-primary) 70%,var(--template-accent) 30%);box-shadow:0 18px 40px rgba(33,78,68,.12);}
@@ -4090,6 +4293,40 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="annual-summary"] .annual-summary-timeline::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),color-mix(in srgb,var(--template-primary) 28%,#fff 72%));}
     body[data-layout="annual-summary"] .annual-summary-timeline span{position:relative;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--template-accent);}
     body[data-layout="annual-summary"] .page-number{z-index:8;right:7.4%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 68%,transparent);background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-layout="public-course-enrollment"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbff 0%,var(--template-bg) 58%,#e2f7fb 100%);}
+    body[data-layout="public-course-enrollment"] .slide::before{background:radial-gradient(circle at 82% 20%,rgba(36,198,220,.18),transparent 24%),radial-gradient(circle at 16% 82%,rgba(255,107,61,.12),transparent 28%),repeating-linear-gradient(90deg,rgba(23,58,106,.052) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(23,58,106,.035) 0 1px,transparent 1px 38px);}
+    body[data-layout="public-course-enrollment"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:8.8%;bottom:8.4%;z-index:1;border-radius:24px;background:rgba(255,255,255,.94);border:1px solid rgba(23,58,106,.13);box-shadow:0 24px 54px rgba(15,35,59,.14);}
+    body[data-layout="public-course-enrollment"] .accent{height:6.2%;z-index:2;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary) 62%,var(--template-accent));box-shadow:0 8px 24px rgba(23,58,106,.12);}
+    body[data-layout="public-course-enrollment"] .public-course-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="public-course-enrollment"] .public-course-kicker{position:absolute;left:8.4%;top:14.2%;font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--template-secondary);}
+    body[data-layout="public-course-enrollment"] .public-course-title{position:absolute;left:8.4%;top:21.2%;width:43%;margin:0;color:var(--template-title);font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="public-course-enrollment"] .public-course-summary{position:absolute;left:8.5%;top:41.5%;width:37%;font-size:13px;line-height:1.46;font-weight:800;color:#40536a;overflow-wrap:anywhere;}
+    body[data-layout="public-course-enrollment"] .public-course-bullets{position:absolute;left:8.5%;top:52%;width:37%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.45;font-weight:800;color:var(--template-body);}
+    body[data-layout="public-course-enrollment"] .public-course-bullets li{margin:.12em 0;} body[data-layout="public-course-enrollment"] .public-course-bullets li::marker{color:var(--template-accent);}
+    body[data-layout="public-course-enrollment"] .public-course-live{position:absolute;right:8%;top:17%;width:39%;height:46%;border-radius:22px;background:#fff;border:1px solid rgba(23,58,106,.12);box-shadow:0 18px 38px rgba(15,35,59,.12);overflow:hidden;}
+    body[data-layout="public-course-enrollment"] .public-course-live::before{content:"";position:absolute;left:7%;top:11%;width:56%;height:62%;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--template-secondary) 20%,#fff 80%),#eefaff);}
+    body[data-layout="public-course-enrollment"] .public-course-live::after{content:"LIVE";position:absolute;right:9%;top:12%;padding:6px 14px;border-radius:999px;background:var(--template-accent);color:#fff;font-size:11px;font-weight:900;letter-spacing:.08em;}
+    body[data-layout="public-course-enrollment"] .public-course-live i{position:absolute;left:18%;top:25%;width:48px;height:48px;border-radius:50%;background:var(--template-secondary);box-shadow:0 54px 0 18px rgba(23,58,106,.18);}
+    body[data-layout="public-course-enrollment"] .public-course-live b{position:absolute;right:10%;bottom:15%;width:26%;height:28%;border-radius:16px;background:color-mix(in srgb,var(--template-accent) 18%,#fff 82%);}
+    body[data-layout="public-course-enrollment"] .public-course-live span{position:absolute;right:10%;height:9px;border-radius:999px;background:color-mix(in srgb,var(--template-primary) 20%,#fff 80%);}body[data-layout="public-course-enrollment"] .public-course-live span:nth-of-type(1){top:34%;width:22%;}body[data-layout="public-course-enrollment"] .public-course-live span:nth-of-type(2){top:43%;width:29%;}body[data-layout="public-course-enrollment"] .public-course-live span:nth-of-type(3){top:52%;width:18%;}
+    body[data-layout="public-course-enrollment"] .public-course-metrics{position:absolute;left:8.4%;right:48%;bottom:14.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="public-course-enrollment"] .public-course-metrics span{min-height:62px;border-radius:15px;background:#fff;border:1px solid rgba(23,58,106,.12);box-shadow:0 10px 22px rgba(15,35,59,.08);display:grid;align-content:center;gap:3px;padding:11px 13px;font-size:10.5px;font-weight:800;color:var(--template-body);border-top:5px solid var(--template-secondary);}
+    body[data-layout="public-course-enrollment"] .public-course-metrics strong{font-size:20px;line-height:1;color:var(--template-title);}
+    body[data-layout="public-course-enrollment"] .public-course-hook,.public-course-value,.public-course-action{position:absolute;right:8%;top:19%;width:39%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="public-course-enrollment"] .public-course-hook span,.public-course-value span,.public-course-action span{min-height:92px;border-radius:18px;background:#fff;border:1px solid rgba(23,58,106,.12);box-shadow:0 12px 26px rgba(15,35,59,.09);padding:17px 15px;font-size:13px;line-height:1.35;font-weight:900;color:var(--template-title);border-left:7px solid var(--template-accent);}
+    body[data-layout="public-course-enrollment"] .public-course-value{top:18%;}body[data-layout="public-course-enrollment"] .public-course-value span:nth-child(2),body[data-layout="public-course-enrollment"] .public-course-action span:nth-child(2){border-left-color:var(--template-secondary);}body[data-layout="public-course-enrollment"] .public-course-value span:nth-child(3),body[data-layout="public-course-enrollment"] .public-course-action span:nth-child(3){border-left-color:var(--template-success);}
+    body[data-layout="public-course-enrollment"] .public-course-poster{position:absolute;right:10%;bottom:15%;width:33%;height:22%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-accent) 10%,#fff 90%));border:1px solid rgba(23,58,106,.12);box-shadow:0 12px 24px rgba(15,35,59,.08);}
+    body[data-layout="public-course-enrollment"] .public-course-poster i{position:absolute;left:8%;top:22%;width:44%;height:12px;border-radius:999px;background:var(--template-primary);}body[data-layout="public-course-enrollment"] .public-course-poster b{position:absolute;left:8%;top:45%;width:58%;height:8px;border-radius:999px;background:var(--template-secondary);}body[data-layout="public-course-enrollment"] .public-course-poster span{position:absolute;left:8%;bottom:18%;width:24%;height:18px;border-radius:9px;background:var(--template-accent);}body[data-layout="public-course-enrollment"] .public-course-poster span:nth-of-type(2){left:38%;width:18%;background:var(--template-success);}body[data-layout="public-course-enrollment"] .public-course-poster em{position:absolute;right:9%;top:28%;width:54px;height:54px;border-radius:50%;background:var(--template-warning);}
+    body[data-layout="public-course-enrollment"] .public-course-agenda{position:absolute;right:8%;top:18%;width:39%;display:grid;gap:10px;}
+    body[data-layout="public-course-enrollment"] .public-course-agenda span{position:relative;min-height:58px;border-radius:15px;background:#fff;border:1px solid rgba(23,58,106,.12);box-shadow:0 10px 22px rgba(15,35,59,.08);padding:15px 16px 12px 56px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="public-course-enrollment"] .public-course-agenda span::before{content:attr(data-step);position:absolute;left:16px;top:15px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--template-primary);color:#fff;font-size:11px;}
+    body[data-layout="public-course-enrollment"] .public-course-path{position:absolute;left:8.4%;right:8.4%;bottom:15%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="public-course-enrollment"] .public-course-path::before{content:"";position:absolute;left:8%;right:8%;top:34px;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-secondary),var(--template-accent));}
+    body[data-layout="public-course-enrollment"] .public-course-path span{position:relative;min-height:98px;border-radius:18px;background:#fff;border:1px solid rgba(23,58,106,.12);box-shadow:0 12px 26px rgba(15,35,59,.09);padding:50px 14px 12px;text-align:center;font-size:12px;line-height:1.35;font-weight:900;color:var(--template-title);}
+    body[data-layout="public-course-enrollment"] .public-course-path span::before{content:attr(data-step);position:absolute;left:50%;top:13px;transform:translateX(-50%);min-width:54px;height:30px;border-radius:999px;background:var(--template-primary);color:#fff;display:grid;place-items:center;font-size:11px;}
+    body[data-layout="public-course-enrollment"] .public-course-path span:nth-child(2)::before{background:var(--template-success);}body[data-layout="public-course-enrollment"] .public-course-path span:nth-child(3)::before{background:var(--template-secondary);}body[data-layout="public-course-enrollment"] .public-course-path span:nth-child(4)::before{background:var(--template-accent);}
+    body[data-layout="public-course-enrollment"] .public-course-cta{position:absolute;right:9%;top:22%;min-width:150px;height:48px;border-radius:999px;background:linear-gradient(135deg,var(--template-accent),#ff8b5f);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900;box-shadow:0 16px 28px rgba(255,107,61,.22);}
+    body[data-layout="public-course-enrollment"] .page-number{z-index:4;right:7.2%;bottom:6.2%;background:rgba(255,255,255,.8);border:1px solid rgba(23,58,106,.12);border-radius:999px;padding:5px 10px;color:rgba(16,35,59,.62);}
     body[data-layout="red-gold"] .slide{background-image:var(--dome-content-bg),linear-gradient(135deg,var(--template-primary),var(--dome-title-grad-end) 58%,var(--dome-title-grad-start));background-size:cover;background-position:center;border:0;padding:10.5% 12% 9%;box-shadow:0 22px 58px rgba(var(--dome-accent-rgb),.18);outline:1px solid rgba(var(--dome-frame-stroke-rgb),.24);}
     body[data-layout="red-gold"] .slide-cover{background-image:var(--dome-cover-bg),linear-gradient(135deg,var(--template-primary),var(--dome-title-grad-end) 58%,var(--dome-title-grad-start));}
     body[data-layout="red-gold"] .slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 46%),repeating-linear-gradient(115deg,rgba(var(--dome-accent-rgb),.05) 0 1px,transparent 1px 42px);}
@@ -6790,6 +7027,90 @@ function isTeachingAchievementShowcaseVisual(visual) {
   return visual?.layout === "teaching-achievement-showcase" && (id === "teaching-achievement-report" || id === "education-teaching-achievement-report-showcase");
 }
 
+function workshopPracticeReviewPreviewScene({ slide, index, total }) {
+  const bullets = workshopPracticeReviewTexts(slide);
+  const layout = String(slide?.layout || "");
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("action")
+      ? "actions"
+      : index === total - 1 || layout.includes("summary") || layout === "closing"
+        ? "summary"
+      : layout.includes("flow")
+        ? "flow"
+        : layout.includes("cocreation") || layout.includes("group")
+          ? "cocreation"
+          : layout.includes("feedback") || layout.includes("practice")
+            ? "feedback"
+            : layout.includes("retro") || layout.includes("review")
+              ? "retro"
+              : ["flow", "cocreation", "feedback", "retro", "actions"][(index - 1) % 5];
+  const kickerMap = {
+    cover: "WORKSHOP CANVAS",
+    flow: "REVIEW FLOW",
+    cocreation: "GROUP OUTPUT",
+    feedback: "PRACTICE FEEDBACK",
+    retro: "RETRO BOARD",
+    actions: "ACTION PLAN",
+    summary: "NEXT PRACTICE",
+  };
+  return {
+    variant: "practice-review",
+    role,
+    kicker: kickerMap[role] || "WORKSHOP CANVAS",
+    title: workshopPracticeReviewCompactText(slide?.title, "研修工作坊复盘", role === "cover" ? 28 : 24),
+    bullets,
+    cards: ["实践结果", "关键发现", "问题原因", "改进行动"].map((fallback, itemIndex) => workshopPracticeReviewCompactText(bullets[itemIndex], fallback, 12)),
+    steps: ["输入", "观察", "洞察", "行动"].map((fallback, itemIndex) => workshopPracticeReviewCompactText(bullets[itemIndex], fallback, 9)),
+    groups: ["A 组", "B 组", "C 组", "D 组"].map((fallback, itemIndex) => workshopPracticeReviewCompactText(bullets[itemIndex], fallback, 8)),
+  };
+}
+
+function renderWorkshopPracticeReviewPreview(slide, scene) {
+  // 研修工作坊模板把复盘过程放入专属白板画布，避免通用正文层挤压便签和行动卡。
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(workshopPracticeReviewCompactText(item, scene.title, 38))}</li>`).join("");
+  const common = `<div class="workshop-kicker">${escapeHtml(scene.kicker)}</div><h2 class="workshop-title">${escapeHtml(scene.title || slide?.title || "")}</h2><div class="workshop-rule"></div><ul class="workshop-bullets">${bulletItems}</ul>`;
+  if (scene.role === "cover") {
+    return `<div class="workshop-layer">${common}<div class="workshop-board"><i></i><i></i><i></i></div><div class="workshop-outcomes">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "flow") {
+    return `<div class="workshop-layer">${common}<div class="workshop-flow">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div><div class="workshop-canvas-line"></div></div>`;
+  }
+  if (scene.role === "cocreation") {
+    return `<div class="workshop-layer">${common}<div class="workshop-sticky-wall">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="workshop-group-row">${scene.groups.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "feedback") {
+    return `<div class="workshop-layer">${common}<div class="workshop-feedback-matrix">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="workshop-vote-row"><i></i><i></i><i></i><i></i></div></div>`;
+  }
+  if (scene.role === "retro") {
+    return `<div class="workshop-layer">${common}<div class="workshop-retro-board">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="workshop-retro-arrow"></div></div>`;
+  }
+  if (scene.role === "actions") {
+    return `<div class="workshop-layer">${common}<div class="workshop-action-kanban">${scene.cards.slice(0, 4).map((item, index) => `<span data-owner="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="workshop-layer">${common}<div class="workshop-summary-stack">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="workshop-flow workshop-flow-summary">${scene.steps.map((item, index) => `<span data-step="${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function workshopPracticeReviewTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || item.action || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["梳理研修后的实践结果和真实反馈", "归纳小组共创结论与关键问题", "形成可追踪的下一轮改进行动"];
+}
+
+function workshopPracticeReviewCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isWorkshopPracticeReviewVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "education-workshop-practice-review" && (id === "workshop-seminar" || id === "education-workshop-seminar-practice-review");
+}
+
 function productRoadmapPreviewScene(visual) {
   const variant = productRoadmapVariant(visual);
   const scenes = {
@@ -7373,6 +7694,72 @@ function isBiExecutiveCockpitVisual(visual) {
 }
 
 /**
+ * 渲染数据治理标准化模板的预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderDataGovernanceStandardPreview(slide, scene) {
+  // 该模板以指标地图、字典表和治理闭环承载内容，默认正文层需要关闭，避免与专属版式叠加。
+  const title = escapeHtml(scene.title || slide?.title || "统一指标定义");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(dataGovernanceCompactText(item, "治理要点", 38))}</li>`).join("");
+  const common = `<div class="governance-kicker">${escapeHtml(scene.kicker)}</div><h2 class="governance-title">${title}</h2><div class="governance-summary">${escapeHtml(scene.summary)}</div><ul class="governance-bullets">${bulletItems}</ul>`;
+  const cards = `<div class="governance-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover" || scene.kind === "overview") {
+    return `<div class="governance-layer">${common}<div class="governance-map"><i></i><i></i><i></i><i></i><i></i></div>${cards}</div>`;
+  }
+  if (scene.kind === "diagnosis") {
+    return `<div class="governance-layer">${common}<div class="governance-compare"><span>${escapeHtml(scene.cards[0])}</span><b></b><span>${escapeHtml(scene.cards[1])}</span></div>${cards}</div>`;
+  }
+  if (scene.kind === "dictionary") {
+    const rows = scene.cards.slice(0, 4).map((item, index) => `<span><b>${escapeHtml(item)}</b><b>${escapeHtml(scene.fields[index] || "定义")}</b><b>${escapeHtml(scene.owners[index] || "负责人")}</b></span>`).join("");
+    return `<div class="governance-layer">${common}<div class="governance-dictionary">${rows}</div>${cards}</div>`;
+  }
+  if (scene.kind === "loop") {
+    return `<div class="governance-layer">${common}<div class="governance-loop"></div>${cards}</div>`;
+  }
+  return `<div class="governance-layer">${common}<div class="governance-roadmap">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${cards}</div>`;
+}
+
+function dataGovernanceStandardPreviewScene({ slide, index, total }) {
+  const bullets = dataGovernanceBulletTexts(slide);
+  const title = dataGovernanceCompactText(slide?.title, "统一指标定义，建立可信数据底座", index === 0 ? 32 : 28);
+  const cards = ["指标定义", "计算逻辑", "数据来源", "责任归属"].map((fallback, itemIndex) => dataGovernanceCompactText(bullets[itemIndex], fallback, 12));
+  const fields = ["业务含义", "取数规则", "更新频率", "版本状态"];
+  const owners = ["数据Owner", "系统Owner", "业务Owner", "治理Owner"];
+  const scenes = [
+    { kind: "cover", variant: "data-governance-standard", kicker: "METRIC STANDARD", title, summary: dataGovernanceCompactText(bullets[0], "统一核心指标定义，形成可复用、可追溯、可运营的数据标准。", 42), bullets, cards, fields, owners },
+    { kind: "overview", variant: "data-governance-standard", kicker: "METRIC MAP", title, summary: dataGovernanceCompactText(bullets[0], "围绕业务域、数据源、负责人和系统表建立指标地图。", 42), bullets, cards: ["业务域", "核心指标", "系统表", "责任人"].map((fallback, itemIndex) => dataGovernanceCompactText(bullets[itemIndex], fallback, 12)), fields, owners },
+    { kind: "diagnosis", variant: "data-governance-standard", kicker: "DEFINITION REVIEW", title, summary: dataGovernanceCompactText(bullets[0], "识别同名指标、口径差异和数据源不一致，推动统一确认。", 42), bullets, cards: ["现状口径", "统一口径", "差异原因", "确认机制"].map((fallback, itemIndex) => dataGovernanceCompactText(bullets[itemIndex], fallback, 12)), fields, owners },
+    { kind: "dictionary", variant: "data-governance-standard", kicker: "METRIC DICTIONARY", title, summary: dataGovernanceCompactText(bullets[0], "沉淀指标字典，明确定义、计算逻辑、数据源和责任归属。", 42), bullets, cards, fields, owners },
+    { kind: "loop", variant: "data-governance-standard", kicker: "GOVERNANCE LOOP", title, summary: dataGovernanceCompactText(bullets[0], "通过发现、确认、发布、落地、监控形成治理闭环。", 42), bullets, cards: ["发现差异", "确认标准", "系统落地", "监控复盘"].map((fallback, itemIndex) => dataGovernanceCompactText(bullets[itemIndex], fallback, 12)), fields, owners },
+  ];
+  if (index === total - 1) {
+    return { kind: "roadmap", variant: "data-governance-standard", kicker: "ROADMAP", title, summary: dataGovernanceCompactText(bullets[0], "分阶段推进标准梳理、系统固化和持续运营。", 42), bullets, cards: ["标准梳理", "系统固化", "持续运营", "责任机制"].map((fallback, itemIndex) => dataGovernanceCompactText(bullets[itemIndex], fallback, 12)), fields, owners };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function dataGovernanceBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["统一核心指标定义和计算规则", "明确数据源、更新频率和责任归属", "建立发布、落地、监控和复盘机制"];
+}
+
+function dataGovernanceCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isDataGovernanceStandardVisual(visual) {
+  return visual?.layout === "data-governance-standard";
+}
+
+/**
  * 渲染指标异常诊断的归因分析预览层。
  * @param {object} slide
  * @param {object} scene
@@ -7600,6 +7987,95 @@ function productRetentionPathCompactText(text, fallback, maxLength) {
 
 function isProductRetentionPathVisual(visual) {
   return visual?.layout === "product-retention-path";
+}
+
+/**
+ * 渲染渠道数据分析的渠道质量诊断预览层。
+ * 标题、指标、来源网络、质量评分和行动卡全部由专属层控制，避免默认正文叠加。
+ *
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderChannelTrafficQualityPreview(slide, scene) {
+  const title = escapeHtml(scene.title || slide?.title || "渠道质量诊断报告");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(channelTrafficCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="channel-quality-kicker">${escapeHtml(scene.kicker)}</div><h2 class="channel-quality-title">${title}</h2><div class="channel-quality-summary">${escapeHtml(scene.summary)}</div><ul class="channel-quality-bullets">${bulletItems}</ul>`;
+  const metrics = `<div class="channel-quality-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover" || scene.kind === "source") {
+    return `<div class="channel-quality-layer">${common}<div class="channel-network"><i></i><i></i><i></i><i></i></div>${metrics}</div>`;
+  }
+  if (scene.kind === "scorecard") {
+    return `<div class="channel-quality-layer">${common}<div class="channel-score-ring"></div><div class="channel-score-grid">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "conversion") {
+    return `<div class="channel-quality-layer">${common}<div class="channel-funnel">${scene.steps.map((step) => `<span><b>${escapeHtml(step.label)}</b><em>${escapeHtml(step.value)}</em></span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.kind === "actions") {
+    return `<div class="channel-quality-layer">${common}<div class="channel-matrix"><i></i><i></i><i></i><i></i></div><div class="channel-action-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="channel-quality-layer">${common}<div class="channel-roadmap"></div><div class="channel-action-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function channelTrafficQualityPreviewScene({ slide, index, total }) {
+  const bullets = channelTrafficBulletTexts(slide);
+  const title = channelTrafficCompactText(slide?.title, "渠道质量诊断报告", index === 0 ? 30 : 28);
+  const values = channelTrafficMetricValues(bullets);
+  const metrics = [
+    { value: values[0], label: channelTrafficCompactText(bullets[0], "有效流量", 8) },
+    { value: values[1], label: channelTrafficCompactText(bullets[1], "转化效率", 8) },
+    { value: values[2], label: channelTrafficCompactText(bullets[2], "低质占比", 8) },
+  ];
+  const steps = ["曝光", "点击", "到站", "成交"].map((label, stepIndex) => ({
+    label: channelTrafficCompactText(bullets[stepIndex], label, 8),
+    value: values[stepIndex] || `${Math.max(18, 88 - stepIndex * 19)}%`,
+  }));
+  const cards = ["优质放量", "观察调价", "低质止损", "复盘验证"].map((fallback, cardIndex) => channelTrafficCompactText(bullets[cardIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "channel-quality", kicker: "CHANNEL QUALITY LAB" },
+    { kind: "source", variant: "channel-quality", kicker: "SOURCE MIX REVIEW" },
+    { kind: "scorecard", variant: "channel-quality", kicker: "QUALITY SCORECARD" },
+    { kind: "conversion", variant: "channel-quality", kicker: "CONVERSION PATH" },
+    { kind: "actions", variant: "channel-quality", kicker: "OPTIMIZATION MATRIX" },
+  ];
+  const base = index === total - 1 && total > 2
+    ? { kind: "closing", variant: "channel-quality", kicker: "NEXT CHANNEL LOOP" }
+    : scenes[Math.min(index, scenes.length - 1)];
+  return {
+    ...base,
+    title,
+    bullets,
+    metrics,
+    steps,
+    cards: base.kind === "closing"
+      ? ["放量名单", "降本实验", "链路修复", "周度复盘"].map((fallback, cardIndex) => channelTrafficCompactText(bullets[cardIndex], fallback, 12))
+      : cards,
+    summary: channelTrafficCompactText(bullets[0], "围绕渠道来源、投放质量和转化链路建立可复盘的诊断结论。", 42),
+  };
+}
+
+function channelTrafficBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["有效流量占比提升至 82%", "核心渠道转化率达到 38%", "低质线索占比下降 12%", "下阶段聚焦放量和止损动作"];
+}
+
+function channelTrafficMetricValues(bullets) {
+  const matches = bullets.flatMap((item) => String(item).match(/\+?\d+(?:\.\d+)?%|\d+(?:\.\d+)?[万千]?|P[0-3]/gi) || []);
+  return [matches[0] || "82%", matches[1] || "38%", matches[2] || "-12%", matches[3] || "24%"];
+}
+
+function channelTrafficCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isChannelTrafficQualityVisual(visual) {
+  return visual?.layout === "channel-traffic-quality";
 }
 
 /**
@@ -7961,6 +8437,84 @@ function isPreAMarketValidationVisual(visual) {
 }
 
 /**
+ * 渲染科技创业路演的 AI 产品化融资预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderPitchAiSaasPreview(slide, scene) {
+  // AI SaaS 模板用产品控制台、模型管线和投资人指标承载信息，避免默认标题/正文与图层重叠。
+  const title = escapeHtml(pitchAiSaasCompactText(slide?.title, scene.title, scene.role === "cover" ? 26 : 24));
+  const bullets = pitchAiSaasBulletTexts(slide);
+  const summary = escapeHtml(pitchAiSaasCompactText(bullets[0], scene.summary, 42));
+  const bulletItems = bullets.slice(0, 4).map((item) => `<li>${escapeHtml(pitchAiSaasCompactText(item, scene.summary, 28))}</li>`).join("");
+  const common = `<div class="ai-saas-kicker">${escapeHtml(scene.kicker)}</div><h2 class="ai-saas-title">${title}</h2><div class="ai-saas-summary">${summary}</div><ul class="ai-saas-bullets">${bulletItems}</ul>`;
+  const metrics = `<div class="ai-saas-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.role === "cover") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-console"><i></i><i></i><i></i><b></b></div>${metrics}</div>`;
+  }
+  if (scene.role === "market") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-opportunity">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchAiSaasCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.role === "architecture") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-architecture">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchAiSaasCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "moat") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-moat">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchAiSaasCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "growth") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-growth"><i></i><i></i><i></i><i></i></div>${metrics}</div>`;
+  }
+  if (scene.role === "capital") {
+    return `<div class="ai-saas-layer">${common}<div class="ai-saas-capital">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchAiSaasCompactText(bullets[index] || item, item, 16))}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="ai-saas-layer">${common}<div class="ai-saas-closing"></div>${metrics}</div>`;
+}
+
+function pitchAiSaasPreviewScene({ slide, index, total }) {
+  const bullets = pitchAiSaasBulletTexts(slide);
+  const title = pitchAiSaasCompactText(slide?.title, "智能产品平台融资路演", index === 0 ? 26 : 24);
+  const metrics = [
+    { value: "ARR", label: "收入牵引" },
+    { value: "NRR", label: "留存扩张" },
+    { value: "API", label: "平台集成" },
+  ];
+  const cards = ["模型能力", "工作流交付", "客户价值", "数据闭环"].map((fallback, itemIndex) => pitchAiSaasCompactText(bullets[itemIndex], fallback, 16));
+  const scenes = [
+    { role: "cover", variant: "ai-saas", kicker: "INTELLIGENT PRODUCT PLATFORM", title, summary: "用产品界面、技术架构和增长指标说明企业级智能软件的融资价值。", metrics, cards },
+    { role: "market", variant: "ai-saas", kicker: "MARKET INFLECTION", title, summary: "把行业需求、付费场景、客户预算和替代成本整理成投资人能判断的市场机会。", metrics, cards: ["预算迁移", "效率缺口", "垂直场景", "付费意愿"] },
+    { role: "architecture", variant: "ai-saas", kicker: "PRODUCT ARCHITECTURE", title, summary: "展示数据接入、模型推理、业务工作流和系统集成构成的产品架构。", metrics, cards: ["数据接入", "模型编排", "工作流引擎", "交付集成"] },
+    { role: "moat", variant: "ai-saas", kicker: "TECHNICAL MOAT", title, summary: "从场景数据、模型能力、流程沉淀和客户部署说明技术壁垒。", metrics, cards: ["行业数据", "推理能力", "流程资产", "部署经验"] },
+    { role: "growth", variant: "ai-saas", kicker: "GROWTH DASHBOARD", title, summary: "用收入、留存、转化和客户扩张证明商业增长具备可复制性。", metrics: [{ value: "3.2x", label: "收入增长" }, { value: "91%", label: "核心留存" }, { value: "42%", label: "试点转化" }], cards },
+    { role: "capital", variant: "ai-saas", kicker: "CAPITAL DEPLOYMENT", title, summary: "把融资用途绑定到研发、市场、交付和生态伙伴的 12-18 个月里程碑。", metrics, cards: ["模型研发", "行业方案", "交付团队", "生态渠道"] },
+  ];
+  if (index === total - 1) {
+    return { role: "closing", variant: "ai-saas", kicker: "NEXT INVESTOR STEP", title, summary: "用技术壁垒、客户验证和资金计划推动下一轮投资沟通。", metrics, cards: ["技术复核", "产品演示", "客户访谈", "融资条款"] };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function pitchAiSaasBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["企业客户正在把 AI 能力嵌入核心工作流", "产品架构已经覆盖数据、模型、流程和集成交付", "融资将用于技术壁垒、行业方案和商业增长"];
+}
+
+function pitchAiSaasCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isPitchAiSaasVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "pitch-ai-saas" && (id === "tech-startup-pitch" || id === "pitch-tech-startup-pitch-ai-saas");
+}
+
+/**
  * 渲染产品融资路演的产品演示型在线预览层。
  * @param {object} slide
  * @param {object} scene
@@ -8113,6 +8667,78 @@ function investorUpdateCompactText(text, fallback, maxLength) {
 function isInvestorUpdateProgressVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "investor-update-progress-sync" && (id === "investor-update-report" || id === "pitch-investor-update-report-progress-sync");
+}
+
+/**
+ * 渲染招商融资方案的项目收益型在线预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderPitchProjectReturnPreview(slide, scene) {
+  // 招商融资模板用专属层承载收益测算和合作结构，避免默认标题列表与图形重叠。
+  const title = escapeHtml(pitchProjectReturnCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 28));
+  const bullets = pitchProjectReturnBulletTexts(slide);
+  const summary = escapeHtml(pitchProjectReturnCompactText(bullets[0], scene.summary, 46));
+  const bulletItems = bullets.slice(0, 4).map((item) => `<li>${escapeHtml(pitchProjectReturnCompactText(item, scene.summary, 30))}</li>`).join("");
+  const common = `<div class="project-return-kicker">${escapeHtml(scene.kicker)}</div><h2 class="project-return-title">${title}</h2><div class="project-return-summary">${summary}</div><ul class="project-return-bullets">${bulletItems}</ul>`;
+  const metrics = `<div class="project-return-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.role === "cover") {
+    return `<div class="project-return-layer">${common}<div class="project-return-site"></div>${metrics}</div>`;
+  }
+  if (scene.role === "return") {
+    return `<div class="project-return-layer">${common}<div class="project-return-curve"></div>${metrics}</div>`;
+  }
+  if (scene.role === "rights" || scene.role === "value") {
+    return `<div class="project-return-layer">${common}<div class="project-return-cards">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchProjectReturnCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div>${metrics}</div>`;
+  }
+  if (scene.role === "path" || scene.role === "funding") {
+    return `<div class="project-return-layer">${common}<div class="project-return-path">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchProjectReturnCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="project-return-layer">${common}<div class="project-return-capital"></div><div class="project-return-path">${scene.cards.map((item, index) => `<span>${escapeHtml(pitchProjectReturnCompactText(bullets[index] || item, item, 18))}</span>`).join("")}</div></div>`;
+}
+
+function pitchProjectReturnPreviewScene({ slide, index, total }) {
+  const bullets = pitchProjectReturnBulletTexts(slide);
+  const title = pitchProjectReturnCompactText(slide?.title, "用收益测算证明项目招商价值", index === 0 ? 30 : 28);
+  const metrics = [
+    { value: "18%+", label: "目标年化收益" },
+    { value: "24M", label: "预计回收周期" },
+    { value: "3类", label: "合作权益包" },
+  ];
+  const cards = ["项目资源清晰", "投入产出可测", "合作权益明确", "分润路径透明"].map((fallback, itemIndex) => pitchProjectReturnCompactText(bullets[itemIndex], fallback, 18));
+  const scenes = [
+    { role: "cover", variant: "project-return", kicker: "INVESTMENT ATTRACTION BRIEF", title, summary: "用项目价值、收益模型和合作机制说明招商融资的确定性。", metrics, cards },
+    { role: "value", variant: "project-return", kicker: "VALUE MAP", title, summary: "把区位、客群、资源和现金流能力拆成合作方可判断的项目价值。", metrics, cards: ["区位资源", "稳定客群", "运营能力", "现金流基础"] },
+    { role: "return", variant: "project-return", kicker: "RETURN MODEL", title, summary: "展示投入金额、收益来源、ROI 和回收周期，帮助合作方理解回报边界。", metrics, cards },
+    { role: "rights", variant: "project-return", kicker: "PARTNER RIGHTS", title, summary: "用权益矩阵说明资源支持、收益分配、运营协同和风险共担机制。", metrics, cards: ["资源支持", "收益分配", "运营协同", "风险共担"] },
+    { role: "path", variant: "project-return", kicker: "COOPERATION PATH", title, summary: "把接洽、评估、签约、建设、运营和分润放在同一条合作路径中。", metrics, cards: ["接洽", "评估", "签约", "建设", "运营分润"] },
+    { role: "funding", variant: "project-return", kicker: "CAPITAL USE PLAN", title, summary: "说明融资金额、资金用途、建设节奏和收益兑现节点。", metrics, cards: ["空间建设", "招商拓展", "运营启动", "品牌推广", "现金回收"] },
+  ];
+  if (index === total - 1) {
+    return { role: "closing", variant: "project-return", kicker: "NEXT COOPERATION STEP", title, summary: "用合作条件、资金计划和下一步沟通推动项目招商决策。", metrics, cards: ["确认合作意向", "复核收益模型", "进入尽调流程", "制定签约计划"] };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function pitchProjectReturnBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["项目资源和客群基础具备招商价值", "投入产出模型可量化预计收益和回收周期", "合作模式包含权益分配、运营支持和风险控制"];
+}
+
+function pitchProjectReturnCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isPitchProjectReturnVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "pitch-project-return" && (id === "investment-attraction-financing-plan" || id === "pitch-investment-attraction-financing-plan-project-return");
 }
 
 /**
@@ -8459,6 +9085,80 @@ function integratedMediaMixCompactText(text, fallback, maxLength) {
 function isIntegratedMediaMixVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "integrated-media-mix" && (id === "integrated-campaign" || id === "marketing-integrated-campaign-media-mix");
+}
+
+function publicCourseEnrollmentPreviewScene({ slide, index, total }) {
+  const bullets = publicCourseEnrollmentBulletTexts(slide);
+  const title = publicCourseEnrollmentCompactText(slide?.title, index === 0 ? "公开课价值说明" : `Page ${index + 1}`, index === 0 ? 24 : 22);
+  const layout = String(slide?.layout || "").toLowerCase();
+  // 页面角色优先读 AI 大纲 layout，避免预览和导出按不同页码推断导致结构漂移。
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("hook") || layout.includes("pain")
+      ? "hook"
+      : layout.includes("agenda") || layout.includes("schedule")
+        ? "agenda"
+        : layout.includes("path") || layout.includes("funnel") || layout.includes("conversion")
+          ? "path"
+          : layout.includes("action") || layout.includes("closing") || index === total - 1
+            ? "action"
+            : layout.includes("value")
+              ? "value"
+              : ["hook", "value", "agenda", "path"][(index - 1) % 4];
+  const cards = ["目标人群", "课程亮点", "资料权益", "报名动作"].map((fallback, itemIndex) => publicCourseEnrollmentCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    variant: "public-course-enrollment",
+    role,
+    kicker: role === "cover" ? "LIVE CLASS OPS" : role === "hook" ? "LEARNER HOOKS" : role === "value" ? "COURSE VALUE" : role === "agenda" ? "CLASS FLOW" : role === "path" ? "NEXT STEP PATH" : "JOIN & FOLLOW",
+    title,
+    summary: publicCourseEnrollmentCompactText(bullets[0], "围绕公开课内容、课程价值、互动体验和后续行动建立清晰的报名承接路径。", 42),
+    bullets,
+    cards,
+    metrics: [
+      { value: "60", label: "分钟内容" },
+      { value: "4", label: "核心模块" },
+      { value: "1", label: "行动入口" },
+    ],
+  };
+}
+
+function renderPublicCourseEnrollmentPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(publicCourseEnrollmentCompactText(item, scene.title, 34))}</li>`).join("");
+  const cards = scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const common = `<div class="public-course-kicker">${escapeHtml(scene.kicker)}</div><h2 class="public-course-title">${escapeHtml(scene.title)}</h2><div class="public-course-summary">${escapeHtml(scene.summary)}</div><ul class="public-course-bullets">${bulletItems}</ul>`;
+  const live = `<div class="public-course-live"><i></i><b></b><span></span><span></span><span></span></div>`;
+  const poster = `<div class="public-course-poster"><i></i><b></b><span></span><span></span><em></em></div>`;
+  const path = `<div class="public-course-path">${["听课", "资料", "咨询", "报名"].map((step, itemIndex) => `<span data-step="${escapeHtml(step)}">${escapeHtml(scene.cards[itemIndex])}</span>`).join("")}</div>`;
+  const visual = scene.role === "cover"
+    ? `${live}<div class="public-course-metrics">${metrics}</div>`
+    : scene.role === "hook"
+      ? `<div class="public-course-hook">${cards}</div>${live}`
+      : scene.role === "agenda"
+        ? `<div class="public-course-agenda">${scene.cards.map((item, itemIndex) => `<span data-step="${itemIndex + 1}">${escapeHtml(item)}</span>`).join("")}</div>${poster}`
+        : scene.role === "path"
+          ? `${path}<div class="public-course-cta">${escapeHtml(publicCourseEnrollmentCompactText(scene.cards[3], "下一步行动", 12))}</div>`
+          : scene.role === "action"
+            ? `<div class="public-course-action">${cards}</div><div class="public-course-cta">${escapeHtml(publicCourseEnrollmentCompactText(scene.cards[3], "立即预约", 12))}</div>`
+            : `<div class="public-course-value">${cards}</div>${poster}`;
+  return `<div class="public-course-layer">${common}${visual}</div>`;
+}
+
+function publicCourseEnrollmentBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["明确目标人群和课程承诺", "展示课程价值和学习收益", "设计直播互动和答疑节奏", "承接资料领取与报名动作"];
+}
+
+function publicCourseEnrollmentCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function isPublicCourseEnrollmentVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "public-course-enrollment" && (id === "public-courseware" || id === "education-public-courseware-enrollment-conversion");
 }
 
 function festivalPromotionRhythmPreviewScene({ slide, index, total }) {
@@ -9260,6 +9960,8 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "product-funding-highlights") return false;
+  if (visual.layout === "pitch-ai-saas") return false;
+  if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "operating-problem-tree") return false;
   if (visual.layout === "business-opportunity-map") return false;
@@ -9282,6 +9984,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
   if (visual.layout === "user-path-funnel") return false;
+  if (visual.layout === "channel-traffic-quality") return false;
   if (visual.layout === "market-trend-radar") return false;
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
@@ -9303,11 +10006,13 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
+  if (visual.layout === "education-workshop-practice-review") return false;
   if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "private-domain-member-layering") return false;
   if (visual.layout === "integrated-media-mix") return false;
+  if (visual.layout === "public-course-enrollment") return false;
   if (visual.layout === "department-team-performance") return false;
   return shouldRenderDomePreviewBodyList(visual, role);
 }

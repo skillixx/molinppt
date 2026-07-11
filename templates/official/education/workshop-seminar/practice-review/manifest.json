@@ -1,0 +1,19 @@
+{
+  "slug": "education-workshop-seminar-practice-review",
+  "name": "研修工作坊 - 实践复盘",
+  "description": "适合研修工作坊、小组共创、练习反馈和实践复盘总结的官方教育培训模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "workshop-seminar",
+    "practice-review",
+    "group-cocreation",
+    "training-feedback"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}
