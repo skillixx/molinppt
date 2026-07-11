@@ -396,6 +396,7 @@ function topBandTitleFillStyle(visual) {
  * @returns {string}
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
+  if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
   if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "integrated-media-mix", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
@@ -958,6 +959,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
   if (visual.layout === "sales-key-account-decision-chain") return false;
+  if (visual.layout === "presales-architecture-solution") return false;
   if (visual.layout === "sales-training-objection-handling") return false;
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "channel-recruitment-policy") return false;
@@ -969,6 +971,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
+  if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "private-domain-member-layering") return false;
@@ -989,6 +992,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "product-interview-insight") return false;
   if (visual.layout === "business-model-value-chain") return false;
+  if (visual.layout === "presales-architecture-solution") return false;
   if (visual.layout === "sales-training-objection-handling") return false;
   if (visual.layout === "product-pricing-strategy") return false;
   if (visual.layout === "product-retention-path") return false;
@@ -997,6 +1001,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "management-agenda-decision") return false;
   if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "concept-breakdown-courseware") return false;
+  if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "private-domain-member-layering") return false;
@@ -1246,6 +1251,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   if (visual.layout === "sales-key-account-decision-chain") {
     return base + keyAccountDecisionDecorationsXml({ visual, index, role, slide });
   }
+  if (visual.layout === "presales-architecture-solution") {
+    return base + presalesArchitectureDecorationsXml({ visual, index, role, slide });
+  }
   if (visual.layout === "sales-training-objection-handling") {
     return base + salesTrainingObjectionDecorationsXml({ visual, index, role, slide });
   }
@@ -1269,6 +1277,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "integrated-media-mix") {
     return base + integratedMediaMixDecorationsXml({ visual, index, role, slide, total });
+  }
+  if (visual.layout === "marketing-festival-promotion-rhythm") {
+    return base + festivalPromotionRhythmDecorationsXml({ visual, index, role, slide, total });
   }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
@@ -5928,6 +5939,178 @@ function isKeyAccountDecisionVisual(visual) {
   return visual?.layout === "sales-key-account-decision-chain" && (id === "key-account-plan" || id === "sales-key-account-plan-decision-chain");
 }
 
+function presalesArchitectureDecorationsXml({ visual, index, role, slide }) {
+  const scene = presalesArchitectureSceneFromSlide({ slide, index, role });
+  const palette = {
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.74),
+    panel: blendHexColor(visual.background, "FFFFFF", 0.56),
+    grid: blendHexColor(visual.secondary || visual.accent, "FFFFFF", 0.62),
+    soft: blendHexColor(visual.accent, "FFFFFF", 0.78),
+    amber: visual.warning || "F59E0B",
+  };
+  const base = presalesArchitectureCanvasXml({ visual, palette })
+    + presalesArchitectureHeaderXml({ visual, palette, scene })
+    + presalesArchitectureBulletsXml({ visual, scene });
+  if (scene.role === "requirement") return base + presalesArchitectureMapXml({ visual, palette, items: scene.map });
+  if (scene.role === "blueprint") return base + presalesArchitectureNodeCanvasXml({ visual, palette }) + presalesArchitectureLayerXml({ visual, palette, items: scene.layers });
+  if (scene.role === "module") return base + presalesArchitectureModuleXml({ visual, palette, items: scene.modules });
+  if (scene.role === "topology") return base + presalesArchitectureTopologyXml({ visual, palette, items: scene.topology });
+  if (scene.role === "delivery" || scene.role === "next") return base + presalesArchitectureTimelineXml({ visual, palette, items: scene.timeline });
+  return base + presalesArchitectureNodeCanvasXml({ visual, palette }) + presalesArchitectureTagXml({ visual, palette, items: scene.tags });
+}
+
+function presalesArchitectureCanvasXml({ visual, palette }) {
+  return solidShapeXml({ id: 1260, name: "Presales Architecture Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + rectShapeXml({ id: 1261, name: "Presales Architecture Top Band", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + rectShapeXml({ id: 1262, name: "Presales Architecture Accent Rule", x: 0, y: 365760, cx: 9144000, cy: 30480, fill: visual.accent })
+    + solidShapeXml({ id: 1263, name: "Presales Architecture Workspace", geom: "roundRect", x: 512064, y: 472440, cx: 8122920, cy: 4251960, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1264, name: "Presales Architecture Workspace Border", geom: "roundRect", x: 512064, y: 472440, cx: 8122920, cy: 4251960, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1265, name: "Presales Architecture Grid X", x: 838200, y: 731520, cx: 7620, cy: 3657600, fill: palette.grid, transparency: 52000 })
+    + rectShapeXml({ id: 1266, name: "Presales Architecture Grid Y", x: 670560, y: 975360, cx: 7772400, cy: 7620, fill: palette.grid, transparency: 52000 });
+}
+
+function presalesArchitectureHeaderXml({ visual, scene }) {
+  return textShapeXml({ id: 1270, name: "Presales Architecture Kicker", x: 762000, y: 762000, cx: 2743200, cy: 167640, text: scene.kicker, size: 660, bold: true, color: visual.secondary || visual.accent })
+    + textShapeXml({ id: 1271, name: "Presales Architecture Title", x: 762000, y: 1013460, cx: 3855720, cy: 731520, text: scene.title, size: 1240, bold: true, color: visual.title })
+    + rectShapeXml({ id: 1272, name: "Presales Architecture Title Rule", x: 762000, y: 2026920, cx: 1158240, cy: 38100, fill: visual.accent });
+}
+
+function presalesArchitectureBulletsXml({ visual, scene }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2255520 + itemIndex * 266700;
+    return solidShapeXml({ id: 1278 + itemIndex * 2, name: `Presales Architecture Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 777240, y: y + 45720, cx: 60960, cy: 60960, fill: itemIndex === 1 ? (visual.secondary || visual.accent) : visual.accent })
+      + textShapeXml({ id: 1279 + itemIndex * 2, name: `Presales Architecture Bullet ${itemIndex + 1}`, x: 899160, y, cx: 3505200, cy: 198120, text: presalesArchitectureCompactText(item, "", 40), size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function presalesArchitectureNodeCanvasXml({ visual, palette }) {
+  const panel = solidShapeXml({ id: 1290, name: "Presales Architecture Blueprint Panel", geom: "roundRect", x: 4998720, y: 914400, cx: 3429000, cy: 2377440, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1291, name: "Presales Architecture Blueprint Border", geom: "roundRect", x: 4998720, y: 914400, cx: 3429000, cy: 2377440, stroke: palette.frame, width: 10160 });
+  const links = rectShapeXml({ id: 1292, name: "Presales Architecture Core Link", x: 5836920, y: 2011680, cx: 1752600, cy: 38100, fill: visual.accent, transparency: 5000 })
+    + rectShapeXml({ id: 1293, name: "Presales Architecture Upper Link", x: 5943600, y: 1485900, cx: 1524000, cy: 30480, fill: visual.secondary || visual.accent, transparency: 24000 })
+    + rectShapeXml({ id: 1294, name: "Presales Architecture Lower Link", x: 5943600, y: 2606040, cx: 1524000, cy: 30480, fill: palette.amber, transparency: 30000 });
+  const nodes = [
+    { id: 1295, name: "Presales Architecture Core Node", x: 6484620, y: 1714500, cx: 685800, cy: 594360, fill: visual.primary },
+    { id: 1296, name: "Presales Architecture Business Node", x: 5402580, y: 1219200, cx: 731520, cy: 396240, fill: visual.secondary || visual.accent },
+    { id: 1297, name: "Presales Architecture Interface Node", x: 7452360, y: 1219200, cx: 731520, cy: 396240, fill: palette.amber },
+    { id: 1298, name: "Presales Architecture Data Node", x: 5402580, y: 2636520, cx: 731520, cy: 396240, fill: visual.accent },
+    { id: 1299, name: "Presales Architecture Cloud Node", x: 7452360, y: 2636520, cx: 731520, cy: 396240, fill: visual.secondary || visual.accent },
+  ].map((node) => solidShapeXml({ ...node, geom: "roundRect" })).join("");
+  return panel + links + nodes;
+}
+
+function presalesArchitectureTagXml({ visual, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 762000 + itemIndex * 1219200;
+    return solidShapeXml({ id: 1310 + itemIndex * 3, name: `Presales Architecture Tag ${itemIndex + 1}`, geom: "roundRect", x, y: 3718560, cx: 1036320, cy: 487680, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1311 + itemIndex * 3, name: `Presales Architecture Tag Rule ${itemIndex + 1}`, x, y: 3718560, cx: 1036320, cy: 45720, fill: itemIndex === 1 ? (visual.secondary || visual.accent) : visual.accent })
+      + textShapeXml({ id: 1312 + itemIndex * 3, name: `Presales Architecture Tag Text ${itemIndex + 1}`, x: x + 106680, y: 3893820, cx: 822960, cy: 167640, text: presalesArchitectureCompactText(item, "", 10), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function presalesArchitectureMapXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5181600 + col * 1600200;
+    const y = 1036320 + row * 1066800;
+    return solidShapeXml({ id: 1320 + itemIndex * 4, name: `Presales Architecture Requirement Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 792480, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1321 + itemIndex * 4, name: `Presales Architecture Requirement Border ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 792480, stroke: palette.frame, width: 7620 })
+      + solidShapeXml({ id: 1322 + itemIndex * 4, name: `Presales Architecture Requirement Icon ${itemIndex + 1}`, geom: "roundRect", x: x + 121920, y: y + 121920, cx: 243840, cy: 243840, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + textShapeXml({ id: 1323 + itemIndex * 4, name: `Presales Architecture Requirement Text ${itemIndex + 1}`, x: x + 121920, y: y + 457200, cx: 1127760, cy: 182880, text: presalesArchitectureCompactText(item, `匹配 ${itemIndex + 1}`, 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function presalesArchitectureLayerXml({ visual, palette, items }) {
+  return items.slice(0, 5).map((item, itemIndex) => {
+    const x = 762000 + itemIndex * 1524000;
+    return solidShapeXml({ id: 1340 + itemIndex * 4, name: `Presales Architecture Layer Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3627120, cx: 1280160, cy: 609600, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1341 + itemIndex * 4, name: `Presales Architecture Layer Accent ${itemIndex + 1}`, x, y: 3627120, cx: 1280160, cy: 45720, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + lineFrameShapeXml({ id: 1342 + itemIndex * 4, name: `Presales Architecture Layer Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3627120, cx: 1280160, cy: 609600, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1343 + itemIndex * 4, name: `Presales Architecture Layer Text ${itemIndex + 1}`, x: x + 106680, y: 3840480, cx: 1066800, cy: 167640, text: presalesArchitectureCompactText(item, `层级 ${itemIndex + 1}`, 10), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function presalesArchitectureModuleXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5181600 + col * 1600200;
+    const y = 1005840 + row * 1036320;
+    return solidShapeXml({ id: 1360 + itemIndex * 4, name: `Presales Architecture Module Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1402080, cy: 777240, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1361 + itemIndex * 4, name: `Presales Architecture Module Rule ${itemIndex + 1}`, x, y, cx: 1402080, cy: 45720, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + solidShapeXml({ id: 1362 + itemIndex * 4, name: `Presales Architecture Module Icon ${itemIndex + 1}`, geom: "roundRect", x: x + 121920, y: y + 152400, cx: 243840, cy: 243840, fill: palette.soft })
+      + textShapeXml({ id: 1363 + itemIndex * 4, name: `Presales Architecture Module Text ${itemIndex + 1}`, x: x + 121920, y: y + 472440, cx: 1127760, cy: 167640, text: presalesArchitectureCompactText(item, `模块 ${itemIndex + 1}`, 12), size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function presalesArchitectureTopologyXml({ visual, palette, items }) {
+  const panel = solidShapeXml({ id: 1380, name: "Presales Architecture Deployment Topology", geom: "roundRect", x: 762000, y: 3352800, cx: 7620000, cy: 914400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1381, name: "Presales Architecture Deployment Border", geom: "roundRect", x: 762000, y: 3352800, cx: 7620000, cy: 914400, stroke: palette.frame, width: 7620 })
+    + rectShapeXml({ id: 1382, name: "Presales Architecture Deployment Rail", x: 1219200, y: 3802380, cx: 6705600, cy: 45720, fill: visual.accent });
+  const nodes = items.slice(0, 4).map((item, itemIndex) => {
+    const x = 1066800 + itemIndex * 1828800;
+    return solidShapeXml({ id: 1383 + itemIndex * 3, name: `Presales Architecture Deployment Node ${itemIndex + 1}`, geom: "roundRect", x, y: 3596640, cx: 1371600, cy: 487680, fill: palette.panel })
+      + textShapeXml({ id: 1384 + itemIndex * 3, name: `Presales Architecture Deployment Text ${itemIndex + 1}`, x: x + 121920, y: 3756660, cx: 1127760, cy: 167640, text: presalesArchitectureCompactText(item, `节点 ${itemIndex + 1}`, 10), size: 650, bold: true, color: visual.title });
+  }).join("");
+  return panel + nodes;
+}
+
+function presalesArchitectureTimelineXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const x = 762000 + itemIndex * 1905000;
+    return solidShapeXml({ id: 1400 + itemIndex * 4, name: `Presales Architecture Delivery Step ${itemIndex + 1}`, geom: "roundRect", x, y: 3474720, cx: 1600200, cy: 762000, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1401 + itemIndex * 4, name: `Presales Architecture Delivery Rule ${itemIndex + 1}`, x: x + 121920, y: 3642360, cx: 320040, cy: 60960, fill: itemIndex % 2 ? (visual.secondary || visual.accent) : visual.accent })
+      + lineFrameShapeXml({ id: 1402 + itemIndex * 4, name: `Presales Architecture Delivery Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3474720, cx: 1600200, cy: 762000, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1403 + itemIndex * 4, name: `Presales Architecture Delivery Text ${itemIndex + 1}`, x: x + 121920, y: 3810000, cx: 1325880, cy: 182880, text: presalesArchitectureCompactText(item, `步骤 ${itemIndex + 1}`, 10), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function presalesArchitectureSceneFromSlide({ slide, index, role }) {
+  const bullets = presalesArchitectureBulletTexts(slide);
+  const sceneRole = presalesArchitectureRoleFromSlide({ slide, index, role });
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "TECHNICAL BLUEPRINT" : sceneRole === "requirement" ? "CLIENT FIT MAP" : sceneRole === "blueprint" ? "SYSTEM LAYERS" : sceneRole === "module" ? "CAPABILITY MODULES" : sceneRole === "topology" ? "DEPLOYMENT VIEW" : sceneRole === "delivery" ? "DELIVERY ASSURANCE" : "NEXT STEP",
+    title: presalesArchitectureCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    tags: ["需求匹配", "系统集成", "交付保障"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    map: ["业务诉求", "技术能力", "集成边界", "业务收益"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 12)),
+    layers: ["用户入口", "业务应用", "平台能力", "数据服务", "基础资源"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    modules: ["身份权限", "流程编排", "数据集成", "安全审计"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 12)),
+    topology: ["客户系统", "接口网关", "数据服务", "云资源"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+    timeline: ["范围确认", "技术评审", "POC 验证", "上线交付"].map((fallback, itemIndex) => presalesArchitectureCompactText(bullets[itemIndex], fallback, 10)),
+  };
+}
+
+function presalesArchitectureRoleFromSlide({ slide, index, role }) {
+  const roleText = String(role || slide?.layout || "").toLowerCase();
+  if (index === 0 || roleText.includes("cover")) return "cover";
+  if (roleText.includes("requirement") || roleText.includes("map")) return "requirement";
+  if (roleText.includes("blueprint") || roleText.includes("architecture")) return "blueprint";
+  if (roleText.includes("module") || roleText.includes("capability")) return "module";
+  if (roleText.includes("deployment") || roleText.includes("topology")) return "topology";
+  if (roleText.includes("delivery") || roleText.includes("assurance") || roleText.includes("roadmap")) return "delivery";
+  if (roleText.includes("closing") || roleText.includes("next")) return "next";
+  return ["requirement", "blueprint", "module", "topology", "delivery"][(index - 1) % 5];
+}
+
+function presalesArchitectureBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["梳理客户核心诉求与现有系统边界", "设计分层架构、接口集成和数据流转", "明确交付计划、风险控制和验收标准"];
+}
+
+function presalesArchitectureCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= maxLength) return raw;
+  return `${raw.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isPresalesArchitectureVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "presales-architecture-solution" && (id === "presales-technical-plan" || id === "sales-presales-technical-plan-architecture-solution");
+}
+
 function salesTrainingObjectionDecorationsXml({ visual, index, role, slide }) {
   const scene = salesTrainingObjectionSceneFromSlide({ slide, index, role });
   const palette = salesTrainingObjectionColorPalette(visual);
@@ -10052,6 +10235,197 @@ function integratedMediaMixPalette(visual) {
 function isIntegratedMediaMixVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "integrated-media-mix" && (id === "integrated-campaign" || id === "marketing-integrated-campaign-media-mix");
+}
+
+function festivalPromotionRhythmDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = festivalPromotionRhythmExportScene({ slide, index, role, total });
+  const palette = festivalPromotionRhythmPalette(visual);
+  // 节日促销模板全部用可编辑形状绘制，局部礼盒、券包和节奏卡片只作为营销场景隐喻。
+  const common = festivalPromotionRhythmCanvasXml({ visual, palette })
+    + festivalPromotionRhythmHeaderXml({ visual, scene })
+    + festivalPromotionRhythmBulletXml({ visual, scene });
+  if (scene.role === "timeline") return common + festivalPromotionRhythmTimelineXml({ visual, scene });
+  if (scene.role === "benefits") return common + festivalPromotionRhythmBenefitsXml({ visual, scene, palette }) + festivalPromotionRhythmMetricsXml({ visual, scene });
+  if (scene.role === "channel") return common + festivalPromotionRhythmChannelXml({ visual, scene }) + festivalPromotionRhythmMetricsXml({ visual, scene });
+  if (scene.role === "funnel") return common + festivalPromotionRhythmFunnelXml({ visual, scene }) + festivalPromotionRhythmMetricsXml({ visual, scene });
+  if (scene.role === "review") return common + festivalPromotionRhythmReviewXml({ visual, palette }) + festivalPromotionRhythmMetricsXml({ visual, scene });
+  if (scene.role === "closing") return common + festivalPromotionRhythmActionsXml({ visual, scene });
+  return common + festivalPromotionRhythmHeroXml({ visual, palette }) + festivalPromotionRhythmMetricsXml({ visual, scene });
+}
+
+function festivalPromotionRhythmCanvasXml({ visual, palette }) {
+  return solidShapeXml({ id: 7600, name: "Festival Promotion Warm Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 7601, name: "Festival Promotion Rose Glow", geom: "ellipse", x: 6522720, y: -274320, cx: 1981200, cy: 1676400, fill: palette.roseGlow })
+    + solidShapeXml({ id: 7602, name: "Festival Promotion Gold Glow", geom: "ellipse", x: -304800, y: 3619500, cx: 2133600, cy: 1371600, fill: palette.goldGlow })
+    + solidShapeXml({ id: 7603, name: "Festival Promotion Main Paper", geom: "roundRect", x: 530352, y: 462915, cx: 8083296, cy: 4217670, fill: visual.surface })
+    + lineFrameShapeXml({ id: 7604, name: "Festival Promotion Paper Frame", geom: "roundRect", x: 530352, y: 462915, cx: 8083296, cy: 4217670, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 7605, name: "Festival Promotion Top Confetti Rail", x: 530352, y: 462915, cx: 8083296, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 7606, name: "Festival Promotion Orange Rail", x: 2438400, y: 462915, cx: 2590800, cy: 53340, fill: visual.secondary || "FF8A00" })
+    + rectShapeXml({ id: 7607, name: "Festival Promotion Gold Rail", x: 5029200, y: 462915, cx: 3597400, cy: 53340, fill: visual.warning || "FBBF24" });
+}
+
+function festivalPromotionRhythmHeaderXml({ visual, scene }) {
+  return textShapeXml({ id: 7610, name: "Festival Promotion Kicker", x: 795528, y: 678180, cx: 2438400, cy: 182880, text: scene.kicker, size: 660, bold: true, color: visual.secondary || "FF8A00", fontFace: "Arial" })
+    + textShapeXml({ id: 7611, name: "Festival Promotion Title", x: 795528, y: 998220, cx: 3810000, cy: 914400, text: scene.title, size: scene.role === "cover" ? 2000 : 1680, bold: true, color: visual.title, fontFace: "Microsoft YaHei" })
+    + textShapeXml({ id: 7612, name: "Festival Promotion Summary", x: 795528, y: 2026920, cx: 3657600, cy: 335280, text: scene.summary, size: 720, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+}
+
+function festivalPromotionRhythmBulletXml({ visual, scene }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2575560 + itemIndex * 236220;
+    return solidShapeXml({ id: 7620 + itemIndex * 3, name: `Festival Promotion Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 807720, y: y + 45720, cx: 60960, cy: 60960, fill: itemIndex % 2 ? (visual.secondary || "FF8A00") : visual.accent })
+      + textShapeXml({ id: 7621 + itemIndex * 3, name: `Festival Promotion Bullet ${itemIndex + 1}`, x: 929640, y, cx: 3444240, cy: 198120, text: festivalPromotionRhythmCompactText(item, "", 34), size: 690, bold: true, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function festivalPromotionRhythmHeroXml({ visual, palette }) {
+  return solidShapeXml({ id: 7640, name: "Festival Promotion Hero Coupon", geom: "roundRect", x: 5486400, y: 975360, cx: 2895600, cy: 2057400, fill: visual.primary })
+    + solidShapeXml({ id: 7641, name: "Festival Promotion Hero Coupon Glow", geom: "roundRect", x: 5730240, y: 1229200, cx: 1981200, cy: 365760, fill: "FFFFFF" })
+    + solidShapeXml({ id: 7642, name: "Festival Promotion Gift Block", geom: "roundRect", x: 7162800, y: 2171700, cx: 731520, cy: 716280, fill: visual.warning || "FBBF24" })
+    + rectShapeXml({ id: 7643, name: "Festival Promotion Gift Ribbon", x: 7467600, y: 2171700, cx: 121920, cy: 716280, fill: visual.accent })
+    + solidShapeXml({ id: 7644, name: "Festival Promotion Gift Lid", geom: "roundRect", x: 7071360, y: 2019300, cx: 914400, cy: 198120, fill: visual.secondary || "FF8A00" })
+    + solidShapeXml({ id: 7645, name: "Festival Promotion Gold Coin", geom: "ellipse", x: 7772400, y: 1219200, cx: 396240, cy: 396240, fill: visual.warning || "FBBF24" })
+    + textShapeXml({ id: 7646, name: "Festival Promotion Countdown 1", x: 5638800, y: 3390900, cx: 609600, cy: 335280, text: "T-7", size: 1180, bold: true, color: visual.primary })
+    + textShapeXml({ id: 7647, name: "Festival Promotion Countdown 2", x: 6553200, y: 3390900, cx: 609600, cy: 335280, text: "D", size: 1180, bold: true, color: visual.accent })
+    + textShapeXml({ id: 7648, name: "Festival Promotion Countdown 3", x: 7467600, y: 3390900, cx: 609600, cy: 335280, text: "+7", size: 1180, bold: true, color: visual.secondary || "FF8A00" })
+    + lineFrameShapeXml({ id: 7649, name: "Festival Promotion Offer Orbit", geom: "ellipse", x: 5715000, y: 3200400, cx: 2286000, cy: 731520, stroke: palette.frame, width: 15240 });
+}
+
+function festivalPromotionRhythmTimelineXml({ visual, scene }) {
+  return scene.timeline.map((item, itemIndex) => {
+    const x = 731520 + itemIndex * 1600200;
+    return solidShapeXml({ id: 7660 + itemIndex * 4, name: `Festival Promotion Timeline Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3718560, cx: 1371600, cy: 701040, fill: "FFFFFF" })
+      + rectShapeXml({ id: 7661 + itemIndex * 4, name: `Festival Promotion Timeline Rule ${itemIndex + 1}`, x, y: 3718560, cx: 1371600, cy: 53340, fill: itemIndex === 2 ? visual.accent : visual.secondary || "FF8A00" })
+      + textShapeXml({ id: 7662 + itemIndex * 4, name: `Festival Promotion Timeline Step ${itemIndex + 1}`, x: x + 121920, y: 3848100, cx: 609600, cy: 152400, text: item.step, size: 720, bold: true, color: visual.accent })
+      + textShapeXml({ id: 7663 + itemIndex * 4, name: `Festival Promotion Timeline Text ${itemIndex + 1}`, x: x + 121920, y: 4053840, cx: 1051560, cy: 198120, text: item.text, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function festivalPromotionRhythmBenefitsXml({ visual, scene, palette }) {
+  return scene.labels.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5334000 + col * 1524000;
+    const y = 1043940 + row * 990600;
+    return solidShapeXml({ id: 7680 + itemIndex * 4, name: `Festival Promotion Benefit Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 777240, fill: itemIndex === 1 ? palette.soft : "FFFFFF" })
+      + lineFrameShapeXml({ id: 7681 + itemIndex * 4, name: `Festival Promotion Benefit Dash ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 777240, stroke: visual.accent, width: 11430, transparency: 38000 })
+      + rectShapeXml({ id: 7682 + itemIndex * 4, name: `Festival Promotion Benefit Rule ${itemIndex + 1}`, x: x + 152400, y: y + 518160, cx: 457200, cy: 45720, fill: visual.secondary || "FF8A00" })
+      + textShapeXml({ id: 7683 + itemIndex * 4, name: `Festival Promotion Benefit Text ${itemIndex + 1}`, x: x + 152400, y: y + 213360, cx: 914400, cy: 198120, text: item, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function festivalPromotionRhythmChannelXml({ visual, scene }) {
+  return ["站内会场", "社媒种草", "私域触达", "直播承接"].map((fallback, itemIndex) => {
+    const y = 1219200 + itemIndex * 533400;
+    const x = 5334000 + itemIndex * 182880;
+    const label = scene.labels[itemIndex] || fallback;
+    return solidShapeXml({ id: 7700 + itemIndex * 3, name: `Festival Promotion Channel ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2438400, cy: 335280, fill: itemIndex === 3 ? (visual.warning || "FBBF24") : itemIndex === 1 ? (visual.secondary || "FF8A00") : visual.accent })
+      + textShapeXml({ id: 7701 + itemIndex * 3, name: `Festival Promotion Channel Text ${itemIndex + 1}`, x: x + 182880, y: y + 76200, cx: 1828800, cy: 152400, text: label, size: 690, bold: true, color: itemIndex === 3 ? visual.title : "FFFFFF" });
+  }).join("");
+}
+
+function festivalPromotionRhythmFunnelXml({ visual, scene }) {
+  return ["曝光触达", "权益领取", "加购转化", "订单复购"].map((fallback, itemIndex) => {
+    const x = 5334000 + itemIndex * 274320;
+    const y = 1188720 + itemIndex * 487680;
+    const width = 2743200 - itemIndex * 457200;
+    return solidShapeXml({ id: 7720 + itemIndex * 3, name: `Festival Promotion Funnel ${itemIndex + 1}`, geom: "roundRect", x, y, cx: width, cy: 365760, fill: itemIndex === 3 ? visual.accent : "FFFFFF" })
+      + lineFrameShapeXml({ id: 7721 + itemIndex * 3, name: `Festival Promotion Funnel Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: width, cy: 365760, stroke: visual.accent, width: 7620, transparency: itemIndex === 3 ? 100000 : 54000 })
+      + textShapeXml({ id: 7722 + itemIndex * 3, name: `Festival Promotion Funnel Text ${itemIndex + 1}`, x: x + 152400, y: y + 106680, cx: width - 304800, cy: 152400, text: scene.labels[itemIndex] || fallback, size: 680, bold: true, color: itemIndex === 3 ? "FFFFFF" : visual.title });
+  }).join("");
+}
+
+function festivalPromotionRhythmReviewXml({ visual, palette }) {
+  const bars = [518160, 914400, 1280160, 731520];
+  const panel = solidShapeXml({ id: 7740, name: "Festival Promotion Review Panel", geom: "roundRect", x: 5334000, y: 1013460, cx: 2895600, cy: 1981200, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 7741, name: "Festival Promotion Review Frame", geom: "roundRect", x: 5334000, y: 1013460, cx: 2895600, cy: 1981200, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 7742, name: "Festival Promotion Review Baseline", x: 5638800, y: 2613660, cx: 2133600, cy: 30480, fill: palette.frame });
+  const barXml = bars.map((height, itemIndex) => {
+    const x = 5791200 + itemIndex * 426720;
+    return solidShapeXml({ id: 7743 + itemIndex, name: `Festival Promotion Review Bar ${itemIndex + 1}`, geom: "roundRect", x, y: 2613660 - height, cx: 243840, cy: height, fill: itemIndex === 3 ? (visual.warning || "FBBF24") : itemIndex === 1 ? (visual.secondary || "FF8A00") : visual.accent });
+  }).join("");
+  return panel + barXml;
+}
+
+function festivalPromotionRhythmActionsXml({ visual, scene }) {
+  return scene.labels.slice(0, 3).map((item, itemIndex) => {
+    const x = 975360 + itemIndex * 2286000;
+    return solidShapeXml({ id: 7760 + itemIndex * 3, name: `Festival Promotion Next Action ${itemIndex + 1}`, geom: "roundRect", x, y: 3467100, cx: 1828800, cy: 716280, fill: "FFFFFF" })
+      + rectShapeXml({ id: 7761 + itemIndex * 3, name: `Festival Promotion Action Rule ${itemIndex + 1}`, x: x + 182880, y: 3893820, cx: 457200, cy: 45720, fill: itemIndex === 1 ? (visual.secondary || "FF8A00") : visual.accent })
+      + textShapeXml({ id: 7762 + itemIndex * 3, name: `Festival Promotion Action Text ${itemIndex + 1}`, x: x + 182880, y: 3657600, cx: 1371600, cy: 182880, text: item, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function festivalPromotionRhythmMetricsXml({ visual, scene }) {
+  return scene.metrics.map((metric, itemIndex) => {
+    const x = 914400 + itemIndex * 1219200;
+    return solidShapeXml({ id: 7780 + itemIndex * 3, name: `Festival Promotion Metric ${itemIndex + 1}`, geom: "roundRect", x, y: 3764280, cx: 1066800, cy: 548640, fill: "FFFFFF" })
+      + textShapeXml({ id: 7781 + itemIndex * 3, name: `Festival Promotion Metric Value ${itemIndex + 1}`, x: x + 121920, y: 3886200, cx: 731520, cy: 152400, text: metric.value, size: 1020, bold: true, color: visual.title })
+      + textShapeXml({ id: 7782 + itemIndex * 3, name: `Festival Promotion Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4091940, cx: 792480, cy: 137160, text: metric.label, size: 610, bold: true, color: visual.body });
+  }).join("");
+}
+
+function festivalPromotionRhythmExportScene({ slide, index, role, total }) {
+  const bullets = festivalPromotionRhythmBulletTexts(slide);
+  const title = festivalPromotionRhythmCompactText(slide?.title, index === 0 ? "节日 campaign 增长作战图" : `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const layout = String(slide?.layout || role || "").toLowerCase();
+  const sceneRole = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("benefit") || layout.includes("rights") || layout.includes("coupon")
+      ? "benefits"
+      : layout.includes("channel") || layout.includes("media")
+        ? "channel"
+        : layout.includes("funnel") || layout.includes("convert")
+          ? "funnel"
+          : layout.includes("review") || layout.includes("data") || layout.includes("result")
+            ? "review"
+            : index === total - 1 || layout.includes("closing") || layout.includes("action")
+              ? "closing"
+              : ["timeline", "benefits", "channel", "funnel", "review"][(index - 1) % 5];
+  const timeline = ["T-21", "T-7", "DAY", "T+3", "T+7"].map((step, itemIndex) => ({
+    step,
+    text: festivalPromotionRhythmCompactText(bullets[itemIndex], ["预热蓄水", "权益预告", "爆发转化", "返场追单", "复盘沉淀"][itemIndex], 12),
+  }));
+  const labels = ["满减门槛", "会员券包", "爆品秒杀", "返场礼包"].map((fallback, itemIndex) => festivalPromotionRhythmCompactText(bullets[itemIndex], fallback, 14));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "FESTIVAL CAMPAIGN" : sceneRole === "timeline" ? "CAMPAIGN CALENDAR" : sceneRole === "benefits" ? "BENEFIT DESIGN" : sceneRole === "channel" ? "CHANNEL ROUTE" : sceneRole === "funnel" ? "CONVERSION PATH" : sceneRole === "review" ? "DATA REVIEW" : "NEXT CAMPAIGN",
+    title,
+    summary: festivalPromotionRhythmCompactText(bullets[0], "围绕节日节点、权益机制、触达渠道和转化复盘搭建可执行的活动方案。", 44),
+    bullets,
+    timeline,
+    labels,
+    metrics: [
+      { value: "5", label: "活动阶段" },
+      { value: "4", label: "权益组合" },
+      { value: "ROI", label: "复盘指标" },
+    ],
+  };
+}
+
+function festivalPromotionRhythmBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => exportTextValue(item).trim()).filter(Boolean) : [];
+  return values.length ? values : ["拆解节日节点与活动目标", "规划预热、爆发和返场动作", "设计满减、券包和爆品权益", "复盘转化数据和下次优化"];
+}
+
+function festivalPromotionRhythmCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, Math.max(1, maxLength - 1)).join("")}...`;
+}
+
+function festivalPromotionRhythmPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.background, 0.78),
+    soft: blendHexColor(visual.accent, visual.surface, 0.86),
+    roseGlow: blendHexColor(visual.accent, visual.background, 0.72),
+    goldGlow: blendHexColor(visual.secondary || "FF8A00", visual.background, 0.72),
+  };
+}
+
+function isFestivalPromotionRhythmVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "marketing-festival-promotion-rhythm" && (id === "festival-marketing-plan" || id === "marketing-festival-marketing-plan-promotion-rhythm");
 }
 
 function businessModelValueChainDecorationsXml({ visual, index, role, slide }) {

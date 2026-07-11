@@ -200,6 +200,72 @@ test("sales training objection handling preview uses dedicated roleplay scenes",
   assert.doesNotMatch(html, /<div class="slide-content"><h2/);
 });
 
+test("presales technical architecture preview uses dedicated blueprint scenes", async () => {
+  const deck = {
+    id: "deck-presales-architecture-preview",
+    ownerUserId: 7,
+    title: "Presales architecture solution",
+    templateId: "sales-presales-technical-plan-architecture-solution",
+    theme: "architecture-solution",
+    templateVisual: {
+      id: "sales-presales-technical-plan-architecture-solution",
+      primary: "0B1F3A",
+      accent: "22D3EE",
+      secondary: "38BDF8",
+      warning: "F59E0B",
+      background: "EAF3FB",
+      surface: "FFFFFF",
+      title: "071827",
+      body: "334155",
+      layout: "presales-architecture-solution",
+      variant: "architecture-solution",
+    },
+    status: "ready",
+    slides: [
+      { title: "Client technical solution overview", layout: "presales-architecture-cover", bullets: ["Match client requirements", "Design integration architecture", "Define delivery assurance"] },
+      { title: "Requirement and capability fit", layout: "presales-requirement-map", bullets: ["Business goal", "Technical capability", "Integration boundary", "Expected value"] },
+      { title: "Layered system architecture", layout: "presales-architecture-blueprint", bullets: ["User portal", "Business apps", "Platform services", "Data services", "Cloud resources"] },
+      { title: "Capability module design", layout: "presales-module-capability", bullets: ["Identity access", "Workflow orchestration", "Data integration", "Security audit"] },
+      { title: "Deployment topology", layout: "presales-deployment-topology", bullets: ["Client systems", "API gateway", "Data service", "Cloud resources"] },
+      { title: "Delivery assurance path", layout: "presales-delivery-assurance", bullets: ["Scope confirmation", "Technical review", "POC validation", "Production handover"] },
+    ],
+  };
+  const service = new PptService({
+    database: { findOne: async (collection, predicate) => (collection === "decks" && predicate(deck) ? deck : null) },
+    storage: {},
+    taskCenter: {},
+    templateManager: new TemplateManager({
+      templates: [{
+        id: "sales-presales-technical-plan-architecture-solution",
+        name: "Presales Technical Plan",
+        categoryId: "sales",
+        scope: "official",
+        official: true,
+        status: "active",
+        themes: [{ id: "architecture-solution", visual: deck.templateVisual }],
+        visual: deck.templateVisual,
+      }],
+    }),
+    aiProvider: {},
+    promptManager: {},
+    exporter: new PptExportService(),
+    billingClient: {},
+  });
+
+  const html = await service.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(html, /data-layout="presales-architecture-solution"/);
+  assert.match(html, /presales-arch-layer/);
+  assert.match(html, /presales-arch-canvas/);
+  assert.match(html, /presales-arch-map/);
+  assert.match(html, /presales-arch-blueprint/);
+  assert.match(html, /presales-arch-modules/);
+  assert.match(html, /presales-arch-topology/);
+  assert.match(html, /presales-arch-timeline/);
+  assert.doesNotMatch(html, />架构方案</);
+  assert.doesNotMatch(html, /<div class="slide-content"><h2/);
+});
+
 test("product pricing strategy online preview uses dedicated scenes", async () => {
   const deck = {
     id: "deck-product-pricing-preview",

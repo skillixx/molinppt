@@ -579,6 +579,24 @@ test("resolveTemplateVisual maps key account official slug to dedicated visual",
   assert.equal(visual.variant, "decision-chain");
 });
 
+test("resolveTemplateVisual applies presales technical architecture official visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "presales-technical-plan", theme: "architecture-solution" });
+
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "22D3EE");
+  assert.equal(visual.secondary, "38BDF8");
+  assert.equal(visual.background, "EAF3FB");
+  assert.equal(visual.layout, "presales-architecture-solution");
+  assert.equal(visual.variant, "architecture-solution");
+});
+
+test("resolveTemplateVisual maps presales technical official slug to dedicated visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "sales-presales-technical-plan-architecture-solution", theme: "architecture-solution" });
+
+  assert.equal(visual.layout, "presales-architecture-solution");
+  assert.equal(visual.variant, "architecture-solution");
+});
+
 test("resolveTemplateVisual applies sales training objection handling official visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-training-course", theme: "objection-handling" });
 
