@@ -229,6 +229,28 @@ test("PptService renders editorial brand story preview with distinct magazine pa
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders premium brand story preview with luxury material pages", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "高端品牌新品发布",
+    slideCount: 6,
+    templateId: "brand-story",
+    theme: "premium",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="brand-story" data-layout="luxury-brand-story"/);
+  assert.match(preview, /luxury-brand-layer/);
+  assert.match(preview, /luxury-brand-photo|luxury-brand-gallery|luxury-brand-proof|luxury-brand-launch/);
+  assert.match(preview, /--luxury-product:url/);
+  assert.doesNotMatch(preview, />高端质感</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService applies a new template to an existing deck preview", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

@@ -950,8 +950,9 @@ test("resolveTemplateVisual applies brand story commercial visuals", () => {
   assert.equal(editorial.variant, "editorial");
   assert.equal(editorial.primary, "2A2F3F");
   assert.equal(editorial.accent, "C7825A");
-  assert.equal(premium.layout, "brand-story");
+  assert.equal(premium.layout, "luxury-brand-story");
   assert.equal(premium.variant, "premium");
+  assert.equal(premium.background, "F6F1E8");
   assert.equal(premium.accent, "BFA06A");
   assert.equal(identity.layout, "brand-identity-system");
   assert.equal(identity.variant, "identity-manual");

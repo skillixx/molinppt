@@ -12,7 +12,7 @@ export const templateRenderer = {
   "visual": {
     "primary": "181C24",
     "accent": "BFA06A",
-    "background": "F2EFE8",
+    "background": "F6F1E8",
     "surface": "FFFEFA",
     "title": "151922",
     "body": "474B55",

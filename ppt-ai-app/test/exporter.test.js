@@ -3338,15 +3338,18 @@ test("PptExportService uses premium brand story decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const rels1 = pptPartText(text, "ppt/slides/_rels/slide1.xml.rels");
 
-  assert.match(slide1, /name="Brand Story Image Panel"/);
-  assert.match(slide1, /name="Brand Story premium Chip"/);
-  assert.match(slide1, /name="Brand Story Premium Texture Block"/);
-  assert.match(slide1, /name="Brand Story Premium Gold Slab"/);
-  assert.match(slide1, /name="Brand Story Premium Top Plate"/);
-  assert.match(slide1, /name="Brand Story Premium Seal"/);
-  assert.match(slide1, /val="181C24"/);
+  assert.match(slide1, /name="Luxury Brand Ivory Canvas"/);
+  assert.match(slide1, /name="Luxury Brand Gold Material Band"/);
+  assert.match(slide1, /name="Luxury Brand Fine Gallery Frame"/);
+  assert.match(slide1, /name="Luxury Brand Product Still"/);
+  assert.match(slide1, /name="Luxury Brand Index Card 1"/);
+  assert.match(rels1, /luxury-product-still\.png/);
+  assert.match(rels1, /brushed-gold-texture\.png/);
+  assert.match(slide1, /val="151922"/);
   assert.match(slide1, /val="BFA06A"/);
+  assert.doesNotMatch(slide1, /高端质感/);
 });
 
 test("PptExportService uses identity brand story decorations", () => {

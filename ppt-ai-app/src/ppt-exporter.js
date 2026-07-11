@@ -15194,6 +15194,11 @@ function luxuryBrandStoryCompactText(text, fallback, maxLength) {
   return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
 }
 
+function isLuxuryBrandStoryVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "luxury-brand-story" && (id === "brand-story" || id === "marketing-brand-story-premium");
+}
+
 function brandStoryVisualXml({ visual, palette, scene, isCover }) {
   const panel = isCover
     ? { x: 6172200, y: 1463040, cx: 2133600, cy: 1676400 }
