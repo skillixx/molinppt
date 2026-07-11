@@ -139,6 +139,96 @@ test("PptService renders commercial template theme chips as decorative elements 
   assert.doesNotMatch(preview, /<div class="marketing-chip">/);
 });
 
+test("PptService renders growth marketing lab preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "用户增长实验复盘",
+    slideCount: 4,
+    templateId: "marketing-campaign",
+    theme: "growth",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /data-layout="growth-marketing-lab"/);
+  assert.match(preview, /growth-lab-wheel|growth-lab-funnel|growth-lab-matrix/);
+  assert.doesNotMatch(preview, /增长营销/);
+});
+
+test("PptService renders brand communication preview without theme labels", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "品牌传播年度计划",
+    slideCount: 6,
+    templateId: "marketing-campaign",
+    theme: "brand",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="marketing-campaign" data-layout="marketing-brand-communication-console"/);
+  assert.match(preview, /brand-comms-layer/);
+  assert.match(preview, /brand-comms-content-matrix|brand-comms-touchpoint-map|brand-comms-dashboard/);
+  assert.match(preview, /COMMS CONTROL|MESSAGE HOUSE|MEDIA TOUCHPOINTS/);
+  assert.doesNotMatch(preview, />品牌传播</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders brand identity system preview with manual style", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "品牌升级视觉体系",
+    slideCount: 4,
+    templateId: "brand-story",
+    theme: "identity",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="brand-story" data-layout="brand-identity-system"/);
+  assert.match(preview, /brand-id-safe-area|brand-id-palette|brand-id-type-spec|brand-id-touchpoints/);
+  assert.match(preview, /BRAND SYSTEM MANUAL/);
+  assert.doesNotMatch(preview, />品牌识别</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders editorial brand story preview with distinct magazine pages", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "品牌年度故事",
+    slideCount: 8,
+    templateId: "brand-story",
+    theme: "editorial",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="brand-story" data-layout="brand-story-editorial"/);
+  assert.match(preview, /editorial-role-cover/);
+  assert.match(preview, /editorial-role-opener/);
+  assert.match(preview, /editorial-role-timeline/);
+  assert.match(preview, /editorial-role-interview/);
+  assert.match(preview, /editorial-role-manifesto/);
+  assert.match(preview, /editorial-role-feature/);
+  assert.match(preview, /editorial-role-evidence/);
+  assert.match(preview, /editorial-role-closing/);
+  assert.match(preview, /BRAND JOURNAL|FEATURE STORY|NEXT CHAPTER/);
+  assert.doesNotMatch(preview, />编辑叙事</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService applies a new template to an existing deck preview", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

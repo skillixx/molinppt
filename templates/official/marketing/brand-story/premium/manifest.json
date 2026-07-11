@@ -10,8 +10,12 @@
     "marketing",
     "brand-story",
     "premium",
-    "brand-narrative"
+    "brand-narrative",
+    "luxury",
+    "product-showcase",
+    "material-texture"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

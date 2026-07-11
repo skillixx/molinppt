@@ -16,15 +16,20 @@ export const templateRenderer = {
     "surface": "FFFEFA",
     "title": "151922",
     "body": "474B55",
-    "layout": "brand-story",
+    "secondary": "D8C7A5",
+    "layout": "luxury-brand-story",
     "variant": "premium"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "luxury-brand-cover",
+    "defaultContentLayout": "luxury-brand-story",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
+      "luxury-brand-cover",
+      "luxury-brand-story",
+      "luxury-brand-gallery",
+      "luxury-brand-proof",
+      "luxury-brand-launch",
+      "luxury-brand-closing",
       "hero",
       "story"
     ]

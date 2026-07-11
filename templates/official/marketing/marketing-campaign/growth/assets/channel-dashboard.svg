@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-label="channel dashboard">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#ECFDF5"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="480" rx="34" fill="#F8FFFB"/>
+  <rect x="64" y="70" width="592" height="340" rx="28" fill="url(#panel)" stroke="#B7E6D0" stroke-width="3"/>
+  <g fill="#047857">
+    <rect x="108" y="126" width="120" height="64" rx="18"/>
+    <rect x="108" y="214" width="120" height="64" rx="18" opacity="0.72"/>
+    <rect x="108" y="302" width="120" height="64" rx="18" opacity="0.42"/>
+  </g>
+  <g fill="#F97316">
+    <rect x="284" y="286" width="46" height="80" rx="14"/>
+    <rect x="356" y="230" width="46" height="136" rx="14"/>
+    <rect x="428" y="176" width="46" height="190" rx="14"/>
+    <rect x="500" y="128" width="46" height="238" rx="14"/>
+  </g>
+  <path d="M284 258C336 210 396 226 448 168C486 126 526 118 580 90" fill="none" stroke="#047857" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#063327" opacity="0.16">
+    <rect x="284" y="126" width="164" height="14" rx="7"/>
+    <rect x="284" y="152" width="118" height="14" rx="7"/>
+  </g>
+</svg>

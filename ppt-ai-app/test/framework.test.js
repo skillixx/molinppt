@@ -913,11 +913,12 @@ test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   assert.equal(launch.layout, "marketing");
   assert.equal(launch.variant, "launch");
   assert.equal(launch.primary, "E11D48");
-  assert.equal(brand.layout, "marketing");
-  assert.equal(brand.variant, "brand");
-  assert.equal(brand.accent, "06B6D4");
-  assert.equal(growth.layout, "marketing");
-  assert.equal(growth.variant, "growth");
+  assert.equal(brand.layout, "marketing-brand-communication-console");
+  assert.equal(brand.variant, "brand-console");
+  assert.equal(brand.primary, "7F1D4E");
+  assert.equal(brand.accent, "F97316");
+  assert.equal(growth.layout, "growth-marketing-lab");
+  assert.equal(growth.variant, "growth-lab");
   assert.equal(growth.accent, "F97316");
 });
 
@@ -945,17 +946,17 @@ test("resolveTemplateVisual applies brand story commercial visuals", () => {
   const premium = resolveTemplateVisual({ templateId: "brand-story", theme: "premium" });
   const identity = resolveTemplateVisual({ templateId: "brand-story", theme: "identity" });
 
-  assert.equal(editorial.layout, "brand-story");
+  assert.equal(editorial.layout, "brand-story-editorial");
   assert.equal(editorial.variant, "editorial");
   assert.equal(editorial.primary, "2A2F3F");
   assert.equal(editorial.accent, "C7825A");
   assert.equal(premium.layout, "brand-story");
   assert.equal(premium.variant, "premium");
   assert.equal(premium.accent, "BFA06A");
-  assert.equal(identity.layout, "brand-story");
-  assert.equal(identity.variant, "identity");
-  assert.equal(identity.primary, "123D4A");
-  assert.equal(identity.accent, "E56F4F");
+  assert.equal(identity.layout, "brand-identity-system");
+  assert.equal(identity.variant, "identity-manual");
+  assert.equal(identity.primary, "121826");
+  assert.equal(identity.accent, "D84B3F");
 });
 
 test("resolveTemplateVisual applies data insight commercial visuals", () => {

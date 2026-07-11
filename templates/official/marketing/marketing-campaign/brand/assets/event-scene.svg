@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="brand event scene">
+  <rect width="600" height="360" rx="32" fill="#fff7ed"/>
+  <path d="M92 276h416l-52 46H144z" fill="#7f1d4e"/>
+  <rect x="140" y="82" width="320" height="146" rx="24" fill="#ffffff" stroke="#fed7aa" stroke-width="4"/>
+  <rect x="172" y="112" width="152" height="18" rx="9" fill="#7f1d4e"/>
+  <rect x="172" y="150" width="102" height="12" rx="6" fill="#5a3b48" opacity=".42"/>
+  <rect x="172" y="176" width="164" height="12" rx="6" fill="#5a3b48" opacity=".28"/>
+  <circle cx="394" cy="158" r="38" fill="#f97316" opacity=".84"/>
+  <path d="M120 66l92 190M480 66l-92 190" stroke="#f97316" stroke-width="8" stroke-linecap="round" opacity=".28"/>
+  <circle cx="162" cy="308" r="12" fill="#f97316"/>
+  <circle cx="218" cy="310" r="12" fill="#0f766e"/>
+  <circle cx="274" cy="306" r="12" fill="#7f1d4e"/>
+  <circle cx="330" cy="310" r="12" fill="#f97316"/>
+  <circle cx="386" cy="306" r="12" fill="#0f766e"/>
+  <circle cx="442" cy="310" r="12" fill="#7f1d4e"/>
+</svg>

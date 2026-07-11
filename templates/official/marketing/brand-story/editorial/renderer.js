@@ -16,17 +16,21 @@ export const templateRenderer = {
     "surface": "FFFDFC",
     "title": "171B26",
     "body": "4A5160",
-    "layout": "brand-story",
+    "layout": "brand-story-editorial",
     "variant": "editorial"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "editorial-cover",
+    "defaultContentLayout": "editorial-story",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "editorial-cover",
+      "editorial-opener",
+      "editorial-timeline",
+      "editorial-interview",
+      "editorial-manifesto",
+      "editorial-feature",
+      "editorial-evidence",
+      "editorial-closing"
     ]
   }
 };

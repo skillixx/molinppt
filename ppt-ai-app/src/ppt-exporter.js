@@ -19,6 +19,13 @@ import {
 
 const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scaleY: 1, type: "screen16x9" };
 const BUSINESS_MODERN_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
+const LUXURY_BRAND_ASSET_BASE_URL = new URL("../../templates/official/marketing/brand-story/premium/assets/", import.meta.url);
+const LUXURY_BRAND_MEDIA = {
+  product: { file: "luxury-product-still.png", content: readFileSync(new URL("luxury-product-still.png", LUXURY_BRAND_ASSET_BASE_URL)) },
+  gold: { file: "brushed-gold-texture.png", content: readFileSync(new URL("brushed-gold-texture.png", LUXURY_BRAND_ASSET_BASE_URL)) },
+  silk: { file: "ivory-silk-stone.png", content: readFileSync(new URL("ivory-silk-stone.png", LUXURY_BRAND_ASSET_BASE_URL)) },
+  glass: { file: "glass-showcase-detail.png", content: readFileSync(new URL("glass-showcase-detail.png", LUXURY_BRAND_ASSET_BASE_URL)) },
+};
 const STATUS_REPORT_MEDIA = {
   weekly: {
     file: "status-report-weekly.jpeg",
@@ -403,7 +410,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -930,6 +937,9 @@ function shouldRenderDomeBodyList(visual, role) {
  * @returns {boolean}
  */
 function shouldRenderTemplateBodyList(visual, role) {
+  if (visual.layout === "luxury-brand-story") return false;
+  if (visual.layout === "brand-story-editorial") return false;
+  if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
   if (visual.layout === "product-funding-highlights") return false;
@@ -992,6 +1002,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "exam-review-keypoints") return false;
   if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "education-workshop-practice-review") return false;
+  if (visual.layout === "marketing-brand-communication-console") return false;
   if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
@@ -999,6 +1010,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "integrated-media-mix") return false;
   if (visual.layout === "public-course-enrollment") return false;
   if (visual.layout === "department-team-performance") return false;
+  if (visual.layout === "brand-identity-system") return false;
   return shouldRenderDomeBodyList(visual, role);
 }
 
@@ -1009,6 +1021,9 @@ function shouldRenderTemplateBodyList(visual, role) {
  * @returns {boolean}
  */
 function shouldRenderTemplateTitle(visual, role) {
+  if (visual.layout === "luxury-brand-story") return false;
+  if (visual.layout === "brand-story-editorial") return false;
+  if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "finance-risk-inspection") return false;
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
@@ -1028,6 +1043,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "education-workshop-practice-review") return false;
+  if (visual.layout === "marketing-brand-communication-console") return false;
   if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
   if (visual.layout === "pre-a-market-validation") return false;
@@ -1035,6 +1051,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "integrated-media-mix") return false;
   if (visual.layout === "public-course-enrollment") return false;
   if (visual.layout === "department-team-performance") return false;
+  if (visual.layout === "brand-identity-system") return false;
   return true;
 }
 
@@ -1333,6 +1350,15 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   if (visual.layout === "department-team-performance") {
     return base + departmentTeamPerformanceDecorationsXml({ visual, index, role, slide });
   }
+  if (visual.layout === "brand-story-editorial") {
+    return base + brandStoryEditorialDecorationsXml({ visual, index, slide, total });
+  }
+  if (visual.layout === "brand-identity-system") {
+    return base + brandIdentitySystemDecorationsXml({ visual, index, role, slide, total });
+  }
+  if (typeof isGrowthMarketingLabVisual === "function" && typeof growthMarketingLabDecorationsXml === "function" && isGrowthMarketingLabVisual(visual)) {
+    return base + growthMarketingLabDecorationsXml({ visual, index, role, slide, total });
+  }
   if (isGrowthFundingFlywheelVisual(visual)) {
     return base + growthFundingFlywheelDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1353,6 +1379,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (isSeedRoundStoryVisual(visual)) {
     return base + seedRoundStoryDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (typeof isBrandCommunicationVisual === "function" && typeof brandCommunicationDecorationsXml === "function" && isBrandCommunicationVisual(visual)) {
+    return base + brandCommunicationDecorationsXml({ visual, index, role, slide, total });
   }
   if (visual.layout === "marketing") {
     const isCover = index === 0;
@@ -1378,6 +1407,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       + marketingCampaignVisualXml({ visual, palette, scene, isCover })
       + metrics
       + textShapeXml({ id: 340, name: "Marketing Caption", x: isCover ? 6248400 : 6248400, y: isCover ? 3429000 : 3200400, cx: isCover ? 2133600 : 1981200, cy: 182880, text: scene.caption, size: isCover ? 820 : 760, bold: true, color: visual.body });
+  }
+  if (visual.layout === "luxury-brand-story") {
+    return base + luxuryBrandStoryDecorationsXml({ visual, slide, index, total });
   }
   if (visual.layout === "brand-story") {
     const isCover = index === 0;
@@ -1608,6 +1640,9 @@ function templateMediaFiles(visual) {
   if (isStrategyConsultingVisual(visual)) {
     const media = strategyConsultingMedia(visual);
     return { [`ppt/media/${media.file}`]: media.content };
+  }
+  if (typeof isLuxuryBrandStoryVisual === "function" && isLuxuryBrandStoryVisual(visual)) {
+    return Object.fromEntries(Object.values(LUXURY_BRAND_MEDIA).map((media) => [`ppt/media/${media.file}`, media.content]));
   }
   return {};
 }
@@ -3182,6 +3217,18 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: "D7DEE8",
     };
   }
+  if (visual.layout === "brand-story-editorial") {
+    return {
+      surface: { x: 292608, y: 164592, cx: 8558784, cy: 4814316 },
+      accent: { x: 475488, y: 533400, cx: 8193024, cy: 22860 },
+      secondaryAccent: { x: 640080, y: 2743200, cx: 2133600, cy: 45720 },
+      label: { x: 475488, y: 266700, cx: 2438400, cy: 213360 },
+      title: { x: 640080, y: 1219200, cx: 3962400, cy: 1280160 },
+      content: { x: 640080, y: 2872740, cx: 3200400, cy: 731520 },
+      titleSize: index === 0 ? 3600 : 3000,
+      bodySize: 980,
+    };
+  }
   if (visual.layout === "brand-story") {
     if (index === 0) {
       return {
@@ -3204,6 +3251,18 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 1066800, y: 1981200, cx: 3962400, cy: 1371600 },
       titleSize: 2800,
       bodySize: 1220,
+    };
+  }
+  if (visual.layout === "brand-identity-system") {
+    return {
+      surface: { x: 548640, y: 457200, cx: 8046720, cy: 4221480 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 76200 },
+      secondaryAccent: { x: 762000, y: 4533900, cx: 7620000, cy: 76200 },
+      label: { x: 822960, y: 640080, cx: 2590800, cy: 243840 },
+      title: { x: 822960, y: 1036320, cx: 3962400, cy: 914400 },
+      content: { x: 914400, y: 2438400, cx: 3657600, cy: 1066800 },
+      titleSize: index === 0 ? 3100 : 2500,
+      bodySize: 980,
     };
   }
   if (visual.layout === "data-insight") {
@@ -3518,7 +3577,10 @@ function slideRelsXml(visual, role = "content") {
   const businessImageRel = businessImage
     ? `<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${businessImage}"/>`
     : "";
-  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}</Relationships>`;
+  const luxuryBrandRels = typeof isLuxuryBrandStoryVisual === "function" && isLuxuryBrandStoryVisual(visual)
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.product.file}"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.gold.file}"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.silk.file}"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.glass.file}"/>`
+    : "";
+  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}${luxuryBrandRels}</Relationships>`;
 }
 
 /**
@@ -11581,6 +11643,191 @@ function isBusinessModelBpVisual(visual) {
   return ["business-plan", "pitch-business-plan-business-model"].includes(visual?.id) && visual?.layout === "business-model-bp";
 }
 
+function growthMarketingLabDecorationsXml({ visual, index, slide, total }) {
+  const scene = growthMarketingLabScene({ slide, index, total });
+  const palette = growthMarketingLabPalette(visual);
+  const titleSize = scene.role === "cover" ? 2500 : 2100;
+  const bulletBody = scene.bullets.slice(0, 4).map((item) => paragraphXml(`• ${item}`, 760, false, visual.body)).join("");
+  const header = textShapeXml({ id: 421, name: "Growth Lab Kicker", x: 768096, y: 731520, cx: 1828800, cy: 182880, text: "GROWTH COMMAND", size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 422, name: "Growth Lab Title", x: 768096, y: 1005840, cx: 3657600, cy: 762000, text: scene.title, size: titleSize, bold: true, color: visual.title })
+    + textShapeXml({ id: 423, name: "Growth Lab Summary", x: 777240, y: 2034540, cx: 3352800, cy: 457200, text: scene.summary, size: 780, bold: true, color: visual.body })
+    + textShapeXml({ id: 424, name: "Growth Lab Bullet Block", x: 777240, y: 2651760, cx: 3200400, cy: 853440, body: bulletBody || paragraphXml("• 用户增长链路复盘", 760, false, visual.body), size: 760, bold: false, color: visual.body });
+  const metrics = growthMarketingLabMetricsXml({ visual, metrics: scene.metrics });
+  const right = scene.role === "cover"
+    ? growthMarketingLabWheelXml({ visual, palette, stages: scene.stages })
+    : scene.role === "matrix"
+      ? growthMarketingLabMatrixXml({ visual, scene })
+      : scene.role === "experiment"
+        ? growthMarketingLabExperimentXml({ visual, scene })
+        : scene.role === "roi"
+          ? growthMarketingLabRoiXml({ visual, palette })
+          : scene.role === "priority" || scene.role === "closing"
+            ? growthMarketingLabPriorityXml({ visual, scene })
+            : growthMarketingLabFunnelXml({ visual, scene });
+  return solidShapeXml({ id: 401, name: "Growth Lab Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 402, name: "Growth Lab Warm Glow", geom: "ellipse", x: 6705600, y: 365760, cx: 1676400, cy: 1676400, fill: palette.orangeSoft })
+    + solidShapeXml({ id: 403, name: "Growth Lab Green Glow", geom: "ellipse", x: -304800, y: 3429000, cx: 1828800, cy: 1371600, fill: palette.greenSoft })
+    + lineFrameShapeXml({ id: 404, name: "Growth Lab Canvas Frame", geom: "roundRect", x: 521208, y: 416052, cx: 8101584, cy: 4349496, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 405, name: "Growth Lab Top Rule", geom: "roundRect", x: 521208, y: 416052, cx: 8101584, cy: 60960, fill: visual.primary })
+    + solidShapeXml({ id: 406, name: "Growth Lab Accent Rule", geom: "roundRect", x: 518160, y: 416052, cx: 2438400, cy: 60960, fill: visual.accent })
+    + growthMarketingLabGridXml({ visual, palette })
+    + header
+    + right
+    + metrics
+    + growthMarketingLabDeviceXml({ visual, palette });
+}
+
+function growthMarketingLabGridXml({ palette }) {
+  return [0, 1, 2, 3, 4].map((itemIndex) => solidShapeXml({
+    id: 410 + itemIndex,
+    name: `Growth Lab Grid Line ${itemIndex + 1}`,
+    x: 914400 + itemIndex * 1219200,
+    y: 609600,
+    cx: 9144,
+    cy: 3886200,
+    fill: palette.grid,
+  })).join("");
+}
+
+function growthMarketingLabWheelXml({ visual, palette, stages }) {
+  const nodes = [
+    { x: 6263640, y: 792480 },
+    { x: 7452360, y: 1600200 },
+    { x: 7162800, y: 2941320 },
+    { x: 5821680, y: 2941320 },
+    { x: 5486400, y: 1600200 },
+  ];
+  return solidShapeXml({ id: 451, name: "Growth Lab Flywheel Outer", geom: "ellipse", x: 5700000, y: 1005840, cx: 2133600, cy: 2133600, fill: palette.wheel })
+    + solidShapeXml({ id: 452, name: "Growth Lab Flywheel Core", geom: "ellipse", x: 6198880, y: 1504720, cx: 1135840, cy: 1135840, fill: visual.surface })
+    + arcLineShapeXml({ id: 453, name: "Growth Lab Flywheel Motion", x: 5791200, y: 1097280, cx: 1950720, cy: 1950720, stroke: visual.accent, width: 45720 })
+    + nodes.map((node, itemIndex) => solidShapeXml({ id: 454 + itemIndex * 2, name: `Growth Lab Stage Node ${itemIndex + 1}`, geom: "roundRect", x: node.x, y: node.y, cx: 548640, cy: 228600, fill: visual.surface })
+      + textShapeXml({ id: 455 + itemIndex * 2, name: `Growth Lab Stage Text ${itemIndex + 1}`, x: node.x + 45720, y: node.y + 45720, cx: 457200, cy: 121920, text: stages[itemIndex], size: 620, bold: true, color: visual.title })).join("");
+}
+
+function growthMarketingLabFunnelXml({ visual, scene }) {
+  return scene.stages.map((stage, itemIndex) => {
+    const width = 2743200 - itemIndex * 274320;
+    const x = 5532120 + itemIndex * 137160;
+    const y = 1036320 + itemIndex * 365760;
+    return solidShapeXml({ id: 481 + itemIndex * 2, name: `Growth Lab Funnel Bar ${itemIndex + 1}`, geom: "roundRect", x, y, cx: width, cy: 274320, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 482 + itemIndex * 2, name: `Growth Lab Funnel Text ${itemIndex + 1}`, x: x + 152400, y: y + 60960, cx: width - 304800, cy: 121920, text: scene.bullets[itemIndex] || stage, size: 680, bold: true, color: "FFFFFF" });
+  }).join("");
+}
+
+function growthMarketingLabMatrixXml({ visual, scene }) {
+  return scene.channels.map((channel, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5295900 + col * 1485900;
+    const y = 1036320 + row * 1066800;
+    return solidShapeXml({ id: 501 + itemIndex * 4, name: `Growth Lab Channel Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, fill: visual.surface })
+      + lineFrameShapeXml({ id: 502 + itemIndex * 4, name: `Growth Lab Channel Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, stroke: itemIndex % 2 ? visual.accent : visual.primary, width: 11430 })
+      + solidShapeXml({ id: 503 + itemIndex * 4, name: `Growth Lab Channel Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 152400, y: y + 137160, cx: 152400, cy: 152400, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 504 + itemIndex * 4, name: `Growth Lab Channel Text ${itemIndex + 1}`, x: x + 365760, y: y + 137160, cx: 792480, cy: 457200, text: `${channel}\n${scene.bullets[itemIndex] || "渠道效率复盘"}`, size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function growthMarketingLabExperimentXml({ visual, scene }) {
+  return solidShapeXml({ id: 531, name: "Growth Lab Experiment Card", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 2133600, fill: visual.surface })
+    + lineFrameShapeXml({ id: 532, name: "Growth Lab Experiment Frame", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 2133600, stroke: visual.accent, width: 15240 })
+    + textShapeXml({ id: 533, name: "Growth Lab Experiment Label", x: 5562600, y: 1203960, cx: 1371600, cy: 182880, text: "HYPOTHESIS", size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 534, name: "Growth Lab Experiment Title", x: 5562600, y: 1516380, cx: 2438400, cy: 457200, text: scene.bullets[1] || "用实验验证关键转化假设", size: 1260, bold: true, color: visual.title })
+    + textShapeXml({ id: 535, name: "Growth Lab Experiment Rule", x: 5562600, y: 2225040, cx: 2286000, cy: 365760, text: scene.bullets[2] || "指标、样本、周期和判定标准", size: 820, bold: true, color: visual.body })
+    + growthMarketingLabFunnelXml({ visual, scene });
+}
+
+function growthMarketingLabRoiXml({ visual, palette }) {
+  return solidShapeXml({ id: 561, name: "Growth Lab ROI Board", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, fill: visual.surface })
+    + lineFrameShapeXml({ id: 562, name: "Growth Lab ROI Frame", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, stroke: palette.frame, width: 15240 })
+    + solidShapeXml({ id: 563, name: "Growth Lab ROI Axis", x: 5638800, y: 2506980, cx: 2438400, cy: 15240, fill: palette.line })
+    + solidShapeXml({ id: 564, name: "Growth Lab ROI Bar 1", geom: "roundRect", x: 5821680, y: 2026920, cx: 243840, cy: 480060, fill: visual.primary })
+    + solidShapeXml({ id: 565, name: "Growth Lab ROI Bar 2", geom: "roundRect", x: 6400800, y: 1661160, cx: 243840, cy: 845820, fill: visual.accent })
+    + solidShapeXml({ id: 566, name: "Growth Lab ROI Bar 3", geom: "roundRect", x: 6979920, y: 1356360, cx: 243840, cy: 1150620, fill: visual.primary })
+    + arcLineShapeXml({ id: 567, name: "Growth Lab ROI Curve", x: 5638800, y: 1219200, cx: 2438400, cy: 1371600, stroke: visual.accent, width: 38100 });
+}
+
+function growthMarketingLabPriorityXml({ visual, scene }) {
+  return scene.actions.map((action, itemIndex) => {
+    const y = 1066800 + itemIndex * 716280;
+    return solidShapeXml({ id: 581 + itemIndex * 3, name: `Growth Lab Priority Card ${itemIndex + 1}`, geom: "roundRect", x: 5295900, y, cx: 3048000, cy: 548640, fill: visual.surface })
+      + solidShapeXml({ id: 582 + itemIndex * 3, name: `Growth Lab Priority Badge ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y: y + 106680, cx: 365760, cy: 335280, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 583 + itemIndex * 3, name: `Growth Lab Priority Text ${itemIndex + 1}`, x: 6019800, y: y + 121920, cx: 2011680, cy: 274320, text: scene.bullets[itemIndex] || action, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function growthMarketingLabMetricsXml({ visual, metrics }) {
+  return metrics.map((metric, itemIndex) => {
+    const x = 768096 + itemIndex * 1066800;
+    return solidShapeXml({ id: 611 + itemIndex * 3, name: `Growth Lab Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3810000, cx: 944880, cy: 502920, fill: visual.surface })
+      + textShapeXml({ id: 612 + itemIndex * 3, name: `Growth Lab Metric Value ${itemIndex + 1}`, x: x + 106680, y: 3924300, cx: 701040, cy: 152400, text: metric.value, size: 1060, bold: true, color: visual.title })
+      + textShapeXml({ id: 613 + itemIndex * 3, name: `Growth Lab Metric Label ${itemIndex + 1}`, x: x + 106680, y: 4122420, cx: 701040, cy: 137160, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function growthMarketingLabDeviceXml({ visual, palette }) {
+  return solidShapeXml({ id: 631, name: "Growth Lab Device Scene", geom: "roundRect", x: 6858000, y: 3627120, cx: 1371600, cy: 792480, fill: palette.device })
+    + solidShapeXml({ id: 632, name: "Growth Lab Device Line 1", geom: "roundRect", x: 7086600, y: 3863340, cx: 914400, cy: 76200, fill: visual.primary })
+    + solidShapeXml({ id: 633, name: "Growth Lab Device Line 2", geom: "roundRect", x: 7086600, y: 4030980, cx: 670560, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: 634, name: "Growth Lab Device Dot", geom: "ellipse", x: 7879080, y: 4191000, cx: 182880, cy: 182880, fill: "22C55E" });
+}
+
+function growthMarketingLabPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.surface, 0.68),
+    grid: blendHexColor(visual.primary, visual.surface, 0.86),
+    line: blendHexColor(visual.title, visual.surface, 0.82),
+    wheel: blendHexColor(visual.primary, visual.accent, 0.30),
+    greenSoft: blendHexColor(visual.primary, visual.surface, 0.72),
+    orangeSoft: blendHexColor(visual.accent, visual.surface, 0.72),
+    device: blendHexColor(visual.surface, visual.primary, 0.08),
+  };
+}
+
+function growthMarketingLabScene({ slide, index, total }) {
+  const bullets = growthMarketingLabBulletTexts(slide);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("matrix") || layout.includes("channel")
+      ? "matrix"
+      : layout.includes("experiment") || layout.includes("card")
+        ? "experiment"
+        : layout.includes("roi") || layout.includes("trend")
+          ? "roi"
+          : layout.includes("priority") || layout.includes("action")
+            ? "priority"
+            : layout.includes("closing") || index === total - 1
+              ? "closing"
+              : ["funnel", "matrix", "experiment", "roi", "priority"][(index - 1) % 5];
+  return {
+    role,
+    title: growthMarketingLabCompactText(slide?.title, role === "cover" ? "增长计划作战台" : "关键增长路径", role === "cover" ? 24 : 22),
+    summary: growthMarketingLabCompactText(bullets[0], "围绕获客、激活、留存、变现和推荐建立可复用的实验闭环。", 44),
+    bullets,
+    metrics: [
+      { value: "AARRR", label: "核心链路" },
+      { value: "ROI", label: "投放复盘" },
+      { value: "30D", label: "实验周期" },
+    ],
+    channels: ["搜索", "内容", "社群", "广告"],
+    stages: ["获客", "激活", "留存", "转化", "复购"],
+    actions: ["高影响", "快验证", "低成本"],
+  };
+}
+
+function growthMarketingLabBulletTexts(slide) {
+  return (slide?.bullets || []).map((item) => growthMarketingLabCompactText(item, "", 34)).filter(Boolean);
+}
+
+function growthMarketingLabCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  return value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
+}
+
+function isGrowthMarketingLabVisual(visual) {
+  return visual?.id === "marketing-campaign" && visual?.layout === "growth-marketing-lab";
+}
+
 function marketingCampaignVisualXml({ visual, palette, scene, isCover }) {
   const panel = isCover
     ? { x: 6172200, y: 1447800, cx: 2133600, cy: 1676400 }
@@ -11676,6 +11923,217 @@ function marketingCampaignVariant(visual) {
 
 function isMarketingCampaignVisual(visual) {
   return visual?.id === "marketing-campaign" && visual?.layout === "marketing";
+}
+
+function isBrandCommunicationVisual(visual) {
+  return visual?.id === "marketing-campaign" && visual?.layout === "marketing-brand-communication-console";
+}
+
+function brandCommunicationDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = brandCommunicationSceneFromSlide({ slide, index, total });
+  const palette = brandCommunicationPalette(visual);
+  // 品牌传播控制台模板用代码绘制全部主体结构，保证下载后的 PPTX 仍然可编辑。
+  const backdrop = rectShapeXml({ id: 1800, name: "Brand Comms Warm Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 1801, name: "Brand Comms Orange Glow", geom: "ellipse", x: 6858000, y: -381000, cx: 1828800, cy: 1828800, fill: palette.orangeGlow })
+    + solidShapeXml({ id: 1802, name: "Brand Comms Berry Glow", geom: "ellipse", x: -304800, y: 3505200, cx: 2133600, cy: 1295400, fill: palette.berryGlow })
+    + solidShapeXml({ id: 1803, name: "Brand Comms Surface", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, fill: palette.surface })
+    + lineFrameShapeXml({ id: 1804, name: "Brand Comms Surface Frame", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1805, name: "Brand Comms Top Signal Rule", x: 731520, y: 662940, cx: 2011680, cy: 30480, fill: visual.accent });
+  const header = textShapeXml({ id: 1810, name: "Brand Comms Kicker", x: 795528, y: 677940, cx: 1676400, cy: 198120, text: scene.kicker, size: 700, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1811, name: "Brand Comms Title", x: 795528, y: index === 0 ? 1005840 : 975360, cx: 3657600, cy: 731520, text: scene.title, size: index === 0 ? 2150 : 1780, bold: true, color: visual.title })
+    + textShapeXml({ id: 1812, name: "Brand Comms Summary", x: 804672, y: 1973580, cx: 3200400, cy: 396240, text: scene.summary, size: 720, bold: true, color: visual.body })
+    + brandCommunicationBulletXml({ visual, scene });
+  if (scene.role === "proposition") return backdrop + header + brandCommunicationMessageHouseXml({ visual, palette, scene }) + brandCommunicationSignalXml({ visual, palette });
+  if (scene.role === "audience") return backdrop + header + brandCommunicationPersonaXml({ visual, palette, scene });
+  if (scene.role === "content-matrix") return backdrop + header + brandCommunicationContentMatrixXml({ visual, palette, scene });
+  if (scene.role === "media-matrix") return backdrop + header + brandCommunicationTouchpointXml({ visual, palette, scene });
+  if (scene.role === "rhythm") return backdrop + header + brandCommunicationRhythmXml({ visual, palette, scene });
+  if (scene.role === "dashboard") return backdrop + header + brandCommunicationDashboardXml({ visual, palette, scene });
+  if (scene.role === "closing") return backdrop + header + brandCommunicationNextXml({ visual, palette, scene });
+  return backdrop + header + brandCommunicationConsoleXml({ visual, palette }) + brandCommunicationSceneCardsXml({ visual, palette }) + brandCommunicationMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function brandCommunicationBulletXml({ visual, scene }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2712720 + itemIndex * 228600;
+    return solidShapeXml({ id: 1820 + itemIndex * 2, name: `Brand Comms Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 820000, y: y + 45720, cx: 60960, cy: 60960, fill: itemIndex % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1821 + itemIndex * 2, name: `Brand Comms Bullet Text ${itemIndex + 1}`, x: 944880, y, cx: 3200400, cy: 167640, text: item, size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function brandCommunicationConsoleXml({ visual, palette }) {
+  return solidShapeXml({ id: 1840, name: "Brand Comms Console Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 1828800, fill: visual.primary })
+    + solidShapeXml({ id: 1841, name: "Brand Comms Console Accent Wash", geom: "roundRect", x: 5486400, y: 1066800, cx: 1371600, cy: 304800, fill: "FFFFFF" })
+    + solidShapeXml({ id: 1842, name: "Brand Comms Console Device", geom: "roundRect", x: 7315200, y: 1905000, cx: 670560, cy: 701040, fill: palette.card })
+    + rectShapeXml({ id: 1843, name: "Brand Comms Console Line 1", x: 5638800, y: 2286000, cx: 1066800, cy: 60960, fill: "FFFFFF" })
+    + rectShapeXml({ id: 1844, name: "Brand Comms Console Line 2", x: 5638800, y: 2514600, cx: 762000, cy: 60960, fill: palette.soft })
+    + solidShapeXml({ id: 1845, name: "Brand Comms Console Node", geom: "ellipse", x: 7650480, y: 1158240, cx: 365760, cy: 365760, fill: visual.secondary || "0F766E" });
+}
+
+function brandCommunicationSceneCardsXml({ visual, palette }) {
+  return [0, 1, 2, 3].map((itemIndex) => {
+    const x = 5394960 + itemIndex * 731520;
+    return solidShapeXml({ id: 1850 + itemIndex * 4, name: `Brand Comms Scene Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3665220, cx: 609600, cy: 640080, fill: palette.card })
+      + rectShapeXml({ id: 1851 + itemIndex * 4, name: `Brand Comms Scene Line ${itemIndex + 1}`, x: x + 91440, y: 3817620, cx: 304800, cy: 45720, fill: itemIndex % 2 ? visual.secondary || "0F766E" : visual.primary })
+      + solidShapeXml({ id: 1852 + itemIndex * 4, name: `Brand Comms Scene Visual ${itemIndex + 1}`, geom: itemIndex === 1 ? "parallelogram" : "roundRect", x: x + 289560, y: 4046220, cx: 213360, cy: 182880, fill: visual.accent });
+  }).join("");
+}
+
+function brandCommunicationMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.map((metric, itemIndex) => {
+    const x = 804672 + itemIndex * 1219200;
+    return solidShapeXml({ id: 1870 + itemIndex * 3, name: `Brand Comms Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3916680, cx: 1066800, cy: 548640, fill: palette.card })
+      + textShapeXml({ id: 1871 + itemIndex * 3, name: `Brand Comms Metric Value ${itemIndex + 1}`, x: x + 121920, y: 4023360, cx: 822960, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 1872 + itemIndex * 3, name: `Brand Comms Metric Label ${itemIndex + 1}`, x: x + 121920, y: 4229100, cx: 822960, cy: 137160, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function brandCommunicationMessageHouseXml({ visual, palette, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const y = 1051560 + itemIndex * 640080;
+    return solidShapeXml({ id: 1890 + itemIndex * 3, name: `Brand Comms Message House ${itemIndex + 1}`, geom: "roundRect", x: 5334000, y, cx: 3048000, cy: 487680, fill: itemIndex === 0 ? visual.primary : palette.card })
+      + textShapeXml({ id: 1891 + itemIndex * 3, name: `Brand Comms Message Text ${itemIndex + 1}`, x: 5577840, y: y + 152400, cx: 2438400, cy: 167640, text: item, size: 760, bold: true, color: itemIndex === 0 ? "FFFFFF" : visual.title });
+  }).join("");
+}
+
+function brandCommunicationSignalXml({ visual, palette }) {
+  return arcLineShapeXml({ id: 1910, name: "Brand Comms Signal Arc 1", x: 5486400, y: 3429000, cx: 2743200, cy: 914400, stroke: visual.accent, width: 45720 })
+    + arcLineShapeXml({ id: 1911, name: "Brand Comms Signal Arc 2", x: 5943600, y: 3505200, cx: 1828800, cy: 609600, stroke: visual.primary, width: 30480 })
+    + solidShapeXml({ id: 1912, name: "Brand Comms Signal Node", geom: "ellipse", x: 6705600, y: 3657600, cx: 182880, cy: 182880, fill: visual.accent });
+}
+
+function brandCommunicationPersonaXml({ visual, palette, scene }) {
+  const cards = scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5334000 + (itemIndex % 2) * 1524000;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 1066800;
+    return solidShapeXml({ id: 1920 + itemIndex * 4, name: `Brand Comms Audience Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 853440, fill: palette.card })
+      + textShapeXml({ id: 1921 + itemIndex * 4, name: `Brand Comms Audience Index ${itemIndex + 1}`, x: x + 152400, y: y + 137160, cx: 365760, cy: 182880, text: `0${itemIndex + 1}`, size: 920, bold: true, color: visual.accent })
+      + textShapeXml({ id: 1922 + itemIndex * 4, name: `Brand Comms Audience Text ${itemIndex + 1}`, x: x + 152400, y: y + 426720, cx: 914400, cy: 182880, text: item, size: 700, bold: true, color: visual.title });
+  }).join("");
+  return cards + lineFrameShapeXml({ id: 1938, name: "Brand Comms Audience Radar", geom: "ellipse", x: 6400800, y: 3505200, cx: 1219200, cy: 822960, stroke: palette.frame, width: 19050 });
+}
+
+function brandCommunicationContentMatrixXml({ visual, palette, scene }) {
+  return scene.cards.map((item, itemIndex) => {
+    const col = itemIndex % 4;
+    const row = Math.floor(itemIndex / 4);
+    const x = 4937760 + col * 914400;
+    const y = 1005840 + row * 914400;
+    return solidShapeXml({ id: 1950 + itemIndex * 4, name: `Brand Comms Content Matrix Cell ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 792480, cy: 731520, fill: palette.card })
+      + rectShapeXml({ id: 1951 + itemIndex * 4, name: `Brand Comms Content Axis ${itemIndex + 1}`, x: x + 91440, y: y + 106680, cx: 274320, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 1952 + itemIndex * 4, name: `Brand Comms Content Text ${itemIndex + 1}`, x: x + 91440, y: y + 259080, cx: 579120, cy: 243840, text: item, size: 600, bold: true, color: visual.title });
+  }).join("");
+}
+
+function brandCommunicationTouchpointXml({ visual, palette, scene }) {
+  const map = solidShapeXml({ id: 1990, name: "Brand Comms Touchpoint Core", geom: "ellipse", x: 6096000, y: 1905000, cx: 609600, cy: 609600, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1991, name: "Brand Comms Touchpoint Line A", geom: "line", x: 6400800, y: 2209800, cx: -914400, cy: -685800, stroke: palette.frame, width: 22860 })
+    + lineFrameShapeXml({ id: 1992, name: "Brand Comms Touchpoint Line B", geom: "line", x: 6400800, y: 2209800, cx: 914400, cy: -609600, stroke: palette.frame, width: 22860 })
+    + lineFrameShapeXml({ id: 1993, name: "Brand Comms Touchpoint Line C", geom: "line", x: 6400800, y: 2209800, cx: -838200, cy: 731520, stroke: palette.frame, width: 22860 })
+    + lineFrameShapeXml({ id: 1994, name: "Brand Comms Touchpoint Line D", geom: "line", x: 6400800, y: 2209800, cx: 914400, cy: 685800, stroke: palette.frame, width: 22860 })
+    + [0, 1, 2, 3].map((itemIndex) => {
+      const points = [{ x: 5181600, y: 1219200 }, { x: 7315200, y: 1295400 }, { x: 5257800, y: 3124200 }, { x: 7315200, y: 3048000 }];
+      return solidShapeXml({ id: 1995 + itemIndex, name: `Brand Comms Touchpoint Node ${itemIndex + 1}`, geom: "ellipse", x: points[itemIndex].x, y: points[itemIndex].y, cx: 365760, cy: 365760, fill: itemIndex % 2 ? visual.secondary || "0F766E" : visual.accent });
+    }).join("");
+  const stack = scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const y = 1066800 + itemIndex * 579120;
+    return solidShapeXml({ id: 2010 + itemIndex * 2, name: `Brand Comms Media Stack ${itemIndex + 1}`, geom: "roundRect", x: 7467600, y, cx: 914400, cy: 365760, fill: itemIndex % 2 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 2011 + itemIndex * 2, name: `Brand Comms Media Text ${itemIndex + 1}`, x: 7604760, y: y + 106680, cx: 609600, cy: 137160, text: item, size: 560, bold: true, color: "FFFFFF" });
+  }).join("");
+  return map + stack;
+}
+
+function brandCommunicationRhythmXml({ visual, palette, scene }) {
+  return scene.timeline.map((item, itemIndex) => {
+    const x = 804672 + itemIndex * 1524000;
+    return solidShapeXml({ id: 2030 + itemIndex * 4, name: `Brand Comms Rhythm Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3665220, cx: 1219200, cy: 792480, fill: palette.card })
+      + rectShapeXml({ id: 2031 + itemIndex * 4, name: `Brand Comms Rhythm Rule ${itemIndex + 1}`, x: x + 121920, y: 3825240, cx: 335280, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 2032 + itemIndex * 4, name: `Brand Comms Rhythm Step ${itemIndex + 1}`, x: x + 121920, y: 3947160, cx: 822960, cy: 152400, text: item.step, size: 760, bold: true, color: visual.title })
+      + textShapeXml({ id: 2033 + itemIndex * 4, name: `Brand Comms Rhythm Text ${itemIndex + 1}`, x: x + 121920, y: 4145280, cx: 822960, cy: 182880, text: item.text, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function brandCommunicationDashboardXml({ visual, palette, scene }) {
+  const panel = solidShapeXml({ id: 2060, name: "Brand Comms Dashboard Panel", geom: "roundRect", x: 5334000, y: 1066800, cx: 3048000, cy: 2438400, fill: palette.card })
+    + lineFrameShapeXml({ id: 2061, name: "Brand Comms Dashboard Frame", geom: "roundRect", x: 5334000, y: 1066800, cx: 3048000, cy: 2438400, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 2062, name: "Brand Comms Dashboard Axis", x: 5638800, y: 3048000, cx: 1219200, cy: 15240, fill: palette.frame })
+    + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 2063 + itemIndex, name: `Brand Comms Dashboard Bar ${itemIndex + 1}`, x: 5791200 + itemIndex * 335280, y: 2819400 - itemIndex * 152400, cx: 182880, cy: 243840 + itemIndex * 152400, fill: itemIndex === 3 ? visual.secondary || "0F766E" : visual.accent })).join("");
+  return panel + brandCommunicationMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function brandCommunicationNextXml({ visual, palette, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5334000 + (itemIndex % 2) * 1524000;
+    const y = 1295400 + Math.floor(itemIndex / 2) * 1066800;
+    return solidShapeXml({ id: 2080 + itemIndex * 3, name: `Brand Comms Next Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 853440, fill: palette.card })
+      + rectShapeXml({ id: 2081 + itemIndex * 3, name: `Brand Comms Next Rule ${itemIndex + 1}`, x: x + 152400, y: y + 152400, cx: 396240, cy: 30480, fill: visual.accent })
+      + textShapeXml({ id: 2082 + itemIndex * 3, name: `Brand Comms Next Text ${itemIndex + 1}`, x: x + 152400, y: y + 335280, cx: 914400, cy: 243840, text: item, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function brandCommunicationSceneFromSlide({ slide, index, total }) {
+  const bullets = brandCommunicationBulletTexts(slide);
+  const title = brandCommunicationCompactText(slide?.title, index === 0 ? "传播策略控制台" : `传播页面 ${index + 1}`, index === 0 ? 28 : 24);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const heading = String(slide?.title || "");
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("proposition") || /主张|claim|message/i.test(heading)
+      ? "proposition"
+      : layout.includes("audience") || /人群|受众|persona/i.test(heading)
+        ? "audience"
+        : layout.includes("content") || /内容|矩阵|pillar/i.test(heading)
+          ? "content-matrix"
+          : layout.includes("media") || /媒介|触点|channel|touchpoint/i.test(heading)
+            ? "media-matrix"
+            : layout.includes("rhythm") || /节奏|时间|阶段|timeline/i.test(heading)
+              ? "rhythm"
+              : layout.includes("dashboard") || /效果|看板|复盘|kpi|metric/i.test(heading)
+                ? "dashboard"
+                : (index === total - 1 && total > 2) || layout.includes("closing")
+                  ? "closing"
+                  : ["proposition", "audience", "content-matrix", "media-matrix", "rhythm", "dashboard"][(index - 1) % 6];
+  return {
+    role,
+    kicker: role === "cover" ? "COMMS CONTROL" : role === "proposition" ? "MESSAGE HOUSE" : role === "audience" ? "AUDIENCE MAP" : role === "content-matrix" ? "CONTENT MATRIX" : role === "media-matrix" ? "TOUCHPOINT MAP" : role === "rhythm" ? "CAMPAIGN RHYTHM" : role === "dashboard" ? "EFFECT DASHBOARD" : "NEXT ACTION",
+    title,
+    summary: brandCommunicationCompactText(bullets[0], "围绕传播主张、目标人群、内容支柱、媒介触点和效果复盘建立一体化传播方案。", 48),
+    bullets,
+    cards: brandCommunicationCardTexts(bullets, ["核心主张", "目标人群", "内容支柱", "社媒触点", "户外曝光", "移动内容", "活动现场", "口碑复盘"]),
+    timeline: ["预热", "发布", "扩散", "沉淀", "复盘"].map((step, itemIndex) => ({ step, text: brandCommunicationCompactText(bullets[itemIndex], step, 14) })),
+    metrics: [
+      { value: "4", label: "场景素材" },
+      { value: "6", label: "核心触点" },
+      { value: "28D", label: "传播周期" },
+    ],
+  };
+}
+
+function brandCommunicationPalette(visual) {
+  return {
+    surface: blendHexColor(visual.surface, visual.background, 0.12),
+    card: blendHexColor(visual.surface, visual.accent, 0.10),
+    soft: blendHexColor(visual.accent, visual.surface, 0.58),
+    frame: blendHexColor(visual.primary, visual.background, 0.64),
+    orangeGlow: blendHexColor(visual.accent, visual.background, 0.72),
+    berryGlow: blendHexColor(visual.primary, visual.background, 0.78),
+  };
+}
+
+function brandCommunicationBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.filter((item) => typeof item === "string" && item.trim()) : [];
+  return values.length > 0 ? values : ["明确传播主张与内容支柱", "拆解目标人群和关键触点", "规划媒介矩阵与传播节奏", "复盘声量、互动与转化表现"];
+}
+
+function brandCommunicationCardTexts(values, fallback) {
+  return Array.from({ length: 8 }, (_, index) => brandCommunicationCompactText(values[index], fallback[index], 16));
+}
+
+function brandCommunicationCompactText(value, fallback, maxLength) {
+  const raw = String(value || fallback || "").replace(/[：:，,。；;]/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
 }
 
 function launchRhythmDecorationsXml({ visual, index, role, slide }) {
@@ -14335,6 +14793,405 @@ function educationCourseVariant(visual) {
 
 function isEducationCourseVisual(visual) {
   return visual?.id === "education" && visual?.layout === "education-course";
+}
+
+function brandIdentitySystemDecorationsXml({ visual, index, slide, total }) {
+  // 品牌识别模板用设计手册语法承载页面内容：网格、安全区、色板、字体和触点矩阵均为可编辑图形。
+  const palette = brandIdentitySystemPalette(visual);
+  const scene = brandIdentitySystemExportScene({ slide, index, total });
+  const title = brandIdentityCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 24);
+  const summary = brandIdentityCompactText((slide?.bullets || [])[0], scene.summary, 58);
+  const bullets = brandIdentityBulletTexts(slide, scene.items);
+  const bulletRows = bullets.map((item, itemIndex) => {
+    const y = 2819400 + itemIndex * 350520;
+    return solidShapeXml({ id: 610 + itemIndex * 3, name: `Brand Identity Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 914400, y: y + 60960, cx: 76200, cy: 76200, fill: visual.accent })
+      + textShapeXml({ id: 611 + itemIndex * 3, name: `Brand Identity Bullet Text ${itemIndex + 1}`, x: 1066800, y, cx: 3352800, cy: 213360, text: brandIdentityCompactText(item, item, 34), size: 880, bold: true, color: visual.body });
+  }).join("");
+  return rectShapeXml({ id: 580, name: "Brand Identity Top Spectrum", x: 0, y: 0, cx: 9144000, cy: 76200, fill: visual.accent })
+    + solidShapeXml({ id: 581, name: "Brand Identity Manual Canvas", geom: "roundRect", x: 609600, y: 457200, cx: 7924800, cy: 4191000, fill: palette.canvas })
+    + brandIdentityGridXml(palette)
+    + lineFrameShapeXml({ id: 582, name: "Brand Identity Manual Frame", geom: "roundRect", x: 609600, y: 457200, cx: 7924800, cy: 4191000, stroke: palette.frame, width: 15240 })
+    + textShapeXml({ id: 583, name: "Brand Identity Kicker", x: 822960, y: 701040, cx: 2895600, cy: 182880, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 584, name: "Brand Identity Title", x: 822960, y: index === 0 ? 1066800 : 975360, cx: index === 0 ? 4267200 : 3962400, cy: index === 0 ? 914400 : 792480, text: title, size: index === 0 ? 3100 : 2450, bold: true, color: visual.title })
+    + textShapeXml({ id: 585, name: "Brand Identity Summary", x: 838200, y: 2194560, cx: 3505200, cy: 396240, text: summary, size: 900, bold: true, color: visual.body })
+    + bulletRows
+    + brandIdentityManualTagXml({ visual, scene })
+    + brandIdentitySceneVisualXml({ visual, palette, scene });
+}
+
+function brandIdentityGridXml(palette) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 586 + itemIndex, name: `Brand Identity Grid Vertical ${itemIndex + 1}`, x: 1219200 + itemIndex * 1219200, y: 518160, cx: 7620, cy: 4070040, fill: palette.grid, transparency: 52000 })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 592 + itemIndex, name: `Brand Identity Grid Horizontal ${itemIndex + 1}`, x: 670560, y: 1219200 + itemIndex * 838200, cx: 7802880, cy: 7620, fill: palette.grid, transparency: 56000 })).join("");
+  return vertical + horizontal;
+}
+
+function brandIdentityManualTagXml({ visual, scene }) {
+  return rectShapeXml({ id: 598, name: "Brand Identity Tag Rule", x: 7010400, y: 731520, cx: 548640, cy: 76200, fill: visual.primary })
+    + rectShapeXml({ id: 599, name: "Brand Identity Tag Accent", x: 7559040, y: 731520, cx: 304800, cy: 76200, fill: visual.accent })
+    + rectShapeXml({ id: 600, name: "Brand Identity Tag Gold", x: 7863840, y: 731520, cx: 304800, cy: 76200, fill: "D7A43A" })
+    + textShapeXml({ id: 601, name: "Brand Identity Tag Text", x: 6705600, y: 853440, cx: 1524000, cy: 182880, text: scene.tag, size: 700, bold: true, color: visual.body });
+}
+
+function brandIdentitySceneVisualXml({ visual, palette, scene }) {
+  if (scene.role === "logo") return brandIdentitySafeAreaXml({ visual, palette });
+  if (scene.role === "palette") return brandIdentityPaletteXml({ visual });
+  if (scene.role === "typography") return brandIdentityTypeScaleXml({ visual, palette });
+  if (scene.role === "matrix") return brandIdentityTouchpointsXml({ visual, palette, scene });
+  return brandIdentityMockupXml({ visual, palette });
+}
+
+function brandIdentitySafeAreaXml({ visual, palette }) {
+  return lineFrameShapeXml({ id: 630, name: "Brand Identity Logo Safe Area", geom: "rect", x: 5943600, y: 1371600, cx: 2286000, cy: 1828800, stroke: palette.frame, width: 22860 })
+    + lineFrameShapeXml({ id: 631, name: "Brand Identity Clear Space", geom: "rect", x: 6172200, y: 1600200, cx: 1828800, cy: 1371600, stroke: palette.grid, width: 15240, dash: "dash" })
+    + solidShapeXml({ id: 632, name: "Brand Identity Symbol Block", geom: "roundRect", x: 6705600, y: 1981200, cx: 762000, cy: 762000, fill: visual.primary })
+    + solidShapeXml({ id: 633, name: "Brand Identity Symbol Counter", geom: "ellipse", x: 6926580, y: 2202180, cx: 320040, cy: 320040, fill: palette.canvas });
+}
+
+function brandIdentityPaletteXml({ visual }) {
+  const colors = [visual.primary, visual.accent, "D7A43A", "F6F0E7"];
+  return colors.map((fill, itemIndex) => {
+    const x = 5486400 + itemIndex * 701040;
+    return solidShapeXml({ id: 640 + itemIndex * 2, name: `Brand Identity Color Swatch ${itemIndex + 1}`, geom: "roundRect", x, y: 1371600, cx: 579120, cy: 1371600, fill })
+      + textShapeXml({ id: 641 + itemIndex * 2, name: `Brand Identity Color Label ${itemIndex + 1}`, x: x + 76200, y: 2537460, cx: 426720, cy: 152400, text: itemIndex === 0 ? "Primary" : itemIndex === 1 ? "Accent" : itemIndex === 2 ? "Gold" : "Canvas", size: 620, bold: true, color: itemIndex === 3 ? visual.title : "FFFFFF" });
+  }).join("");
+}
+
+function brandIdentityTypeScaleXml({ visual, palette }) {
+  return [
+    { label: "Headline Aa", y: 1371600, size: 1900 },
+    { label: "Subtitle System", y: 2057400, size: 1250 },
+    { label: "Body / Caption / Label", y: 2651760, size: 820 },
+  ].map((item, itemIndex) => solidShapeXml({ id: 650 + itemIndex * 2, name: `Brand Identity Type Card ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y: item.y, cx: 2743200, cy: 457200, fill: palette.card })
+    + textShapeXml({ id: 651 + itemIndex * 2, name: `Brand Identity Type Sample ${itemIndex + 1}`, x: 5715000, y: item.y + 91440, cx: 2286000, cy: 243840, text: item.label, size: item.size, bold: true, color: visual.title })).join("");
+}
+
+function brandIdentityMockupXml({ visual, palette }) {
+  return solidShapeXml({ id: 660, name: "Brand Identity Package Mockup", geom: "roundRect", x: 5334000, y: 1371600, cx: 1371600, cy: 914400, fill: palette.card })
+    + solidShapeXml({ id: 661, name: "Brand Identity Screen Mockup", geom: "roundRect", x: 7086600, y: 1066800, cx: 914400, cy: 1524000, fill: visual.primary })
+    + solidShapeXml({ id: 662, name: "Brand Identity Card Mockup", geom: "roundRect", x: 5646420, y: 2971800, cx: 1828800, cy: 487680, fill: palette.card })
+    + solidShapeXml({ id: 663, name: "Brand Identity Outdoor Mockup", geom: "roundRect", x: 7315200, y: 3048000, cx: 762000, cy: 609600, fill: visual.accent })
+    + rectShapeXml({ id: 664, name: "Brand Identity Mockup Rule", x: 5562600, y: 1752600, cx: 731520, cy: 76200, fill: visual.accent })
+    + rectShapeXml({ id: 665, name: "Brand Identity Mockup Gold Rule", x: 5875020, y: 3291840, cx: 914400, cy: 60960, fill: "D7A43A" });
+}
+
+function brandIdentityTouchpointsXml({ visual, palette, scene }) {
+  return scene.touchpoints.map((item, itemIndex) => {
+    const col = itemIndex % 3;
+    const row = Math.floor(itemIndex / 3);
+    const x = 5486400 + col * 883920;
+    const y = 1371600 + row * 701040;
+    return solidShapeXml({ id: 670 + itemIndex * 3, name: `Brand Identity Touchpoint ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 762000, cy: 548640, fill: palette.card })
+      + rectShapeXml({ id: 671 + itemIndex * 3, name: `Brand Identity Touchpoint Accent ${itemIndex + 1}`, x: x + 213360, y: y + 121920, cx: 335280, cy: 60960, fill: visual.accent })
+      + textShapeXml({ id: 672 + itemIndex * 3, name: `Brand Identity Touchpoint Text ${itemIndex + 1}`, x: x + 91440, y: y + 274320, cx: 579120, cy: 152400, text: item, size: 780, bold: true, color: visual.title });
+  }).join("");
+}
+
+function brandIdentitySystemPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.18),
+    card: blendHexColor(visual.surface, visual.background, 0.10),
+    frame: blendHexColor(visual.primary, visual.background, 0.34),
+    grid: blendHexColor(visual.primary, visual.background, 0.58),
+  };
+}
+
+function brandIdentitySystemExportScene({ slide, index, total }) {
+  const scene = brandIdentitySystemSceneByIndex(index, total);
+  return { ...scene, title: slide?.title || scene.title };
+}
+
+function brandIdentitySystemSceneByIndex(index, total) {
+  const roles = ["cover", "logo", "palette", "typography", "applications", "matrix"];
+  const role = index === 0 ? "cover" : index >= total - 1 ? "matrix" : roles[Math.min(index, roles.length - 1)];
+  const scenes = {
+    cover: { role, kicker: "BRAND SYSTEM MANUAL", tag: "Visual governance", title: "品牌升级视觉体系总览", summary: "把核心符号、色彩、字体和应用触点放进同一套可执行规范。", items: ["标志安全区与比例关系", "色彩和字体层级", "应用物料与触点一致性"] },
+    logo: { role, kicker: "LOGO CLEAR SPACE", tag: "Grid / Ratio", title: "标志安全区与比例网格", summary: "用安全区、最小尺寸和组合关系确保品牌标志在不同媒介里稳定呈现。", items: ["定义标志四周留白", "约束横版/竖版组合", "建立禁止使用清单"] },
+    palette: { role, kicker: "COLOR TOKENS", tag: "Palette", title: "色彩板与使用比例", summary: "主色、强调色和辅助色形成明确层级，支撑线上线下素材统一落地。", items: ["主色用于品牌识别", "强调色用于行动和重点", "中性色用于信息承载"] },
+    typography: { role, kicker: "TYPE SCALE", tag: "Typography", title: "字体规范与信息层级", summary: "标题、正文、标签和说明文字形成统一尺度，减少跨页面信息噪声。", items: ["标题强化品牌语气", "正文保持阅读效率", "标签用于模块识别"] },
+    applications: { role, kicker: "BRAND APPLICATIONS", tag: "Mockup", title: "品牌资产应用场景", summary: "包装、名片、屏幕和户外广告承载统一识别系统，形成可复用资产库。", items: ["包装与物料规范", "数字界面适配", "户外和活动场景延展"] },
+    matrix: { role, kicker: "TOUCHPOINT MATRIX", tag: "Consistency", title: "多触点一致性矩阵", summary: "把官网、社媒、门店、活动和广告统一到一套品牌资产管理机制。", items: ["触点资产统一命名", "场景模板统一管理", "定期巡检视觉一致性"], touchpoints: ["官网", "社媒", "门店", "包装", "活动", "广告"] },
+  };
+  return { variant: "identity-manual", ...scenes[role] };
+}
+
+function brandIdentityBulletTexts(slide, fallback) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean).slice(0, 3) : [];
+  return values.length ? values : fallback;
+}
+
+function brandIdentityCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").trim();
+  return value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
+}
+
+function brandStoryEditorialDecorationsXml({ visual, index, slide, total }) {
+  const scene = brandStoryEditorialExportScene({ slide, index, total });
+  const common = lineFrameShapeXml({ id: 400, name: "Editorial Paper Frame", x: 292608, y: 164592, cx: 8558784, cy: 4814316, stroke: blendHexColor(visual.primary, visual.background, 0.38), width: 11430 })
+    + textShapeXml({ id: 401, name: "Editorial Masthead", x: 475488, y: 266700, cx: 2438400, cy: 213360, text: scene.kicker, size: 700, bold: true, color: visual.title })
+    + textShapeXml({ id: 402, name: "Editorial Folio", x: 8052120, y: 266700, cx: 396240, cy: 213360, text: scene.folio, size: 900, bold: true, color: visual.accent })
+    + rectShapeXml({ id: 403, name: "Editorial Masthead Rule", x: 475488, y: 533400, cx: 8193024, cy: 22860, fill: visual.title })
+    + textShapeXml({ id: 404, name: "Editorial Running Title", x: 475488, y: 4655820, cx: 2133600, cy: 182880, text: scene.deckTitle, size: 600, bold: true, color: blendHexColor(visual.body, visual.background, 0.28) });
+  if (scene.role === "cover") return common + brandStoryEditorialCoverXml({ visual, scene });
+  if (scene.role === "opener") return common + brandStoryEditorialOpenerXml({ visual, scene });
+  if (scene.role === "timeline") return common + brandStoryEditorialTimelineXml({ visual, scene });
+  if (scene.role === "interview") return common + brandStoryEditorialInterviewXml({ visual, scene });
+  if (scene.role === "manifesto") return common + brandStoryEditorialManifestoXml({ visual, scene });
+  if (scene.role === "evidence") return common + brandStoryEditorialEvidenceXml({ visual, scene });
+  if (scene.role === "closing") return common + brandStoryEditorialClosingXml({ visual, scene });
+  return common + brandStoryEditorialFeatureXml({ visual, scene });
+}
+
+function brandStoryEditorialCoverXml({ visual, scene }) {
+  return textShapeXml({ id: 410, name: "Editorial Cover Title", x: 640080, y: 1219200, cx: 3962400, cy: 1280160, text: scene.title, size: 3600, bold: true, color: visual.title })
+    + rectShapeXml({ id: 411, name: "Editorial Cover Accent Rule", x: 640080, y: 2743200, cx: 2133600, cy: 45720, fill: visual.accent })
+    + textShapeXml({ id: 412, name: "Editorial Cover Lead", x: 640080, y: 2872740, cx: 3200400, cy: 731520, text: scene.lead, size: 980, bold: false, color: visual.body })
+    + brandStoryEditorialPortraitXml({ visual, x: 5257800, y: 800100, cx: 2773680, cy: 3657600, id: 420 })
+    + ["01  STORY", "02  PEOPLE", "03  VALUES"].map((label, itemIndex) => textShapeXml({ id: 430 + itemIndex, name: `Editorial Cover Index ${itemIndex + 1}`, x: 640080 + itemIndex * 914400, y: 4114800, cx: 822960, cy: 182880, text: label, size: 620, bold: true, color: visual.title })).join("");
+}
+
+function brandStoryEditorialOpenerXml({ visual, scene }) {
+  const copy = scene.bullets.slice(0, 4).join("\n\n");
+  return textShapeXml({ id: 410, name: "Editorial Opener Title", x: 640080, y: 853440, cx: 5486400, cy: 914400, text: scene.title, size: 3000, bold: true, color: visual.title })
+    + textShapeXml({ id: 411, name: "Editorial Drop Cap", x: 640080, y: 1905000, cx: 762000, cy: 914400, text: Array.from(scene.lead)[0] || "品", size: 6200, bold: true, color: visual.accent })
+    + textShapeXml({ id: 412, name: "Editorial Opener Lead", x: 640080, y: 2895600, cx: 2133600, cy: 914400, text: scene.lead, size: 940, bold: true, color: visual.body })
+    + rectShapeXml({ id: 413, name: "Editorial Column Rule", x: 3200400, y: 1905000, cx: 22860, cy: 2217420, fill: blendHexColor(visual.primary, visual.background, 0.52) })
+    + textShapeXml({ id: 414, name: "Editorial Column One", x: 3429000, y: 1905000, cx: 2057400, cy: 2217420, text: copy, size: 780, bold: false, color: visual.body })
+    + textShapeXml({ id: 415, name: "Editorial Column Two", x: 5791200, y: 1905000, cx: 2057400, cy: 2217420, text: copy, size: 780, bold: false, color: visual.body });
+}
+
+function brandStoryEditorialTimelineXml({ visual, scene }) {
+  const track = rectShapeXml({ id: 420, name: "Editorial Timeline Track", x: 640080, y: 2948940, cx: 7772400, cy: 30480, fill: visual.title });
+  const nodes = scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const x = 640080 + itemIndex * 1943100;
+    return solidShapeXml({ id: 421 + itemIndex * 4, name: `Editorial Timeline Node ${itemIndex + 1}`, geom: "ellipse", x, y: 2887980, cx: 152400, cy: 152400, fill: visual.accent })
+      + textShapeXml({ id: 422 + itemIndex * 4, name: `Editorial Timeline Year ${itemIndex + 1}`, x, y: 3177540, cx: 914400, cy: 274320, text: String(2012 + itemIndex * 4), size: 1350, bold: true, color: visual.accent })
+      + textShapeXml({ id: 423 + itemIndex * 4, name: `Editorial Timeline Copy ${itemIndex + 1}`, x, y: 3535680, cx: 1676400, cy: 640080, text: item, size: 720, bold: false, color: visual.body });
+  }).join("");
+  return textShapeXml({ id: 410, name: "Editorial Timeline Title", x: 640080, y: 853440, cx: 4876800, cy: 914400, text: scene.title, size: 2900, bold: true, color: visual.title })
+    + rectShapeXml({ id: 411, name: "Editorial Timeline Lead Rule", x: 5791200, y: 914400, cx: 45720, cy: 822960, fill: visual.accent })
+    + textShapeXml({ id: 412, name: "Editorial Timeline Lead", x: 6004560, y: 914400, cx: 2286000, cy: 822960, text: scene.lead, size: 820, bold: true, color: visual.body })
+    + track + nodes;
+}
+
+function brandStoryEditorialInterviewXml({ visual, scene }) {
+  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 3352800, cy: 3657600, id: 420 })
+    + textShapeXml({ id: 410, name: "Editorial Interview Quote Mark", x: 4495800, y: 777240, cx: 762000, cy: 762000, text: "“", size: 6800, bold: true, color: visual.accent })
+    + textShapeXml({ id: 411, name: "Editorial Interview Title", x: 4495800, y: 1447800, cx: 3505200, cy: 731520, text: scene.title, size: 2250, bold: true, color: visual.title })
+    + textShapeXml({ id: 412, name: "Editorial Interview Quote", x: 4495800, y: 2286000, cx: 3505200, cy: 1371600, text: scene.lead, size: 1450, bold: true, color: visual.title })
+    + rectShapeXml({ id: 413, name: "Editorial Interview Byline Rule", x: 4495800, y: 3962400, cx: 3505200, cy: 22860, fill: visual.title })
+    + textShapeXml({ id: 414, name: "Editorial Interview Byline", x: 4495800, y: 4076700, cx: 2438400, cy: 182880, text: "人物专访 · 核心观点", size: 650, bold: true, color: visual.body });
+}
+
+function brandStoryEditorialManifestoXml({ visual, scene }) {
+  const values = scene.bullets.slice(0, 3).map((item, itemIndex) => {
+    const widths = [2133600, 2743200, 1676400];
+    const x = [640080, 2926080, 5943600][itemIndex];
+    return rectShapeXml({ id: 430 + itemIndex * 3, name: `Editorial Value Rule ${itemIndex + 1}`, x, y: 3733800, cx: widths[itemIndex], cy: 30480, fill: visual.title })
+      + textShapeXml({ id: 431 + itemIndex * 3, name: `Editorial Value Number ${itemIndex + 1}`, x, y: 3848100, cx: 457200, cy: 274320, text: `0${itemIndex + 1}`, size: 1200, bold: true, color: visual.accent })
+      + textShapeXml({ id: 432 + itemIndex * 3, name: `Editorial Value Copy ${itemIndex + 1}`, x: x + 457200, y: 3848100, cx: widths[itemIndex] - 457200, cy: 487680, text: item, size: 680, bold: true, color: visual.body });
+  }).join("");
+  return textShapeXml({ id: 410, name: "Editorial Manifesto Ghost Folio", x: 6934200, y: 640080, cx: 1371600, cy: 1066800, text: scene.folio, size: 7200, bold: true, color: blendHexColor(visual.accent, visual.background, 0.78) })
+    + textShapeXml({ id: 411, name: "Editorial Manifesto Title", x: 640080, y: 914400, cx: 3962400, cy: 762000, text: scene.title, size: 2550, bold: true, color: visual.title })
+    + rectShapeXml({ id: 412, name: "Editorial Manifesto Rule", x: 640080, y: 1981200, cx: 60960, cy: 1066800, fill: visual.accent })
+    + textShapeXml({ id: 413, name: "Editorial Manifesto Quote", x: 914400, y: 1981200, cx: 6858000, cy: 1219200, text: scene.lead, size: 2100, bold: true, color: visual.title })
+    + values;
+}
+
+function brandStoryEditorialFeatureXml({ visual, scene }) {
+  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 4572000, cy: 3505200, id: 420 })
+    + textShapeXml({ id: 410, name: "Editorial Feature Title", x: 5486400, y: 914400, cx: 2743200, cy: 731520, text: scene.title, size: 2250, bold: true, color: visual.title })
+    + textShapeXml({ id: 411, name: "Editorial Feature Lead", x: 5486400, y: 1798320, cx: 2743200, cy: 731520, text: scene.lead, size: 900, bold: true, color: visual.body })
+    + textShapeXml({ id: 412, name: "Editorial Feature Copy", x: 5486400, y: 2667000, cx: 2743200, cy: 1371600, text: scene.bullets.join("\n\n"), size: 720, bold: false, color: visual.body })
+    + rectShapeXml({ id: 413, name: "Editorial Feature Caption Rule", x: 640080, y: 4427220, cx: 4572000, cy: 22860, fill: visual.title })
+    + textShapeXml({ id: 414, name: "Editorial Feature Caption", x: 640080, y: 4495800, cx: 3048000, cy: 152400, text: "图像记录品牌与人的真实连接", size: 600, bold: false, color: visual.body });
+}
+
+function brandStoryEditorialEvidenceXml({ visual, scene }) {
+  const metrics = scene.bullets.slice(0, 3).map((item, itemIndex) => {
+    const x = 640080 + itemIndex * 2514600;
+    return lineFrameShapeXml({ id: 420 + itemIndex * 3, name: `Editorial Evidence Card ${itemIndex + 1}`, x, y: 3048000, cx: 2286000, cy: 1219200, stroke: blendHexColor(visual.primary, visual.background, 0.44), width: 11430 })
+      + textShapeXml({ id: 421 + itemIndex * 3, name: `Editorial Evidence Value ${itemIndex + 1}`, x: x + 152400, y: 3200400, cx: 914400, cy: 426720, text: ["68%", "12Y", "3.6X"][itemIndex], size: 2400, bold: true, color: visual.accent })
+      + textShapeXml({ id: 422 + itemIndex * 3, name: `Editorial Evidence Copy ${itemIndex + 1}`, x: x + 152400, y: 3733800, cx: 1981200, cy: 426720, text: item, size: 680, bold: true, color: visual.body });
+  }).join("");
+  return textShapeXml({ id: 410, name: "Editorial Evidence Title", x: 640080, y: 853440, cx: 4876800, cy: 914400, text: scene.title, size: 2850, bold: true, color: visual.title })
+    + textShapeXml({ id: 411, name: "Editorial Evidence Lead", x: 5791200, y: 914400, cx: 2438400, cy: 762000, text: scene.lead, size: 820, bold: true, color: visual.body })
+    + [0, 1, 2, 3, 4].map((itemIndex) => rectShapeXml({ id: 440 + itemIndex, name: `Editorial Evidence Bar ${itemIndex + 1}`, x: 5791200 + itemIndex * 457200, y: 2514600 - [0, 182880, 335280, 121920, 487680][itemIndex], cx: 274320, cy: 304800 + [0, 182880, 335280, 121920, 487680][itemIndex], fill: itemIndex % 2 ? visual.accent : visual.primary })).join("")
+    + metrics;
+}
+
+function brandStoryEditorialClosingXml({ visual, scene }) {
+  return rectShapeXml({ id: 410, name: "Editorial Closing Accent", x: 4236720, y: 1219200, cx: 685800, cy: 60960, fill: visual.accent })
+    + textShapeXml({ id: 411, name: "Editorial Closing Title", x: 1371600, y: 1752600, cx: 6400800, cy: 1066800, text: scene.title, size: 3500, bold: true, color: visual.title })
+    + textShapeXml({ id: 412, name: "Editorial Closing Quote", x: 2133600, y: 3048000, cx: 4876800, cy: 762000, text: scene.lead, size: 1250, bold: true, color: visual.body })
+    + textShapeXml({ id: 413, name: "Editorial Closing Label", x: 3352800, y: 4114800, cx: 2438400, cy: 182880, text: "THE STORY CONTINUES", size: 650, bold: true, color: visual.title });
+}
+
+function brandStoryEditorialPortraitXml({ visual, x, y, cx, cy, id }) {
+  const skin = blendHexColor(visual.accent, "F1D0B6", 0.62);
+  return solidShapeXml({ id, name: "Editorial Portrait Field", x, y, cx, cy, fill: blendHexColor(visual.primary, "59534D", 0.44) })
+    + solidShapeXml({ id: id + 1, name: "Editorial Portrait Head", geom: "ellipse", x: x + Math.round(cx * 0.34), y: y + Math.round(cy * 0.12), cx: Math.round(cx * 0.28), cy: Math.round(cx * 0.28), fill: skin })
+    + solidShapeXml({ id: id + 2, name: "Editorial Portrait Body", geom: "roundRect", x: x + Math.round(cx * 0.18), y: y + Math.round(cy * 0.44), cx: Math.round(cx * 0.64), cy: Math.round(cy * 0.62), fill: blendHexColor(visual.primary, "15171D", 0.28) })
+    + lineFrameShapeXml({ id: id + 3, name: "Editorial Portrait Crop Frame", x: x + Math.round(cx * 0.07), y: y + Math.round(cy * 0.07), cx: Math.round(cx * 0.86), cy: Math.round(cy * 0.86), stroke: "FFFFFF", width: 11430, transparency: 24000 })
+    + textShapeXml({ id: id + 4, name: "Editorial Portrait Caption", x: x + Math.round(cx * 0.10), y: y + Math.round(cy * 0.86), cx: Math.round(cx * 0.70), cy: 152400, text: "PORTRAIT / STORY", size: 560, bold: true, color: "FFFFFF" });
+}
+
+function brandStoryEditorialExportScene({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  const bullets = brandStoryEditorialExportBullets(slide);
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : index === total - 1 || layout.includes("closing") || layout.includes("ending")
+      ? "closing"
+      : layout.includes("timeline") || layout.includes("history") || layout.includes("milestone")
+        ? "timeline"
+        : layout.includes("quote") || layout.includes("interview") || layout.includes("person")
+          ? "interview"
+          : layout.includes("manifesto") || layout.includes("value") || layout.includes("claim")
+            ? "manifesto"
+            : layout.includes("data") || layout.includes("metric") || layout.includes("evidence")
+              ? "evidence"
+              : ["opener", "timeline", "interview", "manifesto", "feature", "evidence"][(index - 1) % 6];
+  return {
+    role,
+    folio: String(index + 1).padStart(2, "0"),
+    kicker: role === "cover" ? "BRAND JOURNAL" : role === "closing" ? "NEXT CHAPTER" : "FEATURE STORY",
+    title: brandStoryEditorialExportCompactText(slide?.title, index === 0 ? "品牌的下一段故事" : "品牌故事", role === "cover" ? 34 : 30),
+    deckTitle: brandStoryEditorialExportCompactText(slide?.title, "品牌故事", 16),
+    lead: brandStoryEditorialExportCompactText(bullets[0], "以真实的人、时间和选择，讲述品牌如何形成长期价值。", role === "interview" ? 54 : 48),
+    bullets: bullets.slice(0, 4).map((item) => brandStoryEditorialExportCompactText(item, "", 46)),
+  };
+}
+
+function brandStoryEditorialExportBullets(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean) : [];
+  return bullets.length > 0 ? bullets : ["从一个真实问题出发，建立品牌最初的价值判断", "让产品、团队和用户共同塑造品牌表达", "以持续行动积累可被信任的长期资产"];
+}
+
+function brandStoryEditorialExportCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  return chars.length <= maxLength ? raw : `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function luxuryBrandStoryDecorationsXml({ visual, slide, index, total }) {
+  const scene = luxuryBrandStoryScene({ slide, index, total });
+  const palette = luxuryBrandStoryPalette(visual);
+  const bullets = scene.bullets.slice(0, 3);
+  const bulletXml = bullets.map((item, itemIndex) => textShapeXml({
+    id: 3780 + itemIndex,
+    name: `Luxury Brand Story Bullet ${itemIndex + 1}`,
+    x: 838200,
+    y: 3352800 + itemIndex * 274320,
+    cx: 3200400,
+    cy: 182880,
+    text: luxuryBrandStoryCompactText(item, scene.title, 34),
+    size: 760,
+    bold: true,
+    color: visual.body,
+  })).join("");
+  const common = solidShapeXml({ id: 3700, name: "Luxury Brand Ivory Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.surface })
+    + pictureXml({ id: 3701, name: "Luxury Brand Gold Material Band", relId: "rId3", x: 0, y: 4213860, cx: 9144000, cy: 929640 })
+    + lineFrameShapeXml({ id: 3702, name: "Luxury Brand Fine Gallery Frame", x: 621792, y: 442976, cx: 7900416, cy: 4297680, stroke: visual.accent, width: 7620, transparency: 18000 })
+    + rectShapeXml({ id: 3703, name: "Luxury Brand Hairline Rule", x: 676656, y: 495300, cx: 7790688, cy: 7620, fill: visual.accent })
+    + textShapeXml({ id: 3704, name: "Luxury Brand Kicker", x: 822960, y: 716280, cx: 2438400, cy: 182880, text: scene.kicker, size: 680, bold: true, color: visual.accent })
+    + textShapeXml({ id: 3705, name: "Luxury Brand Title", x: 822960, y: index === 0 ? 1112520 : 1005840, cx: 3962400, cy: 975360, text: scene.title, size: index === 0 ? 2920 : 2420, bold: true, color: visual.title })
+    + textShapeXml({ id: 3706, name: "Luxury Brand Summary", x: 838200, y: 2392680, cx: 3169920, cy: 548640, text: scene.summary, size: 860, bold: true, color: visual.body })
+    + bulletXml;
+  if (scene.role === "closing") {
+    return common
+      + solidShapeXml({ id: 3710, name: "Luxury Brand Closing Vellum", x: 1371600, y: 1066800, cx: 6400800, cy: 2667000, fill: palette.vellum, transparency: 9000 })
+      + lineFrameShapeXml({ id: 3711, name: "Luxury Brand Closing Frame", x: 1676400, y: 1325880, cx: 5791200, cy: 2133600, stroke: visual.accent, width: 7620, transparency: 12000 })
+      + textShapeXml({ id: 3712, name: "Luxury Brand Closing Statement", x: 2286000, y: 1905000, cx: 4572000, cy: 762000, text: scene.title, size: 2380, bold: true, color: visual.title });
+  }
+  if (scene.role === "gallery") {
+    return common
+      + pictureXml({ id: 3720, name: "Luxury Brand Glass Showcase", relId: "rId5", x: 5486400, y: 853440, cx: 1219200, cy: 2743200 })
+      + pictureXml({ id: 3721, name: "Luxury Brand Ivory Silk Stone", relId: "rId4", x: 6858000, y: 853440, cx: 1524000, cy: 1280160 })
+      + pictureXml({ id: 3722, name: "Luxury Brand Brushed Gold Detail", relId: "rId3", x: 6858000, y: 2286000, cx: 1524000, cy: 1219200 })
+      + lineFrameShapeXml({ id: 3723, name: "Luxury Brand Gallery Photo Frame", x: 5334000, y: 762000, cx: 3200400, cy: 2895600, stroke: palette.frame, width: 7620, transparency: 8000 });
+  }
+  if (scene.role === "proof") {
+    return common + luxuryBrandProofXml({ visual, palette, labels: scene.labels, extra: scene.bullets[3] });
+  }
+  if (scene.role === "launch") {
+    return common
+      + pictureXml({ id: 3740, name: "Luxury Brand Launch Showcase", relId: "rId5", x: 5715000, y: 853440, cx: 2743200, cy: 2621280 })
+      + lineFrameShapeXml({ id: 3741, name: "Luxury Brand Launch Photo Frame", x: 5554980, y: 777240, cx: 2743200, cy: 2621280, stroke: visual.accent, width: 7620, transparency: 8000 })
+      + luxuryBrandIndexXml({ visual, palette, labels: scene.labels, x: 5943600, y: 3657600 });
+  }
+  return common
+    + pictureXml({ id: 3730, name: "Luxury Brand Product Still", relId: "rId2", x: 5730240, y: 716280, cx: 2743200, cy: 2743200 })
+    + lineFrameShapeXml({ id: 3731, name: "Luxury Brand Product Photo Frame", x: 5577840, y: 609600, cx: 2743200, cy: 2743200, stroke: visual.accent, width: 7620, transparency: 9000 })
+    + pictureXml({ id: 3732, name: "Luxury Brand Gold Product Accent", relId: "rId3", x: 8001000, y: 2590800, cx: 701040, cy: 1158240 })
+    + luxuryBrandIndexXml({ visual, palette, labels: scene.labels, x: 5943600, y: 3657600 });
+}
+
+function luxuryBrandProofXml({ visual, palette, labels, extra }) {
+  const allLabels = [...labels, luxuryBrandStoryCompactText(extra, "传播触点", 11)];
+  return allLabels.map((label, itemIndex) => {
+    const x = 5486400 + (itemIndex % 2) * 1371600;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 1066800;
+    return solidShapeXml({ id: 3750 + itemIndex * 3, name: `Luxury Brand Proof Vitrine ${itemIndex + 1}`, x, y, cx: 1219200, cy: 838200, fill: palette.vellum, transparency: 6000 })
+      + lineFrameShapeXml({ id: 3751 + itemIndex * 3, name: `Luxury Brand Proof Hairline ${itemIndex + 1}`, x, y, cx: 1219200, cy: 838200, stroke: visual.accent, width: 7620, transparency: 18000 })
+      + textShapeXml({ id: 3752 + itemIndex * 3, name: `Luxury Brand Proof Text ${itemIndex + 1}`, x: x + 152400, y: y + 274320, cx: 914400, cy: 182880, text: label, size: 820, bold: true, color: visual.title });
+  }).join("");
+}
+
+function luxuryBrandIndexXml({ visual, palette, labels, x, y }) {
+  return labels.map((label, itemIndex) => {
+    const cardX = x + itemIndex * 822960;
+    return solidShapeXml({ id: 3760 + itemIndex * 4, name: `Luxury Brand Index Card ${itemIndex + 1}`, x: cardX, y, cx: 731520, cy: 487680, fill: palette.vellum, transparency: 6000 })
+      + lineFrameShapeXml({ id: 3761 + itemIndex * 4, name: `Luxury Brand Index Frame ${itemIndex + 1}`, x: cardX, y, cx: 731520, cy: 487680, stroke: visual.accent, width: 5715, transparency: 18000 })
+      + textShapeXml({ id: 3762 + itemIndex * 4, name: `Luxury Brand Index Number ${itemIndex + 1}`, x: cardX + 121920, y: y + 91440, cx: 304800, cy: 152400, text: `0${itemIndex + 1}`, size: 900, bold: true, color: visual.title })
+      + textShapeXml({ id: 3763 + itemIndex * 4, name: `Luxury Brand Index Text ${itemIndex + 1}`, x: cardX + 121920, y: y + 274320, cx: 487680, cy: 152400, text: label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function luxuryBrandStoryPalette(visual) {
+  return {
+    frame: blendHexColor(visual.accent, visual.primary, 0.24),
+    vellum: blendHexColor(visual.surface, visual.background, 0.26),
+  };
+}
+
+function luxuryBrandStoryScene({ slide, index, total }) {
+  const bullets = luxuryBrandStoryBulletTexts(slide);
+  const layout = String(slide?.layout || "").toLowerCase();
+  const role = index === 0 || layout.includes("cover")
+    ? "cover"
+    : index === total - 1 || layout.includes("closing") || layout.includes("summary")
+      ? "closing"
+      : layout.includes("gallery") || layout.includes("story") || layout.includes("narrative")
+        ? "gallery"
+        : layout.includes("proof") || layout.includes("asset") || layout.includes("value")
+          ? "proof"
+          : layout.includes("launch") || layout.includes("release") || layout.includes("product")
+            ? "launch"
+            : ["gallery", "proof", "launch"][(index - 1) % 3];
+  return {
+    role,
+    kicker: role === "cover" ? "MAISON NARRATIVE" : role === "gallery" ? "CURATED STORY" : role === "proof" ? "QUALITY PROOF" : role === "launch" ? "PRODUCT MOMENT" : "BRAND STATEMENT",
+    title: luxuryBrandStoryCompactText(slide?.title, index === 0 ? "品牌叙事与高级质感表达" : `Page ${index + 1}`, index === 0 ? 24 : 22),
+    summary: luxuryBrandStoryCompactText(bullets[0], "以品牌故事、材质证据和产品特写建立高级、可信、克制的传播表达。", 46),
+    bullets,
+    labels: ["品牌起点", "核心主张", "材质证据"].map((fallback, itemIndex) => luxuryBrandStoryCompactText(bullets[itemIndex], fallback, 11)),
+  };
+}
+
+function luxuryBrandStoryBulletTexts(slide) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return bullets.length ? bullets : ["品牌起点与精神内核", "产品材质和工艺证据", "高端用户心智与展陈触点", "发布节奏和传播动作"];
+}
+
+function luxuryBrandStoryCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
 }
 
 function brandStoryVisualXml({ visual, palette, scene, isCover }) {

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="brand signal lines">
+  <rect width="600" height="360" rx="32" fill="#fffaf7"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M84 232C178 122 282 112 386 196c52 42 92 50 132 18" stroke="#7f1d4e" stroke-width="12" opacity=".75"/>
+    <path d="M88 266C202 168 300 160 398 234c46 34 86 42 120 24" stroke="#f97316" stroke-width="10" opacity=".62"/>
+    <path d="M96 300C214 226 318 218 420 270c42 22 72 24 96 12" stroke="#0f766e" stroke-width="8" opacity=".48"/>
+  </g>
+  <circle cx="144" cy="132" r="30" fill="#f97316" opacity=".75"/>
+  <circle cx="458" cy="110" r="42" fill="#7f1d4e" opacity=".18"/>
+  <rect x="214" y="82" width="172" height="42" rx="21" fill="#ffffff" stroke="#fed7aa" stroke-width="4"/>
+  <rect x="246" y="98" width="108" height="10" rx="5" fill="#7f1d4e"/>
+</svg>

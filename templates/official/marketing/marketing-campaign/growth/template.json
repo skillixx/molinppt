@@ -13,8 +13,8 @@
         "surface": "FFFFFF",
         "title": "063327",
         "body": "36594F",
-        "layout": "marketing",
-        "variant": "growth"
+        "layout": "growth-marketing-lab",
+        "variant": "growth-lab"
       }
     }
   ],
@@ -25,15 +25,20 @@
     "surface": "FFFFFF",
     "title": "063327",
     "body": "36594F",
-    "layout": "marketing",
-    "variant": "growth"
+    "layout": "growth-marketing-lab",
+    "variant": "growth-lab"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "campaign-cover",
-    "defaultContentLayout": "campaign-content",
+    "defaultCoverLayout": "growth-lab-cover",
+    "defaultContentLayout": "growth-lab-funnel",
     "allowedLayouts": [
-      "campaign-cover",
-      "campaign-content",
+      "growth-lab-cover",
+      "growth-lab-funnel",
+      "growth-lab-channel-matrix",
+      "growth-lab-experiment-card",
+      "growth-lab-trend-roi",
+      "growth-lab-action-priority",
+      "growth-lab-closing",
       "hero",
       "story",
       "content"

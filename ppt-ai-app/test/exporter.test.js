@@ -2155,15 +2155,16 @@ test("PptExportService uses commercial marketing brand decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Marketing Visual Panel"/);
-  assert.match(slide1, /name="Marketing Brand Circle A"/);
-  assert.match(slide1, /name="Marketing Brand Circle B"/);
-  assert.match(slide1, /name="Marketing Brand Signal"/);
-  assert.match(slide1, /name="Marketing Brand Identity Circle A"/);
-  assert.match(slide1, /name="Marketing Brand Side Code"/);
-  assert.match(slide1, /val="5B21B6"/);
-  assert.match(slide1, /val="06B6D4"/);
+  assert.match(slide1, /name="Brand Comms Warm Canvas"/);
+  assert.match(slide1, /name="Brand Comms Console Panel"/);
+  assert.match(slide1, /name="Brand Comms Scene Card 1"/);
+  assert.match(slide1, /name="Brand Comms Metric Card 1"/);
+  assert.match(slide1, /val="7F1D4E"/);
+  assert.match(slide1, /val="F97316"/);
+  assert.match(slide2, /name="Brand Comms Message House 1"/);
+  assert.doesNotMatch(slide1, /品牌传播/);
 });
 
 test("PptExportService uses commercial marketing growth decorations", () => {
@@ -2175,11 +2176,11 @@ test("PptExportService uses commercial marketing growth decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Marketing Visual Panel"/);
-  assert.match(slide1, /name="Marketing Growth Bar 1"/);
-  assert.match(slide1, /name="Marketing Growth Arc"/);
-  assert.match(slide1, /name="Marketing Growth Grid Line 1"/);
-  assert.match(slide1, /name="Marketing Growth Momentum Curve"/);
+  assert.match(slide1, /name="Growth Lab Canvas Frame"/);
+  assert.match(slide1, /name="Growth Lab Flywheel Outer"/);
+  assert.match(slide1, /name="Growth Lab Device Scene"/);
+  assert.match(slide1, /name="Growth Lab Metric Card 1"/);
+  assert.doesNotMatch(slide1, /增长营销/);
   assert.match(slide1, /val="047857"/);
   assert.match(slide1, /val="F97316"/);
 });
@@ -3319,16 +3320,13 @@ test("PptExportService uses editorial brand story decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Brand Story Cover Canvas"/);
-  assert.match(slide1, /name="Brand Story Image Panel"/);
-  assert.match(slide1, /name="Brand Story editorial Chip"/);
-  assert.match(slide1, /name="Brand Story Editorial Photo Tone"/);
-  assert.match(slide1, /name="Brand Story Editorial Folio"/);
-  assert.match(slide1, /name="Brand Story Editorial Margin Rule"/);
-  assert.match(slide1, /name="Brand Story Point Card 1"/);
-  assert.match(slide2, /name="Brand Story Content Canvas"/);
-  assert.match(slide2, /name="Brand Story Index Card 1"/);
-  assert.match(slide1, /val="2A2F3F"/);
+  assert.match(slide1, /name="Editorial Paper Frame"/);
+  assert.match(slide1, /name="Editorial Cover Title"/);
+  assert.match(slide1, /name="Editorial Portrait Field"/);
+  assert.match(slide1, /BRAND JOURNAL/);
+  assert.match(slide2, /name="Editorial Paper Frame"/);
+  assert.match(slide2, /name="Editorial Opener Title"|name="Editorial Timeline Title"|name="Editorial Feature Title"|name="Editorial Closing Title"/);
+  assert.match(slide1, /val="171B26"/);
   assert.match(slide1, /val="C7825A"/);
 });
 
@@ -3360,14 +3358,14 @@ test("PptExportService uses identity brand story decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Brand Story Image Panel"/);
-  assert.match(slide1, /name="Brand Story identity Chip"/);
-  assert.match(slide1, /name="Brand Story Identity Symbol Core"/);
-  assert.match(slide1, /name="Brand Story Identity Orbit"/);
-  assert.match(slide1, /name="Brand Story Identity Module 1"/);
-  assert.match(slide1, /name="Brand Story Identity Baseline"/);
-  assert.match(slide1, /val="123D4A"/);
-  assert.match(slide1, /val="E56F4F"/);
+  assert.match(slide1, /name="Brand Identity Manual Canvas"/);
+  assert.match(slide1, /name="Brand Identity Package Mockup"/);
+  assert.match(slide1, /name="Brand Identity Screen Mockup"/);
+  assert.match(slide1, /name="Brand Identity Tag Rule"/);
+  assert.match(slide1, /BRAND SYSTEM MANUAL/);
+  assert.match(slide1, /val="121826"/);
+  assert.match(slide1, /val="D84B3F"/);
+  assert.doesNotMatch(slide1, /Brand Story Identity Symbol Core/);
 });
 
 test("PptExportService uses dashboard data insight decorations", () => {

@@ -1,39 +1,47 @@
 {
   "baseTemplateId": "marketing-campaign",
   "themeId": "brand",
-  "style": "campaign-story",
+  "style": "brand-communication-console",
   "themes": [
     {
       "id": "brand",
       "name": "品牌传播",
       "visual": {
-        "primary": "5B21B6",
-        "accent": "06B6D4",
-        "background": "F2F0FF",
+        "primary": "7F1D4E",
+        "accent": "F97316",
+        "secondary": "0F766E",
+        "background": "FFF7F3",
         "surface": "FFFFFF",
-        "title": "20113D",
-        "body": "4B3D68",
-        "layout": "marketing",
-        "variant": "brand"
+        "title": "26101F",
+        "body": "5A3B48",
+        "layout": "marketing-brand-communication-console",
+        "variant": "brand-console"
       }
     }
   ],
   "visual": {
-    "primary": "5B21B6",
-    "accent": "06B6D4",
-    "background": "F2F0FF",
+    "primary": "7F1D4E",
+    "accent": "F97316",
+    "secondary": "0F766E",
+    "background": "FFF7F3",
     "surface": "FFFFFF",
-    "title": "20113D",
-    "body": "4B3D68",
-    "layout": "marketing",
-    "variant": "brand"
+    "title": "26101F",
+    "body": "5A3B48",
+    "layout": "marketing-brand-communication-console",
+    "variant": "brand-console"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "campaign-cover",
-    "defaultContentLayout": "campaign-content",
+    "defaultCoverLayout": "brand-communication-cover",
+    "defaultContentLayout": "brand-communication-content",
     "allowedLayouts": [
-      "campaign-cover",
-      "campaign-content",
+      "brand-communication-cover",
+      "brand-communication-proposition",
+      "brand-communication-audience",
+      "brand-communication-content-matrix",
+      "brand-communication-media-matrix",
+      "brand-communication-rhythm",
+      "brand-communication-dashboard",
+      "brand-communication-closing",
       "hero",
       "story",
       "content"

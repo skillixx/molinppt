@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="outdoor advertising scene">
+  <rect width="600" height="360" rx="32" fill="#fff7f3"/>
+  <path d="M54 284h492" stroke="#7f1d4e" stroke-width="8" stroke-linecap="round" opacity=".16"/>
+  <rect x="84" y="66" width="384" height="178" rx="20" fill="#26101f"/>
+  <rect x="106" y="88" width="340" height="134" rx="14" fill="#fff7ed"/>
+  <path d="M124 196c72-78 142-88 210-30 34 29 72 35 96 18v38H124z" fill="#f97316" opacity=".88"/>
+  <rect x="126" y="112" width="150" height="18" rx="9" fill="#7f1d4e"/>
+  <rect x="126" y="144" width="106" height="12" rx="6" fill="#5a3b48" opacity=".45"/>
+  <rect x="126" y="166" width="142" height="12" rx="6" fill="#5a3b48" opacity=".32"/>
+  <rect x="182" y="244" width="28" height="82" rx="8" fill="#26101f" opacity=".82"/>
+  <rect x="342" y="244" width="28" height="82" rx="8" fill="#26101f" opacity=".82"/>
+  <rect x="486" y="128" width="42" height="116" rx="20" fill="#0f766e" opacity=".78"/>
+  <circle cx="512" cy="94" r="22" fill="#f97316"/>
+</svg>
