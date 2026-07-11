@@ -3486,6 +3486,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           theme: document.querySelector("#theme").value
         });
         state.outlineId = data.outline.id;
+        // 新大纲必须开启全新的 PPT 生成链路，不能继续复用上一份 deck。
+        state.deckId = null;
+        state.taskId = null;
+        state.previewedSlideCount = 0;
+        stopTaskPoll();
         renderOutlineBoard(data.outline.slides, { stagger: true });
         setFlowStage("outline");
         statusEl.textContent = JSON.stringify(data.outline, null, 2);
@@ -3523,6 +3528,11 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         // 直接回到当前大纲编辑态，保留用户已经生成或润色后的内容。
         setWorkspacePage("create");
         setFlowStage("outline");
+        // 返回编辑态后，下次生成应读取当前大纲，而不是只给旧 PPT 更换模板。
+        state.deckId = null;
+        state.taskId = null;
+        state.previewedSlideCount = 0;
+        stopTaskPoll();
         renderOutlineBoard(state.outlineSlides);
         statusEl.textContent = "已返回大纲内容，可继续编辑标题和要点。";
       } catch (error) { statusEl.textContent = error.message; }

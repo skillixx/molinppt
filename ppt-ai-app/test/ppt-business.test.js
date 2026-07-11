@@ -3938,6 +3938,8 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /selectTemplateCard/);
     assert.match(html, /normalizedTemplateVisual/);
     assert.match(html, /id="generate-outline"/);
+    assert.match(html, /state\.outlineId = data\.outline\.id;[\s\S]{0,220}state\.deckId = null;\s*state\.taskId = null;\s*state\.previewedSlideCount = 0;/);
+    assert.match(html, /setFlowStage\("outline"\);[\s\S]{0,240}state\.deckId = null;\s*state\.taskId = null;\s*state\.previewedSlideCount = 0;[\s\S]{0,80}renderOutlineBoard/);
     assert.match(html, /<select id="slide-count">/);
     assert.match(html, /<option value="32">32 页<\/option>/);
     assert.match(html, /setButtonWaiting\(generateButton, true, "生成中\.\.\."\)/);
