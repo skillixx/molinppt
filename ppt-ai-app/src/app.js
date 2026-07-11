@@ -306,7 +306,10 @@ export function createApp(dependencies) {
 
       if (request.method === "POST" && url.pathname === "/api/ppt/decks") {
         const body = await readJson(request);
-        const result = await dependencies.pptService.generateDeck({
+        const generationMethod = body.progressive === true
+          ? "startProgressiveDeckGeneration"
+          : "generateDeck";
+        const result = await dependencies.pptService[generationMethod]({
           ownerUserId,
           outlineId: body.outline_id,
           templateId: body.template_id,
@@ -3323,9 +3326,19 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         const response = await fetch("/api/ppt/tasks/" + taskId);
         const payload = await response.json();
         if (!response.ok) throw new Error(formatApiError(payload));
+        state.taskPollFailures = 0;
 
         const task = payload.task;
         updateDeckGeneratingPreview({ progress: task.progress, slides: state.outlineSlides });
+        const completedSlides = Number(task.completedSlides || 0);
+        const totalSlides = Number(task.totalSlides || state.outlineSlides.length || 0);
+        if (task.deckId) state.deckId = task.deckId;
+        // 只在新增页面到达时刷新当前 iframe，用户始终停留在同一个在线预览区域。
+        if (state.deckId && completedSlides > Number(state.previewedSlideCount || 0)) {
+          state.previewedSlideCount = completedSlides;
+          renderDeckPreviewFrame(state.deckId, { bustCache: true });
+          setFlowStage("preview");
+        }
         statusEl.textContent = "任务状态: " + task.status + "\\n"
           + "进度: " + task.progress + "%\\n"
           + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\\n"
@@ -3352,6 +3365,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         }
         setDeckGenerationBusy(false);
       } catch (error) {
+        state.taskPollFailures = Number(state.taskPollFailures || 0) + 1;
+        if (state.taskId === taskId && state.taskPollFailures <= 3) {
+          statusEl.textContent = error.message + "\\n正在重新连接生成任务...";
+          taskPollTimeout = setTimeout(() => pollTaskProgress(taskId), 1500);
+          return;
+        }
         setDeckGenerationBusy(false);
         statusEl.textContent = error.message;
       }
@@ -3535,10 +3554,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           outline_id: state.outlineId,
           template_id: document.querySelector("#template").value,
           theme: document.querySelector("#theme").value,
+          progressive: true,
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
         });
         state.deckId = data.deck.id;
         state.taskId = data.task.id;
+        state.previewedSlideCount = 0;
         showTaskStatus(data.task);
         updateDeckGeneratingPreview({ progress: data.task.progress, slides: state.outlineSlides });
         pollTaskProgress(state.taskId);
@@ -3579,6 +3600,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         });
         state.deckId = data.deck.id;
         state.taskId = data.task.id;
+        state.previewedSlideCount = 0;
         showTaskStatus(data.task);
         pollTaskProgress(state.taskId);
         if (data.task.status === "succeeded" && state.deckId) {

@@ -2936,6 +2936,105 @@ test("PptService marks failed generation retryable and retry succeeds", async ()
   assert.deepEqual(context.billingCalls.map((call) => call[0]), ["balance", "reserve", "release", "balance", "reserve", "settle"]);
 });
 
+test("PptService progressively persists and previews each generated slide", async () => {
+  const gates = [];
+  const aiProvider = {
+    async generateOutline() {
+      return [
+        { id: "slide-1", sortOrder: 1, title: "第一页", bullets: ["首个要点"] },
+        { id: "slide-2", sortOrder: 2, title: "第二页", bullets: ["第二个要点"] },
+      ];
+    },
+    async generateSlides({ outline }) {
+      const gate = {};
+      gate.promise = new Promise((resolve) => { gate.resolve = resolve; });
+      gates.push(gate);
+      await gate.promise;
+      const source = outline.slides[0];
+      return [{ ...source, theme: outline.theme }];
+    },
+    async regenerateSlide({ slide }) { return slide; },
+  };
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "渐进式预览",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  const started = await context.pptService.startProgressiveDeckGeneration({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+  assert.equal(started.task.status, "running");
+  assert.equal(started.deck.slides.length, 0);
+  await waitForCondition(() => gates.length === 2);
+
+  gates[0].resolve();
+  await waitForCondition(async () => {
+    const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+    return task.completedSlides === 1;
+  });
+  const partialPreview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: started.deck.id });
+  assert.match(partialPreview, /第一页/);
+  assert.doesNotMatch(partialPreview, /第二页/);
+
+  gates[1].resolve();
+  await waitForCondition(async () => {
+    const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+    return task.status === "succeeded";
+  });
+  const completedTask = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+  const completedDeck = await context.database.findOne("decks", (deck) => deck.id === started.deck.id);
+  assert.equal(completedTask.completedSlides, 2);
+  assert.equal(completedDeck.status, "ready");
+  assert.equal(completedDeck.slides.length, 2);
+  assert.equal(completedDeck.slides[0].layout, "cover");
+  assert.notEqual(completedDeck.slides[1].layout, "cover");
+});
+
+test("PptService keeps progressive settlement failures non-retryable for reconciliation", async () => {
+  const context = await createBusinessContext({
+    billingOverrides: {
+      settleCredits: async (input) => {
+        context.billingCalls.push(["settle", input]);
+        throw new Error("settlement unavailable");
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({ ownerUserId: 7, topic: "结算保护", slideCount: 1, templateId: "business" });
+  const started = await context.pptService.startProgressiveDeckGeneration({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  await waitForCondition(async () => {
+    const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+    return task.status === "reconcile_pending";
+  });
+  const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+  assert.equal(task.retryable, false);
+  assert.equal(context.billingCalls.some(([operation]) => operation === "release"), false);
+});
+
+test("PptService blocks progressive retry while credit release is pending", async () => {
+  const context = await createBusinessContext({
+    aiProvider: new MockAiProvider({ failNextDeck: true }),
+    billingOverrides: {
+      releaseCredits: async (input) => {
+        context.billingCalls.push(["release", input]);
+        throw new Error("release unavailable");
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({ ownerUserId: 7, topic: "释放保护", slideCount: 1, templateId: "business" });
+  const started = await context.pptService.startProgressiveDeckGeneration({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  await waitForCondition(async () => {
+    const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+    return task.status === "release_pending";
+  });
+  const task = await context.pptService.getGenerationTask({ ownerUserId: 7, taskId: started.task.id });
+  assert.equal(task.retryable, false);
+});
+
 test("HTTP API returns retryable task ID when deck generation fails", async () => {
   const context = await createBusinessContext({
     aiProvider: new MockAiProvider({ failNextDeck: true }),
@@ -3890,6 +3989,9 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /deck-loading-slide/);
     assert.match(html, /renderDeckGeneratingPreview/);
     assert.match(html, /updateDeckGeneratingPreview/);
+    assert.match(html, /progressive: true/);
+    assert.match(html, /task\.completedSlides/);
+    assert.match(html, /state\.previewedSlideCount/);
     assert.match(html, /setDeckGenerationBusy/);
     assert.match(html, /DECK_REVEAL_INTERVAL_MS = 700/);
     assert.match(html, /DECK_MIN_LOADING_MS = 2200/);
@@ -4565,6 +4667,15 @@ test("HTTP API falls back to configured entitlement for restored sessions withou
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
 });
+
+async function waitForCondition(predicate, timeoutMs = 1000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    if (await predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for condition");
+}
 
 async function createBusinessContext(options = {}) {
   const database = new JsonFileDatabase({

@@ -20,6 +20,7 @@ const REGENERATE_SLIDE_AMOUNT = "2";
 const MIN_SLIDE_COUNT = 1;
 const MAX_SLIDE_COUNT = 32;
 const SLIDE_GENERATION_MAX_ATTEMPTS = 2;
+const PROGRESSIVE_GENERATION_CONCURRENCY = 3;
 const MAX_ACTIVE_PPT_ASSETS = 100;
 const MAX_PROMPT_CHARS = 5000;
 const DOME_AGENDA_DEFAULT_ITEMS = ["工作汇报", "成果展示", "问题不足", "下步计划"];
@@ -352,6 +353,201 @@ export class PptService {
   }
 
   /**
+   * 启动渐进式 PPT 生成任务，并立即返回可预览的空 deck。
+   * 后台每完成一页就持久化一次，供工作台轮询刷新预览。
+   * @param {{ownerUserId: number, outlineId: string, entitlementId: number, templateId?: string, theme?: string}} input
+   * @returns {Promise<{deck: object, task: object}>}
+   */
+  async startProgressiveDeckGeneration({ ownerUserId, outlineId, entitlementId, templateId, theme }) {
+    const outline = await this.#getOwned("outlines", outlineId, ownerUserId, "OUTLINE_NOT_FOUND");
+    const selectedTemplateId = templateId || outline.templateId;
+    const selectedTheme = theme || outline.theme || "modern";
+    const template = this.templateManager.getTemplate(selectedTemplateId, { ownerUserId });
+    validateTemplateTheme({ template, theme: selectedTheme });
+    await this.#ensureAssetQuota({ ownerUserId });
+    const generationLock = await this.#acquireGenerationLock({ ownerUserId, outlineId });
+    let task;
+    let reserve;
+    try {
+      task = await this.taskCenter.createTask({
+        ownerUserId,
+        type: "ppt_generate_progressive",
+        input: { outlineId, entitlementId, templateId: selectedTemplateId, theme: selectedTheme },
+      });
+      const totalSlides = Array.isArray(outline.slides) ? outline.slides.length : 0;
+      await this.#ensureBalance({ ownerUserId, entitlementId, amount: GENERATE_AMOUNT });
+      const reserveKey = `${task.id}:ppt_generate:reserve`;
+      reserve = await this.#reserveGenerationCredits({ ownerUserId, entitlementId, idempotencyKey: reserveKey });
+      await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "reserve", amount: GENERATE_AMOUNT, status: "reserved", holdId: reserve.hold_id, idempotencyKey: reserveKey });
+      await this.database.insert("generation_tasks", {
+        id: task.id, ownerUserId, outlineId, entitlementId,
+        status: "running", progress: 5, retryable: false,
+        completedSlides: 0, totalSlides,
+        generationMode: "progressive", templateId: selectedTemplateId, theme: selectedTheme,
+        holdId: reserve.hold_id,
+      });
+      const deck = await this.database.insert("decks", {
+        ownerUserId,
+        outlineId,
+        title: outline.topic,
+        templateId: selectedTemplateId,
+        templateName: template.name,
+        templateVisual: resolveTemplateVisual({
+          templateId: selectedTemplateId,
+          theme: selectedTheme,
+          template: { id: template.id, name: template.name, visual: template.visual, themes: template.themes },
+        }),
+        templateLayoutSchema: template.layoutSchema,
+        theme: selectedTheme,
+        status: "generating",
+        slides: [],
+      });
+      await this.database.update("generation_tasks", task.id, { deckId: deck.id });
+      const runningTask = await this.taskCenter.updateTask(task.id, {
+        status: "running", progress: 5, deckId: deck.id,
+        completedSlides: 0, totalSlides,
+      });
+      // 后台任务负责生成、结算和释放锁，HTTP 请求无需等待全部页面。
+      void this.#runProgressiveDeckGeneration({
+        ownerUserId, outline, template, selectedTemplateId, selectedTheme,
+        taskId: task.id, deckId: deck.id, reserve, generationLock,
+      }).catch(() => {
+        // 后台补偿本身异常时仍需吞掉拒绝，避免进程触发 unhandledRejection。
+        this.metrics?.increment?.("alerts_total", { type: "progressive_generation_unhandled" });
+      });
+      return { deck, task: runningTask };
+    } catch (error) {
+      try {
+        let setupReleasePending = false;
+        if (reserve?.hold_id && task?.id) {
+          const releaseKey = `${task.id}:ppt_generate:release`;
+          try {
+            await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+            await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+          } catch {
+            setupReleasePending = true;
+            await this.#recordBilling({ ownerUserId, taskId: task.id, eventType: "release", amount: "0", status: "release_pending", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+          }
+        }
+        if (task?.id) {
+          await this.database.update("generation_tasks", task.id, { status: setupReleasePending ? "release_pending" : "failed", progress: 100, retryable: !setupReleasePending, errorMessage: error.message });
+        }
+      } catch {
+        this.metrics?.increment?.("alerts_total", { type: "progressive_generation_setup_compensation_failed" });
+      } finally {
+        try {
+          await generationLock.release();
+        } catch {
+          this.metrics?.increment?.("alerts_total", { type: "progressive_generation_lock_release_failed" });
+        }
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * 在后台逐页生成并持久化 PPT 内容。
+   * @param {object} input
+   * @returns {Promise<void>}
+   */
+  async #runProgressiveDeckGeneration({ ownerUserId, outline, template, selectedTemplateId, selectedTheme, taskId, deckId, reserve, generationLock }) {
+    const settleKey = `${taskId}:ppt_generate:settle`;
+    const releaseKey = `${taskId}:ppt_generate:release`;
+    const sourceSlides = Array.isArray(outline.slides) ? outline.slides : [];
+    let completed = [];
+    let generationCompleted = false;
+    try {
+      const generatedSlots = new Array(sourceSlides.length);
+      let nextIndex = 0;
+      let generationError;
+      let persistChain = Promise.resolve();
+      const persistGeneratedSlides = () => {
+        // 每个真实完成页立即进入预览；sortOrder 保留其在最终 PPT 中的原始位置。
+        persistChain = persistChain.then(async () => {
+          completed = generatedSlots.filter(Boolean).sort((left, right) => left.sortOrder - right.sortOrder);
+          const completedSlides = completed.length;
+          const progress = Math.min(95, 5 + Math.round((completedSlides / Math.max(sourceSlides.length, 1)) * 90));
+          await this.database.update("decks", deckId, { slides: [...completed] });
+          await this.database.update("generation_tasks", taskId, { progress, completedSlides, totalSlides: sourceSlides.length, deckId });
+          await this.taskCenter.updateTask(taskId, { status: "running", progress, completedSlides, totalSlides: sourceSlides.length, deckId });
+        });
+        return persistChain;
+      };
+      const generateNextPage = async () => {
+        if (generationError) return;
+        const index = nextIndex;
+        nextIndex += 1;
+        if (index >= sourceSlides.length) return;
+        try {
+          const sourceSlide = sourceSlides[index];
+          const pageOutline = { ...outline, templateId: selectedTemplateId, theme: selectedTheme, slides: [sourceSlide] };
+          const prompt = this.promptManager.buildDeckPrompt({ outline: pageOutline, template });
+          this.#assertPromptWithinLimit({ operation: "deck_page", prompt });
+          const [generated] = await this.#generateValidSlides({
+            prompt,
+            outline: pageOutline,
+            template,
+            globalIndexOffset: index,
+            globalTotal: sourceSlides.length,
+          });
+          const mergedSlide = { ...sourceSlide, ...generated };
+          generatedSlots[index] = {
+            ...generated,
+            id: sourceSlide.id || generated.id || `slide-${index + 1}`,
+            sortOrder: sourceSlide.sortOrder || index + 1,
+            layout: normalizeSlideLayout({ layout: generated.layout || sourceSlide.layout, template, index, total: sourceSlides.length, slide: mergedSlide }),
+            theme: selectedTheme,
+          };
+          await persistGeneratedSlides();
+        } catch (error) {
+          generationError ||= error;
+          return;
+        }
+        await generateNextPage();
+      };
+      // 限制并发数，兼顾首屏速度和模型服务的限流压力。
+      await Promise.all(Array.from(
+        { length: Math.min(PROGRESSIVE_GENERATION_CONCURRENCY, sourceSlides.length) },
+        () => generateNextPage(),
+      ));
+      await persistChain;
+      if (generationError) throw generationError;
+      generationCompleted = true;
+      await this.billingClient.settleCredits({ holdId: reserve.hold_id, actualAmount: GENERATE_AMOUNT, idempotencyKey: settleKey });
+      await this.#recordBilling({ ownerUserId, taskId, eventType: "settle", amount: GENERATE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
+      const readyDeck = await this.database.update("decks", deckId, { status: "ready", slides: completed });
+      await this.database.update("generation_tasks", taskId, { status: "succeeded", progress: 100, completedSlides: completed.length, totalSlides: sourceSlides.length, deckId });
+      await this.taskCenter.updateTask(taskId, { status: "succeeded", progress: 100, completedSlides: completed.length, totalSlides: sourceSlides.length, deckId, result: { deckId } });
+      await this.#createAssetForDeck({ deck: readyDeck, outline });
+      await this.#log({ ownerUserId, action: "deck_generated_progressively", resourceType: "deck", resourceId: deckId, metadata: { slideCount: completed.length } });
+    } catch (error) {
+      if (generationCompleted) {
+        // 已进入结算阶段后不能再释放预扣；状态交给对账任务处理，防止重复扣费。
+        await this.#recordBilling({ ownerUserId, taskId, eventType: "settle", amount: GENERATE_AMOUNT, status: "settle_pending", holdId: reserve.hold_id, idempotencyKey: settleKey });
+        await this.database.update("decks", deckId, { status: "billing_pending", slides: completed });
+        await this.database.update("generation_tasks", taskId, { status: "reconcile_pending", progress: 100, retryable: false, errorCode: "SETTLE_FAILED", errorMessage: error.message, completedSlides: completed.length, totalSlides: sourceSlides.length, deckId });
+        await this.taskCenter.updateTask(taskId, { status: "failed", progress: 100, retryable: false, error: "Billing reconciliation pending", completedSlides: completed.length, totalSlides: sourceSlides.length, deckId });
+        await this.#log({ ownerUserId, action: "billing_settle_pending", resourceType: "task", resourceId: taskId, metadata: { error: error.message, deckId } });
+        return;
+      }
+      let releasePending = false;
+      try {
+        await this.billingClient.releaseCredits({ holdId: reserve.hold_id, idempotencyKey: releaseKey });
+        await this.#recordBilling({ ownerUserId, taskId, eventType: "release", amount: "0", status: "released", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      } catch {
+        releasePending = true;
+        await this.#recordBilling({ ownerUserId, taskId, eventType: "release", amount: "0", status: "release_pending", holdId: reserve.hold_id, idempotencyKey: releaseKey });
+      }
+      await this.database.update("decks", deckId, { status: "failed", slides: completed });
+      await this.database.update("generation_tasks", taskId, { status: releasePending ? "release_pending" : "failed", progress: 100, retryable: !releasePending, errorMessage: error.message, completedSlides: completed.length, totalSlides: sourceSlides.length, deckId });
+      await this.taskCenter.updateTask(taskId, { status: "failed", progress: 100, retryable: !releasePending, error: releasePending ? "Billing reconciliation pending" : error.message, completedSlides: completed.length, totalSlides: sourceSlides.length, deckId });
+      await this.#log({ ownerUserId, action: "deck_generation_progressive_failed", resourceType: "task", resourceId: taskId, metadata: { error: error.message, completedSlides: completed.length } });
+    } finally {
+      await generationLock.release();
+    }
+  }
+
+  /**
    * Retries a failed generation task.
    * @param {{ownerUserId: number, taskId: string, entitlementId: number}} input
    * @returns {Promise<{deck: object, task: object}>}
@@ -360,6 +556,15 @@ export class PptService {
     const failedTask = await this.#getOwned("generation_tasks", taskId, ownerUserId, "TASK_NOT_FOUND");
     if (!failedTask.retryable) {
       throw new AppError({ code: "TASK_NOT_RETRYABLE", status: 400, message: "Task is not retryable" });
+    }
+    if (failedTask.generationMode === "progressive") {
+      return this.startProgressiveDeckGeneration({
+        ownerUserId,
+        outlineId: failedTask.outlineId,
+        entitlementId,
+        templateId: failedTask.templateId,
+        theme: failedTask.theme,
+      });
     }
     return this.generateDeck({ ownerUserId, outlineId: failedTask.outlineId, entitlementId });
   }
@@ -557,8 +762,12 @@ export class PptService {
    */
   async previewDeck({ ownerUserId, deckId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
-    assertDeckReady(deck);
+    if (deck.status !== "generating") assertDeckReady(deck);
     const deckForPreview = this.#withCurrentTemplateVisual({ deck, ownerUserId });
+    // 生成过程中直接返回当前已完成页面，避免 LibreOffice 在每次轮询时重复启动。
+    if (deck.status === "generating") {
+      return renderDeckPreview({ deck: deckForPreview, visual: deckForPreview.templateVisual });
+    }
     if (this.pptPreviewRenderer) {
       const pptx = this.exporter.exportDeck({ deck: deckForPreview, format: "pptx" });
       const rendered = await this.pptPreviewRenderer.render({
@@ -666,7 +875,7 @@ export class PptService {
    * @param {{prompt: object, outline: object, template: object}} input
    * @returns {Promise<object[]>}
    */
-  async #generateValidSlides({ prompt, outline, template }) {
+  async #generateValidSlides({ prompt, outline, template, globalIndexOffset = 0, globalTotal = outline?.slides?.length || 0 }) {
     let lastError;
     for (let attempt = 1; attempt <= SLIDE_GENERATION_MAX_ATTEMPTS; attempt += 1) {
       try {
@@ -682,13 +891,13 @@ export class PptService {
               },
             },
         );
-        return normalizeGeneratedSlides({ slides, outline, template });
+        return normalizeGeneratedSlides({ slides, outline, template, globalIndexOffset, globalTotal });
       } catch (error) {
         if (!isSlideSchemaError(error)) throw error;
         lastError = error;
       }
     }
-    return buildFallbackSlides({ outline, template });
+    return buildFallbackSlides({ outline, template, globalIndexOffset, globalTotal });
   }
 
   /**
@@ -10342,7 +10551,7 @@ function validateOutlineSlides(slides) {
  * @param {{slides: unknown, outline: object, template: object}} input
  * @returns {object[]}
  */
-function normalizeGeneratedSlides({ slides, outline, template }) {
+function normalizeGeneratedSlides({ slides, outline, template, globalIndexOffset = 0, globalTotal = outline?.slides?.length || 0 }) {
   const outlineSlides = Array.isArray(outline?.slides) ? outline.slides : [];
   if (!Array.isArray(slides)) {
     throwSlideSchemaError("slides must be an array");
@@ -10351,6 +10560,7 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
     throwSlideSchemaError(`slides length must match outline length ${outlineSlides.length}`);
   }
   return slides.map((slide, index) => {
+    const globalIndex = globalIndexOffset + index;
     if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
       throwSlideSchemaError(`slide ${index + 1} must be an object`);
     }
@@ -10372,7 +10582,7 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
       title,
       bullets: slide.bullets,
       speakerNotes: typeof slide.speakerNotes === "string" ? slide.speakerNotes : "",
-      layout: normalizeSlideLayout({ layout: slide.layout || outlineSlide.layout, template, index, total: outlineSlides.length, slide: mergedSlide }),
+      layout: normalizeSlideLayout({ layout: slide.layout || outlineSlide.layout, template, index: globalIndex, total: globalTotal, slide: mergedSlide }),
       theme: normalizeSlideText(slide.theme, outline.theme || "modern"),
     };
   });
@@ -10383,9 +10593,10 @@ function normalizeGeneratedSlides({ slides, outline, template }) {
  * @param {{outline: object, template: object}} input
  * @returns {object[]}
  */
-function buildFallbackSlides({ outline, template }) {
+function buildFallbackSlides({ outline, template, globalIndexOffset = 0, globalTotal = outline?.slides?.length || 0 }) {
   const outlineSlides = Array.isArray(outline?.slides) ? outline.slides : [];
   return outlineSlides.map((slide, index) => {
+    const globalIndex = globalIndexOffset + index;
     const title = normalizeSlideText(slide?.title, `Slide ${index + 1}`);
     return {
       ...preserveStructuredSlideMetadata({ outlineSlide: slide, generatedSlide: {} }),
@@ -10394,7 +10605,7 @@ function buildFallbackSlides({ outline, template }) {
       title,
       bullets: normalizeBulletList(slide?.bullets),
       speakerNotes: `Generated from confirmed outline: ${title}`,
-      layout: normalizeSlideLayout({ layout: "", template, index, total: outlineSlides.length, slide }),
+      layout: normalizeSlideLayout({ layout: "", template, index: globalIndex, total: globalTotal, slide }),
       theme: outline.theme || "modern",
       fallback: true,
     };
