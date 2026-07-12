@@ -3654,6 +3654,50 @@ test("PptExportService uses research report data insight decorations", () => {
   assert.match(slide1, /val="B8822D"/);
 });
 
+test("PptExportService keeps research report slide text from appearing twice on one page", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-insight",
+      theme: "research",
+      slides: [
+        {
+          title: "Research duplicate guard",
+          bullets: [
+            "Alpha summary unique",
+            "Bravo detail unique",
+            "Charlie evidence unique",
+          ],
+        },
+        {
+          title: "Method duplicate guard",
+          bullets: [
+            "DeltaSummary",
+            "EchoMethod",
+            "FoxtrotSample",
+          ],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(pptShapeByName(slide1, "Data Research Report Abstract Summary"), /Alpha summary unique/);
+  assert.match(pptShapeByName(slide1, "Data Research Report Bullet 1"), /Bravo detail unique/);
+  assert.doesNotMatch(pptShapeByName(slide1, "Data Research Report Bullet 1"), /Alpha summary unique/);
+  assert.equal((slide1.match(/Alpha summary unique/g) || []).length, 1);
+  assert.equal((slide1.match(/Bravo detail unique/g) || []).length, 1);
+  assert.match(pptShapeByName(slide2, "Data Research Report Abstract Summary"), /DeltaSummary/);
+  assert.match(slide2, /EchoMethod/);
+  assert.doesNotMatch(slide2, /name="Data Research Report Bullet 1"/);
+  assert.equal((slide2.match(/DeltaSummary/g) || []).length, 1);
+  assert.equal((slide2.match(/EchoMethod/g) || []).length, 1);
+});
+
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

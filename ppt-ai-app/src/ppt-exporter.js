@@ -14052,10 +14052,10 @@ function dataInsightWorkbenchCompactText(text, fallback, maxLength) {
 function dataResearchReportDecorationsXml({ visual, index, slide, total }) {
   const palette = dataResearchReportPalette(visual);
   const scene = dataResearchReportScene({ slide, index, total });
-  const bullets = dataResearchReportBulletTexts(slide);
   const title = dataResearchReportCompactText(slide?.title, scene.title, index === 0 ? 30 : 26);
-  const summary = dataResearchReportCompactText(bullets[0], scene.summary, 54);
-  const bulletXml = bullets.slice(0, 3).map((item, itemIndex) => textShapeXml({
+  const summary = dataResearchReportCompactText(scene.summary, "围绕样本、方法、证据和结论建立可追溯的研究汇报结构。", 54);
+  const inlineBullets = scene.kind === "cover" ? scene.detailBullets : [];
+  const bulletXml = inlineBullets.slice(0, 3).map((item, itemIndex) => textShapeXml({
     id: 5440 + itemIndex,
     name: `Data Research Report Bullet ${itemIndex + 1}`,
     x: 914400,
@@ -14178,9 +14178,11 @@ function dataResearchReportFooterXml({ visual, palette, index, total }) {
 
 function dataResearchReportScene({ slide, index, total }) {
   const bullets = dataResearchReportBulletTexts(slide);
+  const detailBullets = bullets.length > 1 ? bullets.slice(1, 4) : [];
   const title = dataResearchReportCompactText(slide?.title, "研究摘要与关键发现", index === 0 ? 30 : 26);
   const metrics = ["样本", "方法", "证据"].map((fallback, itemIndex) => dataResearchReportMetricFromText(bullets[itemIndex], fallback, itemIndex));
-  const cards = ["研究方法", "样本结构", "证据引用", "核心发现"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 16));
+  const cardSource = detailBullets.length ? detailBullets : bullets;
+  const cards = ["研究方法", "样本结构", "证据引用", "核心发现"].map((fallback, itemIndex) => dataResearchReportCompactText(cardSource[itemIndex], fallback, 16));
   const scenes = [
     { kind: "cover", kicker: "RESEARCH PUBLICATION" },
     { kind: "method", kicker: "METHOD NOTES" },
@@ -14210,9 +14212,10 @@ function dataResearchReportScene({ slide, index, total }) {
     ...base,
     title,
     bullets,
+    detailBullets,
     metrics,
     cards: base.kind === "appendix"
-      ? ["资料索引", "脚注说明", "样本限制", "后续研究"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 14))
+      ? ["资料索引", "脚注说明", "样本限制", "后续研究"].map((fallback, itemIndex) => dataResearchReportCompactText(cardSource[itemIndex], fallback, 14))
       : cards,
     summary: dataResearchReportCompactText(bullets[0], "围绕样本、方法、证据和结论建立可追溯的研究汇报结构。", 52),
   };

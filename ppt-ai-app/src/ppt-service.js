@@ -10874,7 +10874,8 @@ function isBrandStoryVisual(visual) {
 }
 
 function renderDataResearchReportPreview(scene) {
-  const bullets = scene.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const inlineBullets = ["cover", "summary"].includes(scene.kind) ? scene.detailBullets : [];
+  const bullets = inlineBullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
   const common = `<div class="research-layer"><div class="research-kicker">${escapeHtml(scene.kicker)}</div><h2 class="research-title">${escapeHtml(scene.title)}</h2><div class="research-summary">${escapeHtml(scene.summary)}</div><ul class="research-bullets">${bullets}</ul>`;
   if (scene.kind === "cover" || scene.kind === "summary") {
@@ -10900,9 +10901,11 @@ function renderDataResearchReportPreview(scene) {
 
 function dataResearchReportPreviewScene({ slide, index, total }) {
   const bullets = dataResearchReportBulletTexts(slide);
+  const detailBullets = bullets.length > 1 ? bullets.slice(1, 4) : [];
   const title = dataResearchReportCompactText(slide?.title, "研究摘要与关键发现", index === 0 ? 26 : 24);
   const metrics = ["样本", "方法", "证据"].map((fallback, itemIndex) => dataResearchReportMetricFromText(bullets[itemIndex], fallback, itemIndex));
-  const cards = ["研究方法", "样本结构", "证据引用", "核心发现"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 16));
+  const cardSource = detailBullets.length ? detailBullets : bullets;
+  const cards = ["研究方法", "样本结构", "证据引用", "核心发现"].map((fallback, itemIndex) => dataResearchReportCompactText(cardSource[itemIndex], fallback, 16));
   const scenes = [
     { kind: "cover", kicker: "RESEARCH PUBLICATION" },
     { kind: "summary", kicker: "EXECUTIVE ABSTRACT" },
@@ -10920,9 +10923,10 @@ function dataResearchReportPreviewScene({ slide, index, total }) {
     ...base,
     title,
     bullets,
+    detailBullets,
     metrics,
     cards: base.kind === "appendix"
-      ? ["资料索引", "脚注说明", "样本限制", "后续研究"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 14))
+      ? ["资料索引", "脚注说明", "样本限制", "后续研究"].map((fallback, itemIndex) => dataResearchReportCompactText(cardSource[itemIndex], fallback, 14))
       : cards,
     summary: dataResearchReportCompactText(bullets[0], "围绕样本、方法、证据和结论建立可追溯的研究汇报结构。", 46),
     footnote: `Source index ${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")} · Evidence notes are editable`,
