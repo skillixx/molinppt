@@ -1259,6 +1259,7 @@ function renderDeckPreview({ deck, visual }) {
     const statusReportScene = visual.layout === "status-report" ? statusReportPreviewScene(visual) : null;
     const strategyScene = isStrategyConsultingVisual(visual) ? strategyConsultingPreviewScene(visual) : null;
     const financeScene = isFinancialReviewVisual(visual) ? financialReviewPreviewScene(visual) : null;
+    const financeAuditScene = isFinanceAuditReviewVisual(visual) ? financeAuditReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const salesScene = isSalesProposalVisual(visual) ? salesProposalPreviewScene(visual) : null;
     const channelPolicyScene = isChannelRecruitmentPolicyVisual(visual) ? channelRecruitmentPolicyPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const financialSolutionScene = isFinancialSolutionVisual(visual) ? financialSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1351,6 +1352,7 @@ function renderDeckPreview({ deck, visual }) {
     const budgetPlanningScene = isBudgetPlanningVisual(visual) ? budgetPlanningPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetVarianceScene = isBudgetVarianceVisual(visual) ? budgetVariancePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const budgetAdjustmentScene = isBudgetAdjustmentVisual(visual) ? budgetAdjustmentPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const financeQuarterlyScene = isFinanceQuarterlyReviewVisual(visual) ? financeQuarterlyReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const riskInspectionScene = typeof isRiskInspectionVisual === "function" && typeof riskInspectionPreviewScene === "function" && isRiskInspectionVisual(visual)
       ? riskInspectionPreviewScene({ slide, index, total: deck.slides.length })
       : null;
@@ -1371,6 +1373,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const financeMark = financeScene
       ? `<div class="finance-label">${escapeHtml(financeScene.label)}</div><div class="finance-visual" data-finance-kind="${escapeHtml(financeScene.variant)}"><span></span><span></span><span></span><span></span></div><div class="finance-chip" aria-hidden="true"></div>`
+      : "";
+    const financeAuditMark = financeAuditScene
+      ? renderFinanceAuditReviewPreview(slide, financeAuditScene)
       : "";
     const salesMark = salesScene
       ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip" aria-hidden="true"></div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
@@ -1667,6 +1672,9 @@ function renderDeckPreview({ deck, visual }) {
     const budgetAdjustmentMark = budgetAdjustmentScene
       ? renderBudgetAdjustmentPreview(slide, budgetAdjustmentScene)
       : "";
+    const financeQuarterlyMark = financeQuarterlyScene
+      ? renderFinanceQuarterlyReviewPreview(slide, financeQuarterlyScene)
+      : "";
     const riskInspectionMark = riskInspectionScene
       ? renderRiskInspectionPreview(slide, riskInspectionScene)
       : "";
@@ -1687,11 +1695,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${financeAuditMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -2431,6 +2439,45 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="finance-budget-variance"] .variance-loop span{position:absolute;top:31%;width:42px;height:42px;border-radius:50%;background:#fff;border:7px solid var(--template-accent);box-shadow:0 8px 18px rgba(22,33,62,.12);}
     body[data-layout="finance-budget-variance"] .variance-loop span:nth-child(1){left:8%;}body[data-layout="finance-budget-variance"] .variance-loop span:nth-child(2){left:35%;border-color:#f6b84b;}body[data-layout="finance-budget-variance"] .variance-loop span:nth-child(3){left:62%;border-color:#2fa879;}body[data-layout="finance-budget-variance"] .variance-loop span:nth-child(4){left:84%;border-color:var(--template-primary);}
     body[data-layout="finance-budget-variance"] .page-number{z-index:4;right:7.1%;bottom:5.5%;background:rgba(255,255,255,.78);border:1px solid rgba(22,33,62,.12);border-radius:999px;padding:5px 10px;color:rgba(23,32,54,.62);}
+    body[data-layout="finance-quarterly-review"] .slide{padding:0;border:0;background:linear-gradient(135deg,#fbfcfe 0%,var(--template-bg) 52%,#e9eef4 100%);}
+    body[data-layout="finance-quarterly-review"] .slide::before{background:repeating-linear-gradient(90deg,rgba(18,38,58,.055) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(18,38,58,.04) 0 1px,transparent 1px 38px);}
+    body[data-layout="finance-quarterly-review"] .slide::after{content:"";position:absolute;right:-8%;top:-16%;width:42%;height:58%;border-radius:36px;background:rgba(217,144,47,.12);transform:rotate(8deg);}
+    body[data-layout="finance-quarterly-review"] .accent{height:6.3%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#1d3f5e 70%,var(--template-accent));box-shadow:0 8px 22px rgba(18,38,58,.16);}
+    body[data-layout="finance-quarterly-review"] .fq-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="finance-quarterly-review"] .fq-surface{position:absolute;left:5.8%;right:5.8%;top:11.2%;bottom:8.2%;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(248,250,252,.92));border:1px solid rgba(18,38,58,.14);box-shadow:0 24px 54px rgba(18,38,58,.15),inset 0 0 0 1px rgba(255,255,255,.78);}
+    body[data-layout="finance-quarterly-review"] .fq-kicker{position:absolute;left:8.2%;top:15%;font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--template-accent);}
+    body[data-layout="finance-quarterly-review"] .fq-title{position:absolute;left:8.2%;top:21.5%;width:43%;margin:0;color:var(--template-title);font-size:33px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="finance-quarterly-review"] .fq-rule{position:absolute;left:8.2%;top:42.4%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="finance-quarterly-review"] .fq-bullets{position:absolute;left:8.2%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:13.4px;line-height:1.45;color:var(--template-body);}
+    body[data-layout="finance-quarterly-review"] .fq-bullets li{margin:.14em 0;}
+    body[data-layout="finance-quarterly-review"] .fq-dashboard{position:absolute;right:8%;top:18%;width:39%;height:50%;border-radius:16px;background:linear-gradient(135deg,#12263a,#1c405f);border:1px solid rgba(18,38,58,.16);box-shadow:0 18px 38px rgba(18,38,58,.18);overflow:hidden;}
+    body[data-layout="finance-quarterly-review"] .fq-dashboard::before{content:"";position:absolute;left:8%;top:12%;width:30%;height:34%;border-radius:50%;background:conic-gradient(var(--template-accent) 0 58%,var(--template-secondary) 58% 76%,rgba(255,255,255,.22) 76% 100%);box-shadow:0 0 0 16px rgba(47,158,109,.12);}
+    body[data-layout="finance-quarterly-review"] .fq-dashboard::after{content:"";position:absolute;right:9%;top:18%;bottom:17%;width:44%;background:linear-gradient(180deg,transparent 0 14%,rgba(255,255,255,.22) 14% 15%,transparent 15% 34%,rgba(47,158,109,.62) 34% 35%,transparent 35% 55%,rgba(217,144,47,.62) 55% 56%,transparent 56% 76%,rgba(255,255,255,.22) 76% 77%,transparent 77%),linear-gradient(90deg,var(--template-accent) 0 8px,transparent 8px 100%);}
+    body[data-layout="finance-quarterly-review"] .fq-metrics{position:absolute;left:8.2%;right:47%;bottom:13.6%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+    body[data-layout="finance-quarterly-review"] .fq-metrics span{min-height:60px;border-radius:10px;background:#fff;border:1px solid rgba(18,38,58,.12);box-shadow:0 10px 22px rgba(18,38,58,.08);padding:11px 10px;display:grid;align-content:center;gap:3px;font-size:10px;font-weight:820;color:var(--template-body);border-top:4px solid var(--template-accent);}
+    body[data-layout="finance-quarterly-review"] .fq-metrics span:nth-child(2){border-top-color:var(--template-secondary);}body[data-layout="finance-quarterly-review"] .fq-metrics span:nth-child(4){border-top-color:var(--template-warning);}
+    body[data-layout="finance-quarterly-review"] .fq-metrics strong{font-size:18px;line-height:1;color:var(--template-title);}
+    body[data-layout="finance-quarterly-review"] .fq-bridge{position:absolute;right:7.6%;top:18.2%;width:40%;height:51%;border-radius:16px;background:#fff;border:1px solid rgba(18,38,58,.12);box-shadow:0 14px 30px rgba(18,38,58,.1);overflow:hidden;}
+    body[data-layout="finance-quarterly-review"] .fq-bridge::before{content:"";position:absolute;left:7%;right:7%;bottom:18%;height:2px;background:rgba(18,38,58,.25);}
+    body[data-layout="finance-quarterly-review"] .fq-bridge span{position:absolute;bottom:18%;width:12.5%;border-radius:7px 7px 2px 2px;background:var(--template-accent);box-shadow:0 10px 20px rgba(18,38,58,.08);}
+    body[data-layout="finance-quarterly-review"] .fq-bridge span:nth-child(1){left:8%;height:42%;background:var(--template-primary);}body[data-layout="finance-quarterly-review"] .fq-bridge span:nth-child(2){left:24%;height:62%;}body[data-layout="finance-quarterly-review"] .fq-bridge span:nth-child(3){left:40%;height:30%;background:var(--template-warning);}body[data-layout="finance-quarterly-review"] .fq-bridge span:nth-child(4){left:56%;height:48%;background:var(--template-secondary);}body[data-layout="finance-quarterly-review"] .fq-bridge span:nth-child(5){left:72%;height:54%;background:var(--template-primary);}
+    body[data-layout="finance-quarterly-review"] .fq-variance{position:absolute;right:7.6%;top:18.2%;width:40%;height:51%;display:grid;grid-template-columns:1.1fr .9fr;gap:12px;}
+    body[data-layout="finance-quarterly-review"] .fq-ledger,.fq-reason-list{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(18,38,58,.12);box-shadow:0 12px 26px rgba(18,38,58,.08);overflow:hidden;}
+    body[data-layout="finance-quarterly-review"] .fq-ledger::before{content:"";position:absolute;left:0;right:0;top:0;height:42px;background:var(--template-primary);}
+    body[data-layout="finance-quarterly-review"] .fq-ledger span{position:absolute;left:12%;right:12%;height:12px;border-radius:999px;background:rgba(18,38,58,.16);}
+    body[data-layout="finance-quarterly-review"] .fq-ledger span:nth-child(1){top:30%;width:70%;}body[data-layout="finance-quarterly-review"] .fq-ledger span:nth-child(2){top:45%;width:58%;background:rgba(217,144,47,.78);}body[data-layout="finance-quarterly-review"] .fq-ledger span:nth-child(3){top:60%;width:78%;background:rgba(201,75,75,.72);}body[data-layout="finance-quarterly-review"] .fq-ledger span:nth-child(4){top:75%;width:50%;background:rgba(47,158,109,.72);}
+    body[data-layout="finance-quarterly-review"] .fq-reason-list{display:grid;align-content:center;gap:10px;padding:16px;}
+    body[data-layout="finance-quarterly-review"] .fq-reason-list span{border-radius:12px;background:#f8fafc;border-left:5px solid var(--template-secondary);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="finance-quarterly-review"] .fq-reason-list span:nth-child(2){border-left-color:var(--template-warning);}body[data-layout="finance-quarterly-review"] .fq-reason-list span:nth-child(3){border-left-color:var(--template-accent);}
+    body[data-layout="finance-quarterly-review"] .fq-risk-matrix{position:absolute;right:7.6%;top:18.2%;width:40%;height:51%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    body[data-layout="finance-quarterly-review"] .fq-risk-matrix span{border-radius:14px;background:rgba(47,158,109,.20);border:1px solid rgba(18,38,58,.09);box-shadow:0 10px 20px rgba(18,38,58,.06);}
+    body[data-layout="finance-quarterly-review"] .fq-risk-matrix span:nth-child(2),body[data-layout="finance-quarterly-review"] .fq-risk-matrix span:nth-child(5){background:rgba(217,144,47,.28);}body[data-layout="finance-quarterly-review"] .fq-risk-matrix span:nth-child(3),body[data-layout="finance-quarterly-review"] .fq-risk-matrix span:nth-child(6){background:rgba(201,75,75,.24);}
+    body[data-layout="finance-quarterly-review"] .fq-actions{position:absolute;left:8.2%;right:8.2%;bottom:14.2%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;}
+    body[data-layout="finance-quarterly-review"] .fq-actions span{position:relative;min-height:78px;border-radius:13px;background:#fff;border:1px solid rgba(18,38,58,.12);box-shadow:0 10px 21px rgba(18,38,58,.08);padding:14px 10px 10px 40px;font-size:11px;font-weight:900;color:var(--template-title);overflow-wrap:anywhere;}
+    body[data-layout="finance-quarterly-review"] .fq-actions span::before{content:attr(data-step);position:absolute;left:12px;top:14px;width:22px;height:22px;border-radius:50%;background:var(--template-accent);color:#fff;text-align:center;line-height:22px;font-size:10px;}
+    body[data-layout="finance-quarterly-review"] .fq-closing{position:absolute;left:8.2%;right:8.2%;top:48%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    body[data-layout="finance-quarterly-review"] .fq-closing span{min-height:116px;border-radius:15px;background:#fff;border:1px solid rgba(18,38,58,.12);box-shadow:0 12px 24px rgba(18,38,58,.08);padding:18px;font-size:13px;font-weight:850;color:var(--template-body);border-top:5px solid var(--template-accent);}
+    body[data-layout="finance-quarterly-review"] .page-number{z-index:4;right:7%;bottom:5.4%;background:rgba(255,255,255,.82);border:1px solid rgba(18,38,58,.12);border-radius:999px;padding:5px 10px;color:rgba(15,23,42,.58);}
     body[data-layout="finance-profit-bridge"] .slide{padding:0;border:0;background:radial-gradient(circle at 82% 18%,rgba(201,154,46,.18) 0 16%,transparent 17% 42%),linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 52%,#e7edf4 100%);}
     body[data-layout="finance-profit-bridge"] .slide::before{background:linear-gradient(110deg,rgba(20,33,61,.08) 0 13%,transparent 13% 100%),repeating-linear-gradient(90deg,rgba(20,33,61,.05) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,rgba(201,154,46,.05) 0 1px,transparent 1px 40px);}
     body[data-layout="finance-profit-bridge"] .slide::after{content:"";position:absolute;right:-9%;bottom:-18%;width:42%;height:48%;border-radius:999px;background:rgba(46,125,122,.13);}
@@ -2646,6 +2693,49 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual::after{content:"";position:absolute;left:12%;right:10%;top:30%;height:45%;border-top:4px solid var(--template-accent);border-right:4px solid var(--template-accent);border-radius:60% 40% 0 0;transform:skewX(-12deg);}
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span{width:10px;height:10px;border-radius:50%;bottom:auto;background:var(--template-primary);}
     body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(1){left:16%;top:58%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(2){left:38%;top:48%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(3){left:60%;top:37%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(4){left:78%;top:25%;}
+
+    body[data-layout="finance-audit-review"] .slide{background:linear-gradient(135deg,#f4f6f8 0%,#ffffff 58%,#edf1f4 100%);overflow:hidden;}
+    body[data-layout="finance-audit-review"] .accent{display:none;}
+    body[data-layout="finance-audit-review"] .motif{position:absolute;inset:0;background-image:linear-gradient(rgba(23,32,51,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(23,32,51,.06) 1px,transparent 1px);background-size:38px 38px;opacity:.55;}
+    .audit-review-layer{position:absolute;inset:0;padding:7.2% 7.4%;color:#101827;z-index:2;font-family:"Microsoft YaHei",Arial,sans-serif;}
+    .audit-review-layer::before{content:"";position:absolute;left:5.2%;top:5.4%;width:6px;height:86%;background:linear-gradient(180deg,var(--template-primary),var(--template-accent));}
+    .audit-kicker{position:absolute;left:8.1%;top:6.7%;font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--template-accent);}
+    .audit-title{position:absolute;left:8.1%;top:11.6%;width:45%;margin:0;font-size:31px;line-height:1.08;color:var(--template-title);}
+    .audit-summary{position:absolute;left:8.2%;top:32%;width:36%;font-size:13px;line-height:1.55;color:var(--template-body);}
+    .audit-metrics{position:absolute;left:8.1%;bottom:10%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:46%;}
+    .audit-metrics span{border:1px solid rgba(23,32,51,.13);background:rgba(255,255,255,.9);padding:10px 12px;min-height:54px;}
+    .audit-metrics strong{display:block;font-size:21px;line-height:1;color:var(--template-primary);}
+    .audit-metrics i{display:block;margin-top:5px;font-size:10px;font-style:normal;color:var(--template-body);}
+    .audit-matrix{position:absolute;right:8%;top:13%;width:30%;height:34%;border:1px solid rgba(23,32,51,.16);background:#fff;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);box-shadow:0 18px 28px rgba(15,23,42,.1);}
+    .audit-matrix span{position:relative;border:1px solid rgba(23,32,51,.08);padding:10px;font-size:10px;font-weight:700;color:#334155;}
+    .audit-matrix span:nth-child(1){background:rgba(45,127,118,.12);}
+    .audit-matrix span:nth-child(2){background:rgba(217,144,47,.15);}
+    .audit-matrix span:nth-child(3){background:rgba(217,144,47,.08);}
+    .audit-matrix span:nth-child(4){background:rgba(194,65,58,.16);color:#8f1f1a;}
+    .audit-evidence{position:absolute;right:8%;bottom:11%;width:30%;display:grid;gap:8px;}
+    .audit-evidence span{position:relative;background:#fff;border-left:4px solid var(--template-accent);box-shadow:0 8px 18px rgba(15,23,42,.08);padding:9px 10px;font-size:11px;font-weight:700;color:#172033;}
+    .audit-evidence span::after{content:attr(data-code);position:absolute;right:9px;top:9px;font-size:9px;color:#8a94a6;}
+    .audit-checklist,.audit-flow,.audit-remediation{position:absolute;left:8.1%;right:8%;bottom:10%;height:36%;display:grid;gap:10px;}
+    .audit-checklist{grid-template-columns:1.15fr .85fr;}
+    .audit-findings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .audit-findings span,.audit-status span{background:#fff;border:1px solid rgba(23,32,51,.12);padding:12px;box-shadow:0 10px 20px rgba(15,23,42,.08);font-size:12px;font-weight:700;color:#172033;}
+    .audit-findings span::before{content:attr(data-level);display:block;margin-bottom:9px;font-size:10px;color:var(--template-accent);}
+    .audit-status{display:grid;gap:8px;}
+    .audit-flow{grid-template-columns:repeat(5,1fr);align-items:center;height:26%;bottom:18%;}
+    .audit-flow span{position:relative;background:#fff;border-top:4px solid var(--template-primary);padding:14px 10px 12px;font-size:11px;font-weight:700;text-align:center;box-shadow:0 8px 18px rgba(15,23,42,.08);}
+    .audit-flow span::after{content:"";position:absolute;right:-13px;top:42%;width:16px;height:2px;background:var(--template-accent);}
+    .audit-flow span:last-child::after{display:none;}
+    .audit-transaction{position:absolute;left:8.1%;right:8%;bottom:11%;height:40%;display:grid;grid-template-columns:1.2fr .8fr;gap:12px;}
+    .audit-table{display:grid;grid-template-rows:repeat(4,1fr);background:#fff;border:1px solid rgba(23,32,51,.13);}
+    .audit-table span{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:0 12px;border-bottom:1px solid rgba(23,32,51,.09);font-size:10px;font-weight:700;color:#334155;}
+    .audit-table span:last-child{border-bottom:0;}
+    .audit-heat{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+    .audit-heat i{display:block;background:rgba(194,65,58,.12);border:1px solid rgba(194,65,58,.24);}
+    .audit-heat i:nth-child(2),.audit-heat i:nth-child(6){background:rgba(217,144,47,.2);}
+    .audit-heat i:nth-child(5){background:rgba(194,65,58,.32);}
+    .audit-remediation{grid-template-columns:repeat(4,1fr);height:30%;bottom:15%;}
+    .audit-remediation span{background:#fff;border:1px solid rgba(23,32,51,.13);padding:12px;font-size:11px;font-weight:700;box-shadow:0 8px 18px rgba(15,23,42,.08);}
+    .audit-remediation span::before{content:attr(data-state);display:block;margin-bottom:8px;color:var(--template-secondary);}
     body[data-template^="finance-operating-dashboard-"] h2{max-width:61%;font-size:32px;line-height:1.14;margin-bottom:4.4%;}
     body[data-template^="finance-operating-dashboard-"] ul{max-width:56%;font-size:14.5px;line-height:1.48;}
     body[data-template^="finance-operating-dashboard-"] .finance-label{position:absolute;left:9.2%;top:15.2%;z-index:3;color:var(--template-accent);font-size:12px;font-weight:900;letter-spacing:.12em;}
@@ -5590,6 +5680,74 @@ function isBudgetVarianceVisual(visual) {
   return visual?.layout === "finance-budget-variance" && (id === "budget-management-report" || id === "finance-budget-management-report-execution-variance");
 }
 
+function financeQuarterlyReviewPreviewScene({ slide, index, total }) {
+  const bullets = budgetPlanningBulletTexts(slide);
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 26);
+  const role = financeQuarterlyReviewRoleFromSlide({ slide, index, total });
+  const metrics = [0, 1, 2, 3].map((itemIndex) => financeQuarterlyReviewMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    variant: role,
+    role,
+    // 页面角标使用 CFO 会材料语义，避免把“季度复盘”主题名直接暴露在 PPT 页面中。
+    kicker: role === "cover" ? "CFO OPERATING REVIEW" : role === "closing" ? "NEXT QUARTER ACTIONS" : "OPERATING FINANCE",
+    title,
+    bullets: bullets.slice(0, role === "cover" ? 3 : 4),
+    metrics,
+    reasons: [
+      budgetPlanningCompactText(bullets[0], "收入结构变化", 14),
+      budgetPlanningCompactText(bullets[1], "成本费用波动", 14),
+      budgetPlanningCompactText(bullets[2], "预算执行偏差", 14),
+    ],
+    actions: ["校准收入预测", "压实费用 Owner", "复盘利润桥", "关闭风险项", "跟踪下季动作"],
+  };
+}
+
+function financeQuarterlyReviewRoleFromSlide({ slide, index, total }) {
+  const layout = String(slide?.layout || "").toLowerCase();
+  if (index === 0 || layout.includes("cover")) return "cover";
+  if (index === total - 1 || layout.includes("closing") || layout.includes("summary")) return "closing";
+  if (layout.includes("profit") || layout.includes("bridge") || layout.includes("margin")) return "profit";
+  if (layout.includes("budget") || layout.includes("variance") || layout.includes("analysis")) return "variance";
+  if (layout.includes("risk") || layout.includes("matrix")) return "risk";
+  if (layout.includes("action") || layout.includes("roadmap") || layout.includes("loop")) return "action";
+  return ["overview", "profit", "variance", "risk", "action"][(index - 1) % 5];
+}
+
+function renderFinanceQuarterlyReviewPreview(slide, scene) {
+  const bulletItems = scene.bullets.map((item) => `<li>${escapeHtml(budgetPlanningCompactText(item, scene.title, 42))}</li>`).join("");
+  const metrics = scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("");
+  const reasons = scene.reasons.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+  const actions = scene.actions.map((step, index) => `<span data-step="${index + 1}">${escapeHtml(step)}</span>`).join("");
+  const visual = scene.role === "profit"
+    ? '<div class="fq-bridge"><span></span><span></span><span></span><span></span><span></span></div>'
+    : scene.role === "variance"
+      ? `<div class="fq-variance"><div class="fq-ledger"><span></span><span></span><span></span><span></span></div><div class="fq-reason-list">${reasons}</div></div>`
+      : scene.role === "risk"
+        ? '<div class="fq-risk-matrix"><span></span><span></span><span></span><span></span><span></span><span></span></div>'
+        : scene.role === "action"
+          ? `<div class="fq-actions">${actions}</div>`
+          : scene.role === "closing"
+            ? `<div class="fq-closing">${scene.actions.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+            : `<div class="fq-dashboard"></div><div class="fq-metrics">${metrics}</div>`;
+  return `<div class="fq-layer"><div class="fq-surface"></div><div class="fq-kicker">${escapeHtml(scene.kicker)}</div><h2 class="fq-title">${escapeHtml(scene.title)}</h2><div class="fq-rule"></div><ul class="fq-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function financeQuarterlyReviewMetricFromText(text, index) {
+  const fallbackValues = ["128%", "￥2.6亿", "18.4%", "-6.2%"];
+  const fallbackLabels = ["收入达成", "营业收入", "经营利润率", "预算偏差"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: fallbackLabels[index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function isFinanceQuarterlyReviewVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "finance-quarterly-review" && (id === "financial-review" || id === "finance-financial-review-quarterly");
+}
+
 function profitBridgePreviewScene({ slide, index, total }) {
   const bullets = budgetPlanningBulletTexts(slide);
   const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 28 : 24);
@@ -6846,6 +7004,70 @@ function strategyConsultingVariant(visual) {
 
 function isStrategyConsultingVisual(visual) {
   return visual?.id === "strategy-consulting" && visual?.layout === "executive";
+}
+
+function financeAuditReviewPreviewScene({ slide, index, total }) {
+  const bullets = normalizeAuditReviewBullets(slide);
+  const title = compactAuditReviewText(slide?.title, index === 0 ? "审计复盘与风险闭环汇报" : "审计发现与整改跟踪", 26);
+  const summary = compactAuditReviewText(bullets[0], "围绕审计发现、证据链、责任归属和复核状态形成闭环材料。", 44);
+  const metrics = [
+    { value: "18", label: "审计发现" },
+    { value: "5", label: "高风险事项" },
+    { value: "82%", label: "整改闭环率" },
+  ];
+  const cards = ["授权审批缺口", "异常交易样本", "凭证链路缺失"].map((fallback, itemIndex) => compactAuditReviewText(bullets[itemIndex], fallback, 14));
+  const actions = ["责任部门确认", "整改计划锁定", "复核状态跟进", "风险关闭归档"].map((fallback, itemIndex) => compactAuditReviewText(bullets[itemIndex], fallback, 13));
+  const roles = ["cover", "summary", "findings", "control-flow", "transaction", "remediation"];
+  const role = index >= total - 1 ? "closing" : roles[Math.min(index, roles.length - 1)];
+  const kickerMap = {
+    cover: "AUDIT WORKPAPER",
+    summary: "RISK COMMITTEE",
+    findings: "FINDINGS & EVIDENCE",
+    "control-flow": "CONTROL WALKTHROUGH",
+    transaction: "EXCEPTION SAMPLE",
+    remediation: "REMEDIATION TRACK",
+    closing: "REVIEW STATUS",
+  };
+  return { role, variant: "finance-audit-review", kicker: kickerMap[role], title, summary, metrics, cards, actions };
+}
+
+function renderFinanceAuditReviewPreview(slide, scene) {
+  const metrics = `<div class="audit-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong><i>${escapeHtml(metric.label)}</i></span>`).join("")}</div>`;
+  const base = `<div class="audit-review-layer" data-audit-role="${escapeHtml(scene.role)}"><div class="audit-kicker">${escapeHtml(scene.kicker)}</div><h2 class="audit-title">${escapeHtml(scene.title)}</h2><div class="audit-summary">${escapeHtml(scene.summary)}</div>`;
+  if (scene.role === "cover" || scene.role === "summary") {
+    return `${base}${metrics}<div class="audit-matrix"><span>低影响<br/>已复核</span><span>中影响<br/>待整改</span><span>低概率<br/>需观察</span><span>高风险<br/>委员会关注</span></div><div class="audit-evidence">${scene.cards.map((item, index) => `<span data-code="EV-${index + 1}">${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.role === "findings") {
+    return `${base}<div class="audit-checklist"><div class="audit-findings">${scene.cards.map((item, index) => `<span data-level="R${index + 1}">${escapeHtml(item)}</span>`).join("")}</div><div class="audit-status">${scene.actions.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div></div>`;
+  }
+  if (scene.role === "control-flow") {
+    return `${base}<div class="audit-flow"><span>业务发起</span><span>权限审批</span><span>凭证入账</span><span>抽样复核</span><span>归档关闭</span></div></div>`;
+  }
+  if (scene.role === "transaction") {
+    const tableRows = ["样本编号  金额区间  风险信号", "TX-018  高额  越权审批", "TX-024  中额  凭证缺失", "TX-031  低额  重复报销"];
+    return `${base}<div class="audit-transaction"><div class="audit-table">${tableRows.map((row) => `<span>${escapeHtml(row)}</span>`).join("")}</div><div class="audit-heat">${Array.from({ length: 9 }, () => "<i></i>").join("")}</div></div></div>`;
+  }
+  // 整改和结尾页共享责任看板结构，强调责任人、截止日期、复核状态和风险关闭证据。
+  return `${base}<div class="audit-remediation">${scene.actions.map((item, index) => `<span data-state="${index < 2 ? "进行中" : "复核中"}">${escapeHtml(item)}</span>`).join("")}</div>${metrics}</div>`;
+}
+
+function normalizeAuditReviewBullets(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["审计发现覆盖收入确认、费用报销和审批权限三类风险", "证据链已归集至样本编号和凭证编号", "整改责任按部门拆分并进入复核状态"];
+}
+
+function compactAuditReviewText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isFinanceAuditReviewVisual(visual) {
+  return visual?.layout === "finance-audit-review";
 }
 
 function financialReviewPreviewScene(visual) {
@@ -11512,8 +11734,10 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "finance-budget-planning") return false;
+  if (visual.layout === "finance-audit-review") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
   if (visual.layout === "finance-risk-inspection") return false;
+  if (visual.layout === "finance-quarterly-review") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "sales-financial-solution") return false;

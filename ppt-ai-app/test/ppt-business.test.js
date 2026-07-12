@@ -842,6 +842,28 @@ test("PptService renders synced product release cadence preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders financial audit review preview with workpaper layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "审计复盘与整改闭环汇报",
+    slideCount: 6,
+    templateId: "financial-review",
+    theme: "audit",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="financial-review" data-layout="finance-audit-review"/);
+  assert.match(preview, /audit-review-layer/);
+  assert.match(preview, /audit-matrix/);
+  assert.match(preview, /audit-evidence|audit-remediation|audit-flow/);
+  assert.doesNotMatch(preview, />审计分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced feature priority matrix preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -1041,6 +1063,28 @@ test("PptService renders synced budget variance preview with dedicated layout", 
   assert.match(preview, /variance-ledger|variance-waterfall|variance-analysis|variance-actions/);
   assert.match(preview, /variance-surface/);
   assert.doesNotMatch(preview, />执行偏差</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders financial quarterly review preview with CFO layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertFinancialQuarterlyReviewTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营回顾、收入利润复盘、预算执行和下季度经营动作",
+    slideCount: 6,
+    templateId: "finance-financial-review-quarterly",
+    theme: "quarterly",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="finance-financial-review-quarterly" data-layout="finance-quarterly-review"/);
+  assert.match(preview, /fq-dashboard|fq-bridge|fq-variance|fq-risk-matrix|fq-actions/);
+  assert.match(preview, /fq-surface/);
+  assert.doesNotMatch(preview, />季度复盘</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -6352,6 +6396,54 @@ async function insertBudgetVarianceTemplate(context) {
       defaultCoverLayout: "finance-budget-variance-cover",
       defaultContentLayout: "finance-budget-variance-content",
       allowedLayouts: ["finance-budget-variance-cover", "finance-budget-variance-overview", "finance-budget-variance-comparison", "finance-budget-variance-analysis", "finance-budget-variance-correction", "finance-budget-variance-loop", "title", "content"],
+    },
+  });
+}
+
+async function insertFinancialQuarterlyReviewTemplate(context) {
+  // 测试数据库模拟官方模板同步后的财务经营复盘季度主题，确保预览使用 CFO 季度经营会专用布局。
+  await context.database.insert("templates", {
+    id: "finance-financial-review-quarterly",
+    slug: "finance-financial-review-quarterly",
+    name: "财务经营复盘 - 季度复盘",
+    categoryId: "finance",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "quarterly",
+        name: "季度复盘",
+        visual: {
+          primary: "12263A",
+          accent: "2F9E6D",
+          secondary: "D9902F",
+          warning: "C94B4B",
+          background: "F5F7FA",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "finance-quarterly-review",
+          variant: "quarterly",
+        },
+      },
+    ],
+    visual: {
+      primary: "12263A",
+      accent: "2F9E6D",
+      secondary: "D9902F",
+      warning: "C94B4B",
+      background: "F5F7FA",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "finance-quarterly-review",
+      variant: "quarterly",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "finance-quarterly-cover",
+      defaultContentLayout: "finance-quarterly-overview",
+      allowedLayouts: ["finance-quarterly-cover", "finance-quarterly-overview", "finance-quarterly-profit-bridge", "finance-quarterly-budget-variance", "finance-quarterly-risk-matrix", "finance-quarterly-action-loop", "finance-quarterly-closing", "title", "content"],
     },
   });
 }
