@@ -1647,7 +1647,8 @@ export class TemplateManager {
    * @returns {object}
    */
   getTemplate(templateId, { ownerUserId } = {}) {
-    const template = this.#visibleTemplates({ ownerUserId }).find((item) => item.id === templateId);
+    const lookupId = normalizeTemplateLookupId(templateId);
+    const template = this.#visibleTemplates({ ownerUserId }).find((item) => item.id === templateId || item.id === lookupId);
     if (!template) throw new AppError({ code: "TEMPLATE_NOT_FOUND", status: 404, message: "Template not found" });
     return template;
   }

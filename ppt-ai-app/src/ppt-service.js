@@ -167,7 +167,8 @@ export class PptService {
     const outline = await this.database.insert("outlines", {
       ownerUserId,
       topic: topic || documentText.split(/\r?\n/).find(Boolean) || "Document generated presentation",
-      templateId: template.id,
+      // 保留用户选择的官方目录 slug，避免生成后预览/导出丢失目录化模板身份。
+      templateId,
       theme,
       status: "outline_ready",
       input: { topic, sourceFileId, slideCount: normalizedSlideCount, templateId, theme },
