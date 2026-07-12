@@ -1485,6 +1485,43 @@ test("PptExportService maps synced product roadmap slug to strategy roadmap deco
   assert.doesNotMatch(slide1, /name="Hero Surface"/);
 });
 
+test("PptExportService keeps product roadmap capability page text from overlapping", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-roadmap-roadmap",
+      theme: "roadmap",
+      templateVisual: undefined,
+      slides: [
+        { title: "产品路线规划", layout: "cover", bullets: ["围绕阶段目标、能力建设和资源投入对齐产品节奏。"] },
+        {
+          title: "Q3营收同比+15%，但环比增速显著放缓",
+          layout: "capability-map",
+          bullets: [
+            "总营收达成率102%（超目标），但环比仅增长2%（低于季度平均5%），增长动力减弱",
+            "核心产品线贡献占比下降5个百分点（至62%），主因市场竞争加剧",
+            "新品类收入同比+80%，但因基数低（占比8%），暂难弥补核心缺口",
+            "资源投入优先级需要围绕能力建设重新排序",
+          ],
+        },
+        { title: "阶段里程碑", layout: "milestone-plan", bullets: ["目标冻结", "能力交付", "灰度验证", "规模推广"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const summary = pptShapeByName(slide2, "Product Strategy Roadmap Summary");
+  const bulletCard = pptShapeByName(slide2, "Product Strategy Roadmap Bullet Card 1");
+  const bulletText = pptShapeByName(slide2, "Product Strategy Roadmap Bullet Text 1");
+
+  assert.match(slide2, /name="Product Strategy Roadmap Capability Layer 1"/);
+  assert.match(summary, /<a:off x="792480" y="1767840"\/><a:ext cx="3048000" cy="274320"\/>/);
+  assert.match(bulletCard, /<a:off x="792480" y="2590800"\/><a:ext cx="3200400" cy="182880"\/>/);
+  assert.match(bulletText, /sz="520"/);
+});
+
 test("PptExportService uses product pain points decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

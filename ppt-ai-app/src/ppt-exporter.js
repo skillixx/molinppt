@@ -8971,7 +8971,7 @@ function productRoadmapDecorationsXml({ visual, index, role, slide, total }) {
     + rectShapeXml({ id: 223, name: "Product Strategy Roadmap Accent Rule", x: 493776, y: 482600, cx: 8156448, cy: 15240, fill: visual.accent });
   const header = textShapeXml({ id: 224, name: "Product Strategy Roadmap Kicker", ...scene.labelBox, text: scene.kicker, size: 680, bold: true, color: visual.accent })
     + textShapeXml({ id: 225, name: "Product Strategy Roadmap Title", ...scene.titleBox, text: scene.title, size: isCover ? 1480 : 1120, bold: true, color: visual.title })
-    + textShapeXml({ id: 226, name: "Product Strategy Roadmap Summary", ...scene.summaryBox, text: scene.summary, size: isCover ? 760 : 660, bold: false, color: visual.body });
+    + textShapeXml({ id: 226, name: "Product Strategy Roadmap Summary", ...scene.summaryBox, text: scene.summary, size: isCover ? 760 : 540, bold: false, color: visual.body });
   const bullets = productRoadmapBulletCardsXml({ visual, palette, scene, isCover });
   const body = scene.role === "cover"
     ? productRoadmapLanesXml({ visual, palette, scene, x: 5120640, y: 1066800, cx: 3352800, cy: 1546860 }) + productRoadmapConsoleXml({ visual, palette })
@@ -8991,10 +8991,14 @@ function productRoadmapDecorationsXml({ visual, index, role, slide, total }) {
 
 function productRoadmapBulletCardsXml({ visual, palette, scene, isCover }) {
   return scene.bullets.slice(0, 4).map((item, itemIndex) => {
-    const y = (isCover ? 2926080 : 2316480) + itemIndex * 228600;
-    return solidShapeXml({ id: 230 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 792480, y, cx: 3200400, cy: 167640, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
-      + solidShapeXml({ id: 231 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 853440, y: y + 53340, cx: 60960, cy: 60960, fill: itemIndex === 0 ? visual.accent : visual.secondary || "F59E0B" })
-      + textShapeXml({ id: 232 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Text ${itemIndex + 1}`, x: 975360, y: y + 30480, cx: 2773680, cy: 91440, text: productRoadmapCompactText(item, scene.title, 30), size: 620, bold: true, color: visual.body });
+    // 非封面页标题和摘要更容易占用多行，bullet 卡片统一下移并缩短文案，避免下载 PPT 中文字外溢互相压叠。
+    const y = (isCover ? 2926080 : 2590800) + itemIndex * (isCover ? 228600 : 259080);
+    const cardHeight = isCover ? 167640 : 182880;
+    const dotY = y + (isCover ? 53340 : 60960);
+    const textY = y + (isCover ? 30480 : 38100);
+    return solidShapeXml({ id: 230 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 792480, y, cx: 3200400, cy: cardHeight, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
+      + solidShapeXml({ id: 231 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 853440, y: dotY, cx: 60960, cy: 60960, fill: itemIndex === 0 ? visual.accent : visual.secondary || "F59E0B" })
+      + textShapeXml({ id: 232 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Text ${itemIndex + 1}`, x: 975360, y: textY, cx: 2773680, cy: isCover ? 91440 : 106680, text: productRoadmapCompactText(item, scene.title, isCover ? 30 : 22), size: isCover ? 620 : 520, bold: true, color: visual.body });
   }).join("");
 }
 
@@ -9100,15 +9104,16 @@ function productRoadmapColorPalette(visual) {
 function productRoadmapScene({ slide, index, role, total }) {
   const bullets = productRoadmapBullets(slide);
   const resolvedRole = productRoadmapRole(slide?.layout || role, index, total);
+  const isCover = resolvedRole === "cover";
   const title = productRoadmapCompactText(slide?.title, "产品路线规划", index === 0 ? 26 : 22);
   return {
     role: resolvedRole,
     kicker: productRoadmapKicker(resolvedRole),
     title,
-    summary: productRoadmapCompactText(bullets[0], "围绕阶段目标、能力建设和资源投入对齐产品节奏。", 44),
+    summary: productRoadmapCompactText(bullets[0], "围绕阶段目标、能力建设和资源投入对齐产品节奏。", isCover ? 44 : 32),
     labelBox: { x: 768096, y: 701040, cx: 2590800, cy: 198120 },
     titleBox: { x: 749808, y: index === 0 ? 1005840 : 944880, cx: index === 0 ? 3962400 : 3901440, cy: index === 0 ? 944880 : 670560 },
-    summaryBox: { x: 792480, y: index === 0 ? 2133600 : 1767840, cx: index === 0 ? 3352800 : 3200400, cy: 365760 },
+    summaryBox: { x: 792480, y: isCover ? 2133600 : 1767840, cx: isCover ? 3352800 : 3048000, cy: isCover ? 365760 : 274320 },
     bullets,
     lanes: ["Now", "Next", "Later"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex], ["当前聚焦", "下一阶段", "后续探索"][itemIndex], 15) })),
     capabilities: ["基础能力", "增长能力", "平台能力"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex + 1], ["稳定性与数据", "转化与留存", "生态与效率"][itemIndex], 13) })),
