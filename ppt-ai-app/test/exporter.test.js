@@ -1470,6 +1470,21 @@ test("PptExportService uses commercial product roadmap decorations", () => {
   assert.match(slide1, /val="14B8A6"/);
 });
 
+test("PptExportService maps synced product roadmap slug to strategy roadmap decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-product-roadmap-roadmap", theme: "roadmap", templateVisual: undefined },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Product Strategy Roadmap Canvas"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Lane Now"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.doesNotMatch(slide1, /name="Hero Surface"/);
+});
+
 test("PptExportService uses product pain points decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -1942,6 +1957,8 @@ test("PptExportService uses commercial product review decorations", () => {
 
   assert.match(slide1, /name="Product Review Canvas Surface"/);
   assert.match(slide1, /name="Product Review Canvas Board"/);
+  assert.match(slide1, /name="Product Review Bullet Dot 1"/);
+  assert.match(slide1, /name="Product Review Bullet Text 3"/);
   assert.match(slide1, /name="Product Review Metric Card 3"/);
   assert.match(slide2, /name="Product Review Goal Bridge Panel"/);
   assert.match(slide5, /name="Product Review Feedback Cluster Panel"/);
@@ -1950,6 +1967,7 @@ test("PptExportService uses commercial product review decorations", () => {
   assert.match(slide8, /name="Product Review Iteration Loop Panel"/);
   assert.match(slide1, /val="173B3A"/);
   assert.match(slide1, /val="20B486"/);
+  assert.doesNotMatch(slide1, /Product Review Evidence Card/);
   assert.doesNotMatch(slide1, /Product product-review Chip/);
   assert.doesNotMatch(slide1, /产品复盘/);
 });

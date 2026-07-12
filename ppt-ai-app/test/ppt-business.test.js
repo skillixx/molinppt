@@ -864,6 +864,26 @@ test("PptService renders product strategy roadmap preview with dedicated layout"
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService maps synced product roadmap slug preview to dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品路线图汇报",
+    slideCount: 4,
+    templateId: "product-product-roadmap-roadmap",
+    theme: "roadmap",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-product-roadmap-roadmap" data-layout="product-strategy-roadmap"/);
+  assert.match(preview, /product-roadmap-layer/);
+  assert.match(preview, /product-roadmap-lanes/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders product release committee preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

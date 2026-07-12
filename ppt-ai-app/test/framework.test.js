@@ -631,6 +631,15 @@ test("resolveTemplateVisual applies product roadmap commercial visual", () => {
   assert.equal(visual.variant, "roadmap");
 });
 
+test("resolveTemplateVisual maps product roadmap official slug to strategy roadmap visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "product-product-roadmap-roadmap", theme: "roadmap" });
+
+  assert.equal(visual.layout, "product-strategy-roadmap");
+  assert.equal(visual.variant, "roadmap");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
+});
+
 test("resolveTemplateVisual applies product release commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "release" });
 

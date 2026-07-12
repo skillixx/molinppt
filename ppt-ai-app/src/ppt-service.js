@@ -8535,7 +8535,8 @@ function productRoadmapPreviewBullets(slide) {
 }
 
 function isProductRoadmapVisual(visual) {
-  return visual?.id === "product-roadmap" && visual?.layout === "product-strategy-roadmap";
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-strategy-roadmap" && (id === "product-roadmap" || id === "product-product-roadmap-roadmap");
 }
 
 function renderProductRoadmapPreview(slide, scene) {

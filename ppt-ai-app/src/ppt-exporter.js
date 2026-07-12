@@ -8745,7 +8745,8 @@ function productReviewCanvasDecorationsXml({ visual, index, layout, role, slide,
   const scene = productReviewCanvasScene({ slide, index, role, total });
   const palette = productReviewCanvasColorPalette(visual);
   const canvas = solidShapeXml({ id: 1810, name: "Product Review Canvas Surface", geom: "roundRect", ...layout.surface, fill: visual.surface })
-    + lineFrameShapeXml({ id: 1811, name: "Product Review Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    // 下载 PPTX 与在线预览保持一致：主画布只保留轻量边界，避免在 PowerPoint 中形成醒目的深色外框。
+    + lineFrameShapeXml({ id: 1811, name: "Product Review Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 7620, transparency: 42000 })
     + rectShapeXml({ id: 1812, name: "Product Review Canvas Top Rule", ...layout.accent, fill: visual.accent })
     + rectShapeXml({ id: 1813, name: "Product Review Canvas Warm Rule", x: layout.accent.x + 3124200, y: layout.accent.y, cx: 1828800, cy: 60960, fill: visual.secondary || "F59E0B" });
   const header = textShapeXml({ id: 1814, name: "Product Review Canvas Kicker", ...layout.label, text: scene.kicker, size: 760, bold: true, color: visual.accent })
@@ -8765,10 +8766,10 @@ function productReviewCanvasDecorationsXml({ visual, index, layout, role, slide,
 
 function productReviewCanvasBulletCardsXml({ visual, palette, items }) {
   return items.slice(0, 4).map((item, itemIndex) => {
-    const y = 2286000 + itemIndex * 228600;
-    return solidShapeXml({ id: 1820 + itemIndex, name: `Product Review Evidence Card ${itemIndex + 1}`, geom: "roundRect", x: 777240, y, cx: 3352800, cy: 167640, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
-      + lineFrameShapeXml({ id: 1824 + itemIndex, name: `Product Review Evidence Frame ${itemIndex + 1}`, geom: "roundRect", x: 777240, y, cx: 3352800, cy: 167640, stroke: palette.frame, width: 7620 })
-      + textShapeXml({ id: 1828 + itemIndex, name: `Product Review Evidence Text ${itemIndex + 1}`, x: 876300, y: y + 36576, cx: 3108960, cy: 91440, text: productReviewCanvasCompactText(item, "复盘证据", 24), size: 620, bold: true, color: visual.body });
+    const y = 2301240 + itemIndex * 228600;
+    // 在线预览中这里是普通 bullet 列表，PPTX 也用点状符号承载，避免下载后变成厚重的条形卡片。
+    return solidShapeXml({ id: 1820 + itemIndex, name: `Product Review Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 777240, y: y + 60960, cx: 53340, cy: 53340, fill: visual.accent })
+      + textShapeXml({ id: 1828 + itemIndex, name: `Product Review Bullet Text ${itemIndex + 1}`, x: 876300, y: y + 27432, cx: 3108960, cy: 106680, text: productReviewCanvasCompactText(item, "复盘证据", 28), size: 640, bold: true, color: visual.body });
   }).join("");
 }
 
@@ -8950,7 +8951,7 @@ function productReviewCanvasColorPalette(visual) {
     panel: blendHexColor(visual.surface, visual.background, 0.28),
     soft: blendHexColor(visual.accent, visual.background, 0.76),
     warm: blendHexColor(visual.secondary || "F59E0B", visual.background, 0.76),
-    frame: blendHexColor(visual.primary, visual.surface, 0.36),
+    frame: blendHexColor(visual.primary, visual.surface, 0.18),
     line: blendHexColor(visual.primary, visual.background, 0.58),
   };
 }
@@ -9158,7 +9159,8 @@ function productRoadmapCompactText(text, fallback, maxLength) {
 }
 
 function isProductRoadmapVisual(visual) {
-  return visual?.id === "product-roadmap" && visual?.layout === "product-strategy-roadmap";
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-strategy-roadmap" && (id === "product-roadmap" || id === "product-product-roadmap-roadmap");
 }
 
 function productReleaseCommitteeDecorationsXml({ visual, index, layout, role, slide }) {

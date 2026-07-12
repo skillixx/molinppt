@@ -1766,6 +1766,7 @@ function normalizeTemplateLookupId(templateId) {
     "sales-key-account-plan-decision-chain": "key-account-plan",
     "sales-presales-technical-plan-architecture-solution": "presales-technical-plan",
     "sales-sales-training-course-objection-handling": "sales-training-course",
+    "product-product-roadmap-roadmap": "product-roadmap",
     "product-product-commercialization-plan-pricing-strategy": "product-commercialization-plan",
     "product-user-research-report-interview-insight": "user-research-report",
     "data-channel-data-analysis-traffic-quality": "channel-data-analysis",
