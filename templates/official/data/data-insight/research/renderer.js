@@ -8,25 +8,33 @@ export const templateRenderer = {
   "templateName": "数据洞察报告",
   "themeId": "research",
   "themeName": "研究报告",
-  "style": "analytics-report",
+  "style": "research-publication",
   "visual": {
-    "primary": "2F3A4A",
-    "accent": "7C9A92",
-    "background": "F3F1EC",
-    "surface": "FFFEFA",
-    "title": "1B2430",
-    "body": "505A66",
-    "layout": "data-insight",
+    "primary": "172033",
+    "accent": "315C7C",
+    "secondary": "B8822D",
+    "background": "F7F5EF",
+    "surface": "FFFFFF",
+    "title": "172033",
+    "body": "46515E",
+    "layout": "data-research-report",
     "variant": "research"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "executive-cover",
-    "defaultContentLayout": "executive-content",
+    "defaultCoverLayout": "data-research-report-cover",
+    "defaultContentLayout": "data-research-report-finding",
     "allowedLayouts": [
-      "executive-cover",
-      "executive-content",
+      "data-research-report-cover",
+      "data-research-report-summary",
+      "data-research-report-method",
+      "data-research-report-sample",
+      "data-research-report-evidence",
+      "data-research-report-finding",
+      "data-research-report-recommendation",
+      "data-research-report-appendix",
       "title",
-      "content"
+      "content",
+      "closing"
     ]
   }
 };

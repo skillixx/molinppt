@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" role="img" aria-label="Sample structure grid">
+  <rect width="900" height="600" rx="24" fill="#fffdf7"/>
+  <g transform="translate(142 92)" stroke="#d8d4c9" stroke-width="2">
+    <rect width="616" height="392" fill="#ffffff"/>
+    <path d="M0 98H616M0 196H616M0 294H616M123 0V392M246 0V392M369 0V392M492 0V392"/>
+  </g>
+  <g fill="#315c7c" opacity=".72">
+    <circle cx="202" cy="152" r="18"/><circle cx="448" cy="152" r="18"/><circle cx="694" cy="250" r="18"/>
+    <circle cx="325" cy="348" r="18"/><circle cx="571" cy="446" r="18"/>
+  </g>
+  <g fill="#b8822d" opacity=".68">
+    <circle cx="325" cy="152" r="14"/><circle cx="571" cy="250" r="14"/><circle cx="202" cy="446" r="14"/>
+  </g>
+</svg>
