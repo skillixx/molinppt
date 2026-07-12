@@ -3605,6 +3605,9 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="brand-story-editorial"] .editorial-masthead{position:absolute;left:5.2%;right:5.2%;top:5.2%;display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:2px solid var(--template-title);font-size:10px;font-weight:900;letter-spacing:.14em;}
     body[data-layout="brand-story-editorial"] .editorial-masthead b{font-size:13px;color:var(--template-accent);letter-spacing:0;}
     body[data-layout="brand-story-editorial"] .editorial-running-title{position:absolute;left:5.2%;bottom:4.8%;font-size:9px;font-weight:800;letter-spacing:.08em;color:rgba(23,27,38,.52);}
+    body[data-layout="brand-story-editorial"] .editorial-section-index{position:absolute;right:5.2%;bottom:4.8%;display:flex;gap:10px;align-items:center;font-size:8px;font-weight:900;letter-spacing:.08em;color:rgba(23,27,38,.66);}
+    body[data-layout="brand-story-editorial"] .editorial-section-index span{padding-left:10px;border-left:1px solid rgba(23,27,38,.28);}
+    body[data-layout="brand-story-editorial"] .editorial-section-index span.is-active{color:var(--template-accent);}
     body[data-layout="brand-story-editorial"] .editorial-title{margin:0;color:var(--template-title);font-size:42px;line-height:1.02;font-weight:900;letter-spacing:0;overflow-wrap:anywhere;}
     body[data-layout="brand-story-editorial"] .editorial-lead{margin:0;color:var(--template-body);font-size:14px;line-height:1.58;font-weight:600;}
     body[data-layout="brand-story-editorial"] .editorial-copy{margin:0;padding:0;list-style:none;max-width:none;font-size:12px;line-height:1.6;}
@@ -3617,6 +3620,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="brand-story-editorial"] .editorial-photo span:nth-child(2){right:7%;top:8%;width:1px;height:84%;}
     body[data-layout="brand-story-editorial"] .editorial-photo span:nth-child(3){left:7%;right:7%;bottom:8%;height:1px;}
     body[data-layout="brand-story-editorial"] .editorial-photo i{position:absolute;z-index:3;left:10%;bottom:11%;color:#fff;font-size:8px;font-style:normal;font-weight:900;letter-spacing:.12em;}
+    body[data-layout="brand-story-editorial"] .editorial-photo .editorial-grain{position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 5px);mix-blend-mode:screen;}
     body[data-layout="brand-story-editorial"] .editorial-cover-grid{position:absolute;inset:14% 7% 9% 7%;display:grid;grid-template-columns:54% 40%;grid-template-rows:auto 1fr auto;gap:4% 6%;}
     body[data-layout="brand-story-editorial"] .editorial-cover-grid .editorial-title{font-size:54px;max-width:96%;align-self:end;}
     body[data-layout="brand-story-editorial"] .editorial-cover-grid .editorial-lead{align-self:start;max-width:86%;padding-top:12px;border-top:5px solid var(--template-accent);}
@@ -3627,6 +3631,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="brand-story-editorial"] .editorial-opener .editorial-dropcap{grid-column:1;font-size:88px;line-height:.82;font-family:Georgia,serif;color:var(--template-accent);}
     body[data-layout="brand-story-editorial"] .editorial-opener .editorial-lead{grid-column:1;padding-top:11%;font-size:15px;}
     body[data-layout="brand-story-editorial"] .editorial-opener .editorial-copy{grid-column:2/4;grid-row:2;columns:2;column-gap:28px;border-top:1px solid var(--template-title);padding-top:12px;}
+    body[data-layout="brand-story-editorial"] .editorial-opener .editorial-copy li{break-inside:avoid;}
     body[data-layout="brand-story-editorial"] .editorial-columns{position:absolute;right:0;top:0;display:flex;gap:5px}.editorial-columns span{width:5px;height:34px;background:var(--template-accent)}
     body[data-layout="brand-story-editorial"] .editorial-timeline{position:absolute;inset:16% 7% 13%;}
     body[data-layout="brand-story-editorial"] .editorial-timeline .editorial-title{max-width:58%;font-size:43px;}
@@ -3653,6 +3658,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="brand-story-editorial"] .editorial-feature .editorial-photo{grid-row:1;min-height:100%;}
     body[data-layout="brand-story-editorial"] .editorial-feature-copy{display:flex;flex-direction:column;gap:14px;}
     body[data-layout="brand-story-editorial"] .editorial-feature-copy .editorial-title{font-size:34px;}
+    body[data-layout="brand-story-editorial"] .editorial-feature-copy .editorial-copy{columns:1;}
     body[data-layout="brand-story-editorial"] .editorial-caption{grid-column:1;font-size:9px;border-top:1px solid var(--template-title);padding-top:7px;}
     body[data-layout="brand-story-editorial"] .editorial-evidence{position:absolute;inset:16% 7% 12%;}
     body[data-layout="brand-story-editorial"] .editorial-evidence .editorial-title{max-width:56%;font-size:42px;}
@@ -10128,40 +10134,88 @@ function brandStoryEditorialPreviewScene({ slide, index, total }) {
     variant: "editorial",
     role,
     folio: String(index + 1).padStart(2, "0"),
-    kicker: role === "cover" ? "BRAND JOURNAL" : role === "closing" ? "NEXT CHAPTER" : "FEATURE STORY",
+    kicker: brandStoryEditorialKicker(role),
+    sectionLabel: brandStoryEditorialSectionLabel(role),
     title: brandStoryEditorialCompactText(slide?.title, index === 0 ? "品牌的下一段故事" : "品牌故事", role === "cover" ? 34 : 30),
     deckTitle: brandStoryEditorialCompactText(slide?.title, "品牌故事", 16),
     lead: brandStoryEditorialCompactText(bullets[0], "以真实的人、时间和选择，讲述品牌如何形成长期价值。", role === "interview" ? 54 : 48),
     bullets: bullets.slice(0, 4).map((item) => brandStoryEditorialCompactText(item, "", 46)),
+    sections: brandStoryEditorialSections(role),
   };
 }
 
 function renderBrandStoryEditorialPreview(scene) {
   const bullets = scene.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  const masthead = `<div class="editorial-masthead"><span>${escapeHtml(scene.kicker)}</span><b>${escapeHtml(scene.folio)}</b></div>`;
+  const masthead = `<div class="editorial-masthead"><span>${escapeHtml(scene.kicker)} / ${escapeHtml(scene.sectionLabel)}</span><b>${escapeHtml(scene.folio)}</b></div>`;
+  const sectionIndex = `<div class="editorial-section-index">${scene.sections.map((item) => `<span class="${item.active ? "is-active" : ""}">${escapeHtml(item.label)}</span>`).join("")}</div>`;
   const title = `<h2 class="editorial-title">${escapeHtml(scene.title)}</h2>`;
   const lead = `<p class="editorial-lead">${escapeHtml(scene.lead)}</p>`;
   const list = `<ul class="editorial-copy">${bullets}</ul>`;
-  const photo = `<div class="editorial-photo" aria-hidden="true"><span></span><span></span><span></span><i>PORTRAIT / STORY</i></div>`;
+  const photo = `<div class="editorial-photo" aria-hidden="true"><span></span><span></span><span></span><em class="editorial-grain"></em><i>${escapeHtml(brandStoryEditorialPhotoCaption(scene.role))}</i></div>`;
   let layout = "";
   if (scene.role === "cover") {
-    layout = `<div class="editorial-cover-grid">${title}${lead}<div class="editorial-cover-index"><span>01 STORY</span><span>02 PEOPLE</span><span>03 VALUES</span></div>${photo}</div>`;
+    layout = `<div class="editorial-cover-grid">${title}${lead}<div class="editorial-cover-index">${scene.sections.slice(0, 3).map((item) => `<span>${escapeHtml(item.label)}</span>`).join("")}</div>${photo}</div>`;
   } else if (scene.role === "opener") {
     layout = `<div class="editorial-opener">${title}<div class="editorial-dropcap">${escapeHtml(Array.from(scene.lead)[0] || "品")}</div>${lead}${list}<div class="editorial-columns"><span></span><span></span><span></span></div></div>`;
   } else if (scene.role === "timeline") {
     layout = `<div class="editorial-timeline">${title}${lead}<div class="editorial-timeline-track">${scene.bullets.slice(0, 4).map((item, itemIndex) => `<span><b>${String(2012 + itemIndex * 4)}</b><i>${escapeHtml(item)}</i></span>`).join("")}</div></div>`;
   } else if (scene.role === "interview") {
-    layout = `<div class="editorial-interview">${photo}<div class="editorial-quote-mark">“</div>${title}<blockquote>${escapeHtml(scene.lead)}</blockquote><div class="editorial-byline">人物专访 · 核心观点</div></div>`;
+    layout = `<div class="editorial-interview">${photo}<div class="editorial-quote-mark">“</div>${title}<blockquote>${escapeHtml(scene.lead)}</blockquote><div class="editorial-byline">${escapeHtml(scene.sectionLabel)} · ${escapeHtml(brandStoryEditorialByline(scene.role))}</div></div>`;
   } else if (scene.role === "manifesto") {
     layout = `<div class="editorial-manifesto"><div class="editorial-manifesto-number">${escapeHtml(scene.folio)}</div>${title}<blockquote>${escapeHtml(scene.lead)}</blockquote><div class="editorial-value-grid">${scene.bullets.slice(0, 3).map((item, itemIndex) => `<span><b>0${itemIndex + 1}</b>${escapeHtml(item)}</span>`).join("")}</div></div>`;
   } else if (scene.role === "evidence") {
     layout = `<div class="editorial-evidence">${title}${lead}<div class="editorial-metric-grid">${scene.bullets.slice(0, 3).map((item, itemIndex) => `<span><b>${["68%", "12Y", "3.6X"][itemIndex]}</b>${escapeHtml(item)}</span>`).join("")}</div><div class="editorial-bar-chart"><i></i><i></i><i></i><i></i><i></i></div></div>`;
   } else if (scene.role === "closing") {
-    layout = `<div class="editorial-closing"><div class="editorial-closing-rule"></div>${title}<blockquote>${escapeHtml(scene.lead)}</blockquote><span>THE STORY CONTINUES</span></div>`;
+    layout = `<div class="editorial-closing"><div class="editorial-closing-rule"></div>${title}<blockquote>${escapeHtml(scene.lead)}</blockquote><span>${escapeHtml(scene.sectionLabel)} / STORY CONTINUES</span></div>`;
   } else {
-    layout = `<div class="editorial-feature">${photo}<div class="editorial-feature-copy">${title}${lead}${list}</div><div class="editorial-caption">图像记录品牌与人的真实连接</div></div>`;
+    layout = `<div class="editorial-feature">${photo}<div class="editorial-feature-copy">${title}${lead}${list}</div><div class="editorial-caption">${escapeHtml(brandStoryEditorialByline(scene.role))}</div></div>`;
   }
-  return `<div class="editorial-layer editorial-role-${scene.role}">${masthead}${layout}<div class="editorial-running-title">${escapeHtml(scene.deckTitle)}</div></div>`;
+  return `<div class="editorial-layer editorial-role-${scene.role}">${masthead}${layout}<div class="editorial-running-title">${escapeHtml(scene.deckTitle)}</div>${sectionIndex}</div>`;
+}
+
+function brandStoryEditorialKicker(role) {
+  if (role === "cover") return "BRAND JOURNAL";
+  if (role === "timeline") return "ARCHIVE";
+  if (role === "interview") return "INTERVIEW";
+  if (role === "manifesto") return "MANIFESTO";
+  if (role === "evidence") return "PROOF";
+  if (role === "closing") return "NEXT CHAPTER";
+  return "FEATURE STORY";
+}
+
+function brandStoryEditorialSectionLabel(role) {
+  const labels = {
+    cover: "ANNUAL ISSUE",
+    opener: "ORIGIN STORY",
+    timeline: "BRAND TIMELINE",
+    interview: "PEOPLE QUOTE",
+    manifesto: "VALUE CLAIM",
+    feature: "PHOTO ESSAY",
+    evidence: "VALUE PROOF",
+    closing: "EDITORIAL END",
+  };
+  return labels[role] || labels.feature;
+}
+
+function brandStoryEditorialSections(role) {
+  return [
+    { label: "01 ORIGIN", match: ["cover", "opener"] },
+    { label: "02 TIME", match: ["timeline"] },
+    { label: "03 PEOPLE", match: ["interview", "feature"] },
+    { label: "04 VALUES", match: ["manifesto", "evidence", "closing"] },
+  ].map((item) => ({ label: item.label, active: item.match.includes(role) }));
+}
+
+function brandStoryEditorialPhotoCaption(role) {
+  if (role === "cover") return "COVER / STORY";
+  if (role === "interview") return "PORTRAIT / QUOTE";
+  return "FIELD / BRAND";
+}
+
+function brandStoryEditorialByline(role) {
+  if (role === "interview") return "核心引语";
+  if (role === "feature") return "场景记录与图文混排";
+  return "品牌与人的真实连接";
 }
 
 function brandStoryEditorialBulletTexts(slide) {

@@ -14927,10 +14927,11 @@ function brandIdentityCompactText(text, fallback, maxLength) {
 function brandStoryEditorialDecorationsXml({ visual, index, slide, total }) {
   const scene = brandStoryEditorialExportScene({ slide, index, total });
   const common = lineFrameShapeXml({ id: 400, name: "Editorial Paper Frame", x: 292608, y: 164592, cx: 8558784, cy: 4814316, stroke: blendHexColor(visual.primary, visual.background, 0.38), width: 11430 })
-    + textShapeXml({ id: 401, name: "Editorial Masthead", x: 475488, y: 266700, cx: 2438400, cy: 213360, text: scene.kicker, size: 700, bold: true, color: visual.title })
+    + textShapeXml({ id: 401, name: "Editorial Masthead", x: 475488, y: 266700, cx: 3048000, cy: 213360, text: `${scene.kicker} / ${scene.sectionLabel}`, size: 700, bold: true, color: visual.title })
     + textShapeXml({ id: 402, name: "Editorial Folio", x: 8052120, y: 266700, cx: 396240, cy: 213360, text: scene.folio, size: 900, bold: true, color: visual.accent })
     + rectShapeXml({ id: 403, name: "Editorial Masthead Rule", x: 475488, y: 533400, cx: 8193024, cy: 22860, fill: visual.title })
-    + textShapeXml({ id: 404, name: "Editorial Running Title", x: 475488, y: 4655820, cx: 2133600, cy: 182880, text: scene.deckTitle, size: 600, bold: true, color: blendHexColor(visual.body, visual.background, 0.28) });
+    + textShapeXml({ id: 404, name: "Editorial Running Title", x: 475488, y: 4655820, cx: 2133600, cy: 182880, text: scene.deckTitle, size: 600, bold: true, color: blendHexColor(visual.body, visual.background, 0.28) })
+    + brandStoryEditorialSectionIndexXml({ visual, scene });
   if (scene.role === "cover") return common + brandStoryEditorialCoverXml({ visual, scene });
   if (scene.role === "opener") return common + brandStoryEditorialOpenerXml({ visual, scene });
   if (scene.role === "timeline") return common + brandStoryEditorialTimelineXml({ visual, scene });
@@ -14945,8 +14946,8 @@ function brandStoryEditorialCoverXml({ visual, scene }) {
   return textShapeXml({ id: 410, name: "Editorial Cover Title", x: 640080, y: 1219200, cx: 3962400, cy: 1280160, text: scene.title, size: 3600, bold: true, color: visual.title })
     + rectShapeXml({ id: 411, name: "Editorial Cover Accent Rule", x: 640080, y: 2743200, cx: 2133600, cy: 45720, fill: visual.accent })
     + textShapeXml({ id: 412, name: "Editorial Cover Lead", x: 640080, y: 2872740, cx: 3200400, cy: 731520, text: scene.lead, size: 980, bold: false, color: visual.body })
-    + brandStoryEditorialPortraitXml({ visual, x: 5257800, y: 800100, cx: 2773680, cy: 3657600, id: 420 })
-    + ["01  STORY", "02  PEOPLE", "03  VALUES"].map((label, itemIndex) => textShapeXml({ id: 430 + itemIndex, name: `Editorial Cover Index ${itemIndex + 1}`, x: 640080 + itemIndex * 914400, y: 4114800, cx: 822960, cy: 182880, text: label, size: 620, bold: true, color: visual.title })).join("");
+    + brandStoryEditorialPortraitXml({ visual, x: 5257800, y: 800100, cx: 2773680, cy: 3657600, id: 420, caption: brandStoryEditorialPhotoCaption(scene.role) })
+    + scene.sections.slice(0, 3).map((item, itemIndex) => textShapeXml({ id: 430 + itemIndex, name: `Editorial Cover Index ${itemIndex + 1}`, x: 640080 + itemIndex * 914400, y: 4114800, cx: 822960, cy: 182880, text: item.label, size: 620, bold: true, color: item.active ? visual.accent : visual.title })).join("");
 }
 
 function brandStoryEditorialOpenerXml({ visual, scene }) {
@@ -14974,12 +14975,12 @@ function brandStoryEditorialTimelineXml({ visual, scene }) {
 }
 
 function brandStoryEditorialInterviewXml({ visual, scene }) {
-  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 3352800, cy: 3657600, id: 420 })
+  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 3352800, cy: 3657600, id: 420, caption: brandStoryEditorialPhotoCaption(scene.role) })
     + textShapeXml({ id: 410, name: "Editorial Interview Quote Mark", x: 4495800, y: 777240, cx: 762000, cy: 762000, text: "“", size: 6800, bold: true, color: visual.accent })
     + textShapeXml({ id: 411, name: "Editorial Interview Title", x: 4495800, y: 1447800, cx: 3505200, cy: 731520, text: scene.title, size: 2250, bold: true, color: visual.title })
     + textShapeXml({ id: 412, name: "Editorial Interview Quote", x: 4495800, y: 2286000, cx: 3505200, cy: 1371600, text: scene.lead, size: 1450, bold: true, color: visual.title })
     + rectShapeXml({ id: 413, name: "Editorial Interview Byline Rule", x: 4495800, y: 3962400, cx: 3505200, cy: 22860, fill: visual.title })
-    + textShapeXml({ id: 414, name: "Editorial Interview Byline", x: 4495800, y: 4076700, cx: 2438400, cy: 182880, text: "人物专访 · 核心观点", size: 650, bold: true, color: visual.body });
+    + textShapeXml({ id: 414, name: "Editorial Interview Byline", x: 4495800, y: 4076700, cx: 3048000, cy: 182880, text: `${scene.sectionLabel} · ${brandStoryEditorialByline(scene.role)}`, size: 650, bold: true, color: visual.body });
 }
 
 function brandStoryEditorialManifestoXml({ visual, scene }) {
@@ -14998,12 +14999,12 @@ function brandStoryEditorialManifestoXml({ visual, scene }) {
 }
 
 function brandStoryEditorialFeatureXml({ visual, scene }) {
-  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 4572000, cy: 3505200, id: 420 })
+  return brandStoryEditorialPortraitXml({ visual, x: 640080, y: 800100, cx: 4572000, cy: 3505200, id: 420, caption: brandStoryEditorialPhotoCaption(scene.role) })
     + textShapeXml({ id: 410, name: "Editorial Feature Title", x: 5486400, y: 914400, cx: 2743200, cy: 731520, text: scene.title, size: 2250, bold: true, color: visual.title })
     + textShapeXml({ id: 411, name: "Editorial Feature Lead", x: 5486400, y: 1798320, cx: 2743200, cy: 731520, text: scene.lead, size: 900, bold: true, color: visual.body })
     + textShapeXml({ id: 412, name: "Editorial Feature Copy", x: 5486400, y: 2667000, cx: 2743200, cy: 1371600, text: scene.bullets.join("\n\n"), size: 720, bold: false, color: visual.body })
     + rectShapeXml({ id: 413, name: "Editorial Feature Caption Rule", x: 640080, y: 4427220, cx: 4572000, cy: 22860, fill: visual.title })
-    + textShapeXml({ id: 414, name: "Editorial Feature Caption", x: 640080, y: 4495800, cx: 3048000, cy: 152400, text: "图像记录品牌与人的真实连接", size: 600, bold: false, color: visual.body });
+    + textShapeXml({ id: 414, name: "Editorial Feature Caption", x: 640080, y: 4495800, cx: 3048000, cy: 152400, text: brandStoryEditorialByline(scene.role), size: 600, bold: false, color: visual.body });
 }
 
 function brandStoryEditorialEvidenceXml({ visual, scene }) {
@@ -15023,16 +15024,16 @@ function brandStoryEditorialClosingXml({ visual, scene }) {
   return rectShapeXml({ id: 410, name: "Editorial Closing Accent", x: 4236720, y: 1219200, cx: 685800, cy: 60960, fill: visual.accent })
     + textShapeXml({ id: 411, name: "Editorial Closing Title", x: 1371600, y: 1752600, cx: 6400800, cy: 1066800, text: scene.title, size: 3500, bold: true, color: visual.title })
     + textShapeXml({ id: 412, name: "Editorial Closing Quote", x: 2133600, y: 3048000, cx: 4876800, cy: 762000, text: scene.lead, size: 1250, bold: true, color: visual.body })
-    + textShapeXml({ id: 413, name: "Editorial Closing Label", x: 3352800, y: 4114800, cx: 2438400, cy: 182880, text: "THE STORY CONTINUES", size: 650, bold: true, color: visual.title });
+    + textShapeXml({ id: 413, name: "Editorial Closing Label", x: 3352800, y: 4114800, cx: 2743200, cy: 182880, text: `${scene.sectionLabel} / STORY CONTINUES`, size: 650, bold: true, color: visual.title });
 }
 
-function brandStoryEditorialPortraitXml({ visual, x, y, cx, cy, id }) {
+function brandStoryEditorialPortraitXml({ visual, x, y, cx, cy, id, caption }) {
   const skin = blendHexColor(visual.accent, "F1D0B6", 0.62);
   return solidShapeXml({ id, name: "Editorial Portrait Field", x, y, cx, cy, fill: blendHexColor(visual.primary, "59534D", 0.44) })
     + solidShapeXml({ id: id + 1, name: "Editorial Portrait Head", geom: "ellipse", x: x + Math.round(cx * 0.34), y: y + Math.round(cy * 0.12), cx: Math.round(cx * 0.28), cy: Math.round(cx * 0.28), fill: skin })
     + solidShapeXml({ id: id + 2, name: "Editorial Portrait Body", geom: "roundRect", x: x + Math.round(cx * 0.18), y: y + Math.round(cy * 0.44), cx: Math.round(cx * 0.64), cy: Math.round(cy * 0.62), fill: blendHexColor(visual.primary, "15171D", 0.28) })
     + lineFrameShapeXml({ id: id + 3, name: "Editorial Portrait Crop Frame", x: x + Math.round(cx * 0.07), y: y + Math.round(cy * 0.07), cx: Math.round(cx * 0.86), cy: Math.round(cy * 0.86), stroke: "FFFFFF", width: 11430, transparency: 24000 })
-    + textShapeXml({ id: id + 4, name: "Editorial Portrait Caption", x: x + Math.round(cx * 0.10), y: y + Math.round(cy * 0.86), cx: Math.round(cx * 0.70), cy: 152400, text: "PORTRAIT / STORY", size: 560, bold: true, color: "FFFFFF" });
+    + textShapeXml({ id: id + 4, name: "Editorial Portrait Caption", x: x + Math.round(cx * 0.10), y: y + Math.round(cy * 0.86), cx: Math.round(cx * 0.70), cy: 152400, text: caption || "FIELD / BRAND", size: 560, bold: true, color: "FFFFFF" });
 }
 
 function brandStoryEditorialExportScene({ slide, index, total }) {
@@ -15054,12 +15055,74 @@ function brandStoryEditorialExportScene({ slide, index, total }) {
   return {
     role,
     folio: String(index + 1).padStart(2, "0"),
-    kicker: role === "cover" ? "BRAND JOURNAL" : role === "closing" ? "NEXT CHAPTER" : "FEATURE STORY",
+    kicker: brandStoryEditorialKicker(role),
+    sectionLabel: brandStoryEditorialSectionLabel(role),
     title: brandStoryEditorialExportCompactText(slide?.title, index === 0 ? "品牌的下一段故事" : "品牌故事", role === "cover" ? 34 : 30),
     deckTitle: brandStoryEditorialExportCompactText(slide?.title, "品牌故事", 16),
     lead: brandStoryEditorialExportCompactText(bullets[0], "以真实的人、时间和选择，讲述品牌如何形成长期价值。", role === "interview" ? 54 : 48),
     bullets: bullets.slice(0, 4).map((item) => brandStoryEditorialExportCompactText(item, "", 46)),
+    sections: brandStoryEditorialSections(role),
   };
+}
+
+function brandStoryEditorialSectionIndexXml({ visual, scene }) {
+  return scene.sections.map((item, itemIndex) => textShapeXml({
+    id: 460 + itemIndex,
+    name: `Editorial Section Index ${itemIndex + 1}`,
+    x: 5791200 + itemIndex * 685800,
+    y: 4655820,
+    cx: 640080,
+    cy: 182880,
+    text: item.label,
+    size: 520,
+    bold: true,
+    color: item.active ? visual.accent : blendHexColor(visual.body, visual.background, 0.32),
+  })).join("");
+}
+
+function brandStoryEditorialKicker(role) {
+  if (role === "cover") return "BRAND JOURNAL";
+  if (role === "timeline") return "ARCHIVE";
+  if (role === "interview") return "INTERVIEW";
+  if (role === "manifesto") return "MANIFESTO";
+  if (role === "evidence") return "PROOF";
+  if (role === "closing") return "NEXT CHAPTER";
+  return "FEATURE STORY";
+}
+
+function brandStoryEditorialSectionLabel(role) {
+  const labels = {
+    cover: "ANNUAL ISSUE",
+    opener: "ORIGIN STORY",
+    timeline: "BRAND TIMELINE",
+    interview: "PEOPLE QUOTE",
+    manifesto: "VALUE CLAIM",
+    feature: "PHOTO ESSAY",
+    evidence: "VALUE PROOF",
+    closing: "EDITORIAL END",
+  };
+  return labels[role] || labels.feature;
+}
+
+function brandStoryEditorialSections(role) {
+  return [
+    { label: "01 ORIGIN", match: ["cover", "opener"] },
+    { label: "02 TIME", match: ["timeline"] },
+    { label: "03 PEOPLE", match: ["interview", "feature"] },
+    { label: "04 VALUES", match: ["manifesto", "evidence", "closing"] },
+  ].map((item) => ({ label: item.label, active: item.match.includes(role) }));
+}
+
+function brandStoryEditorialPhotoCaption(role) {
+  if (role === "cover") return "COVER / STORY";
+  if (role === "interview") return "PORTRAIT / QUOTE";
+  return "FIELD / BRAND";
+}
+
+function brandStoryEditorialByline(role) {
+  if (role === "interview") return "核心引语";
+  if (role === "feature") return "场景记录与图文混排";
+  return "品牌与人的真实连接";
 }
 
 function brandStoryEditorialExportBullets(slide) {

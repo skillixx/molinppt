@@ -145,7 +145,7 @@ test("PptService renders growth marketing lab preview with dedicated layout", as
   const outline = await context.pptService.generateOutline({
     ownerUserId: 7,
     topic: "用户增长实验复盘",
-    slideCount: 4,
+    slideCount: 7,
     templateId: "marketing-campaign",
     theme: "growth",
   });
@@ -154,7 +154,13 @@ test("PptService renders growth marketing lab preview with dedicated layout", as
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
   assert.match(preview, /data-layout="growth-marketing-lab"/);
-  assert.match(preview, /growth-lab-wheel|growth-lab-funnel|growth-lab-matrix/);
+  assert.match(preview, /growth-lab-wheel/);
+  assert.match(preview, /growth-lab-funnel/);
+  assert.match(preview, /growth-lab-matrix/);
+  assert.match(preview, /growth-lab-experiment/);
+  assert.match(preview, /growth-lab-roi/);
+  assert.match(preview, /growth-lab-priority/);
+  assert.match(preview, /AARRR 漏斗|渠道矩阵|实验卡片|趋势 ROI|行动优先级/);
   assert.doesNotMatch(preview, /增长营销/);
 });
 
@@ -175,7 +181,8 @@ test("PptService renders brand communication preview without theme labels", asyn
   assert.match(preview, /<body data-template="marketing-campaign" data-layout="marketing-brand-communication-console"/);
   assert.match(preview, /brand-comms-layer/);
   assert.match(preview, /brand-comms-content-matrix|brand-comms-touchpoint-map|brand-comms-dashboard/);
-  assert.match(preview, /COMMS CONTROL|MESSAGE HOUSE|MEDIA TOUCHPOINTS/);
+  assert.match(preview, /COMMS CONTROL|MESSAGE HOUSE|TOUCHPOINT MAP/);
+  assert.match(preview, /#172033|#e64b6a|#21a6a1/i);
   assert.doesNotMatch(preview, />品牌传播</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
@@ -225,6 +232,9 @@ test("PptService renders editorial brand story preview with distinct magazine pa
   assert.match(preview, /editorial-role-evidence/);
   assert.match(preview, /editorial-role-closing/);
   assert.match(preview, /BRAND JOURNAL|FEATURE STORY|NEXT CHAPTER/);
+  assert.match(preview, /01 ORIGIN/);
+  assert.match(preview, /04 VALUES/);
+  assert.match(preview, /PEOPLE QUOTE|VALUE CLAIM|VALUE PROOF/);
   assert.doesNotMatch(preview, />编辑叙事</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });

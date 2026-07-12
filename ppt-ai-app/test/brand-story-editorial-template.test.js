@@ -50,10 +50,12 @@ test("编辑叙事 PPTX 为八类页面输出独立且可编辑的 DrawingML 图
     "Editorial Feature Title",
     "Editorial Evidence Title",
     "Editorial Closing Title",
+    "Editorial Section Index 1",
   ]) {
     assert.match(text, new RegExp(marker));
   }
   assert.match(text, /Editorial Portrait Field/);
+  assert.match(text, /ANNUAL ISSUE|PEOPLE QUOTE|VALUE CLAIM/);
   assert.match(text, /Editorial Timeline Node 1/);
   assert.match(text, /Editorial Evidence Card 1/);
   assert.doesNotMatch(text, />编辑叙事</);
