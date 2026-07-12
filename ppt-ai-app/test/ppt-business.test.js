@@ -1318,6 +1318,69 @@ test("PptService renders pitch investor memo preview with dedicated layout", asy
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced pitch investor memo preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await context.database.insert("templates", {
+    id: "pitch-pitch-investor",
+    slug: "pitch-pitch-investor",
+    name: "创业融资路演 - 投资人版",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "investor",
+        name: "投资人版",
+        visual: {
+          primary: "101828",
+          accent: "12B76A",
+          secondary: "F79009",
+          background: "F8FAFC",
+          surface: "FFFFFF",
+          title: "101828",
+          body: "475467",
+          layout: "pitch-investor-memo",
+          variant: "investor",
+        },
+      },
+    ],
+    visual: {
+      primary: "101828",
+      accent: "12B76A",
+      secondary: "F79009",
+      background: "F8FAFC",
+      surface: "FFFFFF",
+      title: "101828",
+      body: "475467",
+      layout: "pitch-investor-memo",
+      variant: "investor",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "pitch-investor-memo-cover",
+      defaultContentLayout: "pitch-investor-memo-market",
+      allowedLayouts: ["pitch-investor-memo-cover", "pitch-investor-memo-summary", "pitch-investor-memo-market", "pitch-investor-memo-revenue", "pitch-investor-memo-unit-economics", "pitch-investor-memo-moat", "pitch-investor-memo-funding", "pitch-investor-memo-closing", "title", "content"],
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "创业融资市场空间和资金用途",
+    slideCount: 6,
+    templateId: "pitch-pitch-investor",
+    theme: "investor",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-pitch-investor" data-layout="pitch-investor-memo"/);
+  assert.match(preview, /investor-memo-layer/);
+  assert.match(preview, /investor-memo-market|investor-memo-formula|investor-memo-unit|investor-memo-funding/);
+  assert.doesNotMatch(preview, />投资人版</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders founder cinematic startup story preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

@@ -9627,7 +9627,19 @@ function pitchInvestorMemoPalette(visual) {
 
 function pitchInvestorMemoScene({ slide, index, role, total = 0 }) {
   const roles = ["cover", "summary", "market", "revenue", "unit", "moat", "funding", "closing"];
-  const resolvedRole = index === 0 ? "cover" : (index === total - 1 || role === "closing" ? "closing" : roles[Math.min(index, roles.length - 2)]);
+  const layoutRoleMap = {
+    "pitch-investor-memo-cover": "cover",
+    "pitch-investor-memo-summary": "summary",
+    "pitch-investor-memo-market": "market",
+    "pitch-investor-memo-revenue": "revenue",
+    "pitch-investor-memo-unit-economics": "unit",
+    "pitch-investor-memo-moat": "moat",
+    "pitch-investor-memo-funding": "funding",
+    "pitch-investor-memo-closing": "closing",
+  };
+  const explicitRole = layoutRoleMap[String(slide?.layout || "").toLowerCase()];
+  // 导出优先读取官方模板写入的 slide.layout，保证后台同步模板的 PPTX 页型与在线预览一致。
+  const resolvedRole = explicitRole || (index === 0 ? "cover" : (index === total - 1 || role === "closing" ? "closing" : roles[Math.min(index, roles.length - 2)]));
   const presets = {
     cover: { kicker: "INVESTMENT MEMO", title: "用投资备忘录讲清下一轮融资价值", summary: "结论先行呈现市场空间、商业模型和资金计划。", metrics: [{ value: "TAM", label: "市场空间" }, { value: "ARR", label: "收入模型" }, { value: "18M", label: "Runway" }], cards: ["投资亮点", "关键证据", "风险假设", "资金用途"] },
     summary: { kicker: "IC SNAPSHOT", title: "投委会决策摘要", summary: "用投委会摘要矩阵快速交代本轮融资判断。", metrics: [{ value: "01", label: "机会" }, { value: "02", label: "证据" }, { value: "03", label: "计划" }], cards: ["市场窗口", "增长质量", "壁垒强度", "融资效率"] },
@@ -9652,7 +9664,8 @@ function pitchInvestorMemoCompactText(text, fallback, maxLength) {
 }
 
 function isPitchInvestorMemoVisual(visual) {
-  return visual?.id === "pitch" && visual?.layout === "pitch-investor-memo";
+  // 后台同步后的官方模板使用完整 slug，内置兜底模板使用基础 id；两者都必须命中同一套投资备忘录样式。
+  return ["pitch", "pitch-pitch-investor"].includes(visual?.id) && visual?.layout === "pitch-investor-memo";
 }
 
 function growthFundingFlywheelDecorationsXml({ visual, index, role, slide }) {

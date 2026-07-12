@@ -2542,6 +2542,47 @@ test("PptExportService uses commercial pitch investor decorations", () => {
   assert.doesNotMatch(slide1, /投资人版/);
 });
 
+test("PptExportService uses synced pitch investor memo decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch-pitch-investor",
+      theme: "investor",
+      templateVisual: {
+        id: "pitch-pitch-investor",
+        primary: "101828",
+        accent: "12B76A",
+        secondary: "F79009",
+        background: "F8FAFC",
+        surface: "FFFFFF",
+        title: "101828",
+        body: "475467",
+        layout: "pitch-investor-memo",
+        variant: "investor",
+      },
+      slides: [
+        { title: "融资摘要", bullets: ["用 18 个月 runway 完成核心市场验证"] },
+        { title: "市场空间", bullets: ["TAM/SAM/SOM 清晰拆分", "聚焦可服务客群"] },
+        { title: "商业模型", bullets: ["收入由用户数、ARPU 和留存共同驱动"] },
+      ].map((slide, index) => ({
+        ...slide,
+        // 同步后的官方模板导出应尊重后端生成的投资备忘录页面版式。
+        layout: ["pitch-investor-memo-summary", "pitch-investor-memo-market", "pitch-investor-memo-revenue"][index],
+      })),
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+
+  assert.match(slide1, /name="Pitch Investor Memo Paper"/);
+  assert.match(slide1, /name="Pitch Investor Memo Decision Metric 1"/);
+  assert.match(slide2, /name="Pitch Investor Memo TAM Funnel TAM"/);
+  assert.doesNotMatch(slide1, /name="Pitch Stage Canvas"/);
+});
+
 test("PptExportService uses commercial pitch product decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

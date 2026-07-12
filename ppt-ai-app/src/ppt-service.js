@@ -9124,7 +9124,8 @@ function pitchInvestorMemoCompactText(text, fallback, maxLength) {
 }
 
 function isPitchInvestorMemoVisual(visual) {
-  return visual?.id === "pitch" && visual?.layout === "pitch-investor-memo";
+  // 后台同步后的官方模板使用完整 slug，内置兜底模板使用基础 id；两者都必须命中同一套投资备忘录样式。
+  return ["pitch", "pitch-pitch-investor"].includes(visual?.id) && visual?.layout === "pitch-investor-memo";
 }
 
 /**
