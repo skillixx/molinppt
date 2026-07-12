@@ -952,6 +952,7 @@ function shouldRenderDomeBodyList(visual, role) {
 function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "luxury-brand-story") return false;
   if (visual.layout === "brand-story-editorial") return false;
+  if (visual.layout === "data-insight") return false;
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
@@ -1040,6 +1041,7 @@ function shouldRenderTemplateBodyList(visual, role) {
 function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "luxury-brand-story") return false;
   if (visual.layout === "brand-story-editorial") return false;
+  if (visual.layout === "data-insight") return false;
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "marketing-product-premiere") return false;
   if (visual.layout === "finance-risk-inspection") return false;
@@ -1487,6 +1489,7 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       + solidShapeXml({ id: 506, name: `Data Insight ${scene.variant} Chip`, geom: "roundRect", x: isCover ? 6979920 : 7040880, y: isCover ? 899160 : 800100, cx: 944880, cy: 304800, fill: palette.chip })
       + textShapeXml({ id: 507, name: "Data Insight Chip Text", x: isCover ? 7132320 : 7193280, y: isCover ? 960120 : 861060, cx: 640080, cy: 152400, text: "", size: 760, bold: true, color: "FFFFFF" })
       + rectShapeXml({ id: 508, name: "Data Insight Scan Line", x: 914400, y: isCover ? 3337560 : 1577340, cx: 3657600, cy: 22860, fill: visual.accent })
+      + dataInsightContentXml({ visual, palette, slide, isCover })
       + dataInsightVisualXml({ visual, palette, scene, isCover })
       + lowerData
       + textShapeXml({ id: 550, name: "Data Insight Caption", x: isCover ? 6248400 : 6248400, y: isCover ? 3505200 : 3230880, cx: 2133600, cy: 182880, text: scene.caption, size: isCover ? 800 : 740, bold: true, color: visual.body });
@@ -15754,6 +15757,27 @@ function dataInsightSignalCardsXml({ visual, palette }) {
     return solidShapeXml({ id: 580 + itemIndex * 2, name: `Data Insight Signal Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3581400, cx: 1066800, cy: 396240, fill: itemIndex === 1 ? palette.soft : palette.card })
       + rectShapeXml({ id: 581 + itemIndex * 2, name: `Data Insight Signal Rule ${itemIndex + 1}`, x: x + 152400, y: 3718560, cx: 762000, cy: 30480, fill: itemIndex === 1 ? visual.accent : visual.primary });
   }).join("");
+}
+
+function dataInsightContentXml({ visual, palette, slide, isCover }) {
+  const title = dataResearchReportCompactText(slide?.title, "数据洞察结论", isCover ? 24 : 26);
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.slice(0, 3) : [];
+  const titleBox = isCover
+    ? { x: 914400, y: 1264920, cx: 3962400, cy: 762000, size: 2100 }
+    : { x: 914400, y: 929640, cx: 3962400, cy: 609600, size: 1780 };
+  const cardY = isCover ? 2484120 : 1973580;
+  const cardHeight = isCover ? 274320 : 243840;
+  const gap = isCover ? 335280 : 304800;
+  // 基础 data-insight 旧布局仍保留右侧洞察图形，但文字改由专属小字号卡片承载，避免下载 PPTX 中通用标题/正文溢出叠在一起。
+  const titleShape = textShapeXml({ id: 530, name: "Data Insight Content Title", x: titleBox.x, y: titleBox.y, cx: titleBox.cx, cy: titleBox.cy, text: title, size: titleBox.size, bold: true, color: visual.title });
+  const bulletShapes = bullets.map((item, itemIndex) => {
+    const y = cardY + itemIndex * gap;
+    const accent = itemIndex % 2 ? visual.primary : visual.accent;
+    return solidShapeXml({ id: 531 + itemIndex * 4, name: `Data Insight Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 1066800, y, cx: 3505200, cy: cardHeight, fill: itemIndex === 1 ? palette.soft : palette.card })
+      + rectShapeXml({ id: 532 + itemIndex * 4, name: `Data Insight Bullet Accent ${itemIndex + 1}`, x: 1066800, y, cx: 60960, cy: cardHeight, fill: accent })
+      + textShapeXml({ id: 533 + itemIndex * 4, name: `Data Insight Bullet Text ${itemIndex + 1}`, x: 1219200, y: y + 60960, cx: 3048000, cy: cardHeight - 91440, text: dataResearchReportCompactText(item, `洞察要点 ${itemIndex + 1}`, 32), size: isCover ? 620 : 560, bold: true, color: visual.body });
+  }).join("");
+  return titleShape + bulletShapes;
 }
 
 function dataInsightColorPalette(visual) {

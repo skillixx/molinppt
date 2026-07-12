@@ -3549,6 +3549,48 @@ test("PptExportService uses dashboard data insight decorations", () => {
   assert.match(slide1, /val="36C5F0"/);
 });
 
+test("PptExportService suppresses generic text layers for base data insight exports", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "data-insight",
+      templateVisual: {
+        id: "data-insight",
+        primary: "172033",
+        secondary: "315C7C",
+        accent: "B8822D",
+        background: "F7F5EF",
+        surface: "FEFEFE",
+        title: "172033",
+        body: "46515E",
+        layout: "data-insight",
+        variant: "research",
+      },
+      slides: [
+        {
+          title: "渠道提效、客户唤醒与定价优化",
+          bullets: [
+            "策略核心：渠道预算重新分配，聚焦低成本留存量收入。",
+            "关键预期：定价体系切换后提升毛利率。",
+          ],
+        },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Data Insight Content Analysis Canvas"|name="Data Insight Cover Dashboard Canvas"/);
+  assert.match(slide1, /name="Data Insight Kicker"/);
+  assert.match(slide1, /name="Data Insight Content Title"/);
+  assert.match(slide1, /name="Data Insight Bullet Card 1"/);
+  assert.match(slide1, /name="Data Insight Bullet Text 1"/);
+  assert.doesNotMatch(slide1, /name="Content 2"/);
+  assert.doesNotMatch(slide1, /name="Dome Content Title"/);
+});
+
 test("PptExportService uses insight analysis workbench decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
