@@ -1,0 +1,7 @@
+interface:
+  display_name: "PPT 模板缩略图生成"
+  short_description: "批量将目录中的 PPT 模板制作成高质量介绍缩略图"
+  default_prompt: "Use $generate-ppt-template-thumbnails to generate catalog thumbnails for every PPTX in a directory."
+
+policy:
+  allow_implicit_invocation: true
