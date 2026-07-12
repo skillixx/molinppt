@@ -1672,6 +1672,28 @@ test("PptService renders startup pitch product highlights preview with investor-
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders official startup pitch product highlights slug with content layer", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertStartupPitchProductTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "创业产品融资路演",
+    slideCount: 6,
+    templateId: "pitch-pitch-product",
+    theme: "product",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch-pitch-product" data-layout="startup-product-highlights"/);
+  assert.match(preview, /product-funding-layer/);
+  assert.match(preview, /product-funding-console/);
+  assert.match(preview, /PRODUCT INVESTOR DEMO|PAIN SCENE MAP|PRODUCT ARCHITECTURE|COMMERCIALIZATION PATH/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders AI SaaS technology pitch preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -7231,6 +7253,54 @@ async function insertProductFundingHighlightsTemplate(context) {
       title: "0F172A",
       body: "334155",
       layout: "product-funding-highlights",
+      variant: "product-highlights",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "product-funding-cover",
+      defaultContentLayout: "product-capability-map",
+      allowedLayouts: ["product-funding-cover", "product-capability-map", "product-demo-flow", "technical-advantage", "user-value-journey", "validation-dashboard", "funding-roadmap", "product-funding-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertStartupPitchProductTemplate(context) {
+  // 测试真实官方模板 slug，避免只覆盖内置 pitch/product 导致后台同步模板预览内容层丢失。
+  await context.database.insert("templates", {
+    id: "pitch-pitch-product",
+    slug: "pitch-pitch-product",
+    name: "创业融资路演 - 产品亮点",
+    categoryId: "pitch",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "product",
+        name: "产品亮点",
+        visual: {
+          primary: "0F172A",
+          accent: "14B8A6",
+          secondary: "22C55E",
+          warning: "F59E0B",
+          background: "F8FAFC",
+          surface: "FFFFFF",
+          title: "0F172A",
+          body: "334155",
+          layout: "startup-product-highlights",
+          variant: "product-highlights",
+        },
+      },
+    ],
+    visual: {
+      primary: "0F172A",
+      accent: "14B8A6",
+      secondary: "22C55E",
+      warning: "F59E0B",
+      background: "F8FAFC",
+      surface: "FFFFFF",
+      title: "0F172A",
+      body: "334155",
+      layout: "startup-product-highlights",
       variant: "product-highlights",
     },
     layoutSchema: {

@@ -10145,7 +10145,7 @@ function productFundingCompactText(text, fallback, maxLength) {
 function isProductFundingHighlightsVisual(visual) {
   const id = String(visual?.id || "");
   // 创业融资路演的产品亮点复用产品演示台绘制组件，但用独立 layout 保持后台、缩略图和测试可区分。
-  if (visual?.layout === "startup-product-highlights" && id === "pitch") return true;
+  if (visual?.layout === "startup-product-highlights" && (id === "pitch" || id === "pitch-pitch-product")) return true;
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
 }
 
