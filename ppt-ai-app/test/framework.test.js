@@ -548,10 +548,11 @@ test("resolveTemplateVisual applies sales proposal enterprise commercial visual"
 test("resolveTemplateVisual applies sales proposal solution commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "solution" });
 
-  assert.equal(visual.primary, "1E4F76");
-  assert.equal(visual.accent, "39A7A0");
-  assert.equal(visual.background, "EFF6F8");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "123047");
+  assert.equal(visual.accent, "1AA6A6");
+  assert.equal(visual.secondary, "D99A2B");
+  assert.equal(visual.background, "F4F7FA");
+  assert.equal(visual.layout, "sales-proposal-solution");
   assert.equal(visual.variant, "solution");
 });
 
@@ -963,10 +964,12 @@ test("resolveTemplateVisual applies pitch deck commercial visuals", () => {
   assert.equal(investor.primary, "101828");
   assert.equal(investor.accent, "12B76A");
   assert.equal(investor.secondary, "F79009");
-  assert.equal(product.layout, "venture");
-  assert.equal(product.variant, "product");
-  assert.equal(product.primary, "3B1D5A");
-  assert.equal(product.accent, "E879F9");
+  assert.equal(product.layout, "startup-product-highlights");
+  assert.equal(product.variant, "product-highlights");
+  assert.equal(product.primary, "0F172A");
+  assert.equal(product.accent, "14B8A6");
+  assert.equal(product.secondary, "22C55E");
+  assert.equal(product.warning, "F59E0B");
 });
 
 test("resolveTemplateVisual applies brand story commercial visuals", () => {

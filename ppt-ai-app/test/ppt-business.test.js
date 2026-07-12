@@ -1349,6 +1349,28 @@ test("PptService renders key account decision chain preview with dedicated layou
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders sales proposal solution preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "客户提案需求诊断与解决方案架构",
+    slideCount: 6,
+    templateId: "sales-proposal",
+    theme: "solution",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-proposal" data-layout="sales-proposal-solution"/);
+  assert.match(preview, /sales-solution-layer/);
+  assert.match(preview, /sales-solution-architecture/);
+  assert.match(preview, /sales-solution-process|sales-solution-roadmap|sales-solution-value|sales-solution-closing/);
+  assert.doesNotMatch(preview, /<div class="sales-label"/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced key account decision chain preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -1623,7 +1645,29 @@ test("PptService renders product funding highlights preview with dedicated layou
   assert.match(preview, /product-funding-layer/);
   assert.match(preview, /product-funding-console/);
   assert.match(preview, /product-funding-capability|product-funding-architecture|product-funding-journey|product-funding-dashboard/);
-  assert.match(preview, /PRODUCT INVESTOR DEMO|CAPABILITY MAP|LIVE DEMO FLOW|TECH ADVANTAGE/);
+  assert.match(preview, /PRODUCT INVESTOR DEMO|PAIN SCENE MAP|FEATURE DEMO FLOW|PRODUCT ARCHITECTURE/);
+  assert.doesNotMatch(preview, />产品亮点</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders startup pitch product highlights preview with investor-readable layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "创业产品融资路演",
+    slideCount: 6,
+    templateId: "pitch",
+    theme: "product",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch" data-layout="startup-product-highlights"/);
+  assert.match(preview, /product-funding-layer/);
+  assert.match(preview, /product-funding-console/);
+  assert.match(preview, /PAIN SCENE MAP|PRODUCT ARCHITECTURE|USER VALUE JOURNEY|MOAT &amp; ADVANTAGE|COMMERCIALIZATION PATH/);
   assert.doesNotMatch(preview, />产品亮点</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });

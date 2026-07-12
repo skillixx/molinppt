@@ -423,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "startup-product-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -505,7 +505,7 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1880);
   }
-  if (visual.layout === "product-funding-highlights") {
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") {
     if (index === 0) {
       if (textLength >= 30) return 2000;
       if (textLength >= 22) return 2250;
@@ -967,7 +967,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
-  if (visual.layout === "product-funding-highlights") return false;
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") return false;
   if (visual.layout === "pitch-ai-saas") return false;
   if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
@@ -2721,7 +2721,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
-  if (visual.layout === "product-funding-highlights") {
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") {
     const isCover = index === 0;
     const isClosing = role === "closing";
     return {
@@ -11369,16 +11369,16 @@ function productFundingHighlightsScene({ slide, index, role }) {
   ];
   const baseCards = ["核心能力清晰", "技术壁垒可验证", "用户价值可量化", "演示路径完整"].map((fallback, itemIndex) => productFundingHighlightsCompactText(bullets[itemIndex], fallback, 18));
   const scenes = [
-    { role: "cover", kicker: "PRODUCT INVESTOR DEMO", summary: "用产品控制台、能力矩阵和用户价值证据说明融资后的放大空间。", metrics, cards: baseCards },
-    { role: "capability", kicker: "CAPABILITY MAP", summary: "把核心功能、关键场景、业务收益和交付能力拆成可投资判断的产品证据。", metrics, cards: baseCards },
-    { role: "demo", kicker: "LIVE DEMO FLOW", summary: "展示输入、分析、推荐和输出的完整演示链路，帮助投资人快速理解产品效率。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
-    { role: "technology", kicker: "TECH ADVANTAGE", summary: "从数据层、模型层、工作流和集成能力说明产品护城河。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
+    { role: "cover", kicker: "PRODUCT INVESTOR DEMO", summary: "用产品界面、核心指标和投资人速读结构，第一屏说明产品定位和融资价值。", metrics, cards: baseCards },
+    { role: "capability", kicker: "PAIN SCENE MAP", summary: "把用户场景、痛点链路和现有方案断点压缩成一页，先证明问题真实且高频。", metrics, cards: ["高频业务痛点", "现有方案断点", "用户触发场景", "付费动机清晰"] },
+    { role: "demo", kicker: "FEATURE DEMO FLOW", summary: "展示输入、分析、推荐和输出的完整功能链路，帮助投资人快速理解产品如何工作。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
+    { role: "technology", kicker: "PRODUCT ARCHITECTURE", summary: "用数据层、模型层、工作流和开放集成说明产品架构，而不是只讲单点功能。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
     { role: "journey", kicker: "USER VALUE JOURNEY", summary: "用用户旅程说明从痛点到效率提升再到业务结果的价值闭环。", metrics, cards: ["发现痛点", "产品介入", "效率提升", "结果验证"] },
-    { role: "validation", kicker: "MARKET VALIDATION", summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards: baseCards },
-    { role: "roadmap", kicker: "PRODUCT ROADMAP", summary: "把融资后的研发、技术升级、客户交付和市场拓展放进一条路线。", metrics, cards: ["研发迭代", "技术升级", "客户交付", "市场扩张"] },
-    { role: "funding", kicker: "CAPITAL PLAN", summary: "说明资金用途与 12-18 个月的产品、技术和商业化里程碑。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
+    { role: "validation", kicker: "PRODUCT DATA PROOF", summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards: baseCards },
+    { role: "roadmap", kicker: "MOAT & ADVANTAGE", summary: "把数据资产、工作流沉淀、客户迁移成本和生态接口组织成可读的竞争壁垒。", metrics, cards: ["数据资产", "流程沉淀", "迁移成本", "生态接口"] },
+    { role: "funding", kicker: "COMMERCIALIZATION PATH", summary: "说明收入路径、产品里程碑和资金用途，连接商业化潜力与下一轮增长。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
   ];
-  if (role === "closing") return { role: "closing", kicker: "INVESTOR NEXT STEP", summary: "用投资亮点、产品证据和资金计划推动下一轮投资沟通。", metrics, cards: baseCards };
+  if (role === "closing") return { role: "closing", kicker: "INVESTOR NEXT STEP", summary: "用投资亮点、产品证据、壁垒和资金计划推动下一轮投资沟通。", metrics, cards: baseCards };
   return scenes[Math.min(index, scenes.length - 1)];
 }
 
@@ -11395,6 +11395,8 @@ function productFundingHighlightsCompactText(text, fallback, maxLength) {
 
 function isProductFundingHighlightsVisual(visual) {
   const id = String(visual?.id || "");
+  // 创业融资路演产品亮点用独立 layout，导出仍复用产品演示台 DrawingML 组件以保持预览/PPTX 一致。
+  if (visual?.layout === "startup-product-highlights" && id === "pitch") return true;
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
 }
 

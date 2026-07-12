@@ -2699,12 +2699,12 @@ test("PptExportService uses commercial pitch product decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Pitch Stage Canvas"/);
-  assert.match(slide1, /name="Pitch Visual Panel"/);
-  assert.match(slide1, /name="Pitch Product Screen"/);
-  assert.match(slide1, /name="Pitch Product Glow"/);
-  assert.match(slide1, /val="3B1D5A"/);
-  assert.match(slide1, /val="E879F9"/);
+  assert.match(slide1, /name="Product Funding Content Surface"/);
+  assert.match(slide1, /name="Product Funding Demo Console"/);
+  assert.match(slide1, /name="Product Funding Product Mockup"/);
+  assert.match(slide1, /name="Product Funding Metric Card 1"/);
+  assert.match(slide1, /val="0F172A"/);
+  assert.match(slide1, /val="14B8A6"/);
 });
 
 test("PptExportService uses business plan model decorations", () => {
@@ -2945,6 +2945,49 @@ test("PptExportService uses product funding highlights decorations", () => {
   assert.match(slide2, /name="Product Funding Capability Card 1"/);
   assert.match(slide4, /name="Product Funding Technical Chain 1"/);
   assert.match(slide5, /name="Product Funding Value Journey Node 1"/);
+  assert.doesNotMatch(slide1, /product-highlights/);
+});
+
+test("PptExportService uses startup product highlights decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch",
+      theme: "product",
+      templateVisual: {
+        id: "pitch",
+        primary: "0F172A",
+        accent: "14B8A6",
+        secondary: "22C55E",
+        warning: "F59E0B",
+        background: "F8FAFC",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "startup-product-highlights",
+        variant: "product-highlights",
+      },
+      slides: [
+        { title: "创业产品融资路演", bullets: ["产品界面帮助投资人快速理解价值", "痛点场景和用户价值形成闭环", "商业化路径可以被持续验证"] },
+        { title: "痛点场景", bullets: ["高频业务痛点", "现有方案断点", "用户触发场景", "付费动机清晰"] },
+        { title: "产品架构", bullets: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
+        { title: "用户价值链路", bullets: ["发现痛点", "产品介入", "效率提升", "结果验证"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Product Funding Content Surface"/);
+  assert.match(slide1, /name="Product Funding Demo Console"/);
+  assert.match(slide2, /name="Product Funding Capability Card 1"/);
+  assert.match(slide3, /name="Product Funding Demo Console"/);
+  assert.match(slide4, /name="Product Funding Technical Chain 1"/);
   assert.doesNotMatch(slide1, /product-highlights/);
 });
 

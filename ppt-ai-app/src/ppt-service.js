@@ -2025,46 +2025,46 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="pitch-ai-saas"] .ai-saas-closing::before{content:"";position:absolute;left:15%;right:15%;top:30%;height:8px;border-radius:999px;background:linear-gradient(90deg,#2dd4bf,#60a5fa,#f59e0b);}
     body[data-layout="pitch-ai-saas"] .ai-saas-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:22%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
     body[data-layout="pitch-ai-saas"] .page-number{z-index:7;color:rgba(15,23,42,.60);background:rgba(255,255,255,.80);border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:5px 10px;}
-    body[data-layout="product-funding-highlights"]{background:#dfe9f4;}
-    body[data-layout="product-funding-highlights"] main{width:min(100%,1160px);}
-    body[data-layout="product-funding-highlights"] .slide{background:linear-gradient(135deg,#eaf2f8 0%,#ffffff 42%,#edf7fb 100%);padding:0;border:0;box-shadow:0 24px 58px rgba(15,23,42,.18);}
-    body[data-layout="product-funding-highlights"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(6,182,212,.20),transparent 25%),radial-gradient(circle at 18% 80%,rgba(34,197,94,.13),transparent 28%),repeating-linear-gradient(90deg,rgba(15,23,42,.035) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(15,23,42,.025) 0 1px,transparent 1px 42px);pointer-events:none;}
-    body[data-layout="product-funding-highlights"] .slide::after{content:"";position:absolute;left:4.8%;right:4.8%;top:8.2%;bottom:7.6%;z-index:1;border-radius:24px;background:rgba(255,255,255,.86);border:1px solid rgba(148,163,184,.30);box-shadow:0 18px 38px rgba(15,23,42,.10);}
-    body[data-layout="product-funding-highlights"] .accent{left:4.8%;right:4.8%;top:8.2%;height:7px;z-index:5;border-radius:999px;background:linear-gradient(90deg,#0b1220,#06b6d4,#22c55e,#f59e0b);}
-    body[data-layout="product-funding-highlights"] .product-funding-layer{position:absolute;inset:0;z-index:8;color:#334155;pointer-events:none;}
-    body[data-layout="product-funding-highlights"] .product-funding-kicker{position:absolute;left:8%;top:14%;font-size:12px;font-weight:900;letter-spacing:.14em;color:#0891b2;}
-    body[data-layout="product-funding-highlights"] .product-funding-title{position:absolute;left:8%;top:20.5%;width:40%;margin:0;color:#0f172a;font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
-    body[data-layout="product-funding-highlights"] .product-funding-summary{position:absolute;left:8%;top:39%;width:36%;font-size:13px;line-height:1.46;color:#475569;font-weight:800;overflow-wrap:anywhere;}
-    body[data-layout="product-funding-highlights"] .product-funding-bullets{position:absolute;left:8.1%;top:50%;width:35%;margin:0;padding-left:1.05em;font-size:11px;line-height:1.42;font-weight:800;color:#334155;}
-    body[data-layout="product-funding-highlights"] .product-funding-bullets li{margin:.22em 0;}
-    body[data-layout="product-funding-highlights"] .product-funding-metrics{position:absolute;left:8%;bottom:13%;width:38%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
-    body[data-layout="product-funding-highlights"] .product-funding-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.09);box-shadow:0 10px 22px rgba(15,23,42,.08);display:grid;align-content:center;gap:4px;padding:11px 12px;font-size:10px;font-weight:900;color:#64748b;}
-    body[data-layout="product-funding-highlights"] .product-funding-metrics strong{font-size:18px;line-height:1;color:#0f172a;}
-    body[data-layout="product-funding-highlights"] .product-funding-console{position:absolute;right:7.2%;top:18%;width:38%;height:52%;border-radius:24px;background:#fff;border:1px solid rgba(15,23,42,.14);box-shadow:0 22px 42px rgba(15,23,42,.15);overflow:hidden;}
-    body[data-layout="product-funding-highlights"] .product-funding-console::before{content:"";position:absolute;left:0;right:0;top:0;height:14%;background:#0b1220;}
-    body[data-layout="product-funding-highlights"] .product-funding-console::after{content:"";position:absolute;left:9%;right:9%;top:23%;height:8px;border-radius:999px;background:linear-gradient(90deg,#06b6d4 0 46%,#22c55e 46% 76%,#f59e0b 76%);}
-    body[data-layout="product-funding-highlights"] .product-funding-console span{position:absolute;border-radius:12px;background:#eef7fb;border:1px solid rgba(6,182,212,.20);}
-    body[data-layout="product-funding-highlights"] .product-funding-console span:nth-child(1){left:9%;top:34%;width:37%;height:30%;}
-    body[data-layout="product-funding-highlights"] .product-funding-console span:nth-child(2){right:9%;top:34%;width:37%;height:18%;background:#f0fdf4;}
-    body[data-layout="product-funding-highlights"] .product-funding-console span:nth-child(3){right:9%;top:58%;width:37%;height:25%;background:#fff7ed;}
-    body[data-layout="product-funding-highlights"] .product-funding-capability{position:absolute;right:7%;top:22%;width:41%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
-    body[data-layout="product-funding-highlights"] .product-funding-capability span{min-height:74px;border-radius:16px;background:#fff;border:1px solid rgba(6,182,212,.22);box-shadow:0 10px 24px rgba(15,23,42,.08);padding:16px 14px;font-size:12px;line-height:1.32;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
-    body[data-layout="product-funding-highlights"] .product-funding-capability span::before{content:"";display:block;width:34px;height:5px;margin-bottom:10px;border-radius:999px;background:linear-gradient(90deg,#06b6d4,#22c55e);}
-    body[data-layout="product-funding-highlights"] .product-funding-architecture{position:absolute;right:7%;top:25%;width:42%;height:44%;display:grid;grid-template-columns:1fr;gap:12px;}
-    body[data-layout="product-funding-highlights"] .product-funding-architecture span{position:relative;display:grid;align-items:center;min-height:56px;border-radius:16px;background:#0b1220;color:#fff;font-size:12px;font-weight:900;padding:0 22px;box-shadow:0 12px 24px rgba(15,23,42,.14);}
-    body[data-layout="product-funding-highlights"] .product-funding-architecture span:nth-child(even){background:#0e7490;}
-    body[data-layout="product-funding-highlights"] .product-funding-journey{position:absolute;left:8%;right:8%;bottom:16%;height:22%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
-    body[data-layout="product-funding-highlights"] .product-funding-journey span{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:16px 13px 12px;font-size:12px;line-height:1.28;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
-    body[data-layout="product-funding-highlights"] .product-funding-journey span::after{content:"";position:absolute;left:14px;right:14px;bottom:12px;height:4px;border-radius:999px;background:#06b6d4;}
-    body[data-layout="product-funding-highlights"] .product-funding-dashboard{position:absolute;right:7%;top:22%;width:42%;height:45%;border-radius:20px;background:#0b1220;box-shadow:0 18px 36px rgba(15,23,42,.18);overflow:hidden;}
-    body[data-layout="product-funding-highlights"] .product-funding-dashboard::before{content:"";position:absolute;left:8%;right:8%;top:16%;height:5px;border-radius:999px;background:linear-gradient(90deg,#06b6d4 0 38%,#22c55e 38% 70%,#f59e0b 70%);}
-    body[data-layout="product-funding-highlights"] .product-funding-dashboard::after{content:"";position:absolute;left:9%;right:9%;bottom:18%;height:48%;background:linear-gradient(90deg,#06b6d4 0 11%,transparent 11% 18%,#22c55e 18% 32%,transparent 32% 39%,#06b6d4 39% 56%,transparent 56% 63%,#f59e0b 63% 82%,transparent 82%);}
-    body[data-layout="product-funding-highlights"] .product-funding-roadmap{position:absolute;left:8%;right:8%;bottom:15%;height:24%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
-    body[data-layout="product-funding-highlights"] .product-funding-roadmap span{border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:17px 14px 12px;font-size:12px;line-height:1.3;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
-    body[data-layout="product-funding-highlights"] .product-funding-closing{position:absolute;right:9%;top:23%;width:34%;height:42%;border-radius:24px;background:linear-gradient(135deg,#0b1220,#0e7490);box-shadow:0 22px 42px rgba(15,23,42,.22);}
-    body[data-layout="product-funding-highlights"] .product-funding-closing::before{content:"";position:absolute;left:13%;right:13%;top:28%;height:8px;border-radius:999px;background:linear-gradient(90deg,#06b6d4,#22c55e,#f59e0b);}
-    body[data-layout="product-funding-highlights"] .product-funding-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:23%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.08);}
-    body[data-layout="product-funding-highlights"] .page-number{z-index:9;color:rgba(15,23,42,.58);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"]{background:#dfe9f4;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] main{width:min(100%,1160px);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .slide{background:linear-gradient(135deg,#eaf2f8 0%,#ffffff 42%,#edf7fb 100%);padding:0;border:0;box-shadow:0 24px 58px rgba(15,23,42,.18);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .slide::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(6,182,212,.20),transparent 25%),radial-gradient(circle at 18% 80%,rgba(34,197,94,.13),transparent 28%),repeating-linear-gradient(90deg,rgba(15,23,42,.035) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(15,23,42,.025) 0 1px,transparent 1px 42px);pointer-events:none;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .slide::after{content:"";position:absolute;left:4.8%;right:4.8%;top:8.2%;bottom:7.6%;z-index:1;border-radius:24px;background:rgba(255,255,255,.86);border:1px solid rgba(148,163,184,.30);box-shadow:0 18px 38px rgba(15,23,42,.10);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .accent{left:4.8%;right:4.8%;top:8.2%;height:7px;z-index:5;border-radius:999px;background:linear-gradient(90deg,#0b1220,#06b6d4,#22c55e,#f59e0b);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-layer{position:absolute;inset:0;z-index:8;color:#334155;pointer-events:none;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-kicker{position:absolute;left:8%;top:14%;font-size:12px;font-weight:900;letter-spacing:.14em;color:#0891b2;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-title{position:absolute;left:8%;top:20.5%;width:40%;margin:0;color:#0f172a;font-size:34px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-summary{position:absolute;left:8%;top:39%;width:36%;font-size:13px;line-height:1.46;color:#475569;font-weight:800;overflow-wrap:anywhere;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-bullets{position:absolute;left:8.1%;top:50%;width:35%;margin:0;padding-left:1.05em;font-size:11px;line-height:1.42;font-weight:800;color:#334155;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-bullets li{margin:.22em 0;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-metrics{position:absolute;left:8%;bottom:13%;width:38%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-metrics span{min-height:58px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.09);box-shadow:0 10px 22px rgba(15,23,42,.08);display:grid;align-content:center;gap:4px;padding:11px 12px;font-size:10px;font-weight:900;color:#64748b;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-metrics strong{font-size:18px;line-height:1;color:#0f172a;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console{position:absolute;right:7.2%;top:18%;width:38%;height:52%;border-radius:24px;background:#fff;border:1px solid rgba(15,23,42,.14);box-shadow:0 22px 42px rgba(15,23,42,.15);overflow:hidden;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console::before{content:"";position:absolute;left:0;right:0;top:0;height:14%;background:#0b1220;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console::after{content:"";position:absolute;left:9%;right:9%;top:23%;height:8px;border-radius:999px;background:linear-gradient(90deg,#06b6d4 0 46%,#22c55e 46% 76%,#f59e0b 76%);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console span{position:absolute;border-radius:12px;background:#eef7fb;border:1px solid rgba(6,182,212,.20);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console span:nth-child(1){left:9%;top:34%;width:37%;height:30%;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console span:nth-child(2){right:9%;top:34%;width:37%;height:18%;background:#f0fdf4;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-console span:nth-child(3){right:9%;top:58%;width:37%;height:25%;background:#fff7ed;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-capability{position:absolute;right:7%;top:22%;width:41%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-capability span{min-height:74px;border-radius:16px;background:#fff;border:1px solid rgba(6,182,212,.22);box-shadow:0 10px 24px rgba(15,23,42,.08);padding:16px 14px;font-size:12px;line-height:1.32;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-capability span::before{content:"";display:block;width:34px;height:5px;margin-bottom:10px;border-radius:999px;background:linear-gradient(90deg,#06b6d4,#22c55e);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-architecture{position:absolute;right:7%;top:25%;width:42%;height:44%;display:grid;grid-template-columns:1fr;gap:12px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-architecture span{position:relative;display:grid;align-items:center;min-height:56px;border-radius:16px;background:#0b1220;color:#fff;font-size:12px;font-weight:900;padding:0 22px;box-shadow:0 12px 24px rgba(15,23,42,.14);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-architecture span:nth-child(even){background:#0e7490;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-journey{position:absolute;left:8%;right:8%;bottom:16%;height:22%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-journey span{position:relative;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:16px 13px 12px;font-size:12px;line-height:1.28;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-journey span::after{content:"";position:absolute;left:14px;right:14px;bottom:12px;height:4px;border-radius:999px;background:#06b6d4;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-dashboard{position:absolute;right:7%;top:22%;width:42%;height:45%;border-radius:20px;background:#0b1220;box-shadow:0 18px 36px rgba(15,23,42,.18);overflow:hidden;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-dashboard::before{content:"";position:absolute;left:8%;right:8%;top:16%;height:5px;border-radius:999px;background:linear-gradient(90deg,#06b6d4 0 38%,#22c55e 38% 70%,#f59e0b 70%);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-dashboard::after{content:"";position:absolute;left:9%;right:9%;bottom:18%;height:48%;background:linear-gradient(90deg,#06b6d4 0 11%,transparent 11% 18%,#22c55e 18% 32%,transparent 32% 39%,#06b6d4 39% 56%,transparent 56% 63%,#f59e0b 63% 82%,transparent 82%);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-roadmap{position:absolute;left:8%;right:8%;bottom:15%;height:24%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-roadmap span{border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.10);box-shadow:0 10px 22px rgba(15,23,42,.08);padding:17px 14px 12px;font-size:12px;line-height:1.3;font-weight:900;color:#0f172a;overflow-wrap:anywhere;}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-closing{position:absolute;right:9%;top:23%;width:34%;height:42%;border-radius:24px;background:linear-gradient(135deg,#0b1220,#0e7490);box-shadow:0 22px 42px rgba(15,23,42,.22);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-closing::before{content:"";position:absolute;left:13%;right:13%;top:28%;height:8px;border-radius:999px;background:linear-gradient(90deg,#06b6d4,#22c55e,#f59e0b);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .product-funding-closing::after{content:"";position:absolute;left:18%;right:18%;bottom:23%;height:34%;border-radius:16px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.08);}
+    body[data-layout="product-funding-highlights"],body[data-layout="startup-product-highlights"] .page-number{z-index:9;color:rgba(15,23,42,.58);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:5px 10px;}
     body[data-layout="status-report"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 56%,color-mix(in srgb,var(--template-bg) 72%,var(--template-primary) 28%));padding:7.2% 8% 6.6%;border:0;}
     body[data-layout="status-report"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(22,61,89,.035) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(42,167,165,.026) 0 1px,transparent 1px 38px);mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 92%,transparent 100%);}
     body[data-layout="status-report"] .slide::after{content:"";position:absolute;left:5.4%;top:12.5%;right:5.4%;bottom:10.5%;border-radius:16px;background:rgba(255,255,255,.86);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 18px 44px rgba(15,42,67,.12);}
@@ -10112,17 +10112,17 @@ function productFundingHighlightsPreviewScene({ slide, index, total }) {
   ];
   const cards = ["核心能力清晰", "技术壁垒可验证", "用户价值可量化", "演示路径完整"].map((fallback, itemIndex) => productFundingCompactText(bullets[itemIndex], fallback, 18));
   const scenes = [
-    { role: "cover", variant: "product-highlights", kicker: "PRODUCT INVESTOR DEMO", title, summary: "用产品控制台、能力矩阵和用户价值证据说明融资后的放大空间。", metrics, cards },
-    { role: "capability", variant: "product-highlights", kicker: "CAPABILITY MAP", title, summary: "把核心功能、关键场景、业务收益和交付能力拆成可投资判断的产品证据。", metrics, cards },
-    { role: "demo", variant: "product-highlights", kicker: "LIVE DEMO FLOW", title, summary: "展示输入、分析、推荐和输出的完整演示链路，帮助投资人快速理解产品效率。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
-    { role: "technology", variant: "product-highlights", kicker: "TECH ADVANTAGE", title, summary: "从数据层、模型层、工作流和集成能力说明产品护城河。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
+    { role: "cover", variant: "product-highlights", kicker: "PRODUCT INVESTOR DEMO", title, summary: "用产品界面、核心指标和投资人速读结构，第一屏说明产品定位和融资价值。", metrics, cards },
+    { role: "capability", variant: "product-highlights", kicker: "PAIN SCENE MAP", title, summary: "把用户场景、痛点链路和现有方案断点压缩成一页，先证明问题真实且高频。", metrics, cards: ["高频业务痛点", "现有方案断点", "用户触发场景", "付费动机清晰"] },
+    { role: "demo", variant: "product-highlights", kicker: "FEATURE DEMO FLOW", title, summary: "展示输入、分析、推荐和输出的完整功能链路，帮助投资人快速理解产品如何工作。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
+    { role: "technology", variant: "product-highlights", kicker: "PRODUCT ARCHITECTURE", title, summary: "用数据层、模型层、工作流和开放集成说明产品架构，而不是只讲单点功能。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
     { role: "journey", variant: "product-highlights", kicker: "USER VALUE JOURNEY", title, summary: "用用户旅程说明从痛点到效率提升再到业务结果的价值闭环。", metrics, cards: ["发现痛点", "产品介入", "效率提升", "结果验证"] },
-    { role: "validation", variant: "product-highlights", kicker: "MARKET VALIDATION", title, summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards },
-    { role: "roadmap", variant: "product-highlights", kicker: "PRODUCT ROADMAP", title, summary: "把融资后的研发、技术升级、客户交付和市场拓展放进一条路线。", metrics, cards: ["研发迭代", "技术升级", "客户交付", "市场扩张"] },
-    { role: "funding", variant: "product-highlights", kicker: "CAPITAL PLAN", title, summary: "说明资金用途与 12-18 个月的产品、技术和商业化里程碑。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
+    { role: "validation", variant: "product-highlights", kicker: "PRODUCT DATA PROOF", title, summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards },
+    { role: "roadmap", variant: "product-highlights", kicker: "MOAT & ADVANTAGE", title, summary: "把数据资产、工作流沉淀、客户迁移成本和生态接口组织成可读的竞争壁垒。", metrics, cards: ["数据资产", "流程沉淀", "迁移成本", "生态接口"] },
+    { role: "funding", variant: "product-highlights", kicker: "COMMERCIALIZATION PATH", title, summary: "说明收入路径、产品里程碑和资金用途，连接商业化潜力与下一轮增长。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
   ];
   if (index === total - 1) {
-    return { role: "closing", variant: "product-highlights", kicker: "INVESTOR NEXT STEP", title, summary: "用投资亮点、产品证据和资金计划推动下一轮投资沟通。", metrics, cards };
+    return { role: "closing", variant: "product-highlights", kicker: "INVESTOR NEXT STEP", title, summary: "用投资亮点、产品证据、壁垒和资金计划推动下一轮投资沟通。", metrics, cards };
   }
   return scenes[Math.min(index, scenes.length - 1)];
 }
@@ -10144,6 +10144,8 @@ function productFundingCompactText(text, fallback, maxLength) {
 
 function isProductFundingHighlightsVisual(visual) {
   const id = String(visual?.id || "");
+  // 创业融资路演的产品亮点复用产品演示台绘制组件，但用独立 layout 保持后台、缩略图和测试可区分。
+  if (visual?.layout === "startup-product-highlights" && id === "pitch") return true;
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
 }
 
@@ -12192,7 +12194,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
-  if (visual.layout === "product-funding-highlights") return false;
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") return false;
   if (visual.layout === "pitch-ai-saas") return false;
   if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "quarterly-action-loop") return false;
