@@ -1,7 +1,7 @@
 {
   "slug": "finance-financial-review-forecast",
   "name": "财务经营复盘 - 预测规划",
-  "description": "适合财务分析、经营指标和预算预测的专业复盘模板。",
+  "description": "适合滚动预测、年度预算规划、收入成本联动、现金流趋势和资源配置优先级汇报的 FP&A 预测模型模板。",
   "category_slug": "finance",
   "category_name": "财务经营",
   "category_sort_order": 30,
@@ -10,8 +10,11 @@
     "finance",
     "financial-review",
     "forecast",
-    "finance-report"
+    "finance-report",
+    "fpa-forecast",
+    "rolling-forecast"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

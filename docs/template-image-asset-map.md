@@ -60,7 +60,7 @@ templates/official/_shared/generated-illustrations/
 | 模板 | 主题风格 | 推荐配图 | 模板目录 | 配图用途 |
 |---|---|---|---|---|
 | 财务经营复盘 | 审计分析 | `templates/official/_shared/generated-illustrations/finance-ledger.svg` | `templates/official/finance/financial-review/audit/` | 审计清单、凭证、风险检查页。 |
-| 财务经营复盘 | 预测规划 | `templates/official/_shared/generated-illustrations/finance-ledger.svg` | `templates/official/finance/financial-review/forecast/` | 收入预测、利润曲线、预算规划页。 |
+| 财务经营复盘 | 预测规划 | `templates/official/finance/financial-review/forecast/assets/forecast-model-panel.svg`、`templates/official/finance/financial-review/forecast/assets/scenario-resource-map.svg` | `templates/official/finance/financial-review/forecast/` | FP&A 预测曲线、情景模型、假设卡和资源投入优先级页。 |
 | 财务经营复盘 | 季度复盘 | `templates/official/_shared/generated-illustrations/finance-ledger.svg` | `templates/official/finance/financial-review/quarterly/` | 季度指标、费用结构、现金流复盘页。 |
 
 ### 销售方案
