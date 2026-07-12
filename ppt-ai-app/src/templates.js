@@ -1674,6 +1674,7 @@ function normalizeTemplateLookupId(templateId) {
     "product-product-commercialization-plan-pricing-strategy": "product-commercialization-plan",
     "product-user-research-report-interview-insight": "user-research-report",
     "data-channel-data-analysis-traffic-quality": "channel-data-analysis",
+    "marketing-marketing-campaign-brand": "marketing-campaign",
   };
   return officialTemplateAliases[id] || id;
 }

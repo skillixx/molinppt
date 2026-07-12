@@ -2198,6 +2198,40 @@ test("PptExportService uses commercial marketing brand decorations", () => {
   assert.doesNotMatch(slide1, /品牌传播/);
 });
 
+
+test("PptExportService renders synced marketing brand official slug decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "marketing-marketing-campaign-brand",
+      theme: "brand",
+      slides: [
+        { title: "Brand communication dashboard", layout: "brand-comms-cover", bullets: ["Unified claim", "Audience layers", "Content matrix"] },
+        { title: "Message house", layout: "brand-comms-message-house", bullets: ["Claim", "Benefit", "Proof", "Call to action"] },
+        { title: "Audience map", layout: "brand-comms-audience", bullets: ["Core audience", "Potential buyers", "Creators", "VIP customers"] },
+        { title: "Content matrix", layout: "brand-comms-content-matrix", bullets: ["Brand story", "Product proof", "User case", "Campaign topic"] },
+        { title: "Media touchpoints", layout: "brand-comms-touchpoint-map", bullets: ["Social", "Outdoor", "Mobile", "Event"] },
+        { title: "Effect dashboard", layout: "brand-comms-dashboard", bullets: ["Reach", "Engagement", "Leads", "Review"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+
+  assert.match(slide1, /name="Brand Comms Command Canvas"/);
+  assert.match(slide1, /name="Brand Comms Command Center Panel"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="E64B6A"/);
+  assert.match(slide4, /Brand Comms Content Matrix Grid/);
+  assert.match(slide5, /Brand Comms Touchpoint Core/);
+  assert.match(slide6, /Brand Comms Dashboard Panel/);
+});
+
 test("PptExportService uses commercial marketing growth decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

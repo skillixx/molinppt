@@ -11964,7 +11964,7 @@ function isMarketingCampaignVisual(visual) {
 }
 
 function isBrandCommunicationVisual(visual) {
-  return visual?.id === "marketing-campaign" && visual?.layout === "marketing-brand-communication-console";
+  return visual?.layout === "marketing-brand-communication-console" || visual?.variant === "brand-console";
 }
 
 function brandCommunicationDecorationsXml({ visual, index, role, slide, total }) {

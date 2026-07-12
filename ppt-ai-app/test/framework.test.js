@@ -908,6 +908,7 @@ test("resolveTemplateVisual applies workshop practice review official visual", (
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
+  const syncedBrand = resolveTemplateVisual({ templateId: "marketing-marketing-campaign-brand", theme: "brand" });
   const growth = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "growth" });
 
   assert.equal(launch.layout, "marketing-product-premiere");
@@ -919,6 +920,8 @@ test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   assert.equal(brand.primary, "172033");
   assert.equal(brand.accent, "E64B6A");
   assert.equal(brand.secondary, "21A6A1");
+  assert.equal(syncedBrand.layout, "marketing-brand-communication-console");
+  assert.equal(syncedBrand.variant, "brand-console");
   assert.equal(growth.layout, "growth-marketing-lab");
   assert.equal(growth.variant, "growth-lab");
   assert.equal(growth.accent, "F97316");

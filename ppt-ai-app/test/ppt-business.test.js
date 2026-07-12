@@ -190,6 +190,77 @@ test("PptService renders brand communication preview without theme labels", asyn
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+
+test("PptService renders synced brand communication official slug with content and style", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await context.database.insert("templates", {
+    id: "marketing-marketing-campaign-brand",
+    name: "Marketing campaign - Brand communication",
+    categoryId: "marketing",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "brand",
+        name: "Brand communication",
+        visual: {
+          primary: "172033",
+          accent: "E64B6A",
+          secondary: "21A6A1",
+          background: "F5F7FA",
+          surface: "FFFFFF",
+          title: "101827",
+          body: "334155",
+          layout: "marketing-brand-communication-console",
+          variant: "brand-console",
+        },
+      },
+    ],
+    visual: {
+      primary: "172033",
+      accent: "E64B6A",
+      secondary: "21A6A1",
+      background: "F5F7FA",
+      surface: "FFFFFF",
+      title: "101827",
+      body: "334155",
+      layout: "marketing-brand-communication-console",
+      variant: "brand-console",
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Brand communication strategy review",
+    slideCount: 6,
+    templateId: "marketing-marketing-campaign-brand",
+    theme: "brand",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "Brand communication strategy review", bullets: ["Unified brand claim", "Audience segmentation", "Content matrix orchestration"] },
+      { title: "Message house and proof chain", bullets: ["Core claim", "Benefit point", "Proof point", "Call to action"] },
+      { title: "Audience touchpoint map", bullets: ["Core audience", "Potential buyers", "Opinion leaders", "High value customers"] },
+      { title: "Content matrix plan", bullets: ["Brand story", "Product proof", "User case", "Campaign topic"] },
+      { title: "Media touchpoint orchestration", bullets: ["Social media", "Outdoor ads", "Mobile content", "Event scene"] },
+      { title: "Communication effect dashboard", bullets: ["Reach volume", "Engagement quality", "Lead conversion", "Review insight"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="marketing-marketing-campaign-brand" data-layout="marketing-brand-communication-console"/);
+  assert.match(preview, /Brand communication strategy review/);
+  assert.match(preview, /Unified brand claim/);
+  assert.match(preview, /brand-comms-layer/);
+  assert.match(preview, /brand-comms-content-matrix|brand-comms-touchpoint-map|brand-comms-dashboard/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders brand identity system preview with manual style", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
