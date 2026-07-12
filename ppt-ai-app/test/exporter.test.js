@@ -2685,10 +2685,10 @@ test("PptExportService uses founder cinematic startup story decorations", () => 
   assert.match(slide1, /name="Founder Cinematic team Scene"/);
   assert.match(slide1, /name="Seed Round Storyline"/);
   assert.match(slide1, /MVP retention plan visible/);
-  assert.match(text, /founder-team-scene\.png/);
-  assert.match(text, /user-pain-scene\.png/);
-  assert.match(text, /product-prototype-panel\.png/);
-  assert.match(text, /growth-stage-path\.png/);
+  assert.match(text, /founder-team-scene\.jpg/);
+  assert.match(text, /user-pain-scene\.jpg/);
+  assert.match(text, /product-prototype-panel\.jpg/);
+  assert.match(text, /growth-stage-path\.jpg/);
   assert.match(slide2, /name="Seed Round Pain Evidence 1"/);
   assert.match(slide3, /name="Seed Round Pain Evidence 1"/);
   assert.match(slide4, /name="Seed Round MVP Board"/);

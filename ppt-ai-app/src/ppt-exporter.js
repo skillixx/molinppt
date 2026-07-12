@@ -34,10 +34,10 @@ const PRODUCT_PREMIERE_MEDIA = {
   lifestyle: { file: "product-lifestyle-scene.png", content: readFileSync(new URL("product-lifestyle-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
 };
 const FOUNDER_CINEMATIC_MEDIA = {
-  team: { file: "founder-team-scene.png", content: readFileSync(new URL("founder-team-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
-  pain: { file: "user-pain-scene.png", content: readFileSync(new URL("user-pain-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
-  product: { file: "product-prototype-panel.png", content: readFileSync(new URL("product-prototype-panel.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
-  growth: { file: "growth-stage-path.png", content: readFileSync(new URL("growth-stage-path.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  team: { file: "founder-team-scene.jpg", content: readFileSync(new URL("founder-team-scene.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  pain: { file: "user-pain-scene.jpg", content: readFileSync(new URL("user-pain-scene.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  product: { file: "product-prototype-panel.jpg", content: readFileSync(new URL("product-prototype-panel.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  growth: { file: "growth-stage-path.jpg", content: readFileSync(new URL("growth-stage-path.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
 };
 const STATUS_REPORT_MEDIA = {
   weekly: {

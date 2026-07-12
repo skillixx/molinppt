@@ -35,10 +35,10 @@ const PRODUCT_PREMIERE_ASSETS = {
   lifestyle: readFileSync(new URL("product-lifestyle-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)).toString("base64"),
 };
 const FOUNDER_CINEMATIC_ASSETS = {
-  team: readFileSync(new URL("founder-team-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
-  pain: readFileSync(new URL("user-pain-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
-  product: readFileSync(new URL("product-prototype-panel.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
-  growth: readFileSync(new URL("growth-stage-path.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
+  team: readFileSync(new URL("founder-team-scene.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
+  pain: readFileSync(new URL("user-pain-scene.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
+  product: readFileSync(new URL("product-prototype-panel.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
+  growth: readFileSync(new URL("growth-stage-path.jpg", FOUNDER_CINEMATIC_ASSET_BASE_URL)).toString("base64"),
 };
 
 const GENERATE_AMOUNT = "6";
@@ -4715,6 +4715,7 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="founder-cinematic-story"] .seed-storyline{position:absolute;left:8.5%;right:8.5%;bottom:15.5%;height:92px;}
     body[data-layout="founder-cinematic-story"] .seed-storyline::before{content:"";position:absolute;left:2%;right:2%;top:42%;height:5px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#fdba74,#22c55e,var(--template-primary));}
     body[data-layout="founder-cinematic-story"] .seed-storyline span{position:absolute;top:18%;width:26px;height:26px;border-radius:50%;background:#fff;border:6px solid var(--template-accent);box-shadow:0 10px 20px rgba(23,32,51,.12);}
+    body[data-layout="founder-cinematic-story"] .seed-storyline span b{position:absolute;left:50%;top:34px;transform:translateX(-50%);min-width:52px;text-align:center;color:var(--template-title);font-size:10px;line-height:1.1;font-weight:900;}
     body[data-layout="founder-cinematic-story"] .seed-storyline span:nth-child(1){left:2%;}body[data-layout="founder-cinematic-story"] .seed-storyline span:nth-child(2){left:25%;}body[data-layout="founder-cinematic-story"] .seed-storyline span:nth-child(3){left:48%;}body[data-layout="founder-cinematic-story"] .seed-storyline span:nth-child(4){left:71%;border-color:#22c55e;}body[data-layout="founder-cinematic-story"] .seed-storyline span:nth-child(5){right:2%;border-color:var(--template-primary);}
     body[data-layout="founder-cinematic-story"] .seed-metrics{position:absolute;left:8.5%;right:50%;bottom:13%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     body[data-layout="founder-cinematic-story"] .seed-metrics span{min-height:66px;border-radius:8px;background:#fff;border:1px solid rgba(23,32,51,.12);box-shadow:0 12px 24px rgba(23,32,51,.07);padding:12px 13px;font-size:10px;font-weight:800;color:var(--template-body);}
@@ -9595,7 +9596,8 @@ function renderSeedRoundStoryPreview(slide, scene) {
   const bullets = seedRoundStoryBulletTexts(slide);
   const bulletItems = bullets.slice(0, 4).map((item) => `<li>${escapeHtml(seedRoundStoryCompactText(item, scene.title, 38))}</li>`).join("");
   const photo = `<div class="seed-photo seed-mockup" data-asset="${escapeHtml(scene.asset || "team")}"></div>`;
-  const storyline = `<div class="seed-storyline"><span></span><span></span><span></span><span></span><span></span></div>`;
+  const storylineItems = Array.isArray(scene.roadmap) ? scene.roadmap : ["问题", "洞察", "产品", "验证", "增长"];
+  const storyline = `<div class="seed-storyline">${storylineItems.slice(0, 5).map((item) => `<span><b>${escapeHtml(item)}</b></span>`).join("")}</div>`;
   const common = `<div class="seed-kicker">${escapeHtml(scene.kicker)}</div><h2 class="seed-title">${title}</h2><div class="seed-summary">${escapeHtml(seedRoundStoryCompactText(bullets[0], scene.summary, 54))}</div><ul class="seed-bullets">${bulletItems}</ul>${photo}`;
   if (scene.role === "cover") {
     return `<div class="seed-layer">${common}<div class="seed-metrics">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>${storyline}</div>`;
@@ -9628,7 +9630,7 @@ function seedRoundStoryPreviewScene({ slide, index, total }) {
   ];
   const cards = ["问题现场", "创始洞察", "原型验证", "增长信号"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14));
   const scenes = [
-    { role: "cover", variant: "startup-story", asset: "team", kicker: "FOUNDER FILM / ACT 01", title, summary: "用问题现场、创始动机、产品验证和增长愿景串起完整融资故事。", metrics, cards },
+    { role: "cover", variant: "startup-story", asset: "team", kicker: "FOUNDER FILM / ACT 01", title, summary: "用问题现场、创始动机、产品验证和增长愿景串起完整融资故事。", metrics, cards, roadmap: ["问题", "洞察", "创立", "产品", "验证"] },
     { role: "pain", variant: "startup-story", asset: "pain", kicker: "PROBLEM SCENE", title, summary: "先展示用户真实处境，再说明痛点为什么足够高频、强烈且值得解决。", metrics, cards },
     { role: "pain", variant: "startup-story", asset: "team", kicker: "FOUNDER INSIGHT", title, summary: "把创始团队的经历、洞察和初始假设讲成可信的创业起点。", metrics, cards: ["创始动机", "关键洞察", "初始假设", "行动起点"].map((fallback, itemIndex) => seedRoundStoryCompactText(bullets[itemIndex], fallback, 14)) },
     { role: "mvp", variant: "startup-story", asset: "product", kicker: "PROTOTYPE VALIDATION", title, summary: "用最小可行产品、核心流程和反馈闭环证明方案已经进入真实验证。", metrics: [
