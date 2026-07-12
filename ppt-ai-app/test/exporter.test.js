@@ -736,11 +736,12 @@ test("PptExportService uses commercial financial forecast decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial forecast Chip"/);
-  assert.match(slide1, /name="Financial Forecast Dot 4"/);
-  assert.match(slide1, /val="123B4D"/);
-  assert.match(slide1, /val="2F9E9A"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Canvas"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Curve Panel"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Scenario Dot 3"/);
+  assert.doesNotMatch(slide1, /name="Financial Forecast Dot 4"/);
+  assert.match(slide1, /val="0F2D3A"/);
+  assert.match(slide1, /val="22A699"/);
 });
 
 test("PptExportService uses cost control breakdown decorations", () => {
@@ -1880,18 +1881,35 @@ test("PptExportService uses experience gap comparison decorations", () => {
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "product-roadmap", theme: "release" },
+    deck: {
+      ...deck,
+      templateId: "product-roadmap",
+      theme: "release",
+      slides: [
+        { title: "版本发布评审", bullets: ["冻结发布范围", "明确灰度策略", "准备回滚预案"] },
+        { title: "功能模块范围", bullets: ["核心功能", "影响模块", "依赖系统", "状态标签"] },
+        { title: "上线时间线", bullets: ["范围冻结", "联调验收", "灰度放量", "全量上线"] },
+        { title: "灰度放量策略", bullets: ["1% 验证", "10% 观察", "50% 放量", "100% 全量"] },
+        { title: "风险和回滚预案", bullets: ["数据异常", "链路阻塞", "体验波动", "运营投诉"] },
+        { title: "成功指标", bullets: ["稳定性", "使用率", "转化率", "工单量"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
 
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product release Chip"/);
-  assert.match(slide1, /name="Product Release Card 2"/);
-  assert.match(slide1, /name="Product Release Milestone 3"/);
-  assert.match(slide1, /val="3B4A8F"/);
-  assert.match(slide1, /val="F2A65A"/);
+  assert.match(slide1, /name="Product Release Committee Canvas"/);
+  assert.match(slide1, /name="Product Release Committee Status Board"/);
+  assert.match(slide3, /name="Product Release Launch Timeline Gate 3"/);
+  assert.match(slide4, /name="Product Release Gray Strategy Step 3"/);
+  assert.match(slide5, /name="Product Release Rollback Card 2"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /版本发布/);
 });
 
 test("PptExportService uses commercial product review decorations", () => {
@@ -2467,7 +2485,6 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
     { templateId: "strategy-consulting", theme: "board", shapeName: "Strategy Chip Text" },
     { templateId: "financial-review", theme: "quarterly", shapeName: "Finance Quarterly Theme Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
-    { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },
     { templateId: "pitch", theme: "startup", shapeName: "Pitch Chip Text" },
   ];
@@ -2483,6 +2500,15 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
     // 主题风格只用于选择样式，不能作为页面上的可见角标文字写进 PPTX。
     assert.match(chipTextShape, /<a:t><\/a:t>/, `${item.templateId}/${item.theme} should render an empty decorative chip`);
   }
+
+  const releaseResult = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-roadmap", theme: "release" },
+    format: "pptx",
+  });
+  const releaseSlide1 = pptPartText(releaseResult.content.toString("latin1"), "ppt/slides/slide1.xml");
+
+  assert.match(releaseSlide1, /name="Product Release Committee Canvas"/);
+  assert.doesNotMatch(releaseSlide1, /版本发布/);
 });
 
 test("PptExportService uses commercial pitch startup decorations", () => {

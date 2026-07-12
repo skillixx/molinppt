@@ -1260,6 +1260,7 @@ function renderDeckPreview({ deck, visual }) {
     const strategyScene = isStrategyConsultingVisual(visual) ? strategyConsultingPreviewScene(visual) : null;
     const financeScene = isFinancialReviewVisual(visual) ? financialReviewPreviewScene(visual) : null;
     const financeAuditScene = isFinanceAuditReviewVisual(visual) ? financeAuditReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const financeFpaScene = isFinanceFpaForecastVisual(visual) ? financeFpaForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const salesScene = isSalesProposalVisual(visual) ? salesProposalPreviewScene(visual) : null;
     const channelPolicyScene = isChannelRecruitmentPolicyVisual(visual) ? channelRecruitmentPolicyPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const financialSolutionScene = isFinancialSolutionVisual(visual) ? financialSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1279,6 +1280,7 @@ function renderDeckPreview({ deck, visual }) {
     const workshopPracticeScene = isWorkshopPracticeReviewVisual(visual) ? workshopPracticeReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const productScene = isProductRoadmapVisual(visual) ? productRoadmapPreviewScene(visual) : null;
     const releaseCadenceScene = isProductReleaseCadenceVisual(visual) ? productReleaseCadencePreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const releaseCommitteeScene = isProductReleaseCommitteeVisual(visual) ? productReleaseCommitteePreviewScene({ slide, index, total: deck.slides.length }) : null;
     const painPointScene = isProductPainPointsVisual(visual) ? productPainPointsPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const pricingStrategyScene = typeof isProductPricingStrategyVisual === "function" && isProductPricingStrategyVisual(visual) ? productPricingStrategyPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const interviewInsightScene = typeof isProductInterviewInsightVisual === "function" && isProductInterviewInsightVisual(visual) ? productInterviewInsightPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1377,6 +1379,9 @@ function renderDeckPreview({ deck, visual }) {
     const financeAuditMark = financeAuditScene
       ? renderFinanceAuditReviewPreview(slide, financeAuditScene)
       : "";
+    const financeFpaMark = financeFpaScene
+      ? renderFinanceFpaForecastPreview(slide, financeFpaScene)
+      : "";
     const salesMark = salesScene
       ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip" aria-hidden="true"></div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
       : "";
@@ -1427,6 +1432,9 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const releaseCadenceMark = releaseCadenceScene
       ? renderProductReleaseCadencePreview(slide, releaseCadenceScene)
+      : "";
+    const releaseCommitteeMark = releaseCommitteeScene
+      ? renderProductReleaseCommitteePreview(slide, releaseCommitteeScene)
       : "";
     const painPointMark = painPointScene
       ? renderProductPainPointsPreview(slide, painPointScene)
@@ -1695,11 +1703,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || releaseCadenceScene || releaseCommitteeScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeFpaScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || releaseCadenceScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${financeAuditMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${releaseCadenceMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || financeFpaScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || releaseCadenceScene?.variant || releaseCommitteeScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${financeAuditMark}${financeFpaMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${releaseCadenceMark}${releaseCommitteeMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -2670,29 +2678,67 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="strategy-consulting"] .slide[data-template-variant="matrix"] .motif{right:11%;top:64%;width:19%;height:3px;border-radius:999px;}
     body[data-template="strategy-consulting"] .slide[data-template-variant="workstream"] .strategy-photo{right:9%;top:27%;height:28%;border-radius:16px 6px 16px 6px;}
     body[data-template="strategy-consulting"] .slide[data-template-variant="workstream"] .strategy-chip{border-radius:6px 18px 18px 6px;background:linear-gradient(90deg,var(--template-accent),color-mix(in srgb,var(--template-primary) 42%,var(--template-accent) 58%));}
-    body[data-template="financial-review"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 60%,color-mix(in srgb,var(--template-accent) 10%,var(--template-bg) 90%));}
-    body[data-template="financial-review"] .slide::after{inset:10% 5.6% 9.2%;border-radius:14px;border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);background:rgba(255,255,255,.92);box-shadow:0 22px 48px rgba(16,38,57,.12);}
-    body[data-template="financial-review"] .slide-content{padding:1.8% 36% 0 0;}
-    body[data-template="financial-review"] h2{max-width:61%;font-size:32px;line-height:1.14;margin-bottom:4.4%;}
-    body[data-template="financial-review"] ul{max-width:56%;font-size:14.5px;line-height:1.48;}
-    body[data-template="financial-review"] .finance-label{position:absolute;left:9.2%;top:15.2%;z-index:3;color:var(--template-accent);font-size:12px;font-weight:900;letter-spacing:.12em;}
-    body[data-template="financial-review"] .finance-chip{position:absolute;right:10.4%;top:17%;z-index:4;min-width:84px;height:30px;display:grid;place-items:center;border-radius:999px;background:var(--template-primary);color:#fff;font-size:11px;font-weight:900;box-shadow:0 10px 20px rgba(16,38,57,.14);}
-    body[data-template="financial-review"] .finance-visual{position:absolute;right:8.8%;top:28%;width:24%;height:31%;z-index:3;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.92),color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 16px 30px rgba(16,38,57,.14);overflow:hidden;}
-    body[data-template="financial-review"] .finance-visual::before{content:"";position:absolute;left:9%;right:9%;bottom:17%;height:2px;background:color-mix(in srgb,var(--template-primary) 18%,transparent);}
-    body[data-template="financial-review"] .finance-visual span{position:absolute;bottom:20%;width:12%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--template-accent),color-mix(in srgb,var(--template-accent) 52%,var(--template-primary) 48%));}
-    body[data-template="financial-review"] .finance-visual span:nth-child(1){left:14%;height:31%;}
-    body[data-template="financial-review"] .finance-visual span:nth-child(2){left:34%;height:48%;}
-    body[data-template="financial-review"] .finance-visual span:nth-child(3){left:54%;height:38%;}
-    body[data-template="financial-review"] .finance-visual span:nth-child(4){left:74%;height:61%;}
-    body[data-template="financial-review"] .page-number{z-index:5;right:7.3%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 72%,transparent);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
-    body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual{border-radius:8px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 86%,var(--template-accent) 14%));}
-    body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual::before{left:12%;right:12%;top:20%;bottom:auto;height:3px;box-shadow:0 34px 0 color-mix(in srgb,var(--template-primary) 16%,transparent),0 68px 0 color-mix(in srgb,var(--template-primary) 16%,transparent);}
-    body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual span{width:14px;height:14px;border-radius:50%;bottom:auto;left:13%;background:var(--template-accent);}
-    body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual span:nth-child(1){top:18%;}body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual span:nth-child(2){top:38%;}body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual span:nth-child(3){top:58%;}body[data-template="financial-review"] .slide[data-template-variant="audit"] .finance-visual span:nth-child(4){display:none;}
-    body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual{border-radius:18px 6px 18px 6px;}
-    body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual::after{content:"";position:absolute;left:12%;right:10%;top:30%;height:45%;border-top:4px solid var(--template-accent);border-right:4px solid var(--template-accent);border-radius:60% 40% 0 0;transform:skewX(-12deg);}
-    body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span{width:10px;height:10px;border-radius:50%;bottom:auto;background:var(--template-primary);}
-    body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(1){left:16%;top:58%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(2){left:38%;top:48%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(3){left:60%;top:37%;}body[data-template="financial-review"] .slide[data-template-variant="forecast"] .finance-visual span:nth-child(4){left:78%;top:25%;}
+    body[data-layout="finance-fpa-forecast"] .slide{padding:0;border:0;background:linear-gradient(135deg,#fbfefd 0%,var(--template-bg) 52%,#e2f2ef 100%);}
+    body[data-layout="finance-fpa-forecast"] .slide::before{background:repeating-linear-gradient(90deg,rgba(15,45,58,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(15,45,58,.035) 0 1px,transparent 1px 38px),radial-gradient(circle at 82% 18%,rgba(34,166,153,.17),transparent 25%);}
+    body[data-layout="finance-fpa-forecast"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:10.2%;bottom:8.2%;z-index:1;border-radius:16px;background:rgba(255,255,255,.94);border:1px solid rgba(15,45,58,.13);box-shadow:0 24px 54px rgba(15,45,58,.14);}
+    body[data-layout="finance-fpa-forecast"] .accent{height:5.4%;z-index:2;background:linear-gradient(90deg,var(--template-primary),var(--template-accent) 58%,var(--template-secondary));box-shadow:0 8px 24px rgba(15,45,58,.14);}
+    body[data-layout="finance-fpa-forecast"] .fpa-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="finance-fpa-forecast"] .fpa-surface{position:absolute;left:5.8%;right:5.8%;top:10.2%;bottom:8.2%;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(244,248,247,.24));}
+    body[data-layout="finance-fpa-forecast"] .fpa-kicker{position:absolute;left:8.6%;top:14.4%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-accent);}
+    body[data-layout="finance-fpa-forecast"] .fpa-title{position:absolute;left:8.5%;top:21.5%;width:41%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="finance-fpa-forecast"] .fpa-bullets{position:absolute;left:8.7%;top:48%;width:34%;margin:0;padding-left:1.05em;font-size:13.5px;line-height:1.46;font-weight:800;color:var(--template-body);}
+    body[data-layout="finance-fpa-forecast"] .fpa-bullets li{margin:.15em 0;} body[data-layout="finance-fpa-forecast"] .fpa-bullets li::marker{color:var(--template-accent);}
+    body[data-layout="finance-fpa-forecast"] .fpa-footnote{position:absolute;left:8.6%;bottom:13.5%;font-size:11px;font-weight:900;letter-spacing:.08em;color:rgba(15,45,58,.56);}
+    body[data-layout="finance-fpa-forecast"] .fpa-curve-panel{position:absolute;right:8.2%;top:17.2%;width:39.4%;height:48%;border-radius:14px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 18px 38px rgba(15,45,58,.12);overflow:hidden;}
+    body[data-layout="finance-fpa-forecast"] .fpa-curve-panel::before{content:"";position:absolute;inset:13% 8% 18%;background:repeating-linear-gradient(90deg,rgba(15,45,58,.08) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(15,45,58,.055) 0 1px,transparent 1px 32px);}
+    body[data-layout="finance-fpa-forecast"] .fpa-curve-panel::after{content:"";position:absolute;left:10%;right:9%;top:50%;height:7px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),var(--template-warning));transform:rotate(-13deg);box-shadow:42px -32px 0 -2px var(--template-accent),94px -6px 0 -2px var(--template-secondary),148px -48px 0 -2px var(--template-warning);}
+    body[data-layout="finance-fpa-forecast"] .fpa-curve-panel i{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(34,166,153,.13);}
+    body[data-layout="finance-fpa-forecast"] .fpa-curve-panel i:nth-child(1){left:28%;top:58%;} body[data-layout="finance-fpa-forecast"] .fpa-curve-panel i:nth-child(2){left:58%;top:42%;background:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-curve-panel i:nth-child(3){left:81%;top:24%;background:var(--template-warning);}
+    body[data-layout="finance-fpa-forecast"] .fpa-scenario-strip{position:absolute;right:8.2%;bottom:17.4%;width:39.4%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-scenario-strip span,body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid span,body[data-layout="finance-fpa-forecast"] .fpa-decision-list span{min-height:58px;border-radius:8px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 10px 22px rgba(15,45,58,.08);display:grid;place-items:center;text-align:center;padding:10px;font-size:12px;font-weight:900;color:var(--template-title);border-top:5px solid var(--template-accent);}
+    body[data-layout="finance-fpa-forecast"] .fpa-scenario-strip span:nth-child(2){border-top-color:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-scenario-strip span:nth-child(3){border-top-color:var(--template-warning);}
+    body[data-layout="finance-fpa-forecast"] .fpa-model-flow{position:absolute;right:8.2%;top:20%;width:41%;height:48%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:center;}
+    body[data-layout="finance-fpa-forecast"] .fpa-model-flow span{min-height:78px;border-radius:8px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 10px 22px rgba(15,45,58,.08);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:900;color:var(--template-title);position:relative;padding:8px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-model-flow span:not(:last-child)::after{content:"";position:absolute;right:-11px;top:50%;width:14px;height:3px;background:var(--template-accent);}
+    body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid{position:absolute;right:8.3%;top:19%;width:39%;height:50%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid span{min-height:0;align-content:center;border-left:6px solid var(--template-accent);border-top:0;}
+    body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid span:nth-child(2){border-left-color:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid span:nth-child(3){border-left-color:var(--template-warning);} body[data-layout="finance-fpa-forecast"] .fpa-assumption-grid span:nth-child(4){border-left-color:var(--template-primary);}
+    body[data-layout="finance-fpa-forecast"] .fpa-scenario-board{position:absolute;right:8.3%;top:18.5%;width:40%;height:34%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-scenario-board span{border-radius:10px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 10px 22px rgba(15,45,58,.08);display:grid;place-items:center;font-size:12px;font-weight:900;color:var(--template-title);border-bottom:7px solid var(--template-accent);} body[data-layout="finance-fpa-forecast"] .fpa-scenario-board span:nth-child(2){border-bottom-color:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-scenario-board span:nth-child(3){border-bottom-color:var(--template-warning);}
+    body[data-layout="finance-fpa-forecast"] .fpa-sensitivity{position:absolute;right:8.3%;bottom:18%;width:40%;height:24%;border-radius:12px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 10px 22px rgba(15,45,58,.08);padding:20px;display:grid;gap:12px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-sensitivity span{border-radius:999px;background:linear-gradient(90deg,var(--template-accent),rgba(34,166,153,.16));} body[data-layout="finance-fpa-forecast"] .fpa-sensitivity span:nth-child(2){background:linear-gradient(90deg,var(--template-secondary),rgba(59,130,246,.14));width:82%;} body[data-layout="finance-fpa-forecast"] .fpa-sensitivity span:nth-child(3){background:linear-gradient(90deg,var(--template-warning),rgba(245,158,11,.14));width:64%;}
+    body[data-layout="finance-fpa-forecast"] .fpa-linkage-map{position:absolute;right:8.2%;top:18.2%;width:40%;height:50%;border-radius:14px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 14px 30px rgba(15,45,58,.10);}
+    body[data-layout="finance-fpa-forecast"] .fpa-linkage-map span{position:absolute;width:30%;height:26%;border-radius:10px;background:color-mix(in srgb,var(--template-accent) 13%,#fff 87%);border:1px solid rgba(15,45,58,.12);} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map span:nth-child(1){left:8%;top:16%;} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map span:nth-child(2){left:35%;top:54%;background:color-mix(in srgb,var(--template-secondary) 13%,#fff 87%);} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map span:nth-child(3){right:8%;top:22%;background:color-mix(in srgb,var(--template-warning) 18%,#fff 82%);} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map b{position:absolute;height:4px;border-radius:999px;background:var(--template-primary);transform:rotate(20deg);} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map b:nth-of-type(1){left:30%;top:40%;width:31%;} body[data-layout="finance-fpa-forecast"] .fpa-linkage-map b:nth-of-type(2){left:58%;top:46%;width:26%;transform:rotate(-22deg);}
+    body[data-layout="finance-fpa-forecast"] .fpa-cash-chart{position:absolute;right:8.4%;top:18.4%;width:39%;height:50%;border-radius:14px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 14px 30px rgba(15,45,58,.10);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;gap:10px;padding:36px 24px 28px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span{border-radius:8px 8px 2px 2px;background:var(--template-accent);} body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span:nth-child(1){height:72%;background:var(--template-primary);} body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span:nth-child(2){height:46%;} body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span:nth-child(3){height:58%;background:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span:nth-child(4){height:33%;background:var(--template-warning);} body[data-layout="finance-fpa-forecast"] .fpa-cash-chart span:nth-child(5){height:77%;background:var(--template-accent);}
+    body[data-layout="finance-fpa-forecast"] .fpa-resource-map{position:absolute;right:8.3%;top:18.8%;width:39%;height:50%;border-radius:14px;background:#fff;border:1px solid rgba(15,45,58,.12);box-shadow:0 14px 30px rgba(15,45,58,.10);padding:28px;display:grid;align-content:center;gap:16px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-resource-map span{height:20px;border-radius:999px;background:#dbecea;position:relative;} body[data-layout="finance-fpa-forecast"] .fpa-resource-map span::before{content:"";position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--template-accent);width:78%;} body[data-layout="finance-fpa-forecast"] .fpa-resource-map span:nth-child(2)::before{width:58%;background:var(--template-secondary);} body[data-layout="finance-fpa-forecast"] .fpa-resource-map span:nth-child(3)::before{width:42%;background:var(--template-warning);} body[data-layout="finance-fpa-forecast"] .fpa-resource-map i{position:absolute;right:12%;bottom:16%;width:76px;height:76px;border-radius:50%;background:var(--template-primary);box-shadow:0 0 0 16px rgba(15,45,58,.08);}
+    body[data-layout="finance-fpa-forecast"] .fpa-decision-list{position:absolute;right:8.3%;top:22%;width:39%;display:grid;gap:13px;}
+    body[data-layout="finance-fpa-forecast"] .fpa-decision-list span{min-height:70px;justify-content:start;text-align:left;padding-left:18px;border-left:7px solid var(--template-accent);border-top:0;}
+    body[data-layout="finance-fpa-forecast"] .page-number{z-index:4;right:7.2%;bottom:5.4%;background:rgba(255,255,255,.78);border:1px solid rgba(15,45,58,.12);border-radius:999px;padding:5px 10px;color:rgba(15,45,58,.62);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 60%,color-mix(in srgb,var(--template-accent) 10%,var(--template-bg) 90%));}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide::after{inset:10% 5.6% 9.2%;border-radius:14px;border:1px solid color-mix(in srgb,var(--template-primary) 10%,transparent);background:rgba(255,255,255,.92);box-shadow:0 22px 48px rgba(16,38,57,.12);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide-content{padding:1.8% 36% 0 0;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) h2{max-width:61%;font-size:32px;line-height:1.14;margin-bottom:4.4%;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) ul{max-width:56%;font-size:14.5px;line-height:1.48;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-label{position:absolute;left:9.2%;top:15.2%;z-index:3;color:var(--template-accent);font-size:12px;font-weight:900;letter-spacing:.12em;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-chip{position:absolute;right:10.4%;top:17%;z-index:4;min-width:84px;height:30px;display:grid;place-items:center;border-radius:999px;background:var(--template-primary);color:#fff;font-size:11px;font-weight:900;box-shadow:0 10px 20px rgba(16,38,57,.14);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual{position:absolute;right:8.8%;top:28%;width:24%;height:31%;z-index:3;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.92),color-mix(in srgb,var(--template-bg) 74%,#fff 26%));border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 16px 30px rgba(16,38,57,.14);overflow:hidden;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual::before{content:"";position:absolute;left:9%;right:9%;bottom:17%;height:2px;background:color-mix(in srgb,var(--template-primary) 18%,transparent);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual span{position:absolute;bottom:20%;width:12%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--template-accent),color-mix(in srgb,var(--template-accent) 52%,var(--template-primary) 48%));}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual span:nth-child(1){left:14%;height:31%;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual span:nth-child(2){left:34%;height:48%;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual span:nth-child(3){left:54%;height:38%;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .finance-visual span:nth-child(4){left:74%;height:61%;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .page-number{z-index:5;right:7.3%;bottom:6.8%;color:color-mix(in srgb,var(--template-title) 72%,transparent);background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.08);border-radius:999px;padding:4px 9px;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual{border-radius:8px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 86%,var(--template-accent) 14%));}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual::before{left:12%;right:12%;top:20%;bottom:auto;height:3px;box-shadow:0 34px 0 color-mix(in srgb,var(--template-primary) 16%,transparent),0 68px 0 color-mix(in srgb,var(--template-primary) 16%,transparent);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual span{width:14px;height:14px;border-radius:50%;bottom:auto;left:13%;background:var(--template-accent);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual span:nth-child(1){top:18%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual span:nth-child(2){top:38%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual span:nth-child(3){top:58%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="audit"] .finance-visual span:nth-child(4){display:none;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual{border-radius:18px 6px 18px 6px;}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual::after{content:"";position:absolute;left:12%;right:10%;top:30%;height:45%;border-top:4px solid var(--template-accent);border-right:4px solid var(--template-accent);border-radius:60% 40% 0 0;transform:skewX(-12deg);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual span{width:10px;height:10px;border-radius:50%;bottom:auto;background:var(--template-primary);}
+    body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual span:nth-child(1){left:16%;top:58%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual span:nth-child(2){left:38%;top:48%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual span:nth-child(3){left:60%;top:37%;}body[data-template="financial-review"]:not([data-layout="finance-fpa-forecast"]) .slide[data-template-variant="forecast"] .finance-visual span:nth-child(4){left:78%;top:25%;}
 
     body[data-layout="finance-audit-review"] .slide{background:linear-gradient(135deg,#f4f6f8 0%,#ffffff 58%,#edf1f4 100%);overflow:hidden;}
     body[data-layout="finance-audit-review"] .accent{display:none;}
@@ -3049,6 +3095,44 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="product-release-cadence"] .cadence-actions span{min-height:86px;border-radius:16px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
     body[data-layout="product-release-cadence"] .cadence-actions span::before{content:"";display:block;width:28px;height:6px;margin-bottom:12px;border-radius:999px;background:var(--template-accent);}
     body[data-layout="product-release-cadence"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.82);border:1px solid rgba(11,31,58,.12);border-radius:999px;padding:5px 10px;color:rgba(10,23,48,.62);}
+    body[data-layout="product-release-committee"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfc 0%,var(--template-bg) 55%,#dbe7ef 100%);box-shadow:0 22px 58px rgba(11,31,58,.18);}
+    body[data-layout="product-release-committee"] .slide::before{background:repeating-linear-gradient(90deg,rgba(11,31,58,.055) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(20,184,166,.04) 0 1px,transparent 1px 38px),radial-gradient(circle at 84% 18%,rgba(20,184,166,.18),transparent 24%);}
+    body[data-layout="product-release-committee"] .slide::after{content:"";position:absolute;left:5.8%;right:5.8%;top:9%;bottom:8.4%;z-index:1;border-radius:8px;background:rgba(255,255,255,.94);border:1px solid rgba(11,31,58,.13);box-shadow:0 24px 54px rgba(11,31,58,.13),inset 0 0 0 1px rgba(255,255,255,.75);}
+    body[data-layout="product-release-committee"] .accent{height:7%;z-index:2;background:linear-gradient(90deg,var(--template-primary),#0f766e 68%,var(--template-accent));box-shadow:inset 0 -3px 0 #f59e0b;}
+    body[data-layout="product-release-committee"] .release-committee-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="product-release-committee"] .release-committee-kicker{position:absolute;left:8.4%;top:14.2%;font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="product-release-committee"] .release-committee-title{position:absolute;left:8.4%;top:21%;width:43%;margin:0;color:var(--template-title);font-size:31px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="product-release-committee"] .release-committee-rule{position:absolute;left:8.4%;top:42.6%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f59e0b,transparent);}
+    body[data-layout="product-release-committee"] .release-committee-bullets{position:absolute;left:8.7%;top:48.8%;width:38%;margin:0;padding-left:1.05em;font-size:13px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="product-release-committee"] .release-committee-bullets li{margin:.12em 0;}
+    body[data-layout="product-release-committee"] .release-committee-board{position:absolute;right:8%;top:18%;width:38%;height:38%;border-radius:8px;background:linear-gradient(145deg,#fff,#f5fafb);border:1px solid rgba(11,31,58,.14);box-shadow:0 18px 36px rgba(11,31,58,.12);}
+    body[data-layout="product-release-committee"] .release-committee-board::before{content:"";position:absolute;left:0;right:0;top:0;height:34px;border-radius:8px 8px 0 0;background:var(--template-primary);}
+    body[data-layout="product-release-committee"] .release-committee-board span{position:absolute;left:8%;height:12px;border-radius:999px;background:rgba(11,31,58,.16);}
+    body[data-layout="product-release-committee"] .release-committee-board span:nth-child(1){top:28%;width:48%;background:var(--template-accent);}body[data-layout="product-release-committee"] .release-committee-board span:nth-child(2){top:45%;width:72%;}body[data-layout="product-release-committee"] .release-committee-board span:nth-child(3){top:62%;width:58%;background:#f59e0b;}
+    body[data-layout="product-release-committee"] .release-committee-board i{position:absolute;right:10%;bottom:16%;width:28%;height:36%;border-radius:8px;background:linear-gradient(180deg,var(--template-accent),#0f766e);}
+    body[data-layout="product-release-committee"] .release-committee-tags{position:absolute;left:8.4%;right:49%;bottom:14.4%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-tags span{min-height:58px;border-radius:8px;background:#fff;border:1px solid rgba(11,31,58,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(11,31,58,.08);padding:10px 12px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-matrix{position:absolute;right:8%;top:18%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-matrix span{min-height:92px;border-radius:8px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-matrix span::before{content:"";display:block;width:28px;height:8px;margin-bottom:12px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="product-release-committee"] .release-committee-timeline{position:absolute;left:8.4%;right:8.4%;bottom:16%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+    body[data-layout="product-release-committee"] .release-committee-timeline span{position:relative;min-height:82px;border-radius:8px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:17px 14px 12px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-timeline span::before{content:"";display:block;width:24px;height:24px;margin-bottom:9px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(20,184,166,.12);}
+    body[data-layout="product-release-committee"] .release-committee-gray{position:absolute;right:8%;top:20%;width:39%;height:44%;display:grid;grid-template-columns:repeat(4,1fr);align-items:end;gap:10px;}
+    body[data-layout="product-release-committee"] .release-committee-gray span{display:flex;align-items:flex-end;min-height:62px;border-radius:8px;background:linear-gradient(180deg,var(--template-accent),#0f766e);padding:12px 9px;font-size:11px;font-weight:900;color:#fff;box-shadow:0 12px 24px rgba(11,31,58,.12);}
+    body[data-layout="product-release-committee"] .release-committee-gray span:nth-child(2){min-height:80px;}body[data-layout="product-release-committee"] .release-committee-gray span:nth-child(3){min-height:98px;background:linear-gradient(180deg,#f59e0b,var(--template-accent));}body[data-layout="product-release-committee"] .release-committee-gray span:nth-child(4){min-height:116px;background:linear-gradient(180deg,var(--template-primary),#0f766e);}
+    body[data-layout="product-release-committee"] .release-committee-risk{position:absolute;right:8%;top:18%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-risk span{min-height:78px;border-radius:8px;background:linear-gradient(135deg,#fff,#fff7ed);border:1px solid rgba(245,158,11,.24);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-risk span::before{content:"";display:block;width:18px;height:18px;margin-bottom:8px;border-radius:50%;background:#dc2626;box-shadow:0 0 0 7px rgba(220,38,38,.12);}
+    body[data-layout="product-release-committee"] .release-committee-rollback{position:absolute;left:8.4%;right:8.4%;bottom:14.5%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-rollback span{min-height:58px;border-radius:8px;background:#fff;border:1px solid rgba(220,38,38,.18);border-left:6px solid #dc2626;box-shadow:0 10px 22px rgba(11,31,58,.08);padding:12px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-metrics{position:absolute;right:8%;top:18%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-metrics span{min-height:96px;border-radius:8px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:16px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-metrics span::after{content:"";display:block;width:76%;height:6px;margin-top:18px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),#f59e0b,transparent);}
+    body[data-layout="product-release-committee"] .release-committee-checklist{position:absolute;left:8.4%;right:8.4%;bottom:16%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="product-release-committee"] .release-committee-checklist span{min-height:86px;border-radius:8px;background:#fff;border:1px solid rgba(11,31,58,.12);box-shadow:0 12px 24px rgba(11,31,58,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="product-release-committee"] .release-committee-checklist span::before{content:"";display:block;width:22px;height:22px;margin-bottom:10px;border-radius:50%;background:var(--template-accent);box-shadow:inset 0 0 0 6px #fff,0 0 0 1px var(--template-accent);}
+    body[data-layout="product-release-committee"] .page-number{z-index:4;right:7.2%;bottom:5.5%;background:rgba(255,255,255,.82);border:1px solid rgba(11,31,58,.12);border-radius:999px;padding:5px 10px;color:rgba(10,23,48,.62);}
     body[data-template="product-roadmap"] .slide{background:linear-gradient(135deg,var(--template-bg),#ffffff 64%,color-mix(in srgb,var(--template-primary) 11%,var(--template-bg) 89%));padding:7.8% 8.2% 6.8%;border:0;}
     body[data-template="product-roadmap"] .slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--template-primary) 5%,transparent) 0 1px,transparent 1px 44px),radial-gradient(circle at 78% 25%,color-mix(in srgb,var(--template-accent) 20%,transparent),transparent 28%);pointer-events:none;}
     body[data-template="product-roadmap"] .slide::after{content:"";position:absolute;inset:11% 6.2% 10%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid color-mix(in srgb,var(--template-primary) 12%,transparent);box-shadow:0 22px 48px rgba(17,55,70,.12);}
@@ -7070,6 +7154,105 @@ function isFinanceAuditReviewVisual(visual) {
   return visual?.layout === "finance-audit-review";
 }
 
+function financeFpaForecastPreviewScene({ slide, index, total }) {
+  const role = financeFpaForecastRole({ slide, index, total });
+  const defaults = {
+    cover: {
+      kicker: "FP&A MODEL PACK",
+      title: "Rolling Forecast Model",
+      cards: ["预测周期", "情景假设", "资源约束"],
+      footer: "Base / Upside / Downside",
+    },
+    agenda: {
+      kicker: "MODEL FLOW",
+      title: "Forecast Working Logic",
+      cards: ["假设透明", "驱动拆解", "现金校准"],
+      footer: "Input -> Driver -> Scenario -> Decision",
+    },
+    assumptions: {
+      kicker: "ASSUMPTION BOOK",
+      title: "Forecast Assumptions",
+      cards: ["增长率假设", "价格与转化", "费用率约束", "产能边界"],
+      footer: "Assumption cards",
+    },
+    scenario: {
+      kicker: "SCENARIO MODEL",
+      title: "Scenario Comparison",
+      cards: ["基准情景", "乐观情景", "压力情景"],
+      footer: "Sensitivity view",
+    },
+    linkage: {
+      kicker: "DRIVER LINKAGE",
+      title: "Revenue Cost Coupling",
+      cards: ["收入驱动", "成本弹性", "毛利传导"],
+      footer: "Revenue -> Cost -> Margin",
+    },
+    cash: {
+      kicker: "CASH OUTLOOK",
+      title: "Cash Flow Trend",
+      cards: ["回款节奏", "支出峰值", "资金缓冲"],
+      footer: "Liquidity runway",
+    },
+    resource: {
+      kicker: "RESOURCE PRIORITY",
+      title: "Resource Allocation",
+      cards: ["预算优先级", "团队投入", "渠道资源"],
+      footer: "Priority allocation",
+    },
+    closing: {
+      kicker: "DECISION LOG",
+      title: "Next Forecast Cycle",
+      cards: ["锁定关键假设", "确认资源上限", "跟踪现金缺口"],
+      footer: "Decision and next cycle",
+    },
+  };
+  return { role, variant: "forecast", ...defaults[role] };
+}
+
+function renderFinanceFpaForecastPreview(slide, scene) {
+  const title = escapeHtml(slide.title || scene.title);
+  const bullets = normalizeFpaForecastBullets(slide, scene.cards, 3);
+  const bulletList = `<ul class="fpa-bullets">${bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  const roleBlocks = {
+    cover: '<div class="fpa-curve-panel"><i></i><i></i><i></i><span></span><span></span><span></span></div><div class="fpa-scenario-strip"><span>Base</span><span>Upside</span><span>Downside</span></div>',
+    agenda: `<div class="fpa-model-flow">${["Assumptions", "Revenue", "Cost", "Cash", "Resources"].map((item) => `<span>${item}</span>`).join("")}</div>`,
+    assumptions: `<div class="fpa-assumption-grid">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`,
+    scenario: `<div class="fpa-scenario-board">${["Base", "Upside", "Downside"].map((item) => `<span>${item}</span>`).join("")}</div><div class="fpa-sensitivity"><span></span><span></span><span></span></div>`,
+    linkage: '<div class="fpa-linkage-map"><span></span><span></span><span></span><b></b><b></b></div>',
+    cash: '<div class="fpa-cash-chart"><span></span><span></span><span></span><span></span><span></span></div>',
+    resource: '<div class="fpa-resource-map"><span></span><span></span><span></span><i></i></div>',
+    closing: `<div class="fpa-decision-list">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`,
+  };
+  return `<div class="fpa-layer" data-fpa-role="${escapeHtml(scene.role)}"><div class="fpa-surface"></div><div class="fpa-kicker">${escapeHtml(scene.kicker)}</div><h2 class="fpa-title">${title}</h2>${bulletList}${roleBlocks[scene.role] || roleBlocks.assumptions}<div class="fpa-footnote">${escapeHtml(scene.footer)}</div></div>`;
+}
+
+function normalizeFpaForecastBullets(slide, fallbackItems, maxItems) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return (values.length ? values : fallbackItems).slice(0, maxItems);
+}
+
+function financeFpaForecastRole({ slide, index, total }) {
+  const text = `${slide?.layout || ""} ${slide?.title || ""}`.toLowerCase();
+  if (index === 0 || text.includes("cover")) return "cover";
+  if (index === total - 1 || text.includes("closing") || text.includes("next")) return "closing";
+  if (/目录|agenda|overview|框架|流程/.test(text)) return "agenda";
+  if (/假设|assumption|driver/.test(text)) return "assumptions";
+  if (/情景|scenario|敏感/.test(text)) return "scenario";
+  if (/收入|成本|cost|revenue|margin|毛利/.test(text)) return "linkage";
+  if (/现金|cash|回款|流动性/.test(text)) return "cash";
+  if (/资源|resource|投入|priority|优先/.test(text)) return "resource";
+  return ["agenda", "assumptions", "scenario", "linkage", "cash", "resource"][Math.max(0, index - 1) % 6];
+}
+
+function isFinanceFpaForecastVisual(visual) {
+  const id = String(visual?.id || "");
+  return (id === "financial-review" || id === "finance-financial-review-forecast") && visual?.layout === "finance-fpa-forecast";
+}
+
 function financialReviewPreviewScene(visual) {
   const variant = financialReviewVariant(visual);
   const scenes = {
@@ -8144,6 +8327,73 @@ function productRoadmapVariant(visual) {
 
 function isProductRoadmapVisual(visual) {
   return visual?.id === "product-roadmap" && visual?.layout === "academy";
+}
+
+function renderProductReleaseCommitteePreview(slide, scene) {
+  // 发布委员会模板由专属层承载动态标题、要点和评审图形，避免默认正文层覆盖发布看板。
+  const title = escapeHtml(scene.title || slide?.title || "产品版本发布评审");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(productReleaseCommitteeCompactText(item, scene.title, 42))}</li>`).join("");
+  const common = `<div class="release-committee-kicker">${escapeHtml(scene.kicker)}</div><h2 class="release-committee-title">${title}</h2><div class="release-committee-rule"></div><ul class="release-committee-bullets">${bulletItems}</ul>`;
+  const statusBoard = `<div class="release-committee-board"><span></span><span></span><span></span><i></i></div>`;
+  const tags = `<div class="release-committee-tags">${scene.tags.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  if (scene.kind === "scope") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-matrix">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "timeline") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-timeline">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "gray") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-gray">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "risk") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-risk">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div><div class="release-committee-rollback">${scene.rollback.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  if (scene.kind === "metrics") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-metrics">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${tags}</div>`;
+  }
+  if (scene.kind === "summary") {
+    return `<div class="release-committee-layer">${common}<div class="release-committee-checklist">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="release-committee-layer">${common}${statusBoard}${tags}</div>`;
+}
+
+function productReleaseCommitteePreviewScene({ slide, index, total }) {
+  const bullets = productReleaseCommitteeBulletTexts(slide);
+  const title = productReleaseCommitteeCompactText(slide?.title, "产品版本发布评审", index === 0 ? 30 : 28);
+  const tags = ["范围", "灰度", "风险"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 8));
+  const cards = ["范围冻结", "联调验收", "灰度放量", "全量上线"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", variant: "release-committee", kicker: "RELEASE REVIEW", title, bullets, tags, cards, rollback: [] },
+    { kind: "scope", variant: "release-committee", kicker: "SCOPE MATRIX", title, bullets, tags, cards: ["核心功能", "影响模块", "依赖系统", "状态标签"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)), rollback: [] },
+    { kind: "timeline", variant: "release-committee", kicker: "LAUNCH TIMELINE", title, bullets, tags, cards, rollback: [] },
+    { kind: "gray", variant: "release-committee", kicker: "GRAY STRATEGY", title, bullets, tags, cards: ["1% 验证", "10% 观察", "50% 放量", "100% 全量"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)), rollback: [] },
+    { kind: "risk", variant: "release-committee", kicker: "RISK & ROLLBACK", title, bullets, tags, cards: ["数据异常", "链路阻塞", "体验波动", "运营投诉"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)), rollback: ["触发阈值", "回滚窗口", "责任人"] },
+    { kind: "metrics", variant: "release-committee", kicker: "SUCCESS METRICS", title, bullets, tags, cards: ["稳定性", "使用率", "转化率", "工单量"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)), rollback: [] },
+  ];
+  if (index === total - 1) {
+    return { kind: "summary", variant: "release-committee", kicker: "GO / NO-GO", title, bullets, tags, cards: ["准入结论", "未闭环事项", "复盘时间", "下一版本"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)), rollback: [] };
+  }
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productReleaseCommitteeBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["冻结发布范围和核心功能模块", "按灰度策略观察关键指标", "准备风险阈值和回滚预案"];
+}
+
+function productReleaseCommitteeCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function isProductReleaseCommitteeVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-release-committee" && (id === "product-roadmap" || id === "product-product-roadmap-release");
 }
 
 function renderProductReleaseCadencePreview(slide, scene) {
@@ -11716,6 +11966,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "strategy-second-curve") return false;
   if (visual.layout === "strategy-swot-map") return false;
   if (visual.layout === "product-release-cadence") return false;
+  if (visual.layout === "product-release-committee") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "product-pricing-strategy") return false;
   if (visual.layout === "product-interview-insight") return false;
@@ -12348,6 +12599,7 @@ function normalizeLimit(value) {
   if (!Number.isInteger(parsed) || parsed <= 0) return 20;
   return Math.min(parsed, 100);
 }
+
 
 
 

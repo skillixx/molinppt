@@ -842,6 +842,28 @@ test("PptService renders synced product release cadence preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders product release committee preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品版本发布评审",
+    slideCount: 6,
+    templateId: "product-roadmap",
+    theme: "release",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-roadmap" data-layout="product-release-committee"/);
+  assert.match(preview, /release-committee-layer/);
+  assert.match(preview, /release-committee-board/);
+  assert.match(preview, /release-committee-matrix|release-committee-timeline|release-committee-gray|release-committee-risk/);
+  assert.doesNotMatch(preview, />版本发布</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders financial audit review preview with workpaper layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -861,6 +883,27 @@ test("PptService renders financial audit review preview with workpaper layout", 
   assert.match(preview, /audit-matrix/);
   assert.match(preview, /audit-evidence|audit-remediation|audit-flow/);
   assert.doesNotMatch(preview, />审计分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders financial forecast preview with FP&A model layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "滚动预测、年度预算规划、收入成本联动、现金流和资源配置汇报",
+    slideCount: 7,
+    templateId: "financial-review",
+    theme: "forecast",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="financial-review" data-layout="finance-fpa-forecast"/);
+  assert.match(preview, /fpa-layer/);
+  assert.match(preview, /fpa-curve-panel|fpa-scenario-board|fpa-resource-map/);
+  assert.doesNotMatch(preview, />预测规划</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 

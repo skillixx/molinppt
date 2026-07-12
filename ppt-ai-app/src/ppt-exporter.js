@@ -423,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -817,7 +817,7 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1820);
   }
-  if (visual.layout === "product-release-cadence") {
+  if (visual.layout === "product-release-cadence" || visual.layout === "product-release-committee") {
     if (index === 0) {
       if (textLength >= 30) return 1980;
       if (textLength >= 22) return 2220;
@@ -993,6 +993,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "product-release-cadence") return false;
+  if (visual.layout === "product-release-committee") return false;
   if (visual.layout === "product-pain-points") return false;
   if (visual.layout === "product-interview-insight") return false;
   if (visual.layout === "finance-cash-flow-forecast") return false;
@@ -1255,6 +1256,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "product-release-cadence") {
     return base + productReleaseCadenceDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "product-release-committee") {
+    return base + productReleaseCommitteeDecorationsXml({ visual, index, layout, role, slide });
   }
   if (visual.layout === "product-pain-points") {
     return base + productPainPointsDecorationsXml({ visual, index, layout, role, slide });
@@ -1552,6 +1556,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (isBusinessModelBpVisual(visual)) {
     return base + businessModelBpDecorationsXml({ visual, index, layout });
+  }
+  if (isFinanceFpaForecastVisual(visual)) {
+    return base + financeFpaForecastDecorationsXml({ visual, index, role, slide, total, layout });
   }
   if (["executive", "academy", "venture"].includes(visual.layout)) {
     if (isPitchDeckVisual(visual)) {
@@ -2038,6 +2045,27 @@ function domeRoleBusinessMedia(visual, role) {
  */
 function templateLayout(visual, index, role = index === 0 ? "cover" : "content") {
   const redGoldPalette = redGoldColorPalette(visual);
+  if (isFinanceFpaForecastVisual(visual)) {
+    const isCover = index === 0 || role === "cover";
+    const isClosing = role === "closing";
+    return {
+      // FP&A 预测规划模板左侧承载动态结论，右侧固定绘制模型图表，和在线预览保持同一信息密度。
+      surface: { x: 530352, y: 502920, cx: 8084820, cy: 4213860 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 304800 },
+      secondaryAccent: { x: 0, y: 0, cx: 0, cy: 0 },
+      label: { x: 792480, y: 746760, cx: 2438400, cy: 243840 },
+      title: isCover
+        ? { x: 792480, y: 1104900, cx: 3962400, cy: 975360 }
+        : { x: 792480, y: 990600, cx: 3962400, cy: 716280 },
+      content: isCover || isClosing
+        ? { x: 914400, y: 2468880, cx: 3352800, cy: 853440 }
+        : { x: 914400, y: 1905000, cx: 3352800, cy: 1066800 },
+      titleSize: isCover ? 2700 : 2050,
+      bodySize: isCover ? 920 : 840,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (isFinanceAuditReviewVisual(visual)) {
     const isCover = index === 0 || role === "cover";
     const isClosing = role === "closing";
@@ -2446,7 +2474,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
-  if (visual.layout === "product-release-cadence") {
+  if (visual.layout === "product-release-cadence" || visual.layout === "product-release-committee") {
     const isCover = index === 0;
     const isClosing = role === "closing";
     return {
@@ -8759,6 +8787,171 @@ function productRoadmapVariant(visual) {
 
 function isProductRoadmapVisual(visual) {
   return visual?.id === "product-roadmap" && visual?.layout === "academy";
+}
+
+function productReleaseCommitteeDecorationsXml({ visual, index, layout, role, slide }) {
+  const scene = productReleaseCommitteeScene({ slide, index, role });
+  const palette = productReleaseCommitteeColorPalette(visual);
+  const isClosing = role === "closing";
+  const warning = visual.warning || "DC2626";
+  const canvas = solidShapeXml({ id: 1710, name: "Product Release Committee Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1711, name: "Product Release Committee Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 });
+  const header = solidShapeXml({ id: 1712, name: "Product Release Committee Header", x: 0, y: 0, cx: 9144000, cy: 335280, fill: visual.primary })
+    + rectShapeXml({ id: 1713, name: "Product Release Committee Teal Rule", x: 0, y: 304800, cx: 9144000, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1714, name: "Product Release Committee Amber Rule", x: 0, y: 335280, cx: 9144000, cy: 15240, fill: visual.secondary || "F59E0B" })
+    + textShapeXml({ id: 1715, name: "Product Release Committee Kicker", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
+  const title = textShapeXml({ id: 1716, name: "Product Release Committee Title", ...layout.title, text: productReleaseCommitteeCompactText(slide?.title, "产品版本发布评审", index === 0 ? 30 : 28), size: layout.titleSize, bold: true, color: visual.title });
+  const bullets = productReleaseCommitteeBulletCardsXml({ visual, items: scene.bullets });
+  const focusRule = rectShapeXml({ id: 1717, name: "Product Release Committee Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
+
+  if (isClosing || scene.kind === "summary") {
+    return canvas + header + title + focusRule + bullets + productReleaseCommitteeChecklistXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "scope") {
+    return canvas + header + title + focusRule + bullets + productReleaseCommitteeMatrixXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "timeline") {
+    return canvas + header + title + focusRule + bullets + productReleaseCommitteeTimelineXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "gray") {
+    return canvas + header + title + focusRule + bullets + productReleaseCommitteeGrayXml({ visual, palette, items: scene.cards });
+  }
+  if (scene.kind === "risk") {
+    return canvas + header + title + focusRule + bullets
+      + productReleaseCommitteeRiskXml({ visual, warning, items: scene.cards })
+      + productReleaseCommitteeRollbackXml({ visual, warning, items: scene.rollback });
+  }
+  if (scene.kind === "metrics") {
+    return canvas + header + title + focusRule + bullets + productReleaseCommitteeMetricXml({ visual, palette, items: scene.cards });
+  }
+  return canvas + header + title + focusRule + bullets + productReleaseCommitteeBoardXml({ visual, palette });
+}
+
+function productReleaseCommitteeBulletCardsXml({ visual, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const y = 1943100 + itemIndex * 243840;
+    return solidShapeXml({ id: 1720 + itemIndex, name: `Product Release Committee Bullet ${itemIndex + 1}`, geom: "roundRect", x: 786384, y, cx: 3474720, cy: 182880, fill: itemIndex === 0 ? blendHexColor(visual.accent, visual.surface, 0.78) : "FFFFFF" })
+      + textShapeXml({ id: 1724 + itemIndex, name: `Product Release Committee Bullet Text ${itemIndex + 1}`, x: 914400, y: y + 30480, cx: 3048000, cy: 106680, text: productReleaseCommitteeCompactText(item, "", 34), size: 660, bold: itemIndex === 0, color: visual.body });
+  }).join("");
+}
+
+function productReleaseCommitteeBoardXml({ visual, palette }) {
+  return solidShapeXml({ id: 1730, name: "Product Release Committee Status Board", geom: "roundRect", x: 5852160, y: 1158240, cx: 2514600, cy: 2011680, fill: palette.board })
+    + rectShapeXml({ id: 1731, name: "Product Release Committee Board Header", x: 5852160, y: 1158240, cx: 2514600, cy: 304800, fill: visual.primary })
+    + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 1732 + itemIndex, name: `Product Release Committee Status Bar ${itemIndex + 1}`, x: 6096000, y: 1691640 + itemIndex * 304800, cx: 1280160 + itemIndex * 243840, cy: 91440, fill: itemIndex === 2 ? visual.secondary || "F59E0B" : visual.accent })).join("")
+    + solidShapeXml({ id: 1736, name: "Product Release Committee Status Tag", geom: "roundRect", x: 7315200, y: 2423160, cx: 701040, cy: 365760, fill: visual.primary });
+}
+
+function productReleaseCommitteeMatrixXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5638800 + col * 1371600;
+    const y = 1097280 + row * 914400;
+    return solidShapeXml({ id: 1740 + itemIndex, name: `Product Release Scope Matrix Cell ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 701040, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1744 + itemIndex, name: `Product Release Scope Matrix Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 701040, stroke: palette.frame, width: 12700 })
+      + rectShapeXml({ id: 1748 + itemIndex, name: `Product Release Scope Status ${itemIndex + 1}`, x: x + 137160, y: y + 137160, cx: 365760, cy: 76200, fill: itemIndex === 2 ? visual.secondary || "F59E0B" : visual.accent })
+      + textShapeXml({ id: 1752 + itemIndex, name: `Product Release Scope Text ${itemIndex + 1}`, x: x + 137160, y: y + 304800, cx: 853440, cy: 182880, text: productReleaseCommitteeCompactText(item, "", 12), size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productReleaseCommitteeTimelineXml({ visual, palette, items }) {
+  return rectShapeXml({ id: 1760, name: "Product Release Launch Timeline Rail", x: 1097280, y: 3794760, cx: 6705600, cy: 38100, fill: palette.frame })
+    + items.slice(0, 4).map((item, itemIndex) => {
+      const x = 1219200 + itemIndex * 1676400;
+      return solidShapeXml({ id: 1761 + itemIndex, name: `Product Release Launch Timeline Gate ${itemIndex + 1}`, geom: "ellipse", x, y: 3642360, cx: 304800, cy: 304800, fill: itemIndex === 3 ? visual.primary : visual.accent })
+        + textShapeXml({ id: 1765 + itemIndex, name: `Product Release Launch Timeline Text ${itemIndex + 1}`, x: x - 304800, y: 4023360, cx: 914400, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 12), size: 660, bold: true, color: visual.title });
+    }).join("");
+}
+
+function productReleaseCommitteeGrayXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const height = 518160 + itemIndex * 182880;
+    const x = 5715000 + itemIndex * 548640;
+    const y = 3017520 - itemIndex * 182880;
+    return solidShapeXml({ id: 1770 + itemIndex, name: `Product Release Gray Strategy Step ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 396240, cy: height, fill: itemIndex === 2 ? visual.secondary || "F59E0B" : itemIndex === 3 ? visual.primary : visual.accent })
+      + textShapeXml({ id: 1774 + itemIndex, name: `Product Release Gray Strategy Text ${itemIndex + 1}`, x: x - 76200, y: y + height + 76200, cx: 548640, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 10), size: 620, bold: true, color: visual.title });
+  }).join("")
+    + rectShapeXml({ id: 1779, name: "Product Release Gray Baseline", x: 5486400, y: 3596640, cx: 2743200, cy: 30480, fill: palette.frame });
+}
+
+function productReleaseCommitteeRiskXml({ visual, warning, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5638800 + col * 1371600;
+    const y = 1066800 + row * 746760;
+    return solidShapeXml({ id: 1780 + itemIndex, name: `Product Release Risk Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 548640, fill: itemIndex === 0 ? blendHexColor(warning, visual.surface, 0.86) : "FFFFFF" })
+      + rectShapeXml({ id: 1784 + itemIndex, name: `Product Release Risk Signal ${itemIndex + 1}`, x: x + 121920, y: y + 121920, cx: 198120, cy: 76200, fill: itemIndex === 0 ? warning : visual.secondary || "F59E0B" })
+      + textShapeXml({ id: 1788 + itemIndex, name: `Product Release Risk Text ${itemIndex + 1}`, x: x + 121920, y: y + 274320, cx: 883920, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 12), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productReleaseCommitteeRollbackXml({ visual, warning, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 1097280 + itemIndex * 1981200;
+    return solidShapeXml({ id: 1792 + itemIndex, name: `Product Release Rollback Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3794760, cx: 1676400, cy: 426720, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1795 + itemIndex, name: `Product Release Rollback Alert ${itemIndex + 1}`, x, y: 3794760, cx: 91440, cy: 426720, fill: warning })
+      + textShapeXml({ id: 1798 + itemIndex, name: `Product Release Rollback Text ${itemIndex + 1}`, x: x + 182880, y: 3916680, cx: 1219200, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 12), size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productReleaseCommitteeMetricXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5638800 + col * 1371600;
+    const y = 1127760 + row * 822960;
+    return solidShapeXml({ id: 1802 + itemIndex, name: `Product Release Success Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 609600, fill: "FFFFFF" })
+      + rectShapeXml({ id: 1806 + itemIndex, name: `Product Release Success Metric Bar ${itemIndex + 1}`, x: x + 121920, y: y + 381000, cx: 792480, cy: 60960, fill: itemIndex === 1 ? visual.secondary || "F59E0B" : visual.accent })
+      + textShapeXml({ id: 1810 + itemIndex, name: `Product Release Success Metric Text ${itemIndex + 1}`, x: x + 121920, y: y + 152400, cx: 883920, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productReleaseCommitteeChecklistXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const x = 1097280 + itemIndex * 1676400;
+    return solidShapeXml({ id: 1814 + itemIndex, name: `Product Release Go No-Go Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3657600, cx: 1371600, cy: 548640, fill: "FFFFFF" })
+      + solidShapeXml({ id: 1818 + itemIndex, name: `Product Release Go No-Go Check ${itemIndex + 1}`, geom: "ellipse", x: x + 121920, y: 3794760, cx: 213360, cy: 213360, fill: visual.accent })
+      + textShapeXml({ id: 1822 + itemIndex, name: `Product Release Go No-Go Text ${itemIndex + 1}`, x: x + 396240, y: 3832860, cx: 792480, cy: 152400, text: productReleaseCommitteeCompactText(item, "", 12), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productReleaseCommitteeScene({ slide, index, role }) {
+  const bullets = productReleaseCommitteeBulletTexts(slide);
+  const cards = ["范围冻结", "联调验收", "灰度放量", "全量上线"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12));
+  if (role === "closing") return { kind: "summary", kicker: "GO / NO-GO", bullets, cards: ["准入结论", "未闭环事项", "复盘时间", "下一版本"] };
+  const scenes = [
+    { kind: "cover", kicker: "RELEASE REVIEW", bullets, cards },
+    { kind: "scope", kicker: "SCOPE MATRIX", bullets, cards: ["核心功能", "影响模块", "依赖系统", "状态标签"].map((fallback, itemIndex) => productReleaseCommitteeCompactText(bullets[itemIndex], fallback, 12)) },
+    { kind: "timeline", kicker: "LAUNCH TIMELINE", bullets, cards },
+    { kind: "gray", kicker: "GRAY STRATEGY", bullets, cards: ["1% 验证", "10% 观察", "50% 放量", "100% 全量"] },
+    { kind: "risk", kicker: "RISK & ROLLBACK", bullets, cards: ["数据异常", "链路阻塞", "体验波动", "运营投诉"], rollback: ["触发阈值", "回滚窗口", "责任人"] },
+    { kind: "metrics", kicker: "SUCCESS METRICS", bullets, cards: ["稳定性", "使用率", "转化率", "工单量"] },
+  ];
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function productReleaseCommitteeBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["冻结发布范围和核心功能模块", "按灰度策略观察关键指标", "准备风险阈值和回滚预案"];
+}
+
+function productReleaseCommitteeCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function productReleaseCommitteeColorPalette(visual) {
+  return {
+    board: blendHexColor(visual.surface, visual.background, 0.22),
+    frame: blendHexColor(visual.primary, visual.background, 0.72),
+  };
 }
 
 function productReleaseCadenceDecorationsXml({ visual, index, layout, role, slide }) {
@@ -19209,6 +19402,141 @@ function financeAuditReviewColorPalette(visual) {
     watch: blendHexColor(visual.primary, visual.surface, 0.84),
     high: blendHexColor(visual.accent, visual.surface, 0.72),
   };
+}
+
+function financeFpaForecastDecorationsXml({ visual, index, role, slide, total, layout }) {
+  const scene = financeFpaForecastScene({ slide, index, total, role });
+  const palette = financeFpaForecastColorPalette(visual);
+  const isCover = scene.role === "cover";
+  return rectShapeXml({ id: 701, name: "FP&A Forecast Top Model Band", x: 0, y: 0, cx: 9144000, cy: 304800, fill: visual.primary })
+    + rectShapeXml({ id: 702, name: "FP&A Forecast Accent Band", x: 4572000, y: 0, cx: 4572000, cy: 304800, fill: visual.accent })
+    + solidShapeXml({ id: 703, name: "FP&A Forecast Canvas", geom: "roundRect", x: 530352, y: 502920, cx: 8084820, cy: 4213860, fill: visual.surface })
+    + lineFrameShapeXml({ id: 704, name: "FP&A Forecast Canvas Frame", geom: "roundRect", x: 530352, y: 502920, cx: 8084820, cy: 4213860, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 705, name: "FP&A Forecast Model Grid Horizontal 1", x: 530352, y: 1371600, cx: 8084820, cy: 7620, fill: palette.grid })
+    + rectShapeXml({ id: 706, name: "FP&A Forecast Model Grid Horizontal 2", x: 530352, y: 2362200, cx: 8084820, cy: 7620, fill: palette.grid })
+    + rectShapeXml({ id: 707, name: "FP&A Forecast Model Grid Horizontal 3", x: 530352, y: 3352800, cx: 8084820, cy: 7620, fill: palette.grid })
+    + rectShapeXml({ id: 708, name: "FP&A Forecast Model Grid Vertical 1", x: 2590800, y: 502920, cx: 7620, cy: 4213860, fill: palette.grid })
+    + rectShapeXml({ id: 709, name: "FP&A Forecast Model Grid Vertical 2", x: 4572000, y: 502920, cx: 7620, cy: 4213860, fill: palette.grid })
+    + textShapeXml({ id: 710, name: "FP&A Forecast Kicker", ...layout.label, text: scene.kicker, size: 800, bold: true, color: visual.accent })
+    + solidShapeXml({ id: 711, name: "FP&A Forecast Decision Chip", geom: "roundRect", x: 762000, y: isCover ? 3779520 : 3901440, cx: 1219200, cy: 259080, fill: palette.chip })
+    + textShapeXml({ id: 712, name: "FP&A Forecast Decision Chip Text", x: 853440, y: isCover ? 3832860 : 3954780, cx: 975360, cy: 137160, text: "", size: 660, bold: true, color: "FFFFFF" })
+    + financeFpaForecastVisualXml({ visual, palette, scene });
+}
+
+function financeFpaForecastVisualXml({ visual, palette, scene }) {
+  if (scene.role === "cover") return financeFpaForecastCurveXml({ visual, palette, x: 5265420, y: 914400, w: 2895600, h: 2186940, id: 720 });
+  if (scene.role === "agenda") {
+    return [0, 1, 2, 3, 4].map((itemIndex) => {
+      const x = 4983480 + itemIndex * 609600;
+      return solidShapeXml({ id: 720 + itemIndex * 3, name: `FP&A Forecast Model Step ${itemIndex + 1}`, geom: "roundRect", x, y: 1645920, cx: 487680, cy: 853440, fill: itemIndex % 2 ? palette.blueSoft : palette.greenSoft })
+        + rectShapeXml({ id: 721 + itemIndex * 3, name: `FP&A Forecast Model Connector ${itemIndex + 1}`, x: x + 487680, y: 2026920, cx: itemIndex === 4 ? 0 : 121920, cy: 22860, fill: visual.accent });
+    }).join("");
+  }
+  if (scene.role === "assumptions") {
+    return scene.cards.map((item, itemIndex) => {
+      const col = itemIndex % 2;
+      const row = Math.floor(itemIndex / 2);
+      const x = 5036820 + col * 1447800;
+      const y = 1112520 + row * 1066800;
+      const color = [visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent, visual.primary][itemIndex];
+      return solidShapeXml({ id: 720 + itemIndex * 4, name: `FP&A Forecast Assumption Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1280160, cy: 807720, fill: visual.surface })
+        + rectShapeXml({ id: 721 + itemIndex * 4, name: `FP&A Forecast Assumption Marker ${itemIndex + 1}`, x, y, cx: 76200, cy: 807720, fill: color })
+        + textShapeXml({ id: 722 + itemIndex * 4, name: `FP&A Forecast Assumption Text ${itemIndex + 1}`, x: x + 152400, y: y + 259080, cx: 914400, cy: 213360, text: item, size: 760, bold: true, color: visual.title });
+    }).join("");
+  }
+  if (scene.role === "scenario") {
+    const cards = ["Base", "Upside", "Downside"].map((label, itemIndex) => {
+      const x = 4953000 + itemIndex * 1066800;
+      const color = [visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent][itemIndex];
+      return solidShapeXml({ id: 720 + itemIndex * 4, name: `FP&A Forecast Scenario Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1066800, cx: 914400, cy: 822960, fill: visual.surface })
+        + rectShapeXml({ id: 721 + itemIndex * 4, name: `FP&A Forecast Scenario Bottom ${itemIndex + 1}`, x, y: 1813560, cx: 914400, cy: 76200, fill: color })
+        + textShapeXml({ id: 722 + itemIndex * 4, name: `FP&A Forecast Scenario Label ${itemIndex + 1}`, x: x + 91440, y: 1325880, cx: 731520, cy: 182880, text: label, size: 760, bold: true, color: visual.title });
+    }).join("");
+    return cards
+      + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 740 + itemIndex, name: `FP&A Forecast Sensitivity Bar ${itemIndex + 1}`, x: 5067300, y: 2468880 + itemIndex * 289560, cx: [2133600, 1767840, 1371600][itemIndex], cy: 121920, fill: [visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent][itemIndex] })).join("");
+  }
+  if (scene.role === "linkage") {
+    return solidShapeXml({ id: 720, name: "FP&A Forecast Revenue Driver Card", geom: "roundRect", x: 5013960, y: 1127760, cx: 1066800, cy: 777240, fill: palette.greenSoft })
+      + solidShapeXml({ id: 721, name: "FP&A Forecast Cost Driver Card", geom: "roundRect", x: 6568440, y: 1127760, cx: 1066800, cy: 777240, fill: palette.amberSoft })
+      + solidShapeXml({ id: 722, name: "FP&A Forecast Margin Output Card", geom: "roundRect", x: 5791200, y: 2514600, cx: 1219200, cy: 777240, fill: palette.blueSoft })
+      + rectShapeXml({ id: 723, name: "FP&A Forecast Revenue To Margin Link", x: 5943600, y: 2057400, cx: 152400, cy: 609600, fill: visual.accent })
+      + rectShapeXml({ id: 724, name: "FP&A Forecast Cost To Margin Link", x: 6705600, y: 2057400, cx: 152400, cy: 609600, fill: visual.warning || visual.accent });
+  }
+  if (scene.role === "cash") {
+    return [0, 1, 2, 3, 4].map((itemIndex) => {
+      const heights = [914400, 579120, 731520, 426720, 990600];
+      const x = 5105400 + itemIndex * 457200;
+      return solidShapeXml({ id: 720 + itemIndex, name: `FP&A Forecast Cash Flow Bar ${itemIndex + 1}`, geom: "roundRect", x, y: 3124200 - heights[itemIndex], cx: 243840, cy: heights[itemIndex], fill: [visual.primary, visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent, visual.accent][itemIndex] });
+    }).join("") + rectShapeXml({ id: 730, name: "FP&A Forecast Cash Flow Baseline", x: 4953000, y: 3124200, cx: 2743200, cy: 22860, fill: palette.line });
+  }
+  if (scene.role === "resource") {
+    return [0, 1, 2].map((itemIndex) => {
+      const y = 1432560 + itemIndex * 579120;
+      const widths = [2133600, 1676400, 1219200];
+      const color = [visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent][itemIndex];
+      return solidShapeXml({ id: 720 + itemIndex * 3, name: `FP&A Forecast Resource Track ${itemIndex + 1}`, geom: "roundRect", x: 5029200, y, cx: 2438400, cy: 152400, fill: palette.track })
+        + solidShapeXml({ id: 721 + itemIndex * 3, name: `FP&A Forecast Resource Allocation ${itemIndex + 1}`, geom: "roundRect", x: 5029200, y, cx: widths[itemIndex], cy: 152400, fill: color });
+    }).join("") + solidShapeXml({ id: 735, name: "FP&A Forecast Resource Priority Node", geom: "ellipse", x: 7269480, y: 2743200, cx: 548640, cy: 548640, fill: visual.primary });
+  }
+  return scene.cards.map((item, itemIndex) => solidShapeXml({ id: 720 + itemIndex * 3, name: `FP&A Forecast Decision Item ${itemIndex + 1}`, geom: "roundRect", x: 5105400, y: 1219200 + itemIndex * 609600, cx: 2286000, cy: 365760, fill: visual.surface })
+    + rectShapeXml({ id: 721 + itemIndex * 3, name: `FP&A Forecast Decision Marker ${itemIndex + 1}`, x: 5105400, y: 1219200 + itemIndex * 609600, cx: 76200, cy: 365760, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+    + textShapeXml({ id: 722 + itemIndex * 3, name: `FP&A Forecast Decision Text ${itemIndex + 1}`, x: 5257800, y: 1310640 + itemIndex * 609600, cx: 1905000, cy: 152400, text: item, size: 740, bold: true, color: visual.title })).join("");
+}
+
+function financeFpaForecastCurveXml({ visual, palette, x, y, w, h, id }) {
+  return solidShapeXml({ id, name: "FP&A Forecast Curve Panel", geom: "roundRect", x, y, cx: w, cy: h, fill: visual.surface })
+    + lineFrameShapeXml({ id: id + 1, name: "FP&A Forecast Curve Panel Frame", geom: "roundRect", x, y, cx: w, cy: h, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: id + 2, name: "FP&A Forecast Curve Base Line", x: x + 259080, y: y + h - 472440, cx: w - 518160, cy: 22860, fill: palette.line })
+    + solidShapeXml({ id: id + 3, name: "FP&A Forecast Base Scenario Line", geom: "parallelogram", x: x + 365760, y: y + 1219200, cx: 731520, cy: 60960, fill: visual.accent })
+    + solidShapeXml({ id: id + 4, name: "FP&A Forecast Upside Scenario Line", geom: "parallelogram", x: x + 1066800, y: y + 944880, cx: 822960, cy: 60960, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: id + 5, name: "FP&A Forecast Downside Scenario Line", geom: "parallelogram", x: x + 1706880, y: y + 1371600, cx: 701040, cy: 60960, fill: visual.warning || visual.accent })
+    + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: id + 6 + itemIndex, name: `FP&A Forecast Scenario Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 670560 + itemIndex * 609600, y: y + 1280160 - itemIndex * 198120, cx: 121920, cy: 121920, fill: [visual.accent, visual.secondary || visual.accent, visual.warning || visual.accent][itemIndex] })).join("");
+}
+
+function financeFpaForecastScene({ slide, index, total, role }) {
+  const resolvedRole = financeFpaForecastRole({ slide, index, total, role });
+  const defaults = {
+    cover: { kicker: "FP&A MODEL PACK", cards: ["预测周期", "情景假设", "资源约束"] },
+    agenda: { kicker: "MODEL FLOW", cards: ["假设透明", "驱动拆解", "现金校准"] },
+    assumptions: { kicker: "ASSUMPTION BOOK", cards: ["增长率假设", "价格与转化", "费用率约束", "产能边界"] },
+    scenario: { kicker: "SCENARIO MODEL", cards: ["基准情景", "乐观情景", "压力情景"] },
+    linkage: { kicker: "DRIVER LINKAGE", cards: ["收入驱动", "成本弹性", "毛利传导"] },
+    cash: { kicker: "CASH OUTLOOK", cards: ["回款节奏", "支出峰值", "资金缓冲"] },
+    resource: { kicker: "RESOURCE PRIORITY", cards: ["预算优先级", "团队投入", "渠道资源"] },
+    closing: { kicker: "DECISION LOG", cards: ["锁定关键假设", "确认资源上限", "跟踪现金缺口"] },
+  };
+  return { role: resolvedRole, ...(defaults[resolvedRole] || defaults.assumptions) };
+}
+
+function financeFpaForecastRole({ slide, index, total, role }) {
+  const text = `${role || ""} ${slide?.layout || ""} ${slide?.title || ""}`.toLowerCase();
+  if (index === 0 || text.includes("cover")) return "cover";
+  if (index === total - 1 || text.includes("closing") || text.includes("next")) return "closing";
+  if (/目录|agenda|overview|框架|流程/.test(text)) return "agenda";
+  if (/假设|assumption|driver/.test(text)) return "assumptions";
+  if (/情景|scenario|敏感/.test(text)) return "scenario";
+  if (/收入|成本|cost|revenue|margin|毛利/.test(text)) return "linkage";
+  if (/现金|cash|回款|流动性/.test(text)) return "cash";
+  if (/资源|resource|投入|priority|优先/.test(text)) return "resource";
+  return ["agenda", "assumptions", "scenario", "linkage", "cash", "resource"][Math.max(0, index - 1) % 6];
+}
+
+function financeFpaForecastColorPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.background, 0.68),
+    grid: blendHexColor(visual.primary, visual.background, 0.88),
+    chip: blendHexColor(visual.primary, visual.accent, 0.18),
+    line: blendHexColor(visual.primary, visual.background, 0.52),
+    track: blendHexColor(visual.primary, visual.background, 0.82),
+    greenSoft: blendHexColor(visual.accent, visual.surface, 0.82),
+    blueSoft: blendHexColor(visual.secondary || visual.accent, visual.surface, 0.84),
+    amberSoft: blendHexColor(visual.warning || visual.accent, visual.surface, 0.78),
+  };
+}
+
+function isFinanceFpaForecastVisual(visual) {
+  const id = String(visual?.id || "");
+  return (id === "financial-review" || id === "finance-financial-review-forecast") && visual?.layout === "finance-fpa-forecast";
 }
 
 function isFinanceAuditReviewVisual(visual) {

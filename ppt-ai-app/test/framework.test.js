@@ -502,10 +502,12 @@ test("resolveTemplateVisual applies financial review audit commercial visual", (
 test("resolveTemplateVisual applies financial review forecast commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "forecast" });
 
-  assert.equal(visual.primary, "123B4D");
-  assert.equal(visual.accent, "2F9E9A");
-  assert.equal(visual.background, "EEF6F7");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "0F2D3A");
+  assert.equal(visual.accent, "22A699");
+  assert.equal(visual.secondary, "3B82F6");
+  assert.equal(visual.warning, "F59E0B");
+  assert.equal(visual.background, "F4F8F7");
+  assert.equal(visual.layout, "finance-fpa-forecast");
   assert.equal(visual.variant, "forecast");
 });
 
@@ -630,10 +632,12 @@ test("resolveTemplateVisual applies product roadmap commercial visual", () => {
 test("resolveTemplateVisual applies product release commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "release" });
 
-  assert.equal(visual.primary, "3B4A8F");
-  assert.equal(visual.accent, "F2A65A");
-  assert.equal(visual.background, "F2F4FB");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "DC2626");
+  assert.equal(visual.background, "EEF4F8");
+  assert.equal(visual.layout, "product-release-committee");
   assert.equal(visual.variant, "release");
 });
 

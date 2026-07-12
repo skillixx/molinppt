@@ -1,41 +1,51 @@
 {
   "baseTemplateId": "product-roadmap",
   "themeId": "release",
-  "style": "product-planning",
+  "style": "product-release-committee",
   "themes": [
     {
       "id": "release",
       "name": "版本发布",
       "visual": {
-        "primary": "3B4A8F",
-        "accent": "F2A65A",
-        "background": "F2F4FB",
+        "primary": "0B1F3A",
+        "accent": "14B8A6",
+        "secondary": "F59E0B",
+        "warning": "DC2626",
+        "background": "EEF4F8",
         "surface": "FFFFFF",
-        "title": "202A55",
-        "body": "4B5678",
-        "layout": "academy",
+        "title": "0A1730",
+        "body": "405166",
+        "layout": "product-release-committee",
         "variant": "release"
       }
     }
   ],
   "visual": {
-    "primary": "3B4A8F",
-    "accent": "F2A65A",
-    "background": "F2F4FB",
+    "primary": "0B1F3A",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "warning": "DC2626",
+    "background": "EEF4F8",
     "surface": "FFFFFF",
-    "title": "202A55",
-    "body": "4B5678",
-    "layout": "academy",
+    "title": "0A1730",
+    "body": "405166",
+    "layout": "product-release-committee",
     "variant": "release"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
+    "defaultCoverLayout": "product-release-committee-cover",
+    "defaultContentLayout": "product-release-committee-content",
     "allowedLayouts": [
-      "academy-cover",
-      "academy-content",
-      "lesson-title",
-      "lesson-content"
+      "product-release-committee-cover",
+      "product-release-committee-scope",
+      "product-release-committee-timeline",
+      "product-release-committee-gray",
+      "product-release-committee-risk",
+      "product-release-committee-metrics",
+      "product-release-committee-summary",
+      "title",
+      "content",
+      "closing"
     ]
   }
 }
