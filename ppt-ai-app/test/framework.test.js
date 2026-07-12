@@ -490,10 +490,10 @@ test("resolveTemplateVisual applies financial review quarterly commercial visual
 test("resolveTemplateVisual applies financial review audit commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "audit" });
 
-  assert.equal(visual.primary, "243447");
-  assert.equal(visual.accent, "A56A43");
-  assert.equal(visual.background, "F3F0EC");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "C2413A");
+  assert.equal(visual.background, "F4F6F8");
+  assert.equal(visual.layout, "finance-audit-review");
   assert.equal(visual.variant, "audit");
 });
 

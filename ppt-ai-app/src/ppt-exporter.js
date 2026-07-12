@@ -1505,6 +1505,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   if (visual.layout === "data-insight-workbench") {
     return base + dataInsightWorkbenchDecorationsXml({ visual, index, role, slide, total });
   }
+  if (isFinanceAuditReviewVisual(visual)) {
+    return base + financeAuditReviewDecorationsXml({ visual, index, role, slide, total, layout });
+  }
   if (visual.layout === "data-research-report") {
     // 研究报告主题已经拥有独立可编辑图形，这里显式接入导出路由，避免只落到通用背景层。
     return base + dataResearchReportDecorationsXml({ visual, index, slide, total });
@@ -2020,6 +2023,27 @@ function domeRoleBusinessMedia(visual, role) {
  */
 function templateLayout(visual, index, role = index === 0 ? "cover" : "content") {
   const redGoldPalette = redGoldColorPalette(visual);
+  if (isFinanceAuditReviewVisual(visual)) {
+    const isCover = index === 0 || role === "cover";
+    const isClosing = role === "closing";
+    return {
+      // 审计复盘模板右侧固定留给风险矩阵、证据链和整改看板，正文框只承载动态结论。
+      surface: { x: 548640, y: 548640, cx: 8046720, cy: 4114800 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 335280 },
+      secondaryAccent: { x: 518160, y: 609600, cx: 60960, cy: 3886200 },
+      label: { x: 792480, y: 701040, cx: 2438400, cy: 274320 },
+      title: isCover
+        ? { x: 792480, y: 1036320, cx: 4114800, cy: 975360 }
+        : { x: 792480, y: 914400, cx: 4267200, cy: 701040 },
+      content: isCover || isClosing
+        ? { x: 914400, y: 2263140, cx: 3429000, cy: 914400 }
+        : { x: 914400, y: 1775460, cx: 3505200, cy: 1066800 },
+      titleSize: isCover ? 2700 : 2100,
+      bodySize: isCover ? 980 : 900,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
   if (visual.layout === "red-gold") {
     if (role === "cover" || role === "closing") {
       return {
@@ -18811,6 +18835,175 @@ function industryResearchScene({ index, role }) {
 function isIndustryResearchVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "industry-research" && (id === "industry-research" || id === "strategy-industry-research-industry-landscape");
+}
+
+function financeAuditReviewDecorationsXml({ visual, index, role, slide, total, layout }) {
+  const scene = financeAuditReviewScene({ visual, index, role, slide, total });
+  const palette = financeAuditReviewColorPalette(visual);
+  const basePanel = solidShapeXml({ id: 2100, name: "Audit Review Workpaper Canvas", geom: "roundRect", x: 548640, y: 548640, cx: 8046720, cy: 4114800, fill: visual.surface })
+    + rectShapeXml({ id: 2101, name: "Audit Review Top Rule", x: 0, y: 0, cx: 9144000, cy: 335280, fill: visual.primary })
+    + rectShapeXml({ id: 2102, name: "Audit Review Risk Rail", x: 518160, y: 609600, cx: 60960, cy: 3886200, fill: visual.accent })
+    + lineFrameShapeXml({ id: 2103, name: "Audit Review Canvas Frame", geom: "roundRect", x: 548640, y: 548640, cx: 8046720, cy: 4114800, stroke: palette.line, width: 15240 })
+    + textShapeXml({ id: 2104, name: "Audit Review Kicker", ...layout.label, text: scene.kicker, size: 760, bold: true, color: visual.accent });
+  if (scene.role === "cover" || scene.role === "summary") {
+    return basePanel
+      + financeAuditReviewMetricCardsXml({ visual, palette })
+      + financeAuditReviewRiskMatrixXml({ visual, palette })
+      + financeAuditReviewEvidenceCardsXml({ visual, palette, cards: scene.cards });
+  }
+  if (scene.role === "findings") {
+    return basePanel + financeAuditReviewFindingCardsXml({ visual, palette, cards: scene.cards }) + financeAuditReviewStatusListXml({ visual, palette, actions: scene.actions });
+  }
+  if (scene.role === "control-flow") {
+    return basePanel + financeAuditReviewControlFlowXml({ visual, palette });
+  }
+  if (scene.role === "transaction") {
+    return basePanel + financeAuditReviewTransactionXml({ visual, palette });
+  }
+  return basePanel + financeAuditReviewRemediationXml({ visual, palette, actions: scene.actions }) + financeAuditReviewMetricCardsXml({ visual, palette });
+}
+
+function financeAuditReviewRiskMatrixXml({ visual, palette }) {
+  const x = 5844540;
+  const y = 899160;
+  const w = 2438400;
+  const h = 1600200;
+  const fills = [palette.low, palette.warn, palette.watch, palette.high];
+  const labels = ["已复核", "待整改", "需观察", "委员会关注"];
+  return lineFrameShapeXml({ id: 2110, name: "Audit Review Risk Matrix Frame", x, y, cx: w, cy: h, stroke: palette.line, width: 15240 })
+    + [0, 1, 2, 3].map((itemIndex) => {
+      const col = itemIndex % 2;
+      const row = Math.floor(itemIndex / 2);
+      return solidShapeXml({ id: 2111 + itemIndex * 2, name: `Audit Review Risk Matrix Cell ${itemIndex + 1}`, x: x + col * (w / 2), y: y + row * (h / 2), cx: w / 2, cy: h / 2, fill: fills[itemIndex] })
+        + textShapeXml({ id: 2112 + itemIndex * 2, name: `Audit Review Risk Matrix Label ${itemIndex + 1}`, x: x + col * (w / 2) + 121920, y: y + row * (h / 2) + 198120, cx: w / 2 - 243840, cy: 213360, text: labels[itemIndex], size: 680, bold: true, color: itemIndex === 3 ? visual.accent : visual.primary });
+    }).join("");
+}
+
+function financeAuditReviewEvidenceCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 3).map((item, index) => {
+    const y = 2865120 + index * 396240;
+    return solidShapeXml({ id: 2130 + index * 3, name: `Audit Review Evidence Card ${index + 1}`, x: 5844540, y, cx: 2438400, cy: 289560, fill: visual.surface })
+      + rectShapeXml({ id: 2131 + index * 3, name: `Audit Review Evidence Accent ${index + 1}`, x: 5844540, y, cx: 60960, cy: 289560, fill: visual.accent })
+      + textShapeXml({ id: 2132 + index * 3, name: `Audit Review Evidence Text ${index + 1}`, x: 5974080, y: y + 60960, cx: 1828800, cy: 152400, text: item, size: 700, bold: true, color: visual.primary });
+  }).join("");
+}
+
+function financeAuditReviewMetricCardsXml({ visual, palette }) {
+  const metrics = [
+    { value: "18", label: "审计发现" },
+    { value: "5", label: "高风险事项" },
+    { value: "82%", label: "整改闭环率" },
+  ];
+  return metrics.map((metric, index) => {
+    const x = 792480 + index * 1402080;
+    return solidShapeXml({ id: 2140 + index * 3, name: `Audit Review Metric Card ${index + 1}`, x, y: 3810000, cx: 1219200, cy: 548640, fill: palette.card })
+      + textShapeXml({ id: 2141 + index * 3, name: `Audit Review Metric Value ${index + 1}`, x: x + 121920, y: 3931920, cx: 609600, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.primary })
+      + textShapeXml({ id: 2142 + index * 3, name: `Audit Review Metric Label ${index + 1}`, x: x + 121920, y: 4183380, cx: 853440, cy: 137160, text: metric.label, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function financeAuditReviewFindingCardsXml({ visual, palette, cards }) {
+  return cards.slice(0, 3).map((item, index) => {
+    const x = 792480 + index * 1600200;
+    return solidShapeXml({ id: 2160 + index * 4, name: `Audit Review Finding Card ${index + 1}`, x, y: 2941320, cx: 1371600, cy: 914400, fill: visual.surface })
+      + rectShapeXml({ id: 2161 + index * 4, name: `Audit Review Finding Level ${index + 1}`, x, y: 2941320, cx: 1371600, cy: 91440, fill: index === 0 ? visual.accent : index === 1 ? visual.warning || "D9902F" : visual.secondary || "2D7F76" })
+      + textShapeXml({ id: 2162 + index * 4, name: `Audit Review Finding Tag ${index + 1}`, x: x + 121920, y: 3108960, cx: 548640, cy: 152400, text: `R${index + 1}`, size: 720, bold: true, color: visual.accent })
+      + textShapeXml({ id: 2163 + index * 4, name: `Audit Review Finding Text ${index + 1}`, x: x + 121920, y: 3352800, cx: 1066800, cy: 274320, text: item, size: 680, bold: true, color: visual.primary });
+  }).join("");
+}
+
+function financeAuditReviewStatusListXml({ visual, palette, actions }) {
+  return actions.slice(0, 3).map((item, index) => {
+    const y = 2926080 + index * 365760;
+    return solidShapeXml({ id: 2180 + index * 3, name: `Audit Review Status Row ${index + 1}`, x: 5844540, y, cx: 2438400, cy: 274320, fill: palette.card })
+      + solidShapeXml({ id: 2181 + index * 3, name: `Audit Review Status Dot ${index + 1}`, geom: "ellipse", x: 6004560, y: y + 83820, cx: 106680, cy: 106680, fill: index === 2 ? visual.warning || "D9902F" : visual.secondary || "2D7F76" })
+      + textShapeXml({ id: 2182 + index * 3, name: `Audit Review Status Text ${index + 1}`, x: 6217920, y: y + 60960, cx: 1524000, cy: 137160, text: item, size: 650, bold: true, color: visual.primary });
+  }).join("");
+}
+
+function financeAuditReviewControlFlowXml({ visual, palette }) {
+  const labels = ["业务发起", "权限审批", "凭证入账", "抽样复核", "归档关闭"];
+  return labels.map((label, index) => {
+    const x = 853440 + index * 1447800;
+    const connector = index < labels.length - 1 ? rectShapeXml({ id: 2202 + index * 4, name: `Audit Review Control Connector ${index + 1}`, x: x + 1219200, y: 3177540, cx: 274320, cy: 30480, fill: visual.accent }) : "";
+    return solidShapeXml({ id: 2200 + index * 4, name: `Audit Review Control Step ${index + 1}`, x, y: 2865120, cx: 1219200, cy: 640080, fill: visual.surface })
+      + rectShapeXml({ id: 2201 + index * 4, name: `Audit Review Control Step Rule ${index + 1}`, x, y: 2865120, cx: 1219200, cy: 76200, fill: index === 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 2203 + index * 4, name: `Audit Review Control Step Text ${index + 1}`, x: x + 91440, y: 3116580, cx: 1036320, cy: 152400, text: label, size: 660, bold: true, color: visual.primary })
+      + connector;
+  }).join("");
+}
+
+function financeAuditReviewTransactionXml({ visual, palette }) {
+  const rows = ["样本编号    金额区间    风险信号", "TX-018      高额      越权审批", "TX-024      中额      凭证缺失", "TX-031      低额      重复报销"];
+  const table = solidShapeXml({ id: 2220, name: "Audit Review Transaction Table", x: 792480, y: 2682240, cx: 4419600, cy: 1295400, fill: visual.surface })
+    + rows.map((row, index) => textShapeXml({ id: 2221 + index, name: `Audit Review Transaction Row ${index + 1}`, x: 975360, y: 2811780 + index * 274320, cx: 3810000, cy: 137160, text: row, size: 620, bold: index === 0, color: index === 0 ? visual.primary : visual.body })).join("");
+  const heat = Array.from({ length: 9 }, (_, index) => {
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    return solidShapeXml({ id: 2230 + index, name: `Audit Review Heat Cell ${index + 1}`, x: 5844540 + col * 457200, y: 2682240 + row * 350520, cx: 365760, cy: 274320, fill: [4, 5].includes(index) ? palette.high : [1, 6].includes(index) ? palette.warn : palette.low });
+  }).join("");
+  return table + heat;
+}
+
+function financeAuditReviewRemediationXml({ visual, palette, actions }) {
+  return actions.slice(0, 4).map((item, index) => {
+    const x = 792480 + index * 1905000;
+    return solidShapeXml({ id: 2250 + index * 4, name: `Audit Review Remediation Card ${index + 1}`, x, y: 2865120, cx: 1600200, cy: 792480, fill: visual.surface })
+      + textShapeXml({ id: 2251 + index * 4, name: `Audit Review Remediation State ${index + 1}`, x: x + 121920, y: 3032760, cx: 822960, cy: 137160, text: index < 2 ? "进行中" : "复核中", size: 620, bold: true, color: visual.secondary || "2D7F76" })
+      + textShapeXml({ id: 2252 + index * 4, name: `Audit Review Remediation Text ${index + 1}`, x: x + 121920, y: 3291840, cx: 1219200, cy: 274320, text: item, size: 620, bold: true, color: visual.primary })
+      + rectShapeXml({ id: 2253 + index * 4, name: `Audit Review Remediation Progress ${index + 1}`, x: x + 121920, y: 3695700, cx: 914400 + index * 121920, cy: 45720, fill: index < 2 ? visual.accent : visual.secondary || "2D7F76" });
+  }).join("");
+}
+
+function financeAuditReviewScene({ index, role, slide, total }) {
+  const bullets = Array.isArray(slide?.bullets) && slide.bullets.length ? slide.bullets : ["授权审批缺口", "异常交易样本", "凭证链路缺失", "责任部门确认"];
+  const cards = bullets.slice(0, 3).map((item) => String(typeof item === "string" ? item : item?.text || item?.title || "审计发现").slice(0, 18));
+  const actions = ["责任部门确认", "整改计划锁定", "复核状态跟进", "风险关闭归档"];
+  const layout = String(slide?.layout || "");
+  const resolvedRole = index >= total - 1 || role === "closing"
+    ? "closing"
+    : layout.includes("control") || layout.includes("flow")
+      ? "control-flow"
+      : layout.includes("transaction")
+        ? "transaction"
+        : layout.includes("remediation") || layout.includes("action")
+          ? "remediation"
+          : index === 0
+            ? "cover"
+            : index === 1
+              ? "summary"
+              : index === 2
+                ? "findings"
+                : index === 3
+                  ? "control-flow"
+                  : index === 4
+                    ? "transaction"
+                    : "remediation";
+  const kickerMap = {
+    cover: "AUDIT WORKPAPER",
+    summary: "RISK COMMITTEE",
+    findings: "FINDINGS & EVIDENCE",
+    "control-flow": "CONTROL WALKTHROUGH",
+    transaction: "EXCEPTION SAMPLE",
+    remediation: "REMEDIATION TRACK",
+    closing: "REVIEW STATUS",
+  };
+  return { role: resolvedRole, kicker: kickerMap[resolvedRole], cards, actions };
+}
+
+function financeAuditReviewColorPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.34),
+    line: blendHexColor(visual.primary, visual.background, 0.62),
+    low: blendHexColor(visual.secondary || "2D7F76", visual.surface, 0.78),
+    warn: blendHexColor(visual.warning || "D9902F", visual.surface, 0.72),
+    watch: blendHexColor(visual.primary, visual.surface, 0.84),
+    high: blendHexColor(visual.accent, visual.surface, 0.72),
+  };
+}
+
+function isFinanceAuditReviewVisual(visual) {
+  return visual?.layout === "finance-audit-review";
 }
 
 function financialReviewDecorationsXml({ visual, index, layout }) {

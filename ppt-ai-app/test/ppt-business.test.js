@@ -842,6 +842,28 @@ test("PptService renders synced product release cadence preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders financial audit review preview with workpaper layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "审计复盘与整改闭环汇报",
+    slideCount: 6,
+    templateId: "financial-review",
+    theme: "audit",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="financial-review" data-layout="finance-audit-review"/);
+  assert.match(preview, /audit-review-layer/);
+  assert.match(preview, /audit-matrix/);
+  assert.match(preview, /audit-evidence|audit-remediation|audit-flow/);
+  assert.doesNotMatch(preview, />审计分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced feature priority matrix preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });

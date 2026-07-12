@@ -719,11 +719,12 @@ test("PptExportService uses commercial financial audit decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial audit Chip"/);
-  assert.match(slide1, /name="Financial Audit Dot 1"/);
-  assert.match(slide1, /val="243447"/);
-  assert.match(slide1, /val="A56A43"/);
+  assert.match(slide1, /name="Audit Review Workpaper Canvas"/);
+  assert.match(slide1, /name="Audit Review Risk Matrix Cell 4"/);
+  assert.match(slide1, /name="Audit Review Evidence Card 1"/);
+  assert.doesNotMatch(slide1, /name="Financial Audit Dot 1"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="C2413A"/);
 });
 
 test("PptExportService uses commercial financial forecast decorations", () => {
