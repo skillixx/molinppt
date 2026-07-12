@@ -242,6 +242,30 @@ test("PptService renders editorial brand story preview with distinct magazine pa
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders synced editorial brand story preview content for official slug", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertBrandStoryEditorialTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "季度经营复盘：达预期但利润承压",
+    slideCount: 6,
+    templateId: "marketing-brand-story-editorial",
+    theme: "editorial",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="marketing-brand-story-editorial" data-layout="brand-story-editorial"/);
+  assert.match(preview, /editorial-layer/);
+  assert.match(preview, /editorial-title/);
+  assert.match(preview, /季度经营复盘/);
+  assert.match(preview, /BRAND JOURNAL|FEATURE STORY|NEXT CHAPTER/);
+  assert.match(preview, /01 ORIGIN/);
+  assert.match(preview, /<article class="preview-page"[\s\S]*?<div class="editorial-layer editorial-role-cover">[\s\S]*?<div class="slide-content"><\/div>/);
+});
+
 test("PptService renders premium brand story preview with luxury material pages", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -6309,6 +6333,50 @@ async function insertLaunchRhythmTemplate(context) {
       defaultCoverLayout: "marketing-launch-rhythm-cover",
       defaultContentLayout: "marketing-launch-rhythm-content",
       allowedLayouts: ["marketing-launch-rhythm-cover", "marketing-launch-rhythm-timeline", "marketing-launch-rhythm-selling-points", "marketing-launch-rhythm-channel", "marketing-launch-rhythm-kpi", "marketing-launch-rhythm-closing", "title", "content"],
+    },
+  });
+}
+
+async function insertBrandStoryEditorialTemplate(context) {
+  // 测试数据库模拟官方模板同步后的真实 slug，覆盖后台模板选择路径，避免只测内置 brand-story 兜底模板。
+  await context.database.insert("templates", {
+    id: "marketing-brand-story-editorial",
+    slug: "marketing-brand-story-editorial",
+    name: "品牌故事叙事 - 编辑叙事",
+    categoryId: "marketing",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "editorial",
+        name: "编辑叙事",
+        visual: {
+          primary: "2A2F3F",
+          accent: "C7825A",
+          background: "F6F1EA",
+          surface: "FFFDFC",
+          title: "171B26",
+          body: "4A5160",
+          layout: "brand-story-editorial",
+          variant: "editorial",
+        },
+      },
+    ],
+    visual: {
+      primary: "2A2F3F",
+      accent: "C7825A",
+      background: "F6F1EA",
+      surface: "FFFDFC",
+      title: "171B26",
+      body: "4A5160",
+      layout: "brand-story-editorial",
+      variant: "editorial",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "editorial-cover",
+      defaultContentLayout: "editorial-story",
+      allowedLayouts: ["editorial-cover", "editorial-opener", "editorial-timeline", "editorial-interview", "editorial-manifesto", "editorial-feature", "editorial-evidence", "editorial-closing"],
     },
   });
 }

@@ -10394,7 +10394,9 @@ function brandStoryEditorialCompactText(text, fallback, maxLength) {
 }
 
 function isBrandStoryEditorialVisual(visual) {
-  return visual?.id === "brand-story" && visual?.layout === "brand-story-editorial";
+  // 官方同步模板的 id 是 marketing-brand-story-editorial，内置兜底模板的 id 是 brand-story；
+  // 这里必须以 layout 为准，否则后台实际选择官方模板时只会渲染纸张背景，正文内容层会丢失。
+  return visual?.layout === "brand-story-editorial";
 }
 
 function luxuryBrandStoryPreviewScene({ slide, index, total }) {
