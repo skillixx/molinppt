@@ -1913,23 +1913,36 @@ test("PptExportService uses commercial product review decorations", () => {
 test("PptExportService uses commercial marketing launch decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "marketing-campaign", theme: "launch" },
+    deck: {
+      ...deck,
+      templateId: "marketing-campaign",
+      theme: "launch",
+      slides: [
+        { title: "新品首发发布会方案", bullets: ["核心卖点确认", "场景化体验证明", "目标人群定位", "渠道首发排期"] },
+        { title: "核心卖点拆解", bullets: ["体验升级", "智能能力", "价格权益", "服务承诺"] },
+        { title: "上市时间轴", bullets: ["T-30 预热启动", "T-14 内容种草", "T-7 预约蓄水", "T-Day 首发上线"] },
+        { title: "渠道首发计划", bullets: ["电商首发", "社媒扩散", "直播转化", "线下体验"] },
+        { title: "首发数据看板", bullets: ["曝光目标", "预约目标", "转化目标", "成交目标"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
 
-  assert.match(slide1, /name="Marketing Cover Wash"/);
-  assert.match(slide1, /name="Marketing Visual Panel"/);
-  assert.match(slide1, /name="Marketing Launch Hero Card"/);
-  assert.match(slide1, /name="Marketing Launch Spotlight"/);
-  assert.match(slide1, /name="Marketing Launch Stage"/);
-  assert.match(slide1, /name="Marketing Metric Card 1"/);
-  assert.match(slide2, /name="Marketing Content Wash"/);
-  assert.match(slide2, /name="Marketing Channel Card 1"/);
-  assert.match(slide1, /val="E11D48"/);
-  assert.match(slide1, /val="F59E0B"/);
+  assert.match(slide1, /name="Product Premiere Dark Stage Background"/);
+  assert.match(slide1, /name="Product Premiere Product Concept"/);
+  assert.match(slide3, /name="Product Premiere Timeline Card 1"/);
+  assert.match(slide4, /name="Product Premiere Channel Card 1"/);
+  assert.match(slide5, /name="Product Premiere Data Dashboard"/);
+  assert.match(text, /ppt\/media\/product-concept-hero\.png/);
+  assert.match(text, /ppt\/media\/launch-stage-scene\.png/);
+  assert.match(text, /ppt\/media\/product-lifestyle-scene\.png/);
+  assert.match(slide1, /val="0B1020"/);
+  assert.match(slide1, /val="FF3B5C"/);
 });
 
 test("PptExportService uses new product launch rhythm decorations", () => {
@@ -2150,36 +2163,77 @@ test("PptExportService uses department performance team decorations", () => {
 test("PptExportService uses commercial marketing brand decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "marketing-campaign", theme: "brand" },
+    deck: {
+      ...deck,
+      templateId: "marketing-campaign",
+      theme: "brand",
+      slides: [
+        { title: "品牌传播控制台", layout: "brand-comms-cover", bullets: ["传播主张统领全年 Campaign", "社媒、户外、移动端和活动现场协同"] },
+        { title: "传播主张", layout: "brand-comms-message-house", bullets: ["核心主张", "利益点", "证据点", "行动号召"] },
+        { title: "目标人群", layout: "brand-comms-audience", bullets: ["核心人群", "潜在人群", "高价值客户", "意见领袖"] },
+        { title: "内容矩阵", layout: "brand-comms-content-matrix", bullets: ["品牌故事", "产品证据", "用户案例", "活动话题", "专家背书", "互动挑战", "福利机制", "复盘内容"] },
+        { title: "媒介触点", layout: "brand-comms-touchpoint-map", bullets: ["社交媒体", "户外广告", "移动端内容", "活动现场"] },
+        { title: "效果看板", layout: "brand-comms-dashboard", bullets: ["曝光声量", "互动质量", "线索转化", "复盘洞察"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
 
-  assert.match(slide1, /name="Brand Comms Warm Canvas"/);
-  assert.match(slide1, /name="Brand Comms Console Panel"/);
-  assert.match(slide1, /name="Brand Comms Scene Card 1"/);
+  assert.match(slide1, /name="Brand Comms Command Canvas"/);
+  assert.match(slide1, /name="Brand Comms Command Center Panel"/);
+  assert.match(slide1, /name="Brand Comms Local Scene Card 1"/);
   assert.match(slide1, /name="Brand Comms Metric Card 1"/);
-  assert.match(slide1, /val="7F1D4E"/);
-  assert.match(slide1, /val="F97316"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="E64B6A"/);
+  assert.match(slide1, /val="21A6A1"/);
   assert.match(slide2, /name="Brand Comms Message House 1"/);
+  assert.match(`${slide3}${slide4}${slide5}${slide6}`, /Brand Comms Content Matrix Grid|Brand Comms Touchpoint Core|Brand Comms Dashboard Panel/);
   assert.doesNotMatch(slide1, /品牌传播/);
 });
 
 test("PptExportService uses commercial marketing growth decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "marketing-campaign", theme: "growth" },
+    deck: {
+      ...deck,
+      templateId: "marketing-campaign",
+      theme: "growth",
+      slides: [
+        { title: "Growth lab command center", layout: "growth-lab-cover", bullets: ["Build AARRR loop", "Review ROI", "Prioritize next experiments"] },
+        { title: "Conversion funnel", layout: "growth-lab-funnel", bullets: ["Acquisition traffic", "Activation rate", "Retention cohort", "Revenue action", "Referral loop"] },
+        { title: "Channel matrix", layout: "growth-lab-channel-matrix", bullets: ["Search conversion", "Content seed", "Community reach", "Paid retarget"] },
+        { title: "Experiment card", layout: "growth-lab-experiment-card", bullets: ["Checkout drop off", "Change onboarding offer", "Activation lift"] },
+        { title: "Trend ROI board", layout: "growth-lab-trend-roi", bullets: ["LTV improves", "CAC stabilizes", "Payback shortens"] },
+        { title: "Action priority", layout: "growth-lab-action-priority", bullets: ["Scale winning channel", "Run retention test", "Cut low ROI spend"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
 
   assert.match(slide1, /name="Growth Lab Canvas Frame"/);
   assert.match(slide1, /name="Growth Lab Flywheel Outer"/);
   assert.match(slide1, /name="Growth Lab Device Scene"/);
   assert.match(slide1, /name="Growth Lab Metric Card 1"/);
+  assert.match(slide2, /name="Growth Lab AARRR Funnel Bar 1"/);
+  assert.match(slide3, /name="Growth Lab Channel Matrix Card 1"/);
+  assert.match(slide4, /name="Growth Lab Experiment Field 1"/);
+  assert.match(slide5, /name="Growth Lab Trend ROI Board"/);
+  assert.match(slide5, /name="Growth Lab ROI KPI 1"/);
+  assert.match(slide6, /name="Growth Lab Priority ICE Score 1"/);
   assert.doesNotMatch(slide1, /增长营销/);
   assert.match(slide1, /val="047857"/);
   assert.match(slide1, /val="F97316"/);
@@ -2380,7 +2434,6 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
     { templateId: "financial-review", theme: "quarterly", shapeName: "Financial Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
     { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
-    { templateId: "marketing-campaign", theme: "launch", shapeName: "Marketing Chip Text" },
     { templateId: "data-insight", theme: "dashboard", shapeName: "Data Insight Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },
     { templateId: "pitch", theme: "startup", shapeName: "Pitch Chip Text" },

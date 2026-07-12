@@ -910,13 +910,15 @@ test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
   const growth = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "growth" });
 
-  assert.equal(launch.layout, "marketing");
-  assert.equal(launch.variant, "launch");
-  assert.equal(launch.primary, "E11D48");
+  assert.equal(launch.layout, "marketing-product-premiere");
+  assert.equal(launch.variant, "product-premiere");
+  assert.equal(launch.primary, "0B1020");
+  assert.equal(launch.secondary, "22D3EE");
   assert.equal(brand.layout, "marketing-brand-communication-console");
   assert.equal(brand.variant, "brand-console");
-  assert.equal(brand.primary, "7F1D4E");
-  assert.equal(brand.accent, "F97316");
+  assert.equal(brand.primary, "172033");
+  assert.equal(brand.accent, "E64B6A");
+  assert.equal(brand.secondary, "21A6A1");
   assert.equal(growth.layout, "growth-marketing-lab");
   assert.equal(growth.variant, "growth-lab");
   assert.equal(growth.accent, "F97316");

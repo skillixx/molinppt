@@ -1,19 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="media touchpoint map">
-  <rect width="600" height="360" rx="32" fill="#fff7f3"/>
-  <g fill="none" stroke="#7f1d4e" stroke-width="5" stroke-linecap="round" opacity=".42">
-    <path d="M300 180C238 114 174 94 112 120"/>
-    <path d="M300 180C374 94 454 82 512 126"/>
-    <path d="M300 180C228 238 180 270 112 248"/>
-    <path d="M300 180C380 238 438 266 512 238"/>
-  </g>
-  <circle cx="300" cy="180" r="48" fill="#7f1d4e"/>
-  <circle cx="112" cy="120" r="34" fill="#f97316"/>
-  <circle cx="512" cy="126" r="34" fill="#0f766e"/>
-  <circle cx="112" cy="248" r="34" fill="#0f766e"/>
-  <circle cx="512" cy="238" r="34" fill="#f97316"/>
-  <rect x="262" y="172" width="76" height="16" rx="8" fill="#fff"/>
-  <rect x="88" y="116" width="48" height="8" rx="4" fill="#fff"/>
-  <rect x="488" y="122" width="48" height="8" rx="4" fill="#fff"/>
-  <rect x="88" y="244" width="48" height="8" rx="4" fill="#fff"/>
-  <rect x="488" y="234" width="48" height="8" rx="4" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="420" viewBox="0 0 520 420" role="img" aria-label="媒介触点网络素材">
+  <rect width="520" height="420" rx="32" fill="#F5F7FA"/>
+  <g stroke="#CBD5E1" stroke-width="3"><path d="M260 210L112 92M260 210l296-104M260 210L104 318M260 210l286 102"/></g>
+  <circle cx="260" cy="210" r="58" fill="#172033"/>
+  <circle cx="112" cy="92" r="38" fill="#E64B6A"/>
+  <circle cx="408" cy="106" r="38" fill="#21A6A1"/>
+  <circle cx="104" cy="318" r="38" fill="#21A6A1"/>
+  <circle cx="404" cy="312" r="38" fill="#F6B44B"/>
+  <g fill="#fff"><rect x="232" y="196" width="56" height="12" rx="6"/><rect x="84" y="86" width="56" height="10" rx="5"/><rect x="380" y="100" width="56" height="10" rx="5"/><rect x="76" y="312" width="56" height="10" rx="5"/><rect x="376" y="306" width="56" height="10" rx="5"/></g>
 </svg>

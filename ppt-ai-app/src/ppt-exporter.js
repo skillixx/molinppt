@@ -20,11 +20,17 @@ import {
 const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scaleY: 1, type: "screen16x9" };
 const BUSINESS_MODERN_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const LUXURY_BRAND_ASSET_BASE_URL = new URL("../../templates/official/marketing/brand-story/premium/assets/", import.meta.url);
+const PRODUCT_PREMIERE_ASSET_BASE_URL = new URL("../../templates/official/marketing/marketing-campaign/launch/assets/", import.meta.url);
 const LUXURY_BRAND_MEDIA = {
   product: { file: "luxury-product-still.png", content: readFileSync(new URL("luxury-product-still.png", LUXURY_BRAND_ASSET_BASE_URL)) },
   gold: { file: "brushed-gold-texture.png", content: readFileSync(new URL("brushed-gold-texture.png", LUXURY_BRAND_ASSET_BASE_URL)) },
   silk: { file: "ivory-silk-stone.png", content: readFileSync(new URL("ivory-silk-stone.png", LUXURY_BRAND_ASSET_BASE_URL)) },
   glass: { file: "glass-showcase-detail.png", content: readFileSync(new URL("glass-showcase-detail.png", LUXURY_BRAND_ASSET_BASE_URL)) },
+};
+const PRODUCT_PREMIERE_MEDIA = {
+  product: { file: "product-concept-hero.png", content: readFileSync(new URL("product-concept-hero.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
+  stage: { file: "launch-stage-scene.png", content: readFileSync(new URL("launch-stage-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
+  lifestyle: { file: "product-lifestyle-scene.png", content: readFileSync(new URL("product-lifestyle-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
 };
 const STATUS_REPORT_MEDIA = {
   weekly: {
@@ -1003,6 +1009,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "teaching-achievement-showcase") return false;
   if (visual.layout === "education-workshop-practice-review") return false;
   if (visual.layout === "marketing-brand-communication-console") return false;
+  if (visual.layout === "marketing-product-premiere") return false;
   if (visual.layout === "marketing-festival-promotion-rhythm") return false;
   if (visual.layout === "marketing-launch-rhythm") return false;
   if (visual.layout === "social-video-growth") return false;
@@ -1024,6 +1031,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "luxury-brand-story") return false;
   if (visual.layout === "brand-story-editorial") return false;
   if (visual.layout === "growth-marketing-lab") return false;
+  if (visual.layout === "marketing-product-premiere") return false;
   if (visual.layout === "finance-risk-inspection") return false;
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
@@ -1338,6 +1346,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   if (visual.layout === "marketing-festival-promotion-rhythm") {
     return base + festivalPromotionRhythmDecorationsXml({ visual, index, role, slide, total });
   }
+  if (visual.layout === "marketing-product-premiere") {
+    return base + productPremiereDecorationsXml({ visual, index, role, slide, total });
+  }
   if (visual.layout === "marketing-launch-rhythm") {
     return base + launchRhythmDecorationsXml({ visual, index, layout, role, slide });
   }
@@ -1643,6 +1654,9 @@ function templateMediaFiles(visual) {
   }
   if (typeof isLuxuryBrandStoryVisual === "function" && isLuxuryBrandStoryVisual(visual)) {
     return Object.fromEntries(Object.values(LUXURY_BRAND_MEDIA).map((media) => [`ppt/media/${media.file}`, media.content]));
+  }
+  if (isProductPremiereVisual(visual)) {
+    return Object.fromEntries(Object.values(PRODUCT_PREMIERE_MEDIA).map((media) => [`ppt/media/${media.file}`, media.content]));
   }
   return {};
 }
@@ -3580,7 +3594,10 @@ function slideRelsXml(visual, role = "content") {
   const luxuryBrandRels = typeof isLuxuryBrandStoryVisual === "function" && isLuxuryBrandStoryVisual(visual)
     ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.product.file}"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.gold.file}"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.silk.file}"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${LUXURY_BRAND_MEDIA.glass.file}"/>`
     : "";
-  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}${luxuryBrandRels}</Relationships>`;
+  const productPremiereRels = isProductPremiereVisual(visual)
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.product.file}"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.stage.file}"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.lifestyle.file}"/>`
+    : "";
+  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}${luxuryBrandRels}${productPremiereRels}</Relationships>`;
 }
 
 /**
@@ -11648,10 +11665,11 @@ function growthMarketingLabDecorationsXml({ visual, index, slide, total }) {
   const palette = growthMarketingLabPalette(visual);
   const titleSize = scene.role === "cover" ? 2500 : 2100;
   const bulletBody = scene.bullets.slice(0, 4).map((item) => paragraphXml(`• ${item}`, 760, false, visual.body)).join("");
-  const header = textShapeXml({ id: 421, name: "Growth Lab Kicker", x: 768096, y: 731520, cx: 1828800, cy: 182880, text: "GROWTH COMMAND", size: 760, bold: true, color: visual.accent })
+  const header = textShapeXml({ id: 421, name: "Growth Lab Kicker", x: 768096, y: 731520, cx: 2133600, cy: 182880, text: `GROWTH LAB / ${scene.panelLabel}`, size: 700, bold: true, color: visual.accent })
     + textShapeXml({ id: 422, name: "Growth Lab Title", x: 768096, y: 1005840, cx: 3657600, cy: 762000, text: scene.title, size: titleSize, bold: true, color: visual.title })
     + textShapeXml({ id: 423, name: "Growth Lab Summary", x: 777240, y: 2034540, cx: 3352800, cy: 457200, text: scene.summary, size: 780, bold: true, color: visual.body })
-    + textShapeXml({ id: 424, name: "Growth Lab Bullet Block", x: 777240, y: 2651760, cx: 3200400, cy: 853440, body: bulletBody || paragraphXml("• 用户增长链路复盘", 760, false, visual.body), size: 760, bold: false, color: visual.body });
+    + textShapeXml({ id: 424, name: "Growth Lab Bullet Block", x: 777240, y: 2651760, cx: 3200400, cy: 853440, body: bulletBody || paragraphXml("• 用户增长链路复盘", 760, false, visual.body), size: 760, bold: false, color: visual.body })
+    + textShapeXml({ id: 425, name: "Growth Lab Panel Label", x: 6172200, y: 731520, cx: 1828800, cy: 182880, text: scene.panelLabel, size: 650, bold: true, color: visual.primary });
   const metrics = growthMarketingLabMetricsXml({ visual, metrics: scene.metrics });
   const right = scene.role === "cover"
     ? growthMarketingLabWheelXml({ visual, palette, stages: scene.stages })
@@ -11709,8 +11727,8 @@ function growthMarketingLabFunnelXml({ visual, scene }) {
     const width = 2743200 - itemIndex * 274320;
     const x = 5532120 + itemIndex * 137160;
     const y = 1036320 + itemIndex * 365760;
-    return solidShapeXml({ id: 481 + itemIndex * 2, name: `Growth Lab Funnel Bar ${itemIndex + 1}`, geom: "roundRect", x, y, cx: width, cy: 274320, fill: itemIndex % 2 ? visual.accent : visual.primary })
-      + textShapeXml({ id: 482 + itemIndex * 2, name: `Growth Lab Funnel Text ${itemIndex + 1}`, x: x + 152400, y: y + 60960, cx: width - 304800, cy: 121920, text: scene.bullets[itemIndex] || stage, size: 680, bold: true, color: "FFFFFF" });
+    return solidShapeXml({ id: 481 + itemIndex * 2, name: `Growth Lab AARRR Funnel Bar ${itemIndex + 1}`, geom: "roundRect", x, y, cx: width, cy: 274320, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 482 + itemIndex * 2, name: `Growth Lab AARRR Funnel Text ${itemIndex + 1}`, x: x + 152400, y: y + 60960, cx: width - 304800, cy: 121920, text: scene.bullets[itemIndex] || stage, size: 680, bold: true, color: "FFFFFF" });
   }).join("");
 }
 
@@ -11720,10 +11738,10 @@ function growthMarketingLabMatrixXml({ visual, scene }) {
     const row = Math.floor(itemIndex / 2);
     const x = 5295900 + col * 1485900;
     const y = 1036320 + row * 1066800;
-    return solidShapeXml({ id: 501 + itemIndex * 4, name: `Growth Lab Channel Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, fill: visual.surface })
-      + lineFrameShapeXml({ id: 502 + itemIndex * 4, name: `Growth Lab Channel Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, stroke: itemIndex % 2 ? visual.accent : visual.primary, width: 11430 })
-      + solidShapeXml({ id: 503 + itemIndex * 4, name: `Growth Lab Channel Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 152400, y: y + 137160, cx: 152400, cy: 152400, fill: itemIndex % 2 ? visual.accent : visual.primary })
-      + textShapeXml({ id: 504 + itemIndex * 4, name: `Growth Lab Channel Text ${itemIndex + 1}`, x: x + 365760, y: y + 137160, cx: 792480, cy: 457200, text: `${channel}\n${scene.bullets[itemIndex] || "渠道效率复盘"}`, size: 680, bold: true, color: visual.title });
+    return solidShapeXml({ id: 501 + itemIndex * 4, name: `Growth Lab Channel Matrix Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, fill: visual.surface })
+      + lineFrameShapeXml({ id: 502 + itemIndex * 4, name: `Growth Lab Channel Matrix Frame ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1325880, cy: 838200, stroke: itemIndex % 2 ? visual.accent : visual.primary, width: 11430 })
+      + solidShapeXml({ id: 503 + itemIndex * 4, name: `Growth Lab Channel Matrix Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 152400, y: y + 137160, cx: 152400, cy: 152400, fill: itemIndex % 2 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 504 + itemIndex * 4, name: `Growth Lab Channel Matrix Text ${itemIndex + 1}`, x: x + 365760, y: y + 137160, cx: 792480, cy: 457200, text: `${channel}\n${scene.bullets[itemIndex] || "渠道效率复盘"}`, size: 680, bold: true, color: visual.title });
   }).join("");
 }
 
@@ -11733,17 +11751,18 @@ function growthMarketingLabExperimentXml({ visual, scene }) {
     + textShapeXml({ id: 533, name: "Growth Lab Experiment Label", x: 5562600, y: 1203960, cx: 1371600, cy: 182880, text: "HYPOTHESIS", size: 760, bold: true, color: visual.accent })
     + textShapeXml({ id: 534, name: "Growth Lab Experiment Title", x: 5562600, y: 1516380, cx: 2438400, cy: 457200, text: scene.bullets[1] || "用实验验证关键转化假设", size: 1260, bold: true, color: visual.title })
     + textShapeXml({ id: 535, name: "Growth Lab Experiment Rule", x: 5562600, y: 2225040, cx: 2286000, cy: 365760, text: scene.bullets[2] || "指标、样本、周期和判定标准", size: 820, bold: true, color: visual.body })
-    + growthMarketingLabFunnelXml({ visual, scene });
+    + scene.experimentFields.map((item, itemIndex) => textShapeXml({ id: 536 + itemIndex, name: `Growth Lab Experiment Field ${itemIndex + 1}`, x: 5562600 + (itemIndex % 2) * 1066800, y: 2621280 + Math.floor(itemIndex / 2) * 274320, cx: 914400, cy: 152400, text: item, size: 560, bold: true, color: itemIndex % 2 ? visual.accent : visual.primary })).join("");
 }
 
 function growthMarketingLabRoiXml({ visual, palette }) {
-  return solidShapeXml({ id: 561, name: "Growth Lab ROI Board", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, fill: visual.surface })
-    + lineFrameShapeXml({ id: 562, name: "Growth Lab ROI Frame", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, stroke: palette.frame, width: 15240 })
+  return solidShapeXml({ id: 561, name: "Growth Lab Trend ROI Board", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, fill: visual.surface })
+    + lineFrameShapeXml({ id: 562, name: "Growth Lab Trend ROI Frame", geom: "roundRect", x: 5334000, y: 975360, cx: 3048000, cy: 1981200, stroke: palette.frame, width: 15240 })
     + solidShapeXml({ id: 563, name: "Growth Lab ROI Axis", x: 5638800, y: 2506980, cx: 2438400, cy: 15240, fill: palette.line })
     + solidShapeXml({ id: 564, name: "Growth Lab ROI Bar 1", geom: "roundRect", x: 5821680, y: 2026920, cx: 243840, cy: 480060, fill: visual.primary })
     + solidShapeXml({ id: 565, name: "Growth Lab ROI Bar 2", geom: "roundRect", x: 6400800, y: 1661160, cx: 243840, cy: 845820, fill: visual.accent })
     + solidShapeXml({ id: 566, name: "Growth Lab ROI Bar 3", geom: "roundRect", x: 6979920, y: 1356360, cx: 243840, cy: 1150620, fill: visual.primary })
-    + arcLineShapeXml({ id: 567, name: "Growth Lab ROI Curve", x: 5638800, y: 1219200, cx: 2438400, cy: 1371600, stroke: visual.accent, width: 38100 });
+    + arcLineShapeXml({ id: 567, name: "Growth Lab ROI Trend Curve", x: 5638800, y: 1219200, cx: 2438400, cy: 1371600, stroke: visual.accent, width: 38100 })
+    + ["LTV/CAC", "复购率", "回收期"].map((item, itemIndex) => textShapeXml({ id: 568 + itemIndex, name: `Growth Lab ROI KPI ${itemIndex + 1}`, x: 5562600 + itemIndex * 762000, y: 2727960, cx: 670560, cy: 152400, text: item, size: 560, bold: true, color: visual.title })).join("");
 }
 
 function growthMarketingLabPriorityXml({ visual, scene }) {
@@ -11751,7 +11770,8 @@ function growthMarketingLabPriorityXml({ visual, scene }) {
     const y = 1066800 + itemIndex * 716280;
     return solidShapeXml({ id: 581 + itemIndex * 3, name: `Growth Lab Priority Card ${itemIndex + 1}`, geom: "roundRect", x: 5295900, y, cx: 3048000, cy: 548640, fill: visual.surface })
       + solidShapeXml({ id: 582 + itemIndex * 3, name: `Growth Lab Priority Badge ${itemIndex + 1}`, geom: "roundRect", x: 5486400, y: y + 106680, cx: 365760, cy: 335280, fill: itemIndex === 1 ? visual.accent : visual.primary })
-      + textShapeXml({ id: 583 + itemIndex * 3, name: `Growth Lab Priority Text ${itemIndex + 1}`, x: 6019800, y: y + 121920, cx: 2011680, cy: 274320, text: scene.bullets[itemIndex] || action, size: 820, bold: true, color: visual.title });
+      + textShapeXml({ id: 583 + itemIndex * 3, name: `Growth Lab Priority Text ${itemIndex + 1}`, x: 6019800, y: y + 121920, cx: 1676400, cy: 274320, text: scene.bullets[itemIndex] || action, size: 820, bold: true, color: visual.title })
+      + textShapeXml({ id: 590 + itemIndex, name: `Growth Lab Priority ICE Score ${itemIndex + 1}`, x: 7848600, y: y + 152400, cx: 274320, cy: 152400, text: "ICE", size: 560, bold: true, color: visual.accent });
   }).join("");
 }
 
@@ -11788,6 +11808,8 @@ function growthMarketingLabScene({ slide, index, total }) {
   const layout = String(slide?.layout || "").toLowerCase();
   const role = index === 0 || layout.includes("cover")
     ? "cover"
+    : layout.includes("funnel") || layout.includes("aarrr")
+      ? "funnel"
     : layout.includes("matrix") || layout.includes("channel")
       ? "matrix"
       : layout.includes("experiment") || layout.includes("card")
@@ -11799,8 +11821,10 @@ function growthMarketingLabScene({ slide, index, total }) {
             : layout.includes("closing") || index === total - 1
               ? "closing"
               : ["funnel", "matrix", "experiment", "roi", "priority"][(index - 1) % 5];
+  const roleMeta = growthMarketingLabRoleMeta(role);
   return {
     role,
+    panelLabel: roleMeta.panelLabel,
     title: growthMarketingLabCompactText(slide?.title, role === "cover" ? "增长计划作战台" : "关键增长路径", role === "cover" ? 24 : 22),
     summary: growthMarketingLabCompactText(bullets[0], "围绕获客、激活、留存、变现和推荐建立可复用的实验闭环。", 44),
     bullets,
@@ -11809,10 +11833,24 @@ function growthMarketingLabScene({ slide, index, total }) {
       { value: "ROI", label: "投放复盘" },
       { value: "30D", label: "实验周期" },
     ],
-    channels: ["搜索", "内容", "社群", "广告"],
-    stages: ["获客", "激活", "留存", "转化", "复购"],
+    channels: ["搜索投放", "内容种草", "社群触达", "广告再营销"],
+    stages: ["获客", "激活", "留存", "收入", "推荐"],
     actions: ["高影响", "快验证", "低成本"],
+    experimentFields: ["假设", "变量", "指标", "判定"],
   };
+}
+
+function growthMarketingLabRoleMeta(role) {
+  const labels = {
+    cover: "增长飞轮",
+    funnel: "AARRR 漏斗",
+    matrix: "渠道矩阵",
+    experiment: "实验卡片",
+    roi: "趋势 ROI",
+    priority: "行动优先级",
+    closing: "下一轮行动",
+  };
+  return { panelLabel: labels[role] || labels.funnel };
 }
 
 function growthMarketingLabBulletTexts(slide) {
@@ -11933,12 +11971,12 @@ function brandCommunicationDecorationsXml({ visual, index, role, slide, total })
   const scene = brandCommunicationSceneFromSlide({ slide, index, total });
   const palette = brandCommunicationPalette(visual);
   // 品牌传播控制台模板用代码绘制全部主体结构，保证下载后的 PPTX 仍然可编辑。
-  const backdrop = rectShapeXml({ id: 1800, name: "Brand Comms Warm Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
-    + solidShapeXml({ id: 1801, name: "Brand Comms Orange Glow", geom: "ellipse", x: 6858000, y: -381000, cx: 1828800, cy: 1828800, fill: palette.orangeGlow })
-    + solidShapeXml({ id: 1802, name: "Brand Comms Berry Glow", geom: "ellipse", x: -304800, y: 3505200, cx: 2133600, cy: 1295400, fill: palette.berryGlow })
-    + solidShapeXml({ id: 1803, name: "Brand Comms Surface", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, fill: palette.surface })
-    + lineFrameShapeXml({ id: 1804, name: "Brand Comms Surface Frame", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, stroke: palette.frame, width: 15240 })
-    + rectShapeXml({ id: 1805, name: "Brand Comms Top Signal Rule", x: 731520, y: 662940, cx: 2011680, cy: 30480, fill: visual.accent });
+  const backdrop = rectShapeXml({ id: 1800, name: "Brand Comms Command Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.primary })
+    + solidShapeXml({ id: 1801, name: "Brand Comms Signal Glow", geom: "ellipse", x: 6858000, y: -381000, cx: 1828800, cy: 1828800, fill: palette.signalGlow })
+    + solidShapeXml({ id: 1802, name: "Brand Comms Touchpoint Glow", geom: "ellipse", x: -304800, y: 3505200, cx: 2133600, cy: 1295400, fill: palette.touchpointGlow })
+    + solidShapeXml({ id: 1803, name: "Brand Comms Control Surface", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, fill: palette.surface })
+    + lineFrameShapeXml({ id: 1804, name: "Brand Comms Control Surface Frame", geom: "roundRect", x: 530352, y: 452120, cx: 8083296, cy: 4236720, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1805, name: "Brand Comms Command Signal Rule", x: 731520, y: 662940, cx: 2011680, cy: 30480, fill: visual.accent });
   const header = textShapeXml({ id: 1810, name: "Brand Comms Kicker", x: 795528, y: 677940, cx: 1676400, cy: 198120, text: scene.kicker, size: 700, bold: true, color: visual.accent })
     + textShapeXml({ id: 1811, name: "Brand Comms Title", x: 795528, y: index === 0 ? 1005840 : 975360, cx: 3657600, cy: 731520, text: scene.title, size: index === 0 ? 2150 : 1780, bold: true, color: visual.title })
     + textShapeXml({ id: 1812, name: "Brand Comms Summary", x: 804672, y: 1973580, cx: 3200400, cy: 396240, text: scene.summary, size: 720, bold: true, color: visual.body })
@@ -11962,7 +12000,7 @@ function brandCommunicationBulletXml({ visual, scene }) {
 }
 
 function brandCommunicationConsoleXml({ visual, palette }) {
-  return solidShapeXml({ id: 1840, name: "Brand Comms Console Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 1828800, fill: visual.primary })
+  return solidShapeXml({ id: 1840, name: "Brand Comms Command Center Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 1828800, fill: visual.primary })
     + solidShapeXml({ id: 1841, name: "Brand Comms Console Accent Wash", geom: "roundRect", x: 5486400, y: 1066800, cx: 1371600, cy: 304800, fill: "FFFFFF" })
     + solidShapeXml({ id: 1842, name: "Brand Comms Console Device", geom: "roundRect", x: 7315200, y: 1905000, cx: 670560, cy: 701040, fill: palette.card })
     + rectShapeXml({ id: 1843, name: "Brand Comms Console Line 1", x: 5638800, y: 2286000, cx: 1066800, cy: 60960, fill: "FFFFFF" })
@@ -11973,7 +12011,7 @@ function brandCommunicationConsoleXml({ visual, palette }) {
 function brandCommunicationSceneCardsXml({ visual, palette }) {
   return [0, 1, 2, 3].map((itemIndex) => {
     const x = 5394960 + itemIndex * 731520;
-    return solidShapeXml({ id: 1850 + itemIndex * 4, name: `Brand Comms Scene Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3665220, cx: 609600, cy: 640080, fill: palette.card })
+    return solidShapeXml({ id: 1850 + itemIndex * 4, name: `Brand Comms Local Scene Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3665220, cx: 609600, cy: 640080, fill: palette.card })
       + rectShapeXml({ id: 1851 + itemIndex * 4, name: `Brand Comms Scene Line ${itemIndex + 1}`, x: x + 91440, y: 3817620, cx: 304800, cy: 45720, fill: itemIndex % 2 ? visual.secondary || "0F766E" : visual.primary })
       + solidShapeXml({ id: 1852 + itemIndex * 4, name: `Brand Comms Scene Visual ${itemIndex + 1}`, geom: itemIndex === 1 ? "parallelogram" : "roundRect", x: x + 289560, y: 4046220, cx: 213360, cy: 182880, fill: visual.accent });
   }).join("");
@@ -12014,7 +12052,8 @@ function brandCommunicationPersonaXml({ visual, palette, scene }) {
 }
 
 function brandCommunicationContentMatrixXml({ visual, palette, scene }) {
-  return scene.cards.map((item, itemIndex) => {
+  const grid = lineFrameShapeXml({ id: 1948, name: "Brand Comms Content Matrix Grid", geom: "rect", x: 4876800, y: 944880, cx: 3810000, cy: 1905000, stroke: palette.frame, width: 15240 });
+  return grid + scene.cards.map((item, itemIndex) => {
     const col = itemIndex % 4;
     const row = Math.floor(itemIndex / 4);
     const x = 4937760 + col * 914400;
@@ -12112,11 +12151,11 @@ function brandCommunicationSceneFromSlide({ slide, index, total }) {
 function brandCommunicationPalette(visual) {
   return {
     surface: blendHexColor(visual.surface, visual.background, 0.12),
-    card: blendHexColor(visual.surface, visual.accent, 0.10),
+    card: blendHexColor(visual.surface, visual.background, 0.16),
     soft: blendHexColor(visual.accent, visual.surface, 0.58),
-    frame: blendHexColor(visual.primary, visual.background, 0.64),
-    orangeGlow: blendHexColor(visual.accent, visual.background, 0.72),
-    berryGlow: blendHexColor(visual.primary, visual.background, 0.78),
+    frame: blendHexColor(visual.primary, visual.background, 0.72),
+    signalGlow: blendHexColor(visual.accent, visual.primary, 0.54),
+    touchpointGlow: blendHexColor(visual.secondary || "21A6A1", visual.primary, 0.58),
   };
 }
 
@@ -12134,6 +12173,212 @@ function brandCommunicationCompactText(value, fallback, maxLength) {
   const chars = Array.from(raw);
   if (chars.length <= maxLength) return raw;
   return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function productPremiereDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = productPremiereSceneFromSlide({ slide, index, role, total });
+  const palette = productPremierePalette(visual);
+  // 产品首发模板用生成图片做局部舞台/产品氛围，主体标题、时间轴、渠道和数据图仍由可编辑图形绘制。
+  const backdrop = rectShapeXml({ id: 880, name: "Product Premiere Dark Stage Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 881, name: "Product Premiere Cyan Glow", geom: "ellipse", x: 6400800, y: -304800, cx: 2286000, cy: 1828800, fill: palette.cyanGlow })
+    + solidShapeXml({ id: 882, name: "Product Premiere Red Glow", geom: "ellipse", x: -457200, y: 3657600, cx: 2438400, cy: 1295400, fill: palette.redGlow })
+    + productPremiereGridXml(palette)
+    + pictureXml({ id: 886, name: "Product Premiere Stage Scene", relId: "rId3", x: 5608320, y: 563880, cx: 3002280, cy: 2301240 })
+    + lineFrameShapeXml({ id: 887, name: "Product Premiere Stage Frame", geom: "roundRect", x: 5608320, y: 563880, cx: 3002280, cy: 2301240, stroke: "FFFFFF", width: 10160, transparency: 62000 });
+  const header = textShapeXml({ id: 900, name: "Product Premiere Kicker", x: 713232, y: 640080, cx: 2133600, cy: 198120, text: scene.kicker, size: 640, bold: true, color: visual.secondary || "22D3EE", fontFace: "Arial" })
+    + textShapeXml({ id: 901, name: "Product Premiere Title", x: 713232, y: index === 0 ? 929640 : 838200, cx: index === 0 ? 3962400 : 4267200, cy: index === 0 ? 1066800 : 762000, text: scene.title, size: index === 0 ? 2500 : 1820, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" })
+    + textShapeXml({ id: 902, name: "Product Premiere Summary", x: 731520, y: index === 0 ? 2103120 : 1684020, cx: 3657600, cy: 396240, text: scene.summary, size: 720, bold: true, color: visual.body, fontFace: "Microsoft YaHei" })
+    + productPremiereBulletXml({ scene, visual, index });
+  if (scene.role === "overview") return backdrop + header + productPremiereOverviewXml({ scene, visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette });
+  if (scene.role === "selling-points") return backdrop + header + productPremiereSellingXml({ scene, visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette });
+  if (scene.role === "scenario") return backdrop + header + productPremiereScenarioXml({ scene, visual, palette });
+  if (scene.role === "audience") return backdrop + header + productPremiereAudienceXml({ scene, visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette });
+  if (scene.role === "timeline") return backdrop + header + productPremiereTimelineXml({ scene, palette });
+  if (scene.role === "channel") return backdrop + header + productPremiereChannelXml({ scene, visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette });
+  if (scene.role === "data") return backdrop + header + productPremiereDataXml({ scene, visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette });
+  if (scene.role === "closing") return backdrop + header + productPremiereNextXml({ scene, visual, palette });
+  return backdrop + header + productPremiereHeroXml({ visual, palette }) + productPremiereMetricCardsXml({ scene, visual, palette }) + productPremiereCountdownXml(visual);
+}
+
+function productPremiereGridXml(palette) {
+  return [0, 1, 2, 3, 4].map((itemIndex) => rectShapeXml({ id: 890 + itemIndex, name: `Product Premiere Stage Grid ${itemIndex + 1}`, x: 0, y: 914400 + itemIndex * 731520, cx: 9144000, cy: 7620, fill: palette.grid })).join("")
+    + [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 906 + itemIndex, name: `Product Premiere Vertical Light ${itemIndex + 1}`, x: 609600 + itemIndex * 1371600, y: 0, cx: 7620, cy: 5143500, fill: palette.grid })).join("");
+}
+
+function productPremiereHeroXml({ visual, palette }) {
+  return solidShapeXml({ id: 920, name: "Product Premiere Hero Frame", geom: "roundRect", x: 5669280, y: 716280, cx: 2865120, cy: 2819400, fill: palette.glass })
+    + lineFrameShapeXml({ id: 921, name: "Product Premiere Hero Border", geom: "roundRect", x: 5669280, y: 716280, cx: 2865120, cy: 2819400, stroke: "FFFFFF", width: 10160, transparency: 64000 })
+    + pictureXml({ id: 922, name: "Product Premiere Product Concept", relId: "rId2", x: 5852160, y: 838200, cx: 2499360, cy: 2438400 })
+    + solidShapeXml({ id: 923, name: "Product Premiere Pedestal Glow", geom: "ellipse", x: 6217920, y: 3238500, cx: 1767840, cy: 350520, fill: palette.cyanGlow })
+    + lineFrameShapeXml({ id: 924, name: "Product Premiere Spotlight Beam A", geom: "line", x: 6096000, y: 426720, cx: -762000, cy: 1828800, stroke: visual.secondary || "22D3EE", width: 30480, transparency: 28000 })
+    + lineFrameShapeXml({ id: 925, name: "Product Premiere Spotlight Beam B", geom: "line", x: 8077200, y: 426720, cx: 609600, cy: 1828800, stroke: visual.accent, width: 30480, transparency: 32000 });
+}
+
+function productPremiereCountdownXml(visual) {
+  return textShapeXml({ id: 930, name: "Product Premiere Countdown", x: 713232, y: 3977640, cx: 1066800, cy: 426720, text: "T-Day", size: 2050, bold: true, color: visual.accent, fontFace: "Arial" });
+}
+
+function productPremiereBulletXml({ scene, visual, index }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = (index === 0 ? 2705100 : 2286000) + itemIndex * 228600;
+    return rectShapeXml({ id: 940 + itemIndex * 2, name: `Product Premiere Bullet Rule ${itemIndex + 1}`, x: 731520, y: y + 38100, cx: 45720, cy: 121920, fill: itemIndex % 2 ? visual.secondary || "22D3EE" : visual.accent })
+      + textShapeXml({ id: 941 + itemIndex * 2, name: `Product Premiere Bullet Text ${itemIndex + 1}`, x: 868680, y, cx: 3505200, cy: 167640, text: productPremiereCompactText(item, scene.title, 34), size: 680, bold: false, color: visual.body, fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereMetricCardsXml({ scene, visual, palette }) {
+  return scene.metrics.map((metric, itemIndex) => {
+    const x = 2011680 + itemIndex * 1066800;
+    return solidShapeXml({ id: 950 + itemIndex * 3, name: `Product Premiere Metric Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3947160, cx: 914400, cy: 563880, fill: palette.glass })
+      + lineFrameShapeXml({ id: 951 + itemIndex * 3, name: `Product Premiere Metric Border ${itemIndex + 1}`, geom: "roundRect", x, y: 3947160, cx: 914400, cy: 563880, stroke: "FFFFFF", width: 7620, transparency: 68000 })
+      + textShapeXml({ id: 952 + itemIndex * 3, name: `Product Premiere Metric Text ${itemIndex + 1}`, x: x + 106680, y: 4053840, cx: 701040, cy: 304800, text: `${metric.value}\n${metric.label}`, size: 720, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereOverviewXml({ scene, visual, palette }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5425440 + (itemIndex % 2) * 1447800;
+    const y = 1112520 + Math.floor(itemIndex / 2) * 990600;
+    return solidShapeXml({ id: 970 + itemIndex * 4, name: `Product Premiere Overview Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 777240, fill: palette.glass })
+      + textShapeXml({ id: 971 + itemIndex * 4, name: `Product Premiere Overview Index ${itemIndex + 1}`, x: x + 121920, y: y + 121920, cx: 365760, cy: 152400, text: `0${itemIndex + 1}`, size: 760, bold: true, color: visual.secondary || "22D3EE", fontFace: "Arial" })
+      + textShapeXml({ id: 972 + itemIndex * 4, name: `Product Premiere Overview Text ${itemIndex + 1}`, x: x + 121920, y: y + 381000, cx: 914400, cy: 182880, text: item, size: 660, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereSellingXml({ scene, visual, palette }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const y = 944880 + itemIndex * 731520;
+    return solidShapeXml({ id: 990 + itemIndex * 4, name: `Product Premiere Selling Point ${itemIndex + 1}`, geom: "roundRect", x: 5364480, y, cx: 3048000, cy: 563880, fill: palette.glass })
+      + rectShapeXml({ id: 991 + itemIndex * 4, name: `Product Premiere Selling Accent ${itemIndex + 1}`, x: 5577840, y: y + 381000, cx: 457200, cy: 30480, fill: itemIndex % 2 ? visual.secondary || "22D3EE" : visual.accent })
+      + textShapeXml({ id: 992 + itemIndex * 4, name: `Product Premiere Selling Text ${itemIndex + 1}`, x: 5577840, y: y + 152400, cx: 2438400, cy: 167640, text: item, size: 720, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereScenarioXml({ scene, visual, palette }) {
+  const photo = solidShapeXml({ id: 1010, name: "Product Premiere Scenario Photo Frame", geom: "roundRect", x: 5364480, y: 944880, cx: 3048000, cy: 1828800, fill: palette.glass })
+    + pictureXml({ id: 1011, name: "Product Premiere Lifestyle Scene", relId: "rId4", x: 5486400, y: 1066800, cx: 2804160, cy: 1584960 });
+  const cards = scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 5364480 + itemIndex * 1036320;
+    return solidShapeXml({ id: 1018 + itemIndex * 3, name: `Product Premiere Scenario Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3246120, cx: 914400, cy: 609600, fill: palette.glass })
+      + textShapeXml({ id: 1019 + itemIndex * 3, name: `Product Premiere Scenario Text ${itemIndex + 1}`, x: x + 106680, y: 3436620, cx: 701040, cy: 167640, text: item, size: 620, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+  return photo + cards + lineFrameShapeXml({ id: 1029, name: "Product Premiere Scenario Proof Line", geom: "line", x: 5486400, y: 3048000, cx: 2438400, cy: 0, stroke: visual.secondary || "22D3EE", width: 30480 });
+}
+
+function productPremiereAudienceXml({ scene, visual, palette }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 5334000 + itemIndex * 1066800;
+    return solidShapeXml({ id: 1035 + itemIndex * 5, name: `Product Premiere Audience Card ${itemIndex + 1}`, geom: "roundRect", x, y: 1219200, cx: 914400, cy: 1676400, fill: palette.glass })
+      + solidShapeXml({ id: 1036 + itemIndex * 5, name: `Product Premiere Audience Avatar ${itemIndex + 1}`, geom: "ellipse", x: x + 274320, y: 1447800, cx: 365760, cy: 365760, fill: itemIndex % 2 ? visual.secondary || "22D3EE" : visual.accent })
+      + textShapeXml({ id: 1037 + itemIndex * 5, name: `Product Premiere Audience Text ${itemIndex + 1}`, x: x + 106680, y: 2209800, cx: 701040, cy: 365760, text: item, size: 640, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereTimelineXml({ scene, palette }) {
+  return scene.timeline.map((item, itemIndex) => {
+    const x = 701040 + itemIndex * 1295400;
+    return solidShapeXml({ id: 1060 + itemIndex * 4, name: `Product Premiere Timeline Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3657600, cx: 1066800, cy: 670560, fill: palette.glass })
+      + textShapeXml({ id: 1061 + itemIndex * 4, name: `Product Premiere Timeline Step ${itemIndex + 1}`, x: x + 106680, y: 3779520, cx: 853440, cy: 137160, text: item.step, size: 760, bold: true, color: itemIndex === 4 ? "FF3B5C" : "22D3EE", fontFace: "Arial" })
+      + textShapeXml({ id: 1062 + itemIndex * 4, name: `Product Premiere Timeline Text ${itemIndex + 1}`, x: x + 106680, y: 3992880, cx: 792480, cy: 152400, text: item.text, size: 560, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereChannelXml({ scene, visual, palette }) {
+  return scene.channels.map((item, itemIndex) => {
+    const x = 5364480 + (itemIndex % 2) * 1447800;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 944880;
+    return solidShapeXml({ id: 1090 + itemIndex * 4, name: `Product Premiere Channel Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 731520, fill: palette.glass })
+      + textShapeXml({ id: 1091 + itemIndex * 4, name: `Product Premiere Channel Label ${itemIndex + 1}`, x: x + 121920, y: y + 121920, cx: 731520, cy: 137160, text: item.channel, size: 620, bold: true, color: visual.warning || "F8C14A", fontFace: "Arial" })
+      + textShapeXml({ id: 1092 + itemIndex * 4, name: `Product Premiere Channel Text ${itemIndex + 1}`, x: x + 121920, y: y + 350520, cx: 914400, cy: 167640, text: item.text, size: 640, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereDataXml({ visual, palette }) {
+  const panel = solidShapeXml({ id: 1120, name: "Product Premiere Data Dashboard", geom: "roundRect", x: 5364480, y: 1066800, cx: 3048000, cy: 2133600, fill: palette.glass })
+    + lineFrameShapeXml({ id: 1121, name: "Product Premiere Data Dashboard Border", geom: "roundRect", x: 5364480, y: 1066800, cx: 3048000, cy: 2133600, stroke: "FFFFFF", width: 7620, transparency: 66000 })
+    + rectShapeXml({ id: 1122, name: "Product Premiere Data Baseline", x: 5715000, y: 2865120, cx: 2286000, cy: 30480, fill: palette.grid });
+  const bars = [0.34, 0.58, 0.82, 0.52].map((heightRatio, itemIndex) => {
+    const height = Math.round(1219200 * heightRatio);
+    return rectShapeXml({ id: 1125 + itemIndex, name: `Product Premiere Data Bar ${itemIndex + 1}`, x: 5867400 + itemIndex * 457200, y: 2865120 - height, cx: 259080, cy: height, fill: itemIndex === 3 ? visual.warning || "F8C14A" : itemIndex % 2 ? visual.secondary || "22D3EE" : visual.accent });
+  }).join("");
+  return panel + bars + lineFrameShapeXml({ id: 1135, name: "Product Premiere Data Trend", geom: "line", x: 5867400, y: 2552700, cx: 1676400, cy: -670560, stroke: visual.secondary || "22D3EE", width: 30480 });
+}
+
+function productPremiereNextXml({ scene, visual, palette }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 975360 + itemIndex * 2286000;
+    return solidShapeXml({ id: 1150 + itemIndex * 4, name: `Product Premiere Next Card ${itemIndex + 1}`, geom: "roundRect", x, y: 2926080, cx: 1828800, cy: 914400, fill: palette.glass })
+      + rectShapeXml({ id: 1151 + itemIndex * 4, name: `Product Premiere Next Accent ${itemIndex + 1}`, x: x + 182880, y: 3215640, cx: 365760, cy: 30480, fill: itemIndex === 1 ? visual.secondary || "22D3EE" : visual.accent })
+      + textShapeXml({ id: 1152 + itemIndex * 4, name: `Product Premiere Next Text ${itemIndex + 1}`, x: x + 182880, y: 3329940, cx: 1371600, cy: 243840, text: item, size: 720, bold: true, color: "FFFFFF", fontFace: "Microsoft YaHei" });
+  }).join("");
+}
+
+function productPremiereSceneFromSlide({ slide, index, role, total }) {
+  const bullets = productPremiereBulletTexts(slide);
+  const title = productPremiereCompactText(slide?.title, index === 0 ? "新品首发发布会方案" : `首发执行页面 ${index + 1}`, index === 0 ? 28 : 24);
+  const layout = String(slide?.layout || role || "").toLowerCase();
+  const heading = String(slide?.title || "");
+  const sceneRole = index === 0 || layout.includes("cover")
+    ? "cover"
+    : layout.includes("overview") || /总览|目录|overview/i.test(heading)
+      ? "overview"
+      : layout.includes("selling") || layout.includes("point") || /卖点|亮点|价值|point/i.test(heading)
+        ? "selling-points"
+        : layout.includes("scenario") || layout.includes("scene") || /场景|体验|应用|scene/i.test(heading)
+          ? "scenario"
+          : layout.includes("audience") || /人群|用户|受众|persona/i.test(heading)
+            ? "audience"
+            : layout.includes("timeline") || layout.includes("rhythm") || /时间|节奏|上市|timeline/i.test(heading)
+              ? "timeline"
+              : layout.includes("data") || layout.includes("kpi") || /数据|指标|看板|转化|kpi/i.test(heading)
+                  ? "data"
+                  : layout.includes("channel") || /渠道|首发|铺排|channel/i.test(heading)
+                    ? "channel"
+                  : index === total - 1
+                    ? "closing"
+                    : ["selling-points", "scenario", "audience", "timeline", "channel", "data"][(index - 1) % 6];
+  const cards = ["核心卖点", "场景价值", "目标人群", "上市节奏", "渠道首发", "首发数据"].map((fallback, itemIndex) => productPremiereCompactText(bullets[itemIndex], fallback, 16));
+  return {
+    role: sceneRole,
+    kicker: sceneRole === "cover" ? "PRODUCT PREMIERE" : sceneRole === "overview" ? "LAUNCH MAP" : sceneRole === "selling-points" ? "SELLING POINTS" : sceneRole === "scenario" ? "SCENE PROOF" : sceneRole === "audience" ? "AUDIENCE TARGET" : sceneRole === "timeline" ? "T-MINUS ROADMAP" : sceneRole === "channel" ? "CHANNEL DEBUT" : sceneRole === "data" ? "FIRST-WAVE DATA" : "NEXT WAVE",
+    title,
+    summary: productPremiereCompactText(bullets[0], "围绕新品卖点、发布会节奏、目标人群、渠道首发和上市数据建立一体化 Campaign。", 50),
+    bullets,
+    cards,
+    timeline: ["T-30", "T-14", "T-7", "T-1", "T-Day", "T+7"].map((step, itemIndex) => ({ step, text: productPremiereCompactText(bullets[itemIndex], ["预热启动", "内容种草", "预约蓄水", "发布彩排", "首发上线", "复盘加码"][itemIndex], 12) })),
+    channels: ["ECOM", "SOCIAL", "LIVE", "RETAIL"].map((channel, itemIndex) => ({ channel, text: productPremiereCompactText(bullets[itemIndex], ["电商首发", "社媒扩散", "直播转化", "线下体验"][itemIndex], 14) })),
+    metrics: [
+      { value: "T-Day", label: "首发节点" },
+      { value: "4", label: "渠道矩阵" },
+      { value: "7D", label: "复盘窗口" },
+    ],
+  };
+}
+
+function productPremiereBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.filter((item) => typeof item === "string" && item.trim()) : [];
+  return values.length > 0 ? values : ["新品核心卖点与首发定位", "目标人群与使用场景", "上市时间轴和渠道首发动作", "首发数据指标与复盘节奏"];
+}
+
+function productPremiereCompactText(text, fallback, maxLength) {
+  const raw = String(text || fallback || "").replace(/[：:，,。；;]/g, " ").replace(/\s+/g, " ").trim();
+  const chars = Array.from(raw);
+  if (chars.length <= maxLength) return raw;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join("")}…`;
+}
+
+function productPremierePalette(visual) {
+  return {
+    cyanGlow: blendHexColor(visual.secondary || "22D3EE", visual.background, 0.74),
+    redGlow: blendHexColor(visual.accent, visual.background, 0.68),
+    glass: blendHexColor("FFFFFF", visual.background, 0.86),
+    grid: blendHexColor(visual.secondary || "22D3EE", visual.background, 0.82),
+    stageWash: blendHexColor(visual.background, "000000", 0.18),
+  };
+}
+
+function isProductPremiereVisual(visual) {
+  return visual?.id === "marketing-campaign" && visual?.layout === "marketing-product-premiere";
 }
 
 function launchRhythmDecorationsXml({ visual, index, role, slide }) {

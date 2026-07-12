@@ -1,14 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="outdoor advertising scene">
-  <rect width="600" height="360" rx="32" fill="#fff7f3"/>
-  <path d="M54 284h492" stroke="#7f1d4e" stroke-width="8" stroke-linecap="round" opacity=".16"/>
-  <rect x="84" y="66" width="384" height="178" rx="20" fill="#26101f"/>
-  <rect x="106" y="88" width="340" height="134" rx="14" fill="#fff7ed"/>
-  <path d="M124 196c72-78 142-88 210-30 34 29 72 35 96 18v38H124z" fill="#f97316" opacity=".88"/>
-  <rect x="126" y="112" width="150" height="18" rx="9" fill="#7f1d4e"/>
-  <rect x="126" y="144" width="106" height="12" rx="6" fill="#5a3b48" opacity=".45"/>
-  <rect x="126" y="166" width="142" height="12" rx="6" fill="#5a3b48" opacity=".32"/>
-  <rect x="182" y="244" width="28" height="82" rx="8" fill="#26101f" opacity=".82"/>
-  <rect x="342" y="244" width="28" height="82" rx="8" fill="#26101f" opacity=".82"/>
-  <rect x="486" y="128" width="42" height="116" rx="20" fill="#0f766e" opacity=".78"/>
-  <circle cx="512" cy="94" r="22" fill="#f97316"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" role="img" aria-label="户外广告传播场景局部素材">
+  <rect width="640" height="420" rx="38" fill="#F5F7FA"/>
+  <path d="M0 292h640v128H0z" fill="#172033"/>
+  <g fill="#CBD5E1"><rect x="42" y="138" width="64" height="154"/><rect x="128" y="98" width="82" height="194"/><rect x="478" y="122" width="88" height="170"/></g>
+  <g fill="#94A3B8" opacity=".55"><path d="M58 160h14v14H58zM82 160h14v14H82zM144 122h16v16h-16zM174 122h16v16h-16zM500 146h18v16h-18zM532 146h18v16h-18z"/></g>
+  <rect x="236" y="76" width="214" height="138" rx="18" fill="#172033"/>
+  <rect x="258" y="102" width="122" height="20" rx="10" fill="#fff"/>
+  <rect x="258" y="142" width="154" height="14" rx="7" fill="#E64B6A"/>
+  <rect x="258" y="170" width="94" height="12" rx="6" fill="#21A6A1"/>
+  <path d="M296 214h94l24 112H272z" fill="#334155"/>
+  <rect x="176" y="318" width="292" height="18" rx="9" fill="#E64B6A"/>
+  <circle cx="506" cy="336" r="24" fill="#F6B44B"/>
 </svg>

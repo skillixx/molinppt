@@ -120,13 +120,13 @@ test("PptService falls back to HTML preview when PPTX renderer is unavailable", 
   assert.doesNotMatch(preview, /data-preview-source="rendered-pptx"/);
 });
 
-test("PptService renders commercial template theme chips as decorative elements in HTML preview", async () => {
+test("PptService renders product premiere launch preview with generated assets", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
   const outline = await context.pptService.generateOutline({
     ownerUserId: 7,
     topic: "Market launch plan",
-    slideCount: 2,
+    slideCount: 7,
     templateId: "marketing-campaign",
     theme: "launch",
   });
@@ -134,9 +134,12 @@ test("PptService renders commercial template theme chips as decorative elements 
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  // 主题风格名只保留在选择器里，预览页的角标只作为装饰图形存在。
-  assert.match(preview, /<div class="marketing-chip" aria-hidden="true"><\/div>/);
-  assert.doesNotMatch(preview, /<div class="marketing-chip">/);
+  assert.match(preview, /<body data-template="marketing-campaign" data-layout="marketing-product-premiere"/);
+  assert.match(preview, /product-premiere-layer/);
+  assert.match(preview, /product-premiere-hero/);
+  assert.match(preview, /product-premiere-timeline|product-premiere-channel|product-premiere-data/);
+  assert.match(preview, /--product-premiere-product:url\("data:image\/png;base64,/);
+  assert.doesNotMatch(preview, /新品发布/);
 });
 
 test("PptService renders growth marketing lab preview with dedicated layout", async () => {

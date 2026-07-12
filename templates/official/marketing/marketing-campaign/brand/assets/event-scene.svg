@@ -1,16 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="brand event scene">
-  <rect width="600" height="360" rx="32" fill="#fff7ed"/>
-  <path d="M92 276h416l-52 46H144z" fill="#7f1d4e"/>
-  <rect x="140" y="82" width="320" height="146" rx="24" fill="#ffffff" stroke="#fed7aa" stroke-width="4"/>
-  <rect x="172" y="112" width="152" height="18" rx="9" fill="#7f1d4e"/>
-  <rect x="172" y="150" width="102" height="12" rx="6" fill="#5a3b48" opacity=".42"/>
-  <rect x="172" y="176" width="164" height="12" rx="6" fill="#5a3b48" opacity=".28"/>
-  <circle cx="394" cy="158" r="38" fill="#f97316" opacity=".84"/>
-  <path d="M120 66l92 190M480 66l-92 190" stroke="#f97316" stroke-width="8" stroke-linecap="round" opacity=".28"/>
-  <circle cx="162" cy="308" r="12" fill="#f97316"/>
-  <circle cx="218" cy="310" r="12" fill="#0f766e"/>
-  <circle cx="274" cy="306" r="12" fill="#7f1d4e"/>
-  <circle cx="330" cy="310" r="12" fill="#f97316"/>
-  <circle cx="386" cy="306" r="12" fill="#0f766e"/>
-  <circle cx="442" cy="310" r="12" fill="#7f1d4e"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" role="img" aria-label="活动现场传播场景局部素材">
+  <rect width="640" height="420" rx="38" fill="#101827"/>
+  <path d="M68 328h504v42H68z" fill="#334155"/>
+  <path d="M166 126h308l56 202H110z" fill="#172033" stroke="#475569" stroke-width="4"/>
+  <rect x="206" y="154" width="228" height="92" rx="18" fill="#F5F7FA"/>
+  <rect x="238" y="186" width="116" height="18" rx="9" fill="#172033"/>
+  <rect x="238" y="220" width="72" height="12" rx="6" fill="#E64B6A"/>
+  <path d="M188 328l-54 50M452 328l54 50" stroke="#64748B" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#21A6A1" opacity=".9"><circle cx="158" cy="350" r="14"/><circle cx="210" cy="354" r="16"/><circle cx="430" cy="354" r="16"/><circle cx="482" cy="350" r="14"/></g>
+  <path d="M214 118L162 44M426 118l52-74M320 118V30" stroke="#E64B6A" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  <circle cx="320" cy="30" r="12" fill="#F6B44B"/>
 </svg>
