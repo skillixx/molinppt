@@ -10,21 +10,28 @@ export const templateRenderer = {
   "themeName": "洞察分析",
   "style": "analytics-report",
   "visual": {
-    "primary": "273C75",
-    "accent": "F6A623",
-    "background": "F4F7FB",
+    "primary": "172554",
+    "accent": "F59E0B",
+    "secondary": "14B8A6",
+    "warning": "EF4444",
+    "background": "F6F8FB",
     "surface": "FFFFFF",
-    "title": "17243A",
-    "body": "46566C",
-    "layout": "data-insight",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "data-insight-workbench",
     "variant": "insight"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "executive-cover",
-    "defaultContentLayout": "executive-content",
+    "defaultCoverLayout": "data-insight-workbench-cover",
+    "defaultContentLayout": "data-insight-workbench-trend",
     "allowedLayouts": [
-      "executive-cover",
-      "executive-content",
+      "data-insight-workbench-cover",
+      "data-insight-workbench-trend",
+      "data-insight-workbench-attribution",
+      "data-insight-workbench-correlation",
+      "data-insight-workbench-evidence",
+      "data-insight-workbench-priority",
+      "data-insight-workbench-closing",
       "title",
       "content"
     ]
