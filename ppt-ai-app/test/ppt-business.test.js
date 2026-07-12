@@ -842,6 +842,28 @@ test("PptService renders synced product release cadence preview with dedicated l
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders product strategy roadmap preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品路线图汇报",
+    slideCount: 6,
+    templateId: "product-roadmap",
+    theme: "roadmap",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-roadmap" data-layout="product-strategy-roadmap"/);
+  assert.match(preview, /product-roadmap-layer/);
+  assert.match(preview, /product-roadmap-lanes/);
+  assert.match(preview, /NOW \/ NEXT \/ LATER|CAPABILITY MAP|MILESTONE PLAN|DEPENDENCY MAP|RESOURCE PRIORITY/);
+  assert.doesNotMatch(preview, />路线图</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders product release committee preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -861,6 +883,28 @@ test("PptService renders product release committee preview with dedicated layout
   assert.match(preview, /release-committee-board/);
   assert.match(preview, /release-committee-matrix|release-committee-timeline|release-committee-gray|release-committee-risk/);
   assert.doesNotMatch(preview, />版本发布</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders product review canvas preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "产品迭代复盘与下一轮规划",
+    slideCount: 7,
+    templateId: "product-roadmap",
+    theme: "product-review",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="product-roadmap" data-layout="product-review-canvas"/);
+  assert.match(preview, /review-layer/);
+  assert.match(preview, /review-canvas/);
+  assert.match(preview, /review-goal-bridge|review-behavior-path|review-adoption-grid|review-feedback-cluster|review-cause-map|review-roadmap/);
+  assert.doesNotMatch(preview, />产品复盘</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 

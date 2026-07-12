@@ -1460,15 +1460,14 @@ test("PptExportService uses commercial product roadmap decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Product Cover Strategy Field"/);
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product roadmap Chip"/);
-  assert.match(slide1, /name="Product Roadmap Node 4"/);
-  assert.match(slide2, /name="Product Content Anchor"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Canvas"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Lane Now"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Product Console"/);
+  assert.match(slide2, /name="Product Strategy Roadmap Decision Card 1"/);
   assert.doesNotMatch(slide2, /name="Product Cover Strategy Field"/);
   assert.doesNotMatch(slide1, /name="Secondary Accent"/);
-  assert.match(slide1, /val="145A7A"/);
-  assert.match(slide1, /val="2FB7A3"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.match(slide1, /val="14B8A6"/);
 });
 
 test("PptExportService uses product pain points decorations", () => {
@@ -1890,7 +1889,7 @@ test("PptExportService uses commercial product release decorations", () => {
         { title: "功能模块范围", bullets: ["核心功能", "影响模块", "依赖系统", "状态标签"] },
         { title: "上线时间线", bullets: ["范围冻结", "联调验收", "灰度放量", "全量上线"] },
         { title: "灰度放量策略", bullets: ["1% 验证", "10% 观察", "50% 放量", "100% 全量"] },
-        { title: "风险和回滚预案", bullets: ["数据异常", "链路阻塞", "体验波动", "运营投诉"] },
+        { title: "业务区整售端流失率较同期偏高可能影响续约团队重建", bullets: ["数据异常", "链路阻塞", "体验波动", "运营投诉"] },
         { title: "成功指标", bullets: ["稳定性", "使用率", "转化率", "工单量"] },
       ],
     },
@@ -1907,6 +1906,7 @@ test("PptExportService uses commercial product release decorations", () => {
   assert.match(slide3, /name="Product Release Launch Timeline Gate 3"/);
   assert.match(slide4, /name="Product Release Gray Strategy Step 3"/);
   assert.match(slide5, /name="Product Release Rollback Card 2"/);
+  assert.match(slide5, /name="Product Release Committee Title"[\s\S]*sz="1180"/);
   assert.match(slide1, /val="0B1F3A"/);
   assert.match(slide1, /val="14B8A6"/);
   assert.doesNotMatch(slide1, /版本发布/);
@@ -1915,18 +1915,43 @@ test("PptExportService uses commercial product release decorations", () => {
 test("PptExportService uses commercial product review decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "product-roadmap", theme: "product-review" },
+    deck: {
+      ...deck,
+      templateId: "product-roadmap",
+      theme: "product-review",
+      slides: [
+        { title: "产品迭代复盘", layout: "product-review-cover", bullets: ["目标达成", "用户行为", "功能采纳", "下一轮假设"] },
+        { title: "目标与结果对照", layout: "goal-result-compare", bullets: ["目标 DAU 提升", "实际留存改善", "差距归因", "行动建议"] },
+        { title: "用户行为变化", layout: "behavior-change", bullets: ["访问频次上升", "关键路径缩短", "转化节点波动", "活跃结构变化"] },
+        { title: "功能采纳率矩阵", layout: "feature-adoption", bullets: ["高采纳功能", "低采纳功能", "深度使用", "待验证假设"] },
+        { title: "用户反馈聚类", layout: "feedback-cluster", bullets: ["体验阻塞", "价值感知", "性能问题", "新需求"] },
+        { title: "问题归因", layout: "root-cause", bullets: ["入口不清晰", "价值表达弱", "路径阻塞", "监控不足"] },
+        { title: "下一轮迭代假设", layout: "iteration-hypothesis", bullets: ["优化入口", "灰度实验", "数据监控", "复盘节奏"] },
+        { title: "经验沉淀与后续规划", layout: "product-review-closing", bullets: ["保留动作", "验证假设", "责任人", "下次复盘"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+  const slide7 = pptPartText(text, "ppt/slides/slide7.xml");
+  const slide8 = pptPartText(text, "ppt/slides/slide8.xml");
 
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product product-review Chip"/);
-  assert.match(slide1, /name="Product Review Ring Outer"/);
-  assert.match(slide1, /name="Product Review Feedback Line 3"/);
-  assert.match(slide1, /val="263D4A"/);
-  assert.match(slide1, /val="E07A5F"/);
+  assert.match(slide1, /name="Product Review Canvas Surface"/);
+  assert.match(slide1, /name="Product Review Canvas Board"/);
+  assert.match(slide1, /name="Product Review Metric Card 3"/);
+  assert.match(slide2, /name="Product Review Goal Bridge Panel"/);
+  assert.match(slide5, /name="Product Review Feedback Cluster Panel"/);
+  assert.match(slide6, /name="Product Review Cause Map Panel"/);
+  assert.match(slide7, /name="Product Review Iteration Roadmap Panel"|name="Product Review Iteration Loop Panel"/);
+  assert.match(slide8, /name="Product Review Iteration Loop Panel"/);
+  assert.match(slide1, /val="173B3A"/);
+  assert.match(slide1, /val="20B486"/);
+  assert.doesNotMatch(slide1, /Product product-review Chip/);
+  assert.doesNotMatch(slide1, /产品复盘/);
 });
 
 test("PptExportService uses commercial marketing launch decorations", () => {

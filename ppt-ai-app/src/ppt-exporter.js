@@ -992,6 +992,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "strategy-swot-map") return false;
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "business-model-value-chain") return false;
+  if (visual.layout === "product-review-canvas") return false;
   if (visual.layout === "product-release-cadence") return false;
   if (visual.layout === "product-release-committee") return false;
   if (visual.layout === "product-pain-points") return false;
@@ -1067,6 +1068,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "presales-architecture-solution") return false;
   if (visual.layout === "sales-training-objection-handling") return false;
   if (visual.layout === "product-pricing-strategy") return false;
+  if (visual.layout === "product-review-canvas") return false;
   if (visual.layout === "product-retention-path") return false;
   if (visual.layout === "pitch-ai-saas") return false;
   if (visual.layout === "pitch-project-return") return false;
@@ -1090,6 +1092,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "public-course-enrollment") return false;
   if (visual.layout === "department-team-performance") return false;
   if (visual.layout === "brand-identity-system") return false;
+  if (visual.layout === "product-strategy-roadmap") return false;
   return true;
 }
 
@@ -1125,6 +1128,9 @@ function scaleTemplateGeometryXml(xml, visual) {
 
 function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
+  if (isProductRoadmapVisual(visual)) {
+    return base + productRoadmapDecorationsXml({ visual, index, layout, role, slide, total });
+  }
   if (visual.layout === "data-research-report") {
     // 研究报告主题要先于通用模板 fallback 返回，确保 PPTX 拥有页码、脚注、资料索引和证据卡等专属图形。
     return base + dataResearchReportDecorationsXml({ visual, index, slide, total });
@@ -1253,6 +1259,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (isBusinessModelValueChainVisual(visual)) {
     return base + businessModelValueChainDecorationsXml({ visual, index, role, slide });
+  }
+  if (visual.layout === "product-review-canvas") {
+    return base + productReviewCanvasDecorationsXml({ visual, index, layout, role, slide, total });
   }
   if (visual.layout === "product-release-cadence") {
     return base + productReleaseCadenceDecorationsXml({ visual, index, layout, role, slide });
@@ -3472,6 +3481,55 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 1371600, y: 1905000, cx: 5181600, cy: 1371600 },
       titleSize: 2750,
       bodySize: 1240,
+    };
+  }
+  if (visual.layout === "product-review-canvas") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 产品复盘由专属画布承载标题、指标和行动卡；这些坐标只作为专属绘制函数的统一锚点。
+      surface: { x: 493776, y: 421640, cx: 8156448, cy: 4328160 },
+      accent: { x: 493776, y: 421640, cx: 8156448, cy: 60960 },
+      secondaryAccent: { x: 722376, y: 2042160, cx: 1737360, cy: 45720 },
+      label: { x: 713232, y: 689000, cx: 2438400, cy: 228600 },
+      title: isClosing
+        ? { x: 713232, y: 990600, cx: 4572000, cy: 792480 }
+        : isCover
+          ? { x: 713232, y: 1036320, cx: 3962400, cy: 1005840 }
+          : { x: 713232, y: 960120, cx: 3962400, cy: 914400 },
+      content: isClosing
+        ? { x: 777240, y: 2133600, cx: 3962400, cy: 1066800 }
+        : isCover
+          ? { x: 777240, y: 2446020, cx: 3505200, cy: 914400 }
+          : { x: 777240, y: 2057400, cx: 3429000, cy: 1219200 },
+      titleSize: isCover ? 2100 : isClosing ? 1600 : 1700,
+      bodySize: 840,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "product-strategy-roadmap") {
+    if (index === 0) {
+      return {
+        surface: { x: 493776, y: 421640, cx: 8156448, cy: 4312920 },
+        accent: { x: 493776, y: 421640, cx: 8156448, cy: 76200 },
+        secondaryAccent: { x: 792480, y: 2895600, cx: 3352800, cy: 22860 },
+        label: { x: 768096, y: 701040, cx: 2590800, cy: 228600 },
+        title: { x: 749808, y: 1005840, cx: 3962400, cy: 1036320 },
+        content: { x: 792480, y: 2392680, cx: 3352800, cy: 914400 },
+        titleSize: 2300,
+        bodySize: 820,
+      };
+    }
+    return {
+      surface: { x: 493776, y: 421640, cx: 8156448, cy: 4312920 },
+      accent: { x: 493776, y: 421640, cx: 8156448, cy: 76200 },
+      secondaryAccent: { x: 768096, y: 2385060, cx: 2895600, cy: 22860 },
+      label: { x: 768096, y: 670560, cx: 2590800, cy: 228600 },
+      title: { x: 749808, y: 944880, cx: 3901440, cy: 822960 },
+      content: { x: 792480, y: 2011680, cx: 3200400, cy: 1219200 },
+      titleSize: 1760,
+      bodySize: 700,
     };
   }
   if (visual.layout === "academy") {
@@ -8683,110 +8741,424 @@ function isSalesProposalVisual(visual) {
   return visual?.id === "sales-proposal" && visual?.layout === "academy";
 }
 
-function productRoadmapDecorationsXml({ visual, index, layout }) {
-  const scene = productRoadmapScene(visual);
-  const palette = productRoadmapColorPalette(visual);
-  const isCover = index === 0;
-  const coverChrome = isCover
-    ? (
-        solidShapeXml({ id: 220, name: "Product Cover Strategy Field", geom: "roundRect", x: 365760, y: 548640, cx: 8412480, cy: 3802380, fill: palette.coverWash })
-        + lineFrameShapeXml({ id: 221, name: "Product Cover Field Frame", geom: "roundRect", x: 457200, y: 685800, cx: 8229600, cy: 3657600, stroke: palette.frame, width: 15240 })
-      )
-    : (
-        solidShapeXml({ id: 220, name: "Product Content Anchor", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
-        + rectShapeXml({ id: 221, name: "Product Content Accent Rule", x: 0, y: 342900, cx: 9144000, cy: 30480, fill: visual.accent })
-      );
-  const panel = isCover
-    ? { x: 6324600, y: 1394460, cx: 1981200, cy: 1752600 }
-    : { x: 6256020, y: 1432560, cx: 1950720, cy: 1524000 };
-  const frame = isCover
-    ? { x: 6202680, y: 1280160, cx: 1981200, cy: 1752600 }
-    : { x: 6141720, y: 1325880, cx: 1950720, cy: 1524000 };
-  const chip = isCover
-    ? { x: 6964680, y: 914400, cx: 975360, cy: 304800 }
-    : { x: 7040880, y: 914400, cx: 822960, cy: 274320 };
-  const chipText = isCover
-    ? { x: 7101840, y: 975360, cx: 701040, cy: 182880 }
-    : { x: 7162800, y: 967740, cx: 548640, cy: 152400 };
-  return coverChrome
-    + solidShapeXml({ id: 222, name: "Product Visual Panel", geom: "roundRect", ...panel, fill: palette.panel })
-    + lineFrameShapeXml({ id: 223, name: "Product Visual Frame", geom: "roundRect", ...frame, stroke: visual.accent, width: 15240 })
-    + solidShapeXml({ id: 224, name: `Product ${scene.variant} Chip`, geom: isCover ? "roundRect" : scene.chipShape, ...chip, fill: palette.chip })
-    + textShapeXml({ id: 225, name: "Product Chip Text", ...chipText, text: "", size: 820, bold: true, color: "FFFFFF" })
-    + textShapeXml({ id: 226, name: "Product Section Label", ...layout.label, text: isCover ? scene.kicker : scene.section, size: 1000, bold: true, color: visual.accent })
-    + solidShapeXml({ id: 227, name: "Product Focus Line", x: 914400, y: isCover ? 3322320 : 1516380, cx: 3505200, cy: 22860, fill: visual.accent })
-    + productRoadmapVisualXml({ visual, palette, scene, isCover })
-    + textShapeXml({ id: 246, name: "Product Caption", x: isCover ? 6316980 : 6347460, y: isCover ? 3429000 : 3200400, cx: isCover ? 2133600 : 1828800, cy: 182880, text: scene.caption, size: isCover ? 820 : 760, bold: true, color: visual.body });
+function productReviewCanvasDecorationsXml({ visual, index, layout, role, slide, total }) {
+  const scene = productReviewCanvasScene({ slide, index, role, total });
+  const palette = productReviewCanvasColorPalette(visual);
+  const canvas = solidShapeXml({ id: 1810, name: "Product Review Canvas Surface", geom: "roundRect", ...layout.surface, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1811, name: "Product Review Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1812, name: "Product Review Canvas Top Rule", ...layout.accent, fill: visual.accent })
+    + rectShapeXml({ id: 1813, name: "Product Review Canvas Warm Rule", x: layout.accent.x + 3124200, y: layout.accent.y, cx: 1828800, cy: 60960, fill: visual.secondary || "F59E0B" });
+  const header = textShapeXml({ id: 1814, name: "Product Review Canvas Kicker", ...layout.label, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1815, name: "Product Review Canvas Title", ...layout.title, text: scene.title, size: productReviewCanvasTitleSize(scene.title, index, role), bold: true, color: visual.title })
+    + rectShapeXml({ id: 1816, name: "Product Review Canvas Focus Rule", ...layout.secondaryAccent, fill: visual.accent })
+    + productReviewCanvasBulletCardsXml({ visual, palette, items: scene.bullets });
+
+  if (scene.kind === "cover") return canvas + header + productReviewCanvasBoardXml({ visual, palette }) + productReviewCanvasMetricsXml({ visual, palette, items: scene.metrics });
+  if (scene.kind === "goal") return canvas + header + productReviewCanvasGoalBridgeXml({ visual, palette, items: scene.cards });
+  if (scene.kind === "behavior") return canvas + header + productReviewCanvasBehaviorXml({ visual, palette, items: scene.cards });
+  if (scene.kind === "adoption") return canvas + header + productReviewCanvasAdoptionXml({ visual, palette, items: scene.cards });
+  if (scene.kind === "feedback") return canvas + header + productReviewCanvasFeedbackXml({ visual, palette, items: scene.tags });
+  if (scene.kind === "cause") return canvas + header + productReviewCanvasCauseXml({ visual, palette, items: scene.cards });
+  if (scene.kind === "hypothesis") return canvas + header + productReviewCanvasRoadmapXml({ visual, palette, items: scene.cards });
+  return canvas + header + productReviewCanvasLoopXml({ visual, palette, items: scene.cards });
 }
 
-function productRoadmapVisualXml({ visual, palette, scene, isCover }) {
-  const dx = isCover ? 0 : -45720;
-  if (scene.variant === "release") {
-    return solidShapeXml({ id: 230, name: "Product Release Shelf", geom: "roundRect", x: 6507480 + dx, y: 1661160, cx: 1371600, cy: 396240, fill: palette.soft })
-      + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 231 + itemIndex, name: `Product Release Card ${itemIndex + 1}`, geom: "roundRect", x: 6606540 + dx + itemIndex * 396240, y: 1760220, cx: 274320, cy: 228600, fill: itemIndex === 1 ? visual.primary : visual.accent })).join("")
-      + solidShapeXml({ id: 235, name: "Product Release Timeline", geom: "roundRect", x: 6537960 + dx, y: 2461260, cx: 1310640, cy: 38100, fill: palette.line })
-      + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 236 + itemIndex, name: `Product Release Milestone ${itemIndex + 1}`, geom: "ellipse", x: 6583680 + dx + itemIndex * 426720, y: 2415540, cx: 121920, cy: 121920, fill: itemIndex === 2 ? visual.accent : visual.primary })).join("");
+function productReviewCanvasBulletCardsXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const y = 2286000 + itemIndex * 228600;
+    return solidShapeXml({ id: 1820 + itemIndex, name: `Product Review Evidence Card ${itemIndex + 1}`, geom: "roundRect", x: 777240, y, cx: 3352800, cy: 167640, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
+      + lineFrameShapeXml({ id: 1824 + itemIndex, name: `Product Review Evidence Frame ${itemIndex + 1}`, geom: "roundRect", x: 777240, y, cx: 3352800, cy: 167640, stroke: palette.frame, width: 7620 })
+      + textShapeXml({ id: 1828 + itemIndex, name: `Product Review Evidence Text ${itemIndex + 1}`, x: 876300, y: y + 36576, cx: 3108960, cy: 91440, text: productReviewCanvasCompactText(item, "复盘证据", 24), size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function productReviewCanvasBoardXml({ visual, palette }) {
+  const cells = [
+    { name: "Goal", x: 5501640, y: 1097280, fill: palette.soft },
+    { name: "Result", x: 6934200, y: 1097280, fill: "FFFFFF" },
+    { name: "Feedback", x: 5501640, y: 2407920, fill: "FFFFFF" },
+    { name: "Hypothesis", x: 6934200, y: 2407920, fill: palette.warm },
+  ];
+  return solidShapeXml({ id: 1840, name: "Product Review Canvas Board", geom: "roundRect", x: 5303520, y: 914400, cx: 3048000, cy: 2819400, fill: palette.panel })
+    + cells.map((cell, index) => solidShapeXml({ id: 1841 + index, name: `Product Review Canvas ${cell.name} Cell`, geom: "roundRect", x: cell.x, y: cell.y, cx: 1127760, cy: 853440, fill: cell.fill })).join("")
+    + rectShapeXml({ id: 1846, name: "Product Review Canvas Split X", x: 6751320, y: 1066800, cx: 30480, cy: 2133600, fill: palette.line })
+    + rectShapeXml({ id: 1847, name: "Product Review Canvas Split Y", x: 5486400, y: 2240280, cx: 2590800, cy: 30480, fill: palette.line });
+}
+
+function productReviewCanvasMetricsXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, index) => solidShapeXml({ id: 1850 + index, name: `Product Review Metric Card ${index + 1}`, geom: "roundRect", x: 777240 + index * 1097280, y: 3855720, cx: 975360, cy: 426720, fill: index === 1 ? palette.soft : "FFFFFF" })
+    + textShapeXml({ id: 1853 + index, name: `Product Review Metric Text ${index + 1}`, x: 868680 + index * 1097280, y: 3985260, cx: 792480, cy: 152400, text: productReviewCanvasCompactText(item, "指标", 8), size: 760, bold: true, color: index === 1 ? visual.primary : visual.title })).join("");
+}
+
+function productReviewCanvasGoalBridgeXml({ visual, palette, items }) {
+  return solidShapeXml({ id: 1860, name: "Product Review Goal Bridge Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2217420, fill: palette.panel })
+    + productReviewCanvasLargeCardXml({ id: 1861, name: "Product Review Goal Target Card", x: 5486400, y: 1333500, text: items[0] || "目标", fill: "FFFFFF", visual })
+    + productReviewCanvasLargeCardXml({ id: 1864, name: "Product Review Goal Result Card", x: 6934200, y: 1333500, text: items[1] || "结果", fill: palette.soft, visual })
+    + rectShapeXml({ id: 1867, name: "Product Review Goal Gap Bridge", x: 6637020, y: 1821180, cx: 457200, cy: 60960, fill: visual.accent })
+    + productReviewCanvasLargeCardXml({ id: 1868, name: "Product Review Gap Insight Card", x: 5996940, y: 2484120, text: items[2] || "差距归因", fill: palette.warm, visual });
+}
+
+function productReviewCanvasLargeCardXml({ id, name, x, y, text, fill, visual }) {
+  return solidShapeXml({ id, name, geom: "roundRect", x, y, cx: 1219200, cy: 670560, fill })
+    + textShapeXml({ id: id + 1, name: `${name} Text`, x: x + 106680, y: y + 198120, cx: 1005840, cy: 182880, text: productReviewCanvasCompactText(text, "复盘项", 12), size: 760, bold: true, color: visual.title });
+}
+
+function productReviewCanvasBehaviorXml({ visual, palette, items }) {
+  const dots = [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 1871 + itemIndex, name: `Product Review Behavior Dot ${itemIndex + 1}`, geom: "ellipse", x: 5516880 + itemIndex * 701040, y: 2590800 - itemIndex * 274320 + (itemIndex === 2 ? 274320 : 0), cx: 152400, cy: 152400, fill: itemIndex === 2 ? visual.secondary || "F59E0B" : itemIndex === 3 ? visual.primary : visual.accent })).join("");
+  const cards = items.slice(0, 3).map((item, index) => productReviewCanvasSmallCardXml({ id: 1878 + index * 2, name: `Product Review Behavior Data Card ${index + 1}`, x: 5433060 + index * 944880, y: 3352800, text: item, fill: index === 1 ? palette.soft : "FFFFFF", visual })).join("");
+  return solidShapeXml({ id: 1870, name: "Product Review Behavior Path Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2514600, fill: palette.panel })
+    + rectShapeXml({ id: 1876, name: "Product Review Behavior Baseline", x: 5486400, y: 2743200, cx: 2590800, cy: 45720, fill: palette.line })
+    + dots
+    + cards;
+}
+
+function productReviewCanvasAdoptionXml({ visual, palette, items }) {
+  return solidShapeXml({ id: 1888, name: "Product Review Adoption Matrix Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2514600, fill: palette.panel })
+    + items.slice(0, 4).map((item, index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      return productReviewCanvasSmallCardXml({ id: 1889 + index * 2, name: `Product Review Adoption Cell ${index + 1}`, x: 5486400 + col * 1371600, y: 1333500 + row * 914400, text: item, fill: index === 0 ? palette.soft : index === 3 ? palette.warm : "FFFFFF", visual, width: 1219200, height: 670560 });
+    }).join("");
+}
+
+function productReviewCanvasFeedbackXml({ visual, palette, items }) {
+  const chips = items.slice(0, 4).map((item, index) => {
+    const positions = [
+      { x: 5715000, y: 1546860, fill: visual.primary },
+      { x: 7048500, y: 1737360, fill: visual.accent },
+      { x: 6134100, y: 2537460, fill: visual.secondary || "F59E0B" },
+      { x: 7284720, y: 2857500, fill: visual.warning || "E76F51" },
+    ];
+    const pos = positions[index];
+    return solidShapeXml({ id: 1901 + index, name: `Product Review Feedback Cluster ${index + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 701040, cy: 243840, fill: pos.fill })
+      + textShapeXml({ id: 1905 + index, name: `Product Review Feedback Cluster Text ${index + 1}`, x: pos.x + 76200, y: pos.y + 60960, cx: 548640, cy: 91440, text: productReviewCanvasCompactText(item, "反馈", 8), size: 560, bold: true, color: "FFFFFF" });
+  }).join("");
+  return solidShapeXml({ id: 1900, name: "Product Review Feedback Cluster Panel", geom: "ellipse", x: 5486400, y: 1097280, cx: 2438400, cy: 2133600, fill: palette.panel })
+    + chips
+    + solidShapeXml({ id: 1910, name: "Product Review Feedback Quote Card", geom: "roundRect", x: 5486400, y: 3467100, cx: 2590800, cy: 426720, fill: "FFFFFF" });
+}
+
+function productReviewCanvasCauseXml({ visual, palette, items }) {
+  const nodes = [
+    { name: "Center", x: 6629400, y: 2019300, cx: 426720, fill: visual.primary },
+    { name: "User", x: 5615940, y: 1424940, cx: 335280, fill: visual.accent },
+    { name: "Feature", x: 7589520, y: 1424940, cx: 335280, fill: visual.secondary || "F59E0B" },
+    { name: "Process", x: 5806440, y: 2857500, cx: 335280, fill: visual.warning || "E76F51" },
+    { name: "Data", x: 7399020, y: 2857500, cx: 335280, fill: visual.accent },
+  ].map((node, index) => solidShapeXml({ id: 1921 + index, name: `Product Review Cause ${node.name} Node`, geom: "ellipse", x: node.x, y: node.y, cx: node.cx, cy: node.cx, fill: node.fill })).join("");
+  const evidence = items.slice(0, 3).map((item, index) => productReviewCanvasSmallCardXml({ id: 1928 + index * 2, name: `Product Review Cause Evidence ${index + 1}`, x: 5486400 + index * 883920, y: 3467100, text: item, fill: index === 1 ? palette.soft : "FFFFFF", visual, width: 762000, height: 304800 })).join("");
+  return solidShapeXml({ id: 1920, name: "Product Review Cause Map Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2514600, fill: palette.panel })
+    + rectShapeXml({ id: 1926, name: "Product Review Cause Horizontal Link", x: 5897880, y: 2217420, cx: 1676400, cy: 30480, fill: palette.line })
+    + rectShapeXml({ id: 1927, name: "Product Review Cause Vertical Link", x: 6819900, y: 1546860, cx: 30480, cy: 1524000, fill: palette.line })
+    + nodes
+    + evidence;
+}
+
+function productReviewCanvasRoadmapXml({ visual, palette, items }) {
+  const rail = rectShapeXml({ id: 1940, name: "Product Review Iteration Roadmap Rail", x: 5501640, y: 2354580, cx: 2545080, cy: 60960, fill: visual.accent });
+  const cards = items.slice(0, 4).map((item, index) => productReviewCanvasSmallCardXml({ id: 1941 + index * 2, name: `Product Review Iteration Roadmap Card ${index + 1}`, x: 5364480 + index * 731520, y: 1539240 + (index % 2) * 1066800, text: item, fill: index === 3 ? palette.warm : "FFFFFF", visual, width: 609600, height: 640080 })).join("");
+  return solidShapeXml({ id: 1939, name: "Product Review Iteration Roadmap Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2514600, fill: palette.panel })
+    + rail
+    + cards;
+}
+
+function productReviewCanvasLoopXml({ visual, palette, items }) {
+  return solidShapeXml({ id: 1960, name: "Product Review Iteration Loop Panel", geom: "roundRect", x: 5265420, y: 1112520, cx: 3124200, cy: 2514600, fill: visual.primary })
+    + items.slice(0, 4).map((item, index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      return productReviewCanvasSmallCardXml({ id: 1961 + index * 2, name: `Product Review Loop Action ${index + 1}`, x: 5486400 + col * 1371600, y: 1394460 + row * 853440, text: item, fill: index === 0 ? palette.soft : "FFFFFF", visual, width: 1219200, height: 579120 });
+    }).join("");
+}
+
+function productReviewCanvasSmallCardXml({ id, name, x, y, text, fill, visual, width = 853440, height = 365760 }) {
+  return solidShapeXml({ id, name, geom: "roundRect", x, y, cx: width, cy: height, fill })
+    + textShapeXml({ id: id + 1, name: `${name} Text`, x: x + 76200, y: y + 91440, cx: width - 152400, cy: height - 152400, text: productReviewCanvasCompactText(text, "复盘项", 10), size: 560, bold: true, color: visual.title });
+}
+
+function productReviewCanvasScene({ slide, index, role, total }) {
+  const bullets = productReviewCanvasBulletTexts(slide);
+  const layout = String(slide?.layout || "");
+  const kind = index === 0 || layout.includes("cover")
+    ? "cover"
+    : role === "closing" || index === total - 1 || layout.includes("closing") || layout.includes("summary")
+      ? "closing"
+      : layout.includes("goal") || layout.includes("result")
+        ? "goal"
+        : layout.includes("behavior") || layout.includes("funnel")
+          ? "behavior"
+          : layout.includes("adoption") || layout.includes("feature")
+            ? "adoption"
+            : layout.includes("feedback")
+              ? "feedback"
+              : layout.includes("cause") || layout.includes("diagnosis")
+                ? "cause"
+                : layout.includes("iteration") || layout.includes("roadmap") || layout.includes("hypothesis")
+                  ? "hypothesis"
+                  : ["goal", "behavior", "adoption", "feedback", "cause", "hypothesis"][(index - 1) % 6];
+  const kickerMap = {
+    cover: "GROWTH RETRO CANVAS",
+    goal: "GOAL VS RESULT",
+    behavior: "USER BEHAVIOR",
+    adoption: "FEATURE ADOPTION",
+    feedback: "FEEDBACK CLUSTER",
+    cause: "CAUSE FINDING",
+    hypothesis: "NEXT HYPOTHESIS",
+    closing: "ITERATION LOOP",
+  };
+  return {
+    kind,
+    kicker: kickerMap[kind] || "GROWTH RETRO CANVAS",
+    title: productReviewCanvasCompactText(slide?.title, "产品迭代复盘", index === 0 ? 28 : 24),
+    bullets,
+    cards: ["目标", "结果", "差距", "行动"].map((fallback, itemIndex) => productReviewCanvasCompactText(bullets[itemIndex], fallback, 12)),
+    metrics: ["目标值", "实际值", "达成率"].map((fallback, itemIndex) => productReviewCanvasCompactText(bullets[itemIndex], fallback, 8)),
+    tags: ["反馈", "采纳", "归因", "假设"].map((fallback, itemIndex) => productReviewCanvasCompactText(bullets[itemIndex], fallback, 8)),
+  };
+}
+
+function productReviewCanvasBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || item.action || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length > 0 ? values : ["对照本轮目标和真实结果", "观察用户行为与功能采纳变化", "归因关键问题并形成下一轮实验假设"];
+}
+
+function productReviewCanvasTitleSize(title, index, role) {
+  const length = Array.from(String(title || "").replace(/\s+/g, "")).length;
+  if (index === 0) {
+    if (length >= 24) return 1680;
+    if (length >= 18) return 1880;
+    return 2100;
   }
-  if (scene.variant === "product-review") {
-    return solidShapeXml({ id: 230, name: "Product Review Ring Outer", geom: "ellipse", x: 6675120 + dx, y: 1623060, cx: 914400, cy: 914400, fill: palette.soft })
-      + solidShapeXml({ id: 231, name: "Product Review Ring Inner", geom: "ellipse", x: 6888480 + dx, y: 1836420, cx: 487680, cy: 487680, fill: visual.surface })
-      + arcLineShapeXml({ id: 232, name: "Product Review Progress Arc", x: 6675120 + dx, y: 1623060, cx: 914400, cy: 914400, stroke: visual.accent, width: 53340 })
-      + [0, 1, 2].map((itemIndex) => solidShapeXml({ id: 233 + itemIndex, name: `Product Review Feedback Line ${itemIndex + 1}`, geom: "roundRect", x: 6507480 + dx, y: 2743200 + itemIndex * 152400, cx: 1219200 - itemIndex * 213360, cy: 38100, fill: itemIndex === 0 ? visual.primary : palette.line })).join("");
-  }
-  return solidShapeXml({ id: 230, name: "Product Roadmap Rail", geom: "roundRect", x: 6507480 + dx, y: 2324100, cx: 1371600, cy: 38100, fill: palette.line })
-    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 231 + itemIndex, name: `Product Roadmap Node ${itemIndex + 1}`, geom: "ellipse", x: 6545580 + dx + itemIndex * 365760, y: 2263140 - itemIndex * 91440, cx: 121920, cy: 121920, fill: itemIndex === 3 ? visual.accent : visual.primary })).join("")
-    + solidShapeXml({ id: 236, name: "Product Roadmap Feature Card", geom: "roundRect", x: 6553200 + dx, y: 2667000, cx: 1219200, cy: 304800, fill: palette.card });
+  if (role === "closing") return length >= 20 ? 1360 : 1560;
+  if (length >= 22) return 1280;
+  if (length >= 16) return 1480;
+  return 1680;
+}
+
+function productReviewCanvasCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
+}
+
+function productReviewCanvasColorPalette(visual) {
+  return {
+    panel: blendHexColor(visual.surface, visual.background, 0.28),
+    soft: blendHexColor(visual.accent, visual.background, 0.76),
+    warm: blendHexColor(visual.secondary || "F59E0B", visual.background, 0.76),
+    frame: blendHexColor(visual.primary, visual.surface, 0.36),
+    line: blendHexColor(visual.primary, visual.background, 0.58),
+  };
+}
+
+function isProductReviewCanvasVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "product-review-canvas" && (id === "product-roadmap" || id === "product-product-roadmap-product-review");
+}
+
+function productRoadmapDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = productRoadmapScene({ slide, index, role, total });
+  const palette = productRoadmapColorPalette(visual);
+  const isCover = scene.role === "cover";
+  const canvas = solidShapeXml({ id: 220, name: "Product Strategy Roadmap Canvas", geom: "roundRect", x: 493776, y: 421640, cx: 8156448, cy: 4312920, fill: visual.surface })
+    + lineFrameShapeXml({ id: 221, name: "Product Strategy Roadmap Canvas Frame", geom: "roundRect", x: 493776, y: 421640, cx: 8156448, cy: 4312920, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 222, name: "Product Strategy Roadmap Top Rule", x: 493776, y: 421640, cx: 8156448, cy: 76200, fill: visual.primary })
+    + rectShapeXml({ id: 223, name: "Product Strategy Roadmap Accent Rule", x: 493776, y: 482600, cx: 8156448, cy: 15240, fill: visual.accent });
+  const header = textShapeXml({ id: 224, name: "Product Strategy Roadmap Kicker", ...scene.labelBox, text: scene.kicker, size: 680, bold: true, color: visual.accent })
+    + textShapeXml({ id: 225, name: "Product Strategy Roadmap Title", ...scene.titleBox, text: scene.title, size: isCover ? 1480 : 1120, bold: true, color: visual.title })
+    + textShapeXml({ id: 226, name: "Product Strategy Roadmap Summary", ...scene.summaryBox, text: scene.summary, size: isCover ? 760 : 660, bold: false, color: visual.body });
+  const bullets = productRoadmapBulletCardsXml({ visual, palette, scene, isCover });
+  const body = scene.role === "cover"
+    ? productRoadmapLanesXml({ visual, palette, scene, x: 5120640, y: 1066800, cx: 3352800, cy: 1546860 }) + productRoadmapConsoleXml({ visual, palette })
+    : scene.role === "capabilities"
+      ? productRoadmapCapabilitiesXml({ visual, palette, scene })
+      : scene.role === "milestones"
+        ? productRoadmapMilestonesXml({ visual, palette, scene, large: true })
+        : scene.role === "dependencies"
+          ? productRoadmapDependenciesXml({ visual, palette, scene })
+          : scene.role === "priority"
+            ? productRoadmapPriorityXml({ visual, palette, scene })
+            : scene.role === "closing"
+              ? productRoadmapDecisionXml({ visual, palette, scene })
+              : productRoadmapLanesXml({ visual, palette, scene, x: 5105400, y: 1188720, cx: 3383280, cy: 1371600 }) + productRoadmapMilestonesXml({ visual, palette, scene, large: false });
+  return canvas + header + bullets + body;
+}
+
+function productRoadmapBulletCardsXml({ visual, palette, scene, isCover }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = (isCover ? 2926080 : 2316480) + itemIndex * 228600;
+    return solidShapeXml({ id: 230 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 792480, y, cx: 3200400, cy: 167640, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
+      + solidShapeXml({ id: 231 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 853440, y: y + 53340, cx: 60960, cy: 60960, fill: itemIndex === 0 ? visual.accent : visual.secondary || "F59E0B" })
+      + textShapeXml({ id: 232 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Text ${itemIndex + 1}`, x: 975360, y: y + 30480, cx: 2773680, cy: 91440, text: productRoadmapCompactText(item, scene.title, 30), size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function productRoadmapLanesXml({ visual, palette, scene, x, y, cx, cy }) {
+  const laneWidth = Math.round((cx - 182880) / 3);
+  return scene.lanes.map((lane, itemIndex) => {
+    const laneX = x + itemIndex * (laneWidth + 91440);
+    return solidShapeXml({ id: 260 + itemIndex * 5, name: `Product Strategy Roadmap Lane ${lane.label}`, geom: "roundRect", x: laneX, y, cx: laneWidth, cy, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 261 + itemIndex * 5, name: `Product Strategy Roadmap Lane Frame ${itemIndex + 1}`, geom: "roundRect", x: laneX, y, cx: laneWidth, cy, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 262 + itemIndex * 5, name: `Product Strategy Roadmap Lane Rule ${itemIndex + 1}`, x: laneX + 91440, y: y + 152400, cx: laneWidth - 182880, cy: 45720, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 263 + itemIndex * 5, name: `Product Strategy Roadmap Lane Label ${itemIndex + 1}`, x: laneX + 137160, y: y + 289560, cx: laneWidth - 274320, cy: 182880, text: lane.label, size: 860, bold: true, color: visual.title })
+      + textShapeXml({ id: 264 + itemIndex * 5, name: `Product Strategy Roadmap Lane Text ${itemIndex + 1}`, x: laneX + 137160, y: y + 822960, cx: laneWidth - 274320, cy: 304800, text: lane.text, size: 620, bold: true, color: visual.body });
+  }).join("");
+}
+
+function productRoadmapMilestonesXml({ visual, palette, scene, large }) {
+  const x = large ? 4998720 : 5120640;
+  const y = large ? 1645920 : 3535680;
+  const railWidth = large ? 3429000 : 3230880;
+  const rail = rectShapeXml({ id: 310, name: "Product Strategy Roadmap Milestone Rail", x, y: y + 487680, cx: railWidth, cy: 30480, fill: palette.line });
+  const nodes = scene.milestones.map((item, itemIndex) => {
+    const nodeX = x + itemIndex * Math.round(railWidth / 3);
+    return solidShapeXml({ id: 311 + itemIndex * 5, name: `Product Strategy Roadmap Milestone Node ${itemIndex + 1}`, geom: "ellipse", x: nodeX - 60960, y: y + 426720, cx: 152400, cy: 152400, fill: itemIndex === 3 ? visual.secondary || "F59E0B" : visual.accent })
+      + textShapeXml({ id: 312 + itemIndex * 5, name: `Product Strategy Roadmap Milestone Label ${itemIndex + 1}`, x: nodeX - 152400, y: y + 152400, cx: 548640, cy: 152400, text: item.label, size: 660, bold: true, color: visual.title })
+      + textShapeXml({ id: 313 + itemIndex * 5, name: `Product Strategy Roadmap Milestone Text ${itemIndex + 1}`, x: nodeX - 152400, y: y + 670560, cx: 670560, cy: 243840, text: item.text, size: 560, bold: true, color: visual.body });
+  }).join("");
+  return rail + nodes;
+}
+
+function productRoadmapCapabilitiesXml({ visual, palette, scene }) {
+  return scene.capabilities.map((item, itemIndex) => {
+    const y = 1158240 + itemIndex * 853440;
+    return solidShapeXml({ id: 360 + itemIndex * 5, name: `Product Strategy Roadmap Capability Layer ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 182880, y, cx: 3291840 - itemIndex * 365760, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 361 + itemIndex * 5, name: `Product Strategy Roadmap Capability Frame ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 182880, y, cx: 3291840 - itemIndex * 365760, cy: 609600, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 362 + itemIndex * 5, name: `Product Strategy Roadmap Capability Number ${itemIndex + 1}`, geom: "ellipse", x: 5257800 + itemIndex * 182880, y: y + 167640, cx: 243840, cy: 243840, fill: itemIndex === 1 ? visual.accent : visual.primary })
+      + textShapeXml({ id: 363 + itemIndex * 5, name: `Product Strategy Roadmap Capability Title ${itemIndex + 1}`, x: 5654040 + itemIndex * 182880, y: y + 137160, cx: 1524000, cy: 167640, text: item.label, size: 760, bold: true, color: visual.title })
+      + textShapeXml({ id: 364 + itemIndex * 5, name: `Product Strategy Roadmap Capability Text ${itemIndex + 1}`, x: 5654040 + itemIndex * 182880, y: y + 365760, cx: 1828800, cy: 152400, text: item.text, size: 580, bold: true, color: visual.body });
+  }).join("");
+}
+
+function productRoadmapDependenciesXml({ visual, palette, scene }) {
+  const hub = solidShapeXml({ id: 420, name: "Product Strategy Roadmap Dependency Hub", geom: "ellipse", x: 6385560, y: 2103120, cx: 670560, cy: 670560, fill: visual.primary })
+    + solidShapeXml({ id: 421, name: "Product Strategy Roadmap Dependency Core", geom: "ellipse", x: 6598920, y: 2316480, cx: 243840, cy: 243840, fill: visual.accent });
+  const positions = [
+    { x: 5059680, y: 1219200 },
+    { x: 7353300, y: 1272540 },
+    { x: 5143500, y: 3429000 },
+    { x: 7315200, y: 3352800 },
+  ];
+  const links = positions.map((pos, itemIndex) => rectShapeXml({ id: 430 + itemIndex, name: `Product Strategy Roadmap Dependency Link ${itemIndex + 1}`, x: Math.min(pos.x + 457200, 6705600), y: Math.min(pos.y + 304800, 2440000), cx: Math.abs(6705600 - (pos.x + 457200)) || 30480, cy: 30480, fill: palette.line })).join("");
+  const nodes = scene.dependencies.map((item, itemIndex) => {
+    const pos = positions[itemIndex];
+    return solidShapeXml({ id: 440 + itemIndex * 4, name: `Product Strategy Roadmap Dependency Card ${itemIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 1219200, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 441 + itemIndex * 4, name: `Product Strategy Roadmap Dependency Frame ${itemIndex + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 1219200, cy: 548640, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 442 + itemIndex * 4, name: `Product Strategy Roadmap Dependency Label ${itemIndex + 1}`, x: pos.x + 121920, y: pos.y + 114300, cx: 975360, cy: 137160, text: item.label, size: 700, bold: true, color: visual.title })
+      + textShapeXml({ id: 443 + itemIndex * 4, name: `Product Strategy Roadmap Dependency Text ${itemIndex + 1}`, x: pos.x + 121920, y: pos.y + 320040, cx: 944880, cy: 137160, text: item.text, size: 560, bold: true, color: visual.body });
+  }).join("");
+  return links + hub + nodes;
+}
+
+function productRoadmapPriorityXml({ visual, palette, scene }) {
+  const x = 5006340;
+  const y = 1219200;
+  const cellW = 1676400;
+  const cellH = 914400;
+  return scene.priorities.map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const cellX = x + col * cellW;
+    const cellY = y + row * cellH;
+    return solidShapeXml({ id: 500 + itemIndex * 4, name: `Product Strategy Roadmap Priority Quadrant ${itemIndex + 1}`, x: cellX, y: cellY, cx: cellW, cy: cellH, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
+      + lineFrameShapeXml({ id: 501 + itemIndex * 4, name: `Product Strategy Roadmap Priority Frame ${itemIndex + 1}`, x: cellX, y: cellY, cx: cellW, cy: cellH, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 502 + itemIndex * 4, name: `Product Strategy Roadmap Priority Dot ${itemIndex + 1}`, geom: "ellipse", x: cellX + 152400, y: cellY + 152400, cx: 182880, cy: 182880, fill: itemIndex === 0 ? visual.accent : visual.secondary || "F59E0B" })
+      + textShapeXml({ id: 503 + itemIndex * 4, name: `Product Strategy Roadmap Priority Text ${itemIndex + 1}`, x: cellX + 426720, y: cellY + 182880, cx: 1005840, cy: 304800, text: item, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productRoadmapDecisionXml({ visual, palette, scene }) {
+  return scene.milestones.slice(0, 3).map((item, itemIndex) => {
+    const y = 1371600 + itemIndex * 762000;
+    return solidShapeXml({ id: 560 + itemIndex * 4, name: `Product Strategy Roadmap Decision Card ${itemIndex + 1}`, geom: "roundRect", x: 5029200, y, cx: 3352800, cy: 533400, fill: "FFFFFF" })
+      + rectShapeXml({ id: 561 + itemIndex * 4, name: `Product Strategy Roadmap Decision Accent ${itemIndex + 1}`, x: 5029200, y, cx: 76200, cy: 533400, fill: visual.accent })
+      + lineFrameShapeXml({ id: 562 + itemIndex * 4, name: `Product Strategy Roadmap Decision Frame ${itemIndex + 1}`, geom: "roundRect", x: 5029200, y, cx: 3352800, cy: 533400, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 563 + itemIndex * 4, name: `Product Strategy Roadmap Decision Text ${itemIndex + 1}`, x: 5265420, y: y + 167640, cx: 2819400, cy: 198120, text: item.text, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function productRoadmapConsoleXml({ visual, palette }) {
+  return solidShapeXml({ id: 600, name: "Product Strategy Roadmap Product Console", geom: "roundRect", x: 5486400, y: 3230880, cx: 2667000, cy: 822960, fill: visual.primary })
+    + rectShapeXml({ id: 601, name: "Product Strategy Roadmap Console Header", x: 5707380, y: 3406140, cx: 2133600, cy: 60960, fill: palette.consoleLine })
+    + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 602 + itemIndex, name: `Product Strategy Roadmap Console Bar ${itemIndex + 1}`, x: 5791200 + itemIndex * 670560, y: 3832860 - itemIndex * 121920, cx: 365760, cy: 243840 + itemIndex * 121920, fill: itemIndex === 1 ? visual.secondary || "F59E0B" : visual.accent })).join("");
 }
 
 function productRoadmapColorPalette(visual) {
   return {
-    panel: blendHexColor(visual.surface, visual.background, 0.24),
-    card: blendHexColor(visual.accent, visual.background, 0.72),
-    chip: visual.variant === "release" ? blendHexColor(visual.primary, visual.accent, 0.24) : visual.primary,
-    coverWash: blendHexColor(visual.surface, visual.primary, 0.07),
-    frame: blendHexColor(visual.accent, visual.surface, 0.34),
-    line: blendHexColor(visual.primary, visual.background, 0.52),
-    soft: blendHexColor(visual.accent, visual.background, 0.68),
+    frame: blendHexColor(visual.primary, visual.surface, 0.84),
+    line: blendHexColor(visual.primary, visual.background, 0.48),
+    soft: blendHexColor(visual.accent, visual.background, 0.76),
+    consoleLine: blendHexColor("FFFFFF", visual.primary, 0.28),
   };
 }
 
-function productRoadmapScene(visual) {
-  const variant = productRoadmapVariant(visual);
-  const scenes = {
-    roadmap: {
-      variant: "roadmap",
-      kicker: "PRODUCT ROADMAP",
-      section: "MILESTONE MAP",
-      chip: "路线图",
-      chipShape: "roundRect",
-      caption: "阶段里程碑与能力优先级",
-    },
-    release: {
-      variant: "release",
-      kicker: "VERSION RELEASE",
-      section: "RELEASE PLAN",
-      chip: "发布",
-      chipShape: "rect",
-      caption: "发布节奏与关键特性组合",
-    },
-    "product-review": {
-      variant: "product-review",
-      kicker: "PRODUCT REVIEW",
-      section: "ITERATION REVIEW",
-      chip: "复盘",
-      chipShape: "parallelogram",
-      caption: "用户反馈、指标变化和迭代机会",
-    },
+function productRoadmapScene({ slide, index, role, total }) {
+  const bullets = productRoadmapBullets(slide);
+  const resolvedRole = productRoadmapRole(slide?.layout || role, index, total);
+  const title = productRoadmapCompactText(slide?.title, "产品路线规划", index === 0 ? 26 : 22);
+  return {
+    role: resolvedRole,
+    kicker: productRoadmapKicker(resolvedRole),
+    title,
+    summary: productRoadmapCompactText(bullets[0], "围绕阶段目标、能力建设和资源投入对齐产品节奏。", 44),
+    labelBox: { x: 768096, y: 701040, cx: 2590800, cy: 198120 },
+    titleBox: { x: 749808, y: index === 0 ? 1005840 : 944880, cx: index === 0 ? 3962400 : 3901440, cy: index === 0 ? 944880 : 670560 },
+    summaryBox: { x: 792480, y: index === 0 ? 2133600 : 1767840, cx: index === 0 ? 3352800 : 3200400, cy: 365760 },
+    bullets,
+    lanes: ["Now", "Next", "Later"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex], ["当前聚焦", "下一阶段", "后续探索"][itemIndex], 15) })),
+    capabilities: ["基础能力", "增长能力", "平台能力"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex + 1], ["稳定性与数据", "转化与留存", "生态与效率"][itemIndex], 13) })),
+    milestones: ["M1", "M2", "M3", "M4"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex], ["目标冻结", "能力交付", "灰度验证", "规模推广"][itemIndex], 9) })),
+    dependencies: ["研发", "数据", "运营", "销售"].map((label, itemIndex) => ({ label, text: productRoadmapCompactText(bullets[itemIndex], ["接口联调", "指标口径", "触达策略", "客户反馈"][itemIndex], 9) })),
+    priorities: ["高价值低复杂", "高价值高复杂", "低价值低复杂", "延后观察"].map((label, itemIndex) => productRoadmapCompactText(bullets[itemIndex], label, 12)),
   };
-  return scenes[variant] || scenes.roadmap;
 }
 
-function productRoadmapVariant(visual) {
-  return ["roadmap", "release", "product-review"].includes(visual?.variant) ? visual.variant : "roadmap";
+function productRoadmapBullets(slide) {
+  const raw = Array.isArray(slide?.bullets) ? slide.bullets : [];
+  return raw.map((item) => {
+    if (typeof item === "string") return item;
+    if (item && typeof item === "object") return item.text || item.title || item.action || item.phase || item.label || "";
+    return "";
+  }).filter(Boolean);
+}
+
+function productRoadmapRole(layout, index, total) {
+  const text = String(layout || "").toLowerCase();
+  if (index === 0 || text.includes("cover") || text === "title") return "cover";
+  if (index === total - 1 || text.includes("closing") || text.includes("action")) return "closing";
+  if (text.includes("capabil")) return "capabilities";
+  if (text.includes("milestone")) return "milestones";
+  if (text.includes("depend")) return "dependencies";
+  if (text.includes("priority") || text.includes("resource")) return "priority";
+  if (text.includes("overview") || text.includes("roadmap")) return "overview";
+  return ["overview", "capabilities", "milestones", "dependencies", "priority"][(index - 1) % 5];
+}
+
+function productRoadmapKicker(role) {
+  const labels = {
+    cover: "PRODUCT STRATEGY",
+    overview: "NOW / NEXT / LATER",
+    capabilities: "CAPABILITY MAP",
+    milestones: "MILESTONE PLAN",
+    dependencies: "DEPENDENCY MAP",
+    priority: "RESOURCE PRIORITY",
+    closing: "NEXT DECISIONS",
+  };
+  return labels[role] || labels.overview;
+}
+
+function productRoadmapCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}…`;
 }
 
 function isProductRoadmapVisual(visual) {
-  return visual?.id === "product-roadmap" && visual?.layout === "academy";
+  return visual?.id === "product-roadmap" && visual?.layout === "product-strategy-roadmap";
 }
 
 function productReleaseCommitteeDecorationsXml({ visual, index, layout, role, slide }) {
@@ -8794,13 +9166,16 @@ function productReleaseCommitteeDecorationsXml({ visual, index, layout, role, sl
   const palette = productReleaseCommitteeColorPalette(visual);
   const isClosing = role === "closing";
   const warning = visual.warning || "DC2626";
+  const titleText = productReleaseCommitteeCompactText(slide?.title, "产品版本发布评审", index === 0 ? 30 : 24);
+  const titleBox = productReleaseCommitteeTitleBox({ layout, index, role });
+  const titleSize = productReleaseCommitteeTitleSize({ title: titleText, index, role });
   const canvas = solidShapeXml({ id: 1710, name: "Product Release Committee Canvas", geom: "roundRect", ...layout.surface, fill: visual.surface })
     + lineFrameShapeXml({ id: 1711, name: "Product Release Committee Canvas Frame", geom: "roundRect", ...layout.surface, stroke: palette.frame, width: 15240 });
   const header = solidShapeXml({ id: 1712, name: "Product Release Committee Header", x: 0, y: 0, cx: 9144000, cy: 335280, fill: visual.primary })
     + rectShapeXml({ id: 1713, name: "Product Release Committee Teal Rule", x: 0, y: 304800, cx: 9144000, cy: 30480, fill: visual.accent })
     + rectShapeXml({ id: 1714, name: "Product Release Committee Amber Rule", x: 0, y: 335280, cx: 9144000, cy: 15240, fill: visual.secondary || "F59E0B" })
     + textShapeXml({ id: 1715, name: "Product Release Committee Kicker", ...layout.label, text: scene.kicker, size: 820, bold: true, color: visual.accent });
-  const title = textShapeXml({ id: 1716, name: "Product Release Committee Title", ...layout.title, text: productReleaseCommitteeCompactText(slide?.title, "产品版本发布评审", index === 0 ? 30 : 28), size: layout.titleSize, bold: true, color: visual.title });
+  const title = textShapeXml({ id: 1716, name: "Product Release Committee Title", ...titleBox, text: titleText, size: titleSize, bold: true, color: visual.title });
   const bullets = productReleaseCommitteeBulletCardsXml({ visual, items: scene.bullets });
   const focusRule = rectShapeXml({ id: 1717, name: "Product Release Committee Focus Rule", ...layout.secondaryAccent, fill: visual.accent });
 
@@ -8825,6 +9200,33 @@ function productReleaseCommitteeDecorationsXml({ visual, index, layout, role, sl
     return canvas + header + title + focusRule + bullets + productReleaseCommitteeMetricXml({ visual, palette, items: scene.cards });
   }
   return canvas + header + title + focusRule + bullets + productReleaseCommitteeBoardXml({ visual, palette });
+}
+
+function productReleaseCommitteeTitleBox({ layout, index, role }) {
+  const isCover = index === 0;
+  const isClosing = role === "closing";
+  if (isCover) return layout.title;
+  // 发布评审标题经常包含指标、范围和风险描述，PPTX 导出端单独放大标题框高度，避免中文换行后互相压住。
+  return isClosing
+    ? { x: 768096, y: 1188720, cx: 5486400, cy: 914400 }
+    : { x: 768096, y: 914400, cx: 4267200, cy: 1005840 };
+}
+
+function productReleaseCommitteeTitleSize({ title, index, role }) {
+  const length = Array.from(String(title || "").replace(/\s+/g, "")).length;
+  if (index === 0) {
+    if (length >= 26) return 1980;
+    if (length >= 20) return 2220;
+    return 2480;
+  }
+  if (role === "closing") {
+    if (length >= 24) return 1380;
+    if (length >= 18) return 1580;
+    return 1780;
+  }
+  if (length >= 22) return 1180;
+  if (length >= 16) return 1380;
+  return 1580;
 }
 
 function productReleaseCommitteeBulletCardsXml({ visual, items }) {

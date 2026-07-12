@@ -622,10 +622,12 @@ test("resolveTemplateVisual maps sales training official slug to dedicated visua
 test("resolveTemplateVisual applies product roadmap commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "roadmap" });
 
-  assert.equal(visual.primary, "145A7A");
-  assert.equal(visual.accent, "2FB7A3");
-  assert.equal(visual.background, "EEF8FA");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "DC2626");
+  assert.equal(visual.background, "F6FAFC");
+  assert.equal(visual.layout, "product-strategy-roadmap");
   assert.equal(visual.variant, "roadmap");
 });
 
@@ -644,10 +646,12 @@ test("resolveTemplateVisual applies product release commercial visual", () => {
 test("resolveTemplateVisual applies product review commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "product-review" });
 
-  assert.equal(visual.primary, "263D4A");
-  assert.equal(visual.accent, "E07A5F");
-  assert.equal(visual.background, "F5F6F2");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "173B3A");
+  assert.equal(visual.accent, "20B486");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "E76F51");
+  assert.equal(visual.background, "F4F7F6");
+  assert.equal(visual.layout, "product-review-canvas");
   assert.equal(visual.variant, "product-review");
 });
 
