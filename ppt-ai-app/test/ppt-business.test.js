@@ -1646,6 +1646,8 @@ test("PptService renders product funding highlights preview with dedicated layou
   assert.match(preview, /product-funding-console/);
   assert.match(preview, /product-funding-capability|product-funding-architecture|product-funding-journey|product-funding-dashboard/);
   assert.match(preview, /PRODUCT INVESTOR DEMO|PAIN SCENE MAP|FEATURE DEMO FLOW|PRODUCT ARCHITECTURE/);
+  assert.match(preview, /:is\(body\[data-layout="product-funding-highlights"\],body\[data-layout="startup-product-highlights"\]\) \.slide/);
+  assert.doesNotMatch(preview, /body\[data-layout="product-funding-highlights"\],body\[data-layout="startup-product-highlights"\] \.slide/);
   assert.doesNotMatch(preview, />产品亮点</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
