@@ -423,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-proposal-solution", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "startup-product-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -505,7 +505,7 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1880);
   }
-  if (visual.layout === "product-funding-highlights") {
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") {
     if (index === 0) {
       if (textLength >= 30) return 2000;
       if (textLength >= 22) return 2250;
@@ -604,6 +604,17 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1400;
     if (textLength >= 22) return 1600;
     return Math.min(fallbackSize, 1850);
+  }
+  if (visual.layout === "sales-proposal-solution") {
+    if (index === 0) {
+      if (textLength >= 30) return 1380;
+      if (textLength >= 22) return 1520;
+      return Math.min(fallbackSize, 1680);
+    }
+    // 销售提案解决方案页以图表为核心，标题保持克制，给右侧架构和底部流程留足空间。
+    if (textLength >= 30) return 980;
+    if (textLength >= 22) return 1080;
+    return Math.min(fallbackSize, 1220);
   }
   if (visual.layout === "sales-key-account-decision-chain") {
     if (index === 0) {
@@ -967,7 +978,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "growth-funding-flywheel") return false;
   if (visual.layout === "pre-a-market-validation") return false;
-  if (visual.layout === "product-funding-highlights") return false;
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") return false;
   if (visual.layout === "pitch-ai-saas") return false;
   if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
@@ -1016,6 +1027,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "data-research-report") return false;
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
+  if (visual.layout === "sales-proposal-solution") return false;
   if (visual.layout === "sales-financial-solution") return false;
   if (visual.layout === "sales-manufacturing-solution") return false;
   if (visual.layout === "sales-education-solution") return false;
@@ -1065,6 +1077,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "product-interview-insight") return false;
   if (visual.layout === "business-model-value-chain") return false;
+  if (visual.layout === "sales-proposal-solution") return false;
   if (visual.layout === "presales-architecture-solution") return false;
   if (visual.layout === "sales-training-objection-handling") return false;
   if (visual.layout === "product-pricing-strategy") return false;
@@ -1355,6 +1368,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "sales-education-solution") {
     return base + educationSolutionDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "sales-proposal-solution") {
+    return base + salesProposalSolutionDecorationsXml({ visual, index, role, slide, total });
   }
   if (visual.layout === "channel-recruitment-policy") {
     return base + channelRecruitmentPolicyDecorationsXml({ visual, index, role, slide });
@@ -2721,7 +2737,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
-  if (visual.layout === "product-funding-highlights") {
+  if (visual.layout === "product-funding-highlights" || visual.layout === "startup-product-highlights") {
     const isCover = index === 0;
     const isClosing = role === "closing";
     return {
@@ -8634,6 +8650,181 @@ function isAnnualSummaryVisual(visual) {
   return visual?.id === "annual-business-summary" && visual?.layout === "annual-summary";
 }
 
+function salesProposalSolutionDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = salesProposalSolutionSceneFromSlide({ slide, index, role, total });
+  const palette = salesProposalSolutionColorPalette(visual);
+  const base = salesProposalSolutionCanvasXml({ visual, palette })
+    + salesProposalSolutionHeaderXml({ visual, scene })
+    + salesProposalSolutionBulletsXml({ visual, scene });
+  if (scene.role === "diagnosis") return base + salesProposalSolutionDiagnosisXml({ visual, palette, items: scene.diagnosis });
+  if (scene.role === "painpoints") return base + salesProposalSolutionPainpointXml({ visual, palette, items: scene.painpoints });
+  if (scene.role === "process") return base + salesProposalSolutionProcessXml({ visual, palette, items: scene.process });
+  if (scene.role === "roadmap") return base + salesProposalSolutionRoadmapXml({ visual, palette, items: scene.roadmap });
+  if (scene.role === "value") return base + salesProposalSolutionValueXml({ visual, palette, items: scene.value });
+  if (scene.role === "closing") return base + salesProposalSolutionClosingXml({ visual, palette, items: scene.closing });
+  return base + salesProposalSolutionArchitectureXml({ visual, palette }) + salesProposalSolutionCardXml({ visual, items: scene.cards });
+}
+
+function salesProposalSolutionCanvasXml({ visual, palette }) {
+  return solidShapeXml({ id: 1430, name: "Sales Proposal Solution Outer Canvas", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 1431, name: "Sales Proposal Solution Grid Wash", geom: "roundRect", x: 518160, y: 472440, cx: 8107680, cy: 4221480, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 1432, name: "Sales Proposal Solution Canvas Frame", geom: "roundRect", x: 518160, y: 472440, cx: 8107680, cy: 4221480, stroke: palette.frame, width: 7620, transparency: 15000 })
+    + solidShapeXml({ id: 1433, name: "Sales Proposal Solution Top Band", x: 0, y: 0, cx: 9144000, cy: 365760, fill: visual.primary })
+    + solidShapeXml({ id: 1434, name: "Sales Proposal Solution Warm Rule", x: 0, y: 335280, cx: 9144000, cy: 30480, fill: visual.secondary || visual.accent })
+    + solidShapeXml({ id: 1435, name: "Sales Proposal Solution Ambient Glow", geom: "ellipse", x: 7162800, y: 563880, cx: 975360, cy: 975360, fill: palette.glow, transparency: 42000 });
+}
+
+function salesProposalSolutionHeaderXml({ visual, scene }) {
+  return textShapeXml({ id: 1440, name: "Sales Proposal Solution Kicker", x: 777240, y: 762000, cx: 3505200, cy: 167640, text: scene.kicker, size: 660, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1441, name: "Sales Proposal Solution Title", x: 777240, y: 1066800, cx: 3931920, cy: 868680, text: scene.title, size: 1160, bold: true, color: visual.title })
+    + solidShapeXml({ id: 1442, name: "Sales Proposal Solution Title Rule", x: 777240, y: 2164080, cx: 3124200, cy: 30480, fill: visual.accent });
+}
+
+function salesProposalSolutionBulletsXml({ visual, scene }) {
+  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+    const y = 2438400 + itemIndex * 259080;
+    return solidShapeXml({ id: 1450 + itemIndex * 2, name: `Sales Proposal Solution Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 792480, y: y + 60960, cx: 60960, cy: 60960, fill: itemIndex % 2 === 0 ? visual.accent : visual.secondary || visual.accent })
+      + textShapeXml({ id: 1451 + itemIndex * 2, name: `Sales Proposal Solution Bullet Text ${itemIndex + 1}`, x: 899160, y, cx: 3505200, cy: 198120, text: salesProposalSolutionCompactText(item, "", 40), size: 680, bold: true, color: visual.body });
+  }).join("");
+}
+
+function salesProposalSolutionArchitectureXml({ visual, palette }) {
+  const layers = [
+    { name: "Sales Proposal Solution Touchpoint Layer", y: 1021080, fill: visual.primary },
+    { name: "Sales Proposal Solution Capability Layer", y: 1828800, fill: visual.accent },
+    { name: "Sales Proposal Solution Data Layer", y: 2636520, fill: visual.secondary || visual.accent },
+    { name: "Sales Proposal Solution Delivery Layer", y: 3444240, fill: palette.soft },
+  ];
+  return solidShapeXml({ id: 1460, name: "Sales Proposal Solution Architecture Panel", geom: "roundRect", x: 5584200, y: 899160, cx: 3048000, cy: 2926080, fill: palette.panel })
+    + lineFrameShapeXml({ id: 1461, name: "Sales Proposal Solution Architecture Frame", geom: "roundRect", x: 5584200, y: 899160, cx: 3048000, cy: 2926080, stroke: palette.frame, width: 7620 })
+    + layers.map((layer, itemIndex) => solidShapeXml({ id: 1462 + itemIndex, name: layer.name, geom: "roundRect", x: 5828040, y: layer.y, cx: 2560320, cy: 381000, fill: layer.fill })).join("")
+    + solidShapeXml({ id: 1468, name: "Sales Proposal Solution Architecture Hub", geom: "roundRect", x: 6964680, y: 1973580, cx: 548640, cy: 548640, fill: visual.primary })
+    + solidShapeXml({ id: 1469, name: "Sales Proposal Solution Architecture Connector X", x: 6165840, y: 2232660, cx: 2148840, cy: 22860, fill: palette.line })
+    + solidShapeXml({ id: 1470, name: "Sales Proposal Solution Architecture Connector Y", x: 7223760, y: 1356360, cx: 22860, cy: 2011680, fill: palette.line });
+}
+
+function salesProposalSolutionCardXml({ visual, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 777240 + itemIndex * 1219200;
+    return solidShapeXml({ id: 1480 + itemIndex * 3, name: `Sales Proposal Solution Summary Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3893820, cx: 1066800, cy: 533400, fill: visual.surface })
+      + solidShapeXml({ id: 1481 + itemIndex * 3, name: `Sales Proposal Solution Summary Card Rule ${itemIndex + 1}`, x, y: 3893820, cx: 1066800, cy: 45720, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1482 + itemIndex * 3, name: `Sales Proposal Solution Summary Text ${itemIndex + 1}`, x: x + 91440, y: 4076700, cx: 883920, cy: 182880, text: salesProposalSolutionCompactText(item, `要点 ${itemIndex + 1}`, 12), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionDiagnosisXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const y = 1066800 + itemIndex * 822960;
+    return solidShapeXml({ id: 1490 + itemIndex * 4, name: `Sales Proposal Solution Diagnosis Card ${itemIndex + 1}`, geom: "roundRect", x: 5584200, y, cx: 3048000, cy: 640080, fill: visual.surface })
+      + solidShapeXml({ id: 1491 + itemIndex * 4, name: `Sales Proposal Solution Diagnosis Dot ${itemIndex + 1}`, geom: "ellipse", x: 5805180, y: y + 198120, cx: 182880, cy: 182880, fill: itemIndex === 1 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1492 + itemIndex * 4, name: `Sales Proposal Solution Diagnosis Text ${itemIndex + 1}`, x: 6096000, y: y + 220980, cx: 2209800, cy: 182880, text: salesProposalSolutionCompactText(item, `诊断 ${itemIndex + 1}`, 14), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionPainpointXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5584200 + col * 1524000;
+    const y = 1066800 + row * 975360;
+    return solidShapeXml({ id: 1510 + itemIndex * 4, name: `Sales Proposal Solution Painpoint Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 777240, fill: visual.surface })
+      + solidShapeXml({ id: 1511 + itemIndex * 4, name: `Sales Proposal Solution Painpoint Signal ${itemIndex + 1}`, geom: "roundRect", x: x + 121920, y: y + 137160, cx: 365760, cy: 60960, fill: visual.warning || visual.secondary || visual.accent })
+      + textShapeXml({ id: 1512 + itemIndex * 4, name: `Sales Proposal Solution Painpoint Text ${itemIndex + 1}`, x: x + 121920, y: y + 342900, cx: 1127760, cy: 198120, text: salesProposalSolutionCompactText(item, `痛点 ${itemIndex + 1}`, 12), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionProcessXml({ visual, palette, items }) {
+  return items.slice(0, 5).map((item, itemIndex) => {
+    const x = 777240 + itemIndex * 1524000;
+    return solidShapeXml({ id: 1530 + itemIndex * 4, name: `Sales Proposal Solution Process Step ${itemIndex + 1}`, geom: "roundRect", x, y: 3810000, cx: 1280160, cy: 624840, fill: visual.surface })
+      + solidShapeXml({ id: 1531 + itemIndex * 4, name: `Sales Proposal Solution Process Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 121920, y: 3962400, cx: 182880, cy: 182880, fill: itemIndex % 2 === 0 ? visual.accent : visual.secondary || visual.accent })
+      + (itemIndex < 4 ? solidShapeXml({ id: 1532 + itemIndex * 4, name: `Sales Proposal Solution Process Connector ${itemIndex + 1}`, x: x + 1234440, y: 4053840, cx: 320040, cy: 30480, fill: visual.secondary || visual.accent }) : "")
+      + textShapeXml({ id: 1533 + itemIndex * 4, name: `Sales Proposal Solution Process Text ${itemIndex + 1}`, x: x + 121920, y: 4267200, cx: 1036320, cy: 167640, text: salesProposalSolutionCompactText(item, `流程 ${itemIndex + 1}`, 10), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionRoadmapXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const x = 777240 + itemIndex * 1905000;
+    return solidShapeXml({ id: 1550 + itemIndex * 4, name: `Sales Proposal Solution Roadmap Phase ${itemIndex + 1}`, geom: "roundRect", x, y: 3741420, cx: 1676400, cy: 746760, fill: visual.surface })
+      + solidShapeXml({ id: 1551 + itemIndex * 4, name: `Sales Proposal Solution Roadmap Rule ${itemIndex + 1}`, x: x + 121920, y: 3931920, cx: 457200, cy: 60960, fill: itemIndex === 0 ? visual.accent : visual.secondary || visual.accent })
+      + textShapeXml({ id: 1552 + itemIndex * 4, name: `Sales Proposal Solution Roadmap Text ${itemIndex + 1}`, x: x + 121920, y: 4191000, cx: 1371600, cy: 182880, text: salesProposalSolutionCompactText(item, `阶段 ${itemIndex + 1}`, 10), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionValueXml({ visual, palette, items }) {
+  return items.slice(0, 4).map((item, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5584200 + col * 1524000;
+    const y = 1066800 + row * 975360;
+    return solidShapeXml({ id: 1570 + itemIndex * 4, name: `Sales Proposal Solution Value Matrix ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 777240, fill: visual.surface })
+      + solidShapeXml({ id: 1571 + itemIndex * 4, name: `Sales Proposal Solution Value Rule ${itemIndex + 1}`, x, y, cx: 1371600, cy: 60960, fill: itemIndex % 2 === 0 ? visual.accent : visual.secondary || visual.accent })
+      + textShapeXml({ id: 1572 + itemIndex * 4, name: `Sales Proposal Solution Value Text ${itemIndex + 1}`, x: x + 121920, y: y + 304800, cx: 1127760, cy: 198120, text: salesProposalSolutionCompactText(item, `价值 ${itemIndex + 1}`, 12), size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionClosingXml({ visual, palette, items }) {
+  return items.slice(0, 3).map((item, itemIndex) => {
+    const x = 914400 + itemIndex * 2438400;
+    return solidShapeXml({ id: 1590 + itemIndex * 4, name: `Sales Proposal Solution Closing Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3695700, cx: 2133600, cy: 853440, fill: visual.surface })
+      + solidShapeXml({ id: 1591 + itemIndex * 4, name: `Sales Proposal Solution Closing Number ${itemIndex + 1}`, geom: "ellipse", x: x + 121920, y: 3909060, cx: 243840, cy: 243840, fill: itemIndex === 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 1592 + itemIndex * 4, name: `Sales Proposal Solution Closing Text ${itemIndex + 1}`, x: x + 457200, y: 3931920, cx: 1524000, cy: 198120, text: salesProposalSolutionCompactText(item, `推进 ${itemIndex + 1}`, 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function salesProposalSolutionSceneFromSlide({ slide, index, role, total }) {
+  const bullets = salesProposalSolutionBulletTexts(slide);
+  const sceneRole = salesProposalSolutionRoleFromSlide({ slide, index, role, total });
+  return {
+    role: sceneRole,
+    title: salesProposalSolutionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    kicker: sceneRole === "cover" ? "CLIENT PROPOSAL" : sceneRole === "diagnosis" ? "CURRENT STATE" : sceneRole === "painpoints" ? "PAINPOINT MAP" : sceneRole === "architecture" ? "SOLUTION ARCHITECTURE" : sceneRole === "process" ? "BUSINESS FLOW" : sceneRole === "roadmap" ? "IMPLEMENTATION ROADMAP" : sceneRole === "value" ? "VALUE MODEL" : "NEXT STEP",
+    bullets,
+    cards: ["现状诊断", "业务痛点", "方案价值"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    diagnosis: ["客户现状", "关键痛点", "业务影响"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 14)),
+    painpoints: ["效率瓶颈", "数据割裂", "流程断点", "增长阻力"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    process: ["需求诊断", "方案共创", "POC 验证", "推广上线", "运营复盘"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 10)),
+    roadmap: ["调研诊断", "试点验证", "规模推广", "持续运营"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 10)),
+    value: ["效率提升", "成本优化", "风险降低", "体验增长"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    closing: ["合作模式", "双方分工", "决策节点"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+  };
+}
+
+function salesProposalSolutionRoleFromSlide({ slide, index, role, total }) {
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  const text = `${slide?.title || ""} ${salesProposalSolutionBulletTexts(slide).join(" ")}`;
+  if (/痛点|问题|瓶颈|挑战|根因/.test(text)) return "painpoints";
+  if (/架构|方案|能力|模块|平台/.test(text)) return "architecture";
+  if (/流程|业务流|协同|场景/.test(text)) return "process";
+  if (/实施|路线|计划|阶段|交付/.test(text)) return "roadmap";
+  if (/价值|收益|ROI|回报|测算|效率|成本/.test(text)) return "value";
+  if (/合作|成交|推进|下一步|决策/.test(text)) return "closing";
+  return index === 1 ? "diagnosis" : ["architecture", "process", "roadmap", "value"][Math.max(0, (index - 2) % 4)];
+}
+
+function salesProposalSolutionBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean).map((item) => String(item)) : [];
+}
+
+function salesProposalSolutionCompactText(text, fallback, maxLength) {
+  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (source.length <= maxLength) return source;
+  return `${source.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function salesProposalSolutionColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.24),
+    frame: blendHexColor(visual.primary, visual.surface, 0.72),
+    panel: blendHexColor(visual.surface, visual.background, 0.28),
+    line: blendHexColor(visual.primary, visual.background, 0.52),
+    soft: blendHexColor(visual.accent, visual.background, 0.72),
+    glow: blendHexColor(visual.accent, visual.background, 0.44),
+  };
+}
+
 function salesProposalDecorationsXml({ visual, index, layout }) {
   const scene = salesProposalScene(visual);
   const palette = salesProposalColorPalette(visual);
@@ -11369,16 +11560,16 @@ function productFundingHighlightsScene({ slide, index, role }) {
   ];
   const baseCards = ["核心能力清晰", "技术壁垒可验证", "用户价值可量化", "演示路径完整"].map((fallback, itemIndex) => productFundingHighlightsCompactText(bullets[itemIndex], fallback, 18));
   const scenes = [
-    { role: "cover", kicker: "PRODUCT INVESTOR DEMO", summary: "用产品控制台、能力矩阵和用户价值证据说明融资后的放大空间。", metrics, cards: baseCards },
-    { role: "capability", kicker: "CAPABILITY MAP", summary: "把核心功能、关键场景、业务收益和交付能力拆成可投资判断的产品证据。", metrics, cards: baseCards },
-    { role: "demo", kicker: "LIVE DEMO FLOW", summary: "展示输入、分析、推荐和输出的完整演示链路，帮助投资人快速理解产品效率。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
-    { role: "technology", kicker: "TECH ADVANTAGE", summary: "从数据层、模型层、工作流和集成能力说明产品护城河。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
+    { role: "cover", kicker: "PRODUCT INVESTOR DEMO", summary: "用产品界面、核心指标和投资人速读结构，第一屏说明产品定位和融资价值。", metrics, cards: baseCards },
+    { role: "capability", kicker: "PAIN SCENE MAP", summary: "把用户场景、痛点链路和现有方案断点压缩成一页，先证明问题真实且高频。", metrics, cards: ["高频业务痛点", "现有方案断点", "用户触发场景", "付费动机清晰"] },
+    { role: "demo", kicker: "FEATURE DEMO FLOW", summary: "展示输入、分析、推荐和输出的完整功能链路，帮助投资人快速理解产品如何工作。", metrics, cards: ["输入业务目标", "生成策略分析", "输出行动方案", "沉淀数据资产"] },
+    { role: "technology", kicker: "PRODUCT ARCHITECTURE", summary: "用数据层、模型层、工作流和开放集成说明产品架构，而不是只讲单点功能。", metrics, cards: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
     { role: "journey", kicker: "USER VALUE JOURNEY", summary: "用用户旅程说明从痛点到效率提升再到业务结果的价值闭环。", metrics, cards: ["发现痛点", "产品介入", "效率提升", "结果验证"] },
-    { role: "validation", kicker: "MARKET VALIDATION", summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards: baseCards },
-    { role: "roadmap", kicker: "PRODUCT ROADMAP", summary: "把融资后的研发、技术升级、客户交付和市场拓展放进一条路线。", metrics, cards: ["研发迭代", "技术升级", "客户交付", "市场扩张"] },
-    { role: "funding", kicker: "CAPITAL PLAN", summary: "说明资金用途与 12-18 个月的产品、技术和商业化里程碑。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
+    { role: "validation", kicker: "PRODUCT DATA PROOF", summary: "用留存、活跃、转化和客户案例说明产品已经被市场验证。", metrics, cards: baseCards },
+    { role: "roadmap", kicker: "MOAT & ADVANTAGE", summary: "把数据资产、工作流沉淀、客户迁移成本和生态接口组织成可读的竞争壁垒。", metrics, cards: ["数据资产", "流程沉淀", "迁移成本", "生态接口"] },
+    { role: "funding", kicker: "COMMERCIALIZATION PATH", summary: "说明收入路径、产品里程碑和资金用途，连接商业化潜力与下一轮增长。", metrics, cards: ["产品研发", "AI 能力", "解决方案交付", "增长渠道"] },
   ];
-  if (role === "closing") return { role: "closing", kicker: "INVESTOR NEXT STEP", summary: "用投资亮点、产品证据和资金计划推动下一轮投资沟通。", metrics, cards: baseCards };
+  if (role === "closing") return { role: "closing", kicker: "INVESTOR NEXT STEP", summary: "用投资亮点、产品证据、壁垒和资金计划推动下一轮投资沟通。", metrics, cards: baseCards };
   return scenes[Math.min(index, scenes.length - 1)];
 }
 
@@ -11395,6 +11586,8 @@ function productFundingHighlightsCompactText(text, fallback, maxLength) {
 
 function isProductFundingHighlightsVisual(visual) {
   const id = String(visual?.id || "");
+  // 创业融资路演产品亮点用独立 layout，导出仍复用产品演示台 DrawingML 组件以保持预览/PPTX 一致。
+  if (visual?.layout === "startup-product-highlights" && id === "pitch") return true;
   return visual?.layout === "product-funding-highlights" && (id === "product-funding-pitch" || id === "pitch-product-funding-pitch-product-highlights");
 }
 
