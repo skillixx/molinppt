@@ -123,20 +123,74 @@ test("PptService falls back to HTML preview when PPTX renderer is unavailable", 
 test("PptService renders product premiere launch preview with generated assets", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
+  await context.database.insert("templates", {
+    id: "marketing-marketing-campaign-launch",
+    name: "营销活动方案 - 新品发布",
+    categoryId: "marketing",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "launch",
+        name: "新品发布",
+        visual: {
+          primary: "0B1020",
+          accent: "FF3B5C",
+          secondary: "22D3EE",
+          warning: "F8C14A",
+          background: "0B1020",
+          surface: "FFFFFF",
+          title: "F8FAFC",
+          body: "CBD5E1",
+          layout: "marketing-product-premiere",
+          variant: "product-premiere",
+        },
+      },
+    ],
+    visual: {
+      primary: "0B1020",
+      accent: "FF3B5C",
+      secondary: "22D3EE",
+      warning: "F8C14A",
+      background: "0B1020",
+      surface: "FFFFFF",
+      title: "F8FAFC",
+      body: "CBD5E1",
+      layout: "marketing-product-premiere",
+      variant: "product-premiere",
+    },
+  });
   const outline = await context.pptService.generateOutline({
     ownerUserId: 7,
-    topic: "Market launch plan",
+    topic: "季度经营复盘 达预期但利润承压",
     slideCount: 7,
-    templateId: "marketing-campaign",
+    templateId: "marketing-marketing-campaign-launch",
     theme: "launch",
   });
-  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "季度经营复盘 达预期但利润承压", bullets: ["本季度营收同比+15% 但利润率下降2个百分点", "新品首发节点锁定 T-Day", "渠道矩阵覆盖电商 社媒 直播 门店"] },
+      { title: "核心卖点与首发定位", bullets: ["高频场景下的核心价值更清晰", "发布会聚焦首发权益和体验证据"] },
+      { title: "场景化体验与产品摄影", bullets: ["办公室轻量使用场景", "移动端和桌面端协同"] },
+      { title: "目标人群与转化路径", bullets: ["早期尝鲜用户", "高价值复购用户", "渠道共创伙伴"] },
+      { title: "上市时间轴和预热节奏", bullets: ["T-30 预热启动", "T-7 预约蓄水", "T-Day 首发上线"] },
+      { title: "渠道首发计划", bullets: ["电商首发承接", "社媒话题扩散", "直播间集中转化"] },
+      { title: "首发数据和复盘动作", bullets: ["7D 复盘窗口", "关注转化率与利润率", "沉淀下一轮加码动作"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /<body data-template="marketing-campaign" data-layout="marketing-product-premiere"/);
+  assert.match(preview, /<body data-template="marketing-marketing-campaign-launch" data-layout="marketing-product-premiere"/);
   assert.match(preview, /product-premiere-layer/);
+  assert.match(preview, /季度经营复盘 达预期但利润承压/);
+  assert.match(preview, /本季度营收同比\+15% 但利润率下降2个百分点/);
   assert.match(preview, /product-premiere-hero/);
+  assert.match(preview, /product-premiere-scenario-cards/);
   assert.match(preview, /product-premiere-timeline|product-premiere-channel|product-premiere-data/);
   assert.match(preview, /--product-premiere-product:url\("data:image\/png;base64,/);
   assert.doesNotMatch(preview, /新品发布/);
@@ -145,18 +199,54 @@ test("PptService renders product premiere launch preview with generated assets",
 test("PptService renders growth marketing lab preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
+  await context.database.insert("templates", {
+    id: "marketing-marketing-campaign-growth",
+    name: "营销活动方案 - 增长营销",
+    categoryId: "marketing",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "growth",
+        name: "增长营销",
+        visual: {
+          primary: "047857",
+          accent: "F97316",
+          secondary: "14B8A6",
+          background: "ECFDF5",
+          surface: "FFFFFF",
+          title: "063327",
+          body: "36594F",
+          layout: "growth-marketing-lab",
+          variant: "growth-lab",
+        },
+      },
+    ],
+    visual: {
+      primary: "047857",
+      accent: "F97316",
+      secondary: "14B8A6",
+      background: "ECFDF5",
+      surface: "FFFFFF",
+      title: "063327",
+      body: "36594F",
+      layout: "growth-marketing-lab",
+      variant: "growth-lab",
+    },
+  });
   const outline = await context.pptService.generateOutline({
     ownerUserId: 7,
     topic: "用户增长实验复盘",
     slideCount: 7,
-    templateId: "marketing-campaign",
+    templateId: "marketing-marketing-campaign-growth",
     theme: "growth",
   });
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /data-layout="growth-marketing-lab"/);
+  assert.match(preview, /<body data-template="marketing-marketing-campaign-growth" data-layout="growth-marketing-lab"/);
   assert.match(preview, /growth-lab-wheel/);
   assert.match(preview, /growth-lab-funnel/);
   assert.match(preview, /growth-lab-matrix/);
@@ -165,6 +255,80 @@ test("PptService renders growth marketing lab preview with dedicated layout", as
   assert.match(preview, /growth-lab-priority/);
   assert.match(preview, /AARRR 漏斗|渠道矩阵|实验卡片|趋势 ROI|行动优先级/);
   assert.doesNotMatch(preview, /增长营销/);
+});
+
+test("PptService renders data insight workbench preview without theme label", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "经营数据洞察报告",
+    slideCount: 7,
+    templateId: "data-insight",
+    theme: "insight",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "经营数据洞察工作台", bullets: ["发现收入增长放缓但高价值用户留存提升", "识别三个异常信号", "按影响度排序行动建议"] },
+      { title: "趋势发现与信号扫描", bullets: ["近四周转化率出现连续下滑", "客单价保持稳定", "新增用户质量分层明显"] },
+      { title: "原因定位归因树", bullets: ["渠道结构变化影响转化", "新客激活路径变长", "价格敏感用户占比提升"] },
+      { title: "影响因素相关性分析", bullets: ["触达频次和转化率呈中度相关", "售前响应时长影响成交", "促销力度对复购影响有限"] },
+      { title: "关键结论证据卡", bullets: ["高价值客群贡献主要增量", "低质量渠道拉低整体转化", "样本证据支持优先优化激活"] },
+      { title: "行动优先级矩阵", bullets: ["优先优化激活路径", "暂停低质量渠道加码", "建立每周信号复盘机制"] },
+      { title: "下一步行动队列", bullets: ["本周验证激活路径改版", "两周内复盘渠道质量", "持续监控留存和利润率"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-insight" data-layout="data-insight-workbench"/);
+  assert.match(preview, /workbench-board/);
+  assert.match(preview, /workbench-tree/);
+  assert.match(preview, /workbench-correlation/);
+  assert.match(preview, /workbench-evidence/);
+  assert.match(preview, /workbench-matrix/);
+  assert.match(preview, /行动优先级矩阵/);
+  assert.doesNotMatch(preview, />洞察分析</);
+});
+
+test("PptService renders data insight dashboard console preview without theme label", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "经营监控数据洞察报告",
+    slideCount: 6,
+    templateId: "data-insight",
+    theme: "dashboard",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "经营数据驾驶舱", layout: "data-console-cover", bullets: ["营收同比 +15%，利润率下降 2 个百分点", "核心渠道转化率 38%", "异常告警 3 项待处理", "经营健康度 86%"] },
+      { title: "核心指标监控", layout: "data-console-overview", bullets: ["营收同比 +15%", "利润率下降 2 个百分点", "转化效率 38%", "经营健康度 86%"] },
+      { title: "趋势分析与贡献拆解", layout: "data-console-trend", bullets: ["近四周转化率出现连续下滑", "客单价保持稳定", "新增用户质量分层明显"] },
+      { title: "异常预警队列", layout: "data-console-alert", bullets: ["利润率低于阈值", "获客成本环比抬升", "渠道转化波动"] },
+      { title: "排名与结构分析", layout: "data-console-ranking", bullets: ["华东区域", "线上渠道", "核心产品", "大客户群"] },
+      { title: "管理动作闭环", layout: "data-console-action", bullets: ["锁定异常指标负责人", "复盘趋势拐点原因", "下周更新监控阈值"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-insight" data-layout="data-insight-dashboard-console"/);
+  assert.match(preview, /dashboard-console-metrics/);
+  assert.match(preview, /dashboard-console-trend/);
+  assert.match(preview, /dashboard-console-ring/);
+  assert.match(preview, /dashboard-console-alerts/);
+  assert.match(preview, /dashboard-console-ranking/);
+  assert.match(preview, /dashboard-console-actions/);
+  assert.match(preview, /经营数据驾驶舱/);
+  assert.doesNotMatch(preview, />仪表盘</);
 });
 
 test("PptService renders brand communication preview without theme labels", async () => {
@@ -189,7 +353,6 @@ test("PptService renders brand communication preview without theme labels", asyn
   assert.doesNotMatch(preview, />品牌传播</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
-
 
 test("PptService renders synced brand communication official slug with content and style", async () => {
   const pptPreviewRenderer = { render: async () => null };
@@ -1133,26 +1296,48 @@ test("PptService renders business plan model preview with dedicated layout", asy
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
-test("PptService renders seed round startup story preview with dedicated layout", async () => {
+test("PptService renders pitch investor memo preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "创业融资市场空间和资金用途",
+    slideCount: 6,
+    templateId: "pitch",
+    theme: "investor",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="pitch" data-layout="pitch-investor-memo"/);
+  assert.match(preview, /investor-memo-layer/);
+  assert.match(preview, /investor-memo-market|investor-memo-formula|investor-memo-unit|investor-memo-funding/);
+  assert.match(preview, /INVESTMENT MEMO|MARKET SIZING|REVENUE MODEL|UNIT ECONOMICS|CAPITAL PLAN/);
+  assert.doesNotMatch(preview, />投资人版</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders founder cinematic startup story preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
   await insertSeedRoundStartupStoryTemplate(context);
   const outline = await context.pptService.generateOutline({
     ownerUserId: 7,
-    topic: "早期项目种子轮融资",
+    topic: "创业融资路演",
     slideCount: 6,
-    templateId: "pitch-seed-round-pitch-startup-story",
+    templateId: "pitch-startup-funding-pitch-startup-story",
     theme: "startup-story",
   });
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /<body data-template="pitch-seed-round-pitch-startup-story" data-layout="seed-round-story"/);
+  assert.match(preview, /<body data-template="pitch-startup-funding-pitch-startup-story" data-layout="founder-cinematic-story"/);
   assert.match(preview, /seed-layer/);
-  assert.match(preview, /seed-mockup/);
+  assert.match(preview, /seed-photo/);
+  assert.match(preview, /--founder-cinematic-team:url/);
   assert.match(preview, /seed-pain-wall|seed-validation-board|seed-growth-chart|seed-team-cards|seed-funding-road/);
-  assert.match(preview, /SEED ROUND NARRATIVE|PAIN DISCOVERY|MVP VALIDATION|EARLY TRACTION|WHY THIS TEAM|NEXT INVESTOR CONVERSATION/);
   assert.doesNotMatch(preview, />创业故事</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
@@ -1482,6 +1667,74 @@ test("PptService renders market survey analysis preview with dedicated layout", 
   assert.match(preview, /survey-form|survey-sample-grid|survey-bars|survey-cross|survey-findings|survey-strategy/);
   assert.match(preview, /RESEARCH BRIEF|SAMPLE STRUCTURE|QUESTION ITEM REVIEW|CROSS FINDINGS/);
   assert.doesNotMatch(preview, />问卷分析</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+async function insertDataResearchReportPreviewTemplate(context) {
+  await context.database.insert("templates", {
+    id: "data-data-insight-research",
+    slug: "data-data-insight-research",
+    name: "数据洞察报告 - 研究报告",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "research",
+        name: "研究报告",
+        visual: {
+          primary: "172033",
+          accent: "315C7C",
+          secondary: "B8822D",
+          background: "F7F5EF",
+          surface: "FFFFFF",
+          title: "172033",
+          body: "46515E",
+          layout: "data-research-report",
+          variant: "research",
+        },
+      },
+    ],
+    visual: {
+      primary: "172033",
+      accent: "315C7C",
+      secondary: "B8822D",
+      background: "F7F5EF",
+      surface: "FFFFFF",
+      title: "172033",
+      body: "46515E",
+      layout: "data-research-report",
+      variant: "research",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "data-research-report-cover",
+      defaultContentLayout: "data-research-report-finding",
+      allowedLayouts: ["data-research-report-cover", "data-research-report-summary", "data-research-report-method", "data-research-report-sample", "data-research-report-evidence", "data-research-report-finding", "data-research-report-recommendation", "data-research-report-appendix", "title", "content", "closing"],
+    },
+  });
+}
+
+test("PptService renders data insight research report preview with publication layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  await insertDataResearchReportPreviewTemplate(context);
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "用户研究证据汇报",
+    slideCount: 7,
+    templateId: "data-data-insight-research",
+    theme: "research",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="data-data-insight-research" data-layout="data-research-report"/);
+  assert.match(preview, /research-layer/);
+  assert.match(preview, /research-paper|research-method|research-sample|research-evidence|research-findings|research-actions|research-index/);
+  assert.match(preview, /RESEARCH PUBLICATION|EXECUTIVE ABSTRACT|METHOD NOTES|SAMPLE STRUCTURE|EVIDENCE LOG|KEY FINDINGS|SOURCE INDEX/);
+  assert.doesNotMatch(preview, />研究报告</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
@@ -6499,11 +6752,11 @@ async function insertBusinessPlanModelTemplate(context) {
 }
 
 async function insertSeedRoundStartupStoryTemplate(context) {
-  // 测试数据库模拟官方模板同步后的种子轮融资路演模板，确保页面内容和主题选择元数据分离。
+  // 测试数据库模拟官方模板同步后的创业融资路演模板，确保页面内容和主题选择元数据分离。
   await context.database.insert("templates", {
-    id: "pitch-seed-round-pitch-startup-story",
-    slug: "pitch-seed-round-pitch-startup-story",
-    name: "种子轮融资路演 - 创业故事",
+    id: "pitch-startup-funding-pitch-startup-story",
+    slug: "pitch-startup-funding-pitch-startup-story",
+    name: "创业融资路演 - 创业故事",
     categoryId: "pitch",
     scope: "official",
     official: true,
@@ -6519,7 +6772,7 @@ async function insertSeedRoundStartupStoryTemplate(context) {
           surface: "FFFFFF",
           title: "172033",
           body: "465266",
-          layout: "seed-round-story",
+          layout: "founder-cinematic-story",
           variant: "startup-story",
         },
       },
@@ -6531,13 +6784,13 @@ async function insertSeedRoundStartupStoryTemplate(context) {
       surface: "FFFFFF",
       title: "172033",
       body: "465266",
-      layout: "seed-round-story",
+      layout: "founder-cinematic-story",
       variant: "startup-story",
     },
     layoutSchema: {
-      defaultCoverLayout: "seed-story-cover",
-      defaultContentLayout: "seed-story-content",
-      allowedLayouts: ["seed-story-cover", "founder-story", "pain-discovery", "mvp-validation", "early-traction", "team-belief", "funding-roadmap", "seed-story-closing", "title", "content"],
+      defaultCoverLayout: "founder-film-cover",
+      defaultContentLayout: "founder-story-scene",
+      allowedLayouts: ["founder-film-cover", "founder-storyline", "user-pain-scene", "founding-insight", "prototype-validation", "evidence-wall", "growth-chapter", "team-mission", "vision-funding-roadmap", "founder-film-closing", "title", "content"],
     },
   });
 }
@@ -7243,6 +7496,64 @@ async function insertMarketSurveyAnalysisTemplate(context) {
         "market-survey-analysis-finding",
         "market-survey-analysis-strategy",
         "market-survey-analysis-summary",
+        "title",
+        "content",
+        "closing",
+      ],
+    },
+  });
+}
+
+async function insertDataResearchReportTemplate(context) {
+  // 测试数据库模拟官方模板同步后的数据洞察研究报告主题，覆盖出版物风格、脚注和资料索引布局。
+  await context.database.insert("templates", {
+    id: "data-data-insight-research",
+    slug: "data-data-insight-research",
+    name: "数据洞察报告 - 研究报告",
+    categoryId: "data",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "research",
+        name: "研究报告",
+        visual: {
+          primary: "172033",
+          accent: "315C7C",
+          secondary: "B8822D",
+          background: "F7F5EF",
+          surface: "FFFFFF",
+          title: "172033",
+          body: "46515E",
+          layout: "data-research-report",
+          variant: "research",
+        },
+      },
+    ],
+    visual: {
+      primary: "172033",
+      accent: "315C7C",
+      secondary: "B8822D",
+      background: "F7F5EF",
+      surface: "FFFFFF",
+      title: "172033",
+      body: "46515E",
+      layout: "data-research-report",
+      variant: "research",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "data-research-report-cover",
+      defaultContentLayout: "data-research-report-finding",
+      allowedLayouts: [
+        "data-research-report-cover",
+        "data-research-report-summary",
+        "data-research-report-method",
+        "data-research-report-sample",
+        "data-research-report-evidence",
+        "data-research-report-finding",
+        "data-research-report-recommendation",
+        "data-research-report-appendix",
         "title",
         "content",
         "closing",

@@ -2198,7 +2198,6 @@ test("PptExportService uses commercial marketing brand decorations", () => {
   assert.doesNotMatch(slide1, /品牌传播/);
 });
 
-
 test("PptExportService renders synced marketing brand official slug decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -2237,7 +2236,7 @@ test("PptExportService uses commercial marketing growth decorations", () => {
   const result = exporter.exportDeck({
     deck: {
       ...deck,
-      templateId: "marketing-campaign",
+      templateId: "marketing-marketing-campaign-growth",
       theme: "growth",
       slides: [
         { title: "Growth lab command center", layout: "growth-lab-cover", bullets: ["Build AARRR loop", "Review ROI", "Prioritize next experiments"] },
@@ -2468,7 +2467,6 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
     { templateId: "financial-review", theme: "quarterly", shapeName: "Financial Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
     { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
-    { templateId: "data-insight", theme: "dashboard", shapeName: "Data Insight Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },
     { templateId: "pitch", theme: "startup", shapeName: "Pitch Chip Text" },
   ];
@@ -2515,20 +2513,33 @@ test("PptExportService uses commercial pitch startup decorations", () => {
 test("PptExportService uses commercial pitch investor decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "pitch", theme: "investor" },
+    deck: {
+      ...deck,
+      templateId: "pitch",
+      theme: "investor",
+      slides: [
+        { title: "融资摘要", bullets: ["用 18 个月 runway 完成核心市场验证"] },
+        { title: "市场空间", bullets: ["TAM/SAM/SOM 清晰拆分", "聚焦可服务客群"] },
+        { title: "商业模型", bullets: ["收入由用户数、ARPU 和留存共同驱动"] },
+        { title: "资金用途", bullets: ["融资用于产品、增长和关键岗位"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
 
-  assert.match(slide1, /name="Pitch Stage Canvas"/);
-  assert.match(slide1, /name="Pitch Visual Panel"/);
-  assert.match(slide1, /name="Pitch Investor Bar 1"/);
-  assert.match(slide1, /name="Pitch Investor Market Dot"/);
-  assert.match(slide1, /name="Pitch Investor Memo Rule"/);
-  assert.match(slide1, /name="Pitch Investor Ledger Line 1"/);
-  assert.match(slide1, /val="0F2D3A"/);
-  assert.match(slide1, /val="19A0A5"/);
+  assert.match(slide1, /name="Pitch Investor Memo Paper"/);
+  assert.match(slide1, /name="Pitch Investor Memo Decision Metric 1"/);
+  assert.match(slide1, /name="Pitch Investor Memo Scorecard 1"/);
+  assert.match(slide1, /name="Pitch Investor Memo Top Rule"/);
+  assert.match(slide2, /name="Pitch Investor Memo Decision Metric 1"/);
+  assert.match(slide3, /name="Pitch Investor Memo TAM Funnel TAM"/);
+  assert.match(slide1, /val="101828"/);
+  assert.match(slide1, /val="12B76A"/);
+  assert.doesNotMatch(slide1, /投资人版/);
 });
 
 test("PptExportService uses commercial pitch product decorations", () => {
@@ -2591,26 +2602,26 @@ test("PptExportService uses business plan model decorations", () => {
   assert.doesNotMatch(slide1, /business-model/);
 });
 
-test("PptExportService uses seed round startup story decorations", () => {
+test("PptExportService uses founder cinematic startup story decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
     deck: {
       ...deck,
-      templateId: "pitch-seed-round-pitch-startup-story",
+      templateId: "pitch-startup-funding-pitch-startup-story",
       theme: "startup-story",
       templateVisual: {
-        id: "pitch-seed-round-pitch-startup-story",
+        id: "pitch-startup-funding-pitch-startup-story",
         primary: "172033",
         accent: "F97316",
         background: "F6F4EF",
         surface: "FFFFFF",
         title: "172033",
         body: "465266",
-        layout: "seed-round-story",
+        layout: "founder-cinematic-story",
         variant: "startup-story",
       },
       slides: [
-        { title: "种子轮融资计划", bullets: ["真实用户痛点已经被反复验证", "MVP retention plan visible", "早期增长信号支持种子轮融资"] },
+        { title: "创业融资故事", bullets: ["真实用户痛点已经被反复验证", "MVP retention plan visible", "早期增长信号支持创业融资"] },
         { title: "痛点发现", bullets: ["高频场景", "强烈付费意愿", "替代方案低效"] },
         { title: "MVP 验证", bullets: ["核心路径", "首批客户", "体验指标"] },
         { title: "早期增长", bullets: ["用户增长", "留存改善", "转介绍"] },
@@ -2630,12 +2641,16 @@ test("PptExportService uses seed round startup story decorations", () => {
   assert.match(slide1, /name="Seed Round Story Canvas"/);
   assert.match(slide1, /name="Seed Round Content Panel"/);
   assert.match(slide1, /name="Seed Round Planned Content"/);
-  assert.match(slide1, /name="Seed Round MVP Mockup"/);
+  assert.match(slide1, /name="Founder Cinematic team Scene"/);
   assert.match(slide1, /name="Seed Round Storyline"/);
   assert.match(slide1, /MVP retention plan visible/);
+  assert.match(text, /founder-team-scene\.png/);
+  assert.match(text, /user-pain-scene\.png/);
+  assert.match(text, /product-prototype-panel\.png/);
+  assert.match(text, /growth-stage-path\.png/);
   assert.match(slide2, /name="Seed Round Pain Evidence 1"/);
-  assert.match(slide3, /name="Seed Round MVP Board"/);
-  assert.match(slide4, /name="Seed Round Traction Chart"/);
+  assert.match(slide3, /name="Seed Round Pain Evidence 1"/);
+  assert.match(slide4, /name="Seed Round MVP Board"/);
   assert.match(slide6, /name="Seed Round Funding Road"/);
   assert.doesNotMatch(slide1, /startup-story/);
 });
@@ -3461,62 +3476,99 @@ test("PptExportService uses identity brand story decorations", () => {
 test("PptExportService uses dashboard data insight decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "data-insight", theme: "dashboard" },
+    deck: {
+      ...deck,
+      templateId: "data-insight",
+      theme: "dashboard",
+      slides: [
+        { title: "经营数据驾驶舱", layout: "data-console-cover", bullets: ["营收同比 +15%", "利润率下降 2 个百分点", "核心渠道转化率 38%", "经营健康度 86%"] },
+        { title: "核心指标监控", layout: "data-console-overview", bullets: ["营收同比 +15%", "利润率下降 2 个百分点", "异常告警 3 项"] },
+        { title: "趋势分析", layout: "data-console-trend", bullets: ["近四周转化率出现连续下滑", "客单价保持稳定", "新增用户质量分层明显"] },
+        { title: "异常预警", layout: "data-console-alert", bullets: ["利润率低于阈值", "获客成本环比抬升", "渠道转化波动"] },
+        { title: "排名结构", layout: "data-console-ranking", bullets: ["华东区域", "线上渠道", "核心产品", "大客户群"] },
+        { title: "管理动作闭环", layout: "data-console-action", bullets: ["锁定异常指标负责人", "复盘趋势拐点原因", "下周更新监控阈值"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
-  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
 
-  assert.match(slide1, /name="Data Insight Cover Dashboard Canvas"/);
-  assert.match(slide1, /name="Data Insight Visual Panel"/);
-  assert.match(slide1, /name="Data Insight dashboard Chip"/);
-  assert.match(slide1, /name="Data Insight Dashboard Bar 1"/);
-  assert.match(slide1, /name="Data Dashboard Grid 1"/);
-  assert.match(slide1, /name="Data Dashboard Pulse"/);
-  assert.match(slide1, /name="Data Insight Metric Card 1"/);
-  assert.match(slide2, /name="Data Insight Content Analysis Canvas"/);
-  assert.match(slide2, /name="Data Insight Signal Card 1"/);
-  assert.match(slide1, /val="123B63"/);
-  assert.match(slide1, /val="18A0A6"/);
+  assert.match(slide1, /name="Data Insight Dashboard Console Surface"/);
+  assert.match(slide1, /name="Data Insight Dashboard Console KPI Card 1"/);
+  assert.match(slide1, /name="Data Insight Dashboard Console Trend Panel"/);
+  assert.match(slide1, /name="Data Insight Dashboard Console Health Ring"/);
+  assert.match(slide4, /name="Data Insight Dashboard Console Alert Queue"/);
+  assert.match(slide5, /name="Data Insight Dashboard Console Ranking Table"/);
+  assert.match(slide6, /name="Data Insight Dashboard Console Action Card 1"/);
+  assert.match(slide1, /val="07111F"/);
+  assert.match(slide1, /val="36C5F0"/);
 });
 
-test("PptExportService uses insight analysis data insight decorations", () => {
+test("PptExportService uses insight analysis workbench decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "data-insight", theme: "insight" },
+    deck: {
+      ...deck,
+      templateId: "data-insight",
+      theme: "insight",
+      slides: [
+        { title: "洞察工作台", bullets: ["发现收入增长放缓", "识别异常信号", "排序行动建议"] },
+        { title: "趋势发现", bullets: ["转化率连续下滑", "客单价保持稳定", "用户质量分层"] },
+        { title: "原因定位", bullets: ["渠道结构变化", "激活路径变长", "价格敏感提升"] },
+        { title: "行动矩阵", bullets: ["优化激活路径", "暂停低质渠道", "建立复盘机制"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
 
-  assert.match(slide1, /name="Data Insight Visual Panel"/);
-  assert.match(slide1, /name="Data Insight insight Chip"/);
-  assert.match(slide1, /name="Data Insight Magnifier Ring"/);
-  assert.match(slide1, /name="Data Insight Finding Curve"/);
-  assert.match(slide1, /name="Data Insight Signal Path"/);
-  assert.match(slide1, /name="Data Insight Signal Node 1"/);
-  assert.match(slide1, /val="273C75"/);
-  assert.match(slide1, /val="F6A623"/);
+  assert.match(slide1, /name="Data Insight Workbench Surface"/);
+  assert.match(slide1, /name="Data Insight Workbench Signal Panel"/);
+  assert.match(slide1, /name="Data Insight Workbench Lens Ring"/);
+  assert.match(slide1, /name="Data Insight Workbench Action Card 1"/);
+  assert.match(slide3, /name="Data Insight Workbench Attribution Panel"/);
+  assert.match(slide3, /name="Data Insight Workbench Attribution Node 1"/);
+  assert.match(slide1, /val="172554"/);
+  assert.match(slide1, /val="F59E0B"/);
 });
 
 test("PptExportService uses research report data insight decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "data-insight", theme: "research" },
+    deck: {
+      ...deck,
+      templateId: "data-insight",
+      theme: "research",
+      slides: [
+        { title: "研究摘要", bullets: ["样本 N=320 覆盖核心用户", "访谈 M=24 形成证据链", "Ref 12 份资料完成交叉验证"] },
+        { title: "研究方法", bullets: ["桌面研究梳理行业公开资料", "问卷采集形成样本结构", "访谈记录沉淀证据引用"] },
+        { title: "样本结构", bullets: ["一线城市样本占比提升", "高频用户反馈更集中", "样本限制已进入脚注说明"] },
+        { title: "证据引用", bullets: ["访谈摘录支持核心发现", "文档证据解释趋势变化", "资料索引便于回溯"] },
+        { title: "核心发现", bullets: ["发现一：决策周期延长", "发现二：证据需求提升", "发现三：建议优先级明确"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
 
-  assert.match(slide1, /name="Data Insight Visual Panel"/);
-  assert.match(slide1, /name="Data Insight research Chip"/);
-  assert.match(slide1, /name="Data Insight Research Evidence Line 1"/);
-  assert.match(slide1, /name="Data Insight Research Quote Card"/);
-  assert.match(slide1, /name="Data Research Left Margin"/);
-  assert.match(slide1, /name="Data Research Folio"/);
-  assert.match(slide1, /val="2F3A4A"/);
-  assert.match(slide1, /val="7C9A92"/);
+  assert.match(slide1, /name="Data Research Report Page Canvas"/);
+  assert.match(slide1, /name="Data Research Report Document Scene"/);
+  assert.match(slide1, /name="Data Research Report Source Index"/);
+  assert.match(slide3, /name="Data Research Report Sample Matrix"/);
+  assert.match(slide4, /name="Data Research Report Evidence Citation Card 1"/);
+  assert.doesNotMatch(slide1, /name="Data Insight research Chip"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="315C7C"/);
+  assert.match(slide1, /val="B8822D"/);
 });
 
 test("PptExportService reuses dome visual assets and page layout roles for red-gold PPTX output", () => {

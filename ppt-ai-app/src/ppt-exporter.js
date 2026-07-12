@@ -21,6 +21,7 @@ const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scal
 const BUSINESS_MODERN_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const LUXURY_BRAND_ASSET_BASE_URL = new URL("../../templates/official/marketing/brand-story/premium/assets/", import.meta.url);
 const PRODUCT_PREMIERE_ASSET_BASE_URL = new URL("../../templates/official/marketing/marketing-campaign/launch/assets/", import.meta.url);
+const FOUNDER_CINEMATIC_ASSET_BASE_URL = new URL("../../templates/official/pitch/seed-round-pitch/startup-story/assets/", import.meta.url);
 const LUXURY_BRAND_MEDIA = {
   product: { file: "luxury-product-still.png", content: readFileSync(new URL("luxury-product-still.png", LUXURY_BRAND_ASSET_BASE_URL)) },
   gold: { file: "brushed-gold-texture.png", content: readFileSync(new URL("brushed-gold-texture.png", LUXURY_BRAND_ASSET_BASE_URL)) },
@@ -31,6 +32,12 @@ const PRODUCT_PREMIERE_MEDIA = {
   product: { file: "product-concept-hero.png", content: readFileSync(new URL("product-concept-hero.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
   stage: { file: "launch-stage-scene.png", content: readFileSync(new URL("launch-stage-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
   lifestyle: { file: "product-lifestyle-scene.png", content: readFileSync(new URL("product-lifestyle-scene.png", PRODUCT_PREMIERE_ASSET_BASE_URL)) },
+};
+const FOUNDER_CINEMATIC_MEDIA = {
+  team: { file: "founder-team-scene.png", content: readFileSync(new URL("founder-team-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  pain: { file: "user-pain-scene.png", content: readFileSync(new URL("user-pain-scene.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  product: { file: "product-prototype-panel.png", content: readFileSync(new URL("product-prototype-panel.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
+  growth: { file: "growth-stage-path.png", content: readFileSync(new URL("growth-stage-path.png", FOUNDER_CINEMATIC_ASSET_BASE_URL)) },
 };
 const STATUS_REPORT_MEDIA = {
   weekly: {
@@ -416,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "seed-round-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -518,7 +525,7 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 22) return 1520;
     return Math.min(fallbackSize, 1780);
   }
-  if (visual.layout === "seed-round-story") {
+  if (visual.layout === "founder-cinematic-story") {
     if (index === 0) {
       if (textLength >= 30) return 2050;
       if (textLength >= 22) return 2300;
@@ -952,7 +959,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "pitch-ai-saas") return false;
   if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "investor-update-progress-sync") return false;
-  if (visual.layout === "seed-round-story") return false;
+  if (visual.layout === "founder-cinematic-story") return false;
   if (visual.layout === "quarterly-action-loop") return false;
   if (visual.layout === "operating-problem-tree") return false;
   if (visual.layout === "business-opportunity-map") return false;
@@ -989,6 +996,9 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "customer-segmentation-layering") return false;
   if (visual.layout === "metric-anomaly-attribution") return false;
   if (visual.layout === "data-governance-standard") return false;
+  if (visual.layout === "data-insight-dashboard-console") return false;
+  if (visual.layout === "data-insight-workbench") return false;
+  if (visual.layout === "data-research-report") return false;
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "sales-financial-solution") return false;
@@ -1045,6 +1055,9 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "pitch-project-return") return false;
   if (visual.layout === "channel-traffic-quality") return false;
   if (visual.layout === "data-governance-standard") return false;
+  if (visual.layout === "data-insight-dashboard-console") return false;
+  if (visual.layout === "data-insight-workbench") return false;
+  if (visual.layout === "data-research-report") return false;
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "management-agenda-decision") return false;
@@ -1095,6 +1108,13 @@ function scaleTemplateGeometryXml(xml, visual) {
 
 function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
+  if (visual.layout === "data-research-report") {
+    // 研究报告主题要先于通用模板 fallback 返回，确保 PPTX 拥有页码、脚注、资料索引和证据卡等专属图形。
+    return base + dataResearchReportDecorationsXml({ visual, index, slide, total });
+  }
+  if (isPitchInvestorMemoVisual(visual)) {
+    return base + pitchInvestorMemoDecorationsXml({ visual, index, role, slide, total });
+  }
   if (visual.layout === "red-gold") {
     const redGoldPalette = redGoldColorPalette(visual);
     const isCover = ["cover", "closing"].includes(role);
@@ -1471,6 +1491,19 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
       + lowerData
       + textShapeXml({ id: 550, name: "Data Insight Caption", x: isCover ? 6248400 : 6248400, y: isCover ? 3505200 : 3230880, cx: 2133600, cy: 182880, text: scene.caption, size: isCover ? 800 : 740, bold: true, color: visual.body });
   }
+  if (visual.layout === "data-insight-dashboard-console") {
+    return base + dataInsightDashboardConsoleDecorationsXml({ visual, index, role, slide, total });
+  }
+  if (visual.layout === "data-research-report") {
+    return base + dataResearchReportDecorationsXml({ visual, index, role, slide, total });
+  }
+  if (visual.layout === "data-insight-workbench") {
+    return base + dataInsightWorkbenchDecorationsXml({ visual, index, role, slide, total });
+  }
+  if (visual.layout === "data-research-report") {
+    // 研究报告主题已经拥有独立可编辑图形，这里显式接入导出路由，避免只落到通用背景层。
+    return base + dataResearchReportDecorationsXml({ visual, index, slide, total });
+  }
   if (visual.layout === "education-course") {
     const isCover = index === 0;
     const palette = educationCourseColorPalette(visual);
@@ -1657,6 +1690,9 @@ function templateMediaFiles(visual) {
   }
   if (isProductPremiereVisual(visual)) {
     return Object.fromEntries(Object.values(PRODUCT_PREMIERE_MEDIA).map((media) => [`ppt/media/${media.file}`, media.content]));
+  }
+  if (isSeedRoundStoryVisual(visual)) {
+    return Object.fromEntries(Object.values(FOUNDER_CINEMATIC_MEDIA).map((media) => [`ppt/media/${media.file}`, media.content]));
   }
   return {};
 }
@@ -2532,7 +2568,7 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodyColor: visual.body,
     };
   }
-  if (visual.layout === "seed-round-story") {
+  if (visual.layout === "founder-cinematic-story") {
     const isCover = index === 0;
     const isClosing = role === "closing";
     return {
@@ -3303,6 +3339,18 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       bodySize: 1220,
     };
   }
+  if (visual.layout === "data-research-report") {
+    return {
+      surface: { x: 548640, y: 396240, cx: 8046720, cy: 4343400 },
+      accent: { x: 548640, y: 396240, cx: 8046720, cy: 45720 },
+      secondaryAccent: { x: 838200, y: 670560, cx: 45720, cy: 3657600 },
+      label: { x: 838200, y: 670560, cx: 2590800, cy: 198120 },
+      title: { x: 838200, y: 1005840, cx: 3962400, cy: 853440 },
+      content: { x: 914400, y: 2133600, cx: 3505200, cy: 1219200 },
+      titleSize: index === 0 ? 2800 : 2350,
+      bodySize: 900,
+    };
+  }
   if (visual.layout === "education-course") {
     if (index === 0) {
       return {
@@ -3397,6 +3445,18 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       title: { x: 914400, y: 571500, cx: 6400800, cy: 822960 },
       content: { x: 1143000, y: 1828800, cx: 5791200, cy: 2286000 },
       titleSize: 3300,
+    };
+  }
+  if (visual.layout === "pitch-investor-memo") {
+    return {
+      surface: { x: 487680, y: 411480, cx: 8168640, cy: 4312920 },
+      accent: { x: 487680, y: 411480, cx: 8168640, cy: 54864 },
+      secondaryAccent: { x: 731520, y: 3215640, cx: 3352800, cy: 22860 },
+      label: { x: 731520, y: 701040, cx: 3048000, cy: 243840 },
+      title: { x: 731520, y: 1005840, cx: 3810000, cy: 792480 },
+      content: { x: 792480, y: 2057400, cx: 3505200, cy: 990600 },
+      titleSize: index === 0 ? 3000 : 2600,
+      bodySize: 1120,
     };
   }
   if (visual.layout === "venture") {
@@ -3597,7 +3657,10 @@ function slideRelsXml(visual, role = "content") {
   const productPremiereRels = isProductPremiereVisual(visual)
     ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.product.file}"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.stage.file}"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${PRODUCT_PREMIERE_MEDIA.lifestyle.file}"/>`
     : "";
-  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}${luxuryBrandRels}${productPremiereRels}</Relationships>`;
+  const founderCinematicRels = isSeedRoundStoryVisual(visual)
+    ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${FOUNDER_CINEMATIC_MEDIA.team.file}"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${FOUNDER_CINEMATIC_MEDIA.pain.file}"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${FOUNDER_CINEMATIC_MEDIA.product.file}"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${FOUNDER_CINEMATIC_MEDIA.growth.file}"/>`
+    : "";
+  return `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${imageRel}${businessImageRel}${luxuryBrandRels}${productPremiereRels}${founderCinematicRels}</Relationships>`;
 }
 
 /**
@@ -9417,6 +9480,181 @@ function isPitchDeckVisual(visual) {
   return visual?.id === "pitch" && visual?.layout === "venture";
 }
 
+function pitchInvestorMemoDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = pitchInvestorMemoScene({ slide, index, role, total });
+  const palette = pitchInvestorMemoPalette(visual);
+  // 投资备忘录版使用固定纸面和右侧模型区，避免导出时默认正文与财务模型重叠。
+  const shell = solidShapeXml({ id: 820, name: "Pitch Investor Memo Paper", geom: "roundRect", x: 487680, y: 411480, cx: 8168640, cy: 4312920, fill: visual.surface })
+    + lineFrameShapeXml({ id: 821, name: "Pitch Investor Memo Paper Frame", geom: "roundRect", x: 487680, y: 411480, cx: 8168640, cy: 4312920, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 822, name: "Pitch Investor Memo Top Rule", x: 487680, y: 411480, cx: 8168640, cy: 54864, fill: visual.primary })
+    + rectShapeXml({ id: 823, name: "Pitch Investor Memo Green Rule", x: 3505200, y: 411480, cx: 2590800, cy: 54864, fill: visual.accent })
+    + rectShapeXml({ id: 824, name: "Pitch Investor Memo Orange Rule", x: 6096000, y: 411480, cx: 2286000, cy: 54864, fill: palette.orange })
+    + textShapeXml({ id: 825, name: "Pitch Investor Memo Kicker", x: 731520, y: 701040, cx: 3048000, cy: 243840, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 826, name: "Pitch Investor Memo Title", x: 731520, y: 1005840, cx: 3810000, cy: 792480, text: pitchInvestorMemoCompactText(slide?.title, scene.title, scene.role === "cover" ? 30 : 26), size: scene.role === "cover" ? 1500 : 1320, bold: true, color: visual.title })
+    + textShapeXml({ id: 827, name: "Pitch Investor Memo Summary", x: 731520, y: 2011680, cx: 3505200, cy: 457200, text: pitchInvestorMemoCompactText(pitchInvestorMemoBulletTexts(slide)[0], scene.summary, 48), size: 760, bold: true, color: visual.body })
+    + pitchInvestorMemoBulletsXml({ visual, slide, fallback: scene.summary });
+  if (scene.role === "cover" || scene.role === "summary") {
+    return shell + pitchInvestorMemoDecisionXml({ visual, palette, scene }) + pitchInvestorMemoScorecardXml({ visual, palette, scene });
+  }
+  if (scene.role === "market") {
+    return shell + pitchInvestorMemoMarketXml({ visual, palette, scene, slide });
+  }
+  if (scene.role === "revenue") {
+    return shell + pitchInvestorMemoRevenueXml({ visual, palette });
+  }
+  if (scene.role === "unit") {
+    return shell + pitchInvestorMemoUnitXml({ visual, palette, scene });
+  }
+  if (scene.role === "moat") {
+    return shell + pitchInvestorMemoMoatXml({ visual, palette, scene, slide });
+  }
+  return shell + pitchInvestorMemoFundingXml({ visual, palette, scene, slide });
+}
+
+function pitchInvestorMemoBulletsXml({ visual, slide, fallback }) {
+  return pitchInvestorMemoBulletTexts(slide).slice(0, 4).map((item, itemIndex) => (
+    textShapeXml({ id: 830 + itemIndex, name: `Pitch Investor Memo Bullet ${itemIndex + 1}`, x: 838200, y: 2590800 + itemIndex * 243840, cx: 3200400, cy: 182880, text: `- ${pitchInvestorMemoCompactText(item, fallback, 36)}`, size: 620, bold: true, color: visual.body })
+  )).join("");
+}
+
+function pitchInvestorMemoDecisionXml({ visual, palette, scene }) {
+  return scene.metrics.map((metric, itemIndex) => {
+    const x = 5181600 + itemIndex * 1036320;
+    return solidShapeXml({ id: 840 + itemIndex * 4, name: `Pitch Investor Memo Decision Metric ${itemIndex + 1}`, geom: "roundRect", x, y: 822960, cx: 914400, cy: 701040, fill: visual.primary })
+      + rectShapeXml({ id: 841 + itemIndex * 4, name: `Pitch Investor Memo Decision Rule ${itemIndex + 1}`, x: x + 76200, y: 899160, cx: 762000, cy: 38100, fill: itemIndex === 2 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 842 + itemIndex * 4, name: `Pitch Investor Memo Decision Value ${itemIndex + 1}`, x: x + 106680, y: 1066800, cx: 701040, cy: 213360, text: metric.value, size: 1120, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 843 + itemIndex * 4, name: `Pitch Investor Memo Decision Label ${itemIndex + 1}`, x: x + 106680, y: 1280160, cx: 701040, cy: 152400, text: metric.label, size: 560, bold: true, color: palette.muted });
+  }).join("");
+}
+
+function pitchInvestorMemoScorecardXml({ visual, palette, scene }) {
+  return scene.cards.map((card, itemIndex) => {
+    const x = 5181600 + (itemIndex % 2) * 1325880;
+    const y = 2895600 + Math.floor(itemIndex / 2) * 640080;
+    return solidShapeXml({ id: 860 + itemIndex * 3, name: `Pitch Investor Memo Scorecard ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 518160, fill: palette.card })
+      + rectShapeXml({ id: 861 + itemIndex * 3, name: `Pitch Investor Memo Scorecard Rule ${itemIndex + 1}`, x: x + 121920, y: y + 121920, cx: 762000, cy: 30480, fill: itemIndex === 1 ? palette.orange : visual.accent })
+      + textShapeXml({ id: 862 + itemIndex * 3, name: `Pitch Investor Memo Scorecard Text ${itemIndex + 1}`, x: x + 121920, y: y + 213360, cx: 914400, cy: 152400, text: card, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function pitchInvestorMemoMarketXml({ visual, palette, scene, slide }) {
+  const labels = ["TAM", "SAM", "SOM"];
+  const funnel = labels.map((label, itemIndex) => {
+    const widths = [2438400, 1828800, 1219200];
+    const x = 5181600 + itemIndex * 304800;
+    const y = 914400 + itemIndex * 701040;
+    return solidShapeXml({ id: 880 + itemIndex * 2, name: `Pitch Investor Memo TAM Funnel ${label}`, geom: "trapezoid", x, y, cx: widths[itemIndex], cy: 548640, fill: itemIndex === 2 ? visual.accent : palette.market })
+      + textShapeXml({ id: 881 + itemIndex * 2, name: `Pitch Investor Memo TAM Label ${label}`, x: x + 304800, y: y + 182880, cx: widths[itemIndex] - 609600, cy: 152400, text: label, size: 820, bold: true, color: visual.title });
+  }).join("");
+  const bullets = pitchInvestorMemoBulletTexts(slide);
+  const assumptions = scene.cards.map((card, itemIndex) => {
+    const x = 5181600 + (itemIndex % 2) * 1325880;
+    const y = 3291840 + Math.floor(itemIndex / 2) * 457200;
+    return solidShapeXml({ id: 890 + itemIndex * 2, name: `Pitch Investor Memo Market Assumption ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1219200, cy: 335280, fill: palette.card })
+      + textShapeXml({ id: 891 + itemIndex * 2, name: `Pitch Investor Memo Market Assumption Text ${itemIndex + 1}`, x: x + 91440, y: y + 106680, cx: 1036320, cy: 121920, text: pitchInvestorMemoCompactText(bullets[itemIndex] || card, card, 18), size: 560, bold: true, color: visual.title });
+  }).join("");
+  return funnel + assumptions;
+}
+
+function pitchInvestorMemoRevenueXml({ visual, palette }) {
+  const parts = ["Users", "ARPU", "Retention", "Revenue"];
+  const formula = parts.map((part, itemIndex) => {
+    const x = 4876800 + itemIndex * 929640;
+    return solidShapeXml({ id: 910 + itemIndex * 3, name: `Pitch Investor Memo Revenue Formula ${itemIndex + 1}`, geom: "roundRect", x, y: 1066800, cx: 731520, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 911 + itemIndex * 3, name: `Pitch Investor Memo Revenue Formula Text ${itemIndex + 1}`, x: x + 76200, y: 1280160, cx: 579120, cy: 152400, text: part, size: 600, bold: true, color: visual.title })
+      + (itemIndex < 3 ? textShapeXml({ id: 912 + itemIndex * 3, name: `Pitch Investor Memo Revenue Operator ${itemIndex + 1}`, x: x + 746760, y: 1295400, cx: 152400, cy: 152400, text: itemIndex === 2 ? "=" : "x", size: 820, bold: true, color: visual.accent }) : "");
+  }).join("");
+  const bars = [0.32, 0.50, 0.66, 0.84].map((height, itemIndex) => (
+    solidShapeXml({ id: 930 + itemIndex, name: `Pitch Investor Memo Revenue Bar ${itemIndex + 1}`, geom: "roundRect", x: 5486400 + itemIndex * 487680, y: 3505200 - Math.round(1066800 * height), cx: 182880, cy: Math.round(1066800 * height), fill: itemIndex === 3 ? palette.orange : visual.accent })
+  )).join("");
+  return formula
+    + lineFrameShapeXml({ id: 929, name: "Pitch Investor Memo Revenue Axis", x: 5181600, y: 2286000, cx: 2514600, cy: 1295400, stroke: palette.frame, width: 11430 })
+    + bars;
+}
+
+function pitchInvestorMemoUnitXml({ visual, palette, scene }) {
+  const metrics = pitchInvestorMemoDecisionXml({ visual, palette, scene }).replace(/Decision/g, "Unit Economics");
+  const cells = [0, 1, 2, 3, 4, 5].map((itemIndex) => {
+    const x = 5181600 + (itemIndex % 3) * 762000;
+    const y = 2636520 + Math.floor(itemIndex / 3) * 457200;
+    return solidShapeXml({ id: 960 + itemIndex, name: `Pitch Investor Memo Unit Economics Sensitivity ${itemIndex + 1}`, x, y, cx: 670560, cy: 365760, fill: itemIndex % 2 ? palette.market : palette.card });
+  }).join("");
+  return metrics + lineFrameShapeXml({ id: 959, name: "Pitch Investor Memo Unit Economics Matrix", x: 5105400, y: 2545080, cx: 2438400, cy: 1005840, stroke: palette.frame, width: 11430 }) + cells;
+}
+
+function pitchInvestorMemoMoatXml({ visual, palette, scene, slide }) {
+  const bullets = pitchInvestorMemoBulletTexts(slide);
+  const cards = scene.cards.map((card, itemIndex) => {
+    const x = 6705600;
+    const y = 914400 + itemIndex * 548640;
+    return solidShapeXml({ id: 980 + itemIndex * 2, name: `Pitch Investor Memo Moat Card ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 426720, fill: palette.card })
+      + textShapeXml({ id: 981 + itemIndex * 2, name: `Pitch Investor Memo Moat Text ${itemIndex + 1}`, x: x + 121920, y: y + 137160, cx: 1066800, cy: 121920, text: pitchInvestorMemoCompactText(bullets[itemIndex] || card, card, 18), size: 600, bold: true, color: visual.title });
+  }).join("");
+  return lineFrameShapeXml({ id: 978, name: "Pitch Investor Memo Moat Matrix", x: 5029200, y: 914400, cx: 1371600, cy: 2346960, stroke: palette.frame, width: 11430 })
+    + rectShapeXml({ id: 979, name: "Pitch Investor Memo Moat Matrix Axis X", x: 5029200, y: 2072640, cx: 1371600, cy: 15240, fill: palette.frame })
+    + rectShapeXml({ id: 982, name: "Pitch Investor Memo Moat Matrix Axis Y", x: 5715000, y: 914400, cx: 15240, cy: 2346960, fill: palette.frame })
+    + solidShapeXml({ id: 983, name: "Pitch Investor Memo Moat Position Dot", geom: "ellipse", x: 5913120, y: 1371600, cx: 243840, cy: 243840, fill: visual.accent })
+    + cards;
+}
+
+function pitchInvestorMemoFundingXml({ visual, palette, scene, slide }) {
+  const allocation = scene.metrics.map((metric, itemIndex) => {
+    const x = 5181600 + itemIndex * 1036320;
+    return solidShapeXml({ id: 1000 + itemIndex * 3, name: `Pitch Investor Memo Capital Allocation ${itemIndex + 1}`, geom: "roundRect", x, y: 914400, cx: 914400, cy: 701040, fill: itemIndex === 2 ? palette.orange : visual.primary })
+      + textShapeXml({ id: 1001 + itemIndex * 3, name: `Pitch Investor Memo Capital Allocation Value ${itemIndex + 1}`, x: x + 106680, y: 1135380, cx: 701040, cy: 152400, text: metric.value, size: 980, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 1002 + itemIndex * 3, name: `Pitch Investor Memo Capital Allocation Label ${itemIndex + 1}`, x: x + 106680, y: 1325880, cx: 701040, cy: 121920, text: metric.label, size: 520, bold: true, color: "FFFFFF" });
+  }).join("");
+  const bullets = pitchInvestorMemoBulletTexts(slide);
+  const roadmap = scene.cards.map((card, itemIndex) => {
+    const x = 5029200 + itemIndex * 838200;
+    return solidShapeXml({ id: 1020 + itemIndex * 2, name: `Pitch Investor Memo Funding Roadmap ${itemIndex + 1}`, geom: "roundRect", x, y: 2971800, cx: 731520, cy: 518160, fill: palette.card })
+      + textShapeXml({ id: 1021 + itemIndex * 2, name: `Pitch Investor Memo Funding Roadmap Text ${itemIndex + 1}`, x: x + 76200, y: 3154680, cx: 579120, cy: 121920, text: pitchInvestorMemoCompactText(bullets[itemIndex] || card, card, 16), size: 520, bold: true, color: visual.title });
+  }).join("");
+  return allocation
+    + rectShapeXml({ id: 1018, name: "Pitch Investor Memo Funding Timeline", x: 5181600, y: 2773680, cx: 3048000, cy: 30480, fill: visual.accent })
+    + roadmap;
+}
+
+function pitchInvestorMemoPalette(visual) {
+  return {
+    card: blendHexColor(visual.surface, visual.background, 0.18),
+    frame: blendHexColor(visual.primary, visual.background, 0.72),
+    market: blendHexColor(visual.accent, visual.background, 0.70),
+    muted: blendHexColor(visual.surface, visual.primary, 0.20),
+    orange: visual.secondary || "F79009",
+  };
+}
+
+function pitchInvestorMemoScene({ slide, index, role, total = 0 }) {
+  const roles = ["cover", "summary", "market", "revenue", "unit", "moat", "funding", "closing"];
+  const resolvedRole = index === 0 ? "cover" : (index === total - 1 || role === "closing" ? "closing" : roles[Math.min(index, roles.length - 2)]);
+  const presets = {
+    cover: { kicker: "INVESTMENT MEMO", title: "用投资备忘录讲清下一轮融资价值", summary: "结论先行呈现市场空间、商业模型和资金计划。", metrics: [{ value: "TAM", label: "市场空间" }, { value: "ARR", label: "收入模型" }, { value: "18M", label: "Runway" }], cards: ["投资亮点", "关键证据", "风险假设", "资金用途"] },
+    summary: { kicker: "IC SNAPSHOT", title: "投委会决策摘要", summary: "用投委会摘要矩阵快速交代本轮融资判断。", metrics: [{ value: "01", label: "机会" }, { value: "02", label: "证据" }, { value: "03", label: "计划" }], cards: ["市场窗口", "增长质量", "壁垒强度", "融资效率"] },
+    market: { kicker: "MARKET SIZING", title: "TAM/SAM/SOM 市场空间", summary: "拆分市场空间和进入假设，避免只给单一大数。", metrics: [{ value: "TAM", label: "总市场" }, { value: "SAM", label: "可进入" }, { value: "SOM", label: "近期可服务" }], cards: ["需求密度", "客群切入", "渠道可达", "增长假设"] },
+    revenue: { kicker: "REVENUE MODEL", title: "收入模型与增长公式", summary: "把收入拆成用户、价格、转化和留存的可验证公式。", metrics: [{ value: "ARPU", label: "客单价" }, { value: "GM", label: "毛利率" }, { value: "NRR", label: "净留存" }], cards: ["定价结构", "转化路径", "续费扩张", "毛利假设"] },
+    unit: { kicker: "UNIT ECONOMICS", title: "单位经济与回收周期", summary: "用 LTV/CAC、回收期和毛利解释增长是否可持续。", metrics: [{ value: "LTV", label: "生命周期价值" }, { value: "CAC", label: "获客成本" }, { value: "Payback", label: "回收期" }], cards: ["获客效率", "毛利空间", "留存周期", "敏感性"] },
+    moat: { kicker: "DEFENSIBILITY", title: "竞争壁垒和护城河证据", summary: "将竞争壁垒拆成技术、数据、渠道和组织执行证据。", metrics: [{ value: "Tech", label: "技术壁垒" }, { value: "Data", label: "数据飞轮" }, { value: "GTM", label: "渠道优势" }], cards: ["技术壁垒", "数据资产", "渠道锁定", "团队执行"] },
+    funding: { kicker: "CAPITAL PLAN", title: "融资金额和资金用途", summary: "说明融资金额、资金用途、里程碑和 runway 的对应关系。", metrics: [{ value: "40%", label: "产品研发" }, { value: "35%", label: "市场增长" }, { value: "25%", label: "组织运营" }], cards: ["产品里程碑", "增长验证", "关键招聘", "下一轮准备"] },
+    closing: { kicker: "NEXT DD", title: "下一步尽调和投委会节奏", summary: "把下一步尽调材料、会议节奏和关键问题整理成清单。", metrics: [{ value: "DD", label: "尽调清单" }, { value: "IC", label: "投委会" }, { value: "TS", label: "交易条款" }], cards: ["数据室", "客户访谈", "财务模型", "交易节奏"] },
+  };
+  return { ...presets[resolvedRole], role: resolvedRole, variant: "investor-memo" };
+}
+
+function pitchInvestorMemoBulletTexts(slide) {
+  return (slide?.bullets || []).map((item) => String(item || "").trim()).filter(Boolean);
+}
+
+function pitchInvestorMemoCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function isPitchInvestorMemoVisual(visual) {
+  return visual?.id === "pitch" && visual?.layout === "pitch-investor-memo";
+}
+
 function growthFundingFlywheelDecorationsXml({ visual, index, role, slide }) {
   const scene = growthFundingFlywheelScene({ slide, index, role });
   const palette = growthFundingFlywheelPalette(visual);
@@ -10488,26 +10726,36 @@ function seedRoundStoryDecorationsXml({ visual, index, layout, role, slide }) {
 
   const notes = seedRoundStoryInsightCardsXml({ visual, palette, items: scene.insights, y: role === "closing" ? 3124200 : 3505200 });
   const content = seedRoundStoryContentXml({ visual, palette, scene, slide, index, role });
+  const photo = seedRoundStoryPhotoXml({ scene });
   if (index === 0) {
     return shell
       + content
-      + seedRoundStoryMockupXml({ visual, palette })
+      + photo
       + seedRoundStoryMetricsXml({ visual, palette, metrics: scene.metrics })
       + seedRoundStoryLineXml({ visual, palette, items: scene.roadmap });
   }
   if (scene.kind === "pain") {
-    return shell + content + seedRoundStoryPainWallXml({ visual, palette, items: scene.cards }) + notes;
+    return shell + content + photo + seedRoundStoryPainWallXml({ visual, palette, items: scene.cards }) + notes;
   }
   if (scene.kind === "mvp") {
-    return shell + content + seedRoundStoryValidationBoardXml({ visual, palette, items: scene.cards }) + notes;
+    return shell + content + photo + seedRoundStoryValidationBoardXml({ visual, palette, items: scene.cards }) + notes;
   }
   if (scene.kind === "traction") {
-    return shell + content + seedRoundStoryGrowthChartXml({ visual, palette, items: scene.metrics }) + notes;
+    return shell + content + photo + seedRoundStoryGrowthChartXml({ visual, palette, items: scene.metrics }) + notes;
   }
   if (scene.kind === "team") {
-    return shell + content + seedRoundStoryTeamCardsXml({ visual, palette, items: scene.cards }) + notes;
+    return shell + content + photo + seedRoundStoryTeamCardsXml({ visual, palette, items: scene.cards }) + notes;
   }
-  return shell + content + seedRoundStoryFundingRoadXml({ visual, palette, items: scene.roadmap }) + notes;
+  return shell + content + photo + seedRoundStoryFundingRoadXml({ visual, palette, items: scene.roadmap }) + notes;
+}
+
+function seedRoundStoryPhotoXml({ scene }) {
+  const relByAsset = { team: "rId2", pain: "rId3", product: "rId4", growth: "rId5" };
+  const relId = relByAsset[scene.asset] || "rId2";
+  // 导出端使用同一组局部叙事图，与在线预览保持电影分镜的一致视觉记忆。
+  return pictureXml({ id: 1810, name: `Founder Cinematic ${scene.asset || "team"} Scene`, relId, x: 5486400, y: 914400, cx: 2743200, cy: 1905000 })
+    + lineFrameShapeXml({ id: 1811, name: "Founder Cinematic Photo Frame", geom: "roundRect", x: 5486400, y: 914400, cx: 2743200, cy: 1905000, stroke: "FFFFFF", width: 15240 })
+    + rectShapeXml({ id: 1812, name: "Founder Cinematic Film Perforation", x: 5486400, y: 914400, cx: 2743200, cy: 76200, fill: "FFFFFF" });
 }
 
 function seedRoundStoryContentXml({ visual, palette, scene, slide, index, role }) {
@@ -10652,29 +10900,32 @@ function seedRoundStoryScene({ slide, index, role }) {
   if (index === 0) {
     return {
       kind: "cover",
-      kicker: "SEED ROUND NARRATIVE",
+      asset: "team",
+      kicker: "FOUNDER FILM / ACT 01",
       insights,
-      roadmap: ["发现痛点", "访谈验证", "MVP", "早期用户", "融资计划"],
+      roadmap: ["问题", "洞察", "创立", "产品", "验证"],
       metrics: [
-        { value: "37", label: "用户访谈" },
-        { value: "12%", label: "周留存" },
-        { value: "3.4x", label: "转介绍" },
+        { value: "01", label: "问题洞察" },
+        { value: "MVP", label: "产品验证" },
+        { value: "增长", label: "阶段信号" },
       ],
     };
   }
   if (role === "closing" || index >= 5) {
     return {
       kind: "funding",
-      kicker: "NEXT INVESTOR CONVERSATION",
+      asset: "growth",
+      kicker: "VISION ROADMAP",
       insights,
-      roadmap: ["资金用途", "18个月里程碑", "核心招聘", "下一轮准备"],
+      roadmap: ["资金用途", "产品验证", "增长实验", "下一轮准备"],
     };
   }
   const scenes = [
-    { kind: "pain", kicker: "PAIN DISCOVERY", cards: ["高频场景", "强烈付费意愿", "替代方案低效", "决策链清晰"] },
-    { kind: "mvp", kicker: "MVP VALIDATION", cards: ["核心路径", "首批客户", "体验指标"] },
-    { kind: "traction", kicker: "EARLY TRACTION", metrics: [{ label: "M1" }, { label: "M2" }, { label: "M3" }] },
-    { kind: "team", kicker: "WHY THIS TEAM", cards: ["行业洞察", "产品交付", "增长经验"] },
+    { kind: "pain", asset: "pain", kicker: "PROBLEM SCENE", cards: ["高频场景", "强烈意愿", "替代低效", "决策清晰"] },
+    { kind: "pain", asset: "team", kicker: "FOUNDER INSIGHT", cards: ["创始动机", "关键洞察", "初始假设", "行动起点"] },
+    { kind: "mvp", asset: "product", kicker: "PROTOTYPE VALIDATION", cards: ["核心路径", "首批客户", "体验指标"] },
+    { kind: "traction", asset: "growth", kicker: "GROWTH SIGNAL", metrics: [{ label: "冷启动" }, { label: "验证期" }, { label: "扩张期" }] },
+    { kind: "team", asset: "team", kicker: "TEAM MISSION", cards: ["行业洞察", "产品交付", "增长经验"] },
   ];
   return { ...scenes[Math.min(index - 1, scenes.length - 1)], insights };
 }
@@ -10685,12 +10936,12 @@ function seedRoundStoryBulletTexts(slide) {
 }
 
 function seedRoundStorySceneSummary(scene) {
-  if (scene.kind === "cover") return "用真实用户问题、MVP 验证和早期信号建立投资人信任";
-  if (scene.kind === "pain") return "把创始团队看到的问题转成可验证的用户证据";
-  if (scene.kind === "mvp") return "用最小可行产品证明关键假设已经被用户理解";
-  if (scene.kind === "traction") return "展示早期用户、留存、转介绍和复购意向等可信信号";
-  if (scene.kind === "team") return "说明团队为什么适合解决这个问题";
-  return "把融资金额、资金用途和下一阶段验证目标放在同一条路径上";
+  if (scene.kind === "cover") return "用问题现场、创始动机、产品验证和增长愿景串起完整融资故事";
+  if (scene.kind === "pain") return scene.kicker === "FOUNDER INSIGHT" ? "把创始团队的经历和洞察讲成可信创业起点" : "先展示用户真实处境，再说明痛点为什么值得解决";
+  if (scene.kind === "mvp") return "用最小可行产品、核心流程和反馈闭环证明方案进入真实验证";
+  if (scene.kind === "traction") return "把早期用户、留存和渠道线索放到阶段路径里表达增长势能";
+  if (scene.kind === "team") return "说明团队为什么适合解决这个问题，并连接使命与阶段目标";
+  return "把融资金额、资金用途和增长愿景压到一条清晰路线中";
 }
 
 function seedRoundStoryCompactText(text, fallback, maxLength) {
@@ -10707,7 +10958,7 @@ function seedRoundStoryReadableText(text, maxLength) {
 
 function isSeedRoundStoryVisual(visual) {
   const id = String(visual?.id || "");
-  return visual?.layout === "seed-round-story" && (id === "seed-round-pitch" || id === "pitch-seed-round-pitch-startup-story");
+  return visual?.layout === "founder-cinematic-story" && (id === "startup-funding-pitch" || id === "pitch-startup-funding-pitch-startup-story");
 }
 
 function integratedMediaMixDecorationsXml({ visual, index, role, slide, total }) {
@@ -11863,7 +12114,7 @@ function growthMarketingLabCompactText(text, fallback, maxLength) {
 }
 
 function isGrowthMarketingLabVisual(visual) {
-  return visual?.id === "marketing-campaign" && visual?.layout === "growth-marketing-lab";
+  return visual?.layout === "growth-marketing-lab" || visual?.variant === "growth-lab";
 }
 
 function marketingCampaignVisualXml({ visual, palette, scene, isCover }) {
@@ -12378,7 +12629,7 @@ function productPremierePalette(visual) {
 }
 
 function isProductPremiereVisual(visual) {
-  return visual?.id === "marketing-campaign" && visual?.layout === "marketing-product-premiere";
+  return visual?.layout === "marketing-product-premiere" || visual?.variant === "product-premiere";
 }
 
 function launchRhythmDecorationsXml({ visual, index, role, slide }) {
@@ -13401,6 +13652,585 @@ function experimentAbTestMetricFromText(text, fallback, index) {
 }
 
 function experimentAbTestCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function dataInsightDashboardConsoleDecorationsXml({ visual, index, slide, total }) {
+  const palette = dataInsightDashboardConsolePalette(visual);
+  const scene = dataInsightDashboardConsoleScene({ slide, index, total });
+  const title = dataInsightDashboardConsoleCompactText(slide?.title, scene.title, 30);
+  const summary = dataInsightDashboardConsoleCompactText(scene.bullets[0], scene.summary, 48);
+  const bulletXml = scene.bullets.slice(0, 3).map((item, itemIndex) => textShapeXml({
+    id: 5410 + itemIndex,
+    name: `Data Insight Dashboard Console Bullet ${itemIndex + 1}`,
+    x: 792480,
+    y: 2301240 + itemIndex * 228600,
+    cx: 3474720,
+    cy: 152400,
+    text: dataInsightDashboardConsoleCompactText(item, "", 30),
+    size: 620,
+    bold: true,
+    color: visual.body,
+  })).join("");
+  return solidShapeXml({ id: 5400, name: "Data Insight Dashboard Console Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 5401, name: "Data Insight Dashboard Console Surface", geom: "roundRect", x: 438912, y: 396240, cx: 8266176, cy: 4300220, fill: palette.surface })
+    + lineFrameShapeXml({ id: 5402, name: "Data Insight Dashboard Console Frame", geom: "roundRect", x: 438912, y: 396240, cx: 8266176, cy: 4300220, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5403, name: "Data Insight Dashboard Console Accent Rail", x: 438912, y: 396240, cx: 3657600, cy: 45720, fill: visual.accent })
+    + dataInsightDashboardConsoleGridXml({ palette })
+    + textShapeXml({ id: 5404, name: "Data Insight Dashboard Console Kicker", x: 701040, y: 670560, cx: 2438400, cy: 182880, text: scene.kicker, size: 680, bold: true, color: visual.accent })
+    + textShapeXml({ id: 5405, name: "Data Insight Dashboard Console Title", x: 701040, y: 1005840, cx: 3962400, cy: 746760, text: title, size: index === 0 ? 2260 : 1960, bold: true, color: visual.title })
+    + textShapeXml({ id: 5406, name: "Data Insight Dashboard Console Summary", x: 701040, y: 1859280, cx: 3505200, cy: 335280, text: summary, size: 740, bold: true, color: visual.body })
+    + bulletXml
+    + dataInsightDashboardConsoleMetricCardsXml({ visual, palette, metrics: scene.metrics })
+    + dataInsightDashboardConsoleVisualXml({ visual, palette, scene });
+}
+
+function dataInsightDashboardConsoleGridXml({ palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({
+    id: 5418 + itemIndex,
+    name: `Data Insight Dashboard Console Grid V${itemIndex + 1}`,
+    x: 914400 + itemIndex * 1219200,
+    y: 609600,
+    cx: 7620,
+    cy: 3810000,
+    fill: palette.grid,
+  })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({
+    id: 5424 + itemIndex,
+    name: `Data Insight Dashboard Console Grid H${itemIndex + 1}`,
+    x: 609600,
+    y: 914400 + itemIndex * 914400,
+    cx: 7924800,
+    cy: 7620,
+    fill: palette.grid,
+  })).join("");
+  return vertical + horizontal;
+}
+
+function dataInsightDashboardConsoleVisualXml({ visual, palette, scene }) {
+  if (scene.role === "alert") {
+    return dataInsightDashboardConsoleAlertXml({ visual, palette, alerts: scene.alerts })
+      + dataInsightDashboardConsoleTrendXml({ visual, palette, x: 4876800, y: 914400, cx: 3048000, cy: 1645920 })
+      + dataInsightDashboardConsoleActionXml({ visual, palette, actions: scene.actions, x: 4876800, y: 3048000, narrow: true });
+  }
+  if (scene.role === "ranking") {
+    return dataInsightDashboardConsoleRankingXml({ visual, palette, ranks: scene.ranks })
+      + dataInsightDashboardConsoleRingXml({ visual, palette, metric: scene.metrics[3], x: 6949440, y: 3048000 })
+      + dataInsightDashboardConsoleBarsXml({ visual, palette, x: 4876800, y: 3048000, cx: 1828800, cy: 944880 });
+  }
+  if (scene.role === "action") {
+    return dataInsightDashboardConsoleActionXml({ visual, palette, actions: scene.actions, x: 701040, y: 3048000 })
+      + dataInsightDashboardConsoleAlertXml({ visual, palette, alerts: scene.alerts, x: 5486400, y: 944880, cx: 2895600 });
+  }
+  if (scene.role === "trend") {
+    return dataInsightDashboardConsoleTrendXml({ visual, palette, x: 4876800, y: 914400, cx: 3048000, cy: 1371600 })
+      + dataInsightDashboardConsoleBarsXml({ visual, palette, x: 4876800, y: 2590800, cx: 3048000, cy: 1066800 })
+      + dataInsightDashboardConsoleActionXml({ visual, palette, actions: scene.actions, x: 4876800, y: 3886200, narrow: true });
+  }
+  return dataInsightDashboardConsoleTrendXml({ visual, palette, x: 4876800, y: 914400, cx: 3048000, cy: 1371600 })
+    + dataInsightDashboardConsoleRingXml({ visual, palette, metric: scene.metrics[3], x: 6949440, y: 2590800 })
+    + dataInsightDashboardConsoleAlertXml({ visual, palette, alerts: scene.alerts, x: 4876800, y: 2590800, cx: 1828800 });
+}
+
+function dataInsightDashboardConsoleMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.map((metric, index) => {
+    const x = 701040 + index * 2057400;
+    const trendColor = metric.trend === "down" ? (visual.warning || "F59E0B") : (visual.secondary || "22C55E");
+    return solidShapeXml({ id: 5430 + index * 5, name: `Data Insight Dashboard Console KPI Card ${index + 1}`, geom: "roundRect", x, y: 3916680, cx: 1828800, cy: 548640, fill: palette.card })
+      + lineFrameShapeXml({ id: 5431 + index * 5, name: `Data Insight Dashboard Console KPI Frame ${index + 1}`, geom: "roundRect", x, y: 3916680, cx: 1828800, cy: 548640, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 5432 + index * 5, name: `Data Insight Dashboard Console KPI Value ${index + 1}`, x: x + 152400, y: 4038600, cx: 1066800, cy: 182880, text: metric.value, size: 1260, bold: true, color: visual.title })
+      + textShapeXml({ id: 5433 + index * 5, name: `Data Insight Dashboard Console KPI Label ${index + 1}`, x: x + 152400, y: 4251960, cx: 1219200, cy: 152400, text: metric.label, size: 620, bold: true, color: visual.body })
+      + solidShapeXml({ id: 5434 + index * 5, name: `Data Insight Dashboard Console KPI Trend ${index + 1}`, geom: "ellipse", x: x + 1432560, y: 4084320, cx: 152400, cy: 152400, fill: trendColor });
+  }).join("");
+}
+
+function dataInsightDashboardConsoleTrendXml({ visual, palette, x, y, cx, cy }) {
+  return solidShapeXml({ id: 5460, name: "Data Insight Dashboard Console Trend Panel", geom: "roundRect", x, y, cx, cy, fill: palette.panel })
+    + lineFrameShapeXml({ id: 5461, name: "Data Insight Dashboard Console Trend Frame", geom: "roundRect", x, y, cx, cy, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 5462, name: "Data Insight Dashboard Console Trend Axis", x: x + 274320, y: y + cy - 335280, cx: cx - 548640, cy: 22860, fill: palette.grid })
+    + arcLineShapeXml({ id: 5463, name: "Data Insight Dashboard Console Trend Line", x: x + 365760, y: y + 396240, cx: cx - 731520, cy: cy - 731520, stroke: visual.accent, width: 38100 })
+    + [0, 1, 2, 3, 4].map((itemIndex) => solidShapeXml({ id: 5464 + itemIndex, name: `Data Insight Dashboard Console Trend Dot ${itemIndex + 1}`, geom: "ellipse", x: x + 457200 + itemIndex * ((cx - 914400) / 4), y: y + cy - 609600 - itemIndex * 137160 + (itemIndex % 2) * 121920, cx: 121920, cy: 121920, fill: itemIndex === 3 ? (visual.warning || "F59E0B") : itemIndex % 2 ? (visual.secondary || "22C55E") : visual.accent })).join("");
+}
+
+function dataInsightDashboardConsoleBarsXml({ visual, palette, x, y, cx, cy }) {
+  const heights = [0.38, 0.68, 0.52, 0.78, 0.60];
+  const bars = heights.map((height, index) => {
+    const barHeight = Math.round(cy * height);
+    const barX = x + 304800 + index * Math.round((cx - 609600) / heights.length);
+    return solidShapeXml({ id: 5480 + index, name: `Data Insight Dashboard Console Bar ${index + 1}`, geom: "roundRect", x: barX, y: y + cy - barHeight - 182880, cx: 152400, cy: barHeight, fill: index === 3 ? (visual.warning || "F59E0B") : index % 2 ? (visual.secondary || "22C55E") : visual.accent });
+  }).join("");
+  return solidShapeXml({ id: 5478, name: "Data Insight Dashboard Console Bar Panel", geom: "roundRect", x, y, cx, cy, fill: palette.panel })
+    + lineFrameShapeXml({ id: 5479, name: "Data Insight Dashboard Console Bar Frame", geom: "roundRect", x, y, cx, cy, stroke: palette.frame, width: 10160 })
+    + bars;
+}
+
+function dataInsightDashboardConsoleRingXml({ visual, palette, metric, x, y }) {
+  return lineFrameShapeXml({ id: 5490, name: "Data Insight Dashboard Console Health Ring", geom: "ellipse", x, y, cx: 883920, cy: 883920, stroke: palette.frame, width: 60960 })
+    + arcLineShapeXml({ id: 5491, name: "Data Insight Dashboard Console Health Arc", x, y, cx: 883920, cy: 883920, stroke: visual.accent, width: 76200 })
+    + textShapeXml({ id: 5492, name: "Data Insight Dashboard Console Health Value", x: x + 167640, y: y + 335280, cx: 548640, cy: 152400, text: metric?.value || "86%", size: 980, bold: true, color: visual.title });
+}
+
+function dataInsightDashboardConsoleAlertXml({ visual, palette, alerts, x = 701040, y = 2880360, cx = 3505200 }) {
+  return solidShapeXml({ id: 5500, name: "Data Insight Dashboard Console Alert Queue", geom: "roundRect", x, y, cx, cy: 762000, fill: palette.panel })
+    + lineFrameShapeXml({ id: 5501, name: "Data Insight Dashboard Console Alert Frame", geom: "roundRect", x, y, cx, cy: 762000, stroke: palette.frame, width: 10160 })
+    + alerts.slice(0, 3).map((item, index) => {
+      const rowY = y + 137160 + index * 182880;
+      const color = index === 0 ? (visual.danger || "EF4444") : index === 1 ? (visual.warning || "F59E0B") : visual.accent;
+      return solidShapeXml({ id: 5502 + index * 3, name: `Data Insight Dashboard Console Alert Dot ${index + 1}`, geom: "ellipse", x: x + 152400, y: rowY + 30480, cx: 91440, cy: 91440, fill: color })
+        + textShapeXml({ id: 5503 + index * 3, name: `Data Insight Dashboard Console Alert Text ${index + 1}`, x: x + 304800, y: rowY, cx: cx - 457200, cy: 152400, text: dataInsightDashboardConsoleCompactText(item, "", 18), size: 600, bold: true, color: visual.title });
+    }).join("");
+}
+
+function dataInsightDashboardConsoleRankingXml({ visual, palette, ranks }) {
+  return solidShapeXml({ id: 5520, name: "Data Insight Dashboard Console Ranking Table", geom: "roundRect", x: 4876800, y: 914400, cx: 3200400, cy: 1828800, fill: palette.panel })
+    + lineFrameShapeXml({ id: 5521, name: "Data Insight Dashboard Console Ranking Frame", geom: "roundRect", x: 4876800, y: 914400, cx: 3200400, cy: 1828800, stroke: palette.frame, width: 10160 })
+    + ranks.slice(0, 4).map((item, index) => {
+      const y = 1127760 + index * 365760;
+      return textShapeXml({ id: 5522 + index * 4, name: `Data Insight Dashboard Console Rank No ${index + 1}`, x: 5105400, y, cx: 304800, cy: 152400, text: `0${index + 1}`, size: 640, bold: true, color: visual.accent })
+        + textShapeXml({ id: 5523 + index * 4, name: `Data Insight Dashboard Console Rank Text ${index + 1}`, x: 5486400, y, cx: 1066800, cy: 152400, text: dataInsightDashboardConsoleCompactText(item, "", 12), size: 660, bold: true, color: visual.title })
+        + rectShapeXml({ id: 5524 + index * 4, name: `Data Insight Dashboard Console Rank Bar ${index + 1}`, x: 6705600, y: y + 60960, cx: 914400 - index * 121920, cy: 60960, fill: index === 0 ? (visual.secondary || "22C55E") : visual.accent });
+    }).join("");
+}
+
+function dataInsightDashboardConsoleActionXml({ visual, palette, actions, x, y, narrow = false }) {
+  const width = narrow ? 914400 : 2438400;
+  const gap = narrow ? 121920 : 304800;
+  return actions.slice(0, 3).map((item, index) => {
+    const itemX = x + index * (width + gap);
+    return solidShapeXml({ id: 5540 + index * 3, name: `Data Insight Dashboard Console Action Card ${index + 1}`, geom: "roundRect", x: itemX, y, cx: width, cy: 548640, fill: palette.card })
+      + rectShapeXml({ id: 5541 + index * 3, name: `Data Insight Dashboard Console Action Rule ${index + 1}`, x: itemX + 152400, y: y + 137160, cx: 396240, cy: 30480, fill: index === 0 ? visual.accent : (visual.secondary || "22C55E") })
+      + textShapeXml({ id: 5542 + index * 3, name: `Data Insight Dashboard Console Action Text ${index + 1}`, x: itemX + 152400, y: y + 243840, cx: width - 304800, cy: 152400, text: dataInsightDashboardConsoleCompactText(item, "", narrow ? 10 : 18), size: 600, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataInsightDashboardConsoleScene({ slide, index, total }) {
+  const bullets = dataInsightDashboardConsoleBulletTexts(slide);
+  const title = dataInsightDashboardConsoleCompactText(slide?.title, index === 0 ? "经营数据驾驶舱" : "核心指标监控", 28);
+  const roleMap = {
+    "data-console-cover": "cover",
+    "data-console-overview": "overview",
+    "data-console-trend": "trend",
+    "data-console-alert": "alert",
+    "data-console-ranking": "ranking",
+    "data-console-action": "action",
+    closing: "action",
+  };
+  const explicit = roleMap[String(slide?.layout || "")] || "";
+  const roles = ["cover", "overview", "trend", "alert", "ranking", "action"];
+  const role = explicit || (index >= total - 1 && total > 2 ? "action" : roles[Math.min(index, roles.length - 1)]);
+  const metrics = ["营收规模", "利润率", "转化效率", "健康度"].map((fallback, itemIndex) => dataInsightDashboardConsoleMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  return {
+    role,
+    kicker: role === "cover" ? "COMMAND CENTER" : role === "trend" ? "TREND SIGNAL" : role === "alert" ? "ALERT QUEUE" : role === "ranking" ? "RANKING BOARD" : role === "action" ? "ACTION LOOP" : "KPI MONITOR",
+    title,
+    summary: "用关键指标、趋势信号和异常队列支撑经营管理决策。",
+    bullets,
+    metrics,
+    alerts: ["利润率低于阈值", "获客成本环比抬升", "渠道转化波动"].map((fallback, itemIndex) => dataInsightDashboardConsoleCompactText(bullets[itemIndex], fallback, 15)),
+    ranks: ["华东区域", "线上渠道", "核心产品", "大客户群"].map((fallback, itemIndex) => dataInsightDashboardConsoleCompactText(bullets[itemIndex], fallback, 12)),
+    actions: ["锁定异常指标负责人", "复盘趋势拐点原因", "下周更新监控阈值"].map((fallback, itemIndex) => dataInsightDashboardConsoleCompactText(bullets[itemIndex], fallback, 18)),
+  };
+}
+
+function dataInsightDashboardConsoleBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["营收同比 +15%，利润率下降 2 个百分点", "核心渠道转化率 38%", "异常告警 3 项待处理", "经营健康度 86%"];
+}
+
+function dataInsightDashboardConsoleMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[+-]?\d+(?:\.\d+)?x|[+-]?\d+(?:\.\d+)?万?|[A-Za-z]{1,4}\d?)/);
+  const value = match?.[1] || ["15%", "12.6%", "38%", "86%"][index] || "86%";
+  const label = dataInsightDashboardConsoleCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  const trend = raw.includes("-") || /下降|下滑|风险|异常|告警/.test(raw) ? "down" : "up";
+  return { value, label, trend };
+}
+
+function dataInsightDashboardConsolePalette(visual) {
+  return {
+    surface: blendHexColor(visual.surface, visual.background, 0.18),
+    panel: blendHexColor(visual.surface, visual.background, 0.34),
+    card: blendHexColor(visual.surface, visual.background, 0.26),
+    frame: blendHexColor(visual.accent, visual.background, 0.72),
+    grid: blendHexColor(visual.accent, visual.background, 0.84),
+  };
+}
+
+function dataInsightDashboardConsoleCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function dataInsightWorkbenchDecorationsXml({ visual, index, slide, total }) {
+  const palette = dataInsightWorkbenchPalette(visual);
+  const scene = dataInsightWorkbenchScene({ slide, index, total });
+  const bullets = Array.isArray(slide?.bullets) && slide.bullets.length > 0 ? slide.bullets : scene.bullets;
+  const title = dataInsightWorkbenchCompactText(slide?.title, scene.title, 30);
+  const summary = dataInsightWorkbenchCompactText(bullets[0], scene.summary, 48);
+  const bulletXml = bullets.slice(0, 3).map((item, itemIndex) => textShapeXml({
+    id: 5310 + itemIndex,
+    name: `Data Insight Workbench Bullet ${itemIndex + 1}`,
+    x: 853440,
+    y: 2590800 + itemIndex * 243840,
+    cx: 3322320,
+    cy: 152400,
+    text: dataInsightWorkbenchCompactText(item, "", 30),
+    size: 680,
+    bold: true,
+    color: visual.body,
+  })).join("");
+  return solidShapeXml({ id: 5200, name: "Data Insight Workbench Surface", geom: "roundRect", x: 487680, y: 457200, cx: 8168640, cy: 4175760, fill: palette.surface })
+    + lineFrameShapeXml({ id: 5201, name: "Data Insight Workbench Frame", geom: "roundRect", x: 487680, y: 457200, cx: 8168640, cy: 4175760, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5202, name: "Data Insight Workbench Top Rail", x: 487680, y: 457200, cx: 8168640, cy: 60960, fill: visual.primary })
+    + rectShapeXml({ id: 5203, name: "Data Insight Workbench Accent Rail", x: 487680, y: 518160, cx: 3352800, cy: 30480, fill: visual.accent })
+    + textShapeXml({ id: 5204, name: "Data Insight Workbench Kicker", x: 762000, y: 731520, cx: 2590800, cy: 182880, text: scene.kicker, size: 700, bold: true, color: visual.accent })
+    + textShapeXml({ id: 5205, name: "Data Insight Workbench Title", x: 762000, y: 1066800, cx: 3657600, cy: 746760, text: title, size: index === 0 ? 2300 : 2050, bold: true, color: visual.title })
+    + textShapeXml({ id: 5206, name: "Data Insight Workbench Summary", x: 762000, y: 1981200, cx: 3200400, cy: 365760, text: summary, size: 820, bold: true, color: visual.body })
+    + bulletXml
+    + dataInsightWorkbenchVisualXml({ visual, palette, scene })
+    + dataInsightWorkbenchActionXml({ visual, palette, scene });
+}
+
+function dataInsightWorkbenchVisualXml({ visual, palette, scene }) {
+  // 不同分析页使用不同可编辑图形，确保趋势、归因、相关性、证据和优先级的逻辑层级一眼可辨。
+  if (scene.role === "attribution") return dataInsightWorkbenchTreeXml({ visual, palette, cards: scene.cards });
+  if (scene.role === "correlation") return dataInsightWorkbenchCorrelationXml({ visual, palette });
+  if (scene.role === "evidence") return dataInsightWorkbenchEvidenceXml({ visual, palette, cards: scene.cards });
+  if (scene.role === "priority" || scene.role === "closing") return dataInsightWorkbenchMatrixXml({ visual, palette, actions: scene.actions });
+  return dataInsightWorkbenchSignalXml({ visual, palette, metrics: scene.metrics });
+}
+
+function dataInsightWorkbenchSignalXml({ visual, palette, metrics }) {
+  const metricXml = metrics.map((metric, index) => {
+    const x = 762000 + index * 1219200;
+    return solidShapeXml({ id: 5270 + index * 3, name: `Data Insight Workbench Metric Card ${index + 1}`, geom: "roundRect", x, y: 3672840, cx: 1066800, cy: 548640, fill: index === 1 ? palette.soft : "FFFFFF" })
+      + textShapeXml({ id: 5271 + index * 3, name: `Data Insight Workbench Metric Value ${index + 1}`, x: x + 121920, y: 3779520, cx: 822960, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 5272 + index * 3, name: `Data Insight Workbench Metric Label ${index + 1}`, x: x + 121920, y: 3985260, cx: 822960, cy: 152400, text: metric.label, size: 660, bold: true, color: visual.body });
+  }).join("");
+  return solidShapeXml({ id: 5220, name: "Data Insight Workbench Signal Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2438400, fill: "FFFFFF" })
+    + rectShapeXml({ id: 5221, name: "Data Insight Workbench Panel Header", x: 5334000, y: 914400, cx: 3048000, cy: 304800, fill: visual.primary })
+    + lineFrameShapeXml({ id: 5222, name: "Data Insight Workbench Panel Frame", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2438400, stroke: palette.frame, width: 12700 })
+    + arcLineShapeXml({ id: 5223, name: "Data Insight Workbench Trend Curve", x: 5638800, y: 1569720, cx: 2286000, cy: 914400, stroke: visual.secondary || "14B8A6", width: 38100 })
+    + lineFrameShapeXml({ id: 5224, name: "Data Insight Workbench Lens Ring", geom: "ellipse", x: 6553200, y: 1257300, cx: 792480, cy: 792480, stroke: visual.accent, width: 38100 })
+    + solidShapeXml({ id: 5225, name: "Data Insight Workbench Lens Handle", geom: "parallelogram", x: 7193280, y: 1935480, cx: 487680, cy: 91440, fill: visual.primary })
+    + [0, 1, 2, 3, 4].map((itemIndex) => solidShapeXml({ id: 5230 + itemIndex, name: `Data Insight Workbench Signal Node ${itemIndex + 1}`, geom: "ellipse", x: 5684520 + itemIndex * 487680, y: 2583180 - itemIndex * 243840 + (itemIndex % 2) * 121920, cx: itemIndex === 3 ? 152400 : 106680, cy: itemIndex === 3 ? 152400 : 106680, fill: itemIndex === 3 ? (visual.warning || "EF4444") : itemIndex % 2 ? visual.accent : (visual.secondary || "14B8A6") })).join("")
+    + metricXml;
+}
+
+function dataInsightWorkbenchTreeXml({ visual, palette, cards }) {
+  const nodes = ["核心问题", ...cards.slice(1, 4)];
+  return solidShapeXml({ id: 5240, name: "Data Insight Workbench Attribution Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 5241, name: "Data Insight Workbench Attribution Frame", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5242, name: "Data Insight Workbench Attribution Spine", x: 6096000, y: 1981200, cx: 1828800, cy: 30480, fill: palette.line })
+    + rectShapeXml({ id: 5243, name: "Data Insight Workbench Attribution Branch A", x: 6705600, y: 1432560, cx: 30480, cy: 1158240, fill: palette.line })
+    + nodes.map((item, index) => {
+      const positions = [
+        { x: 5516880, y: 1775460, fill: visual.primary, color: "FFFFFF" },
+        { x: 7162800, y: 1066800, fill: palette.soft, color: visual.title },
+        { x: 7162800, y: 1775460, fill: "FFFBEB", color: visual.title },
+        { x: 7162800, y: 2484120, fill: "ECFDF5", color: visual.title },
+      ];
+      const pos = positions[index];
+      return solidShapeXml({ id: 5244 + index * 2, name: `Data Insight Workbench Attribution Node ${index + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 1066800, cy: 365760, fill: pos.fill })
+        + textShapeXml({ id: 5245 + index * 2, name: `Data Insight Workbench Attribution Text ${index + 1}`, x: pos.x + 91440, y: pos.y + 91440, cx: 883920, cy: 152400, text: dataInsightWorkbenchCompactText(item, "", 9), size: 620, bold: true, color: pos.color });
+    }).join("");
+}
+
+function dataInsightWorkbenchCorrelationXml({ visual, palette }) {
+  return solidShapeXml({ id: 5250, name: "Data Insight Workbench Correlation Panel", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 5251, name: "Data Insight Workbench Correlation Frame", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5252, name: "Data Insight Workbench Correlation X Axis", x: 5684520, y: 2743200, cx: 2286000, cy: 22860, fill: palette.line })
+    + rectShapeXml({ id: 5253, name: "Data Insight Workbench Correlation Y Axis", x: 5684520, y: 1219200, cx: 22860, cy: 1524000, fill: palette.line })
+    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 5254 + itemIndex, name: `Data Insight Workbench Correlation Dot ${itemIndex + 1}`, geom: "ellipse", x: 5943600 + itemIndex * 457200, y: 2438400 - itemIndex * 304800, cx: itemIndex === 3 ? 152400 : 121920, cy: itemIndex === 3 ? 152400 : 121920, fill: itemIndex === 3 ? (visual.warning || "EF4444") : itemIndex === 1 ? visual.accent : (visual.secondary || "14B8A6") })).join("")
+    + rectShapeXml({ id: 5258, name: "Data Insight Workbench Correlation Trend", x: 6019800, y: 2133600, cx: 1524000, cy: 30480, fill: visual.accent });
+}
+
+function dataInsightWorkbenchEvidenceXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((item, index) => {
+    const x = 5334000 + (index % 2) * 1524000;
+    const y = 914400 + Math.floor(index / 2) * 944880;
+    return solidShapeXml({ id: 5260 + index * 4, name: `Data Insight Workbench Evidence Card ${index + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 792480, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 5261 + index * 4, name: `Data Insight Workbench Evidence Frame ${index + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 792480, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 5262 + index * 4, name: `Data Insight Workbench Evidence Rule ${index + 1}`, x: x + 152400, y: y + 152400, cx: 640080, cy: 30480, fill: index === 1 ? visual.accent : (visual.secondary || "14B8A6") })
+      + textShapeXml({ id: 5263 + index * 4, name: `Data Insight Workbench Evidence Text ${index + 1}`, x: x + 152400, y: y + 274320, cx: 1066800, cy: 243840, text: dataInsightWorkbenchCompactText(item, "", 16), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataInsightWorkbenchMatrixXml({ visual, palette, actions }) {
+  const axis = rectShapeXml({ id: 5280, name: "Data Insight Workbench Priority X Axis", x: 5638800, y: 2286000, cx: 2286000, cy: 22860, fill: palette.line })
+    + rectShapeXml({ id: 5281, name: "Data Insight Workbench Priority Y Axis", x: 6781800, y: 1066800, cx: 22860, cy: 2286000, fill: palette.line });
+  const items = actions.slice(0, 3).map((item, index) => {
+    const positions = [
+      { x: 7040880, y: 1280160, fill: "FFFBEB" },
+      { x: 5844540, y: 1554480, fill: "ECFDF5" },
+      { x: 7162800, y: 2606040, fill: "F8FAFC" },
+    ];
+    const pos = positions[index];
+    return solidShapeXml({ id: 5282 + index * 2, name: `Data Insight Workbench Priority Item ${index + 1}`, geom: "roundRect", x: pos.x, y: pos.y, cx: 944880, cy: 304800, fill: pos.fill })
+      + textShapeXml({ id: 5283 + index * 2, name: `Data Insight Workbench Priority Text ${index + 1}`, x: pos.x + 91440, y: pos.y + 76200, cx: 762000, cy: 152400, text: dataInsightWorkbenchCompactText(item, "", 10), size: 560, bold: true, color: visual.title });
+  }).join("");
+  return solidShapeXml({ id: 5279, name: "Data Insight Workbench Priority Matrix", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 5288, name: "Data Insight Workbench Priority Frame", geom: "roundRect", x: 5334000, y: 914400, cx: 3048000, cy: 2286000, stroke: palette.frame, width: 12700 })
+    + axis
+    + items;
+}
+
+function dataInsightWorkbenchActionXml({ visual, palette, scene }) {
+  return scene.actions.slice(0, 3).map((item, index) => {
+    const x = 762000 + index * 1828800;
+    return solidShapeXml({ id: 5290 + index * 3, name: `Data Insight Workbench Action Card ${index + 1}`, geom: "roundRect", x, y: 3672840, cx: 1676400, cy: 548640, fill: index === 0 ? palette.soft : "FFFFFF" })
+      + rectShapeXml({ id: 5291 + index * 3, name: `Data Insight Workbench Action Rule ${index + 1}`, x: x + 152400, y: 3825240, cx: 396240, cy: 30480, fill: index === 0 ? visual.accent : (visual.secondary || "14B8A6") })
+      + textShapeXml({ id: 5292 + index * 3, name: `Data Insight Workbench Action Text ${index + 1}`, x: x + 152400, y: 3924300, cx: 1371600, cy: 152400, text: dataInsightWorkbenchCompactText(item, "", 18), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataInsightWorkbenchScene({ slide, index, total }) {
+  const bullets = Array.isArray(slide?.bullets) && slide.bullets.length > 0 ? slide.bullets : [
+    "发现核心指标的趋势变化和异常信号",
+    "拆解影响因素并形成可验证证据",
+    "按影响度和可执行性排序行动建议",
+  ];
+  const title = dataInsightWorkbenchCompactText(slide?.title, index === 0 ? "数据洞察工作台" : "洞察分析", 28);
+  const summary = dataInsightWorkbenchCompactText(bullets[0], "围绕趋势发现、原因定位和行动优先级形成完整分析链路。", 44);
+  const cards = ["信号发现", "趋势变化", "归因树", "相关性"].map((fallback, itemIndex) => dataInsightWorkbenchCompactText(bullets[itemIndex], fallback, 14));
+  const actions = ["高影响优先", "快速验证", "持续监控"].map((fallback, itemIndex) => dataInsightWorkbenchCompactText(bullets[itemIndex], fallback, 18));
+  const metrics = [
+    { value: "01", label: "关键结论" },
+    { value: "4", label: "影响因素" },
+    { value: "P1", label: "行动优先级" },
+  ];
+  const scenes = [
+    { role: "cover", kicker: "ANALYTIC WORKBENCH", title, summary, bullets, cards, actions, metrics },
+    { role: "trend", kicker: "SIGNAL DISCOVERY", title, summary, bullets, cards, actions, metrics },
+    { role: "attribution", kicker: "ATTRIBUTION TREE", title, summary, bullets, cards, actions, metrics },
+    { role: "correlation", kicker: "FACTOR CORRELATION", title, summary, bullets, cards, actions, metrics },
+    { role: "evidence", kicker: "EVIDENCE CARDS", title, summary, bullets, cards, actions, metrics },
+    { role: "priority", kicker: "ACTION MATRIX", title, summary, bullets, cards, actions, metrics },
+  ];
+  if (index >= total - 1) return { role: "closing", kicker: "NEXT ACTIONS", title, summary, bullets, cards, actions, metrics };
+  return scenes[Math.min(index, scenes.length - 1)];
+}
+
+function dataInsightWorkbenchPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.surface, 0.28),
+    line: blendHexColor(visual.primary, visual.background, 0.54),
+    soft: blendHexColor(visual.accent, visual.surface, 0.78),
+    surface: blendHexColor(visual.surface, visual.background, 0.16),
+  };
+}
+
+function dataInsightWorkbenchCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function dataResearchReportDecorationsXml({ visual, index, slide, total }) {
+  const palette = dataResearchReportPalette(visual);
+  const scene = dataResearchReportScene({ slide, index, total });
+  const bullets = dataResearchReportBulletTexts(slide);
+  const title = dataResearchReportCompactText(slide?.title, scene.title, index === 0 ? 30 : 26);
+  const summary = dataResearchReportCompactText(bullets[0], scene.summary, 54);
+  const bulletXml = bullets.slice(0, 3).map((item, itemIndex) => textShapeXml({
+    id: 5440 + itemIndex,
+    name: `Data Research Report Bullet ${itemIndex + 1}`,
+    x: 914400,
+    y: 2613660 + itemIndex * 228600,
+    cx: 3505200,
+    cy: 152400,
+    text: dataResearchReportCompactText(item, "", 34),
+    size: 640,
+    bold: true,
+    color: visual.body,
+  })).join("");
+  return rectShapeXml({ id: 5400, name: "Data Research Report Paper Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + dataResearchReportGridXml({ palette })
+    + solidShapeXml({ id: 5401, name: "Data Research Report Page Canvas", x: 548640, y: 396240, cx: 8046720, cy: 4343400, fill: palette.paper })
+    + lineFrameShapeXml({ id: 5402, name: "Data Research Report Page Frame", x: 548640, y: 396240, cx: 8046720, cy: 4343400, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5403, name: "Data Research Report Header Rule", x: 548640, y: 396240, cx: 8046720, cy: 45720, fill: visual.primary })
+    + rectShapeXml({ id: 5404, name: "Data Research Report Accent Rule", x: 548640, y: 441960, cx: 2590800, cy: 30480, fill: visual.secondary || "B8822D" })
+    + rectShapeXml({ id: 5405, name: "Data Research Report Margin Index", x: 762000, y: 670560, cx: 45720, cy: 3657600, fill: visual.secondary || "B8822D" })
+    + textShapeXml({ id: 5406, name: "Data Research Report Kicker", x: 914400, y: 670560, cx: 2590800, cy: 182880, text: scene.kicker, size: 700, bold: true, color: visual.accent })
+    + textShapeXml({ id: 5407, name: "Data Research Report Title", x: 914400, y: 1005840, cx: 3962400, cy: 822960, text: title, size: index === 0 ? 2300 : 2000, bold: true, color: visual.title })
+    + textShapeXml({ id: 5408, name: "Data Research Report Abstract Summary", x: 914400, y: 1981200, cx: 3505200, cy: 335280, text: summary, size: 760, bold: true, color: visual.body })
+    + bulletXml
+    + dataResearchReportVisualXml({ visual, palette, scene })
+    + dataResearchReportFooterXml({ visual, palette, index, total });
+}
+
+function dataResearchReportGridXml({ palette }) {
+  const horizontal = [0, 1, 2, 3, 4].map((itemIndex) => rectShapeXml({ id: 5410 + itemIndex, name: `Data Research Report Baseline Grid ${itemIndex + 1}`, x: 548640, y: 914400 + itemIndex * 609600, cx: 8046720, cy: 7620, fill: palette.grid })).join("");
+  return horizontal
+    + rectShapeXml({ id: 5418, name: "Data Research Report Citation Spine", x: 1158240, y: 670560, cx: 7620, cy: 3505200, fill: palette.grid });
+}
+
+function dataResearchReportVisualXml({ visual, palette, scene }) {
+  if (scene.kind === "method") return dataResearchReportMethodXml({ visual, palette, cards: scene.cards });
+  if (scene.kind === "sample") return dataResearchReportSampleXml({ visual, palette });
+  if (scene.kind === "evidence") return dataResearchReportEvidenceXml({ visual, palette, cards: scene.cards });
+  if (scene.kind === "finding") return dataResearchReportFindingXml({ visual, palette, cards: scene.cards });
+  if (scene.kind === "recommendation") return dataResearchReportRecommendationXml({ visual, palette, cards: scene.cards });
+  if (scene.kind === "appendix") return dataResearchReportSourceIndexXml({ visual, palette, cards: scene.cards });
+  return dataResearchReportPaperStackXml({ visual, palette, metrics: scene.metrics });
+}
+
+function dataResearchReportPaperStackXml({ visual, palette, metrics }) {
+  const metricXml = metrics.map((metric, index) => {
+    const x = 914400 + index * 1219200;
+    return solidShapeXml({ id: 5450 + index * 3, name: `Data Research Report Meta Card ${index + 1}`, x, y: 3657600, cx: 1066800, cy: 487680, fill: index === 1 ? palette.note : "FFFFFF" })
+      + lineFrameShapeXml({ id: 5451 + index * 3, name: `Data Research Report Meta Frame ${index + 1}`, x, y: 3657600, cx: 1066800, cy: 487680, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 5452 + index * 3, name: `Data Research Report Meta Text ${index + 1}`, x: x + 121920, y: 3794760, cx: 822960, cy: 213360, text: `${metric.value} ${metric.label}`, size: 720, bold: true, color: visual.title });
+  }).join("");
+  return solidShapeXml({ id: 5460, name: "Data Research Report Document Scene", x: 5669280, y: 914400, cx: 2590800, cy: 2438400, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 5461, name: "Data Research Report Document Frame", x: 5669280, y: 914400, cx: 2590800, cy: 2438400, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 5462, name: "Data Research Report Document Header", x: 5943600, y: 1219200, cx: 1524000, cy: 45720, fill: visual.primary })
+    + rectShapeXml({ id: 5463, name: "Data Research Report Document Evidence Line 1", x: 5943600, y: 1524000, cx: 1828800, cy: 30480, fill: palette.line })
+    + rectShapeXml({ id: 5464, name: "Data Research Report Document Evidence Line 2", x: 5943600, y: 1752600, cx: 1371600, cy: 30480, fill: palette.grid })
+    + solidShapeXml({ id: 5465, name: "Data Research Report Quote Block", x: 5943600, y: 2179320, cx: 1066800, cy: 487680, fill: palette.note })
+    + metricXml;
+}
+
+function dataResearchReportMethodXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((item, index) => {
+    const y = 914400 + index * 548640;
+    return solidShapeXml({ id: 5470 + index * 3, name: `Data Research Report Method Notes ${index + 1}`, x: 5486400, y, cx: 2895600, cy: 396240, fill: index % 2 ? palette.note : "FFFFFF" })
+      + lineFrameShapeXml({ id: 5471 + index * 3, name: `Data Research Report Method Frame ${index + 1}`, x: 5486400, y, cx: 2895600, cy: 396240, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 5472 + index * 3, name: `Data Research Report Method Text ${index + 1}`, x: 5638800, y: y + 106680, cx: 2438400, cy: 152400, text: dataResearchReportCompactText(item, "", 18), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataResearchReportSampleXml({ visual, palette }) {
+  const cells = Array.from({ length: 20 }, (_, index) => {
+    const x = 5486400 + (index % 5) * 548640;
+    const y = 914400 + Math.floor(index / 5) * 426720;
+    const fill = index % 4 === 0 ? palette.note : index % 3 === 0 ? palette.soft : "FFFFFF";
+    return solidShapeXml({ id: 5490 + index, name: `Data Research Report Sample Matrix Cell ${index + 1}`, x, y, cx: 426720, cy: 304800, fill })
+      + lineFrameShapeXml({ id: 5520 + index, name: `Data Research Report Sample Matrix Frame ${index + 1}`, x, y, cx: 426720, cy: 304800, stroke: palette.frame, width: 7620 });
+  }).join("");
+  return solidShapeXml({ id: 5488, name: "Data Research Report Sample Matrix", x: 5334000, y: 762000, cx: 3200400, cy: 2438400, fill: palette.paper })
+    + cells;
+}
+
+function dataResearchReportEvidenceXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((item, index) => {
+    const y = 914400 + index * 518160;
+    return solidShapeXml({ id: 5540 + index * 4, name: `Data Research Report Evidence Citation Card ${index + 1}`, x: 5486400, y, cx: 2895600, cy: 365760, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 5541 + index * 4, name: `Data Research Report Evidence Citation Frame ${index + 1}`, x: 5486400, y, cx: 2895600, cy: 365760, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 5542 + index * 4, name: `Data Research Report Evidence Citation Rule ${index + 1}`, x: 5486400, y, cx: 76200, cy: 365760, fill: visual.secondary || "B8822D" })
+      + textShapeXml({ id: 5543 + index * 4, name: `Data Research Report Evidence Citation Text ${index + 1}`, x: 5638800, y: y + 91440, cx: 2438400, cy: 152400, text: dataResearchReportCompactText(item, "", 18), size: 620, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataResearchReportFindingXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((item, index) => {
+    const x = 5486400 + (index % 2) * 1524000;
+    const y = 914400 + Math.floor(index / 2) * 975360;
+    return solidShapeXml({ id: 5560 + index * 3, name: `Data Research Report Finding Card ${index + 1}`, x, y, cx: 1371600, cy: 792480, fill: index === 0 ? palette.note : "FFFFFF" })
+      + lineFrameShapeXml({ id: 5561 + index * 3, name: `Data Research Report Finding Frame ${index + 1}`, x, y, cx: 1371600, cy: 792480, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 5562 + index * 3, name: `Data Research Report Finding Text ${index + 1}`, x: x + 152400, y: y + 213360, cx: 1066800, cy: 243840, text: dataResearchReportCompactText(item, "", 16), size: 640, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataResearchReportRecommendationXml({ visual, palette, cards }) {
+  return cards.slice(0, 3).map((item, index) => {
+    const x = 914400 + index * 2438400;
+    return solidShapeXml({ id: 5580 + index * 3, name: `Data Research Report Recommendation Strip ${index + 1}`, x, y: 3505200, cx: 2133600, cy: 640080, fill: index === 0 ? palette.note : "FFFFFF" })
+      + lineFrameShapeXml({ id: 5581 + index * 3, name: `Data Research Report Recommendation Frame ${index + 1}`, x, y: 3505200, cx: 2133600, cy: 640080, stroke: palette.frame, width: 10160 })
+      + textShapeXml({ id: 5582 + index * 3, name: `Data Research Report Recommendation Text ${index + 1}`, x: x + 152400, y: 3695700, cx: 1828800, cy: 182880, text: dataResearchReportCompactText(item, "", 20), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function dataResearchReportSourceIndexXml({ visual, palette, cards }) {
+  return solidShapeXml({ id: 5590, name: "Data Research Report Source Index Panel", x: 5486400, y: 914400, cx: 2895600, cy: 2133600, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 5591, name: "Data Research Report Source Index Frame", x: 5486400, y: 914400, cx: 2895600, cy: 2133600, stroke: palette.frame, width: 10160 })
+    + cards.slice(0, 4).map((item, index) => textShapeXml({ id: 5592 + index, name: `Data Research Report Source Index Item ${index + 1}`, x: 5715000, y: 1127760 + index * 365760, cx: 2438400, cy: 152400, text: dataResearchReportCompactText(item, "", 18), size: 660, bold: true, color: visual.title })).join("");
+}
+
+function dataResearchReportFooterXml({ visual, palette, index, total }) {
+  return rectShapeXml({ id: 5600, name: "Data Research Report Footnote Rule", x: 914400, y: 4495800, cx: 7315200, cy: 7620, fill: palette.line })
+    + textShapeXml({ id: 5601, name: "Data Research Report Source Index", x: 914400, y: 4556760, cx: 3962400, cy: 152400, text: `Source index ${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`, size: 560, bold: true, color: visual.body })
+    + textShapeXml({ id: 5602, name: "Data Research Report Page Folio", x: 7924800, y: 4556760, cx: 457200, cy: 152400, text: `${index + 1}`, size: 640, bold: true, color: visual.title });
+}
+
+function dataResearchReportScene({ slide, index, total }) {
+  const bullets = dataResearchReportBulletTexts(slide);
+  const title = dataResearchReportCompactText(slide?.title, "研究摘要与关键发现", index === 0 ? 30 : 26);
+  const metrics = ["样本", "方法", "证据"].map((fallback, itemIndex) => dataResearchReportMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["研究方法", "样本结构", "证据引用", "核心发现"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 16));
+  const scenes = [
+    { kind: "cover", kicker: "RESEARCH PUBLICATION" },
+    { kind: "method", kicker: "METHOD NOTES" },
+    { kind: "sample", kicker: "SAMPLE STRUCTURE" },
+    { kind: "evidence", kicker: "EVIDENCE LOG" },
+    { kind: "finding", kicker: "KEY FINDINGS" },
+    { kind: "recommendation", kicker: "CONCLUSION MATRIX" },
+  ];
+  const titleText = String(slide?.title || "");
+  const explicitKind = /样本|sample/i.test(titleText)
+    ? "sample"
+    : /证据|引用|evidence|citation/i.test(titleText)
+      ? "evidence"
+      : /发现|结论|finding/i.test(titleText)
+        ? "finding"
+        : /建议|recommend|行动/i.test(titleText)
+          ? "recommendation"
+          : /方法|method/i.test(titleText)
+            ? "method"
+            : "";
+  const base = index === total - 1 && total > 2
+    ? { kind: "appendix", kicker: "SOURCE INDEX" }
+    : explicitKind
+      ? (scenes.find((item) => item.kind === explicitKind) || scenes[0])
+      : scenes[Math.min(index, scenes.length - 1)];
+  return {
+    ...base,
+    title,
+    bullets,
+    metrics,
+    cards: base.kind === "appendix"
+      ? ["资料索引", "脚注说明", "样本限制", "后续研究"].map((fallback, itemIndex) => dataResearchReportCompactText(bullets[itemIndex], fallback, 14))
+      : cards,
+    summary: dataResearchReportCompactText(bullets[0], "围绕样本、方法、证据和结论建立可追溯的研究汇报结构。", 52),
+  };
+}
+
+function dataResearchReportBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["研究样本覆盖关键对象", "方法组合保证结论可追溯", "证据引用支撑核心发现"];
+}
+
+function dataResearchReportMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{1,4}|[零一二三四五六七八九十百千万亿]+份?)/);
+  const value = match?.[1] || ["N", "M", "Ref"][index] || "N";
+  const label = dataResearchReportCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function dataResearchReportPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, visual.surface, 0.34),
+    grid: blendHexColor(visual.primary, visual.background, 0.72),
+    line: blendHexColor(visual.primary, visual.background, 0.50),
+    note: blendHexColor(visual.secondary || "B8822D", visual.surface, 0.82),
+    paper: blendHexColor(visual.surface, visual.background, 0.08),
+    soft: blendHexColor(visual.accent, visual.surface, 0.82),
+  };
+}
+
+function dataResearchReportCompactText(text, fallback, maxLength) {
   const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
   if (Array.from(value).length <= maxLength) return value;
   return `${Array.from(value).slice(0, maxLength).join("")}...`;
