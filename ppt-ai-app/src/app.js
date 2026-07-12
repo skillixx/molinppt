@@ -537,9 +537,11 @@ function sendInlineFile(response, downloaded) {
  */
 function withTemplateThumbnailUrl(template) {
   if (!template.thumbnailFileId) return template;
+  const thumbnailVersion = encodeURIComponent(template.thumbnailMd5 || template.thumbnailFileId);
   return {
     ...template,
-    thumbnailUrl: `/api/templates/${encodeURIComponent(template.id)}/thumbnail`,
+    // 缩略图内容更新后必须换 URL，避免浏览器继续使用旧的模板预览缓存。
+    thumbnailUrl: `/api/templates/${encodeURIComponent(template.id)}/thumbnail?v=${thumbnailVersion}`,
   };
 }
 

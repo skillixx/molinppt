@@ -4314,6 +4314,7 @@ test("HTTP API lists template categories and merges official active templates wi
     scope: "official",
     status: "active",
     thumbnailFileId: officialThumbnail.id,
+    thumbnailMd5: "official-thumbnail-md5",
     themes: [{ id: "clean", name: "Clean" }],
   });
   await context.database.insert("templates", {
@@ -4367,7 +4368,7 @@ test("HTTP API lists template categories and merges official active templates wi
     assert.equal(templatesResponse.status, 200);
     assert.deepEqual(templates.templates.map((template) => template.id), ["official-custom", "my-custom"]);
     assert.equal(templates.templates[0].category.id, "custom");
-    assert.equal(templates.templates[0].thumbnailUrl, "/api/templates/official-custom/thumbnail");
+    assert.equal(templates.templates[0].thumbnailUrl, "/api/templates/official-custom/thumbnail?v=official-thumbnail-md5");
     assert.equal(templates.templates[1].scope, "user");
 
     const thumbnailResponse = await fetch(`${baseUrl}${templates.templates[0].thumbnailUrl}`, { headers: { cookie } });
