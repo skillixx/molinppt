@@ -1405,14 +1405,15 @@ test("PptExportService uses commercial sales enterprise decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Cover Hero Band"/);
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales enterprise Chip"/);
-  assert.match(slide1, /name="Sales Account Card"/);
-  assert.match(slide2, /name="Sales Content Anchor"/);
-  assert.doesNotMatch(slide2, /name="Sales Cover Hero Band"/);
-  assert.match(slide1, /val="14565A"/);
-  assert.match(slide1, /val="D19A3E"/);
+  assert.match(slide1, /name="Sales Enterprise Proposal Canvas"/);
+  assert.match(slide1, /name="Sales Enterprise Architecture Blueprint"/);
+  assert.match(slide1, /name="Sales Enterprise Summary Card 1"/);
+  assert.match(slide2, /name="Sales Enterprise Closing Card 1"/);
+  assert.doesNotMatch(slide1, /name="Sales Visual Panel"/);
+  assert.doesNotMatch(slide1, /企业客户/);
+  assert.match(slide1, /val="0F2F4A"/);
+  assert.match(slide1, /val="22B8A7"/);
+  assert.match(slide1, /val="D99A2B"/);
 });
 
 test("PptExportService uses commercial sales solution decorations", () => {
@@ -1423,13 +1424,17 @@ test("PptExportService uses commercial sales solution decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales solution Chip"/);
-  assert.match(slide1, /name="Sales Solution Hub"/);
+  assert.match(slide1, /name="Sales Proposal Solution Outer Canvas"/);
+  assert.match(slide1, /name="Sales Proposal Solution Architecture Panel"/);
+  assert.match(slide1, /name="Sales Proposal Solution Summary Card 1"/);
+  assert.match(slide2, /name="Sales Proposal Solution Closing Card 1"/);
   assert.doesNotMatch(slide1, /name="Secondary Accent"/);
-  assert.match(slide1, /val="1E4F76"/);
-  assert.match(slide1, /val="39A7A0"/);
+  assert.doesNotMatch(slide1, /解决方案/);
+  assert.match(slide1, /val="123047"/);
+  assert.match(slide1, /val="1AA6A6"/);
+  assert.match(slide1, /val="D99A2B"/);
 });
 
 test("PptExportService uses commercial sales renewal decorations", () => {
@@ -1440,14 +1445,18 @@ test("PptExportService uses commercial sales renewal decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales renewal Chip"/);
-  assert.match(slide1, /name="Sales Renewal Trend Line 1"/);
-  assert.match(slide1, /name="Sales Renewal Dot 4"/);
-  assert.doesNotMatch(slide1, /name="Sales Renewal Segment/);
-  assert.match(slide1, /val="4B3F72"/);
-  assert.match(slide1, /val="E0A33C"/);
+  assert.match(slide1, /name="Sales Renewal QBR Canvas"/);
+  assert.match(slide1, /name="Sales Renewal QBR Work Surface"/);
+  assert.match(slide1, /name="Sales Renewal QBR Summary Card 1"/);
+  assert.match(slide1, /name="Sales Renewal Health Panel"/);
+  assert.match(slide2, /name="Sales Renewal Success Plan 1"/);
+  assert.doesNotMatch(slide1, /name="Sales Visual Panel"/);
+  assert.doesNotMatch(slide1, /续约增长/);
+  assert.match(slide1, /val="123B3A"/);
+  assert.match(slide1, /val="2FBF71"/);
+  assert.match(slide1, /val="F2B84B"/);
 });
 
 test("PptExportService uses commercial product roadmap decorations", () => {

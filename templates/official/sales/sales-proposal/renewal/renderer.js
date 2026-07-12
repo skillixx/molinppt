@@ -8,25 +8,31 @@ export const templateRenderer = {
   "templateName": "销售提案方案",
   "themeId": "renewal",
   "themeName": "续约增长",
-  "style": "proposal",
+  "style": "renewal-growth-qbr",
   "visual": {
-    "primary": "4B3F72",
-    "accent": "E0A33C",
-    "background": "F4F1FA",
+    "primary": "123B3A",
+    "accent": "2FBF71",
+    "secondary": "F2B84B",
+    "warning": "D66A3A",
+    "background": "F5F8F6",
     "surface": "FFFFFF",
-    "title": "302A4D",
-    "body": "514A65",
-    "layout": "academy",
+    "title": "102826",
+    "body": "3F5552",
+    "layout": "sales-renewal-growth-qbr",
     "variant": "renewal"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
+    "defaultCoverLayout": "sales-renewal-qbr-cover",
+    "defaultContentLayout": "sales-renewal-qbr-content",
     "allowedLayouts": [
-      "academy-cover",
-      "academy-content",
-      "lesson-title",
-      "lesson-content"
+      "sales-renewal-qbr-cover",
+      "sales-renewal-qbr-health",
+      "sales-renewal-qbr-value",
+      "sales-renewal-qbr-opportunity",
+      "sales-renewal-qbr-growth-path",
+      "sales-renewal-qbr-pricing",
+      "sales-renewal-qbr-success-plan",
+      "sales-renewal-qbr-closing"
     ]
   }
 };

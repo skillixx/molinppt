@@ -8,25 +8,31 @@ export const templateRenderer = {
   "templateName": "销售提案方案",
   "themeId": "enterprise",
   "themeName": "企业客户",
-  "style": "proposal",
+  "style": "enterprise-account-proposal",
   "visual": {
-    "primary": "14565A",
-    "accent": "D19A3E",
-    "background": "EEF7F6",
+    "primary": "0F2F4A",
+    "accent": "22B8A7",
+    "secondary": "D99A2B",
+    "warning": "D65A31",
+    "background": "F3F7FA",
     "surface": "FFFFFF",
-    "title": "123E42",
-    "body": "3E5A58",
-    "layout": "academy",
+    "title": "0A1F33",
+    "body": "334155",
+    "layout": "sales-enterprise-proposal",
     "variant": "enterprise"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
+    "defaultCoverLayout": "sales-enterprise-proposal-cover",
+    "defaultContentLayout": "sales-enterprise-proposal-content",
     "allowedLayouts": [
-      "academy-cover",
-      "academy-content",
-      "lesson-title",
-      "lesson-content"
+      "sales-enterprise-proposal-cover",
+      "sales-enterprise-proposal-organization",
+      "sales-enterprise-proposal-painpoints",
+      "sales-enterprise-proposal-matching",
+      "sales-enterprise-proposal-deployment",
+      "sales-enterprise-proposal-roi",
+      "sales-enterprise-proposal-sla",
+      "sales-enterprise-proposal-closing"
     ]
   }
 };

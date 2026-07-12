@@ -1262,6 +1262,9 @@ function renderDeckPreview({ deck, visual }) {
     const financeScene = isFinancialReviewVisual(visual) ? financialReviewPreviewScene(visual) : null;
     const financeAuditScene = isFinanceAuditReviewVisual(visual) ? financeAuditReviewPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const financeFpaScene = isFinanceFpaForecastVisual(visual) ? financeFpaForecastPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const salesEnterpriseScene = isSalesEnterpriseProposalVisual(visual) ? salesEnterpriseProposalPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const salesSolutionScene = isSalesProposalSolutionVisual(visual) ? salesProposalSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const salesRenewalScene = isSalesRenewalGrowthVisual(visual) ? salesRenewalGrowthPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const salesScene = isSalesProposalVisual(visual) ? salesProposalPreviewScene(visual) : null;
     const channelPolicyScene = isChannelRecruitmentPolicyVisual(visual) ? channelRecruitmentPolicyPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const financialSolutionScene = isFinancialSolutionVisual(visual) ? financialSolutionPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1386,6 +1389,15 @@ function renderDeckPreview({ deck, visual }) {
       : "";
     const salesMark = salesScene
       ? `<div class="sales-label">${escapeHtml(salesScene.label)}</div><div class="sales-visual"><span></span><span></span><span></span><span></span></div><div class="sales-chip" aria-hidden="true"></div><div class="sales-caption">${escapeHtml(salesScene.caption)}</div>`
+      : "";
+    const salesEnterpriseMark = salesEnterpriseScene
+      ? renderSalesEnterpriseProposalPreview(slide, salesEnterpriseScene)
+      : "";
+    const salesSolutionMark = salesSolutionScene
+      ? renderSalesProposalSolutionPreview(slide, salesSolutionScene)
+      : "";
+    const salesRenewalMark = salesRenewalScene
+      ? renderSalesRenewalGrowthPreview(salesRenewalScene)
       : "";
     const channelPolicyMark = channelPolicyScene
       ? renderChannelRecruitmentPolicyPreview(slide, channelPolicyScene)
@@ -1708,11 +1720,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || productScene || productReviewScene || releaseCadenceScene || releaseCommitteeScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeFpaScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || productScene || productReviewScene || releaseCadenceScene || releaseCommitteeScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeFpaScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || salesEnterpriseScene || salesSolutionScene || salesRenewalScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || financeFpaScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || productReviewScene?.variant || releaseCadenceScene?.variant || releaseCommitteeScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${financeAuditMark}${financeFpaMark}${salesMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${productReviewMark}${releaseCadenceMark}${releaseCommitteeMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || financeFpaScene?.variant || salesEnterpriseScene?.variant || salesSolutionScene?.variant || salesRenewalScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || productReviewScene?.variant || releaseCadenceScene?.variant || releaseCommitteeScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || investmentRoiScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyMark}${financeMark}${financeAuditMark}${financeFpaMark}${salesMark}${salesEnterpriseMark}${salesSolutionMark}${salesRenewalMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${productReviewMark}${releaseCadenceMark}${releaseCommitteeMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -2844,6 +2856,100 @@ function renderDeckPreview({ deck, visual }) {
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual::after{left:18%;right:16%;top:43%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent));transform:rotate(-16deg);}
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span{width:10px;height:10px;border-radius:50%;background:var(--template-primary);}
     body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(1){left:18%;top:60%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(2){left:39%;top:52%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(3){left:60%;top:41%;}body[data-template="sales-proposal"] .slide[data-template-variant="renewal"] .sales-visual span:nth-child(4){left:79%;top:30%;background:var(--template-accent);}
+    body[data-layout="sales-enterprise-proposal"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f8fbfd 0%,var(--template-bg) 56%,#e6f4f2 100%);}
+    body[data-layout="sales-enterprise-proposal"] .slide::before{background:repeating-linear-gradient(90deg,rgba(15,47,74,.055) 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,rgba(34,184,167,.045) 0 1px,transparent 1px 36px);}
+    body[data-layout="sales-enterprise-proposal"] .slide::after{content:"";position:absolute;left:6.5%;right:6.5%;top:11.5%;bottom:8%;border-radius:18px;background:rgba(255,255,255,.94);border:1px solid rgba(15,47,74,.12);box-shadow:0 24px 48px rgba(15,47,74,.13);}
+    body[data-layout="sales-enterprise-proposal"] .accent,body[data-layout="sales-enterprise-proposal"] .slide-content{display:none;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-kicker{position:absolute;left:8.8%;top:15%;font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--template-accent);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-title{position:absolute;left:8.8%;top:20.7%;width:42%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-rule{position:absolute;left:8.8%;top:42.8%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-bullets{position:absolute;left:8.9%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:12.3px;line-height:1.46;color:var(--template-body);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-bullets li{margin:.12em 0;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint{position:absolute;right:8.2%;top:17.5%;width:39%;height:48%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(15,47,74,.14);box-shadow:0 18px 36px rgba(15,47,74,.12);overflow:hidden;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint::before{content:"";position:absolute;inset:10%;background:repeating-linear-gradient(90deg,rgba(15,47,74,.10) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(34,184,167,.10) 0 1px,transparent 1px 36px);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint::after{content:"";position:absolute;left:16%;right:16%;top:48%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-primary),var(--template-accent),var(--template-secondary));}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint i{position:absolute;border-radius:12px;background:#fff;border:1px solid rgba(15,47,74,.14);box-shadow:0 8px 16px rgba(15,47,74,.08);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint i:nth-child(1){left:13%;top:22%;width:23%;height:18%;background:var(--template-primary);}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint i:nth-child(2){left:41%;top:22%;width:22%;height:18%;}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint i:nth-child(3){right:13%;top:22%;width:20%;height:18%;background:color-mix(in srgb,var(--template-secondary) 24%,#fff 76%);}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-blueprint i:nth-child(4){left:32%;bottom:18%;width:36%;height:18%;background:color-mix(in srgb,var(--template-accent) 13%,#fff 87%);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-summary{position:absolute;left:8.8%;right:50%;bottom:13.8%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-summary span{min-height:64px;border-radius:12px;background:#fff;border:1px solid rgba(15,47,74,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 20px rgba(15,47,74,.08);padding:10px 11px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org{position:absolute;right:8.2%;top:17.7%;width:39%;height:49%;border-radius:18px;background:#fff;border:1px solid rgba(15,47,74,.13);box-shadow:0 18px 36px rgba(15,47,74,.11);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span{position:absolute;min-width:24%;height:16%;display:grid;place-items:center;border-radius:13px;background:color-mix(in srgb,var(--template-bg) 70%,#fff 30%);border:1px solid rgba(15,47,74,.12);font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span:nth-child(1){left:38%;top:12%;background:var(--template-primary);color:#fff;}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span:nth-child(2){left:12%;top:42%;}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span:nth-child(3){left:38%;top:42%;border-color:var(--template-accent);}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span:nth-child(4){right:12%;top:42%;}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-org span:nth-child(5){left:38%;bottom:10%;background:color-mix(in srgb,var(--template-secondary) 16%,#fff 84%);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-pain{position:absolute;right:8.2%;top:18%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-pain span{min-height:92px;border-radius:14px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 12px 22px rgba(15,47,74,.08);padding:14px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-pain span::before{content:"";display:block;width:28px;height:6px;margin-bottom:13px;border-radius:999px;background:linear-gradient(90deg,var(--template-warning),var(--template-secondary));}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-match{position:absolute;right:8.2%;top:18%;width:39%;display:grid;grid-template-columns:1fr 34px 1fr;gap:10px;align-items:center;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-match span{min-height:70px;border-radius:13px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 10px 18px rgba(15,47,74,.07);padding:13px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-match i{height:4px;border-radius:999px;background:var(--template-accent);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-deploy{position:absolute;right:8.2%;top:17.5%;width:39%;display:grid;grid-template-rows:repeat(5,1fr);gap:9px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-deploy span{border-radius:12px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 8px 16px rgba(15,47,74,.07);padding:10px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-deploy span::before{content:"";display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--template-accent);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi{position:absolute;right:8.2%;top:18%;width:39%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi span{min-height:96px;border-radius:15px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 12px 24px rgba(15,47,74,.08);padding:16px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi span:nth-child(1),body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi span:nth-child(4){border-top:6px solid var(--template-secondary);}body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi span:nth-child(2),body[data-layout="sales-enterprise-proposal"] .sales-enterprise-roi span:nth-child(3){border-top:6px solid var(--template-accent);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-sla{position:absolute;right:8.2%;top:18%;width:39%;display:grid;grid-template-columns:1fr;gap:10px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-sla span{min-height:62px;border-radius:14px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 10px 18px rgba(15,47,74,.07);padding:13px 16px 12px 52px;font-size:12px;font-weight:900;color:var(--template-title);position:relative;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-sla span::before{content:"";position:absolute;left:17px;top:17px;width:20px;height:20px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(34,184,167,.12);}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-close{position:absolute;left:8.8%;right:8.2%;bottom:15%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
+    body[data-layout="sales-enterprise-proposal"] .sales-enterprise-close span{min-height:100px;border-radius:15px;background:#fff;border:1px solid rgba(15,47,74,.12);box-shadow:0 12px 24px rgba(15,47,74,.08);padding:16px 14px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-kicker{position:absolute;left:8.5%;top:14.7%;font-size:12px;font-weight:900;letter-spacing:.15em;color:var(--template-accent);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-title{position:absolute;left:8.5%;top:20.8%;width:43%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-rule{position:absolute;left:8.5%;top:42.8%;width:34%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-bullets{position:absolute;left:8.6%;top:49%;width:38%;margin:0;padding-left:1.05em;font-size:12.5px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-bullets li{margin:.12em 0;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-architecture{position:absolute;right:7.8%;top:17.6%;width:40%;height:46%;border-radius:18px;background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--template-bg) 72%,#fff 28%));border:1px solid rgba(18,48,71,.12);box-shadow:0 18px 36px rgba(18,48,71,.12);overflow:hidden;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-architecture::before{content:"";position:absolute;left:9%;right:9%;top:24%;height:11%;border-radius:12px;background:var(--template-primary);box-shadow:0 122px 0 rgba(26,166,166,.14),0 204px 0 rgba(217,154,43,.18);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-architecture::after{content:"";position:absolute;left:46%;top:19%;width:6%;height:60%;border-radius:999px;background:var(--template-accent);box-shadow:-150px 126px 0 -10px var(--template-secondary),150px 126px 0 -10px var(--template-primary);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-architecture i{position:absolute;width:22%;height:15%;border-radius:13px;background:#fff;border:1px solid rgba(18,48,71,.13);box-shadow:0 9px 18px rgba(18,48,71,.08);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-architecture i:nth-child(1){left:12%;top:40%;}body[data-layout="sales-proposal-solution"] .sales-solution-architecture i:nth-child(2){left:39%;top:40%;}body[data-layout="sales-proposal-solution"] .sales-solution-architecture i:nth-child(3){left:66%;top:40%;}body[data-layout="sales-proposal-solution"] .sales-solution-architecture i:nth-child(4){left:39%;top:70%;background:color-mix(in srgb,var(--template-accent) 10%,#fff 90%);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-cards{position:absolute;left:8.5%;right:48%;bottom:14.7%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-cards span{min-height:62px;border-radius:12px;background:#fff;border:1px solid rgba(18,48,71,.12);border-top:5px solid var(--template-accent);box-shadow:0 10px 22px rgba(18,48,71,.08);padding:10px 11px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-diagnosis{position:absolute;right:7.8%;top:19%;width:40%;display:grid;grid-template-columns:1fr;gap:12px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-diagnosis span{position:relative;min-height:72px;border-radius:14px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 10px 20px rgba(18,48,71,.08);padding:14px 16px 12px 54px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-diagnosis span::before{content:"";position:absolute;left:18px;top:18px;width:20px;height:20px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(26,166,166,.12);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-painpoints{position:absolute;right:7.8%;top:18.5%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-painpoints span{min-height:92px;border-radius:15px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 12px 24px rgba(18,48,71,.08);padding:14px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-painpoints span::before{content:"";display:block;width:26px;height:6px;margin-bottom:13px;border-radius:999px;background:linear-gradient(90deg,var(--template-warning),var(--template-secondary));}
+    body[data-layout="sales-proposal-solution"] .sales-solution-process{position:absolute;left:8.5%;right:8.5%;bottom:15.5%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-process span{position:relative;min-height:76px;border-radius:14px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 10px 20px rgba(18,48,71,.08);padding:13px 9px 10px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-process span::before{content:"";display:block;width:25px;height:25px;margin-bottom:8px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 7px rgba(26,166,166,.12);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-process span:not(:last-child)::after{content:"";position:absolute;right:-15px;top:38px;width:20px;height:4px;border-radius:999px;background:var(--template-secondary);z-index:2;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-roadmap{position:absolute;left:8.5%;right:8.5%;bottom:15.5%;display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;gap:12px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-roadmap span{min-height:90px;border-radius:15px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 12px 24px rgba(18,48,71,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-roadmap span::before{content:"";display:block;width:30px;height:6px;margin-bottom:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary));}
+    body[data-layout="sales-proposal-solution"] .sales-solution-value{position:absolute;right:7.8%;top:19%;width:40%;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-value span{min-height:92px;border-radius:15px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 12px 24px rgba(18,48,71,.08);padding:15px 13px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-value span:nth-child(1),body[data-layout="sales-proposal-solution"] .sales-solution-value span:nth-child(4){border-top:5px solid var(--template-secondary);}body[data-layout="sales-proposal-solution"] .sales-solution-value span:nth-child(2),body[data-layout="sales-proposal-solution"] .sales-solution-value span:nth-child(3){border-top:5px solid var(--template-accent);}
+    body[data-layout="sales-proposal-solution"] .sales-solution-closing{position:absolute;left:8.5%;right:8.5%;bottom:16.5%;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;}
+    body[data-layout="sales-proposal-solution"] .sales-solution-closing span{min-height:100px;border-radius:15px;background:#fff;border:1px solid rgba(18,48,71,.12);box-shadow:0 12px 24px rgba(18,48,71,.08);padding:16px 14px;font-size:13px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-renewal-growth-qbr"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f5f8f6 0%,var(--template-bg) 56%,#e5f4ec 100%);}
+    body[data-layout="sales-renewal-growth-qbr"] .slide::before{background:repeating-linear-gradient(90deg,rgba(18,59,58,.045) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(18,59,58,.035) 0 1px,transparent 1px 42px);}
+    body[data-layout="sales-renewal-growth-qbr"] .slide::after{content:"";position:absolute;right:-9%;top:-18%;width:38%;height:52%;border-radius:50%;background:rgba(47,191,113,.12);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-layer{position:absolute;inset:0;z-index:3;color:var(--template-body);pointer-events:none;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-kicker{position:absolute;left:7.8%;top:13.6%;font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--template-accent);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-title{position:absolute;left:7.8%;top:19.4%;width:40%;margin:0;color:var(--template-title);font-size:32px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-rule{position:absolute;left:7.8%;top:41.5%;width:33%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-bullets{position:absolute;left:7.9%;top:48%;width:37%;margin:0;padding-left:1.05em;font-size:12.2px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-bullets li{margin:.1em 0;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-panel{position:absolute;right:7.4%;top:16.4%;width:42%;height:47%;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(18,59,58,.12);box-shadow:0 18px 38px rgba(18,59,58,.12);overflow:hidden;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-gauge::before{content:"";position:absolute;left:16%;top:22%;width:68%;height:68%;border-radius:50%;background:conic-gradient(from 220deg,var(--template-accent) 0 245deg,rgba(242,184,75,.7) 245deg 300deg,rgba(18,59,58,.12) 300deg 360deg);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-gauge::after{content:"";position:absolute;left:31%;top:37%;width:38%;height:38%;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 1px rgba(18,59,58,.08);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-chart::before{content:"";position:absolute;left:11%;right:10%;bottom:25%;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent));transform:rotate(-13deg);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-chart::after{content:"";position:absolute;left:16%;bottom:32%;width:11px;height:11px;border-radius:50%;background:var(--template-secondary);box-shadow:96px -22px 0 var(--template-accent),196px -66px 0 var(--template-accent),292px -98px 0 var(--template-primary);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-opportunity{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:34px;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-opportunity span{min-height:88px;border-radius:14px;background:#fff;border:1px solid rgba(18,59,58,.12);padding:15px 14px;font-size:12px;font-weight:900;color:var(--template-title);box-shadow:0 10px 20px rgba(18,59,58,.08);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-opportunity span::before{content:"";display:block;width:28px;height:7px;margin-bottom:12px;border-radius:999px;background:linear-gradient(90deg,var(--template-warning),var(--template-secondary));}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:14px;padding:38px 34px;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-ladder span{border-radius:15px;background:#fff;border:1px solid rgba(18,59,58,.12);padding:16px 13px;font-size:12px;font-weight:900;color:var(--template-title);box-shadow:0 12px 24px rgba(18,59,58,.08);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-ladder span:nth-child(1){min-height:96px;}body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-ladder span:nth-child(2){min-height:132px;border-top:6px solid var(--template-secondary);}body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-ladder span:nth-child(3){min-height:168px;border-top:6px solid var(--template-accent);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-pricing{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;padding:36px;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-pricing span{border-radius:15px;background:#fff;border:1px solid rgba(18,59,58,.12);padding:17px 15px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-plan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:38px 34px;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-plan span{min-height:154px;border-radius:15px;background:#fff;border:1px solid rgba(18,59,58,.12);padding:16px 13px;font-size:12px;font-weight:900;color:var(--template-title);box-shadow:0 12px 24px rgba(18,59,58,.08);}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-summary{position:absolute;left:7.8%;right:7.4%;bottom:13.4%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="sales-renewal-growth-qbr"] .sales-renewal-summary span{min-height:70px;border-radius:14px;background:#fff;border:1px solid rgba(18,59,58,.12);border-top:5px solid var(--template-accent);padding:12px;font-size:11px;font-weight:900;color:var(--template-title);box-shadow:0 10px 22px rgba(18,59,58,.08);}
     body[data-layout="sales-financial-solution"] .slide{padding:0;border:0;background:radial-gradient(circle at 86% 20%,rgba(24,160,166,.18) 0 18%,transparent 19% 42%),linear-gradient(135deg,#f7fbfc 0%,var(--template-bg) 54%,#dbeaf0 100%);}
     body[data-layout="sales-financial-solution"] .slide::before{background:linear-gradient(110deg,rgba(11,42,74,.12) 0 12%,transparent 12% 100%),repeating-linear-gradient(90deg,rgba(11,42,74,.045) 0 1px,transparent 1px 54px),repeating-linear-gradient(0deg,rgba(24,160,166,.04) 0 1px,transparent 1px 44px);}
     body[data-layout="sales-financial-solution"] .slide::after{content:"";position:absolute;right:-10%;bottom:-18%;width:42%;height:48%;border-radius:50%;background:rgba(214,168,79,.14);}
@@ -7413,6 +7519,206 @@ function salesProposalVariant(visual) {
 
 function isSalesProposalVisual(visual) {
   return visual?.id === "sales-proposal" && visual?.layout === "academy";
+}
+
+function salesEnterpriseProposalPreviewScene({ slide, index, total }) {
+  const bullets = salesEnterpriseProposalBulletTexts(slide);
+  const role = salesEnterpriseProposalRoleFromSlide({ slide, index, total });
+  return {
+    variant: "enterprise",
+    role,
+    // 企业客户提案用业务环节做页眉，不把“企业客户”主题名直接写进页面。
+    kicker: role === "cover" ? "ACCOUNT PROPOSAL" : role === "organization" ? "BUYING CENTER" : role === "painpoints" ? "CHALLENGE MAP" : role === "matching" ? "FIT MATRIX" : role === "deployment" ? "DEPLOYMENT BLUEPRINT" : role === "roi" ? "ROI MODEL" : role === "sla" ? "SERVICE ASSURANCE" : "NEXT DECISION",
+    title: salesEnterpriseProposalCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28),
+    bullets,
+    summary: ["组织结构", "采购链路", "价值承诺"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+    organization: ["业务负责人", "采购委员会", "IT 架构", "财务风控", "使用团队"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 10)),
+    painpoints: ["组织协同成本", "流程断点风险", "系统集成压力", "收益证明不足"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+    matching: ["客户痛点", "方案能力", "管理诉求", "部署模块", "风险约束", "保障机制"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+    deployment: ["业务层", "应用层", "数据层", "集成层", "运维层"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 10)),
+    roi: ["投入规模", "效率提升", "成本节约", "回收周期"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+    sla: ["响应时效", "升级机制", "成功经理", "月度复盘"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+    closing: ["POC 范围", "决策会议", "合同推进"].map((fallback, itemIndex) => salesEnterpriseProposalCompactText(bullets[itemIndex], fallback, 12)),
+  };
+}
+
+function renderSalesEnterpriseProposalPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(salesEnterpriseProposalCompactText(item, scene.title, 42))}</li>`).join("");
+  const blueprint = '<div class="sales-enterprise-blueprint"><i></i><i></i><i></i><i></i></div>';
+  const visual = scene.role === "organization"
+    ? `<div class="sales-enterprise-org">${scene.organization.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+    : scene.role === "painpoints"
+      ? `<div class="sales-enterprise-pain">${scene.painpoints.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+      : scene.role === "matching"
+        ? `<div class="sales-enterprise-match">${scene.matching.slice(0, 6).map((item, itemIndex) => itemIndex % 2 === 0 ? `<span>${escapeHtml(item)}</span><i></i>` : `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : scene.role === "deployment"
+          ? `<div class="sales-enterprise-deploy">${scene.deployment.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+          : scene.role === "roi"
+            ? `<div class="sales-enterprise-roi">${scene.roi.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+            : scene.role === "sla"
+              ? `<div class="sales-enterprise-sla">${scene.sla.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+              : scene.role === "closing"
+                ? `<div class="sales-enterprise-close">${scene.closing.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+                : `${blueprint}<div class="sales-enterprise-summary">${scene.summary.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  return `<div class="sales-enterprise-layer"><div class="sales-enterprise-kicker">${escapeHtml(scene.kicker)}</div><h2 class="sales-enterprise-title">${escapeHtml(scene.title)}</h2><div class="sales-enterprise-rule"></div><ul class="sales-enterprise-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function salesEnterpriseProposalRoleFromSlide({ slide, index, total }) {
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  const text = `${slide?.title || ""} ${salesEnterpriseProposalBulletTexts(slide).join(" ")}`;
+  if (/组织|角色|采购|决策|委员会|干系人/.test(text)) return "organization";
+  if (/痛点|挑战|问题|瓶颈|风险|根因/.test(text)) return "painpoints";
+  if (/匹配|能力|模块|价值主张|方案/.test(text)) return "matching";
+  if (/部署|蓝图|架构|集成|上线|实施/.test(text)) return "deployment";
+  if (/ROI|收益|回报|测算|成本|效率|投入/.test(text)) return "roi";
+  if (/SLA|服务|保障|响应|运维|成功经理/.test(text)) return "sla";
+  return ["organization", "painpoints", "matching", "deployment", "roi", "sla"][Math.max(0, (index - 1) % 6)];
+}
+
+function salesEnterpriseProposalBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean).map((item) => String(item)) : [];
+}
+
+function salesEnterpriseProposalCompactText(text, fallback, maxLength) {
+  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (source.length <= maxLength) return source;
+  return `${source.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isSalesEnterpriseProposalVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-enterprise-proposal" && (id === "sales-proposal" || id === "sales-sales-proposal-enterprise");
+}
+
+function salesRenewalGrowthPreviewScene({ slide, index, total }) {
+  const bullets = salesRenewalGrowthBulletTexts(slide);
+  const role = salesRenewalGrowthRoleFromSlide({ slide, index, total });
+  const title = salesRenewalGrowthCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  return {
+    variant: "renewal",
+    role,
+    // 这里的英文角标只表达客户成功汇报阶段，不直接暴露主题风格名称。
+    kicker: role === "cover" ? "CUSTOMER QBR" : role === "health" ? "HEALTH SCORE" : role === "value" ? "VALUE REALIZED" : role === "opportunity" ? "EXPANSION SIGNAL" : role === "growth" ? "GROWTH PATH" : role === "pricing" ? "RENEWAL PACKAGE" : role === "plan" ? "SUCCESS PLAN" : "NEXT DECISION",
+    title,
+    bullets,
+    summary: ["健康度", "已实现价值", "增购机会", "续约节点"].map((fallback, itemIndex) => salesRenewalGrowthCompactText(bullets[itemIndex], fallback, 12)),
+    opportunity: ["未覆盖团队", "流程缺口", "数据价值", "增购触点"].map((fallback, itemIndex) => salesRenewalGrowthCompactText(bullets[itemIndex], fallback, 12)),
+    ladder: ["续约保底", "能力扩展", "规模增购"].map((fallback, itemIndex) => salesRenewalGrowthCompactText(bullets[itemIndex], fallback, 12)),
+    pricing: ["续约方案", "商务条款", "决策节点"].map((fallback, itemIndex) => salesRenewalGrowthCompactText(bullets[itemIndex], fallback, 14)),
+    plan: ["30 天启动", "60 天扩展", "90 天验收"].map((fallback, itemIndex) => salesRenewalGrowthCompactText(bullets[itemIndex], fallback, 12)),
+  };
+}
+
+function renderSalesRenewalGrowthPreview(scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(salesRenewalGrowthCompactText(item, scene.title, 42))}</li>`).join("");
+  const panel = scene.role === "opportunity"
+    ? `<div class="sales-renewal-panel sales-renewal-opportunity">${scene.opportunity.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+    : scene.role === "growth"
+      ? `<div class="sales-renewal-panel sales-renewal-ladder">${scene.ladder.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+      : scene.role === "pricing"
+        ? `<div class="sales-renewal-panel sales-renewal-pricing">${scene.pricing.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : scene.role === "plan" || scene.role === "closing"
+          ? `<div class="sales-renewal-panel sales-renewal-plan">${scene.plan.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+          : `<div class="sales-renewal-panel ${scene.role === "value" ? "sales-renewal-chart" : "sales-renewal-gauge"}"></div>`;
+  return `<div class="sales-renewal-layer"><div class="sales-renewal-kicker">${escapeHtml(scene.kicker)}</div><h2 class="sales-renewal-title">${escapeHtml(scene.title)}</h2><div class="sales-renewal-rule"></div><ul class="sales-renewal-bullets">${bulletItems}</ul>${panel}<div class="sales-renewal-summary">${scene.summary.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function salesRenewalGrowthRoleFromSlide({ slide, index, total }) {
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  const text = `${slide?.title || ""} ${salesRenewalGrowthBulletTexts(slide).join(" ")}`;
+  // 按客户成功 QBR 的常见叙事顺序识别页面角色，标题词不充分时再按页序兜底。
+  if (/健康|活跃|使用|采用|留存|风险/.test(text)) return "health";
+  if (/价值|成效|收益|ROI|回报|节省|提升/.test(text)) return "value";
+  if (/机会|缺口|未满足|增购|扩展|空白/.test(text)) return "opportunity";
+  if (/路径|阶梯|增长|升级|套餐|扩容/.test(text)) return "growth";
+  if (/报价|续约|价格|条款|合同|方案/.test(text)) return "pricing";
+  if (/计划|成功|里程碑|90|30|60|行动/.test(text)) return "plan";
+  return ["health", "value", "opportunity", "growth", "pricing", "plan"][Math.max(0, (index - 1) % 6)];
+}
+
+function salesRenewalGrowthBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean).map((item) => String(item)) : [];
+}
+
+function salesRenewalGrowthCompactText(text, fallback, maxLength) {
+  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (source.length <= maxLength) return source;
+  return `${source.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isSalesRenewalGrowthVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-renewal-growth-qbr" && (id === "sales-proposal" || id === "sales-sales-proposal-renewal");
+}
+
+function salesProposalSolutionPreviewScene({ slide, index, total }) {
+  const bullets = salesProposalSolutionBulletTexts(slide);
+  const title = salesProposalSolutionCompactText(slide?.title, `Page ${index + 1}`, index === 0 ? 30 : 28);
+  const role = salesProposalSolutionRoleFromSlide({ slide, index, total });
+  return {
+    variant: "solution",
+    role,
+    // 大客户销售提案强调阅读路径，英文角标只表达页面职能，不暴露主题风格名称。
+    kicker: role === "cover" ? "CLIENT PROPOSAL" : role === "diagnosis" ? "CURRENT STATE" : role === "painpoints" ? "PAINPOINT MAP" : role === "architecture" ? "SOLUTION ARCHITECTURE" : role === "process" ? "BUSINESS FLOW" : role === "roadmap" ? "IMPLEMENTATION ROADMAP" : role === "value" ? "VALUE MODEL" : "NEXT STEP",
+    title,
+    bullets,
+    cards: ["现状诊断", "业务痛点", "方案价值"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    diagnosis: ["客户现状", "关键痛点", "业务影响"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 14)),
+    painpoints: ["效率瓶颈", "数据割裂", "流程断点", "增长阻力"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    process: ["需求诊断", "方案共创", "POC 验证", "推广上线", "运营复盘"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 10)),
+    roadmap: ["调研诊断", "试点验证", "规模推广", "持续运营"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 10)),
+    value: ["效率提升", "成本优化", "风险降低", "体验增长"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+    closing: ["合作模式", "双方分工", "决策节点"].map((fallback, itemIndex) => salesProposalSolutionCompactText(bullets[itemIndex], fallback, 12)),
+  };
+}
+
+function renderSalesProposalSolutionPreview(slide, scene) {
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(salesProposalSolutionCompactText(item, scene.title, 42))}</li>`).join("");
+  const architecture = '<div class="sales-solution-architecture"><i></i><i></i><i></i><i></i></div>';
+  const visual = scene.role === "diagnosis"
+    ? `<div class="sales-solution-diagnosis">${scene.diagnosis.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+    : scene.role === "painpoints"
+      ? `<div class="sales-solution-painpoints">${scene.painpoints.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+      : scene.role === "process"
+        ? `<div class="sales-solution-process">${scene.process.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+        : scene.role === "roadmap"
+          ? `<div class="sales-solution-roadmap">${scene.roadmap.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+          : scene.role === "value"
+            ? `<div class="sales-solution-value">${scene.value.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+            : scene.role === "closing"
+              ? `<div class="sales-solution-closing">${scene.closing.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`
+              : `${architecture}<div class="sales-solution-cards">${scene.cards.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>`;
+  return `<div class="sales-solution-layer"><div class="sales-solution-kicker">${escapeHtml(scene.kicker)}</div><h2 class="sales-solution-title">${escapeHtml(scene.title)}</h2><div class="sales-solution-rule"></div><ul class="sales-solution-bullets">${bulletItems}</ul>${visual}</div>`;
+}
+
+function salesProposalSolutionRoleFromSlide({ slide, index, total }) {
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  const text = `${slide?.title || ""} ${salesProposalSolutionBulletTexts(slide).join(" ")}`;
+  if (/痛点|问题|瓶颈|挑战|根因/.test(text)) return "painpoints";
+  if (/架构|方案|能力|模块|平台/.test(text)) return "architecture";
+  if (/流程|业务流|协同|场景/.test(text)) return "process";
+  if (/实施|路线|计划|阶段|交付/.test(text)) return "roadmap";
+  if (/价值|收益|ROI|回报|测算|效率|成本/.test(text)) return "value";
+  if (/合作|成交|推进|下一步|决策/.test(text)) return "closing";
+  return index === 1 ? "diagnosis" : ["architecture", "process", "roadmap", "value"][Math.max(0, (index - 2) % 4)];
+}
+
+function salesProposalSolutionBulletTexts(slide) {
+  return Array.isArray(slide?.bullets) ? slide.bullets.filter(Boolean).map((item) => String(item)) : [];
+}
+
+function salesProposalSolutionCompactText(text, fallback, maxLength) {
+  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (source.length <= maxLength) return source;
+  return `${source.slice(0, Math.max(1, maxLength - 1))}…`;
+}
+
+function isSalesProposalSolutionVisual(visual) {
+  const id = String(visual?.id || "");
+  return visual?.layout === "sales-proposal-solution" && (id === "sales-proposal" || id === "sales-sales-proposal-solution");
 }
 
 function channelRecruitmentPolicyPreviewScene({ slide, index, total }) {

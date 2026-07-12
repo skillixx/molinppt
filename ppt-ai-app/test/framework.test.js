@@ -538,10 +538,11 @@ test("resolveTemplateVisual maps cash flow official slug to dedicated visual", (
 test("resolveTemplateVisual applies sales proposal enterprise commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "enterprise" });
 
-  assert.equal(visual.primary, "14565A");
-  assert.equal(visual.accent, "D19A3E");
-  assert.equal(visual.background, "EEF7F6");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0F2F4A");
+  assert.equal(visual.accent, "22B8A7");
+  assert.equal(visual.secondary, "D99A2B");
+  assert.equal(visual.background, "F3F7FA");
+  assert.equal(visual.layout, "sales-enterprise-proposal");
   assert.equal(visual.variant, "enterprise");
 });
 
@@ -559,10 +560,11 @@ test("resolveTemplateVisual applies sales proposal solution commercial visual", 
 test("resolveTemplateVisual applies sales proposal renewal commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "renewal" });
 
-  assert.equal(visual.primary, "4B3F72");
-  assert.equal(visual.accent, "E0A33C");
-  assert.equal(visual.background, "F4F1FA");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "123B3A");
+  assert.equal(visual.accent, "2FBF71");
+  assert.equal(visual.secondary, "F2B84B");
+  assert.equal(visual.background, "F5F8F6");
+  assert.equal(visual.layout, "sales-renewal-growth-qbr");
   assert.equal(visual.variant, "renewal");
 });
 

@@ -1,7 +1,7 @@
 {
   "slug": "sales-sales-proposal-renewal",
   "name": "销售提案方案 - 续约增长",
-  "description": "适合客户提案、价值阐述、解决方案和下一步计划展示。",
+  "description": "适合客户续约、使用成效复盘、价值实现、增购机会、续约报价和客户成功计划汇报的 QBR 提案模板。",
   "category_slug": "sales",
   "category_name": "销售方案",
   "category_sort_order": 40,
@@ -10,8 +10,12 @@
     "sales",
     "sales-proposal",
     "renewal",
-    "proposal"
+    "proposal",
+    "customer-success",
+    "qbr",
+    "expansion"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

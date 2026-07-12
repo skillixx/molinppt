@@ -1371,6 +1371,49 @@ test("PptService renders sales proposal solution preview with dedicated layout",
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 
+test("PptService renders sales renewal growth QBR preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "客户续约 QBR 使用成效复盘与增购增长计划",
+    slideCount: 7,
+    templateId: "sales-proposal",
+    theme: "renewal",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-proposal" data-layout="sales-renewal-growth-qbr"/);
+  assert.match(preview, /sales-renewal-layer/);
+  assert.match(preview, /sales-renewal-gauge|sales-renewal-chart|sales-renewal-ladder|sales-renewal-plan/);
+  assert.doesNotMatch(preview, />续约增长</);
+  assert.doesNotMatch(preview, /<div class="sales-label"/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders sales proposal enterprise preview with dedicated decision layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "企业客户销售提案组织痛点部署方案 ROI 和 SLA",
+    slideCount: 7,
+    templateId: "sales-proposal",
+    theme: "enterprise",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="sales-proposal" data-layout="sales-enterprise-proposal"/);
+  assert.match(preview, /sales-enterprise-layer/);
+  assert.match(preview, /sales-enterprise-blueprint|sales-enterprise-org|sales-enterprise-roi|sales-enterprise-sla/);
+  assert.doesNotMatch(preview, />企业客户</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
 test("PptService renders synced key account decision chain preview with dedicated layout", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
