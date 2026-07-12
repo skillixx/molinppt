@@ -8,25 +8,31 @@ export const templateRenderer = {
   "templateName": "创业融资路演",
   "themeId": "startup",
   "themeName": "创业故事",
-  "style": "venture-story",
+  "style": "founder-cinematic-storytelling",
   "visual": {
-    "primary": "16213E",
-    "accent": "F59E0B",
-    "background": "F7F1E8",
-    "surface": "FFFDF8",
-    "title": "121826",
-    "body": "3F4652",
-    "layout": "venture",
+    "primary": "172033",
+    "accent": "F97316",
+    "background": "F6F4EF",
+    "surface": "FFFFFF",
+    "title": "172033",
+    "body": "465266",
+    "layout": "founder-cinematic-story",
     "variant": "startup"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "founder-film-cover",
+    "defaultContentLayout": "founder-story-scene",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "founder-film-cover",
+      "founder-storyline",
+      "user-pain-scene",
+      "founding-insight",
+      "prototype-validation",
+      "evidence-wall",
+      "growth-chapter",
+      "team-mission",
+      "vision-funding-roadmap",
+      "founder-film-closing"
     ]
   }
 };

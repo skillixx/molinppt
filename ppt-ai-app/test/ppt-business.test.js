@@ -1326,14 +1326,14 @@ test("PptService renders founder cinematic startup story preview with dedicated 
     ownerUserId: 7,
     topic: "创业融资路演",
     slideCount: 6,
-    templateId: "pitch-startup-funding-pitch-startup-story",
-    theme: "startup-story",
+    templateId: "pitch-pitch-startup",
+    theme: "startup",
   });
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /<body data-template="pitch-startup-funding-pitch-startup-story" data-layout="founder-cinematic-story"/);
+  assert.match(preview, /<body data-template="pitch-pitch-startup" data-layout="founder-cinematic-story"/);
   assert.match(preview, /seed-layer/);
   assert.match(preview, /seed-photo/);
   assert.match(preview, /--founder-cinematic-team:url/);
@@ -6754,8 +6754,8 @@ async function insertBusinessPlanModelTemplate(context) {
 async function insertSeedRoundStartupStoryTemplate(context) {
   // 测试数据库模拟官方模板同步后的创业融资路演模板，确保页面内容和主题选择元数据分离。
   await context.database.insert("templates", {
-    id: "pitch-startup-funding-pitch-startup-story",
-    slug: "pitch-startup-funding-pitch-startup-story",
+    id: "pitch-pitch-startup",
+    slug: "pitch-pitch-startup",
     name: "创业融资路演 - 创业故事",
     categoryId: "pitch",
     scope: "official",
@@ -6763,7 +6763,7 @@ async function insertSeedRoundStartupStoryTemplate(context) {
     status: "active",
     themes: [
       {
-        id: "startup-story",
+        id: "startup",
         name: "创业故事",
         visual: {
           primary: "172033",
@@ -6773,7 +6773,7 @@ async function insertSeedRoundStartupStoryTemplate(context) {
           title: "172033",
           body: "465266",
           layout: "founder-cinematic-story",
-          variant: "startup-story",
+          variant: "startup",
         },
       },
     ],
@@ -6785,7 +6785,7 @@ async function insertSeedRoundStartupStoryTemplate(context) {
       title: "172033",
       body: "465266",
       layout: "founder-cinematic-story",
-      variant: "startup-story",
+      variant: "startup",
     },
     layoutSchema: {
       defaultCoverLayout: "founder-film-cover",

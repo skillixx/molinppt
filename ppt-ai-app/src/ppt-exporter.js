@@ -21,7 +21,7 @@ const DEFAULT_SLIDE_METRICS = { width: 9144000, height: 5143500, scaleX: 1, scal
 const BUSINESS_MODERN_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const LUXURY_BRAND_ASSET_BASE_URL = new URL("../../templates/official/marketing/brand-story/premium/assets/", import.meta.url);
 const PRODUCT_PREMIERE_ASSET_BASE_URL = new URL("../../templates/official/marketing/marketing-campaign/launch/assets/", import.meta.url);
-const FOUNDER_CINEMATIC_ASSET_BASE_URL = new URL("../../templates/official/pitch/seed-round-pitch/startup-story/assets/", import.meta.url);
+const FOUNDER_CINEMATIC_ASSET_BASE_URL = new URL("../../templates/official/pitch/pitch/startup/assets/", import.meta.url);
 const LUXURY_BRAND_MEDIA = {
   product: { file: "luxury-product-still.png", content: readFileSync(new URL("luxury-product-still.png", LUXURY_BRAND_ASSET_BASE_URL)) },
   gold: { file: "brushed-gold-texture.png", content: readFileSync(new URL("brushed-gold-texture.png", LUXURY_BRAND_ASSET_BASE_URL)) },
@@ -10958,7 +10958,7 @@ function seedRoundStoryReadableText(text, maxLength) {
 
 function isSeedRoundStoryVisual(visual) {
   const id = String(visual?.id || "");
-  return visual?.layout === "founder-cinematic-story" && (id === "startup-funding-pitch" || id === "pitch-startup-funding-pitch-startup-story");
+  return visual?.layout === "founder-cinematic-story" && (id === "pitch" || id === "pitch-pitch-startup");
 }
 
 function integratedMediaMixDecorationsXml({ visual, index, role, slide, total }) {

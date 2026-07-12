@@ -12,7 +12,7 @@ import {
 const DOME_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/business/business/modern/assets/", import.meta.url);
 const LUXURY_BRAND_PREVIEW_ASSET_BASE_URL = new URL("../../templates/official/marketing/brand-story/premium/assets/", import.meta.url);
 const PRODUCT_PREMIERE_ASSET_BASE_URL = new URL("../../templates/official/marketing/marketing-campaign/launch/assets/", import.meta.url);
-const FOUNDER_CINEMATIC_ASSET_BASE_URL = new URL("../../templates/official/pitch/seed-round-pitch/startup-story/assets/", import.meta.url);
+const FOUNDER_CINEMATIC_ASSET_BASE_URL = new URL("../../templates/official/pitch/pitch/startup/assets/", import.meta.url);
 const DOME_PREVIEW_ASSETS = {
   cover: readFileSync(new URL("dome-cover.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
   content: readFileSync(new URL("dome-content.jpg", DOME_PREVIEW_ASSET_BASE_URL)).toString("base64"),
@@ -9666,7 +9666,7 @@ function seedRoundStoryCompactText(text, fallback, maxLength) {
 
 function isSeedRoundStoryVisual(visual) {
   const id = String(visual?.id || "");
-  return visual?.layout === "founder-cinematic-story" && (id === "startup-funding-pitch" || id === "pitch-startup-funding-pitch-startup-story");
+  return visual?.layout === "founder-cinematic-story" && (id === "pitch" || id === "pitch-pitch-startup");
 }
 
 function renderBusinessModelValueChainPreview(slide, scene) {

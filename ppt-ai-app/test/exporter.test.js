@@ -2607,10 +2607,10 @@ test("PptExportService uses founder cinematic startup story decorations", () => 
   const result = exporter.exportDeck({
     deck: {
       ...deck,
-      templateId: "pitch-startup-funding-pitch-startup-story",
-      theme: "startup-story",
+      templateId: "pitch-pitch-startup",
+      theme: "startup",
       templateVisual: {
-        id: "pitch-startup-funding-pitch-startup-story",
+        id: "pitch-pitch-startup",
         primary: "172033",
         accent: "F97316",
         background: "F6F4EF",
@@ -2618,7 +2618,7 @@ test("PptExportService uses founder cinematic startup story decorations", () => 
         title: "172033",
         body: "465266",
         layout: "founder-cinematic-story",
-        variant: "startup-story",
+        variant: "startup",
       },
       slides: [
         { title: "创业融资故事", bullets: ["真实用户痛点已经被反复验证", "MVP retention plan visible", "早期增长信号支持创业融资"] },
@@ -2652,7 +2652,7 @@ test("PptExportService uses founder cinematic startup story decorations", () => 
   assert.match(slide3, /name="Seed Round Pain Evidence 1"/);
   assert.match(slide4, /name="Seed Round MVP Board"/);
   assert.match(slide6, /name="Seed Round Funding Road"/);
-  assert.doesNotMatch(slide1, /startup-story/);
+  assert.doesNotMatch(slide1, /创业故事/);
 });
 
 test("PptExportService uses growth funding flywheel decorations", () => {
