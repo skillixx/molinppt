@@ -8990,15 +8990,17 @@ function productRoadmapDecorationsXml({ visual, index, role, slide, total }) {
 }
 
 function productRoadmapBulletCardsXml({ visual, palette, scene, isCover }) {
-  return scene.bullets.slice(0, 4).map((item, itemIndex) => {
+  if (scene.role === "capabilities") return "";
+  const bulletLimit = isCover ? 4 : 2;
+  return scene.bullets.slice(0, bulletLimit).map((item, itemIndex) => {
     // 非封面页标题和摘要更容易占用多行，bullet 卡片统一下移并缩短文案，避免下载 PPT 中文字外溢互相压叠。
-    const y = (isCover ? 2926080 : 2590800) + itemIndex * (isCover ? 228600 : 259080);
-    const cardHeight = isCover ? 167640 : 182880;
+    const y = (isCover ? 2926080 : 2865120) + itemIndex * (isCover ? 228600 : 274320);
+    const cardHeight = isCover ? 167640 : 152400;
     const dotY = y + (isCover ? 53340 : 60960);
-    const textY = y + (isCover ? 30480 : 38100);
+    const textY = y + (isCover ? 30480 : 45720);
     return solidShapeXml({ id: 230 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Card ${itemIndex + 1}`, geom: "roundRect", x: 792480, y, cx: 3200400, cy: cardHeight, fill: itemIndex === 0 ? palette.soft : "FFFFFF" })
       + solidShapeXml({ id: 231 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Dot ${itemIndex + 1}`, geom: "ellipse", x: 853440, y: dotY, cx: 60960, cy: 60960, fill: itemIndex === 0 ? visual.accent : visual.secondary || "F59E0B" })
-      + textShapeXml({ id: 232 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Text ${itemIndex + 1}`, x: 975360, y: textY, cx: 2773680, cy: isCover ? 91440 : 106680, text: productRoadmapCompactText(item, scene.title, isCover ? 30 : 22), size: isCover ? 620 : 520, bold: true, color: visual.body });
+      + textShapeXml({ id: 232 + itemIndex * 3, name: `Product Strategy Roadmap Bullet Text ${itemIndex + 1}`, x: 975360, y: textY, cx: 2773680, cy: isCover ? 91440 : 76200, text: productRoadmapCompactText(item, scene.title, isCover ? 30 : 14), size: isCover ? 620 : 440, bold: true, color: visual.body });
   }).join("");
 }
 

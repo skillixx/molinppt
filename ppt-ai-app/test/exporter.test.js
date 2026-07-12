@@ -1513,13 +1513,11 @@ test("PptExportService keeps product roadmap capability page text from overlappi
   const text = result.content.toString("latin1");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
   const summary = pptShapeByName(slide2, "Product Strategy Roadmap Summary");
-  const bulletCard = pptShapeByName(slide2, "Product Strategy Roadmap Bullet Card 1");
-  const bulletText = pptShapeByName(slide2, "Product Strategy Roadmap Bullet Text 1");
 
   assert.match(slide2, /name="Product Strategy Roadmap Capability Layer 1"/);
   assert.match(summary, /<a:off x="792480" y="1767840"\/><a:ext cx="3048000" cy="274320"\/>/);
-  assert.match(bulletCard, /<a:off x="792480" y="2590800"\/><a:ext cx="3200400" cy="182880"\/>/);
-  assert.match(bulletText, /sz="520"/);
+  assert.doesNotMatch(slide2, /name="Product Strategy Roadmap Bullet Card 1"/);
+  assert.doesNotMatch(slide2, /name="Product Strategy Roadmap Bullet Text 1"/);
 });
 
 test("PptExportService uses product pain points decorations", () => {
