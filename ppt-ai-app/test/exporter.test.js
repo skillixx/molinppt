@@ -2580,6 +2580,8 @@ test("PptExportService uses synced pitch investor memo decorations", () => {
   assert.match(slide1, /name="Pitch Investor Memo Paper"/);
   assert.match(slide1, /name="Pitch Investor Memo Decision Metric 1"/);
   assert.match(slide2, /name="Pitch Investor Memo TAM Funnel TAM"/);
+  assert.doesNotMatch(slide1, /name="Title 1"/);
+  assert.doesNotMatch(slide1, /name="Content 2"/);
   assert.doesNotMatch(slide1, /name="Pitch Stage Canvas"/);
 });
 

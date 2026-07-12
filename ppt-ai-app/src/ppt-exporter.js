@@ -950,6 +950,7 @@ function shouldRenderDomeBodyList(visual, role) {
  * @returns {boolean}
  */
 function shouldRenderTemplateBodyList(visual, role) {
+  if (isPitchInvestorMemoVisual(visual)) return false;
   if (visual.layout === "luxury-brand-story") return false;
   if (visual.layout === "brand-story-editorial") return false;
   if (visual.layout === "data-insight") return false;
@@ -1039,6 +1040,7 @@ function shouldRenderTemplateBodyList(visual, role) {
  * @returns {boolean}
  */
 function shouldRenderTemplateTitle(visual, role) {
+  if (isPitchInvestorMemoVisual(visual)) return false;
   if (visual.layout === "luxury-brand-story") return false;
   if (visual.layout === "brand-story-editorial") return false;
   if (visual.layout === "data-insight") return false;
