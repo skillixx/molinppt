@@ -480,10 +480,12 @@ test("resolveTemplateVisual applies growth strategy second curve visual", () => 
 test("resolveTemplateVisual applies financial review quarterly commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "quarterly" });
 
-  assert.equal(visual.primary, "18344E");
-  assert.equal(visual.accent, "3B8C62");
-  assert.equal(visual.background, "EDF3F4");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "12263A");
+  assert.equal(visual.accent, "2F9E6D");
+  assert.equal(visual.secondary, "D9902F");
+  assert.equal(visual.warning, "C94B4B");
+  assert.equal(visual.background, "F5F7FA");
+  assert.equal(visual.layout, "finance-quarterly-review");
   assert.equal(visual.variant, "quarterly");
 });
 

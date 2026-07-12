@@ -1,7 +1,7 @@
 {
   "slug": "finance-financial-review-quarterly",
   "name": "财务经营复盘 - 季度复盘",
-  "description": "适合财务分析、经营指标和预算预测的专业复盘模板。",
+  "description": "适合季度经营回顾、收入利润复盘、预算执行、问题归因、风险事项和下季度经营动作汇报的 CFO 经营会模板。",
   "category_slug": "finance",
   "category_name": "财务经营",
   "category_sort_order": 30,
@@ -10,8 +10,10 @@
     "finance",
     "financial-review",
     "quarterly",
-    "finance-report"
+    "finance-quarterly-review",
+    "cfo-review"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

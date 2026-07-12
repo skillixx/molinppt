@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Profit bridge accent">
+  <rect width="960" height="540" fill="none"/>
+  <g transform="translate(128 112)">
+    <rect x="0" y="176" width="86" height="138" rx="12" fill="#12263A"/>
+    <rect x="118" y="108" width="86" height="206" rx="12" fill="#2F9E6D"/>
+    <rect x="236" y="214" width="86" height="100" rx="12" fill="#C94B4B"/>
+    <rect x="354" y="156" width="86" height="158" rx="12" fill="#D9902F"/>
+    <rect x="472" y="128" width="86" height="186" rx="12" fill="#12263A"/>
+    <path d="M43 170h118V102h118v106h118v-58h118" fill="none" stroke="#2F9E6D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M0 314h620" stroke="#12263A" stroke-opacity=".24" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

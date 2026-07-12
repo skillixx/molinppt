@@ -702,12 +702,12 @@ test("PptExportService uses commercial financial quarterly decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial quarterly Chip"/);
-  assert.match(slide1, /name="Financial Bar 4"/);
-  assert.doesNotMatch(slide1, /name="Financial Point Card/);
-  assert.match(slide1, /val="18344E"/);
-  assert.match(slide1, /val="3B8C62"/);
+  assert.match(slide1, /name="Finance Quarterly CFO Workspace"/);
+  assert.match(slide1, /name="Finance Quarterly Dashboard Panel"/);
+  assert.match(slide1, /name="Finance Quarterly KPI Card 4"/);
+  assert.doesNotMatch(slide1, /name="Financial Visual Panel"/);
+  assert.match(slide1, /val="12263A"/);
+  assert.match(slide1, /val="2F9E6D"/);
 });
 
 test("PptExportService uses commercial financial audit decorations", () => {
@@ -2465,7 +2465,7 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
   const exporter = new PptExportService();
   const cases = [
     { templateId: "strategy-consulting", theme: "board", shapeName: "Strategy Chip Text" },
-    { templateId: "financial-review", theme: "quarterly", shapeName: "Financial Chip Text" },
+    { templateId: "financial-review", theme: "quarterly", shapeName: "Finance Quarterly Theme Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
     { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },

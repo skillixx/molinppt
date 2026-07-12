@@ -423,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -636,6 +636,16 @@ function resolveTitleSize({ visual, index, title, fallbackSize }) {
     if (textLength >= 30) return 1450;
     if (textLength >= 22) return 1650;
     return Math.min(fallbackSize, 1900);
+  }
+  if (visual.layout === "finance-quarterly-review") {
+    if (index === 0) {
+      if (textLength >= 30) return 2080;
+      if (textLength >= 22) return 2320;
+      return Math.min(fallbackSize, 2660);
+    }
+    if (textLength >= 30) return 1400;
+    if (textLength >= 22) return 1600;
+    return Math.min(fallbackSize, 1860);
   }
   if (visual.layout === "finance-cost-breakdown") {
     if (index === 0) {
@@ -970,6 +980,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "finance-budget-planning") return false;
   if (visual.layout === "finance-cost-breakdown") return false;
   if (visual.layout === "finance-risk-inspection") return false;
+  if (visual.layout === "finance-quarterly-review") return false;
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "finance-budget-variance") return false;
@@ -1047,6 +1058,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "growth-marketing-lab") return false;
   if (visual.layout === "marketing-product-premiere") return false;
   if (visual.layout === "finance-risk-inspection") return false;
+  if (visual.layout === "finance-quarterly-review") return false;
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "product-interview-insight") return false;
@@ -1297,6 +1309,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "finance-budget-planning") {
     return base + budgetPlanningDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "finance-quarterly-review") {
+    return base + financeQuarterlyReviewDecorationsXml({ visual, index, role, slide, total });
   }
   if (visual.layout === "finance-cost-breakdown") {
     return base + costBreakdownDecorationsXml({ visual, index, layout, role, slide });
@@ -2857,6 +2872,31 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 841248, y: 1828800, cx: 3474720, cy: 914400 },
       titleSize: isCover ? 2700 : isClosing ? 2550 : 1900,
       bodySize: isCover ? 960 : 780,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "finance-quarterly-review") {
+    const isCover = index === 0;
+    const isClosing = role === "closing";
+    return {
+      // 财务经营复盘季度版左侧保留结论，右侧承载 CFO 经营会图表，坐标与在线预览保持同一层级关系。
+      surface: { x: 530352, y: 576580, cx: 8083296, cy: 4137660 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 320040 },
+      secondaryAccent: { x: 749808, y: isCover ? 2186940 : 1965960, cx: 3108960, cy: 30480 },
+      label: { x: 749808, y: 762000, cx: 2514600, cy: 274320 },
+      title: isClosing
+        ? { x: 749808, y: 1143000, cx: 5486400, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 1127760, cx: 3962400, cy: 1219200 }
+          : { x: 749808, y: 899160, cx: 4114800, cy: 731520 },
+      content: isClosing
+        ? { x: 749808, y: 2377440, cx: 4267200, cy: 914400 }
+        : isCover
+          ? { x: 749808, y: 2514600, cx: 3505200, cy: 762000 }
+          : { x: 749808, y: 1744980, cx: 3352800, cy: 914400 },
+      titleSize: isCover ? 2660 : isClosing ? 2480 : 1860,
+      bodySize: isCover ? 880 : 720,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -4629,6 +4669,175 @@ function budgetVarianceColorPalette(visual) {
 function isBudgetVarianceVisual(visual) {
   const id = String(visual?.id || "");
   return visual?.layout === "finance-budget-variance" && (id === "budget-management-report" || id === "finance-budget-management-report-execution-variance");
+}
+
+function financeQuarterlyReviewDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = financeQuarterlyReviewSceneFromSlide({ slide, index, role, total });
+  const palette = financeQuarterlyReviewColorPalette(visual);
+  // 季度经营复盘用代码绘制 CFO 经营会工作台，确保下载后的 PPTX 仍能编辑图表、指标卡和行动项。
+  const backdrop = rectShapeXml({ id: 1200, name: "Finance Quarterly Background Wash", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: palette.backdrop })
+    + financeQuarterlyGridXml({ palette })
+    + solidShapeXml({ id: 1201, name: "Finance Quarterly Amber Review Plane", geom: "parallelogram", x: 6903720, y: -152400, cx: 2438400, cy: 5943600, fill: palette.amberWash })
+    + solidShapeXml({ id: 1202, name: "Finance Quarterly Green Signal Glow", geom: "ellipse", x: 7010400, y: 3505200, cx: 1752600, cy: 1143000, fill: palette.greenWash });
+  const workspace = solidShapeXml({ id: 1210, name: "Finance Quarterly CFO Workspace", geom: "roundRect", x: 530352, y: 576580, cx: 8083296, cy: 4137660, fill: visual.surface })
+    + lineFrameShapeXml({ id: 1211, name: "Finance Quarterly Workspace Border", geom: "roundRect", x: 530352, y: 576580, cx: 8083296, cy: 4137660, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 1212, name: "Finance Quarterly Header Rail", x: 0, y: 0, cx: 9144000, cy: 320040, fill: visual.primary })
+    + rectShapeXml({ id: 1213, name: "Finance Quarterly Header Accent", x: 0, y: 320040, cx: 9144000, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 1214, name: "Finance Quarterly Kicker", x: 749808, y: 762000, cx: 2743200, cy: 243840, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 1215, name: "Finance Quarterly Dedicated Title", x: 749808, y: index === 0 ? 1127760 : 899160, cx: index === 0 ? 3962400 : 4114800, cy: index === 0 ? 1036320 : 670560, text: scene.title, size: index === 0 ? 1680 : 1180, bold: true, color: visual.title })
+    + rectShapeXml({ id: 1216, name: "Finance Quarterly Title Rule", x: 749808, y: index === 0 ? 2186940 : 1965960, cx: 3108960, cy: 30480, fill: visual.accent })
+    + rectShapeXml({ id: 1217, name: "Finance Quarterly Secondary Rule", x: 749808, y: (index === 0 ? 2186940 : 1965960) + 45720, cx: 1524000, cy: 15240, fill: palette.amber })
+    + solidShapeXml({ id: 1218, name: "Finance Quarterly Theme Chip", geom: "roundRect", x: 7388400, y: 762000, cx: 822960, cy: 243840, fill: visual.primary })
+    + textShapeXml({ id: 1219, name: "Finance Quarterly Theme Chip Text", x: 7528560, y: 815340, cx: 548640, cy: 121920, text: "", size: 620, bold: true, color: "FFFFFF" });
+  const bullets = financeQuarterlyBulletCardsXml({ visual, scene, isCover: index === 0 });
+  if (scene.role === "profit") return backdrop + workspace + bullets + financeQuarterlyProfitBridgeXml({ visual, palette });
+  if (scene.role === "variance") return backdrop + workspace + bullets + financeQuarterlyVarianceXml({ visual, palette, reasons: scene.reasons });
+  if (scene.role === "risk") return backdrop + workspace + bullets + financeQuarterlyRiskMatrixXml({ visual, palette });
+  if (scene.role === "action") return backdrop + workspace + bullets + financeQuarterlyActionLoopXml({ visual, palette, actions: scene.actions });
+  if (scene.role === "closing") return backdrop + workspace + bullets + financeQuarterlyClosingXml({ visual, palette, actions: scene.actions });
+  return backdrop + workspace + bullets + financeQuarterlyDashboardXml({ visual, palette }) + financeQuarterlyMetricCardsXml({ visual, palette, metrics: scene.metrics });
+}
+
+function financeQuarterlyDashboardXml({ visual, palette }) {
+  return solidShapeXml({ id: 1230, name: "Finance Quarterly Dashboard Panel", geom: "roundRect", x: 5486400, y: 944880, cx: 3352800, cy: 2514600, fill: visual.primary })
+    + lineFrameShapeXml({ id: 1231, name: "Finance Quarterly Dashboard Border", geom: "roundRect", x: 5486400, y: 944880, cx: 3352800, cy: 2514600, stroke: palette.frame, width: 12700 })
+    + arcLineShapeXml({ id: 1232, name: "Finance Quarterly Dashboard Ring Green", x: 5852160, y: 1257300, cx: 944880, cy: 944880, stroke: visual.accent, width: 91440 })
+    + arcLineShapeXml({ id: 1233, name: "Finance Quarterly Dashboard Ring Amber", x: 5852160, y: 1257300, cx: 944880, cy: 944880, stroke: palette.amber, width: 60960 })
+    + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 1234 + itemIndex, name: `Finance Quarterly Dashboard Trend ${itemIndex + 1}`, x: 7162800 + itemIndex * 289560, y: 2674620 - itemIndex * 182880, cx: 137160, cy: 518160 + itemIndex * 137160, fill: itemIndex === 2 ? palette.amber : visual.accent })).join("")
+    + rectShapeXml({ id: 1240, name: "Finance Quarterly Dashboard Axis", x: 7010400, y: 2895600, cx: 1447800, cy: 22860, fill: "FFFFFF" });
+}
+
+function financeQuarterlyMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.map((metric, index) => {
+    const x = 749808 + index * 1082040;
+    const color = [visual.accent, palette.amber, visual.primary, palette.risk][index] || visual.accent;
+    return solidShapeXml({ id: 1250 + index * 4, name: `Finance Quarterly KPI Card ${index + 1}`, geom: "roundRect", x, y: 3662688, cx: 944880, cy: 609600, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1251 + index * 4, name: `Finance Quarterly KPI Border ${index + 1}`, geom: "roundRect", x, y: 3662688, cx: 944880, cy: 609600, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1252 + index * 4, name: `Finance Quarterly KPI Accent ${index + 1}`, x, y: 3662688, cx: 944880, cy: 45720, fill: color })
+      + textShapeXml({ id: 1253 + index * 4, name: `Finance Quarterly KPI Text ${index + 1}`, x: x + 106680, y: 3792228, cx: 731520, cy: 289560, text: `${metric.value}\n${metric.label}`, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financeQuarterlyBulletCardsXml({ visual, scene, isCover }) {
+  return scene.bullets.slice(0, isCover ? 3 : 4).map((item, index) => {
+    const y = (isCover ? 2514600 : 1744980) + index * 243840;
+    const color = index === 1 ? (visual.secondary || "D9902F") : index === 2 ? (visual.warning || "C94B4B") : visual.accent;
+    return rectShapeXml({ id: 1270 + index * 2, name: `Finance Quarterly Bullet Rule ${index + 1}`, x: 749808, y: y + 30480, cx: 45720, cy: 137160, fill: color })
+      + textShapeXml({ id: 1271 + index * 2, name: `Finance Quarterly Bullet Text ${index + 1}`, x: 917448, y, cx: 3352800, cy: 182880, text: budgetPlanningCompactText(item, scene.title, 32), size: isCover ? 780 : 690, bold: false, color: visual.body });
+  }).join("");
+}
+
+function financeQuarterlyProfitBridgeXml({ visual, palette }) {
+  const bars = [
+    { x: 5791200, h: 579120, c: visual.primary, n: "Revenue Baseline" },
+    { x: 6248400, h: 883920, c: visual.accent, n: "Revenue Lift" },
+    { x: 6705600, h: 426720, c: palette.risk, n: "Cost Pressure" },
+    { x: 7162800, h: 670560, c: palette.amber, n: "Expense Mix" },
+    { x: 7620000, h: 762000, c: visual.primary, n: "Operating Profit" },
+  ].map((bar, index) => rectShapeXml({ id: 1290 + index, name: `Finance Quarterly Profit Bridge ${bar.n}`, x: bar.x, y: 3048000 - bar.h, cx: 335280, cy: bar.h, fill: bar.c })).join("");
+  return solidShapeXml({ id: 1280, name: "Finance Quarterly Profit Bridge Panel", geom: "roundRect", x: 5486400, y: 990600, cx: 3352800, cy: 2743200, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1281, name: "Finance Quarterly Profit Bridge Border", geom: "roundRect", x: 5486400, y: 990600, cx: 3352800, cy: 2743200, stroke: palette.frame, width: 12700 })
+    + rectShapeXml({ id: 1282, name: "Finance Quarterly Profit Bridge Axis", x: 5715000, y: 3048000, cx: 2743200, cy: 22860, fill: blendHexColor(visual.primary, visual.surface, 0.55) })
+    + bars;
+}
+
+function financeQuarterlyVarianceXml({ visual, palette, reasons }) {
+  const ledger = solidShapeXml({ id: 1310, name: "Finance Quarterly Budget Ledger", geom: "roundRect", x: 5486400, y: 990600, cx: 1524000, cy: 2286000, fill: "FFFFFF" })
+    + lineFrameShapeXml({ id: 1311, name: "Finance Quarterly Budget Ledger Border", geom: "roundRect", x: 5486400, y: 990600, cx: 1524000, cy: 2286000, stroke: palette.frame, width: 10160 })
+    + rectShapeXml({ id: 1312, name: "Finance Quarterly Budget Ledger Header", x: 5486400, y: 990600, cx: 1524000, cy: 365760, fill: visual.primary })
+    + [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 1313 + itemIndex, name: `Finance Quarterly Budget Row ${itemIndex + 1}`, x: 5715000, y: 1546860 + itemIndex * 365760, cx: 1066800 - itemIndex * 91440, cy: 60960, fill: [palette.frame, palette.amber, palette.risk, visual.accent][itemIndex] })).join("");
+  const reasonCards = reasons.slice(0, 3).map((item, index) => {
+    const y = 990600 + index * 731520;
+    const color = [palette.amber, palette.risk, visual.accent][index] || visual.accent;
+    return solidShapeXml({ id: 1330 + index * 4, name: `Finance Quarterly Variance Reason ${index + 1}`, geom: "roundRect", x: 7246620, y, cx: 1447800, cy: 548640, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1331 + index * 4, name: `Finance Quarterly Variance Reason Border ${index + 1}`, geom: "roundRect", x: 7246620, y, cx: 1447800, cy: 548640, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1332 + index * 4, name: `Finance Quarterly Variance Reason Accent ${index + 1}`, x: 7246620, y, cx: 76200, cy: 548640, fill: color })
+      + textShapeXml({ id: 1333 + index * 4, name: `Finance Quarterly Variance Reason Text ${index + 1}`, x: 7414260, y: y + 182880, cx: 1066800, cy: 182880, text: budgetPlanningCompactText(item, "", 12), size: 700, bold: true, color: visual.title });
+  }).join("");
+  return ledger + reasonCards;
+}
+
+function financeQuarterlyRiskMatrixXml({ visual, palette }) {
+  return [0, 1, 2, 3, 4, 5].map((itemIndex) => {
+    const col = itemIndex % 3;
+    const row = Math.floor(itemIndex / 3);
+    const color = col === 0 ? visual.accent : col === 1 ? palette.amber : palette.risk;
+    return solidShapeXml({ id: 1360 + itemIndex, name: `Finance Quarterly Risk Matrix Cell ${itemIndex + 1}`, geom: "roundRect", x: 5486400 + col * 1036320, y: 1066800 + row * 990600, cx: 853440, cy: 762000, fill: blendHexColor(color, visual.surface, 0.74) })
+      + lineFrameShapeXml({ id: 1370 + itemIndex, name: `Finance Quarterly Risk Matrix Border ${itemIndex + 1}`, geom: "roundRect", x: 5486400 + col * 1036320, y: 1066800 + row * 990600, cx: 853440, cy: 762000, stroke: color, width: 10160 });
+  }).join("");
+}
+
+function financeQuarterlyActionLoopXml({ visual, palette, actions }) {
+  return actions.slice(0, 5).map((action, index) => {
+    const x = 749808 + index * 1584960;
+    return solidShapeXml({ id: 1390 + index * 4, name: `Finance Quarterly Action Card ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1280160, cy: 822960, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1391 + index * 4, name: `Finance Quarterly Action Border ${index + 1}`, geom: "roundRect", x, y: 3190248, cx: 1280160, cy: 822960, stroke: palette.frame, width: 10160 })
+      + solidShapeXml({ id: 1392 + index * 4, name: `Finance Quarterly Action Dot ${index + 1}`, geom: "ellipse", x: x + 137160, y: 3345180, cx: 213360, cy: 213360, fill: index === 2 ? palette.amber : index === 3 ? palette.risk : visual.accent })
+      + textShapeXml({ id: 1393 + index * 4, name: `Finance Quarterly Action Text ${index + 1}`, x: x + 137160, y: 3662688, cx: 944880, cy: 213360, text: budgetPlanningCompactText(action, "", 12), size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financeQuarterlyClosingXml({ visual, palette, actions }) {
+  return actions.slice(0, 3).map((action, index) => {
+    const x = 749808 + index * 2514600;
+    return solidShapeXml({ id: 1420 + index * 4, name: `Finance Quarterly Closing Card ${index + 1}`, geom: "roundRect", x, y: 2743200, cx: 2194560, cy: 944880, fill: "FFFFFF" })
+      + lineFrameShapeXml({ id: 1421 + index * 4, name: `Finance Quarterly Closing Border ${index + 1}`, geom: "roundRect", x, y: 2743200, cx: 2194560, cy: 944880, stroke: palette.frame, width: 10160 })
+      + rectShapeXml({ id: 1422 + index * 4, name: `Finance Quarterly Closing Accent ${index + 1}`, x, y: 2743200, cx: 2194560, cy: 60960, fill: [visual.accent, palette.amber, palette.risk][index] || visual.accent })
+      + textShapeXml({ id: 1423 + index * 4, name: `Finance Quarterly Closing Text ${index + 1}`, x: x + 213360, y: 3114048, cx: 1676400, cy: 274320, text: budgetPlanningCompactText(action, "", 18), size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function financeQuarterlyGridXml({ palette }) {
+  return Array.from({ length: 8 }, (_, index) => rectShapeXml({ id: 1440 + index, name: `Finance Quarterly Grid Row ${index + 1}`, x: 0, y: 762000 + index * 457200, cx: 9144000, cy: 7620, fill: palette.grid })).join("")
+    + Array.from({ length: 9 }, (_, index) => rectShapeXml({ id: 1450 + index, name: `Finance Quarterly Grid Column ${index + 1}`, x: 609600 + index * 914400, y: 342900, cx: 7620, cy: 4457700, fill: palette.grid })).join("");
+}
+
+function financeQuarterlyReviewSceneFromSlide({ slide, index, role, total }) {
+  const bullets = Array.isArray(slide?.bullets) ? slide.bullets.map(exportTextValue).filter(Boolean) : [];
+  const title = budgetPlanningCompactText(slide?.title, `Page ${index + 1}`, 26);
+  const layout = String(slide?.layout || "").toLowerCase();
+  let resolvedRole = index === 0 ? "cover" : role === "closing" || index === total - 1 ? "closing" : ["overview", "profit", "variance", "risk", "action"][(index - 1) % 5];
+  if (layout.includes("profit") || layout.includes("bridge") || layout.includes("margin")) resolvedRole = "profit";
+  if (layout.includes("budget") || layout.includes("variance") || layout.includes("analysis")) resolvedRole = "variance";
+  if (layout.includes("risk") || layout.includes("matrix")) resolvedRole = "risk";
+  if (layout.includes("action") || layout.includes("roadmap") || layout.includes("loop")) resolvedRole = "action";
+  const metrics = [0, 1, 2, 3].map((itemIndex) => financeQuarterlyReviewMetricFromText(bullets[itemIndex], itemIndex));
+  return {
+    role: resolvedRole,
+    kicker: resolvedRole === "cover" ? "CFO OPERATING REVIEW" : resolvedRole === "closing" ? "NEXT QUARTER ACTIONS" : "OPERATING FINANCE",
+    title,
+    bullets: bullets.slice(0, resolvedRole === "cover" ? 3 : 4),
+    metrics,
+    reasons: [
+      budgetPlanningCompactText(bullets[0], "收入结构变化", 14),
+      budgetPlanningCompactText(bullets[1], "成本费用波动", 14),
+      budgetPlanningCompactText(bullets[2], "预算执行偏差", 14),
+    ],
+    actions: ["校准收入预测", "压实费用 Owner", "复盘利润桥", "关闭风险项", "跟踪下季动作"],
+  };
+}
+
+function financeQuarterlyReviewMetricFromText(text, index) {
+  const fallbackValues = ["128%", "￥2.6亿", "18.4%", "-6.2%"];
+  const fallbackLabels = ["收入达成", "营业收入", "经营利润率", "预算偏差"];
+  const raw = String(text || "").trim();
+  if (!raw) return { value: fallbackValues[index] || "00", label: fallbackLabels[index] || `指标 ${index + 1}` };
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?\s*(?:万|亿|%|元|M|m)?)/);
+  const value = match ? match[1].replace(/\s+/g, "") : fallbackValues[index] || "00";
+  const labelSource = match ? raw.replace(match[1], "") : raw;
+  return { value, label: budgetPlanningCompactText(labelSource.replace(/[：:，,。]/g, " ").trim(), raw, 10) };
+}
+
+function financeQuarterlyReviewColorPalette(visual) {
+  return {
+    backdrop: blendHexColor(visual.background, visual.surface, 0.30),
+    frame: blendHexColor(visual.primary, visual.surface, 0.78),
+    grid: blendHexColor(visual.primary, visual.background, 0.92),
+    amber: visual.secondary || "D9902F",
+    amberWash: blendHexColor(visual.secondary || "D9902F", visual.background, 0.84),
+    greenWash: blendHexColor(visual.accent, visual.background, 0.86),
+    risk: visual.warning || "C94B4B",
+  };
 }
 
 function budgetAdjustmentDecorationsXml({ visual, index, role, slide }) {
