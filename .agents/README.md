@@ -22,6 +22,20 @@
 .agents/ppt-template-workflow/registry.json
 ```
 
+## PPT 模板缩略图批处理
+
+入口目录：
+
+```text
+.agents/ppt-thumbnail-workflow/
+```
+
+该工作流配合项目 Skill 使用：
+
+```text
+.codex/skills/generate-ppt-template-thumbnails/SKILL.md
+```
+
 Goal 创建模板案例说明：
 
 ```text

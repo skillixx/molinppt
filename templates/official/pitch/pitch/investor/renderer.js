@@ -8,25 +8,32 @@ export const templateRenderer = {
   "templateName": "创业融资路演",
   "themeId": "investor",
   "themeName": "投资人版",
-  "style": "venture-story",
+  "style": "pitch-investor-memo",
   "visual": {
-    "primary": "0F2D3A",
-    "accent": "19A0A5",
-    "background": "EFF7F7",
+    "primary": "101828",
+    "accent": "12B76A",
+    "background": "F8FAFC",
     "surface": "FFFFFF",
-    "title": "0B2530",
-    "body": "39515A",
-    "layout": "venture",
+    "title": "101828",
+    "body": "475467",
+    "secondary": "F79009",
+    "layout": "pitch-investor-memo",
     "variant": "investor"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "pitch-investor-memo-cover",
+    "defaultContentLayout": "pitch-investor-memo-market",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "pitch-investor-memo-cover",
+      "pitch-investor-memo-summary",
+      "pitch-investor-memo-market",
+      "pitch-investor-memo-revenue",
+      "pitch-investor-memo-unit-economics",
+      "pitch-investor-memo-moat",
+      "pitch-investor-memo-funding",
+      "pitch-investor-memo-closing",
+      "title",
+      "content"
     ]
   }
 };

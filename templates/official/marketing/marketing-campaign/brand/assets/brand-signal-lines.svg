@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="220" viewBox="0 0 640 220" role="img" aria-label="品牌传播信号线素材">
+  <rect width="640" height="220" fill="none"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M42 160C148 38 252 44 320 112s166 78 278-28" stroke="#E64B6A" stroke-width="12" opacity=".88"/>
+    <path d="M54 104c94-48 176-38 246 30s164 74 284 6" stroke="#21A6A1" stroke-width="8" opacity=".78"/>
+    <path d="M102 186c116-32 182-10 252-62s130-76 214-46" stroke="#F6B44B" stroke-width="6" opacity=".82"/>
+  </g>
+  <g fill="#172033"><circle cx="320" cy="112" r="18"/><circle cx="118" cy="88" r="12"/><circle cx="520" cy="82" r="12"/></g>
+</svg>

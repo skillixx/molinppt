@@ -16,19 +16,34 @@ export const templateRenderer = {
     "surface": "FFFDFC",
     "title": "171B26",
     "body": "4A5160",
-    "layout": "brand-story",
+    "layout": "brand-story-editorial",
     "variant": "editorial"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "editorial-cover",
+    "defaultContentLayout": "editorial-story",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "editorial-cover",
+      "editorial-opener",
+      "editorial-timeline",
+      "editorial-interview",
+      "editorial-manifesto",
+      "editorial-feature",
+      "editorial-evidence",
+      "editorial-closing"
     ]
-  }
+  },
+  // 页面角色契约用于说明专用布局语义；实际标题和正文仍由用户大纲动态注入。
+  "pageRoles": [
+    { "id": "cover", "layout": "editorial-cover", "purpose": "品牌年刊封面和导读" },
+    { "id": "opener", "layout": "editorial-opener", "purpose": "首字下沉与跨栏故事导读" },
+    { "id": "timeline", "layout": "editorial-timeline", "purpose": "品牌发展历程和关键节点" },
+    { "id": "interview", "layout": "editorial-interview", "purpose": "人物专访和核心引语" },
+    { "id": "manifesto", "layout": "editorial-manifesto", "purpose": "品牌主张和价值证据" },
+    { "id": "feature", "layout": "editorial-feature", "purpose": "品牌摄影与双栏图文故事" },
+    { "id": "evidence", "layout": "editorial-evidence", "purpose": "品牌成果和数据证据" },
+    { "id": "closing", "layout": "editorial-closing", "purpose": "品牌宣言和下一章节" }
+  ]
 };
 
 /**
@@ -37,4 +52,12 @@ export const templateRenderer = {
  */
 export function getTemplateVisual() {
   return templateRenderer.visual;
+}
+
+/**
+ * 返回编辑叙事主题支持的页面角色，供模板检查器和后续目录化渲染器复用。
+ * @returns {Array<{id: string, layout: string, purpose: string}>}
+ */
+export function getTemplatePageRoles() {
+  return templateRenderer.pageRoles;
 }

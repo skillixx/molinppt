@@ -1,7 +1,7 @@
 {
   "slug": "data-data-insight-research",
   "name": "数据洞察报告 - 研究报告",
-  "description": "适合指标解读、数据发现、分析结论和行动建议。",
+  "description": "适合行业研究、用户研究、调研结论、样本说明和证据汇报的专业研究出版物风格模板。",
   "category_slug": "data",
   "category_name": "数据洞察",
   "category_sort_order": 70,
@@ -10,8 +10,11 @@
     "data",
     "data-insight",
     "research",
-    "analytics-report"
+    "analytics-report",
+    "research-publication",
+    "evidence-report"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

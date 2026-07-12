@@ -1,0 +1,19 @@
+{
+  "name": "ppt-thumbnail-workflow",
+  "displayName": "PPT 模板缩略图批处理工作流",
+  "description": "扫描下载目录中的 PPTX，导出代表页并生成模板商城风格缩略图。",
+  "version": "1.0.0",
+  "recommendedOrder": [
+    "ppt-thumbnail-batch-agent"
+  ],
+  "agents": [
+    {
+      "id": "ppt-thumbnail-batch-agent",
+      "name": "PPT 模板缩略图批处理 Agent",
+      "file": "ppt-thumbnail-batch-agent.md",
+      "canUseNetwork": false,
+      "canEditCode": false,
+      "primaryOutput": "PPT 模板缩略图、批次清单和处理报告"
+    }
+  ]
+}

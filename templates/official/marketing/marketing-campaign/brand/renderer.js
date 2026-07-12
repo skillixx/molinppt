@@ -1,35 +1,42 @@
 /**
- * 官方代码模板渲染入口。
- * 当前 PPT 渲染仍由 ppt-exporter.js 和 ppt-service.js 统一调度；
- * 这个文件先承载模板目录化后的独立元数据，后续可把该主题的绘制代码逐步迁入这里。
+ * 官方模板元数据入口。
+ * 具体预览和 PPTX 绘制仍由 ppt-service.js 与 ppt-exporter.js 统一调度；
+ * 这里保持主题目录可被官方模板同步器读取。
  */
 export const templateRenderer = {
-  "templateId": "marketing-campaign",
-  "templateName": "营销活动方案",
-  "themeId": "brand",
-  "themeName": "品牌传播",
-  "style": "campaign-story",
-  "visual": {
-    "primary": "5B21B6",
-    "accent": "06B6D4",
-    "background": "F2F0FF",
-    "surface": "FFFFFF",
-    "title": "20113D",
-    "body": "4B3D68",
-    "layout": "marketing",
-    "variant": "brand"
+  templateId: "marketing-campaign",
+  templateName: "营销活动方案",
+  themeId: "brand",
+  themeName: "品牌传播",
+  style: "brand-communication-command-center",
+  visual: {
+    primary: "172033",
+    accent: "E64B6A",
+    secondary: "21A6A1",
+    background: "F5F7FA",
+    surface: "FFFFFF",
+    title: "101827",
+    body: "334155",
+    layout: "marketing-brand-communication-console",
+    variant: "brand-console",
   },
-  "layoutSchema": {
-    "defaultCoverLayout": "campaign-cover",
-    "defaultContentLayout": "campaign-content",
-    "allowedLayouts": [
-      "campaign-cover",
-      "campaign-content",
+  layoutSchema: {
+    defaultCoverLayout: "brand-communication-cover",
+    defaultContentLayout: "brand-communication-content",
+    allowedLayouts: [
+      "brand-communication-cover",
+      "brand-communication-proposition",
+      "brand-communication-audience",
+      "brand-communication-content-matrix",
+      "brand-communication-media-matrix",
+      "brand-communication-rhythm",
+      "brand-communication-dashboard",
+      "brand-communication-closing",
       "hero",
       "story",
-      "content"
-    ]
-  }
+      "content",
+    ],
+  },
 };
 
 /**

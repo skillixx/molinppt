@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" role="img" aria-label="移动端内容传播场景局部素材">
+  <defs><linearGradient id="screen" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#172033"/><stop offset="1" stop-color="#21A6A1"/></linearGradient></defs>
+  <rect width="640" height="420" rx="38" fill="#172033"/>
+  <circle cx="520" cy="70" r="96" fill="#E64B6A" opacity=".22"/>
+  <circle cx="116" cy="342" r="112" fill="#21A6A1" opacity=".18"/>
+  <rect x="226" y="34" width="188" height="352" rx="38" fill="#0F172A" stroke="#E2E8F0" stroke-width="8"/>
+  <rect x="246" y="72" width="148" height="276" rx="24" fill="url(#screen)"/>
+  <rect x="268" y="102" width="84" height="14" rx="7" fill="#fff"/>
+  <rect x="268" y="138" width="104" height="74" rx="18" fill="#fff" opacity=".92"/>
+  <rect x="288" y="158" width="62" height="12" rx="6" fill="#172033"/>
+  <rect x="288" y="184" width="38" height="9" rx="4.5" fill="#E64B6A"/>
+  <rect x="268" y="236" width="104" height="22" rx="11" fill="#F6B44B"/>
+  <rect x="268" y="278" width="72" height="12" rx="6" fill="#fff" opacity=".76"/>
+  <g fill="#fff" opacity=".9"><circle cx="172" cy="128" r="24"/><circle cx="460" cy="188" r="18"/><circle cx="176" cy="270" r="16"/></g>
+  <path d="M190 128c48 18 72 38 88 78M444 190c-38 22-62 46-74 86" fill="none" stroke="#F6B44B" stroke-width="8" stroke-linecap="round" opacity=".86"/>
+</svg>

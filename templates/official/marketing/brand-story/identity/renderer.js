@@ -8,25 +8,28 @@ export const templateRenderer = {
   "templateName": "品牌故事叙事",
   "themeId": "identity",
   "themeName": "品牌识别",
-  "style": "brand-narrative",
+  "style": "brand-identity-system",
   "visual": {
-    "primary": "123D4A",
-    "accent": "E56F4F",
-    "background": "EEF7F7",
+    "primary": "121826",
+    "accent": "D84B3F",
+    "secondary": "D7A43A",
+    "background": "F6F0E7",
     "surface": "FFFFFF",
-    "title": "102C36",
-    "body": "405B63",
-    "layout": "brand-story",
-    "variant": "identity"
+    "title": "111827",
+    "body": "4B5563",
+    "layout": "brand-identity-system",
+    "variant": "identity-manual"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "brand-identity-cover",
+    "defaultContentLayout": "brand-identity-system",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "brand-identity-cover",
+      "brand-identity-logo",
+      "brand-identity-palette",
+      "brand-identity-typography",
+      "brand-identity-applications",
+      "brand-identity-touchpoints"
     ]
   }
 };

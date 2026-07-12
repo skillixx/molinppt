@@ -1,7 +1,7 @@
 {
   "slug": "marketing-brand-story-identity",
   "name": "品牌故事叙事 - 品牌识别",
-  "description": "适合品牌定位、信息架构、客户故事和传播叙事。",
+  "description": "适合品牌视觉体系、品牌升级、VI规范、品牌资产和多触点一致性汇报。",
   "category_slug": "marketing",
   "category_name": "市场营销",
   "category_sort_order": 60,
@@ -13,5 +13,6 @@
     "brand-narrative"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

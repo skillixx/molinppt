@@ -908,17 +908,26 @@ test("resolveTemplateVisual applies workshop practice review official visual", (
 test("resolveTemplateVisual applies marketing campaign theme visuals", () => {
   const launch = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "launch" });
   const brand = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "brand" });
+  const syncedBrand = resolveTemplateVisual({ templateId: "marketing-marketing-campaign-brand", theme: "brand" });
   const growth = resolveTemplateVisual({ templateId: "marketing-campaign", theme: "growth" });
+  const syncedGrowth = resolveTemplateVisual({ templateId: "marketing-marketing-campaign-growth", theme: "growth" });
 
-  assert.equal(launch.layout, "marketing");
-  assert.equal(launch.variant, "launch");
-  assert.equal(launch.primary, "E11D48");
-  assert.equal(brand.layout, "marketing");
-  assert.equal(brand.variant, "brand");
-  assert.equal(brand.accent, "06B6D4");
-  assert.equal(growth.layout, "marketing");
-  assert.equal(growth.variant, "growth");
+  assert.equal(launch.layout, "marketing-product-premiere");
+  assert.equal(launch.variant, "product-premiere");
+  assert.equal(launch.primary, "0B1020");
+  assert.equal(launch.secondary, "22D3EE");
+  assert.equal(brand.layout, "marketing-brand-communication-console");
+  assert.equal(brand.variant, "brand-console");
+  assert.equal(brand.primary, "172033");
+  assert.equal(brand.accent, "E64B6A");
+  assert.equal(brand.secondary, "21A6A1");
+  assert.equal(syncedBrand.layout, "marketing-brand-communication-console");
+  assert.equal(syncedBrand.variant, "brand-console");
+  assert.equal(growth.layout, "growth-marketing-lab");
+  assert.equal(growth.variant, "growth-lab");
   assert.equal(growth.accent, "F97316");
+  assert.equal(syncedGrowth.layout, "growth-marketing-lab");
+  assert.equal(syncedGrowth.variant, "growth-lab");
 });
 
 test("resolveTemplateVisual applies pitch deck commercial visuals", () => {
@@ -930,10 +939,11 @@ test("resolveTemplateVisual applies pitch deck commercial visuals", () => {
   assert.equal(startup.variant, "startup");
   assert.equal(startup.primary, "16213E");
   assert.equal(startup.accent, "F59E0B");
-  assert.equal(investor.layout, "venture");
+  assert.equal(investor.layout, "pitch-investor-memo");
   assert.equal(investor.variant, "investor");
-  assert.equal(investor.primary, "0F2D3A");
-  assert.equal(investor.accent, "19A0A5");
+  assert.equal(investor.primary, "101828");
+  assert.equal(investor.accent, "12B76A");
+  assert.equal(investor.secondary, "F79009");
   assert.equal(product.layout, "venture");
   assert.equal(product.variant, "product");
   assert.equal(product.primary, "3B1D5A");
@@ -945,17 +955,18 @@ test("resolveTemplateVisual applies brand story commercial visuals", () => {
   const premium = resolveTemplateVisual({ templateId: "brand-story", theme: "premium" });
   const identity = resolveTemplateVisual({ templateId: "brand-story", theme: "identity" });
 
-  assert.equal(editorial.layout, "brand-story");
+  assert.equal(editorial.layout, "brand-story-editorial");
   assert.equal(editorial.variant, "editorial");
   assert.equal(editorial.primary, "2A2F3F");
   assert.equal(editorial.accent, "C7825A");
-  assert.equal(premium.layout, "brand-story");
+  assert.equal(premium.layout, "luxury-brand-story");
   assert.equal(premium.variant, "premium");
+  assert.equal(premium.background, "F6F1E8");
   assert.equal(premium.accent, "BFA06A");
-  assert.equal(identity.layout, "brand-story");
-  assert.equal(identity.variant, "identity");
-  assert.equal(identity.primary, "123D4A");
-  assert.equal(identity.accent, "E56F4F");
+  assert.equal(identity.layout, "brand-identity-system");
+  assert.equal(identity.variant, "identity-manual");
+  assert.equal(identity.primary, "121826");
+  assert.equal(identity.accent, "D84B3F");
 });
 
 test("resolveTemplateVisual applies data insight commercial visuals", () => {
@@ -963,16 +974,16 @@ test("resolveTemplateVisual applies data insight commercial visuals", () => {
   const insight = resolveTemplateVisual({ templateId: "data-insight", theme: "insight" });
   const research = resolveTemplateVisual({ templateId: "data-insight", theme: "research" });
 
-  assert.equal(dashboard.layout, "data-insight");
+  assert.equal(dashboard.layout, "data-insight-dashboard-console");
   assert.equal(dashboard.variant, "dashboard");
-  assert.equal(dashboard.primary, "123B63");
-  assert.equal(dashboard.accent, "18A0A6");
-  assert.equal(insight.layout, "data-insight");
+  assert.equal(dashboard.primary, "07111F");
+  assert.equal(dashboard.accent, "36C5F0");
+  assert.equal(insight.layout, "data-insight-workbench");
   assert.equal(insight.variant, "insight");
-  assert.equal(insight.accent, "F6A623");
-  assert.equal(research.layout, "data-insight");
+  assert.equal(insight.accent, "F59E0B");
+  assert.equal(research.layout, "data-research-report");
   assert.equal(research.variant, "research");
-  assert.equal(research.primary, "2F3A4A");
+  assert.equal(research.primary, "172033");
 });
 
 test("resolveTemplateVisual applies BI executive cockpit official visual", () => {

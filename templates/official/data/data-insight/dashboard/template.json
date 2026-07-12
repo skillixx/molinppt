@@ -7,35 +7,46 @@
       "id": "dashboard",
       "name": "仪表盘",
       "visual": {
-        "primary": "123B63",
-        "accent": "18A0A6",
-        "background": "EEF6F9",
-        "surface": "FFFFFF",
-        "title": "102A43",
-        "body": "3C5364",
-        "layout": "data-insight",
+        "primary": "07111F",
+        "accent": "36C5F0",
+        "secondary": "22C55E",
+        "warning": "F59E0B",
+        "danger": "EF4444",
+        "background": "07111F",
+        "surface": "101D31",
+        "title": "E5EDF7",
+        "body": "93A4B8",
+        "layout": "data-insight-dashboard-console",
         "variant": "dashboard"
       }
     }
   ],
   "visual": {
-    "primary": "123B63",
-    "accent": "18A0A6",
-    "background": "EEF6F9",
-    "surface": "FFFFFF",
-    "title": "102A43",
-    "body": "3C5364",
-    "layout": "data-insight",
+    "primary": "07111F",
+    "accent": "36C5F0",
+    "secondary": "22C55E",
+    "warning": "F59E0B",
+    "danger": "EF4444",
+    "background": "07111F",
+    "surface": "101D31",
+    "title": "E5EDF7",
+    "body": "93A4B8",
+    "layout": "data-insight-dashboard-console",
     "variant": "dashboard"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "executive-cover",
-    "defaultContentLayout": "executive-content",
+    "defaultCoverLayout": "data-console-cover",
+    "defaultContentLayout": "data-console-overview",
     "allowedLayouts": [
-      "executive-cover",
-      "executive-content",
+      "data-console-cover",
+      "data-console-overview",
+      "data-console-trend",
+      "data-console-alert",
+      "data-console-ranking",
+      "data-console-action",
       "title",
-      "content"
+      "content",
+      "closing"
     ]
   }
 }

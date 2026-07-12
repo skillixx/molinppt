@@ -1,7 +1,7 @@
 {
   "slug": "marketing-marketing-campaign-brand",
   "name": "营销活动方案 - 品牌传播",
-  "description": "适合新品发布、品牌传播、增长营销和渠道活动复盘的商业化市场营销模板。",
+  "description": "适合品牌传播策略、整合传播、内容矩阵、媒介触点和传播效果复盘的商业化市场营销模板。",
   "category_slug": "marketing",
   "category_name": "市场营销",
   "category_sort_order": 60,
@@ -10,8 +10,10 @@
     "marketing",
     "marketing-campaign",
     "brand",
-    "campaign-story"
+    "brand-communication-console",
+    "content-matrix"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }
