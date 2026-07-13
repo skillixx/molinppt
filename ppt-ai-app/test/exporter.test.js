@@ -295,10 +295,37 @@ test("PptExportService uses commercial strategy consulting matrix decorations", 
   assert.match(slide1, /name="Strategy Matrix Quadrant Invest And Scale"/);
   assert.match(slide1, /name="Strategy Matrix Bubble 1"/);
   assert.match(slide1, /name="Strategy Matrix Insight Card 1"/);
+  assert.doesNotMatch(slide1, /name="Content 2"/);
   assert.doesNotMatch(slide1, /name="Strategy Consulting Image"/);
   assert.match(slide1, /val="17233B"/);
   assert.match(slide1, /val="2E7D75"/);
   assert.doesNotMatch(text, /ppt\/media\/strategy-matrix\.jpeg/);
+});
+
+test("PptExportService suppresses generic body text on every strategy matrix slide", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-matrix",
+      theme: "matrix",
+      slides: [
+        { title: "运营效率短板：库存周转天数增加10天", bullets: ["现象：库存周转天数达到55天（+10天），额外占用资金约XX万元", "原因：新品备货过多及销售预测偏差，导致库存积压", "影响：呆滞库存占比升至8%，预计造成损失约XX万元", "行动：加速清理呆滞库存，优化备货模型与预测机制"] },
+        { title: "业务组合评估与资源配置建议", bullets: ["高价值机会优先获得资源", "不确定机会进入验证池", "低效率投入逐步收缩"] },
+        { title: "机会分层与优先级判断", bullets: ["核心业务继续加码", "新机会设置验证阈值", "现金流业务保持效率"] },
+        { title: "行动建议与责任闭环", bullets: ["建立30天清理机制", "调整预测模型", "每周复盘库存风险"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const packageText = result.content.toString("latin1");
+
+  for (let index = 1; index <= 4; index += 1) {
+    const slideXml = pptPartText(packageText, `ppt/slides/slide${index}.xml`);
+    assert.match(slideXml, /name="Strategy Matrix Consulting Workspace"/);
+    assert.doesNotMatch(slideXml, /name="Content 2"/);
+    assert.doesNotMatch(slideXml, /<a:buChar char="•"\/>/);
+  }
 });
 
 test("PptExportService uses commercial strategy consulting workstream decorations", () => {

@@ -1021,6 +1021,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
   if (visual.layout === "strategy-board-report") return false;
+  if (visual.layout === "strategy-matrix-consulting") return false;
   if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "strategy-second-curve") return false;
   if (visual.layout === "strategy-swot-map") return false;
