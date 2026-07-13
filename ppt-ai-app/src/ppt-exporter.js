@@ -21054,7 +21054,8 @@ function strategyMatrixConsultingPalette(visual) {
 }
 
 function isStrategyMatrixConsultingVisual(visual) {
-  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-matrix-consulting";
+  // 下载 PPTX 时可能只拿到官方模板 slug，按 layout 识别可避免退回通用无样式导出。
+  return visual?.layout === "strategy-matrix-consulting";
 }
 
 function strategyWorkstreamPmoDecorationsXml({ visual, index, role, slide, total }) {
@@ -21314,7 +21315,8 @@ function strategyConsultingVariant(visual) {
 }
 
 function isStrategyBoardReportVisual(visual) {
-  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-board-report";
+  // 官方同步模板会使用带分类和主题的长 slug，PPTX 资源路由同样以 layout 作为稳定判断。
+  return visual?.layout === "strategy-board-report";
 }
 
 function isStrategyConsultingVisual(visual) {

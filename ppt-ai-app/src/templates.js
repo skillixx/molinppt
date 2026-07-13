@@ -1772,7 +1772,7 @@ export function resolveTemplateVisual(input = {}) {
   const requestedTemplateId = normalizeTemplateLookupId(request.templateId);
   const baseTemplate = DEFAULT_TEMPLATES.find((item) => item.id === requestedTemplateId) || DEFAULT_TEMPLATES[0];
   const templateOverrides = request.template ? removeUndefinedValues(request.template) : null;
-  const selectedTheme = String(request.theme || "").trim();
+  const selectedTheme = String(request.theme || inferOfficialTemplateThemeId(request.templateId) || "").trim();
   // 非 business 官方模板的主题风格是模板版式来源，必须优先于 deck 里可能过期的 visual 快照。
   // business 下存在 red-gold 这类依赖 visual 快照的历史模板，不能被 modern/minimal 主题强行覆盖。
   const officialThemeVisual = baseTemplate.id !== "business" ? resolveThemeVisual(baseTemplate.themes || [], selectedTheme) : null;
@@ -1822,8 +1822,20 @@ function normalizeTemplateLookupId(templateId) {
     "marketing-marketing-campaign-brand": "marketing-campaign",
     "marketing-marketing-campaign-growth": "marketing-campaign",
     "strategy-strategy-consulting-board": "strategy-consulting",
+    "strategy-strategy-consulting-matrix": "strategy-consulting",
+    "strategy-strategy-consulting-workstream": "strategy-consulting",
   };
   return officialTemplateAliases[id] || id;
+}
+
+export function inferOfficialTemplateThemeId(templateId) {
+  const id = String(templateId || "").trim();
+  const officialThemeAliases = {
+    "strategy-strategy-consulting-board": "board",
+    "strategy-strategy-consulting-matrix": "matrix",
+    "strategy-strategy-consulting-workstream": "workstream",
+  };
+  return officialThemeAliases[id] || "";
 }
 
 function resolveThemeVisual(themes, themeId) {

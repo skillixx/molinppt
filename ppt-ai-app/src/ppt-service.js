@@ -1,7 +1,7 @@
 ﻿import { readFileSync } from "node:fs";
 
 import { AppError } from "./errors.js";
-import { resolveTemplateVisual } from "./templates.js";
+import { inferOfficialTemplateThemeId, resolveTemplateVisual } from "./templates.js";
 import {
   resolveBrandStoryScene,
   resolveDataInsightScene,
@@ -146,12 +146,13 @@ export class PptService {
    * @param {{ownerUserId: number, topic?: string, sourceFileId?: string, slideCount?: number, templateId: string, theme?: string}} input
    * @returns {Promise<object>}
    */
-  async generateOutline({ ownerUserId, topic, sourceFileId, slideCount = 8, templateId, theme = "modern" }) {
+  async generateOutline({ ownerUserId, topic, sourceFileId, slideCount = 8, templateId, theme }) {
     const normalizedSlideCount = normalizeSlideCount(slideCount);
     const documentText = sourceFileId ? await this.#readDocumentText({ sourceFileId, ownerUserId }) : "";
     const template = this.templateManager.getTemplate(templateId, { ownerUserId });
-    validateTemplateTheme({ template, theme });
-    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme, template });
+    const selectedTheme = resolveRequestedTemplateTheme({ templateId, theme });
+    validateTemplateTheme({ template, theme: selectedTheme });
+    const prompt = this.promptManager.buildOutlinePrompt({ topic, documentText, slideCount: normalizedSlideCount, theme: selectedTheme, template });
     this.#assertPromptWithinLimit({ operation: "outline", prompt });
     let slides;
     try {
@@ -169,9 +170,9 @@ export class PptService {
       topic: topic || documentText.split(/\r?\n/).find(Boolean) || "Document generated presentation",
       // 保留用户选择的官方目录 slug，避免生成后预览/导出丢失目录化模板身份。
       templateId,
-      theme,
+      theme: selectedTheme,
       status: "outline_ready",
-      input: { topic, sourceFileId, slideCount: normalizedSlideCount, templateId, theme },
+      input: { topic, sourceFileId, slideCount: normalizedSlideCount, templateId, theme: selectedTheme },
       slides,
     });
     await this.#log({ ownerUserId, action: "outline_generated", resourceType: "outline", resourceId: outline.id });
@@ -199,14 +200,15 @@ export class PptService {
    * @param {{ownerUserId: number, deckId: string, templateId: string, theme?: string}} input
    * @returns {Promise<object>}
    */
-  async applyTemplateToDeck({ ownerUserId, deckId, templateId, theme = "modern" }) {
+  async applyTemplateToDeck({ ownerUserId, deckId, templateId, theme }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
     const template = this.templateManager.getTemplate(templateId, { ownerUserId });
-    validateTemplateTheme({ template, theme });
+    const selectedTheme = resolveRequestedTemplateTheme({ templateId, theme, fallbackTheme: deck.theme });
+    validateTemplateTheme({ template, theme: selectedTheme });
     const templateVisual = resolveTemplateVisual({
       templateId,
-      theme,
+      theme: selectedTheme,
       template: { id: template.id, name: template.name, visual: template.visual, themes: template.themes },
     });
     const updatedDeck = await this.database.update("decks", deck.id, {
@@ -214,7 +216,7 @@ export class PptService {
       templateName: template.name,
       templateVisual,
       templateLayoutSchema: template.layoutSchema,
-      theme,
+      theme: selectedTheme,
       status: "ready",
     });
     const activeAsset = await this.database.findOne("ppt_assets", (asset) => (
@@ -224,7 +226,7 @@ export class PptService {
       await this.database.update("ppt_assets", activeAsset.id, {
         templateId,
         templateName: template.name,
-        theme,
+        theme: selectedTheme,
       });
     }
     await this.#log({ ownerUserId, action: "deck_template_applied", resourceType: "deck", resourceId: deck.id });
@@ -239,7 +241,7 @@ export class PptService {
   async generateDeck({ ownerUserId, outlineId, entitlementId, templateId, theme }) {
     const outline = await this.#getOwned("outlines", outlineId, ownerUserId, "OUTLINE_NOT_FOUND");
     const selectedTemplateId = templateId || outline.templateId;
-    const selectedTheme = theme || outline.theme || "modern";
+    const selectedTheme = resolveRequestedTemplateTheme({ templateId: selectedTemplateId, theme, fallbackTheme: outline.theme });
     const template = this.templateManager.getTemplate(selectedTemplateId, { ownerUserId });
     validateTemplateTheme({ template, theme: selectedTheme });
     await this.#ensureAssetQuota({ ownerUserId });
@@ -388,7 +390,7 @@ export class PptService {
   async startProgressiveDeckGeneration({ ownerUserId, outlineId, entitlementId, templateId, theme }) {
     const outline = await this.#getOwned("outlines", outlineId, ownerUserId, "OUTLINE_NOT_FOUND");
     const selectedTemplateId = templateId || outline.templateId;
-    const selectedTheme = theme || outline.theme || "modern";
+    const selectedTheme = resolveRequestedTemplateTheme({ templateId: selectedTemplateId, theme, fallbackTheme: outline.theme });
     const template = this.templateManager.getTemplate(selectedTemplateId, { ownerUserId });
     validateTemplateTheme({ template, theme: selectedTheme });
     await this.#ensureAssetQuota({ ownerUserId });
@@ -7441,7 +7443,8 @@ function strategyMatrixConsultingCompact(text, fallback, maxLength) {
 }
 
 function isStrategyMatrixConsultingVisual(visual) {
-  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-matrix-consulting";
+  // 官方目录化模板会携带完整 slug，按 layout 判断才能保证后台选择矩阵主题后命中专属预览层。
+  return visual?.layout === "strategy-matrix-consulting";
 }
 
 function strategyConsultingPreviewVars(visual) {
@@ -7567,7 +7570,8 @@ function strategyConsultingVariant(visual) {
 }
 
 function isStrategyBoardReportVisual(visual) {
-  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-board-report";
+  // 官方模板同步后 deck.templateId 会变成长 slug，预览应以专用 layout 判断，避免长 slug 跳过董事会内容层。
+  return visual?.layout === "strategy-board-report";
 }
 
 function isStrategyConsultingVisual(visual) {
@@ -7640,7 +7644,7 @@ function compactStrategyWorkstreamText(text, fallback, maxLength) {
 }
 
 function isStrategyWorkstreamPmoVisual(visual) {
-  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-workstream-pmo";
+  return visual?.layout === "strategy-workstream-pmo";
 }
 
 function financeAuditReviewPreviewScene({ slide, index, total }) {
@@ -13219,6 +13223,11 @@ function validateTemplateTheme({ template, theme }) {
       message: `THEME_NOT_SUPPORTED: ${theme} is not supported by template ${template.id}`,
     });
   }
+}
+
+function resolveRequestedTemplateTheme({ templateId, theme, fallbackTheme = "modern" }) {
+  // 官方目录 slug 已经带有主题语义，优先从 slug 还原主题，避免无 theme 请求回落到 business 的 modern。
+  return theme || inferOfficialTemplateThemeId(templateId) || fallbackTheme || "modern";
 }
 
 /**

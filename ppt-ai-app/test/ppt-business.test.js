@@ -293,6 +293,89 @@ test("PptService renders strategy board report preview with dense decision layou
   assert.doesNotMatch(preview, />董事会汇报</);
 });
 
+test("PptService renders synced strategy board official slug with board content layer", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  // 数据库记录模拟官方模板同步后的长 slug；此前预览判断只认 base id，会跳过董事会专用内容层。
+  await context.database.insert("templates", {
+    id: "strategy-strategy-consulting-board",
+    name: "战略咨询方案 - 董事会汇报",
+    categoryId: "strategy",
+    scope: "official",
+    official: true,
+    status: "active",
+    themes: [
+      {
+        id: "board",
+        name: "董事会汇报",
+        visual: {
+          primary: "172033",
+          accent: "B68A3A",
+          secondary: "2F7D68",
+          warning: "B94A48",
+          background: "F3F5F7",
+          surface: "FFFFFF",
+          title: "101828",
+          body: "344054",
+          layout: "strategy-board-report",
+          variant: "board",
+        },
+      },
+    ],
+    visual: {
+      primary: "172033",
+      accent: "B68A3A",
+      secondary: "2F7D68",
+      warning: "B94A48",
+      background: "F3F5F7",
+      surface: "FFFFFF",
+      title: "101828",
+      body: "344054",
+      layout: "strategy-board-report",
+      variant: "board",
+    },
+    layoutSchema: {
+      defaultCoverLayout: "strategy-board-cover",
+      defaultContentLayout: "strategy-board-decision-summary",
+      allowedLayouts: [
+        "strategy-board-cover",
+        "strategy-board-decision-summary",
+        "strategy-board-background",
+        "strategy-board-option-matrix",
+        "strategy-board-risk-return",
+        "strategy-board-resolution",
+        "strategy-board-closing",
+      ],
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "董事会战略汇报",
+    slideCount: 4,
+    templateId: "strategy-strategy-consulting-board",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "年度战略决策汇报", bullets: ["建议优先推进高确定性增长方向", "需董事会确认资源授权", "建立季度复盘节点"] },
+      { title: "核心结论与决策摘要", bullets: ["增长窗口仍在但投入节奏需要收敛", "关键假设需在两周内确认", "请求授权专项资源"] },
+      { title: "战略选项矩阵", bullets: ["稳健推进方案", "加速投入方案", "暂缓观察方案"] },
+      { title: "风险收益判断", bullets: ["高收益中风险", "低风险低收益", "高风险需缓释"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-strategy-consulting-board" data-layout="strategy-board-report"/);
+  assert.match(preview, /strategy-board-layer/);
+  assert.match(preview, /年度战略决策汇报/);
+  assert.match(preview, /核心结论与决策摘要/);
+  assert.match(preview, /option-matrix/);
+  assert.match(preview, /risk-return-chart/);
+});
+
 test("PptService renders data insight workbench preview without theme label", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -816,14 +899,14 @@ test("PptService renders strategy consulting matrix preview with dedicated layou
     ownerUserId: 7,
     topic: "业务组合评估与资源配置建议",
     slideCount: 7,
-    templateId: "strategy-consulting",
+    templateId: "strategy-strategy-consulting-matrix",
     theme: "matrix",
   });
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /<body data-template="strategy-consulting" data-layout="strategy-matrix-consulting"/);
+  assert.match(preview, /<body data-template="strategy-strategy-consulting-matrix" data-layout="strategy-matrix-consulting"/);
   assert.match(preview, /strategy-matrix-layer/);
   assert.match(preview, /strategy-matrix-board/);
   assert.match(preview, /strategy-matrix-priority|strategy-matrix-resource|strategy-matrix-actions/);
@@ -838,14 +921,13 @@ test("PptService renders strategy consulting workstream PMO preview with dedicat
     ownerUserId: 7,
     topic: "咨询项目工作流推进与阶段交付汇报",
     slideCount: 7,
-    templateId: "strategy-consulting",
-    theme: "workstream",
+    templateId: "strategy-strategy-consulting-workstream",
   });
   const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
 
   const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
 
-  assert.match(preview, /<body data-template="strategy-consulting" data-layout="strategy-workstream-pmo"/);
+  assert.match(preview, /<body data-template="strategy-strategy-consulting-workstream" data-layout="strategy-workstream-pmo"/);
   assert.match(preview, /swp-layer/);
   assert.match(preview, /swp-gantt|swp-swimlanes|swp-risk-board/);
   assert.doesNotMatch(preview, />工作流程推进</);

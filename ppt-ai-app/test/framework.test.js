@@ -420,6 +420,16 @@ test("resolveTemplateVisual applies strategy consulting board commercial visual"
   assert.equal(visual.variant, "board");
 });
 
+test("resolveTemplateVisual maps strategy consulting board official slug without explicit theme", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-board" });
+
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "B68A3A");
+  assert.equal(visual.background, "F3F5F7");
+  assert.equal(visual.layout, "strategy-board-report");
+  assert.equal(visual.variant, "board");
+});
+
 test("TemplateManager keeps strategy consulting theme names readable", () => {
   const templates = new TemplateManager();
   const strategy = templates.getTemplate("strategy-consulting");
@@ -437,8 +447,28 @@ test("resolveTemplateVisual applies strategy consulting matrix commercial visual
   assert.equal(visual.variant, "matrix");
 });
 
+test("resolveTemplateVisual maps strategy consulting matrix official slug", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-matrix", theme: "matrix" });
+
+  assert.equal(visual.primary, "17233B");
+  assert.equal(visual.accent, "2E7D75");
+  assert.equal(visual.background, "F4F7F8");
+  assert.equal(visual.layout, "strategy-matrix-consulting");
+  assert.equal(visual.variant, "matrix");
+});
+
 test("resolveTemplateVisual applies strategy consulting workstream commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "workstream" });
+
+  assert.equal(visual.primary, "27364A");
+  assert.equal(visual.accent, "2563EB");
+  assert.equal(visual.background, "F6F8FB");
+  assert.equal(visual.layout, "strategy-workstream-pmo");
+  assert.equal(visual.variant, "workstream");
+});
+
+test("resolveTemplateVisual maps synced strategy workstream slug to PMO visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-workstream" });
 
   assert.equal(visual.primary, "27364A");
   assert.equal(visual.accent, "2563EB");

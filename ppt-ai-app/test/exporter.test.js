@@ -236,6 +236,28 @@ test("PptExportService uses commercial strategy consulting board decorations", (
   assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
 });
 
+test("PptExportService keeps synced strategy board official slug aligned with board media", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-board",
+      templateName: "战略咨询方案 - 董事会汇报",
+      slides: [
+        { title: "Board strategy decision memo", bullets: ["Prioritize the most certain growth path", "Approve resource authorization"] },
+        { title: "Strategic option matrix", bullets: ["Steady growth option", "Accelerated investment option", "Observe and defer option"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Board Report Surface"/);
+  assert.match(slide1, /name="Strategy Board Meeting Crop"/);
+  assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
+});
+
 test("PptExportService hides default page label for strategy consulting pages", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -263,7 +285,7 @@ test("PptExportService hides default page label for strategy consulting pages", 
 test("PptExportService uses commercial strategy consulting matrix decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "strategy-consulting", theme: "matrix" },
+    deck: { ...deck, templateId: "strategy-strategy-consulting-matrix", theme: "matrix" },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
@@ -293,6 +315,29 @@ test("PptExportService uses commercial strategy consulting workstream decoration
   assert.match(slide1, /name="Strategy Workstream PMO Phase Card 1"/);
   assert.match(slide1, /val="27364A"/);
   assert.match(slide1, /val="2563EB"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
+});
+
+test("PptExportService maps synced strategy workstream slug to PMO decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-workstream",
+      templateName: "战略咨询方案 - 工作流程推进",
+      slides: [
+        { title: "咨询项目工作流推进", bullets: ["拆解阶段目标", "锁定交付物", "识别风险阻塞"] },
+        { title: "阶段计划与责任矩阵", bullets: ["工作包拆分", "责任人确认", "下一步节奏"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
+  assert.match(slide1, /val="27364A"/);
   assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
 });
 
