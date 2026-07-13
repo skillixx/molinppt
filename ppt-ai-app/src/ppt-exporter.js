@@ -423,7 +423,7 @@ function topBandTitleFillStyle(visual) {
  */
 function resolveTitleSize({ visual, index, title, fallbackSize }) {
   if (visual.layout === "marketing-festival-promotion-rhythm") return fallbackSize;
-  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-enterprise-proposal", "sales-proposal-solution", "sales-renewal-growth-qbr", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "startup-product-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
+  if (!["top-band", "status-report", "annual-summary", "operating-problem-tree", "industry-research", "industry-trend-forecast", "strategy-board-report", "strategy-competition-map", "strategy-region-entry", "strategy-second-curve", "strategy-swot-map", "enterprise-digital-blueprint", "product-release-cadence", "product-release-committee", "product-pain-points", "product-interview-insight", "product-pricing-strategy", "feature-priority-matrix", "experience-journey-map", "experience-gap-map", "capability-radar-map", "product-retention-path", "investor-update-progress-sync", "pitch-project-return", "finance-budget-planning", "finance-quarterly-review", "finance-cost-breakdown", "finance-cash-flow-forecast", "finance-profit-bridge", "finance-investment-roi-model", "finance-budget-variance", "finance-budget-adjustment", "sales-enterprise-proposal", "sales-proposal-solution", "sales-renewal-growth-qbr", "sales-financial-solution", "sales-manufacturing-solution", "sales-education-solution", "sales-key-account-decision-chain", "presales-architecture-solution", "sales-training-objection-handling", "channel-recruitment-policy", "corporate-training", "onboarding-guide", "knowledge-blackboard", "concept-breakdown-courseware", "exam-review-keypoints", "teaching-achievement-showcase", "education-workshop-practice-review", "integrated-media-mix", "growth-marketing-lab", "marketing-launch-rhythm", "social-video-growth", "private-domain-member-layering", "department-team-performance", "brand-identity-system", "founder-cinematic-story", "growth-funding-flywheel", "pre-a-market-validation", "product-funding-highlights", "startup-product-highlights", "data-insight-dashboard-console", "data-insight-workbench", "data-research-report"].includes(visual.layout)) return fallbackSize;
   const textLength = String(title || "").replace(/\s+/g, "").length;
   if (visual.layout === "operating-problem-tree") {
     if (index === 0) {
@@ -1020,9 +1020,11 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "finance-budget-adjustment") return false;
   if (visual.layout === "industry-trend-forecast") return false;
   if (visual.layout === "strategy-competition-map") return false;
+  if (visual.layout === "strategy-board-report") return false;
   if (visual.layout === "strategy-region-entry") return false;
   if (visual.layout === "strategy-second-curve") return false;
   if (visual.layout === "strategy-swot-map") return false;
+  if (visual.layout === "strategy-workstream-pmo") return false;
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "product-review-canvas") return false;
@@ -1119,7 +1121,10 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "market-survey-analysis") return false;
   if (visual.layout === "experiment-ab-test") return false;
   if (visual.layout === "management-agenda-decision") return false;
+  if (visual.layout === "strategy-board-report") return false;
   if (visual.layout === "strategy-region-entry") return false;
+  if (visual.layout === "strategy-matrix-consulting") return false;
+  if (visual.layout === "strategy-workstream-pmo") return false;
   if (visual.layout === "concept-breakdown-courseware") return false;
   if (visual.layout === "education-workshop-practice-review") return false;
   if (visual.layout === "marketing-brand-communication-console") return false;
@@ -1169,6 +1174,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   const base = rectShapeXml({ id: 2, name: "Template Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background });
   if (isProductRoadmapVisual(visual)) {
     return base + productRoadmapDecorationsXml({ visual, index, layout, role, slide, total });
+  }
+  if (isStrategyMatrixConsultingVisual(visual)) {
+    return base + strategyMatrixConsultingDecorationsXml({ visual, index, slide, total, layout });
   }
   if (visual.layout === "data-research-report") {
     // 研究报告主题要先于通用模板 fallback 返回，确保 PPTX 拥有页码、脚注、资料索引和证据卡等专属图形。
@@ -1272,6 +1280,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   if (visual.layout === "business-opportunity-map") {
     return base + businessOpportunityMapDecorationsXml({ visual, index, layout, role, slide });
   }
+  if (visual.layout === "strategy-board-report") {
+    return base + strategyBoardReportDecorationsXml({ visual, index, role, slide, total });
+  }
   if (visual.layout === "management-agenda-decision") {
     return base + managementAgendaDecisionDecorationsXml({ visual, index, role, slide });
   }
@@ -1292,6 +1303,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "strategy-swot-map") {
     return base + swotMapDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "strategy-workstream-pmo") {
+    return base + strategyWorkstreamPmoDecorationsXml({ visual, index, role, slide, total });
   }
   if (isEnterpriseDigitalBlueprintVisual(visual)) {
     return base + enterpriseDigitalBlueprintDecorationsXml({ visual, index, layout, role, slide });
@@ -1768,7 +1782,7 @@ function templateMediaFiles(visual) {
     const media = statusReportMedia(visual);
     return { [`ppt/media/${media.file}`]: media.content };
   }
-  if (isStrategyConsultingVisual(visual)) {
+  if ((typeof isStrategyBoardReportVisual === "function" && isStrategyBoardReportVisual(visual)) || isStrategyConsultingVisual(visual)) {
     const media = strategyConsultingMedia(visual);
     return { [`ppt/media/${media.file}`]: media.content };
   }
@@ -2527,6 +2541,21 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
           : { x: 749808, y: 1905000, cx: 3505200, cy: 1066800 },
       titleSize: isCover ? 2400 : isClosing ? 2440 : 1780,
       bodySize: isCover ? 900 : 740,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "strategy-workstream-pmo") {
+    return {
+      // PMO 推进模板的文字和图表由专用可编辑图层承载，这些坐标作为通用流程兜底。
+      surface: { x: 530352, y: 535000, cx: 8083296, cy: 4070000 },
+      accent: { x: 0, y: 0, cx: 9144000, cy: 292608 },
+      secondaryAccent: { x: 530352, y: 535000, cx: 8083296, cy: 53340 },
+      label: { x: 768096, y: 731520, cx: 2438400, cy: 228600 },
+      title: { x: 768096, y: 1066800, cx: 3962400, cy: 701040 },
+      content: { x: 786384, y: 2194560, cx: 3200400, cy: 990600 },
+      titleSize: index === 0 ? 2500 : 2100,
+      bodySize: 760,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -3845,7 +3874,7 @@ function slideRelsXml(visual, role = "content") {
   const descriptor = resolveMasterDescriptor(visual);
   const backgroundFile = descriptor ? masterBackgroundFile(descriptor, role) : "";
   const statusReportImage = visual.layout === "status-report" ? statusReportMedia(visual).file : "";
-  const strategyImage = isStrategyConsultingVisual(visual) ? strategyConsultingMedia(visual).file : "";
+  const strategyImage = ((typeof isStrategyBoardReportVisual === "function" && isStrategyBoardReportVisual(visual)) || isStrategyConsultingVisual(visual)) ? strategyConsultingMedia(visual).file : "";
   const imageFile = backgroundFile || statusReportImage || strategyImage;
   const imageRel = imageFile
     ? `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${imageFile}"/>`
@@ -20670,6 +20699,563 @@ function isFinancialReviewVisual(visual) {
   return (id === "financial-review" || id === "operating-dashboard" || id.startsWith("finance-operating-dashboard-")) && visual?.layout === "executive";
 }
 
+function strategyBoardReportDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = strategyBoardReportScene({ slide, index, total });
+  const palette = strategyBoardReportPalette(visual);
+  const backdrop = solidShapeXml({ id: 4200, name: "Strategy Board Report Backdrop", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + solidShapeXml({ id: 4201, name: "Strategy Board Report Surface", geom: "roundRect", x: 438912, y: 401320, cx: 8266176, cy: 4335780, fill: visual.surface })
+    + lineFrameShapeXml({ id: 4202, name: "Strategy Board Report Frame", geom: "roundRect", x: 438912, y: 401320, cx: 8266176, cy: 4335780, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 4203, name: "Strategy Board Report Decision Rule", x: 438912, y: 401320, cx: 8266176, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 4204, name: "Strategy Board Report Top Rail", x: 438912, y: 401320, cx: 3048000, cy: 53340, fill: visual.primary });
+  const header = strategyBoardReportHeaderXml({ visual, palette, scene });
+  const evidence = strategyBoardReportCardStripXml({ visual, scene });
+  if (scene.role === "cover") return backdrop + header + strategyBoardReportCoverXml({ visual, palette, scene });
+  if (scene.role === "summary") return backdrop + header + strategyBoardReportDecisionSummaryXml({ visual, scene });
+  if (scene.role === "background") return backdrop + header + evidence + strategyBoardReportAssumptionsXml({ visual, palette, scene });
+  if (scene.role === "matrix") return backdrop + strategyBoardReportCompactHeaderXml({ visual, scene }) + strategyBoardReportOptionMatrixXml({ visual, palette, scene });
+  if (scene.role === "risk") return backdrop + header + evidence + strategyBoardReportRiskReturnXml({ visual, palette, scene });
+  if (scene.role === "resolution") return backdrop + header + strategyBoardReportResolutionXml({ visual, palette, scene });
+  return backdrop + header + strategyBoardReportClosingXml({ visual, palette, scene });
+}
+
+function strategyBoardReportHeaderXml({ visual, palette, scene }) {
+  const bulletText = scene.bullets.slice(0, 4).map((item) => `• ${item}`).join("\n");
+  // 左侧采用董事会材料常见的“结论先行”结构，右侧再承载矩阵或图表。
+  return textShapeXml({ id: 4210, name: "Strategy Board Report Kicker", x: 713232, y: 670560, cx: 2743200, cy: 213360, text: scene.kicker, size: 720, bold: true, color: visual.accent })
+    + textShapeXml({ id: 4211, name: "Strategy Board Report Title", x: 713232, y: 967740, cx: 3962400, cy: 777240, text: scene.title, size: 2050, bold: true, color: visual.title })
+    + textShapeXml({ id: 4212, name: "Strategy Board Report Summary", x: 713232, y: 1905000, cx: 3429000, cy: 426720, text: scene.summary, size: 780, bold: true, color: palette.muted })
+    + rectShapeXml({ id: 4213, name: "Strategy Board Report Summary Rule", x: 713232, y: 2484120, cx: 1676400, cy: 22860, fill: visual.accent })
+    + textShapeXml({ id: 4214, name: "Strategy Board Report Bullet Notes", x: 713232, y: 2667000, cx: 3352800, cy: 914400, text: bulletText, size: 660, bold: false, color: visual.body });
+}
+
+function strategyBoardReportCompactHeaderXml({ visual, scene }) {
+  return textShapeXml({ id: 4215, name: "Strategy Board Matrix Kicker", x: 713232, y: 670560, cx: 2743200, cy: 213360, text: scene.kicker, size: 720, bold: true, color: visual.accent })
+    + textShapeXml({ id: 4216, name: "Strategy Board Matrix Title", x: 713232, y: 937260, cx: 4724400, cy: 518160, text: scene.title, size: 1740, bold: true, color: visual.title })
+    + textShapeXml({ id: 4217, name: "Strategy Board Matrix Summary", x: 5562600, y: 746760, cx: 2743200, cy: 426720, text: scene.summary, size: 660, bold: true, color: visual.body });
+}
+
+function strategyBoardReportCoverXml({ visual, palette, scene }) {
+  return pictureXml({ id: 4220, name: "Strategy Board Meeting Crop", relId: "rId2", x: 5638800, y: 914400, cx: 2590800, cy: 1493520 })
+    + lineFrameShapeXml({ id: 4221, name: "Strategy Board Meeting Frame", geom: "roundRect", x: 5524500, y: 800100, cx: 2590800, cy: 1493520, stroke: visual.accent, width: 15240 })
+    + strategyBoardReportBottomCardsXml({ visual, palette, scene, y: 3733800, count: 3, name: "Strategy Board Cover Decision Card" });
+}
+
+function strategyBoardReportDecisionSummaryXml({ visual, scene }) {
+  const labels = ["核心结论", "关键判断", "推荐方案", "待决议项"];
+  return labels.map((label, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5181600 + col * 1524000;
+    const y = 1013460 + row * 1112520;
+    return solidShapeXml({ id: 4230 + itemIndex * 3, name: `Strategy Board Decision Quadrant ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 899160, fill: "FFFFFF" })
+      + rectShapeXml({ id: 4231 + itemIndex * 3, name: `Strategy Board Decision Quadrant Accent ${itemIndex + 1}`, x, y, cx: 1371600, cy: 45720, fill: itemIndex === 3 ? visual.warning : itemIndex === 2 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 4232 + itemIndex * 3, name: `Strategy Board Decision Quadrant Text ${itemIndex + 1}`, x: x + 121920, y: y + 152400, cx: 1127760, cy: 548640, text: `${label}\n${scene.cards[itemIndex]}`, size: 660, bold: true, color: visual.title });
+  }).join("")
+    + solidShapeXml({ id: 4245, name: "Strategy Board Agenda Card", geom: "roundRect", x: 7086600, y: 3375660, cx: 975360, cy: 762000, fill: visual.primary })
+    + textShapeXml({ id: 4246, name: "Strategy Board Agenda Card Text", x: 7239000, y: 3543300, cx: 670560, cy: 365760, text: "决议\n议题卡", size: 760, bold: true, color: "FFFFFF" });
+}
+
+function strategyBoardReportAssumptionsXml({ visual, scene }) {
+  return scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 5181600 + (itemIndex % 2) * 1524000;
+    const y = 1066800 + Math.floor(itemIndex / 2) * 1066800;
+    return solidShapeXml({ id: 4250 + itemIndex * 3, name: `Strategy Board Key Assumption ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1371600, cy: 853440, fill: "FFFFFF" })
+      + rectShapeXml({ id: 4251 + itemIndex * 3, name: `Strategy Board Key Assumption Accent ${itemIndex + 1}`, x, y, cx: 45720, cy: 853440, fill: [visual.accent, visual.secondary, visual.warning, visual.primary][itemIndex] })
+      + textShapeXml({ id: 4252 + itemIndex * 3, name: `Strategy Board Key Assumption Text ${itemIndex + 1}`, x: x + 106680, y: y + 152400, cx: 1158240, cy: 457200, text: item, size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyBoardReportOptionMatrixXml({ visual, scene }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 731520 + itemIndex * 2743200;
+    return solidShapeXml({ id: 4270 + itemIndex * 8, name: `Strategy Board Option Matrix Column ${itemIndex + 1}`, geom: "roundRect", x, y: 1371600, cx: 2537460, cy: 2743200, fill: "FFFFFF" })
+      + rectShapeXml({ id: 4271 + itemIndex * 8, name: `Strategy Board Option Matrix Header ${itemIndex + 1}`, x, y: 1371600, cx: 2537460, cy: 381000, fill: itemIndex === 0 ? visual.primary : itemIndex === 1 ? visual.accent : visual.secondary })
+      + textShapeXml({ id: 4272 + itemIndex * 8, name: `Strategy Board Option Matrix Title ${itemIndex + 1}`, x: x + 152400, y: 1455420, cx: 2133600, cy: 182880, text: `选项 ${String.fromCharCode(65 + itemIndex)}`, size: 820, bold: true, color: "FFFFFF" })
+      + textShapeXml({ id: 4273 + itemIndex * 8, name: `Strategy Board Option Matrix Summary ${itemIndex + 1}`, x: x + 152400, y: 1874520, cx: 2133600, cy: 365760, text: item, size: 720, bold: true, color: visual.title })
+      + strategyBoardReportMatrixRowsXml({ visual, x: x + 152400, y: 2385060, idStart: 4274 + itemIndex * 8 });
+  }).join("");
+}
+
+function strategyBoardReportMatrixRowsXml({ visual, x, y, idStart }) {
+  return ["战略匹配", "投入强度", "收益预期", "风险等级"].map((row, index) => {
+    return rectShapeXml({ id: idStart + index, name: `Strategy Board Option Matrix Row ${index + 1}`, x, y: y + index * 365760, cx: 2133600, cy: 274320, fill: index % 2 === 0 ? "F8FAFC" : "FFFFFF" })
+      + textShapeXml({ id: idStart + 10 + index, name: `Strategy Board Option Matrix Row Text ${index + 1}`, x: x + 91440, y: y + index * 365760 + 60960, cx: 1828800, cy: 121920, text: row, size: 560, bold: true, color: visual.body });
+  }).join("");
+}
+
+function strategyBoardReportRiskReturnXml({ visual, palette, scene }) {
+  const chart = solidShapeXml({ id: 4300, name: "Strategy Board Risk Return Chart", geom: "roundRect", x: 5181600, y: 990600, cx: 3048000, cy: 2133600, fill: "FFFFFF" })
+    + rectShapeXml({ id: 4301, name: "Strategy Board Risk Return X Axis", x: 5486400, y: 2057400, cx: 2438400, cy: 15240, fill: palette.axis })
+    + rectShapeXml({ id: 4302, name: "Strategy Board Risk Return Y Axis", x: 6705600, y: 1188720, cx: 15240, cy: 1676400, fill: palette.axis })
+    + solidShapeXml({ id: 4303, name: "Strategy Board Risk Return Recommended Option", geom: "ellipse", x: 7132320, y: 1371600, cx: 182880, cy: 182880, fill: visual.secondary })
+    + solidShapeXml({ id: 4304, name: "Strategy Board Risk Return Watch Option", geom: "ellipse", x: 6019800, y: 1600200, cx: 182880, cy: 182880, fill: visual.accent })
+    + solidShapeXml({ id: 4305, name: "Strategy Board Risk Return Control Option", geom: "ellipse", x: 6934200, y: 2468880, cx: 182880, cy: 182880, fill: visual.warning });
+  const risks = scene.cards.slice(0, 4).map((item, itemIndex) => {
+    const x = 731520 + (itemIndex % 2) * 1905000;
+    const y = 3726180 + Math.floor(itemIndex / 2) * 381000;
+    return solidShapeXml({ id: 4310 + itemIndex * 2, name: `Strategy Board Risk Mitigation ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1752600, cy: 274320, fill: "FFFFFF" })
+      + textShapeXml({ id: 4311 + itemIndex * 2, name: `Strategy Board Risk Mitigation Text ${itemIndex + 1}`, x: x + 91440, y: y + 60960, cx: 1524000, cy: 121920, text: item, size: 560, bold: true, color: visual.title });
+  }).join("");
+  return chart + risks;
+}
+
+function strategyBoardReportResolutionXml({ visual, palette, scene }) {
+  return solidShapeXml({ id: 4330, name: "Strategy Board Resolution Recommendation Panel", geom: "roundRect", x: 5334000, y: 1066800, cx: 2743200, cy: 2133600, fill: visual.primary })
+    + rectShapeXml({ id: 4331, name: "Strategy Board Resolution Gold Rule", x: 5638800, y: 1447800, cx: 2133600, cy: 60960, fill: visual.accent })
+    + textShapeXml({ id: 4332, name: "Strategy Board Resolution Recommendation Text", x: 5638800, y: 1722120, cx: 2133600, cy: 762000, text: scene.cards[0], size: 900, bold: true, color: "FFFFFF" })
+    + strategyBoardReportBottomCardsXml({ visual, palette, scene, y: 3627120, count: 3, name: "Strategy Board Resolution Action Card" });
+}
+
+function strategyBoardReportClosingXml({ visual, scene }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const x = 914400 + itemIndex * 2590800;
+    return solidShapeXml({ id: 4350 + itemIndex * 3, name: `Strategy Board Closing Decision ${itemIndex + 1}`, geom: "roundRect", x, y: 2446020, cx: 2286000, cy: 1066800, fill: "FFFFFF" })
+      + rectShapeXml({ id: 4351 + itemIndex * 3, name: `Strategy Board Closing Decision Rule ${itemIndex + 1}`, x, y: 3444240, cx: 2286000, cy: 60960, fill: itemIndex === 1 ? visual.secondary : visual.accent })
+      + textShapeXml({ id: 4352 + itemIndex * 3, name: `Strategy Board Closing Decision Text ${itemIndex + 1}`, x: x + 182880, y: 2750820, cx: 1905000, cy: 365760, text: item, size: 760, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyBoardReportCardStripXml({ visual, scene }) {
+  return scene.cards.slice(0, 3).map((item, itemIndex) => {
+    const y = 3726180 + itemIndex * 304800;
+    return solidShapeXml({ id: 4370 + itemIndex * 2, name: `Strategy Board Evidence Card ${itemIndex + 1}`, geom: "roundRect", x: 713232, y, cx: 3352800, cy: 228600, fill: "F8FAFC" })
+      + textShapeXml({ id: 4371 + itemIndex * 2, name: `Strategy Board Evidence Card Text ${itemIndex + 1}`, x: 822960, y: y + 45720, cx: 3048000, cy: 106680, text: item, size: 540, bold: true, color: visual.body });
+  }).join("");
+}
+
+function strategyBoardReportBottomCardsXml({ visual, scene, y, count, name }) {
+  return scene.cards.slice(0, count).map((item, itemIndex) => {
+    const x = 713232 + itemIndex * 2590800;
+    return solidShapeXml({ id: 4380 + itemIndex * 3, name: `${name} ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 2316480, cy: 548640, fill: "FFFFFF" })
+      + rectShapeXml({ id: 4381 + itemIndex * 3, name: `${name} Accent ${itemIndex + 1}`, x, y, cx: 2316480, cy: 53340, fill: [visual.accent, visual.secondary, visual.warning][itemIndex] || visual.accent })
+      + textShapeXml({ id: 4382 + itemIndex * 3, name: `${name} Text ${itemIndex + 1}`, x: x + 152400, y: y + 152400, cx: 1981200, cy: 182880, text: item, size: 660, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyBoardReportScene({ slide, index, total }) {
+  const role = strategyBoardReportRole(slide, index, total);
+  const bullets = strategyBoardReportBullets(slide);
+  return {
+    role,
+    kicker: role === "cover" ? "BOARD DECISION MEMO" : "STRATEGIC COMMITTEE PACK",
+    title: strategyBoardReportCompactText(slide?.title, role === "cover" ? "战略决策汇报" : "董事会决策事项", 28),
+    summary: strategyBoardReportCompactText(bullets[0], "围绕关键假设、战略选项、风险收益和授权事项形成可决策材料。", 46),
+    bullets: bullets.slice(0, 5).map((item) => strategyBoardReportCompactText(item, "待补充判断", 34)),
+    cards: strategyBoardReportCards(bullets, role),
+  };
+}
+
+function strategyBoardReportRole(slide, index, total) {
+  const explicit = String(slide?.layout || "").toLowerCase();
+  if (explicit.includes("option") || explicit.includes("matrix")) return "matrix";
+  if (explicit.includes("risk") || explicit.includes("return")) return "risk";
+  if (explicit.includes("resolution") || explicit.includes("decision")) return "resolution";
+  if (explicit.includes("background") || explicit.includes("assumption")) return "background";
+  if (index === 0) return "cover";
+  if (index === total - 1) return "closing";
+  const title = String(slide?.title || "");
+  if (/选项|方案对比|矩阵|option|matrix/i.test(title)) return "matrix";
+  if (/风险|收益|回报|risk|return/i.test(title)) return "risk";
+  if (/决议|建议|授权|行动|resolution|decision/i.test(title)) return "resolution";
+  if (/背景|假设|判断依据|assumption|background/i.test(title)) return "background";
+  if (/摘要|结论|summary/i.test(title)) return "summary";
+  return index % 3 === 1 ? "summary" : index % 3 === 2 ? "matrix" : "risk";
+}
+
+function strategyBoardReportCards(bullets, role) {
+  const defaults = {
+    cover: ["核心结论", "战略选项", "决议建议"],
+    summary: ["判断已收敛", "假设需确认", "推荐优先推进", "授权资源投入"],
+    background: ["市场窗口变化", "能力边界约束", "财务承受能力", "组织执行条件"],
+    matrix: ["稳健推进方案", "加速投入方案", "暂缓观察方案"],
+    risk: ["高收益中风险", "低风险低收益", "高风险需缓释", "退出触发条件"],
+    resolution: ["建议通过", "授权边界", "下一步行动"],
+    closing: ["确认战略方向", "确认资源投入", "确认复盘节点"],
+  };
+  const source = bullets.length > 0 ? bullets : defaults[role] || defaults.summary;
+  const count = role === "summary" || role === "background" || role === "risk" ? 4 : 3;
+  return Array.from({ length: count }, (_, itemIndex) => strategyBoardReportCompactText(source[itemIndex] || defaults[role]?.[itemIndex] || "待董事会确认", "待董事会确认", 24));
+}
+
+function strategyBoardReportBullets(slide) {
+  return Array.isArray(slide?.bullets)
+    ? slide.bullets.map((item) => exportTextValue(item).trim()).filter(Boolean)
+    : [];
+}
+
+function strategyBoardReportCompactText(text, fallback, maxLength) {
+  const value = exportTextValue(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, Math.max(0, maxLength - 1))}…`;
+}
+
+function strategyBoardReportPalette(visual) {
+  return {
+    frame: blendHexColor(visual.primary, "FFFFFF", 0.76),
+    muted: blendHexColor(visual.body, "FFFFFF", 0.14),
+    axis: blendHexColor(visual.primary, "FFFFFF", 0.64),
+  };
+}
+
+function strategyMatrixConsultingDecorationsXml({ visual, index, slide, total, layout }) {
+  const scene = strategyMatrixConsultingScene({ slide, index, total });
+  const palette = strategyMatrixConsultingPalette(visual);
+  // 咨询矩阵主题的主体内容全部由可编辑形状承载，避免回退到旧 executive 照片装饰。
+  const workspace = solidShapeXml({ id: 2100, name: "Strategy Matrix Consulting Workspace", geom: "roundRect", x: 438912, y: 365760, cx: 8266176, cy: 4411980, fill: visual.surface })
+    + rectShapeXml({ id: 2101, name: "Strategy Matrix Consulting Top Rule", x: 438912, y: 365760, cx: 8266176, cy: 45720, fill: visual.primary })
+    + rectShapeXml({ id: 2102, name: "Strategy Matrix Consulting Accent Rule", x: 438912, y: 411480, cx: 3108960, cy: 30480, fill: visual.accent })
+    + textShapeXml({ id: 2103, name: "Strategy Matrix Consulting Kicker", x: 685800, y: 670560, cx: 2590800, cy: 182880, text: scene.kicker, size: 660, bold: true, color: visual.accent })
+    + textShapeXml({ id: 2104, name: "Strategy Matrix Consulting Title", x: 685800, y: 914400, cx: 3657600, cy: 701040, text: scene.title, size: 1880, bold: true, color: visual.title })
+    + textShapeXml({ id: 2105, name: "Strategy Matrix Consulting Summary", x: 701040, y: 1981200, cx: 3200400, cy: 914400, text: scene.summary, size: 760, bold: true, color: visual.body });
+  const hero = ["priority", "resource", "actions", "closing"].includes(scene.role)
+    ? strategyMatrixConsultingDecisionXml({ scene, visual, palette })
+    : strategyMatrixConsultingQuadrantXml({ scene, visual, palette });
+  return workspace
+    + hero
+    + strategyMatrixConsultingCardsXml({ scene, visual, palette })
+    + textShapeXml({ id: 2198, name: "Strategy Matrix Consulting Footer", x: 685800, y: 4572000, cx: 3962400, cy: 167640, text: "portfolio view / priority judgement / resource allocation", size: 560, bold: true, color: palette.muted });
+}
+
+function strategyMatrixConsultingQuadrantXml({ scene, visual, palette }) {
+  const x = 5181600;
+  const y = 914400;
+  const w = 3200400;
+  const h = 2263140;
+  const halfW = w / 2;
+  const halfH = h / 2;
+  const quadrants = [
+    { name: "Invest And Scale", text: scene.quadrants[0], x: x + halfW, y, fill: palette.growth },
+    { name: "Selective Incubation", text: scene.quadrants[1], x, y, fill: palette.warning },
+    { name: "Efficiency Watch", text: scene.quadrants[2], x, y: y + halfH, fill: palette.neutral },
+    { name: "Exit Candidate", text: scene.quadrants[3], x: x + halfW, y: y + halfH, fill: palette.risk },
+  ];
+  const quadrantXml = quadrants.map((item, itemIndex) => (
+    solidShapeXml({ id: 2110 + itemIndex, name: `Strategy Matrix Quadrant ${item.name}`, x: item.x, y: item.y, cx: halfW, cy: halfH, fill: item.fill })
+    + textShapeXml({ id: 2120 + itemIndex, name: `Strategy Matrix Quadrant Label ${itemIndex + 1}`, x: item.x + 91440, y: item.y + 91440, cx: 1066800, cy: 198120, text: item.text, size: 620, bold: true, color: visual.title })
+  )).join("");
+  const bubbles = [
+    { text: scene.bubbles[0], x: x + 2103120, y: y + 365760, size: 563880, fill: visual.accent },
+    { text: scene.bubbles[1], x: x + 853440, y: y + 457200, size: 457200, fill: visual.secondary || "D97706" },
+    { text: scene.bubbles[2], x: x + 1905000, y: y + 1394460, size: 396240, fill: "64748B" },
+    { text: scene.bubbles[3], x: x + 731520, y: y + 1485900, size: 350520, fill: visual.warning || "B91C1C" },
+  ].map((item, itemIndex) => (
+    solidShapeXml({ id: 2130 + itemIndex, name: `Strategy Matrix Bubble ${itemIndex + 1}`, geom: "ellipse", x: item.x, y: item.y, cx: item.size, cy: item.size, fill: item.fill })
+    + textShapeXml({ id: 2140 + itemIndex, name: `Strategy Matrix Bubble Label ${itemIndex + 1}`, x: item.x + 45720, y: item.y + item.size / 2 - 83820, cx: item.size - 91440, cy: 167640, text: item.text, size: 560, bold: true, color: "FFFFFF" })
+  )).join("");
+  return solidShapeXml({ id: 2108, name: "Strategy Matrix Consulting Quadrant Board", geom: "roundRect", x, y, cx: w, cy: h, fill: "FFFFFF" })
+    + quadrantXml
+    + rectShapeXml({ id: 2148, name: "Strategy Matrix Vertical Axis", x: x + halfW, y, cx: 15240, cy: h, fill: palette.axis })
+    + rectShapeXml({ id: 2149, name: "Strategy Matrix Horizontal Axis", x, y: y + halfH, cx: w, cy: 15240, fill: palette.axis })
+    + textShapeXml({ id: 2150, name: "Strategy Matrix Axis Value", x: x + w - 914400, y: y + h + 121920, cx: 914400, cy: 152400, text: "价值吸引力", size: 540, bold: true, color: visual.body })
+    + textShapeXml({ id: 2151, name: "Strategy Matrix Axis Feasibility", x: x - 213360, y: y + 121920, cx: 914400, cy: 152400, text: "可行性", size: 540, bold: true, color: visual.body })
+    + bubbles;
+}
+
+function strategyMatrixConsultingDecisionXml({ scene, visual, palette }) {
+  if (scene.role === "priority") {
+    const cells = scene.priority.map((text, itemIndex) => {
+      const col = itemIndex % 3;
+      const row = Math.floor(itemIndex / 3);
+      const fill = [2, 5].includes(itemIndex) ? palette.growth : [6, 7].includes(itemIndex) ? palette.risk : "FFFFFF";
+      return solidShapeXml({ id: 2160 + itemIndex, name: `Strategy Priority Grid Cell ${itemIndex + 1}`, geom: "roundRect", x: 5181600 + col * 990600, y: 990600 + row * 579120, cx: 914400, cy: 502920, fill })
+        + textShapeXml({ id: 2170 + itemIndex, name: `Strategy Priority Grid Text ${itemIndex + 1}`, x: 5242560 + col * 990600, y: 1143000 + row * 579120, cx: 792480, cy: 152400, text, size: 580, bold: true, color: visual.title });
+    }).join("");
+    return solidShapeXml({ id: 2158, name: "Strategy Priority Grid", geom: "roundRect", x: 5029200, y: 838200, cx: 3352800, cy: 1905000, fill: palette.panel }) + cells;
+  }
+  if (scene.role === "resource") {
+    return scene.resources.map((text, itemIndex) => {
+      const y = 1066800 + itemIndex * 457200;
+      const width = [1981200, 1600200, 1219200, 853440][itemIndex];
+      const fill = [visual.accent, visual.secondary || "D97706", "64748B", visual.warning || "B91C1C"][itemIndex];
+      return textShapeXml({ id: 2160 + itemIndex, name: `Strategy Resource Label ${itemIndex + 1}`, x: 5181600, y, cx: 1524000, cy: 182880, text, size: 620, bold: true, color: visual.title })
+        + rectShapeXml({ id: 2170 + itemIndex, name: `Strategy Resource Allocation Bar ${itemIndex + 1}`, x: 6629400, y: y + 60960, cx: width, cy: 91440, fill });
+    }).join("");
+  }
+  return scene.actions.map((text, itemIndex) => {
+    const y = 1066800 + itemIndex * 624840;
+    const fill = [visual.accent, visual.secondary || "D97706", visual.warning || "B91C1C"][itemIndex];
+    return solidShapeXml({ id: 2160 + itemIndex, name: `Strategy Action Card ${itemIndex + 1}`, geom: "roundRect", x: 5181600, y, cx: 3048000, cy: 487680, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2170 + itemIndex, name: `Strategy Action Card Signal ${itemIndex + 1}`, x: 5181600, y, cx: 76200, cy: 487680, fill })
+      + textShapeXml({ id: 2180 + itemIndex, name: `Strategy Action Card Text ${itemIndex + 1}`, x: 5364480, y: y + 137160, cx: 2590800, cy: 182880, text, size: 680, bold: true, color: visual.title });
+  }).join("");
+}
+
+function strategyMatrixConsultingCardsXml({ scene, visual, palette }) {
+  return scene.cards.map((card, itemIndex) => {
+    const x = 685800 + itemIndex * 2682240;
+    return solidShapeXml({ id: 2190 + itemIndex, name: `Strategy Matrix Insight Card ${itemIndex + 1}`, geom: "roundRect", x, y: 3657600, cx: 2438400, cy: 563880, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2193 + itemIndex, name: `Strategy Matrix Insight Card Rule ${itemIndex + 1}`, x, y: 3657600, cx: 2438400, cy: 45720, fill: itemIndex === 0 ? visual.accent : itemIndex === 1 ? visual.secondary || "D97706" : visual.primary })
+      + textShapeXml({ id: 2196 + itemIndex * 2, name: `Strategy Matrix Insight Card Title ${itemIndex + 1}`, x: x + 121920, y: 3794760, cx: 1828800, cy: 152400, text: card.title, size: 640, bold: true, color: visual.title })
+      + textShapeXml({ id: 2197 + itemIndex * 2, name: `Strategy Matrix Insight Card Body ${itemIndex + 1}`, x: x + 121920, y: 4023360, cx: 1981200, cy: 182880, text: card.body, size: 560, bold: false, color: visual.body });
+  }).join("");
+}
+
+function strategyMatrixConsultingScene({ slide, index, total }) {
+  const bullets = strategyMatrixConsultingBulletTexts(slide);
+  const roles = ["cover", "portfolio", "quadrant", "bubble", "priority", "resource", "actions"];
+  const role = index >= total - 1 ? "closing" : roles[Math.min(index, roles.length - 1)];
+  const kickerMap = {
+    cover: "PORTFOLIO MATRIX",
+    portfolio: "BUSINESS PORTFOLIO",
+    quadrant: "QUADRANT DIAGNOSIS",
+    bubble: "OPPORTUNITY LAYERING",
+    priority: "PRIORITY GRID",
+    resource: "RESOURCE ALLOCATION",
+    actions: "ACTION CARDS",
+    closing: "DECISION PATH",
+  };
+  return {
+    role,
+    kicker: kickerMap[role],
+    title: strategyMatrixConsultingCompact(slide?.title, index === 0 ? "战略组合矩阵与资源配置建议" : "业务组合评估与优先级判断", 30),
+    summary: strategyMatrixConsultingCompact(bullets[0], "以价值吸引力和落地可行性为核心维度，形成业务组合、机会分层和资源投入建议。", 58),
+    quadrants: ["加码增长", "选择孵化", "效率观察", "收缩退出"],
+    bubbles: [
+      strategyMatrixConsultingCompact(bullets[0], "核心业务", 8),
+      strategyMatrixConsultingCompact(bullets[1], "新机会", 8),
+      strategyMatrixConsultingCompact(bullets[2], "现金流", 8),
+      strategyMatrixConsultingCompact(bullets[3], "低效项", 8),
+    ],
+    priority: ["高价值", "重点验证", "立即加码", "中价值", "观察迭代", "排入路线", "低价值", "谨慎投入", "退出候选"],
+    resources: ["核心增长机会 45%", "验证型机会 30%", "效率优化 15%", "风险缓冲 10%"],
+    actions: [
+      strategyMatrixConsultingCompact(bullets[1], "加码高确定性业务，绑定资源与目标", 20),
+      strategyMatrixConsultingCompact(bullets[2], "小规模验证新机会，设置退出阈值", 20),
+      strategyMatrixConsultingCompact(bullets[3], "收缩低效投入，释放预算和团队容量", 20),
+    ],
+    cards: ["价值吸引力", "落地可行性", "资源建议"].map((title, itemIndex) => ({
+      title,
+      body: strategyMatrixConsultingCompact(bullets[itemIndex + 1], itemIndex === 0 ? "市场空间与增长弹性" : itemIndex === 1 ? "能力基础与执行难度" : "预算、人力和节奏匹配", 20),
+    })),
+  };
+}
+
+function strategyMatrixConsultingBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => exportTextValue(item).trim()).filter(Boolean) : [];
+  return values.length ? values : ["业务组合需要按价值与可行性重新分类", "高价值机会优先获得资源", "不确定机会进入验证池", "低效率投入逐步收缩"];
+}
+
+function strategyMatrixConsultingCompact(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function strategyMatrixConsultingPalette(visual) {
+  return {
+    panel: blendHexColor(visual.background, visual.surface, 0.36),
+    axis: blendHexColor(visual.primary, visual.surface, 0.68),
+    muted: blendHexColor(visual.body, visual.surface, 0.34),
+    growth: blendHexColor(visual.accent, visual.surface, 0.82),
+    warning: blendHexColor(visual.secondary || "D97706", visual.surface, 0.84),
+    risk: blendHexColor(visual.warning || "B91C1C", visual.surface, 0.88),
+    neutral: blendHexColor("64748B", visual.surface, 0.88),
+  };
+}
+
+function isStrategyMatrixConsultingVisual(visual) {
+  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-matrix-consulting";
+}
+
+function strategyWorkstreamPmoDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = strategyWorkstreamPmoScene({ slide, index, role, total });
+  const palette = strategyWorkstreamPmoPalette(visual);
+  return strategyWorkstreamPmoBaseXml({ visual, scene, palette })
+    + strategyWorkstreamPmoTextXml({ scene, visual })
+    + strategyWorkstreamPmoChartXml({ scene, visual, palette });
+}
+
+function strategyWorkstreamPmoBaseXml({ visual, scene, palette }) {
+  return rectShapeXml({ id: 2200, name: "Strategy Workstream PMO Top Bar", x: 0, y: 0, cx: 9144000, cy: 292608, fill: visual.primary })
+    + rectShapeXml({ id: 2201, name: "Strategy Workstream PMO Top Signal", x: 5143500, y: 0, cx: 4000500, cy: 292608, fill: visual.accent })
+    + solidShapeXml({ id: 2202, name: "Strategy Workstream PMO Surface", geom: "roundRect", x: 530352, y: 535000, cx: 8083296, cy: 4070000, fill: "FFFFFF" })
+    + rectShapeXml({ id: 2203, name: "Strategy Workstream PMO Surface Rule", x: 530352, y: 535000, cx: 8083296, cy: 53340, fill: visual.accent })
+    + rectShapeXml({ id: 2204, name: "Strategy Workstream PMO Kicker Rule", x: 768096, y: 1973580, cx: 2590800, cy: 30480, fill: palette.softBlue })
+    + textShapeXml({ id: 2205, name: "Strategy Workstream PMO Kicker", x: 768096, y: 731520, cx: 2438400, cy: 182880, text: scene.kicker, size: 620, bold: true, color: visual.accent })
+    + textShapeXml({ id: 2206, name: "Strategy Workstream PMO Role Label", x: 7299960, y: 701040, cx: 1066800, cy: 198120, text: scene.roleLabel, size: 600, bold: true, color: palette.muted });
+}
+
+function strategyWorkstreamPmoTextXml({ scene, visual }) {
+  const bulletXml = scene.bullets.slice(0, 3).map((text, itemIndex) => (
+    textShapeXml({ id: 2210 + itemIndex, name: `Strategy Workstream PMO Bullet ${itemIndex + 1}`, x: 792480, y: 2217420 + itemIndex * 289560, cx: 3200400, cy: 182880, text, size: 660, bold: false, color: visual.body })
+  )).join("");
+  return textShapeXml({ id: 2207, name: "Strategy Workstream PMO Title", x: 768096, y: 1066800, cx: 3962400, cy: 701040, text: scene.title, size: scene.role === "cover" ? 1880 : 1560, bold: true, color: visual.title })
+    + bulletXml;
+}
+
+function strategyWorkstreamPmoChartXml({ scene, visual, palette }) {
+  if (scene.role === "cover") return strategyWorkstreamPmoGanttXml({ scene, visual, palette, x: 5029200, y: 914400 });
+  if (scene.role === "overview") return strategyWorkstreamPmoRoadmapXml({ scene, visual, palette });
+  if (scene.role === "swimlane") return strategyWorkstreamPmoSwimlaneXml({ scene, visual, palette });
+  if (scene.role === "deliverables") return strategyWorkstreamPmoDeliverablesXml({ scene, visual, palette });
+  if (scene.role === "raci") return strategyWorkstreamPmoRaciXml({ scene, visual, palette });
+  if (scene.role === "risks") return strategyWorkstreamPmoRiskXml({ scene, visual, palette });
+  return strategyWorkstreamPmoNextPlanXml({ scene, visual, palette });
+}
+
+function strategyWorkstreamPmoGanttXml({ scene, visual, palette, x, y }) {
+  const line = rectShapeXml({ id: 2220, name: "Strategy Workstream PMO Gantt Line", x: x + 228600, y: y + 1219200, cx: 2743200, cy: 45720, fill: visual.accent });
+  const cards = scene.cards.map((text, itemIndex) => {
+    const cardX = x + itemIndex * 792480;
+    const fill = itemIndex === 3 ? palette.warningSoft : "FFFFFF";
+    return solidShapeXml({ id: 2221 + itemIndex, name: `Strategy Workstream PMO Phase Card ${itemIndex + 1}`, geom: "roundRect", x: cardX, y: y + 457200, cx: 670560, cy: 944880, fill })
+      + rectShapeXml({ id: 2226 + itemIndex, name: `Strategy Workstream PMO Phase Signal ${itemIndex + 1}`, x: cardX, y: y + 457200, cx: 670560, cy: 53340, fill: itemIndex === 1 ? visual.secondary || visual.accent : itemIndex === 3 ? visual.warning || "F59E0B" : visual.accent })
+      + textShapeXml({ id: 2231 + itemIndex, name: `Strategy Workstream PMO Phase Text ${itemIndex + 1}`, x: cardX + 76200, y: y + 701040, cx: 518160, cy: 274320, text, size: 560, bold: true, color: visual.title });
+  }).join("");
+  const metrics = ["4 阶段", "12 交付", "3 阻塞"].map((text, itemIndex) => (
+    solidShapeXml({ id: 2240 + itemIndex, name: `Strategy Workstream PMO Status ${itemIndex + 1}`, geom: "roundRect", x: 792480 + itemIndex * 990600, y: 3733800, cx: 853440, cy: 441960, fill: "FFFFFF" })
+    + textShapeXml({ id: 2245 + itemIndex, name: `Strategy Workstream PMO Status Text ${itemIndex + 1}`, x: 899160 + itemIndex * 990600, y: 3855720, cx: 609600, cy: 152400, text, size: 620, bold: true, color: visual.title })
+  )).join("");
+  return line + cards + metrics;
+}
+
+function strategyWorkstreamPmoRoadmapXml({ scene, visual, palette }) {
+  return strategyWorkstreamPmoGanttXml({ scene, visual, palette, x: 5029200, y: 762000 })
+    + scene.risks.slice(0, 3).map((text, itemIndex) => (
+      solidShapeXml({ id: 2250 + itemIndex, name: `Strategy Workstream PMO Decision ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 1066800, y: 3581400, cx: 914400, cy: 396240, fill: palette.warningSoft })
+      + textShapeXml({ id: 2255 + itemIndex, name: `Strategy Workstream PMO Decision Text ${itemIndex + 1}`, x: 5120640 + itemIndex * 1066800, y: 3703320, cx: 731520, cy: 137160, text, size: 520, bold: true, color: visual.title })
+    )).join("");
+}
+
+function strategyWorkstreamPmoSwimlaneXml({ scene, visual, palette }) {
+  const x = 4876800;
+  const y = 868680;
+  const laneH = 518160;
+  return scene.lanes.map((lane, laneIndex) => {
+    const rowY = y + laneIndex * 609600;
+    const cards = scene.cards.slice(0, 3).map((text, cardIndex) => {
+      const fill = cardIndex === 2 ? palette.warningSoft : cardIndex === 1 ? palette.blueSoft : palette.greenSoft;
+      return solidShapeXml({ id: 2270 + laneIndex * 5 + cardIndex, name: `Strategy Workstream PMO Work Package ${laneIndex + 1}-${cardIndex + 1}`, geom: "roundRect", x: x + 731520 + cardIndex * 822960, y: rowY + 91440, cx: 731520, cy: 335280, fill })
+        + textShapeXml({ id: 2290 + laneIndex * 5 + cardIndex, name: `Strategy Workstream PMO Work Package Text ${laneIndex + 1}-${cardIndex + 1}`, x: x + 792480 + cardIndex * 822960, y: rowY + 182880, cx: 579120, cy: 137160, text: cardIndex === 0 ? lane : text, size: 500, bold: true, color: visual.title });
+    }).join("");
+    return solidShapeXml({ id: 2260 + laneIndex, name: `Strategy Workstream PMO Swimlane ${laneIndex + 1}`, geom: "roundRect", x, y: rowY, cx: 3429000, cy: laneH, fill: laneIndex % 2 ? "F8FAFC" : "FFFFFF" })
+      + textShapeXml({ id: 2265 + laneIndex, name: `Strategy Workstream PMO Lane Label ${laneIndex + 1}`, x: x + 91440, y: rowY + 182880, cx: 548640, cy: 152400, text: lane, size: 540, bold: true, color: visual.title })
+      + cards;
+  }).join("");
+}
+
+function strategyWorkstreamPmoDeliverablesXml({ scene, visual, palette }) {
+  const cards = scene.cards.map((text, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5029200 + col * 1676400;
+    const y = 990600 + row * 883920;
+    return solidShapeXml({ id: 2320 + itemIndex, name: `Strategy Workstream PMO Deliverable ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1524000, cy: 716280, fill: "FFFFFF" })
+      + rectShapeXml({ id: 2325 + itemIndex, name: `Strategy Workstream PMO Deliverable Rule ${itemIndex + 1}`, x, y, cx: 1524000, cy: 53340, fill: itemIndex < 2 ? visual.secondary || visual.accent : visual.accent })
+      + textShapeXml({ id: 2330 + itemIndex, name: `Strategy Workstream PMO Deliverable Text ${itemIndex + 1}`, x: x + 121920, y: y + 228600, cx: 1219200, cy: 198120, text, size: 620, bold: true, color: visual.title });
+  }).join("");
+  const mapLine = rectShapeXml({ id: 2338, name: "Strategy Workstream PMO Deliverable Map Line", x: 5181600, y: 3543300, cx: 3048000, cy: 45720, fill: visual.accent });
+  return cards + mapLine;
+}
+
+function strategyWorkstreamPmoRaciXml({ scene, visual, palette }) {
+  const x = 4876800;
+  const y = 914400;
+  const cellW = 563880;
+  const cellH = 365760;
+  let xml = solidShapeXml({ id: 2350, name: "Strategy Workstream PMO RACI Matrix", geom: "roundRect", x, y, cx: 3581400, cy: 2362200, fill: "FFFFFF" });
+  scene.owners.forEach((owner, itemIndex) => {
+    xml += textShapeXml({ id: 2351 + itemIndex, name: `Strategy Workstream PMO RACI Owner ${itemIndex + 1}`, x: x + 1127760 + itemIndex * cellW, y: y + 152400, cx: cellW - 30480, cy: 137160, text: owner, size: 460, bold: true, color: visual.title });
+  });
+  scene.cards.slice(0, 3).forEach((task, rowIndex) => {
+    const rowY = y + 518160 + rowIndex * cellH;
+    xml += textShapeXml({ id: 2360 + rowIndex, name: `Strategy Workstream PMO RACI Task ${rowIndex + 1}`, x: x + 152400, y: rowY + 91440, cx: 853440, cy: 137160, text: task, size: 500, bold: true, color: visual.body });
+    scene.owners.forEach((_, colIndex) => {
+      const letter = ["R", "A", "C", "I"][(rowIndex + colIndex) % 4];
+      xml += solidShapeXml({ id: 2370 + rowIndex * 4 + colIndex, name: `Strategy Workstream PMO RACI Cell ${rowIndex + 1}-${colIndex + 1}`, geom: "roundRect", x: x + 1127760 + colIndex * cellW, y: rowY, cx: cellW - 45720, cy: 289560, fill: letter === "R" ? palette.blueSoft : letter === "A" ? palette.greenSoft : "F8FAFC" })
+        + textShapeXml({ id: 2390 + rowIndex * 4 + colIndex, name: `Strategy Workstream PMO RACI Letter ${rowIndex + 1}-${colIndex + 1}`, x: x + 1264920 + colIndex * cellW, y: rowY + 76200, cx: 228600, cy: 121920, text: letter, size: 620, bold: true, color: visual.title });
+    });
+  });
+  return xml;
+}
+
+function strategyWorkstreamPmoRiskXml({ scene, visual, palette }) {
+  const risks = scene.risks.map((text, itemIndex) => {
+    const col = itemIndex % 2;
+    const row = Math.floor(itemIndex / 2);
+    const x = 5029200 + col * 1676400;
+    const y = 914400 + row * 792480;
+    const isBlocker = itemIndex === 0;
+    return solidShapeXml({ id: 2410 + itemIndex, name: `Strategy Workstream PMO Risk Blocker ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1524000, cy: 640080, fill: isBlocker ? "FEE2E2" : palette.warningSoft })
+      + rectShapeXml({ id: 2415 + itemIndex, name: `Strategy Workstream PMO Risk Severity ${itemIndex + 1}`, x, y, cx: 76200, cy: 640080, fill: isBlocker ? "DC2626" : visual.warning || "F59E0B" })
+      + textShapeXml({ id: 2420 + itemIndex, name: `Strategy Workstream PMO Risk Text ${itemIndex + 1}`, x: x + 152400, y: y + 213360, cx: 1219200, cy: 152400, text, size: 580, bold: true, color: visual.title });
+  }).join("");
+  const actions = scene.cards.slice(0, 3).map((text, itemIndex) => (
+    solidShapeXml({ id: 2430 + itemIndex, name: `Strategy Workstream PMO Risk Action ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 1066800, y: 3733800, cx: 914400, cy: 396240, fill: "FFFFFF" })
+    + textShapeXml({ id: 2435 + itemIndex, name: `Strategy Workstream PMO Risk Action Text ${itemIndex + 1}`, x: 5120640 + itemIndex * 1066800, y: 3855720, cx: 731520, cy: 137160, text, size: 520, bold: true, color: visual.title })
+  )).join("");
+  return risks + actions;
+}
+
+function strategyWorkstreamPmoNextPlanXml({ scene, visual, palette }) {
+  return ["30 天", "60 天", "90 天"].map((phase, itemIndex) => {
+    const x = 5029200 + itemIndex * 1112520;
+    return solidShapeXml({ id: 2450 + itemIndex, name: `Strategy Workstream PMO Next Plan ${itemIndex + 1}`, geom: "roundRect", x, y: 1219200, cx: 990600, cy: 1447800, fill: itemIndex === 1 ? palette.blueSoft : "FFFFFF" })
+      + textShapeXml({ id: 2455 + itemIndex, name: `Strategy Workstream PMO Next Plan Phase ${itemIndex + 1}`, x: x + 121920, y: 1394460, cx: 670560, cy: 182880, text: phase, size: 760, bold: true, color: visual.title })
+      + textShapeXml({ id: 2460 + itemIndex, name: `Strategy Workstream PMO Next Plan Text ${itemIndex + 1}`, x: x + 121920, y: 1752600, cx: 731520, cy: 335280, text: scene.cards[itemIndex] || phase, size: 560, bold: true, color: visual.body });
+  }).join("")
+    + rectShapeXml({ id: 2468, name: "Strategy Workstream PMO Next Rhythm", x: 5029200, y: 3337560, cx: 3225800, cy: 45720, fill: visual.accent });
+}
+
+function strategyWorkstreamPmoScene({ slide, index, role, total }) {
+  const inferredRole = index === 0
+    ? "cover"
+    : index >= total - 1
+      ? "next-plan"
+      : ["overview", "swimlane", "deliverables", "raci", "risks"][Math.min(index - 1, 4)];
+  const sceneRole = role === "closing" ? "next-plan" : inferredRole;
+  const bullets = normalizeStrategyWorkstreamPmoTexts(slide);
+  const cards = ["阶段目标锁定", "关键工作包拆解", "交付物验收", "风险与决策闭环"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 14));
+  const lanes = ["战略诊断", "方案设计", "试点落地", "治理复盘"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 8));
+  const owners = ["客户负责人", "咨询顾问", "业务负责人", "PMO"];
+  const risks = ["依赖未确认", "资源冲突", "数据口径", "决策延迟"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 9));
+  const kickerMap = {
+    cover: "PMO WORKSTREAM",
+    overview: "PHASE RHYTHM",
+    swimlane: "WORKFLOW LANES",
+    deliverables: "DELIVERY MAP",
+    raci: "RESPONSIBILITY",
+    risks: "RISK BLOCKERS",
+    "next-plan": "NEXT 30/60/90",
+  };
+  return {
+    role: sceneRole,
+    roleLabel: sceneRole.toUpperCase(),
+    kicker: kickerMap[sceneRole],
+    title: compactStrategyWorkstreamPmoText(slide?.title, sceneRole === "cover" ? "咨询项目推进计划" : "阶段工作流与交付推进", 28),
+    bullets,
+    cards,
+    lanes,
+    owners,
+    risks,
+  };
+}
+
+function strategyWorkstreamPmoPalette(visual) {
+  return {
+    blueSoft: blendHexColor(visual.accent, "FFFFFF", 0.84),
+    greenSoft: blendHexColor(visual.secondary || visual.accent, "FFFFFF", 0.84),
+    warningSoft: blendHexColor(visual.warning || "F59E0B", "FFFFFF", 0.82),
+    muted: blendHexColor(visual.body, "FFFFFF", 0.28),
+    softBlue: blendHexColor(visual.accent, "FFFFFF", 0.44),
+  };
+}
+
+function normalizeStrategyWorkstreamPmoTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["明确阶段目标与项目边界", "拆解跨职能工作包和依赖", "锁定交付物验收标准", "识别阻塞风险并推动决策"];
+}
+
+function compactStrategyWorkstreamPmoText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
 function strategyConsultingDecorationsXml({ visual, index, layout }) {
   const scene = strategyConsultingScene(visual);
   const palette = strategyConsultingColorPalette(visual);
@@ -20725,6 +21311,10 @@ function strategyConsultingMedia(visual) {
 
 function strategyConsultingVariant(visual) {
   return ["board", "matrix", "workstream"].includes(visual?.variant) ? visual.variant : "board";
+}
+
+function isStrategyBoardReportVisual(visual) {
+  return visual?.id === "strategy-consulting" && visual?.layout === "strategy-board-report";
 }
 
 function isStrategyConsultingVisual(visual) {

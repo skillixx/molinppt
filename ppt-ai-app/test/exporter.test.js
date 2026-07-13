@@ -207,17 +207,32 @@ test("PptExportService uses commercial project status delivery decorations", () 
 test("PptExportService uses commercial strategy consulting board decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "strategy-consulting", theme: "board" },
+    deck: {
+      ...deck,
+      templateId: "strategy-consulting",
+      theme: "board",
+      slides: [
+        { title: "Board strategy decision memo", bullets: ["Prioritize the most certain growth path", "Approve resource authorization", "Review decision in thirty days"] },
+        { title: "Strategic option matrix", bullets: ["Steady growth option", "Accelerated investment option", "Observe and defer option"] },
+        { title: "Risk return judgement", bullets: ["High return with controlled risk", "Low risk low return", "Mitigation needed", "Exit trigger"] },
+        { title: "Resolution recommendation", bullets: ["Approve steady growth", "Authorize spending boundary", "Set next review gate"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy board Chip"/);
-  assert.doesNotMatch(slide1, /name="Strategy Mark Card 1"/);
-  assert.match(slide1, /val="18253A"/);
-  assert.match(slide1, /val="C7A15A"/);
+  assert.match(slide1, /name="Strategy Board Report Surface"/);
+  assert.match(slide1, /name="Strategy Board Meeting Crop"/);
+  assert.match(slide2, /name="Strategy Board Option Matrix Column 1"/);
+  assert.match(slide3, /name="Strategy Board Risk Return Chart"/);
+  assert.match(slide4, /name="Strategy Board Closing Decision 1"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="B68A3A"/);
   assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
 });
 
@@ -241,7 +256,7 @@ test("PptExportService hides default page label for strategy consulting pages", 
   const text = result.content.toString("latin1");
   const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
 
-  assert.match(slide2, /name="Strategy Section Label"/);
+  assert.match(slide2, /name="Strategy Board Report Kicker"/);
   assert.doesNotMatch(slide2, /name="Section Label"[\s\S]*<a:t>02<\/a:t>/);
 });
 
@@ -254,11 +269,14 @@ test("PptExportService uses commercial strategy consulting matrix decorations", 
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy matrix Chip"/);
-  assert.match(slide1, /val="203A5C"/);
-  assert.match(slide1, /val="4C8F8A"/);
-  assert.match(text, /ppt\/media\/strategy-matrix\.jpeg/);
+  assert.match(slide1, /name="Strategy Matrix Consulting Workspace"/);
+  assert.match(slide1, /name="Strategy Matrix Quadrant Invest And Scale"/);
+  assert.match(slide1, /name="Strategy Matrix Bubble 1"/);
+  assert.match(slide1, /name="Strategy Matrix Insight Card 1"/);
+  assert.doesNotMatch(slide1, /name="Strategy Consulting Image"/);
+  assert.match(slide1, /val="17233B"/);
+  assert.match(slide1, /val="2E7D75"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-matrix\.jpeg/);
 });
 
 test("PptExportService uses commercial strategy consulting workstream decorations", () => {
@@ -270,11 +288,12 @@ test("PptExportService uses commercial strategy consulting workstream decoration
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy workstream Chip"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Phase Card 1"/);
   assert.match(slide1, /val="27364A"/);
-  assert.match(slide1, /val="D29A45"/);
-  assert.match(text, /ppt\/media\/strategy-workstream\.jpeg/);
+  assert.match(slide1, /val="2563EB"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
 });
 
 test("PptExportService uses industry research landscape decorations", () => {
@@ -2569,7 +2588,6 @@ test("PptExportService uses management meeting agenda decision decorations", () 
 test("PptExportService keeps commercial template theme chips decorative", () => {
   const exporter = new PptExportService();
   const cases = [
-    { templateId: "strategy-consulting", theme: "board", shapeName: "Strategy Chip Text" },
     { templateId: "financial-review", theme: "quarterly", shapeName: "Finance Quarterly Theme Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },

@@ -413,10 +413,10 @@ test("resolveTemplateVisual applies project status delivery commercial visual", 
 test("resolveTemplateVisual applies strategy consulting board commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "board" });
 
-  assert.equal(visual.primary, "18253A");
-  assert.equal(visual.accent, "C7A15A");
-  assert.equal(visual.background, "EEF1F5");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "B68A3A");
+  assert.equal(visual.background, "F3F5F7");
+  assert.equal(visual.layout, "strategy-board-report");
   assert.equal(visual.variant, "board");
 });
 
@@ -430,10 +430,10 @@ test("TemplateManager keeps strategy consulting theme names readable", () => {
 test("resolveTemplateVisual applies strategy consulting matrix commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "matrix" });
 
-  assert.equal(visual.primary, "203A5C");
-  assert.equal(visual.accent, "4C8F8A");
-  assert.equal(visual.background, "F0F5F7");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "17233B");
+  assert.equal(visual.accent, "2E7D75");
+  assert.equal(visual.background, "F4F7F8");
+  assert.equal(visual.layout, "strategy-matrix-consulting");
   assert.equal(visual.variant, "matrix");
 });
 
@@ -441,9 +441,9 @@ test("resolveTemplateVisual applies strategy consulting workstream commercial vi
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "workstream" });
 
   assert.equal(visual.primary, "27364A");
-  assert.equal(visual.accent, "D29A45");
-  assert.equal(visual.background, "F4F1EA");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.accent, "2563EB");
+  assert.equal(visual.background, "F6F8FB");
+  assert.equal(visual.layout, "strategy-workstream-pmo");
   assert.equal(visual.variant, "workstream");
 });
 

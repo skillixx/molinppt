@@ -257,6 +257,42 @@ test("PptService renders growth marketing lab preview with dedicated layout", as
   assert.doesNotMatch(preview, /增长营销/);
 });
 
+test("PptService renders strategy board report preview with dense decision layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "董事会战略汇报",
+    slideCount: 6,
+    templateId: "strategy-consulting",
+    theme: "board",
+  });
+  const edited = await context.pptService.updateOutline({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    slides: [
+      { title: "年度战略决策汇报", bullets: ["建议优先推进高确定性增长方向", "需董事会确认资源授权", "建立季度复盘节点"] },
+      { title: "核心结论与决策摘要", bullets: ["增长窗口仍在但投入节奏需要收敛", "关键假设需在两周内确认", "推荐选择稳健推进方案", "请求授权专项资源"] },
+      { title: "战略背景与关键假设", bullets: ["行业需求进入结构性分化", "现有能力支撑第一阶段落地", "财务承受能力允许小步加码", "组织需要明确 owner"] },
+      { title: "战略选项矩阵", bullets: ["稳健推进方案", "加速投入方案", "暂缓观察方案"] },
+      { title: "风险收益判断", bullets: ["高收益中风险", "低风险低收益", "高风险需缓释", "退出触发条件"] },
+      { title: "决议建议与授权事项", bullets: ["建议通过稳健推进", "授权资源投入边界", "三十天内完成复盘"] },
+    ],
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: edited.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-consulting" data-layout="strategy-board-report"/);
+  assert.match(preview, /strategy-board-layer/);
+  assert.match(preview, /decision-quadrant/);
+  assert.match(preview, /option-matrix/);
+  assert.match(preview, /risk-return-chart/);
+  assert.match(preview, /resolution-panel|closing-decisions/);
+  assert.match(preview, /BOARD DECISION MEMO|STRATEGIC COMMITTEE PACK/);
+  assert.doesNotMatch(preview, />董事会汇报</);
+});
+
 test("PptService renders data insight workbench preview without theme label", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
@@ -770,6 +806,49 @@ test("PptService renders synced SWOT map slug preview with dedicated layout", as
   assert.match(preview, /<body data-template="strategy-competitor-analysis-swot-map" data-layout="strategy-swot-map"/);
   assert.match(preview, /<div class="swot-layer">/);
   assert.match(preview, /swot-quadrant/);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders strategy consulting matrix preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "业务组合评估与资源配置建议",
+    slideCount: 7,
+    templateId: "strategy-consulting",
+    theme: "matrix",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-consulting" data-layout="strategy-matrix-consulting"/);
+  assert.match(preview, /strategy-matrix-layer/);
+  assert.match(preview, /strategy-matrix-board/);
+  assert.match(preview, /strategy-matrix-priority|strategy-matrix-resource|strategy-matrix-actions/);
+  assert.doesNotMatch(preview, />矩阵分类</);
+  assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
+});
+
+test("PptService renders strategy consulting workstream PMO preview with dedicated layout", async () => {
+  const pptPreviewRenderer = { render: async () => null };
+  const context = await createBusinessContext({ pptPreviewRenderer });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "咨询项目工作流推进与阶段交付汇报",
+    slideCount: 7,
+    templateId: "strategy-consulting",
+    theme: "workstream",
+  });
+  const { deck } = await context.pptService.generateDeck({ ownerUserId: 7, outlineId: outline.id, entitlementId: 88 });
+
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.match(preview, /<body data-template="strategy-consulting" data-layout="strategy-workstream-pmo"/);
+  assert.match(preview, /swp-layer/);
+  assert.match(preview, /swp-gantt|swp-swimlanes|swp-risk-board/);
+  assert.doesNotMatch(preview, />工作流程推进</);
   assert.doesNotMatch(preview, /<div class="slide-content"><h2/);
 });
 

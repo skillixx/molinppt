@@ -1,7 +1,7 @@
 {
   "slug": "strategy-strategy-consulting-board",
   "name": "战略咨询方案 - 董事会汇报",
-  "description": "适合问题诊断、方案对比和高层决策的咨询风格模板。",
+  "description": "适合董事会战略汇报、重大决策、经营判断、战略选项、风险收益和决议建议的高密度咨询材料模板。",
   "category_slug": "strategy",
   "category_name": "战略咨询",
   "category_sort_order": 20,
@@ -10,8 +10,11 @@
     "strategy",
     "strategy-consulting",
     "board",
-    "consulting-case"
+    "consulting-case",
+    "decision-brief",
+    "risk-return"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }
