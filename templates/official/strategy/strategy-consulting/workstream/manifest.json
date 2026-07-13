@@ -12,7 +12,9 @@
     "workstream",
     "consulting-case",
     "pmo",
-    "delivery"
+    "delivery",
+    "workflow",
+    "risk-blocker"
   ],
   "template_file": "template.json",
   "renderer_file": "renderer.js",
