@@ -23,7 +23,7 @@
 | 战略咨询 | 战略咨询方案 - 矩阵分类 | `templates/official/strategy/strategy-consulting/matrix/` | `templates/official/strategy/strategy-consulting/matrix/assets/template-specific-illustration.svg` | 用于战略路径、咨询框架、矩阵分析或路线图页面。 |
 | 战略咨询 | 战略咨询方案 - 工作流程推进 | `templates/official/strategy/strategy-consulting/workstream/` | `templates/official/strategy/strategy-consulting/workstream/assets/template-specific-illustration.svg` | 用于战略路径、咨询框架、矩阵分析或路线图页面。 |
 | 财务经营 | 财务经营复盘 - 审计分析 | `templates/official/finance/financial-review/audit/` | `templates/official/finance/financial-review/audit/assets/template-specific-illustration.svg` | 用于财务复盘、预算、审计、预测和经营数据页面。 |
-| 财务经营 | 财务经营复盘 - 预测规划 | `templates/official/finance/financial-review/forecast/` | `templates/official/finance/financial-review/forecast/assets/template-specific-illustration.svg` | 用于财务复盘、预算、审计、预测和经营数据页面。 |
+| 财务经营 | 财务经营复盘 - 预测规划 | `templates/official/finance/financial-review/forecast/` | `templates/official/finance/financial-review/forecast/assets/forecast-model-panel.svg`、`templates/official/finance/financial-review/forecast/assets/scenario-resource-map.svg` | 用于 FP&A 滚动预测、情景对比、模型假设和资源配置页面。 |
 | 财务经营 | 财务经营复盘 - 季度复盘 | `templates/official/finance/financial-review/quarterly/` | `templates/official/finance/financial-review/quarterly/assets/template-specific-illustration.svg` | 用于财务复盘、预算、审计、预测和经营数据页面。 |
 | 销售方案 | 销售提案方案 - 企业客户 | `templates/official/sales/sales-proposal/enterprise/` | `templates/official/sales/sales-proposal/enterprise/assets/template-specific-illustration.svg` | 用于解决方案架构、客户价值链、续约增长和交付路径页面。 |
 | 销售方案 | 销售提案方案 - 续约增长 | `templates/official/sales/sales-proposal/renewal/` | `templates/official/sales/sales-proposal/renewal/assets/template-specific-illustration.svg` | 用于解决方案架构、客户价值链、续约增长和交付路径页面。 |

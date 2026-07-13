@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="360" viewBox="0 0 560 360" role="img" aria-label="portfolio bubbles">
+  <rect width="560" height="360" fill="none"/>
+  <circle cx="388" cy="96" r="48" fill="#2E7D75" opacity=".9"/>
+  <circle cx="204" cy="118" r="35" fill="#D97706" opacity=".88"/>
+  <circle cx="332" cy="238" r="30" fill="#64748B" opacity=".78"/>
+  <circle cx="176" cy="252" r="26" fill="#B91C1C" opacity=".72"/>
+  <g fill="#17233B" opacity=".18">
+    <circle cx="90" cy="72" r="7"/>
+    <circle cx="470" cy="202" r="9"/>
+    <circle cx="448" cy="286" r="6"/>
+  </g>
+</svg>

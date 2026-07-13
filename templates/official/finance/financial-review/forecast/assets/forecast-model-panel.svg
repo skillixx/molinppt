@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="FP&A forecast model panel">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9f7f4"/>
+    </linearGradient>
+    <linearGradient id="curve" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22A699"/>
+      <stop offset="0.55" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect x="26" y="28" width="908" height="484" rx="18" fill="url(#bg)" stroke="#b7d6d1" stroke-width="2"/>
+  <g opacity=".42" stroke="#0F2D3A" stroke-width="1">
+    <path d="M92 104h774M92 170h774M92 236h774M92 302h774M92 368h774M92 434h774"/>
+    <path d="M154 82v374M262 82v374M370 82v374M478 82v374M586 82v374M694 82v374M802 82v374"/>
+  </g>
+  <path d="M110 400C190 356 224 306 302 314C386 322 420 244 492 242C580 240 624 152 710 174C782 192 818 132 862 108" fill="none" stroke="#22A699" stroke-width="10" stroke-linecap="round"/>
+  <path d="M110 432C188 402 232 360 306 368C392 378 430 312 502 304C594 294 640 232 714 250C790 268 820 210 862 186" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 18"/>
+  <path d="M110 452C198 430 246 394 322 410C410 428 456 360 532 372C614 386 664 318 734 340C798 360 828 306 862 278" fill="none" stroke="#F59E0B" stroke-width="7" stroke-linecap="round" stroke-dasharray="8 16"/>
+  <g fill="#ffffff" stroke="#0F2D3A" stroke-opacity=".18">
+    <rect x="118" y="90" width="150" height="58" rx="12"/>
+    <rect x="646" y="382" width="200" height="68" rx="12"/>
+    <rect x="606" y="88" width="114" height="42" rx="10"/>
+    <rect x="738" y="88" width="114" height="42" rx="10"/>
+  </g>
+  <g fill="#22A699">
+    <circle cx="302" cy="314" r="11"/>
+    <circle cx="492" cy="242" r="11"/>
+    <circle cx="710" cy="174" r="11"/>
+    <circle cx="862" cy="108" r="11"/>
+  </g>
+  <g opacity=".86">
+    <rect x="140" y="112" width="76" height="8" rx="4" fill="#0F2D3A"/>
+    <rect x="664" y="408" width="122" height="8" rx="4" fill="#0F2D3A"/>
+    <rect x="664" y="426" width="86" height="8" rx="4" fill="#22A699"/>
+    <rect x="624" y="104" width="58" height="8" rx="4" fill="#22A699"/>
+    <rect x="756" y="104" width="58" height="8" rx="4" fill="#F59E0B"/>
+  </g>
+</svg>

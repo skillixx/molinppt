@@ -1,41 +1,51 @@
 {
   "baseTemplateId": "pitch",
   "themeId": "product",
-  "style": "venture-story",
+  "style": "startup-product-highlights",
   "themes": [
     {
       "id": "product",
       "name": "产品亮点",
       "visual": {
-        "primary": "3B1D5A",
-        "accent": "E879F9",
-        "background": "F6F0FF",
+        "primary": "0F172A",
+        "accent": "14B8A6",
+        "secondary": "22C55E",
+        "warning": "F59E0B",
+        "background": "F8FAFC",
         "surface": "FFFFFF",
-        "title": "25113A",
-        "body": "4E3B63",
-        "layout": "venture",
-        "variant": "product"
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "startup-product-highlights",
+        "variant": "product-highlights"
       }
     }
   ],
   "visual": {
-    "primary": "3B1D5A",
-    "accent": "E879F9",
-    "background": "F6F0FF",
+    "primary": "0F172A",
+    "accent": "14B8A6",
+    "secondary": "22C55E",
+    "warning": "F59E0B",
+    "background": "F8FAFC",
     "surface": "FFFFFF",
-    "title": "25113A",
-    "body": "4E3B63",
-    "layout": "venture",
-    "variant": "product"
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "startup-product-highlights",
+    "variant": "product-highlights"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "venture-cover",
-    "defaultContentLayout": "venture-story",
+    "defaultCoverLayout": "startup-product-cover",
+    "defaultContentLayout": "startup-product-capability",
     "allowedLayouts": [
-      "venture-cover",
-      "venture-story",
-      "hero",
-      "story"
+      "startup-product-cover",
+      "startup-product-pain-scene",
+      "startup-product-capability",
+      "startup-product-demo-flow",
+      "startup-product-architecture",
+      "startup-product-value-journey",
+      "startup-product-validation",
+      "startup-product-moat",
+      "startup-product-funding",
+      "startup-product-closing"
     ]
   }
 }

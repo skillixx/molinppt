@@ -1,7 +1,7 @@
 {
   "slug": "strategy-strategy-consulting-matrix",
   "name": "战略咨询方案 - 矩阵分类",
-  "description": "适合问题诊断、方案对比和高层决策的咨询风格模板。",
+  "description": "适合战略分类分析、业务组合评估、机会筛选、优先级判断和资源配置建议汇报的咨询矩阵模板。",
   "category_slug": "strategy",
   "category_name": "战略咨询",
   "category_sort_order": 20,
@@ -10,8 +10,12 @@
     "strategy",
     "strategy-consulting",
     "matrix",
-    "consulting-case"
+    "consulting-case",
+    "consulting-matrix",
+    "portfolio",
+    "priority"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }

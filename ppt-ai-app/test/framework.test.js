@@ -413,10 +413,20 @@ test("resolveTemplateVisual applies project status delivery commercial visual", 
 test("resolveTemplateVisual applies strategy consulting board commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "board" });
 
-  assert.equal(visual.primary, "18253A");
-  assert.equal(visual.accent, "C7A15A");
-  assert.equal(visual.background, "EEF1F5");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "B68A3A");
+  assert.equal(visual.background, "F3F5F7");
+  assert.equal(visual.layout, "strategy-board-report");
+  assert.equal(visual.variant, "board");
+});
+
+test("resolveTemplateVisual maps strategy consulting board official slug without explicit theme", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-board" });
+
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "B68A3A");
+  assert.equal(visual.background, "F3F5F7");
+  assert.equal(visual.layout, "strategy-board-report");
   assert.equal(visual.variant, "board");
 });
 
@@ -430,10 +440,20 @@ test("TemplateManager keeps strategy consulting theme names readable", () => {
 test("resolveTemplateVisual applies strategy consulting matrix commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "matrix" });
 
-  assert.equal(visual.primary, "203A5C");
-  assert.equal(visual.accent, "4C8F8A");
-  assert.equal(visual.background, "F0F5F7");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "17233B");
+  assert.equal(visual.accent, "2E7D75");
+  assert.equal(visual.background, "F4F7F8");
+  assert.equal(visual.layout, "strategy-matrix-consulting");
+  assert.equal(visual.variant, "matrix");
+});
+
+test("resolveTemplateVisual maps strategy consulting matrix official slug", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-matrix", theme: "matrix" });
+
+  assert.equal(visual.primary, "17233B");
+  assert.equal(visual.accent, "2E7D75");
+  assert.equal(visual.background, "F4F7F8");
+  assert.equal(visual.layout, "strategy-matrix-consulting");
   assert.equal(visual.variant, "matrix");
 });
 
@@ -441,9 +461,19 @@ test("resolveTemplateVisual applies strategy consulting workstream commercial vi
   const visual = resolveTemplateVisual({ templateId: "strategy-consulting", theme: "workstream" });
 
   assert.equal(visual.primary, "27364A");
-  assert.equal(visual.accent, "D29A45");
-  assert.equal(visual.background, "F4F1EA");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.accent, "2563EB");
+  assert.equal(visual.background, "F6F8FB");
+  assert.equal(visual.layout, "strategy-workstream-pmo");
+  assert.equal(visual.variant, "workstream");
+});
+
+test("resolveTemplateVisual maps synced strategy workstream slug to PMO visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "strategy-strategy-consulting-workstream" });
+
+  assert.equal(visual.primary, "27364A");
+  assert.equal(visual.accent, "2563EB");
+  assert.equal(visual.background, "F6F8FB");
+  assert.equal(visual.layout, "strategy-workstream-pmo");
   assert.equal(visual.variant, "workstream");
 });
 
@@ -480,30 +510,34 @@ test("resolveTemplateVisual applies growth strategy second curve visual", () => 
 test("resolveTemplateVisual applies financial review quarterly commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "quarterly" });
 
-  assert.equal(visual.primary, "18344E");
-  assert.equal(visual.accent, "3B8C62");
-  assert.equal(visual.background, "EDF3F4");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "12263A");
+  assert.equal(visual.accent, "2F9E6D");
+  assert.equal(visual.secondary, "D9902F");
+  assert.equal(visual.warning, "C94B4B");
+  assert.equal(visual.background, "F5F7FA");
+  assert.equal(visual.layout, "finance-quarterly-review");
   assert.equal(visual.variant, "quarterly");
 });
 
 test("resolveTemplateVisual applies financial review audit commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "audit" });
 
-  assert.equal(visual.primary, "243447");
-  assert.equal(visual.accent, "A56A43");
-  assert.equal(visual.background, "F3F0EC");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "172033");
+  assert.equal(visual.accent, "C2413A");
+  assert.equal(visual.background, "F4F6F8");
+  assert.equal(visual.layout, "finance-audit-review");
   assert.equal(visual.variant, "audit");
 });
 
 test("resolveTemplateVisual applies financial review forecast commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "financial-review", theme: "forecast" });
 
-  assert.equal(visual.primary, "123B4D");
-  assert.equal(visual.accent, "2F9E9A");
-  assert.equal(visual.background, "EEF6F7");
-  assert.equal(visual.layout, "executive");
+  assert.equal(visual.primary, "0F2D3A");
+  assert.equal(visual.accent, "22A699");
+  assert.equal(visual.secondary, "3B82F6");
+  assert.equal(visual.warning, "F59E0B");
+  assert.equal(visual.background, "F4F8F7");
+  assert.equal(visual.layout, "finance-fpa-forecast");
   assert.equal(visual.variant, "forecast");
 });
 
@@ -534,30 +568,33 @@ test("resolveTemplateVisual maps cash flow official slug to dedicated visual", (
 test("resolveTemplateVisual applies sales proposal enterprise commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "enterprise" });
 
-  assert.equal(visual.primary, "14565A");
-  assert.equal(visual.accent, "D19A3E");
-  assert.equal(visual.background, "EEF7F6");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0F2F4A");
+  assert.equal(visual.accent, "22B8A7");
+  assert.equal(visual.secondary, "D99A2B");
+  assert.equal(visual.background, "F3F7FA");
+  assert.equal(visual.layout, "sales-enterprise-proposal");
   assert.equal(visual.variant, "enterprise");
 });
 
 test("resolveTemplateVisual applies sales proposal solution commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "solution" });
 
-  assert.equal(visual.primary, "1E4F76");
-  assert.equal(visual.accent, "39A7A0");
-  assert.equal(visual.background, "EFF6F8");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "123047");
+  assert.equal(visual.accent, "1AA6A6");
+  assert.equal(visual.secondary, "D99A2B");
+  assert.equal(visual.background, "F4F7FA");
+  assert.equal(visual.layout, "sales-proposal-solution");
   assert.equal(visual.variant, "solution");
 });
 
 test("resolveTemplateVisual applies sales proposal renewal commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "sales-proposal", theme: "renewal" });
 
-  assert.equal(visual.primary, "4B3F72");
-  assert.equal(visual.accent, "E0A33C");
-  assert.equal(visual.background, "F4F1FA");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "123B3A");
+  assert.equal(visual.accent, "2FBF71");
+  assert.equal(visual.secondary, "F2B84B");
+  assert.equal(visual.background, "F5F8F6");
+  assert.equal(visual.layout, "sales-renewal-growth-qbr");
   assert.equal(visual.variant, "renewal");
 });
 
@@ -618,30 +655,45 @@ test("resolveTemplateVisual maps sales training official slug to dedicated visua
 test("resolveTemplateVisual applies product roadmap commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "roadmap" });
 
-  assert.equal(visual.primary, "145A7A");
-  assert.equal(visual.accent, "2FB7A3");
-  assert.equal(visual.background, "EEF8FA");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "DC2626");
+  assert.equal(visual.background, "F6FAFC");
+  assert.equal(visual.layout, "product-strategy-roadmap");
   assert.equal(visual.variant, "roadmap");
+});
+
+test("resolveTemplateVisual maps product roadmap official slug to strategy roadmap visual", () => {
+  const visual = resolveTemplateVisual({ templateId: "product-product-roadmap-roadmap", theme: "roadmap" });
+
+  assert.equal(visual.layout, "product-strategy-roadmap");
+  assert.equal(visual.variant, "roadmap");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
 });
 
 test("resolveTemplateVisual applies product release commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "release" });
 
-  assert.equal(visual.primary, "3B4A8F");
-  assert.equal(visual.accent, "F2A65A");
-  assert.equal(visual.background, "F2F4FB");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "0B1F3A");
+  assert.equal(visual.accent, "14B8A6");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "DC2626");
+  assert.equal(visual.background, "EEF4F8");
+  assert.equal(visual.layout, "product-release-committee");
   assert.equal(visual.variant, "release");
 });
 
 test("resolveTemplateVisual applies product review commercial visual", () => {
   const visual = resolveTemplateVisual({ templateId: "product-roadmap", theme: "product-review" });
 
-  assert.equal(visual.primary, "263D4A");
-  assert.equal(visual.accent, "E07A5F");
-  assert.equal(visual.background, "F5F6F2");
-  assert.equal(visual.layout, "academy");
+  assert.equal(visual.primary, "173B3A");
+  assert.equal(visual.accent, "20B486");
+  assert.equal(visual.secondary, "F59E0B");
+  assert.equal(visual.warning, "E76F51");
+  assert.equal(visual.background, "F4F7F6");
+  assert.equal(visual.layout, "product-review-canvas");
   assert.equal(visual.variant, "product-review");
 });
 
@@ -944,10 +996,12 @@ test("resolveTemplateVisual applies pitch deck commercial visuals", () => {
   assert.equal(investor.primary, "101828");
   assert.equal(investor.accent, "12B76A");
   assert.equal(investor.secondary, "F79009");
-  assert.equal(product.layout, "venture");
-  assert.equal(product.variant, "product");
-  assert.equal(product.primary, "3B1D5A");
-  assert.equal(product.accent, "E879F9");
+  assert.equal(product.layout, "startup-product-highlights");
+  assert.equal(product.variant, "product-highlights");
+  assert.equal(product.primary, "0F172A");
+  assert.equal(product.accent, "14B8A6");
+  assert.equal(product.secondary, "22C55E");
+  assert.equal(product.warning, "F59E0B");
 });
 
 test("resolveTemplateVisual applies brand story commercial visuals", () => {

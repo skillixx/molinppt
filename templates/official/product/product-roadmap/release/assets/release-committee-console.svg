@@ -1,0 +1,31 @@
+<svg width="960" height="540" viewBox="0 0 960 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="540" rx="36" fill="#EEF4F8"/>
+  <rect x="56" y="52" width="848" height="436" rx="26" fill="#FFFFFF" stroke="#C9D6E2" stroke-width="2"/>
+  <rect x="56" y="52" width="848" height="64" rx="26" fill="#0B1F3A"/>
+  <rect x="56" y="96" width="848" height="20" fill="#0B1F3A"/>
+  <circle cx="104" cy="84" r="9" fill="#14B8A6"/>
+  <circle cx="132" cy="84" r="9" fill="#F59E0B"/>
+  <circle cx="160" cy="84" r="9" fill="#DC2626"/>
+  <rect x="668" y="75" width="156" height="20" rx="10" fill="#14B8A6"/>
+  <rect x="96" y="152" width="304" height="116" rx="18" fill="#F8FBFC" stroke="#D8E3EC"/>
+  <rect x="120" y="176" width="136" height="16" rx="8" fill="#0B1F3A"/>
+  <rect x="120" y="210" width="230" height="10" rx="5" fill="#8EA0B2"/>
+  <rect x="120" y="236" width="176" height="10" rx="5" fill="#B9C7D4"/>
+  <rect x="438" y="152" width="330" height="116" rx="18" fill="#F8FBFC" stroke="#D8E3EC"/>
+  <path d="M476 228H728" stroke="#14B8A6" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="492" cy="228" r="14" fill="#14B8A6" stroke="white" stroke-width="5"/>
+  <circle cx="574" cy="218" r="14" fill="#F59E0B" stroke="white" stroke-width="5"/>
+  <circle cx="656" cy="208" r="14" fill="#14B8A6" stroke="white" stroke-width="5"/>
+  <circle cx="728" cy="198" r="14" fill="#0B1F3A" stroke="white" stroke-width="5"/>
+  <rect x="96" y="306" width="672" height="122" rx="18" fill="#F8FBFC" stroke="#D8E3EC"/>
+  <rect x="124" y="332" width="112" height="70" rx="14" fill="#E7F8F5" stroke="#14B8A6"/>
+  <rect x="260" y="332" width="112" height="70" rx="14" fill="#FFF7E6" stroke="#F59E0B"/>
+  <rect x="396" y="332" width="112" height="70" rx="14" fill="#FEECEC" stroke="#DC2626"/>
+  <rect x="532" y="332" width="112" height="70" rx="14" fill="#E9EEF5" stroke="#0B1F3A"/>
+  <rect x="672" y="332" width="52" height="70" rx="14" fill="#E7F8F5" stroke="#14B8A6"/>
+  <path d="M140 370H220M276 370H356M412 370H492M548 370H628" stroke="#0B1F3A" stroke-width="8" stroke-linecap="round" opacity=".32"/>
+  <rect x="804" y="152" width="60" height="276" rx="20" fill="#0B1F3A"/>
+  <rect x="822" y="178" width="24" height="58" rx="12" fill="#14B8A6"/>
+  <rect x="822" y="258" width="24" height="58" rx="12" fill="#F59E0B"/>
+  <rect x="822" y="338" width="24" height="58" rx="12" fill="#DC2626"/>
+</svg>

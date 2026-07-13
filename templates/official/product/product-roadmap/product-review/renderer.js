@@ -10,23 +10,30 @@ export const templateRenderer = {
   "themeName": "产品复盘",
   "style": "product-planning",
   "visual": {
-    "primary": "263D4A",
-    "accent": "E07A5F",
-    "background": "F5F6F2",
+    "primary": "173B3A",
+    "accent": "20B486",
+    "secondary": "F59E0B",
+    "warning": "E76F51",
+    "background": "F4F7F6",
     "surface": "FFFFFF",
-    "title": "1E3038",
-    "body": "4A5960",
-    "layout": "academy",
+    "title": "102A2A",
+    "body": "405A58",
+    "layout": "product-review-canvas",
     "variant": "product-review"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
+    "defaultCoverLayout": "product-review-cover",
+    "defaultContentLayout": "product-review-content",
     "allowedLayouts": [
-      "academy-cover",
-      "academy-content",
-      "lesson-title",
-      "lesson-content"
+      "product-review-cover",
+      "product-review-content",
+      "goal-result-compare",
+      "behavior-change",
+      "feature-adoption",
+      "feedback-cluster",
+      "root-cause",
+      "iteration-hypothesis",
+      "product-review-closing"
     ]
   }
 };

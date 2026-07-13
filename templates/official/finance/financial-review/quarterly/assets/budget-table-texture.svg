@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Finance table texture">
+  <rect width="960" height="540" fill="#F5F7FA"/>
+  <g fill="none" stroke="#12263A" stroke-opacity=".09" stroke-width="1">
+    <path d="M80 70h800M80 126h800M80 182h800M80 238h800M80 294h800M80 350h800M80 406h800M80 462h800"/>
+    <path d="M80 70v392M220 70v392M360 70v392M500 70v392M640 70v392M780 70v392M880 70v392"/>
+  </g>
+  <rect x="80" y="70" width="800" height="56" fill="#12263A" fill-opacity=".12"/>
+  <rect x="80" y="238" width="800" height="56" fill="#2F9E6D" fill-opacity=".08"/>
+  <rect x="80" y="350" width="800" height="56" fill="#D9902F" fill-opacity=".08"/>
+</svg>

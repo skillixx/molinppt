@@ -537,9 +537,11 @@ function sendInlineFile(response, downloaded) {
  */
 function withTemplateThumbnailUrl(template) {
   if (!template.thumbnailFileId) return template;
+  const thumbnailVersion = encodeURIComponent(template.thumbnailMd5 || template.thumbnailFileId);
   return {
     ...template,
-    thumbnailUrl: `/api/templates/${encodeURIComponent(template.id)}/thumbnail`,
+    // 缩略图内容更新后必须换 URL，避免浏览器继续使用旧的模板预览缓存。
+    thumbnailUrl: `/api/templates/${encodeURIComponent(template.id)}/thumbnail?v=${thumbnailVersion}`,
   };
 }
 
@@ -1155,7 +1157,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
     .template-manage-split { height: 8px; }
     .template-card {
-      display: grid; gap: 13px; width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px;
+      display: grid; justify-content: stretch; align-items: stretch; gap: 13px; width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px;
       background: #fff; color: var(--text); text-align: center; box-shadow: 0 12px 28px rgba(16,24,40,.05); transform: none;
     }
     .template-card:hover { background: #fff; border-color: #b8ccf0; box-shadow: 0 18px 38px rgba(31,94,255,.12); transform: translateY(-2px); }
@@ -1179,7 +1181,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .create-template-list-title strong { color: #0f172a; font-size: 14px; line-height: 1.35; }
     .create-template-list-title span { color: var(--muted); font-size: 12px; line-height: 1.45; }
     .create-template-list-count { flex: 0 0 auto; border: 1px solid #dbeafe; border-radius: 999px; background: #f8fbff; color: #1d4ed8; padding: 4px 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
-    .create-template-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .create-template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 260px)); gap: 12px; align-items: start; }
     .create-template-grid .template-card { gap: 10px; padding: 9px; text-align: left; border-radius: 12px; }
     .create-template-grid .template-card-title { padding: 0 3px 2px; font-size: 13px; line-height: 1.35; }
     .create-template-grid .template-card-meta { padding: 0 3px 1px; }
@@ -1187,7 +1189,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .create-template-more { min-height: 38px; border-radius: 12px; border: 1px solid #c9d9f4; background: #f8fbff; color: #1d4ed8; font-size: 13px; font-weight: 800; }
     .create-template-more:hover { background: #eef5ff; border-color: #b8ccf0; }
     .template-thumb {
-      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; border: 1px solid rgba(23,32,51,.08);
+      display: block; justify-self: stretch; width: 100%; min-width: 0; position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; border: 1px solid rgba(23,32,51,.08);
       background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
     }
     .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
@@ -1418,6 +1420,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="enterprise-digital-blueprint"] .template-thumb-image { right: 10%; top: 23%; width: 35%; height: 44%; border-radius: 12px; background: linear-gradient(90deg, transparent 31%, color-mix(in srgb, var(--thumb-primary) 34%, transparent) 31% 33%, transparent 33% 64%, color-mix(in srgb, var(--thumb-accent) 42%, transparent) 64% 66%, transparent 66%), linear-gradient(0deg, transparent 30%, color-mix(in srgb, var(--thumb-accent) 36%, transparent) 30% 32%, transparent 32% 64%, color-mix(in srgb, var(--thumb-primary) 30%, transparent) 64% 66%, transparent 66%), radial-gradient(circle at 22% 35%, var(--thumb-accent) 0 5%, transparent 6%), radial-gradient(circle at 51% 56%, var(--thumb-primary) 0 5%, transparent 6%), radial-gradient(circle at 78% 33%, var(--thumb-secondary) 0 5%, transparent 6%), #f8fcff; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: none; }
     .template-thumb[data-layout="enterprise-digital-blueprint"] .template-thumb-wave { left: 12%; right: 51%; bottom: 24%; height: 11%; background: linear-gradient(90deg, var(--thumb-primary) 0 9%, transparent 9% 26%, var(--thumb-accent) 26% 35%, transparent 35% 52%, var(--thumb-secondary) 52% 61%, transparent 61% 78%, var(--thumb-accent) 78%); clip-path: none; opacity: .94; }
     .template-thumb[data-layout="enterprise-digital-blueprint"] .template-thumb-tag { background: var(--thumb-primary); color: #fff; }
+    .template-thumb[data-layout="sales-enterprise-proposal"] { background: linear-gradient(135deg, #f8fbfd 0%, #f3f7fa 54%, #e6f4f2 100%); }
+    .template-thumb[data-layout="sales-enterprise-proposal"]::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 9%, transparent) 0 1px, transparent 1px 26px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-accent) 8%, transparent) 0 1px, transparent 1px 24px); }
+    .template-thumb[data-layout="sales-enterprise-proposal"] .template-thumb-cover { left: 7%; right: 7%; top: 13%; bottom: 12%; border-radius: 16px; background: rgba(255,255,255,.96); border: 1px solid color-mix(in srgb, var(--thumb-primary) 14%, transparent); box-shadow: 0 16px 32px rgba(15,47,74,.13); }
+    .template-thumb[data-layout="sales-enterprise-proposal"] .template-thumb-band { left: 11%; right: 48%; top: 39%; height: 2.4%; border-radius: 999px; background: linear-gradient(90deg, var(--thumb-accent), var(--thumb-secondary), transparent); }
+    .template-thumb[data-layout="sales-enterprise-proposal"] .template-thumb-image { right: 10%; top: 23%; width: 35%; height: 42%; border-radius: 14px; background: radial-gradient(circle at 50% 22%, var(--thumb-primary) 0 9%, transparent 10%), radial-gradient(circle at 21% 56%, var(--thumb-accent) 0 6%, transparent 7%), radial-gradient(circle at 50% 56%, var(--thumb-secondary) 0 6%, transparent 7%), radial-gradient(circle at 79% 56%, var(--thumb-accent) 0 6%, transparent 7%), linear-gradient(90deg, transparent 20%, color-mix(in srgb, var(--thumb-primary) 32%, transparent) 20% 22%, transparent 22% 50%, color-mix(in srgb, var(--thumb-accent) 40%, transparent) 50% 52%, transparent 52% 78%, color-mix(in srgb, var(--thumb-secondary) 44%, transparent) 78% 80%, transparent 80%), #fff; border: 1px solid color-mix(in srgb, var(--thumb-primary) 16%, transparent); box-shadow: none; }
+    .template-thumb[data-layout="sales-enterprise-proposal"] .template-thumb-wave { left: 12%; right: 14%; bottom: 22%; height: 10%; background: linear-gradient(90deg, var(--thumb-primary) 0 10%, transparent 10% 24%, var(--thumb-accent) 24% 34%, transparent 34% 48%, var(--thumb-secondary) 48% 58%, transparent 58% 72%, var(--thumb-warning) 72% 82%, transparent 82%); clip-path: none; opacity: .94; }
+    .template-thumb[data-layout="sales-enterprise-proposal"] .template-thumb-tag { background: var(--thumb-primary); color: #fff; }
     .template-thumb[data-layout="product-pricing-strategy"] { background: linear-gradient(135deg, #f8fafc 0%, var(--thumb-bg) 54%, #e3f7f4 100%); }
     .template-thumb[data-layout="product-pricing-strategy"]::before { background: radial-gradient(circle at 78% 18%, color-mix(in srgb, var(--thumb-accent) 28%, transparent), transparent 25%), repeating-linear-gradient(90deg, color-mix(in srgb, var(--thumb-primary) 8%, transparent) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, color-mix(in srgb, var(--thumb-secondary) 7%, transparent) 0 1px, transparent 1px 26px); }
     .template-thumb[data-layout="product-pricing-strategy"] .template-thumb-cover { left: 7%; right: 7%; top: 14%; bottom: 12%; border-radius: 16px; background: rgba(255,255,255,.95); border: 1px solid color-mix(in srgb, var(--thumb-primary) 14%, transparent); box-shadow: 0 16px 32px rgba(20,33,61,.13); }
@@ -1474,6 +1483,27 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="venture"][data-thumb-variant="wide-cover"] .template-thumb-cover { border-radius: 10px 22px 10px 22px; }
     .template-thumb[data-layout="venture"][data-thumb-variant="center-card"] .template-thumb-cover { border-radius: 22px; background: linear-gradient(145deg, color-mix(in srgb, var(--thumb-primary) 92%, #000 8%), color-mix(in srgb, var(--thumb-accent) 42%, var(--thumb-primary) 58%)); }
     .template-thumb[data-layout="venture"][data-thumb-variant="left-title"] .template-thumb-cover { border-left: 5px solid var(--thumb-accent); }
+    /* 创业融资产品亮点缩略图用控制台、功能卡和价值链路表达产品型路演。 */
+    .template-thumb[data-layout="startup-product-highlights"] { background: linear-gradient(135deg, #eaf2f8 0%, #ffffff 46%, #edf7fb 100%); }
+    /* 已同步真实缩略图时优先展示设计稿，避免布局装饰层覆盖后台缩略图。 */
+    .template-thumb[data-layout="startup-product-highlights"][data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; }
+    .template-thumb[data-layout="startup-product-highlights"][data-has-thumbnail="true"]::before,
+    .template-thumb[data-layout="startup-product-highlights"][data-has-thumbnail="true"]::after { display: none; }
+    .template-thumb[data-layout="startup-product-highlights"][data-has-thumbnail="true"] > span { display: none; }
+    .template-thumb[data-layout="startup-product-highlights"]::before { background: radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--thumb-accent) 24%, transparent), transparent 24%), repeating-linear-gradient(90deg, rgba(15,23,42,.045) 0 1px, transparent 1px 34px), repeating-linear-gradient(0deg, rgba(15,23,42,.035) 0 1px, transparent 1px 30px); }
+    .template-thumb[data-layout="startup-product-highlights"]::after { left: 6%; right: 6%; top: 11%; bottom: 11%; border-radius: 16px; background: rgba(255,255,255,.90); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-back { display: none; }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-cover { left: 8%; right: 44%; top: 20%; bottom: 24%; align-content: center; padding: 7% 6%; border-radius: 14px; background: rgba(255,255,255,.96); border: 1px solid color-mix(in srgb, var(--thumb-primary) 12%, transparent); box-shadow: 0 14px 26px rgba(15,23,42,.12); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-date,
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-kicker,
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-summary { color: color-mix(in srgb, var(--thumb-body) 86%, transparent); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-heading { min-height: 28px; color: var(--thumb-title); font-size: 15px; line-height: 1.06; text-shadow: none; }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-band { left: 7%; right: 7%; top: 14%; height: 7px; border-radius: 999px; background: linear-gradient(90deg, var(--thumb-primary), var(--thumb-accent), var(--thumb-secondary), var(--thumb-warning)); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-image { right: 10%; top: 25%; width: 31%; height: 39%; border-radius: 16px; background: linear-gradient(180deg, var(--thumb-primary) 0 18%, #ffffff 18% 100%); border: 1px solid color-mix(in srgb, var(--thumb-primary) 18%, transparent); box-shadow: 0 14px 26px rgba(15,23,42,.14); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-image::before { background: linear-gradient(var(--thumb-accent), var(--thumb-accent)) 18% 42% / 46% 6% no-repeat, linear-gradient(var(--thumb-secondary), var(--thumb-secondary)) 18% 58% / 62% 6% no-repeat, linear-gradient(var(--thumb-warning), var(--thumb-warning)) 18% 74% / 34% 6% no-repeat, radial-gradient(circle at 78% 36%, var(--thumb-accent) 0 7%, transparent 8%), radial-gradient(circle at 78% 62%, var(--thumb-secondary) 0 7%, transparent 8%); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-image::after { left: 13%; right: 13%; bottom: 18%; height: 7px; border-radius: 999px; background: var(--thumb-accent); box-shadow: 0 -18px 0 color-mix(in srgb, var(--thumb-secondary) 62%, #ffffff 38%), 0 -36px 0 color-mix(in srgb, var(--thumb-warning) 62%, #ffffff 38%); }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-wave { left: 9%; right: 9%; bottom: 14%; height: 8%; border-radius: 999px; background: linear-gradient(90deg, var(--thumb-primary) 0 22%, transparent 22% 28%, var(--thumb-accent) 28% 52%, transparent 52% 58%, var(--thumb-secondary) 58% 82%, transparent 82% 88%, var(--thumb-warning) 88%); clip-path: none; opacity: .94; }
+    .template-thumb[data-layout="startup-product-highlights"] .template-thumb-tag { background: var(--thumb-accent); color: #0f172a; }
     .template-thumb[data-template="pitch"][data-layout="venture"] { background: linear-gradient(120deg, color-mix(in srgb, var(--thumb-primary) 96%, #000 4%), var(--thumb-primary) 52%, color-mix(in srgb, var(--thumb-accent) 24%, var(--thumb-primary) 76%)); }
     .template-thumb[data-template="pitch"][data-layout="venture"]::before { background:
       linear-gradient(105deg, rgba(255,255,255,.06) 0 10%, transparent 10% 64%, rgba(255,255,255,.12) 64% 100%),
@@ -2433,7 +2463,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const copy = templateThumbCopy(display);
       const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout, display);
       const thumbnailUrl = display.thumbnailUrl ? "url('" + cssUrl(display.thumbnailUrl) + "')" : "";
-      const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
+      const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-secondary:#" + displayVisual.secondary + ";--thumb-warning:#" + displayVisual.warning + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
       return ''
         + '<span class="template-thumb" data-template="' + escapeHtml(display.id || "") + '" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
         + '<span class="template-thumb-back template-thumb-back-left"></span><span class="template-thumb-back template-thumb-back-right"></span>'
@@ -2557,11 +2587,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       return {
         primary: normalizeHexColor(visual.primary, "2563EB"),
         accent: normalizeHexColor(visual.accent, "14B8A6"),
+        secondary: normalizeHexColor(visual.secondary, "22C55E"),
+        warning: normalizeHexColor(visual.warning, "F59E0B"),
         background: normalizeHexColor(visual.background, "F8FAFC"),
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2571,11 +2603,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         ...baseVisual,
         primary: normalizeHexColor(theme.visual.primary, baseVisual.primary),
         accent: normalizeHexColor(theme.visual.accent, baseVisual.accent),
+        secondary: normalizeHexColor(theme.visual.secondary, baseVisual.secondary),
+        warning: normalizeHexColor(theme.visual.warning, baseVisual.warning),
         background: normalizeHexColor(theme.visual.background, baseVisual.background),
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,

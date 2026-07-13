@@ -8,32 +8,41 @@
       "name": "工作流程推进",
       "visual": {
         "primary": "27364A",
-        "accent": "D29A45",
-        "background": "F4F1EA",
+        "accent": "2563EB",
+        "secondary": "14B8A6",
+        "warning": "F59E0B",
+        "background": "F6F8FB",
         "surface": "FFFFFF",
-        "title": "182334",
-        "body": "4B5563",
-        "layout": "executive",
+        "title": "172033",
+        "body": "475569",
+        "layout": "strategy-workstream-pmo",
         "variant": "workstream"
       }
     }
   ],
   "visual": {
     "primary": "27364A",
-    "accent": "D29A45",
-    "background": "F4F1EA",
+    "accent": "2563EB",
+    "secondary": "14B8A6",
+    "warning": "F59E0B",
+    "background": "F6F8FB",
     "surface": "FFFFFF",
-    "title": "182334",
-    "body": "4B5563",
-    "layout": "executive",
+    "title": "172033",
+    "body": "475569",
+    "layout": "strategy-workstream-pmo",
     "variant": "workstream"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "executive-cover",
-    "defaultContentLayout": "executive-content",
+    "defaultCoverLayout": "strategy-workstream-cover",
+    "defaultContentLayout": "strategy-workstream-overview",
     "allowedLayouts": [
-      "executive-cover",
-      "executive-content",
+      "strategy-workstream-cover",
+      "strategy-workstream-overview",
+      "strategy-workstream-swimlane",
+      "strategy-workstream-deliverables",
+      "strategy-workstream-raci",
+      "strategy-workstream-risks",
+      "strategy-workstream-next-plan",
       "title",
       "content"
     ]

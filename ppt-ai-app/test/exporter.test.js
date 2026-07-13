@@ -207,17 +207,54 @@ test("PptExportService uses commercial project status delivery decorations", () 
 test("PptExportService uses commercial strategy consulting board decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "strategy-consulting", theme: "board" },
+    deck: {
+      ...deck,
+      templateId: "strategy-consulting",
+      theme: "board",
+      slides: [
+        { title: "Board strategy decision memo", bullets: ["Prioritize the most certain growth path", "Approve resource authorization", "Review decision in thirty days"] },
+        { title: "Strategic option matrix", bullets: ["Steady growth option", "Accelerated investment option", "Observe and defer option"] },
+        { title: "Risk return judgement", bullets: ["High return with controlled risk", "Low risk low return", "Mitigation needed", "Exit trigger"] },
+        { title: "Resolution recommendation", bullets: ["Approve steady growth", "Authorize spending boundary", "Set next review gate"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Strategy Board Report Surface"/);
+  assert.match(slide1, /name="Strategy Board Meeting Crop"/);
+  assert.match(slide2, /name="Strategy Board Option Matrix Column 1"/);
+  assert.match(slide3, /name="Strategy Board Risk Return Chart"/);
+  assert.match(slide4, /name="Strategy Board Closing Decision 1"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="B68A3A"/);
+  assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
+});
+
+test("PptExportService keeps synced strategy board official slug aligned with board media", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-board",
+      templateName: "战略咨询方案 - 董事会汇报",
+      slides: [
+        { title: "Board strategy decision memo", bullets: ["Prioritize the most certain growth path", "Approve resource authorization"] },
+        { title: "Strategic option matrix", bullets: ["Steady growth option", "Accelerated investment option", "Observe and defer option"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy board Chip"/);
-  assert.doesNotMatch(slide1, /name="Strategy Mark Card 1"/);
-  assert.match(slide1, /val="18253A"/);
-  assert.match(slide1, /val="C7A15A"/);
+  assert.match(slide1, /name="Strategy Board Report Surface"/);
+  assert.match(slide1, /name="Strategy Board Meeting Crop"/);
   assert.match(text, /ppt\/media\/strategy-board\.jpeg/);
 });
 
@@ -241,24 +278,54 @@ test("PptExportService hides default page label for strategy consulting pages", 
   const text = result.content.toString("latin1");
   const slide2 = Buffer.from(pptPartText(text, "ppt/slides/slide2.xml"), "latin1").toString("utf8");
 
-  assert.match(slide2, /name="Strategy Section Label"/);
+  assert.match(slide2, /name="Strategy Board Report Kicker"/);
   assert.doesNotMatch(slide2, /name="Section Label"[\s\S]*<a:t>02<\/a:t>/);
 });
 
 test("PptExportService uses commercial strategy consulting matrix decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "strategy-consulting", theme: "matrix" },
+    deck: { ...deck, templateId: "strategy-strategy-consulting-matrix", theme: "matrix" },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy matrix Chip"/);
-  assert.match(slide1, /val="203A5C"/);
-  assert.match(slide1, /val="4C8F8A"/);
-  assert.match(text, /ppt\/media\/strategy-matrix\.jpeg/);
+  assert.match(slide1, /name="Strategy Matrix Consulting Workspace"/);
+  assert.match(slide1, /name="Strategy Matrix Quadrant Invest And Scale"/);
+  assert.match(slide1, /name="Strategy Matrix Bubble 1"/);
+  assert.match(slide1, /name="Strategy Matrix Insight Card 1"/);
+  assert.doesNotMatch(slide1, /name="Content 2"/);
+  assert.doesNotMatch(slide1, /name="Strategy Consulting Image"/);
+  assert.match(slide1, /val="17233B"/);
+  assert.match(slide1, /val="2E7D75"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-matrix\.jpeg/);
+});
+
+test("PptExportService suppresses generic body text on every strategy matrix slide", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-matrix",
+      theme: "matrix",
+      slides: [
+        { title: "运营效率短板：库存周转天数增加10天", bullets: ["现象：库存周转天数达到55天（+10天），额外占用资金约XX万元", "原因：新品备货过多及销售预测偏差，导致库存积压", "影响：呆滞库存占比升至8%，预计造成损失约XX万元", "行动：加速清理呆滞库存，优化备货模型与预测机制"] },
+        { title: "业务组合评估与资源配置建议", bullets: ["高价值机会优先获得资源", "不确定机会进入验证池", "低效率投入逐步收缩"] },
+        { title: "机会分层与优先级判断", bullets: ["核心业务继续加码", "新机会设置验证阈值", "现金流业务保持效率"] },
+        { title: "行动建议与责任闭环", bullets: ["建立30天清理机制", "调整预测模型", "每周复盘库存风险"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const packageText = result.content.toString("latin1");
+
+  for (let index = 1; index <= 4; index += 1) {
+    const slideXml = pptPartText(packageText, `ppt/slides/slide${index}.xml`);
+    assert.match(slideXml, /name="Strategy Matrix Consulting Workspace"/);
+    assert.doesNotMatch(slideXml, /name="Content 2"/);
+    assert.doesNotMatch(slideXml, /<a:buChar char="•"\/>/);
+  }
 });
 
 test("PptExportService uses commercial strategy consulting workstream decorations", () => {
@@ -270,11 +337,39 @@ test("PptExportService uses commercial strategy consulting workstream decoration
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Strategy Consulting Image"/);
-  assert.match(slide1, /name="Strategy workstream Chip"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Phase Card 1"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Title"), /<a:rPr[^>]* sz="2300"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Bullet 1"), /<a:rPr[^>]* sz="940"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Phase Text 1"), /<a:rPr[^>]* sz="820"/);
   assert.match(slide1, /val="27364A"/);
-  assert.match(slide1, /val="D29A45"/);
-  assert.match(text, /ppt\/media\/strategy-workstream\.jpeg/);
+  assert.match(slide1, /val="2563EB"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
+});
+
+test("PptExportService maps synced strategy workstream slug to PMO decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "strategy-strategy-consulting-workstream",
+      templateName: "战略咨询方案 - 工作流程推进",
+      slides: [
+        { title: "咨询项目工作流推进", bullets: ["拆解阶段目标", "锁定交付物", "识别风险阻塞"] },
+        { title: "阶段计划与责任矩阵", bullets: ["工作包拆分", "责任人确认", "下一步节奏"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
+  assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Bullet 1"), /<a:rPr[^>]* sz="940"/);
+  assert.match(slide1, /val="27364A"/);
+  assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
 });
 
 test("PptExportService uses industry research landscape decorations", () => {
@@ -702,12 +797,12 @@ test("PptExportService uses commercial financial quarterly decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial quarterly Chip"/);
-  assert.match(slide1, /name="Financial Bar 4"/);
-  assert.doesNotMatch(slide1, /name="Financial Point Card/);
-  assert.match(slide1, /val="18344E"/);
-  assert.match(slide1, /val="3B8C62"/);
+  assert.match(slide1, /name="Finance Quarterly CFO Workspace"/);
+  assert.match(slide1, /name="Finance Quarterly Dashboard Panel"/);
+  assert.match(slide1, /name="Finance Quarterly KPI Card 4"/);
+  assert.doesNotMatch(slide1, /name="Financial Visual Panel"/);
+  assert.match(slide1, /val="12263A"/);
+  assert.match(slide1, /val="2F9E6D"/);
 });
 
 test("PptExportService uses commercial financial audit decorations", () => {
@@ -719,11 +814,12 @@ test("PptExportService uses commercial financial audit decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial audit Chip"/);
-  assert.match(slide1, /name="Financial Audit Dot 1"/);
-  assert.match(slide1, /val="243447"/);
-  assert.match(slide1, /val="A56A43"/);
+  assert.match(slide1, /name="Audit Review Workpaper Canvas"/);
+  assert.match(slide1, /name="Audit Review Risk Matrix Cell 4"/);
+  assert.match(slide1, /name="Audit Review Evidence Card 1"/);
+  assert.doesNotMatch(slide1, /name="Financial Audit Dot 1"/);
+  assert.match(slide1, /val="172033"/);
+  assert.match(slide1, /val="C2413A"/);
 });
 
 test("PptExportService uses commercial financial forecast decorations", () => {
@@ -735,11 +831,12 @@ test("PptExportService uses commercial financial forecast decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Financial Visual Panel"/);
-  assert.match(slide1, /name="Financial forecast Chip"/);
-  assert.match(slide1, /name="Financial Forecast Dot 4"/);
-  assert.match(slide1, /val="123B4D"/);
-  assert.match(slide1, /val="2F9E9A"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Canvas"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Curve Panel"/);
+  assert.match(slide1, /name="FP&amp;A Forecast Scenario Dot 3"/);
+  assert.doesNotMatch(slide1, /name="Financial Forecast Dot 4"/);
+  assert.match(slide1, /val="0F2D3A"/);
+  assert.match(slide1, /val="22A699"/);
 });
 
 test("PptExportService uses cost control breakdown decorations", () => {
@@ -1403,14 +1500,15 @@ test("PptExportService uses commercial sales enterprise decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Cover Hero Band"/);
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales enterprise Chip"/);
-  assert.match(slide1, /name="Sales Account Card"/);
-  assert.match(slide2, /name="Sales Content Anchor"/);
-  assert.doesNotMatch(slide2, /name="Sales Cover Hero Band"/);
-  assert.match(slide1, /val="14565A"/);
-  assert.match(slide1, /val="D19A3E"/);
+  assert.match(slide1, /name="Sales Enterprise Proposal Canvas"/);
+  assert.match(slide1, /name="Sales Enterprise Architecture Blueprint"/);
+  assert.match(slide1, /name="Sales Enterprise Summary Card 1"/);
+  assert.match(slide2, /name="Sales Enterprise Closing Card 1"/);
+  assert.doesNotMatch(slide1, /name="Sales Visual Panel"/);
+  assert.doesNotMatch(slide1, /企业客户/);
+  assert.match(slide1, /val="0F2F4A"/);
+  assert.match(slide1, /val="22B8A7"/);
+  assert.match(slide1, /val="D99A2B"/);
 });
 
 test("PptExportService uses commercial sales solution decorations", () => {
@@ -1421,13 +1519,17 @@ test("PptExportService uses commercial sales solution decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales solution Chip"/);
-  assert.match(slide1, /name="Sales Solution Hub"/);
+  assert.match(slide1, /name="Sales Proposal Solution Outer Canvas"/);
+  assert.match(slide1, /name="Sales Proposal Solution Architecture Panel"/);
+  assert.match(slide1, /name="Sales Proposal Solution Summary Card 1"/);
+  assert.match(slide2, /name="Sales Proposal Solution Closing Card 1"/);
   assert.doesNotMatch(slide1, /name="Secondary Accent"/);
-  assert.match(slide1, /val="1E4F76"/);
-  assert.match(slide1, /val="39A7A0"/);
+  assert.doesNotMatch(slide1, /解决方案/);
+  assert.match(slide1, /val="123047"/);
+  assert.match(slide1, /val="1AA6A6"/);
+  assert.match(slide1, /val="D99A2B"/);
 });
 
 test("PptExportService uses commercial sales renewal decorations", () => {
@@ -1438,14 +1540,18 @@ test("PptExportService uses commercial sales renewal decorations", () => {
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Sales Visual Panel"/);
-  assert.match(slide1, /name="Sales renewal Chip"/);
-  assert.match(slide1, /name="Sales Renewal Trend Line 1"/);
-  assert.match(slide1, /name="Sales Renewal Dot 4"/);
-  assert.doesNotMatch(slide1, /name="Sales Renewal Segment/);
-  assert.match(slide1, /val="4B3F72"/);
-  assert.match(slide1, /val="E0A33C"/);
+  assert.match(slide1, /name="Sales Renewal QBR Canvas"/);
+  assert.match(slide1, /name="Sales Renewal QBR Work Surface"/);
+  assert.match(slide1, /name="Sales Renewal QBR Summary Card 1"/);
+  assert.match(slide1, /name="Sales Renewal Health Panel"/);
+  assert.match(slide2, /name="Sales Renewal Success Plan 1"/);
+  assert.doesNotMatch(slide1, /name="Sales Visual Panel"/);
+  assert.doesNotMatch(slide1, /续约增长/);
+  assert.match(slide1, /val="123B3A"/);
+  assert.match(slide1, /val="2FBF71"/);
+  assert.match(slide1, /val="F2B84B"/);
 });
 
 test("PptExportService uses commercial product roadmap decorations", () => {
@@ -1458,15 +1564,64 @@ test("PptExportService uses commercial product roadmap decorations", () => {
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
   const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
 
-  assert.match(slide1, /name="Product Cover Strategy Field"/);
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product roadmap Chip"/);
-  assert.match(slide1, /name="Product Roadmap Node 4"/);
-  assert.match(slide2, /name="Product Content Anchor"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Canvas"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Lane Now"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Product Console"/);
+  assert.match(slide2, /name="Product Strategy Roadmap Decision Card 1"/);
   assert.doesNotMatch(slide2, /name="Product Cover Strategy Field"/);
   assert.doesNotMatch(slide1, /name="Secondary Accent"/);
-  assert.match(slide1, /val="145A7A"/);
-  assert.match(slide1, /val="2FB7A3"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.match(slide1, /val="14B8A6"/);
+});
+
+test("PptExportService maps synced product roadmap slug to strategy roadmap decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-product-roadmap-roadmap", theme: "roadmap", templateVisual: undefined },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+
+  assert.match(slide1, /name="Product Strategy Roadmap Canvas"/);
+  assert.match(slide1, /name="Product Strategy Roadmap Lane Now"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.doesNotMatch(slide1, /name="Hero Surface"/);
+});
+
+test("PptExportService keeps product roadmap capability page text from overlapping", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "product-product-roadmap-roadmap",
+      theme: "roadmap",
+      templateVisual: undefined,
+      slides: [
+        { title: "产品路线规划", layout: "cover", bullets: ["围绕阶段目标、能力建设和资源投入对齐产品节奏。"] },
+        {
+          title: "Q3营收同比+15%，但环比增速显著放缓",
+          layout: "capability-map",
+          bullets: [
+            "总营收达成率102%（超目标），但环比仅增长2%（低于季度平均5%），增长动力减弱",
+            "核心产品线贡献占比下降5个百分点（至62%），主因市场竞争加剧",
+            "新品类收入同比+80%，但因基数低（占比8%），暂难弥补核心缺口",
+            "资源投入优先级需要围绕能力建设重新排序",
+          ],
+        },
+        { title: "阶段里程碑", layout: "milestone-plan", bullets: ["目标冻结", "能力交付", "灰度验证", "规模推广"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const summary = pptShapeByName(slide2, "Product Strategy Roadmap Summary");
+
+  assert.match(slide2, /name="Product Strategy Roadmap Capability Layer 1"/);
+  assert.match(summary, /<a:off x="792480" y="1767840"\/><a:ext cx="3048000" cy="274320"\/>/);
+  assert.doesNotMatch(slide2, /name="Product Strategy Roadmap Bullet Card 1"/);
+  assert.doesNotMatch(slide2, /name="Product Strategy Roadmap Bullet Text 1"/);
 });
 
 test("PptExportService uses product pain points decorations", () => {
@@ -1879,35 +2034,81 @@ test("PptExportService uses experience gap comparison decorations", () => {
 test("PptExportService uses commercial product release decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "product-roadmap", theme: "release" },
+    deck: {
+      ...deck,
+      templateId: "product-roadmap",
+      theme: "release",
+      slides: [
+        { title: "版本发布评审", bullets: ["冻结发布范围", "明确灰度策略", "准备回滚预案"] },
+        { title: "功能模块范围", bullets: ["核心功能", "影响模块", "依赖系统", "状态标签"] },
+        { title: "上线时间线", bullets: ["范围冻结", "联调验收", "灰度放量", "全量上线"] },
+        { title: "灰度放量策略", bullets: ["1% 验证", "10% 观察", "50% 放量", "100% 全量"] },
+        { title: "业务区整售端流失率较同期偏高可能影响续约团队重建", bullets: ["数据异常", "链路阻塞", "体验波动", "运营投诉"] },
+        { title: "成功指标", bullets: ["稳定性", "使用率", "转化率", "工单量"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
 
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product release Chip"/);
-  assert.match(slide1, /name="Product Release Card 2"/);
-  assert.match(slide1, /name="Product Release Milestone 3"/);
-  assert.match(slide1, /val="3B4A8F"/);
-  assert.match(slide1, /val="F2A65A"/);
+  assert.match(slide1, /name="Product Release Committee Canvas"/);
+  assert.match(slide1, /name="Product Release Committee Status Board"/);
+  assert.match(slide3, /name="Product Release Launch Timeline Gate 3"/);
+  assert.match(slide4, /name="Product Release Gray Strategy Step 3"/);
+  assert.match(slide5, /name="Product Release Rollback Card 2"/);
+  assert.match(slide5, /name="Product Release Committee Title"[\s\S]*sz="1180"/);
+  assert.match(slide1, /val="0B1F3A"/);
+  assert.match(slide1, /val="14B8A6"/);
+  assert.doesNotMatch(slide1, /版本发布/);
 });
 
 test("PptExportService uses commercial product review decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
-    deck: { ...deck, templateId: "product-roadmap", theme: "product-review" },
+    deck: {
+      ...deck,
+      templateId: "product-roadmap",
+      theme: "product-review",
+      slides: [
+        { title: "产品迭代复盘", layout: "product-review-cover", bullets: ["目标达成", "用户行为", "功能采纳", "下一轮假设"] },
+        { title: "目标与结果对照", layout: "goal-result-compare", bullets: ["目标 DAU 提升", "实际留存改善", "差距归因", "行动建议"] },
+        { title: "用户行为变化", layout: "behavior-change", bullets: ["访问频次上升", "关键路径缩短", "转化节点波动", "活跃结构变化"] },
+        { title: "功能采纳率矩阵", layout: "feature-adoption", bullets: ["高采纳功能", "低采纳功能", "深度使用", "待验证假设"] },
+        { title: "用户反馈聚类", layout: "feedback-cluster", bullets: ["体验阻塞", "价值感知", "性能问题", "新需求"] },
+        { title: "问题归因", layout: "root-cause", bullets: ["入口不清晰", "价值表达弱", "路径阻塞", "监控不足"] },
+        { title: "下一轮迭代假设", layout: "iteration-hypothesis", bullets: ["优化入口", "灰度实验", "数据监控", "复盘节奏"] },
+        { title: "经验沉淀与后续规划", layout: "product-review-closing", bullets: ["保留动作", "验证假设", "责任人", "下次复盘"] },
+      ],
+    },
     format: "pptx",
   });
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+  const slide7 = pptPartText(text, "ppt/slides/slide7.xml");
+  const slide8 = pptPartText(text, "ppt/slides/slide8.xml");
 
-  assert.match(slide1, /name="Product Visual Panel"/);
-  assert.match(slide1, /name="Product product-review Chip"/);
-  assert.match(slide1, /name="Product Review Ring Outer"/);
-  assert.match(slide1, /name="Product Review Feedback Line 3"/);
-  assert.match(slide1, /val="263D4A"/);
-  assert.match(slide1, /val="E07A5F"/);
+  assert.match(slide1, /name="Product Review Canvas Surface"/);
+  assert.match(slide1, /name="Product Review Canvas Board"/);
+  assert.match(slide1, /name="Product Review Bullet Dot 1"/);
+  assert.match(slide1, /name="Product Review Bullet Text 3"/);
+  assert.match(slide1, /name="Product Review Metric Card 3"/);
+  assert.match(slide2, /name="Product Review Goal Bridge Panel"/);
+  assert.match(slide5, /name="Product Review Feedback Cluster Panel"/);
+  assert.match(slide6, /name="Product Review Cause Map Panel"/);
+  assert.match(slide7, /name="Product Review Iteration Roadmap Panel"|name="Product Review Iteration Loop Panel"/);
+  assert.match(slide8, /name="Product Review Iteration Loop Panel"/);
+  assert.match(slide1, /val="173B3A"/);
+  assert.match(slide1, /val="20B486"/);
+  assert.doesNotMatch(slide1, /Product Review Evidence Card/);
+  assert.doesNotMatch(slide1, /Product product-review Chip/);
+  assert.doesNotMatch(slide1, /产品复盘/);
 });
 
 test("PptExportService uses commercial marketing launch decorations", () => {
@@ -2463,10 +2664,8 @@ test("PptExportService uses management meeting agenda decision decorations", () 
 test("PptExportService keeps commercial template theme chips decorative", () => {
   const exporter = new PptExportService();
   const cases = [
-    { templateId: "strategy-consulting", theme: "board", shapeName: "Strategy Chip Text" },
-    { templateId: "financial-review", theme: "quarterly", shapeName: "Financial Chip Text" },
+    { templateId: "financial-review", theme: "quarterly", shapeName: "Finance Quarterly Theme Chip Text" },
     { templateId: "sales-proposal", theme: "enterprise", shapeName: "Sales Chip Text" },
-    { templateId: "product-roadmap", theme: "release", shapeName: "Product Chip Text" },
     { templateId: "education", theme: "lecture", shapeName: "Education Course Chip Text" },
     { templateId: "pitch", theme: "startup", shapeName: "Pitch Chip Text" },
   ];
@@ -2482,6 +2681,15 @@ test("PptExportService keeps commercial template theme chips decorative", () => 
     // 主题风格只用于选择样式，不能作为页面上的可见角标文字写进 PPTX。
     assert.match(chipTextShape, /<a:t><\/a:t>/, `${item.templateId}/${item.theme} should render an empty decorative chip`);
   }
+
+  const releaseResult = exporter.exportDeck({
+    deck: { ...deck, templateId: "product-roadmap", theme: "release" },
+    format: "pptx",
+  });
+  const releaseSlide1 = pptPartText(releaseResult.content.toString("latin1"), "ppt/slides/slide1.xml");
+
+  assert.match(releaseSlide1, /name="Product Release Committee Canvas"/);
+  assert.doesNotMatch(releaseSlide1, /版本发布/);
 });
 
 test("PptExportService uses commercial pitch startup decorations", () => {
@@ -2594,12 +2802,12 @@ test("PptExportService uses commercial pitch product decorations", () => {
   const text = result.content.toString("latin1");
   const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
 
-  assert.match(slide1, /name="Pitch Stage Canvas"/);
-  assert.match(slide1, /name="Pitch Visual Panel"/);
-  assert.match(slide1, /name="Pitch Product Screen"/);
-  assert.match(slide1, /name="Pitch Product Glow"/);
-  assert.match(slide1, /val="3B1D5A"/);
-  assert.match(slide1, /val="E879F9"/);
+  assert.match(slide1, /name="Product Funding Content Surface"/);
+  assert.match(slide1, /name="Product Funding Demo Console"/);
+  assert.match(slide1, /name="Product Funding Product Mockup"/);
+  assert.match(slide1, /name="Product Funding Metric Card 1"/);
+  assert.match(slide1, /val="0F172A"/);
+  assert.match(slide1, /val="14B8A6"/);
 });
 
 test("PptExportService uses business plan model decorations", () => {
@@ -2840,6 +3048,49 @@ test("PptExportService uses product funding highlights decorations", () => {
   assert.match(slide2, /name="Product Funding Capability Card 1"/);
   assert.match(slide4, /name="Product Funding Technical Chain 1"/);
   assert.match(slide5, /name="Product Funding Value Journey Node 1"/);
+  assert.doesNotMatch(slide1, /product-highlights/);
+});
+
+test("PptExportService uses startup product highlights decorations", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "pitch",
+      theme: "product",
+      templateVisual: {
+        id: "pitch",
+        primary: "0F172A",
+        accent: "14B8A6",
+        secondary: "22C55E",
+        warning: "F59E0B",
+        background: "F8FAFC",
+        surface: "FFFFFF",
+        title: "0F172A",
+        body: "334155",
+        layout: "startup-product-highlights",
+        variant: "product-highlights",
+      },
+      slides: [
+        { title: "创业产品融资路演", bullets: ["产品界面帮助投资人快速理解价值", "痛点场景和用户价值形成闭环", "商业化路径可以被持续验证"] },
+        { title: "痛点场景", bullets: ["高频业务痛点", "现有方案断点", "用户触发场景", "付费动机清晰"] },
+        { title: "产品架构", bullets: ["数据层沉淀", "模型能力调度", "业务工作流", "开放集成能力"] },
+        { title: "用户价值链路", bullets: ["发现痛点", "产品介入", "效率提升", "结果验证"] },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide3 = pptPartText(text, "ppt/slides/slide3.xml");
+  const slide4 = pptPartText(text, "ppt/slides/slide4.xml");
+
+  assert.match(slide1, /name="Product Funding Content Surface"/);
+  assert.match(slide1, /name="Product Funding Demo Console"/);
+  assert.match(slide2, /name="Product Funding Capability Card 1"/);
+  assert.match(slide3, /name="Product Funding Demo Console"/);
+  assert.match(slide4, /name="Product Funding Technical Chain 1"/);
   assert.doesNotMatch(slide1, /product-highlights/);
 });
 

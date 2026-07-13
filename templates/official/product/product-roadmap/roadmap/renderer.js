@@ -8,25 +8,34 @@ export const templateRenderer = {
   "templateName": "产品路线规划",
   "themeId": "roadmap",
   "themeName": "路线图",
-  "style": "product-planning",
+  "style": "product-strategy-roadmap",
   "visual": {
-    "primary": "145A7A",
-    "accent": "2FB7A3",
-    "background": "EEF8FA",
+    "primary": "0B1F3A",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "warning": "DC2626",
+    "background": "F6FAFC",
     "surface": "FFFFFF",
-    "title": "113746",
-    "body": "395966",
-    "layout": "academy",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "product-strategy-roadmap",
     "variant": "roadmap"
   },
   "layoutSchema": {
-    "defaultCoverLayout": "academy-cover",
-    "defaultContentLayout": "academy-content",
+    "defaultCoverLayout": "product-strategy-roadmap-cover",
+    "defaultContentLayout": "product-strategy-roadmap-content",
     "allowedLayouts": [
-      "academy-cover",
-      "academy-content",
-      "lesson-title",
-      "lesson-content"
+      "product-strategy-roadmap-cover",
+      "product-strategy-roadmap-overview",
+      "product-strategy-roadmap-capabilities",
+      "product-strategy-roadmap-milestones",
+      "product-strategy-roadmap-dependencies",
+      "product-strategy-roadmap-priority",
+      "product-strategy-roadmap-closing",
+      "product-strategy-roadmap-content",
+      "title",
+      "content",
+      "closing"
     ]
   }
 };

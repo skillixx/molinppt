@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="280" viewBox="0 0 640 280" role="img" aria-label="resource flow lines">
+  <rect width="640" height="280" fill="none"/>
+  <g fill="none" stroke-linecap="round" stroke-width="8">
+    <path d="M72 68C190 54 248 84 346 76C452 68 496 42 574 54" stroke="#2E7D75"/>
+    <path d="M72 136C198 128 276 156 366 146C462 136 514 112 574 120" stroke="#D97706"/>
+    <path d="M72 204C176 204 260 222 352 212C440 202 504 184 574 194" stroke="#64748B"/>
+  </g>
+  <g fill="#17233B" opacity=".16">
+    <circle cx="72" cy="68" r="14"/>
+    <circle cx="574" cy="54" r="14"/>
+    <circle cx="72" cy="136" r="14"/>
+    <circle cx="574" cy="120" r="14"/>
+    <circle cx="72" cy="204" r="14"/>
+    <circle cx="574" cy="194" r="14"/>
+  </g>
+</svg>

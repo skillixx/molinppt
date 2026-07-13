@@ -1,16 +1,17 @@
 {
   "slug": "pitch-pitch-product",
   "name": "创业融资路演 - 产品亮点",
-  "description": "适合投资人沟通、创业项目介绍和商业计划书展示。",
+  "description": "适合融资沟通、产品价值展示、核心功能、用户场景、竞争优势和商业化潜力汇报的产品型创业融资路演模板。",
   "category_slug": "pitch",
   "category_name": "融资路演",
   "category_sort_order": 90,
   "status": "active",
   "tags": [
     "pitch",
-    "product",
-    "venture-story"
+    "product-highlights",
+    "startup-product-highlights"
   ],
   "template_file": "template.json",
-  "renderer_file": "renderer.js"
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
 }
