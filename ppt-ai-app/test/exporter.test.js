@@ -340,6 +340,9 @@ test("PptExportService uses commercial strategy consulting workstream decoration
   assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
   assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
   assert.match(slide1, /name="Strategy Workstream PMO Phase Card 1"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Title"), /<a:rPr[^>]* sz="2300"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Bullet 1"), /<a:rPr[^>]* sz="940"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Phase Text 1"), /<a:rPr[^>]* sz="820"/);
   assert.match(slide1, /val="27364A"/);
   assert.match(slide1, /val="2563EB"/);
   assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
@@ -364,6 +367,7 @@ test("PptExportService maps synced strategy workstream slug to PMO decorations",
 
   assert.match(slide1, /name="Strategy Workstream PMO Surface"/);
   assert.match(slide1, /name="Strategy Workstream PMO Gantt Line"/);
+  assert.match(pptShapeByName(slide1, "Strategy Workstream PMO Bullet 1"), /<a:rPr[^>]* sz="940"/);
   assert.match(slide1, /val="27364A"/);
   assert.doesNotMatch(text, /ppt\/media\/strategy-workstream\.jpeg/);
 });

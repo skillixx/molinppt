@@ -21073,15 +21073,16 @@ function strategyWorkstreamPmoBaseXml({ visual, scene, palette }) {
     + solidShapeXml({ id: 2202, name: "Strategy Workstream PMO Surface", geom: "roundRect", x: 530352, y: 535000, cx: 8083296, cy: 4070000, fill: "FFFFFF" })
     + rectShapeXml({ id: 2203, name: "Strategy Workstream PMO Surface Rule", x: 530352, y: 535000, cx: 8083296, cy: 53340, fill: visual.accent })
     + rectShapeXml({ id: 2204, name: "Strategy Workstream PMO Kicker Rule", x: 768096, y: 1973580, cx: 2590800, cy: 30480, fill: palette.softBlue })
-    + textShapeXml({ id: 2205, name: "Strategy Workstream PMO Kicker", x: 768096, y: 731520, cx: 2438400, cy: 182880, text: scene.kicker, size: 620, bold: true, color: visual.accent })
-    + textShapeXml({ id: 2206, name: "Strategy Workstream PMO Role Label", x: 7299960, y: 701040, cx: 1066800, cy: 198120, text: scene.roleLabel, size: 600, bold: true, color: palette.muted });
+    + textShapeXml({ id: 2205, name: "Strategy Workstream PMO Kicker", x: 768096, y: 731520, cx: 2438400, cy: 213360, text: scene.kicker, size: 800, bold: true, color: visual.accent })
+    + textShapeXml({ id: 2206, name: "Strategy Workstream PMO Role Label", x: 7299960, y: 701040, cx: 1066800, cy: 228600, text: scene.roleLabel, size: 720, bold: true, color: palette.muted });
 }
 
 function strategyWorkstreamPmoTextXml({ scene, visual }) {
+  // 下载后的 PPTX 需要投影可读，PMO 正文和卡片字号按正式咨询汇报页尺度绘制。
   const bulletXml = scene.bullets.slice(0, 3).map((text, itemIndex) => (
-    textShapeXml({ id: 2210 + itemIndex, name: `Strategy Workstream PMO Bullet ${itemIndex + 1}`, x: 792480, y: 2217420 + itemIndex * 289560, cx: 3200400, cy: 182880, text, size: 660, bold: false, color: visual.body })
+    textShapeXml({ id: 2210 + itemIndex, name: `Strategy Workstream PMO Bullet ${itemIndex + 1}`, x: 792480, y: 2186940 + itemIndex * 381000, cx: 3505200, cy: 259080, text, size: 940, bold: false, color: visual.body })
   )).join("");
-  return textShapeXml({ id: 2207, name: "Strategy Workstream PMO Title", x: 768096, y: 1066800, cx: 3962400, cy: 701040, text: scene.title, size: scene.role === "cover" ? 1880 : 1560, bold: true, color: visual.title })
+  return textShapeXml({ id: 2207, name: "Strategy Workstream PMO Title", x: 768096, y: 1046320, cx: 4145280, cy: 777240, text: scene.title, size: scene.role === "cover" ? 2300 : 1880, bold: true, color: visual.title })
     + bulletXml;
 }
 
@@ -21102,11 +21103,11 @@ function strategyWorkstreamPmoGanttXml({ scene, visual, palette, x, y }) {
     const fill = itemIndex === 3 ? palette.warningSoft : "FFFFFF";
     return solidShapeXml({ id: 2221 + itemIndex, name: `Strategy Workstream PMO Phase Card ${itemIndex + 1}`, geom: "roundRect", x: cardX, y: y + 457200, cx: 670560, cy: 944880, fill })
       + rectShapeXml({ id: 2226 + itemIndex, name: `Strategy Workstream PMO Phase Signal ${itemIndex + 1}`, x: cardX, y: y + 457200, cx: 670560, cy: 53340, fill: itemIndex === 1 ? visual.secondary || visual.accent : itemIndex === 3 ? visual.warning || "F59E0B" : visual.accent })
-      + textShapeXml({ id: 2231 + itemIndex, name: `Strategy Workstream PMO Phase Text ${itemIndex + 1}`, x: cardX + 76200, y: y + 701040, cx: 518160, cy: 274320, text, size: 560, bold: true, color: visual.title });
+      + textShapeXml({ id: 2231 + itemIndex, name: `Strategy Workstream PMO Phase Text ${itemIndex + 1}`, x: cardX + 60960, y: y + 670560, cx: 548640, cy: 381000, text, size: 820, bold: true, color: visual.title });
   }).join("");
   const metrics = ["4 阶段", "12 交付", "3 阻塞"].map((text, itemIndex) => (
     solidShapeXml({ id: 2240 + itemIndex, name: `Strategy Workstream PMO Status ${itemIndex + 1}`, geom: "roundRect", x: 792480 + itemIndex * 990600, y: 3733800, cx: 853440, cy: 441960, fill: "FFFFFF" })
-    + textShapeXml({ id: 2245 + itemIndex, name: `Strategy Workstream PMO Status Text ${itemIndex + 1}`, x: 899160 + itemIndex * 990600, y: 3855720, cx: 609600, cy: 152400, text, size: 620, bold: true, color: visual.title })
+    + textShapeXml({ id: 2245 + itemIndex, name: `Strategy Workstream PMO Status Text ${itemIndex + 1}`, x: 868680 + itemIndex * 990600, y: 3832860, cx: 685800, cy: 198120, text, size: 820, bold: true, color: visual.title })
   )).join("");
   return line + cards + metrics;
 }
@@ -21115,7 +21116,7 @@ function strategyWorkstreamPmoRoadmapXml({ scene, visual, palette }) {
   return strategyWorkstreamPmoGanttXml({ scene, visual, palette, x: 5029200, y: 762000 })
     + scene.risks.slice(0, 3).map((text, itemIndex) => (
       solidShapeXml({ id: 2250 + itemIndex, name: `Strategy Workstream PMO Decision ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 1066800, y: 3581400, cx: 914400, cy: 396240, fill: palette.warningSoft })
-      + textShapeXml({ id: 2255 + itemIndex, name: `Strategy Workstream PMO Decision Text ${itemIndex + 1}`, x: 5120640 + itemIndex * 1066800, y: 3703320, cx: 731520, cy: 137160, text, size: 520, bold: true, color: visual.title })
+      + textShapeXml({ id: 2255 + itemIndex, name: `Strategy Workstream PMO Decision Text ${itemIndex + 1}`, x: 5090160 + itemIndex * 1066800, y: 3672840, cx: 792480, cy: 198120, text, size: 720, bold: true, color: visual.title })
     )).join("");
 }
 
@@ -21128,10 +21129,10 @@ function strategyWorkstreamPmoSwimlaneXml({ scene, visual, palette }) {
     const cards = scene.cards.slice(0, 3).map((text, cardIndex) => {
       const fill = cardIndex === 2 ? palette.warningSoft : cardIndex === 1 ? palette.blueSoft : palette.greenSoft;
       return solidShapeXml({ id: 2270 + laneIndex * 5 + cardIndex, name: `Strategy Workstream PMO Work Package ${laneIndex + 1}-${cardIndex + 1}`, geom: "roundRect", x: x + 731520 + cardIndex * 822960, y: rowY + 91440, cx: 731520, cy: 335280, fill })
-        + textShapeXml({ id: 2290 + laneIndex * 5 + cardIndex, name: `Strategy Workstream PMO Work Package Text ${laneIndex + 1}-${cardIndex + 1}`, x: x + 792480 + cardIndex * 822960, y: rowY + 182880, cx: 579120, cy: 137160, text: cardIndex === 0 ? lane : text, size: 500, bold: true, color: visual.title });
+        + textShapeXml({ id: 2290 + laneIndex * 5 + cardIndex, name: `Strategy Workstream PMO Work Package Text ${laneIndex + 1}-${cardIndex + 1}`, x: x + 777240 + cardIndex * 822960, y: rowY + 152400, cx: 609600, cy: 198120, text: cardIndex === 0 ? lane : text, size: 680, bold: true, color: visual.title });
     }).join("");
     return solidShapeXml({ id: 2260 + laneIndex, name: `Strategy Workstream PMO Swimlane ${laneIndex + 1}`, geom: "roundRect", x, y: rowY, cx: 3429000, cy: laneH, fill: laneIndex % 2 ? "F8FAFC" : "FFFFFF" })
-      + textShapeXml({ id: 2265 + laneIndex, name: `Strategy Workstream PMO Lane Label ${laneIndex + 1}`, x: x + 91440, y: rowY + 182880, cx: 548640, cy: 152400, text: lane, size: 540, bold: true, color: visual.title })
+      + textShapeXml({ id: 2265 + laneIndex, name: `Strategy Workstream PMO Lane Label ${laneIndex + 1}`, x: x + 91440, y: rowY + 152400, cx: 548640, cy: 198120, text: lane, size: 720, bold: true, color: visual.title })
       + cards;
   }).join("");
 }
@@ -21144,7 +21145,7 @@ function strategyWorkstreamPmoDeliverablesXml({ scene, visual, palette }) {
     const y = 990600 + row * 883920;
     return solidShapeXml({ id: 2320 + itemIndex, name: `Strategy Workstream PMO Deliverable ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1524000, cy: 716280, fill: "FFFFFF" })
       + rectShapeXml({ id: 2325 + itemIndex, name: `Strategy Workstream PMO Deliverable Rule ${itemIndex + 1}`, x, y, cx: 1524000, cy: 53340, fill: itemIndex < 2 ? visual.secondary || visual.accent : visual.accent })
-      + textShapeXml({ id: 2330 + itemIndex, name: `Strategy Workstream PMO Deliverable Text ${itemIndex + 1}`, x: x + 121920, y: y + 228600, cx: 1219200, cy: 198120, text, size: 620, bold: true, color: visual.title });
+      + textShapeXml({ id: 2330 + itemIndex, name: `Strategy Workstream PMO Deliverable Text ${itemIndex + 1}`, x: x + 121920, y: y + 198120, cx: 1219200, cy: 274320, text, size: 800, bold: true, color: visual.title });
   }).join("");
   const mapLine = rectShapeXml({ id: 2338, name: "Strategy Workstream PMO Deliverable Map Line", x: 5181600, y: 3543300, cx: 3048000, cy: 45720, fill: visual.accent });
   return cards + mapLine;
@@ -21157,15 +21158,15 @@ function strategyWorkstreamPmoRaciXml({ scene, visual, palette }) {
   const cellH = 365760;
   let xml = solidShapeXml({ id: 2350, name: "Strategy Workstream PMO RACI Matrix", geom: "roundRect", x, y, cx: 3581400, cy: 2362200, fill: "FFFFFF" });
   scene.owners.forEach((owner, itemIndex) => {
-    xml += textShapeXml({ id: 2351 + itemIndex, name: `Strategy Workstream PMO RACI Owner ${itemIndex + 1}`, x: x + 1127760 + itemIndex * cellW, y: y + 152400, cx: cellW - 30480, cy: 137160, text: owner, size: 460, bold: true, color: visual.title });
+    xml += textShapeXml({ id: 2351 + itemIndex, name: `Strategy Workstream PMO RACI Owner ${itemIndex + 1}`, x: x + 1127760 + itemIndex * cellW, y: y + 121920, cx: cellW - 30480, cy: 198120, text: owner, size: 620, bold: true, color: visual.title });
   });
   scene.cards.slice(0, 3).forEach((task, rowIndex) => {
     const rowY = y + 518160 + rowIndex * cellH;
-    xml += textShapeXml({ id: 2360 + rowIndex, name: `Strategy Workstream PMO RACI Task ${rowIndex + 1}`, x: x + 152400, y: rowY + 91440, cx: 853440, cy: 137160, text: task, size: 500, bold: true, color: visual.body });
+    xml += textShapeXml({ id: 2360 + rowIndex, name: `Strategy Workstream PMO RACI Task ${rowIndex + 1}`, x: x + 152400, y: rowY + 76200, cx: 853440, cy: 182880, text: task, size: 660, bold: true, color: visual.body });
     scene.owners.forEach((_, colIndex) => {
       const letter = ["R", "A", "C", "I"][(rowIndex + colIndex) % 4];
       xml += solidShapeXml({ id: 2370 + rowIndex * 4 + colIndex, name: `Strategy Workstream PMO RACI Cell ${rowIndex + 1}-${colIndex + 1}`, geom: "roundRect", x: x + 1127760 + colIndex * cellW, y: rowY, cx: cellW - 45720, cy: 289560, fill: letter === "R" ? palette.blueSoft : letter === "A" ? palette.greenSoft : "F8FAFC" })
-        + textShapeXml({ id: 2390 + rowIndex * 4 + colIndex, name: `Strategy Workstream PMO RACI Letter ${rowIndex + 1}-${colIndex + 1}`, x: x + 1264920 + colIndex * cellW, y: rowY + 76200, cx: 228600, cy: 121920, text: letter, size: 620, bold: true, color: visual.title });
+        + textShapeXml({ id: 2390 + rowIndex * 4 + colIndex, name: `Strategy Workstream PMO RACI Letter ${rowIndex + 1}-${colIndex + 1}`, x: x + 1249680 + colIndex * cellW, y: rowY + 60960, cx: 259080, cy: 167640, text: letter, size: 800, bold: true, color: visual.title });
     });
   });
   return xml;
@@ -21180,11 +21181,11 @@ function strategyWorkstreamPmoRiskXml({ scene, visual, palette }) {
     const isBlocker = itemIndex === 0;
     return solidShapeXml({ id: 2410 + itemIndex, name: `Strategy Workstream PMO Risk Blocker ${itemIndex + 1}`, geom: "roundRect", x, y, cx: 1524000, cy: 640080, fill: isBlocker ? "FEE2E2" : palette.warningSoft })
       + rectShapeXml({ id: 2415 + itemIndex, name: `Strategy Workstream PMO Risk Severity ${itemIndex + 1}`, x, y, cx: 76200, cy: 640080, fill: isBlocker ? "DC2626" : visual.warning || "F59E0B" })
-      + textShapeXml({ id: 2420 + itemIndex, name: `Strategy Workstream PMO Risk Text ${itemIndex + 1}`, x: x + 152400, y: y + 213360, cx: 1219200, cy: 152400, text, size: 580, bold: true, color: visual.title });
+      + textShapeXml({ id: 2420 + itemIndex, name: `Strategy Workstream PMO Risk Text ${itemIndex + 1}`, x: x + 152400, y: y + 182880, cx: 1219200, cy: 228600, text, size: 760, bold: true, color: visual.title });
   }).join("");
   const actions = scene.cards.slice(0, 3).map((text, itemIndex) => (
     solidShapeXml({ id: 2430 + itemIndex, name: `Strategy Workstream PMO Risk Action ${itemIndex + 1}`, geom: "roundRect", x: 5029200 + itemIndex * 1066800, y: 3733800, cx: 914400, cy: 396240, fill: "FFFFFF" })
-    + textShapeXml({ id: 2435 + itemIndex, name: `Strategy Workstream PMO Risk Action Text ${itemIndex + 1}`, x: 5120640 + itemIndex * 1066800, y: 3855720, cx: 731520, cy: 137160, text, size: 520, bold: true, color: visual.title })
+    + textShapeXml({ id: 2435 + itemIndex, name: `Strategy Workstream PMO Risk Action Text ${itemIndex + 1}`, x: 5090160 + itemIndex * 1066800, y: 3825240, cx: 792480, cy: 198120, text, size: 720, bold: true, color: visual.title })
   )).join("");
   return risks + actions;
 }
@@ -21193,8 +21194,8 @@ function strategyWorkstreamPmoNextPlanXml({ scene, visual, palette }) {
   return ["30 天", "60 天", "90 天"].map((phase, itemIndex) => {
     const x = 5029200 + itemIndex * 1112520;
     return solidShapeXml({ id: 2450 + itemIndex, name: `Strategy Workstream PMO Next Plan ${itemIndex + 1}`, geom: "roundRect", x, y: 1219200, cx: 990600, cy: 1447800, fill: itemIndex === 1 ? palette.blueSoft : "FFFFFF" })
-      + textShapeXml({ id: 2455 + itemIndex, name: `Strategy Workstream PMO Next Plan Phase ${itemIndex + 1}`, x: x + 121920, y: 1394460, cx: 670560, cy: 182880, text: phase, size: 760, bold: true, color: visual.title })
-      + textShapeXml({ id: 2460 + itemIndex, name: `Strategy Workstream PMO Next Plan Text ${itemIndex + 1}`, x: x + 121920, y: 1752600, cx: 731520, cy: 335280, text: scene.cards[itemIndex] || phase, size: 560, bold: true, color: visual.body });
+      + textShapeXml({ id: 2455 + itemIndex, name: `Strategy Workstream PMO Next Plan Phase ${itemIndex + 1}`, x: x + 121920, y: 1386840, cx: 670560, cy: 228600, text: phase, size: 940, bold: true, color: visual.title })
+      + textShapeXml({ id: 2460 + itemIndex, name: `Strategy Workstream PMO Next Plan Text ${itemIndex + 1}`, x: x + 121920, y: 1737360, cx: 746760, cy: 396240, text: scene.cards[itemIndex] || phase, size: 760, bold: true, color: visual.body });
   }).join("")
     + rectShapeXml({ id: 2468, name: "Strategy Workstream PMO Next Rhythm", x: 5029200, y: 3337560, cx: 3225800, cy: 45720, fill: visual.accent });
 }
@@ -21207,10 +21208,10 @@ function strategyWorkstreamPmoScene({ slide, index, role, total }) {
       : ["overview", "swimlane", "deliverables", "raci", "risks"][Math.min(index - 1, 4)];
   const sceneRole = role === "closing" ? "next-plan" : inferredRole;
   const bullets = normalizeStrategyWorkstreamPmoTexts(slide);
-  const cards = ["阶段目标锁定", "关键工作包拆解", "交付物验收", "风险与决策闭环"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 14));
+  const cards = ["阶段目标锁定", "工作包拆解", "交付物验收", "风险决策闭环"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 12));
   const lanes = ["战略诊断", "方案设计", "试点落地", "治理复盘"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 8));
   const owners = ["客户负责人", "咨询顾问", "业务负责人", "PMO"];
-  const risks = ["依赖未确认", "资源冲突", "数据口径", "决策延迟"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 9));
+  const risks = ["依赖未确认", "资源冲突", "数据口径", "决策延迟"].map((fallback, itemIndex) => compactStrategyWorkstreamPmoText(bullets[itemIndex], fallback, 8));
   const kickerMap = {
     cover: "PMO WORKSTREAM",
     overview: "PHASE RHYTHM",
