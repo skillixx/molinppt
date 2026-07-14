@@ -1070,7 +1070,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-modal[aria-hidden="false"] { max-height: min(680px, calc(100vh - 340px)); height: min(680px, calc(100vh - 340px)); overflow: hidden; }
     body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-dialog { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; min-height: 0; }
     body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
-    /* 操作按钮固定在编辑卡片底部，滚动页面要点和 AI 指令时仍可直接提交。 */
+    /* 操作按钮固定在助手卡片底部，滚动快捷建议和优化指令时仍可直接提交。 */
     body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-actions { position: sticky; bottom: 0; z-index: 2; margin: 0 -4px -4px; padding: 12px 4px 4px; background: #fff; }
     body[data-workspace-page="templates"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .workflow { grid-template-columns: minmax(0, 1fr); }
@@ -1615,7 +1615,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .button-spinner { position: relative; z-index: 1; flex: 0 0 auto; width: 13px; height: 13px; margin-right: 2px; border-color: rgba(255,255,255,.42); border-top-color: #fff; vertical-align: -2px; }
     button.secondary .button-spinner { border-color: rgba(37,99,235,.24); border-top-color: #2563eb; }
     .button-label { position: relative; z-index: 1; }
-    .structure-side-panel, .ai-polish-side-panel { display: none !important; }
     .slide-edit-modal { position: relative; z-index: 30; display: none; min-width: 0; min-height: 0; }
     .slide-edit-modal[aria-hidden="false"] { display: block; }
     .slide-edit-dialog { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
@@ -1624,11 +1623,21 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .slide-edit-selected { color: var(--muted); font-size: 12px; font-weight: 800; }
     .slide-edit-close { width: 34px; height: 34px; padding: 0; border: 1px solid #d8e2f0; background: #fff; color: #475569; box-shadow: none; }
     .slide-edit-body { display: grid; gap: 12px; padding-top: 14px; }
-    .slide-edit-body textarea { min-height: 116px; }
-    .slide-ai-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; }
-    .slide-ai-choice label { display: flex; align-items: center; gap: 8px; margin: 0; color: #1e3a8a; font-size: 13px; font-weight: 850; }
-    .slide-ai-choice input[type="checkbox"] { width: 16px; height: 16px; padding: 0; }
+    .slide-edit-body textarea { min-height: 146px; resize: vertical; }
+    .slide-ai-assistant { display: grid; gap: 14px; }
+    .slide-ai-welcome { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; }
+    .slide-ai-robot { position: relative; width: 44px; height: 44px; border: 1px solid #93c5fd; border-radius: 8px; background: #2563eb; box-shadow: 0 8px 18px rgba(37,99,235,.18); }
+    .slide-ai-robot::before { content: ""; position: absolute; left: 9px; right: 9px; top: 11px; height: 18px; border-radius: 6px; background: #eff6ff; box-shadow: inset 0 -4px 0 #dbeafe; }
+    .slide-ai-robot::after { content: ""; position: absolute; left: 15px; top: 17px; width: 5px; height: 5px; border-radius: 50%; background: #2563eb; box-shadow: 10px 0 0 #14b8a6; }
+    .slide-ai-message { min-width: 0; padding: 11px 12px; border: 1px solid #dbeafe; border-radius: 8px; background: #f8fbff; color: #334155; font-size: 12px; line-height: 1.55; }
+    .slide-ai-prompt-label { color: #64748b; font-size: 11px; font-weight: 800; }
+    .slide-ai-prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .slide-ai-prompt { min-width: 0; min-height: 36px; padding: 8px 9px; border: 1px solid #d8e2f0; border-radius: 8px; background: #fff; color: #1e3a8a; box-shadow: none; font-size: 11px; line-height: 1.3; }
+    .slide-ai-prompt:hover:not(:disabled) { border-color: #93c5fd; background: #eff6ff; transform: none; box-shadow: none; }
+    .slide-ai-input { display: grid; gap: 8px; }
+    .slide-ai-input label { margin: 0; }
     .slide-edit-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+    .slide-edit-actions #regenerate-slide { width: 100%; justify-content: center; }
     .empty-preview { min-height: 584px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 14px; background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 62%, #e8f1ff 100%); }
     .empty-slide { width: min(560px, 90%); aspect-ratio: 16 / 9; border-radius: 16px; background: linear-gradient(135deg, #fff 0%, #fff 58%, #f2f7ff 100%); border: 1px solid #d9e5f5; box-shadow: 0 26px 68px rgba(31,94,255,.13); padding: 48px 58px; }
     .empty-slide h3 { margin: 0 0 14px; font-size: 30px; line-height: 1.16; color: #173b8f; letter-spacing: 0; }
@@ -2028,56 +2037,36 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <div class="slide-edit-dialog" role="dialog" aria-modal="false" aria-labelledby="slide-edit-title">
             <div class="slide-edit-head">
               <div>
-                <h2 id="slide-edit-title">编辑当前页面</h2>
+                <h2 id="slide-edit-title">AI 单页助手</h2>
                 <div id="slide-edit-selected" class="slide-edit-selected">请选择一页 PPT</div>
               </div>
               <button id="close-slide-edit-modal" class="slide-edit-close" type="button" aria-label="关闭">×</button>
             </div>
             <div class="slide-edit-body">
-              <label for="structure-slide-title">页面标题</label>
-              <input id="structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
-              <label for="structure-slide-layout">页面版式</label>
-              <select id="structure-slide-layout" disabled></select>
-              <label for="structure-slide-bullets">页面要点</label>
-              <textarea id="structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
-              <div class="slide-ai-choice">
-                <label for="single-page-ai-toggle"><input id="single-page-ai-toggle" type="checkbox" />需要 AI 单页优化</label>
-                <textarea id="slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
+              <div class="slide-ai-assistant">
+                <div class="slide-ai-welcome">
+                  <span class="slide-ai-robot" aria-hidden="true"></span>
+                  <div id="slide-ai-message" class="slide-ai-message">先在中间预览中选择一页，我会针对该页的内容和表达进行优化。</div>
+                </div>
+                <div class="slide-ai-prompt-label">快捷优化</div>
+                <div class="slide-ai-prompts" aria-label="快捷优化建议">
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="提炼核心观点">提炼核心观点</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="强化高层表达">强化高层表达</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="优化数据叙事">优化数据叙事</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="压缩冗余文字">压缩冗余文字</button>
+                </div>
+                <div class="slide-ai-input">
+                  <label for="slide-instruction">优化指令</label>
+                  <textarea id="slide-instruction" placeholder="告诉 AI 希望这一页如何调整，例如：突出利润下滑原因，并给出三条可执行建议。"></textarea>
+                </div>
               </div>
               <div class="slide-edit-actions">
-                <button id="apply-structure-preview" type="button" class="secondary">仅更新预览</button>
-                <button id="regenerate-slide" type="button">AI 优化本页</button>
+                <button id="regenerate-slide" type="button">发送并优化本页</button>
               </div>
             </div>
           </div>
         </div>
       <span id="slide-edit-home" class="is-hidden" aria-hidden="true"></span>
-      <div class="panel sidebar-panel structure-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
-        <div class="panel-head"><h2>PPT 结构调整</h2></div>
-        <p class="panel-note">在中间预览中选择页面后，可调整标题、要点和版式角色，再按当前模板重新预览。</p>
-        <div class="structure-editor">
-          <label for="legacy-structure-slide-title">页面标题</label>
-          <input id="legacy-structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
-          <label for="legacy-structure-slide-layout">页面版式</label>
-          <select id="legacy-structure-slide-layout" disabled></select>
-          <label for="legacy-structure-slide-bullets">页面要点</label>
-          <textarea id="legacy-structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
-          <div class="structure-editor-note">调整会先同步到大纲结构，再重新生成在线预览。</div>
-          <div class="structure-editor-actions">
-            <button id="legacy-apply-structure-preview" type="button" class="secondary">应用结构并重新预览</button>
-          </div>
-        </div>
-      </div>
-      <div class="panel sidebar-panel ai-polish-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
-        <div class="panel-head"><h2>AI 单页润色</h2></div>
-        <p class="panel-note">在中间预览中点击要优化的页面，再输入润色建议。</p>
-        <div id="legacy-selected-slide-label" class="selected-slide-box">未选择页面<span>请先在在线预览中点击一页 PPT。</span></div>
-        <label for="legacy-slide-instruction">润色建议</label>
-        <textarea id="legacy-slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
-        <div class="actions">
-          <button id="legacy-regenerate-slide" class="secondary">AI 润色本页</button>
-        </div>
-      </div>
       <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
         <div class="panel-head"><h2>任务状态 / 日志</h2></div>
         <pre id="status">ready</pre>
@@ -2142,16 +2131,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const outlineEditorEl = document.querySelector("#outline-editor");
     const outlineBoardEl = document.querySelector("#outline-board");
     const outlineSummaryEl = document.querySelector("#outline-summary");
-    const selectedSlideLabelEl = document.querySelector("#selected-slide-label");
     const slideEditModalEl = document.querySelector("#slide-edit-modal");
     const slideEditHomeEl = document.querySelector("#slide-edit-home");
     const assetSlideEditContextEl = document.querySelector("#asset-slide-edit-context");
     const slideEditSelectedEl = document.querySelector("#slide-edit-selected");
-    const singlePageAiToggleEl = document.querySelector("#single-page-ai-toggle");
-    const structureSlideTitleEl = document.querySelector("#structure-slide-title");
-    const structureSlideLayoutEl = document.querySelector("#structure-slide-layout");
-    const structureSlideBulletsEl = document.querySelector("#structure-slide-bullets");
-    const applyStructurePreviewButton = document.querySelector("#apply-structure-preview");
     const templateGalleryEl = document.querySelector("#template-gallery");
     const templateGalleryCountEl = document.querySelector("#template-gallery-count");
     const templateCategoryTabsEl = document.querySelector("#template-category-tabs");
@@ -2187,21 +2170,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     let deckRevealTimer = null;
     let deckRevealTargetCount = 0;
     let deckRevealSlides = [];
-    const STRUCTURE_LAYOUT_OPTIONS = [
-      ["", "自动匹配"],
-      ["cover", "封面页"],
-      ["agenda", "目录页"],
-      ["section-divider", "章节页"],
-      ["image-report", "图文汇报"],
-      ["metrics", "数据指标"],
-      ["three-steps", "三步骤流程"],
-      ["four-steps", "四步骤流程"],
-      ["showcase", "成果展示"],
-      ["retrospective", "问题复盘"],
-      ["next-plan", "下一步计划"],
-      ["closing", "结束页"],
-      ["content", "普通内容"]
-    ];
     const json = (url, body, method = "POST") => fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -3081,7 +3049,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         page.dataset.selected = page.dataset.slideNumber === String(state.selectedSlideNumber);
       });
       renderSelectedSlideLabel();
-      renderStructureEditor();
+      syncSinglePageAiAssistant();
       if (openEditor) openSlideEditModal();
     }
 
@@ -3186,44 +3154,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
 
     function renderSelectedSlideLabel() {
+      const assistantMessageEl = document.querySelector("#slide-ai-message");
       if (slideEditSelectedEl) {
         slideEditSelectedEl.textContent = state.selectedSlideNumber
-          ? "已选择第 " + state.selectedSlideNumber + " 页，可直接修改内容，或勾选 AI 单页优化。"
+          ? "已连接第 " + state.selectedSlideNumber + " 页"
           : "请选择一页 PPT";
       }
-      if (!selectedSlideLabelEl) return;
-      if (!state.selectedSlideNumber) {
-        selectedSlideLabelEl.innerHTML = '未选择页面<span>请先在在线预览中点击一页 PPT。</span>';
-        return;
+      if (assistantMessageEl) {
+        assistantMessageEl.textContent = state.selectedSlideNumber
+          ? "我已读取第 " + state.selectedSlideNumber + " 页。选择一个快捷方向，或直接告诉我希望如何优化。"
+          : "先在中间预览中选择一页，我会针对该页的内容和表达进行优化。";
       }
-      selectedSlideLabelEl.innerHTML = '已选择第 ' + state.selectedSlideNumber + ' 页<span>点击中间预览中的其他页面可切换。</span>';
     }
 
-    function selectedOutlineSlideIndex() {
-      const index = Number(state.selectedSlideNumber) - 1;
-      return Number.isInteger(index) && index >= 0 && index < state.outlineSlides.length ? index : -1;
-    }
-
-    function renderStructureLayoutOptions(selectedLayout = "") {
-      if (!structureSlideLayoutEl) return;
-      structureSlideLayoutEl.innerHTML = STRUCTURE_LAYOUT_OPTIONS.map(([value, label]) => (
-        '<option value="' + escapeHtml(value) + '">' + escapeHtml(label) + '</option>'
-      )).join("");
-      structureSlideLayoutEl.value = STRUCTURE_LAYOUT_OPTIONS.some(([value]) => value === selectedLayout) ? selectedLayout : "";
-    }
-
-    function setStructureEditorDisabled(isDisabled) {
-      [structureSlideTitleEl, structureSlideLayoutEl, structureSlideBulletsEl, applyStructurePreviewButton].forEach((element) => {
-        if (element) element.disabled = isDisabled;
-      });
-    }
-
-    function syncSinglePageAiChoice() {
+    function syncSinglePageAiAssistant() {
       const instructionEl = document.querySelector("#slide-instruction");
-      const enabled = singlePageAiToggleEl?.checked === true;
-      if (instructionEl) instructionEl.disabled = !enabled;
+      const hasSelectedSlide = Boolean(state.selectedSlideId && state.selectedSlideNumber);
+      if (instructionEl) instructionEl.disabled = !hasSelectedSlide;
       const regenerateButton = document.querySelector("#regenerate-slide");
-      if (regenerateButton) regenerateButton.disabled = !enabled || !state.selectedSlideId;
+      if (regenerateButton) regenerateButton.disabled = !hasSelectedSlide;
+      document.querySelectorAll("[data-slide-ai-prompt]").forEach((button) => {
+        button.disabled = !hasSelectedSlide;
+      });
     }
 
     function formatAssetDate(value) {
@@ -3231,53 +3183,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return String(value);
       return date.toLocaleString("zh-CN", { hour12: false });
-    }
-
-    function renderStructureEditor() {
-      if (!structureSlideTitleEl || !structureSlideLayoutEl || !structureSlideBulletsEl) return;
-      const index = selectedOutlineSlideIndex();
-      renderStructureLayoutOptions(index >= 0 ? String(state.outlineSlides[index]?.layout || "") : "");
-      if (index < 0) {
-        structureSlideTitleEl.value = "";
-        structureSlideBulletsEl.value = "";
-        setStructureEditorDisabled(true);
-        syncSinglePageAiChoice();
-        return;
-      }
-      const slide = state.outlineSlides[index] || {};
-      structureSlideTitleEl.value = slide.title || "";
-      structureSlideBulletsEl.value = normalizePreviewBullets(slide.bullets).join("\\n");
-      setStructureEditorDisabled(false);
-      syncSinglePageAiChoice();
-    }
-
-    function applyStructureEditorToSelectedSlide() {
-      const index = selectedOutlineSlideIndex();
-      if (index < 0) throw new Error("请先在在线预览中选择要调整结构的页面");
-      const title = structureSlideTitleEl.value.trim();
-      const bullets = String(structureSlideBulletsEl.value || "")
-        .split(/\\r?\\n/)
-        .map((line) => line.trim())
-        .filter(Boolean);
-      if (!title) throw new Error("页面标题不能为空");
-      if (!bullets.length) throw new Error("页面至少需要一个要点");
-      const layout = structureSlideLayoutEl.value;
-      const nextSlide = {
-        ...state.outlineSlides[index],
-        title,
-        bullets,
-        ...(layout ? { layout } : {})
-      };
-      if (!layout) delete nextSlide.layout;
-      state.outlineSlides = state.outlineSlides.map((slide, slideIndex) => (
-        slideIndex === index ? nextSlide : slide
-      ));
-      renderOutlineBoard(state.outlineSlides);
-      state.selectedSlideNumber = index + 1;
-      state.selectedSlideId = slideIdForNumber({ slides: state.outlineSlides }, state.selectedSlideNumber);
-      renderStructureEditor();
-      renderSelectedSlideLabel();
-      return state.outlineSlides;
     }
 
     function renderDeckGeneratingPreview(slides = []) {
@@ -3516,7 +3421,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
       outlineEditorEl.value = JSON.stringify(state.outlineSlides, null, 2);
       renderOutlineSummary(state.outlineSlides);
-      renderStructureEditor();
+      syncSinglePageAiAssistant();
       if (!state.outlineSlides.length) {
         outlineBoardEl.innerHTML = '<div class="outline-empty"><div><strong>先生成大纲</strong><span>生成后会以每页卡片展示，直接修改标题和要点即可。</span></div></div>';
         return;
@@ -3599,8 +3504,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 
     function setSlideRegenerationBusy(isBusy) {
       const button = document.querySelector("#regenerate-slide");
-      setButtonWaiting(button, isBusy, isBusy ? "AI 优化中..." : "AI 优化本页");
-      if (!isBusy) syncSinglePageAiChoice();
+      setButtonWaiting(button, isBusy, isBusy ? "AI 正在优化..." : "发送并优化本页");
+      if (!isBusy) syncSinglePageAiAssistant();
       if (previewStageEl) previewStageEl.classList.toggle("is-polishing", isBusy);
       if (previewPolishLoadingEl) previewPolishLoadingEl.setAttribute("aria-hidden", isBusy ? "false" : "true");
     }
@@ -3745,7 +3650,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     setWorkspacePage(location.hash.slice(1) || "create");
     setFlowStage("input");
-    renderStructureEditor();
+    syncSinglePageAiAssistant();
     document.querySelector("#template").addEventListener("change", () => {
       renderThemeOptions();
       renderTemplateGallery();
@@ -3942,34 +3847,38 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       } catch (error) { statusEl.textContent = error.message; }
       finally { setButtonWaiting(retryButton, false, "重试失败任务"); }
     });
-    document.querySelector("#apply-structure-preview").addEventListener("click", async () => {
-      try {
-        if (!state.outlineId) throw new Error("请先生成大纲");
-        applyStructureEditorToSelectedSlide();
-        statusEl.textContent = "已更新第 " + state.selectedSlideNumber + " 页结构，正在重新生成在线预览...";
-        closeSlideEditModal();
-        document.querySelector("#generate-deck").click();
-      } catch (error) {
-        statusEl.textContent = error.message;
-      }
-    });
     document.querySelector("#close-slide-edit-modal")?.addEventListener("click", closeSlideEditModal);
     document.querySelector("#slide-edit-modal")?.addEventListener("click", (event) => {
       if (event.target === event.currentTarget) closeSlideEditModal();
     });
-    singlePageAiToggleEl?.addEventListener("change", syncSinglePageAiChoice);
+    // 快捷指令只是填充对话输入框，用户仍可继续补充自己的要求。
+    document.querySelectorAll("[data-slide-ai-prompt]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const instructionEl = document.querySelector("#slide-instruction");
+        if (!instructionEl) return;
+        const prompt = String(button.dataset.slideAiPrompt || "").trim();
+        const promptInstructions = {
+          "提炼核心观点": "提炼本页核心观点，保留最重要的三条结论，删除重复表达。",
+          "强化高层表达": "将本页改成适合高层汇报的表达，结论前置，突出业务影响和决策建议。",
+          "优化数据叙事": "优化本页的数据叙事，明确关键指标、变化原因和可执行结论。",
+          "压缩冗余文字": "压缩本页冗余文字，使用更短的句子和更清晰的层级，保持信息完整。"
+        };
+        instructionEl.value = promptInstructions[prompt] || prompt;
+        instructionEl.focus();
+      });
+    });
     document.querySelector("#regenerate-slide").addEventListener("click", async () => {
+      const assistantMessageEl = document.querySelector("#slide-ai-message");
       try {
-        if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 润色单页");
-        if (!singlePageAiToggleEl?.checked) throw new Error("请先勾选需要 AI 单页优化");
-        setSlideRegenerationBusy(true);
-        applyStructureEditorToSelectedSlide();
+        if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 单页助手");
         const entitlementValue = document.querySelector("#entitlement").value.trim();
         const slideId = state.selectedSlideId;
         const instruction = document.querySelector("#slide-instruction").value.trim();
-        if (!slideId) throw new Error("请先用鼠标在在线预览中选择要润色的页面");
-        if (!instruction) throw new Error("请输入 AI 润色建议");
-        statusEl.textContent = "AI 正在润色第 " + (state.selectedSlideNumber || slideId) + " 页...";
+        if (!slideId) throw new Error("请先用鼠标在在线预览中选择要优化的页面");
+        if (!instruction) throw new Error("请输入希望 AI 如何优化这一页");
+        setSlideRegenerationBusy(true);
+        if (assistantMessageEl) assistantMessageEl.textContent = "正在分析第 " + state.selectedSlideNumber + " 页并重新组织内容，请稍候...";
+        statusEl.textContent = "AI 正在优化第 " + (state.selectedSlideNumber || slideId) + " 页...";
         const data = await json("/api/ppt/decks/" + state.deckId + "/slides/" + slideId + "/regenerate", {
           instruction,
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
@@ -3983,9 +3892,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = JSON.stringify(data.slide, null, 2);
         await refreshDeckPreviewFrame(state.deckId);
         await loadBalance();
-        closeSlideEditModal();
+        if (assistantMessageEl) assistantMessageEl.textContent = "第 " + state.selectedSlideNumber + " 页已优化完成。可以继续输入要求进行下一轮调整。";
       } catch (error) {
         statusEl.textContent = error.message;
+        if (assistantMessageEl) assistantMessageEl.textContent = error.message;
       } finally {
         setSlideRegenerationBusy(false);
       }
