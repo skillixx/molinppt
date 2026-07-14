@@ -4273,6 +4273,58 @@ test("HTTP API preview reflects business minimal theme layout override", async (
   }
 });
 
+test("HTTP API preview renders business executive deepblue boardroom layout", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Executive operating review",
+      slide_count: 8,
+      template_id: "business",
+      theme: "executive",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const html = await preview.text();
+
+    assert.equal(deckBody.deck.templateId, "business");
+    assert.equal(deckBody.deck.theme, "executive");
+    assert.equal(preview.status, 200);
+    assert.match(html, /data-layout="executive-deepblue-boardroom"/);
+    assert.match(html, /--template-primary:#071A2F/);
+    assert.match(html, /class="boardroom-dashboard"/);
+    assert.match(html, /class="boardroom-agenda"/);
+    assert.match(html, /class="boardroom-matrix"/);
+    assert.match(html, /class="boardroom-path"/);
+    assert.match(html, /class="boardroom-actions"/);
+    assert.match(html, /class="boardroom-decision"/);
+    assert.doesNotMatch(html, />高管深蓝</);
+    assert.doesNotMatch(html, />高管商务汇报</);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("PptService preview renders dome role classes and business image assets", async () => {
   const context = await createBusinessContext();
   const deck = await context.database.insert("decks", {

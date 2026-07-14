@@ -1338,6 +1338,7 @@ function renderDeckPreview({ deck, visual }) {
     const dataResearchReportScene = !dataInsightDashboardConsoleScene && !dataInsightWorkbenchScene && isDataResearchReportVisual(visual) ? dataResearchReportPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const dataInsightScene = !dataInsightDashboardConsoleScene && !dataInsightWorkbenchScene && !dataResearchReportScene && isDataInsightVisual(visual) ? dataInsightPreviewScene(visual) : null;
     const biCockpitScene = isBiExecutiveCockpitVisual(visual) ? biExecutiveCockpitPreviewScene({ slide, index, total: deck.slides.length }) : null;
+    const boardroomScene = isExecutiveDeepblueBoardroomVisual(visual) ? executiveDeepblueBoardroomPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const userPathScene = isUserPathFunnelVisual(visual) ? userPathFunnelPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const channelQualityScene = isChannelTrafficQualityVisual(visual) ? channelTrafficQualityPreviewScene({ slide, index, total: deck.slides.length }) : null;
     const trendRadarScene = typeof isMarketTrendRadarVisual === "function" && isMarketTrendRadarVisual(visual) ? marketTrendRadarPreviewScene({ slide, index, total: deck.slides.length }) : null;
@@ -1602,6 +1603,9 @@ function renderDeckPreview({ deck, visual }) {
     const biCockpitMark = biCockpitScene
       ? renderBiExecutiveCockpitPreview(slide, biCockpitScene)
       : "";
+    const boardroomMark = boardroomScene
+      ? renderExecutiveDeepblueBoardroomPreview(slide, boardroomScene)
+      : "";
     const userPathMark = userPathScene
       ? renderUserPathFunnelPreview(slide, userPathScene)
       : "";
@@ -1734,11 +1738,11 @@ function renderDeckPreview({ deck, visual }) {
       ? `<div class="dome-role-decor dome-canvas-frame"></div>${renderDomePreviewContentFrame(domeRole)}${renderDomePreviewContentSurface(domeRole)}${renderDomePreviewDecoration(domeRole, slide, index)}${renderDomePreviewWaves(visual)}${renderDomePreviewFooter(visual)}`
       : "";
     // 年度总结、行业研究、趋势研判、预算管理、行业解决方案和新品首发节奏模板已经由专用内容层承载真实文字，普通内容层保持空壳，防止两套文字叠加。
-    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || strategyBoardReportScene || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || strategyMatrixScene || strategyWorkstreamScene || productScene || productReviewScene || releaseCadenceScene || releaseCommitteeScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeFpaScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || salesEnterpriseScene || salesSolutionScene || salesRenewalScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
+    const dedicatedContentLayer = (!renderBodyList && !isDomeLayout) || strategyBoardReportScene || luxuryBrandScene || brandStoryEditorialScene || annualSummaryScene || quarterlyActionLoopScene || operatingProblemTreeScene || businessOpportunityScene || managementAgendaScene || industryResearchScene || industryTrendScene || competitionMapScene || regionEntryScene || secondCurveScene || swotMapScene || strategyMatrixScene || strategyWorkstreamScene || productScene || productReviewScene || releaseCadenceScene || releaseCommitteeScene || painPointScene || pricingStrategyScene || interviewInsightScene || priorityMatrixScene || experienceJourneyScene || experienceGapScene || capabilityRadarScene || productRetentionScene || budgetPlanningScene || budgetVarianceScene || budgetAdjustmentScene || financeAuditScene || financeFpaScene || financeQuarterlyScene || riskInspectionScene || costBreakdownScene || cashFlowScene || profitBridgeScene || investmentRoiScene || salesEnterpriseScene || salesSolutionScene || salesRenewalScene || channelPolicyScene || financialSolutionScene || manufacturingSolutionScene || educationSolutionScene || keyAccountScene || presalesArchitectureScene || salesTrainingScene || corporateTrainingScene || onboardingScene || blackboardScene || conceptBreakdownScene || examReviewScene || teachingAchievementScene || workshopPracticeScene || brandCommunicationScene || productPremiereScene || growthMarketingLabScene || integratedMediaScene || publicCourseScene || festivalPromotionScene || launchRhythmScene || socialVideoScene || privateDomainScene || departmentTeamScene || brandIdentityScene || pitchInvestorMemoScene || seedStoryScene || growthFundingScene || preAMarketScene || productFundingScene || pitchAiSaasScene || investorUpdateScene || projectReturnScene || enterpriseBlueprintScene || businessModelValueChainScene || businessModelScene || dataInsightDashboardConsoleScene || dataResearchReportScene || biCockpitScene || boardroomScene || userPathScene || trendRadarScene || segmentationScene || anomalyScene || governanceScene || surveyScene || experimentScene;
     const defaultSlideContent = dedicatedContentLayer
       ? '<div class="slide-content"></div>'
       : `<div class="slide-content"><h2${topBandHeadingClass}>${escapeHtml(slide.title)}</h2>${renderBodyList ? bodyList : ""}</div>`;
-    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyBoardReportScene?.variant || strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || financeFpaScene?.variant || salesEnterpriseScene?.variant || salesSolutionScene?.variant || salesRenewalScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || productReviewScene?.variant || releaseCadenceScene?.variant || releaseCommitteeScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || strategyMatrixScene?.variant || strategyWorkstreamScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyBoardReportMark}${strategyMark}${strategyWorkstreamMark}${financeMark}${financeAuditMark}${financeFpaMark}${salesMark}${salesEnterpriseMark}${salesSolutionMark}${salesRenewalMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${productReviewMark}${releaseCadenceMark}${releaseCommitteeMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${strategyMatrixMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
+    return `<article class="preview-page" aria-label="第 ${index + 1} 页"><div class="slide slide-${slideKind}" data-dome-role="${escapeHtml(domeRole)}" data-status-variant="${escapeHtml(statusReportScene?.variant || "")}" data-template-variant="${escapeHtml(strategyBoardReportScene?.variant || strategyScene?.variant || financeScene?.variant || financeAuditScene?.variant || financeFpaScene?.variant || salesEnterpriseScene?.variant || salesSolutionScene?.variant || salesRenewalScene?.variant || channelPolicyScene?.variant || financialSolutionScene?.variant || manufacturingSolutionScene?.variant || educationSolutionScene?.variant || keyAccountScene?.variant || presalesArchitectureScene?.variant || salesTrainingScene?.variant || corporateTrainingScene?.variant || onboardingScene?.variant || blackboardScene?.variant || conceptBreakdownScene?.variant || examReviewScene?.variant || teachingAchievementScene?.variant || workshopPracticeScene?.variant || productScene?.variant || productReviewScene?.variant || releaseCadenceScene?.variant || releaseCommitteeScene?.variant || painPointScene?.variant || pricingStrategyScene?.variant || interviewInsightScene?.variant || priorityMatrixScene?.variant || experienceJourneyScene?.variant || experienceGapScene?.variant || capabilityRadarScene?.variant || productRetentionScene?.variant || pitchScene?.variant || pitchInvestorMemoScene?.variant || seedStoryScene?.variant || growthFundingScene?.variant || preAMarketScene?.variant || productFundingScene?.variant || pitchAiSaasScene?.variant || investorUpdateScene?.variant || projectReturnScene?.variant || enterpriseBlueprintScene?.variant || businessModelValueChainScene?.variant || businessModelScene?.variant || marketingScene?.variant || brandCommunicationScene?.variant || growthMarketingLabScene?.variant || integratedMediaScene?.variant || publicCourseScene?.variant || festivalPromotionScene?.variant || launchRhythmScene?.variant || socialVideoScene?.variant || privateDomainScene?.variant || brandIdentityScene?.variant || luxuryBrandScene?.variant || brandStoryScene?.variant || dataInsightDashboardConsoleScene?.variant || dataInsightWorkbenchScene?.variant || dataInsightScene?.variant || biCockpitScene?.variant || boardroomScene?.variant || userPathScene?.variant || channelQualityScene?.variant || trendRadarScene?.variant || segmentationScene?.variant || anomalyScene?.variant || surveyScene?.variant || experimentScene?.variant || educationScene?.variant || annualSummaryScene?.variant || quarterlyDashboardScene?.variant || quarterlyDiagnosisScene?.variant || quarterlyActionLoopScene?.variant || operatingProblemTreeScene?.variant || businessOpportunityScene?.variant || managementAgendaScene?.variant || industryResearchScene?.variant || industryTrendScene?.variant || competitionMapScene?.variant || regionEntryScene?.variant || secondCurveScene?.variant || swotMapScene?.variant || strategyMatrixScene?.variant || strategyWorkstreamScene?.variant || budgetPlanningScene?.variant || budgetVarianceScene?.variant || budgetAdjustmentScene?.variant || financeQuarterlyScene?.variant || riskInspectionScene?.variant || costBreakdownScene?.variant || cashFlowScene?.variant || profitBridgeScene?.variant || "")}"><div class="accent"></div><div class="motif"></div><div class="top-band-brand">${topBandBrand}</div>${topBandMark}${statusReportMark}${strategyBoardReportMark}${strategyMark}${strategyWorkstreamMark}${financeMark}${financeAuditMark}${financeFpaMark}${salesMark}${salesEnterpriseMark}${salesSolutionMark}${salesRenewalMark}${channelPolicyMark}${financialSolutionMark}${manufacturingSolutionMark}${educationSolutionMark}${keyAccountMark}${presalesArchitectureMark}${salesTrainingMark}${corporateTrainingMark}${onboardingMark}${blackboardMark}${conceptBreakdownMark}${examReviewMark}${teachingAchievementMark}${workshopPracticeMark}${productMark}${productReviewMark}${releaseCadenceMark}${releaseCommitteeMark}${painPointMark}${pricingStrategyMark}${interviewInsightMark}${priorityMatrixMark}${experienceJourneyMark}${experienceGapMark}${capabilityRadarMark}${productRetentionMark}${pitchMark}${pitchInvestorMemoMark}${seedStoryMark}${growthFundingMark}${preAMarketMark}${productFundingMark}${pitchAiSaasMark}${investorUpdateMark}${projectReturnMark}${enterpriseBlueprintMark}${businessModelValueChainMark}${businessModelMark}${marketingMark}${brandCommunicationMark}${growthMarketingLabMark}${integratedMediaMark}${publicCourseMark}${festivalPromotionMark}${launchRhythmMark}${socialVideoMark}${privateDomainMark}${departmentTeamMark}${brandIdentityMark}${luxuryBrandMark}${brandStoryMark}${dataInsightDashboardConsoleMark}${dataInsightWorkbenchMark}${dataInsightMark}${biCockpitMark}${boardroomMark}${userPathMark}${channelQualityMark}${trendRadarMark}${segmentationMark}${anomalyMark}${surveyMark}${educationMark}${annualSummaryMark}${quarterlyDashboardMark}${quarterlyDiagnosisMark}${quarterlyActionLoopMark}${operatingProblemTreeMark}${businessOpportunityMark}${managementAgendaMark}${industryResearchMark}${industryTrendMark}${competitionMapMark}${regionEntryMark}${secondCurveMark}${swotMapMark}${strategyMatrixMark}${budgetPlanningMark}${budgetVarianceMark}${budgetAdjustmentMark}${financeQuarterlyMark}${riskInspectionMark}${costBreakdownMark}${cashFlowMark}${profitBridgeMark}${investmentRoiMark}${domeChrome}${defaultSlideContent}<div class="page-number">${index + 1} / ${deck.slides.length}</div></div></article>`;
   }).join("");
   const domePreviewVars = visual.layout === "red-gold" ? redGoldPreviewVars(visual) : "";
   const statusReportVars = visual.layout === "status-report" ? statusReportPreviewVars(visual) : "";
@@ -3751,6 +3755,38 @@ function renderDeckPreview({ deck, visual }) {
     body[data-layout="bi-executive-cockpit"] .cockpit-actions{position:absolute;left:8%;right:8%;bottom:16%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;}
     body[data-layout="bi-executive-cockpit"] .cockpit-actions span{min-height:90px;border-radius:16px;background:linear-gradient(135deg,rgba(14,34,56,.92),rgba(8,17,31,.82));border:1px solid rgba(34,211,238,.2);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:16px;font-size:13px;font-weight:900;color:var(--template-title);}
     body[data-layout="bi-executive-cockpit"] .page-number{z-index:5;right:6.2%;bottom:5.4%;background:rgba(8,17,31,.72);border:1px solid rgba(34,211,238,.18);border-radius:999px;padding:5px 10px;color:rgba(230,247,255,.66);}
+    body[data-layout="executive-deepblue-boardroom"] .slide{padding:0;border:0;background:#081426;box-shadow:0 24px 62px rgba(3,8,18,.38);}
+    body[data-layout="executive-deepblue-boardroom"] .slide::before{background:radial-gradient(circle at 82% 18%,rgba(59,165,199,.18),transparent 24%),radial-gradient(circle at 16% 84%,rgba(200,169,106,.14),transparent 26%),repeating-linear-gradient(90deg,rgba(183,198,214,.06) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,rgba(183,198,214,.045) 0 1px,transparent 1px 40px);}
+    body[data-layout="executive-deepblue-boardroom"] .slide::after{content:"";position:absolute;left:5%;right:5%;top:7.8%;bottom:7.2%;z-index:1;border-radius:18px;background:linear-gradient(135deg,rgba(16,36,58,.94),rgba(7,26,47,.88));border:1px solid rgba(200,169,106,.22);box-shadow:0 0 0 1px rgba(255,255,255,.035) inset,0 24px 54px rgba(0,0,0,.30);}
+    body[data-layout="executive-deepblue-boardroom"] .accent{left:5%;right:5%;top:7.8%;height:5px;z-index:4;background:linear-gradient(90deg,var(--template-accent),var(--template-secondary),transparent);}
+    body[data-layout="executive-deepblue-boardroom"] .motif{display:block;right:7%;top:11%;width:13%;height:22%;border-radius:50%;border:1px solid rgba(200,169,106,.26);box-shadow:0 0 34px rgba(59,165,199,.12);background:radial-gradient(circle,rgba(200,169,106,.10),transparent 64%);z-index:2;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-layer{position:absolute;inset:0;z-index:5;color:var(--template-body);pointer-events:none;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-kicker{position:absolute;left:8.2%;top:13.4%;font-size:11px;font-weight:900;letter-spacing:.18em;color:var(--template-accent);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-title{position:absolute;left:8.2%;top:19.4%;width:43%;margin:0;color:var(--template-title);font-size:35px;line-height:1.08;font-weight:900;overflow-wrap:anywhere;text-shadow:0 0 18px rgba(59,165,199,.12);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-bullets{position:absolute;left:8.4%;top:46%;width:38%;margin:0;padding-left:1.1em;font-size:12.5px;line-height:1.48;color:var(--template-body);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-bullets li{margin:.1em 0;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-kpis{position:absolute;left:8.2%;right:8.2%;bottom:12.6%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-kpis span{min-height:70px;border-radius:8px;background:rgba(7,26,47,.80);border:1px solid rgba(200,169,106,.18);box-shadow:0 14px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.05);padding:13px 14px;font-size:11px;font-weight:800;color:var(--template-body);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-kpis strong{display:block;margin-bottom:7px;color:var(--template-title);font-size:20px;line-height:1;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard{position:absolute;right:8.2%;top:18.7%;width:36%;height:38%;border-radius:10px;background:linear-gradient(135deg,rgba(7,26,47,.98),rgba(16,36,58,.88));border:1px solid rgba(200,169,106,.22);box-shadow:0 0 32px rgba(59,165,199,.12),0 18px 34px rgba(0,0,0,.24);overflow:hidden;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard::before{content:"";position:absolute;left:10%;right:10%;bottom:22%;height:2px;background:rgba(183,198,214,.30);box-shadow:0 -45px 0 rgba(183,198,214,.12),0 -90px 0 rgba(183,198,214,.08);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard::after{content:"";position:absolute;left:14%;right:14%;top:42%;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent),#7dd3fc);transform:skewY(-9deg);box-shadow:0 0 20px rgba(59,165,199,.25);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard i{position:absolute;bottom:23%;width:9%;border-radius:4px 4px 0 0;background:var(--template-accent);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard i:nth-child(1){left:17%;height:25%;}body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard i:nth-child(2){left:32%;height:42%;background:var(--template-secondary);}body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard i:nth-child(3){left:47%;height:33%;}body[data-layout="executive-deepblue-boardroom"] .boardroom-dashboard i:nth-child(4){left:62%;height:54%;background:#7dd3fc;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-agenda{position:absolute;right:8.2%;top:18.4%;width:37%;display:grid;gap:10px;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-agenda span{height:48px;border-radius:8px;background:rgba(7,26,47,.82);border:1px solid rgba(200,169,106,.16);padding:13px 14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-agenda span::before{content:"";display:inline-block;width:20px;height:5px;margin-right:10px;border-radius:999px;background:var(--template-accent);vertical-align:middle;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix{position:absolute;right:8.2%;top:18.3%;width:36%;height:39%;border-radius:10px;background:rgba(7,26,47,.82);border:1px solid rgba(200,169,106,.18);box-shadow:0 18px 34px rgba(0,0,0,.22);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix::before{content:"";position:absolute;left:50%;top:10%;bottom:10%;width:2px;background:rgba(200,169,106,.22);}body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix::after{content:"";position:absolute;left:10%;right:10%;top:50%;height:2px;background:rgba(200,169,106,.22);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix i{position:absolute;width:19px;height:19px;border-radius:50%;background:var(--template-accent);box-shadow:0 0 0 8px rgba(200,169,106,.12);}body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix i:nth-child(1){left:66%;top:24%;}body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix i:nth-child(2){left:32%;top:38%;background:var(--template-secondary);box-shadow:0 0 0 8px rgba(59,165,199,.12);}body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix i:nth-child(3){left:58%;top:66%;background:#f59e0b;}body[data-layout="executive-deepblue-boardroom"] .boardroom-matrix i:nth-child(4){left:25%;top:70%;background:#ef4444;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-path{position:absolute;right:8.2%;top:22%;width:37%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-path span{min-height:82px;border-radius:8px;background:rgba(7,26,47,.82);border:1px solid rgba(59,165,199,.20);padding:13px 10px;font-size:11px;font-weight:900;color:var(--template-title);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-path span::before{content:"";display:block;width:28px;height:6px;margin-bottom:10px;border-radius:999px;background:linear-gradient(90deg,var(--template-secondary),var(--template-accent));}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-actions{position:absolute;left:8.2%;right:8.2%;bottom:14.5%;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-actions span{min-height:82px;border-radius:8px;background:linear-gradient(135deg,rgba(16,36,58,.92),rgba(7,26,47,.84));border:1px solid rgba(200,169,106,.20);box-shadow:0 16px 30px rgba(0,0,0,.22);padding:14px;font-size:12px;font-weight:900;color:var(--template-title);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-decision{position:absolute;right:10%;top:22%;width:31%;height:35%;border-radius:50%;border:16px solid rgba(200,169,106,.18);border-left-color:var(--template-accent);border-bottom-color:var(--template-secondary);box-shadow:inset 0 0 0 12px rgba(59,165,199,.08);}
+    body[data-layout="executive-deepblue-boardroom"] .boardroom-decision::after{content:"";position:absolute;left:50%;top:50%;width:76px;height:76px;border-radius:10px;background:var(--template-primary);transform:translate(-50%,-50%);border:1px solid rgba(200,169,106,.28);box-shadow:0 16px 30px rgba(0,0,0,.20);}
+    body[data-layout="executive-deepblue-boardroom"] .page-number{z-index:6;right:6.7%;bottom:5.5%;background:rgba(7,26,47,.72);border:1px solid rgba(200,169,106,.18);border-radius:999px;padding:5px 10px;color:rgba(243,247,250,.66);}
     body[data-layout="channel-traffic-quality"] .slide{padding:0;border:0;background:linear-gradient(135deg,#f7fbff 0%,var(--template-bg) 55%,#eefdf6 100%);box-shadow:0 24px 58px rgba(15,23,42,.16);}
     body[data-layout="channel-traffic-quality"] .slide::before{background:radial-gradient(circle at 78% 20%,rgba(34,197,94,.17),transparent 24%),radial-gradient(circle at 18% 82%,rgba(56,189,248,.16),transparent 26%),repeating-linear-gradient(90deg,rgba(23,37,84,.052) 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,rgba(34,197,94,.040) 0 1px,transparent 1px 38px);}
     body[data-layout="channel-traffic-quality"] .slide::after{content:"";position:absolute;left:5.5%;right:5.5%;top:8.8%;bottom:8.2%;z-index:1;border-radius:26px;background:rgba(255,255,255,.95);border:1px solid rgba(23,37,84,.12);box-shadow:0 24px 54px rgba(15,23,42,.12),inset 0 0 0 1px rgba(255,255,255,.78);}
@@ -9864,6 +9900,92 @@ function isBiExecutiveCockpitVisual(visual) {
   return visual?.layout === "bi-executive-cockpit";
 }
 
+function isExecutiveDeepblueBoardroomVisual(visual) {
+  // 高管深蓝必须走独立董事会汇报版式，避免退回普通 top-band 办公蓝骨架。
+  return visual?.layout === "executive-deepblue-boardroom";
+}
+
+/**
+ * 渲染高管深蓝董事会汇报预览层。
+ * @param {object} slide
+ * @param {object} scene
+ * @returns {string}
+ */
+function renderExecutiveDeepblueBoardroomPreview(slide, scene) {
+  const title = escapeHtml(scene.title || slide?.title || "经营决策汇报");
+  const bulletItems = scene.bullets.slice(0, 4).map((item) => `<li>${escapeHtml(executiveBoardroomCompactText(item, "经营要点", 36))}</li>`).join("");
+  const common = `<div class="boardroom-kicker">${escapeHtml(scene.kicker)}</div><h2 class="boardroom-title">${title}</h2><ul class="boardroom-bullets">${bulletItems}</ul>`;
+  const kpis = `<div class="boardroom-kpis">${scene.metrics.map((metric) => `<span><strong>${escapeHtml(metric.value)}</strong>${escapeHtml(metric.label)}</span>`).join("")}</div>`;
+  if (scene.kind === "cover" || scene.kind === "overview" || scene.kind === "data") {
+    return `<div class="boardroom-layer">${common}<div class="boardroom-dashboard"><i></i><i></i><i></i><i></i></div>${kpis}</div>`;
+  }
+  if (scene.kind === "agenda") {
+    return `<div class="boardroom-layer">${common}<div class="boardroom-agenda">${scene.cards.slice(0, 5).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${kpis}</div>`;
+  }
+  if (scene.kind === "diagnosis") {
+    return `<div class="boardroom-layer">${common}<div class="boardroom-matrix"><i></i><i></i><i></i><i></i></div>${kpis}</div>`;
+  }
+  if (scene.kind === "strategy") {
+    return `<div class="boardroom-layer">${common}<div class="boardroom-path">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>${kpis}</div>`;
+  }
+  if (scene.kind === "action") {
+    return `<div class="boardroom-layer">${common}<div class="boardroom-actions">${scene.cards.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="boardroom-layer">${common}<div class="boardroom-decision"></div><div class="boardroom-actions">${scene.cards.slice(0, 3).map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+}
+
+function executiveDeepblueBoardroomPreviewScene({ slide, index, total }) {
+  const bullets = executiveBoardroomBulletTexts(slide);
+  const title = executiveBoardroomCompactText(slide?.title, "经营决策汇报", index === 0 ? 30 : 28);
+  const metrics = ["收入", "利润", "达成率", "风险项"].map((fallback, itemIndex) => executiveBoardroomMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["经营概览", "关键指标", "问题诊断", "战略判断", "行动计划"].map((fallback, itemIndex) => executiveBoardroomCompactText(bullets[itemIndex], fallback, 12));
+  const scenes = [
+    { kind: "cover", kicker: "BOARD BRIEF" },
+    { kind: "agenda", kicker: "EXECUTIVE AGENDA" },
+    { kind: "overview", kicker: "OPERATING SNAPSHOT" },
+    { kind: "data", kicker: "KPI TREND" },
+    { kind: "diagnosis", kicker: "ISSUE DIAGNOSIS" },
+    { kind: "strategy", kicker: "STRATEGIC JUDGEMENT" },
+    { kind: "action", kicker: "ACTION PLAN" },
+  ];
+  const base = index === total - 1 && total > 2
+    ? { kind: "decision", kicker: "DECISION REQUEST" }
+    : scenes[Math.min(index, scenes.length - 1)];
+  return {
+    variant: "executive-deepblue-boardroom",
+    ...base,
+    title,
+    bullets,
+    metrics,
+    cards: base.kind === "decision"
+      ? ["本次确认", "授权事项", "下轮节奏"].map((fallback, itemIndex) => executiveBoardroomCompactText(bullets[itemIndex], fallback, 14))
+      : cards,
+  };
+}
+
+function executiveBoardroomBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["核心经营指标保持稳定，关键问题需要管理层决策", "业务增长、利润质量和现金流进入同屏复盘", "下一阶段围绕战略判断、资源投入和行动闭环推进"];
+}
+
+function executiveBoardroomMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{2,}|[零一二三四五六七八九十百千万亿]+项?)/);
+  const value = match?.[1] || ["KPI", "GMV", "92%", "3"][index] || "KPI";
+  const label = executiveBoardroomCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function executiveBoardroomCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
 /**
  * 渲染数据治理标准化模板的预览层。
  * @param {object} slide
@@ -12902,6 +13024,7 @@ function shouldRenderTemplatePreviewBodyList(visual, role) {
   if (visual.layout === "enterprise-digital-blueprint") return false;
   if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
+  if (visual.layout === "executive-deepblue-boardroom") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "channel-traffic-quality") return false;
   if (visual.layout === "market-trend-radar") return false;
