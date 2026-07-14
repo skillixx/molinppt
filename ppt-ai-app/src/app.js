@@ -1061,6 +1061,17 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="create"][data-flow-stage="input"] main { grid-template-columns: minmax(0, 760px); justify-content: center; align-items: start; padding-top: 34px; }
     body[data-workspace-page="create"][data-flow-stage="outline"] main { grid-template-columns: minmax(0, 1180px); justify-content: center; align-items: start; }
     body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(300px, 360px) minmax(640px, 1fr) minmax(280px, 340px); }
+    body[data-workspace-page="create"][data-flow-stage="preview"] { overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] main { height: calc(100vh - 78px); max-height: calc(100vh - 78px); align-items: stretch; overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .workflow,
+    body[data-workspace-page="create"][data-flow-stage="preview"] .context { min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .preview-shell { height: 100%; min-height: 0; }
+    /* 编辑表单只在自己的卡片内滚动，避免内容越过卡片边界遮住下方任务日志。 */
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-modal[aria-hidden="false"] { max-height: min(680px, calc(100vh - 340px)); height: min(680px, calc(100vh - 340px)); overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-dialog { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; min-height: 0; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    /* 操作按钮固定在编辑卡片底部，滚动页面要点和 AI 指令时仍可直接提交。 */
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-actions { position: sticky; bottom: 0; z-index: 2; margin: 0 -4px -4px; padding: 12px 4px 4px; background: #fff; }
     body[data-workspace-page="templates"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .workflow { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .template-gallery-wrap { width: 100%; }
@@ -1588,12 +1599,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .preview-meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
     .preview-actions { display: flex; gap: 8px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
     .preview-actions button { min-height: 40px; padding: 9px 13px; }
-    .preview-stage { position: relative; display: grid; min-height: 0; padding: 20px; background: linear-gradient(135deg, #edf3fb 0%, #f5f8fc 100%); overflow: auto; }
+    .preview-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-height: 0; padding: 20px; background: linear-gradient(135deg, #edf3fb 0%, #f5f8fc 100%); overflow: auto; overscroll-behavior: contain; }
     .preview {
       min-height: 620px; background: #ffffff; color: var(--text); border-radius: 14px; padding: 20px; overflow: auto;
       box-shadow: inset 0 0 0 1px rgba(31,94,255,.08), 0 22px 52px rgba(16,24,40,.13);
     }
     .preview.is-deck-loaded { height: 100%; min-height: 0; padding: 0; background: #edf3fb; overflow: hidden; }
+    .preview.is-deck-loaded.has-generation-progress { position: relative; }
     .preview-frame { display: block; width: 100%; min-height: 620px; border: 0; border-radius: 12px; background: #edf3fb; }
     .preview.is-deck-loaded .preview-frame { height: 100%; min-height: 0; }
     .preview-polish-loading { position: absolute; z-index: 20; inset: 18px; display: none; place-items: center; border-radius: 8px; background: rgba(237,243,251,.62); backdrop-filter: blur(2px); pointer-events: none; }
@@ -1604,14 +1616,14 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     button.secondary .button-spinner { border-color: rgba(37,99,235,.24); border-top-color: #2563eb; }
     .button-label { position: relative; z-index: 1; }
     .structure-side-panel, .ai-polish-side-panel { display: none !important; }
-    .slide-edit-modal { position: absolute; z-index: 30; inset: 18px; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15,23,42,.20); backdrop-filter: blur(2px); }
-    .slide-edit-modal[aria-hidden="false"] { display: flex; }
-    .slide-edit-dialog { width: min(720px, 100%); max-height: min(760px, 92vh); overflow: auto; border: 1px solid #cfe0ff; border-radius: 14px; background: #fff; box-shadow: 0 26px 70px rgba(15,23,42,.24); }
-    .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .slide-edit-modal { position: relative; z-index: 30; display: none; min-width: 0; min-height: 0; }
+    .slide-edit-modal[aria-hidden="false"] { display: block; }
+    .slide-edit-dialog { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 0 0 14px; border-bottom: 1px solid var(--line); }
     .slide-edit-head h2 { font-size: 16px; margin: 0 0 5px; color: var(--text); }
     .slide-edit-selected { color: var(--muted); font-size: 12px; font-weight: 800; }
     .slide-edit-close { width: 34px; height: 34px; padding: 0; border: 1px solid #d8e2f0; background: #fff; color: #475569; box-shadow: none; }
-    .slide-edit-body { display: grid; gap: 12px; padding: 16px 18px 18px; }
+    .slide-edit-body { display: grid; gap: 12px; padding-top: 14px; }
     .slide-edit-body textarea { min-height: 116px; }
     .slide-ai-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; }
     .slide-ai-choice label { display: flex; align-items: center; gap: 8px; margin: 0; color: #1e3a8a; font-size: 13px; font-weight: 850; }
@@ -1622,31 +1634,31 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .empty-slide h3 { margin: 0 0 14px; font-size: 30px; line-height: 1.16; color: #173b8f; letter-spacing: 0; }
     .empty-slide p { margin: 0; color: var(--muted); line-height: 1.7; }
     .empty-line { width: 58px; height: 4px; margin: 28px 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--teal)); }
-    .deck-loading { position: relative; display: grid; gap: 18px; min-height: 584px; overflow: hidden; padding: 24px; border: 1px solid #cbd8ea; background: #f8fbff; isolation: isolate; }
-    .deck-loading::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(rgba(37,99,235,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.055) 1px, transparent 1px); background-size: 34px 34px; }
-    .deck-loading::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, rgba(255,255,255,.96) 0 32%, rgba(235,244,255,.82) 58%, rgba(232,250,247,.84) 100%); }
-    .deck-progress-scan { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: #22d3ee; box-shadow: 0 0 18px rgba(34,211,238,.9); animation: deck-scan 2.8s linear infinite; }
-    .deck-loading-dashboard { display: grid; grid-template-columns: 176px minmax(0, 1fr); align-items: center; gap: 26px; min-height: 188px; padding: 22px 26px; border: 1px solid rgba(37,99,235,.18); background: rgba(255,255,255,.88); box-shadow: 0 18px 44px rgba(30,64,175,.10); }
-    .deck-progress-ring { position: relative; width: 148px; height: 148px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 8) * 1%), #dbeafe 0); transition: background .45s ease; box-shadow: 0 0 0 8px rgba(219,234,254,.72), 0 16px 32px rgba(37,99,235,.18); }
-    .deck-progress-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #fff; border: 1px solid #dbeafe; }
-    .deck-progress-ring::after { content: ""; position: absolute; inset: -7px; border: 1px dashed rgba(15,118,110,.48); border-radius: 50%; animation: deck-orbit 7s linear infinite; }
+    .deck-loading { position: relative; display: grid; gap: 18px; min-height: 584px; overflow: hidden; padding: 30px; border: 1px solid #d8e6f5; border-radius: 8px; background: #f8fbff; isolation: isolate; }
+    .deck-loading::before { content: ""; position: absolute; inset: 0; z-index: -2; background: radial-gradient(circle at 50% 20%, rgba(37,99,235,.16), transparent 32%), radial-gradient(circle at 72% 72%, rgba(20,184,166,.14), transparent 30%), linear-gradient(135deg, #ffffff 0%, #f5f9ff 52%, #eefaf7 100%); }
+    .deck-loading::after { content: ""; position: absolute; inset: 18px; z-index: -1; border: 1px solid rgba(148,163,184,.18); border-radius: 8px; background-image: linear-gradient(rgba(37,99,235,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.04) 1px, transparent 1px); background-size: 42px 42px; mask-image: radial-gradient(circle at 50% 34%, #000 0 42%, transparent 72%); }
+    .deck-progress-scan { position: absolute; left: 10%; right: 10%; top: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(37,99,235,.58), transparent); box-shadow: 0 0 18px rgba(37,99,235,.35); animation: deck-scan 3.4s ease-in-out infinite; }
+    .deck-loading-dashboard { display: grid; justify-items: center; align-content: center; gap: 18px; min-height: 310px; padding: 22px 26px; text-align: center; }
+    .deck-progress-ring { position: relative; width: 154px; height: 154px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 8) * 1%), rgba(219,234,254,.78) 0); transition: background .45s ease; box-shadow: 0 22px 48px rgba(37,99,235,.18), 0 0 0 12px rgba(255,255,255,.72); }
+    .deck-progress-ring::before { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: rgba(255,255,255,.96); border: 1px solid rgba(191,219,254,.86); box-shadow: inset 0 0 28px rgba(219,234,254,.62); }
+    .deck-progress-ring::after { content: ""; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid rgba(37,99,235,.18); border-top-color: #2563eb; border-right-color: rgba(20,184,166,.75); animation: deck-orbit 2.4s linear infinite; }
     .deck-progress-core { position: relative; z-index: 1; text-align: center; }
     .deck-progress-value { display: block; color: #163b8f; font-size: 34px; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; }
-    .deck-progress-unit { display: block; margin-top: 7px; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
-    .deck-loading-head { min-width: 0; }
-    .deck-loading-head strong { display: block; margin-bottom: 7px; color: #172554; font-size: 21px; }
-    .deck-loading-head > span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .deck-progress-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: #334155; font-size: 12px; font-weight: 800; }
+    .deck-progress-unit { display: block; margin-top: 7px; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+    .deck-loading-head { display: grid; gap: 8px; justify-items: center; max-width: 560px; min-width: 0; }
+    .deck-loading-head strong { display: block; color: #172554; font-size: 23px; line-height: 1.25; }
+    .deck-loading-head > span { display: block; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .deck-progress-meta { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 4px; color: #334155; font-size: 12px; font-weight: 800; }
     .deck-progress-stage { color: #1d4ed8; }
     .deck-progress-count { font-variant-numeric: tabular-nums; }
-    .deck-progress { height: 10px; margin-top: 9px; border-radius: 999px; overflow: hidden; background: #dbeafe; box-shadow: inset 0 1px 3px rgba(30,64,175,.14); }
-    .deck-progress-bar { display: block; position: relative; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #06b6d4, #0f766e); transition: width .45s ease; }
-    .deck-progress-bar::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(120deg, transparent 0 12px, rgba(255,255,255,.35) 12px 20px); animation: deck-flow 1.1s linear infinite; }
+    .deck-progress { width: min(520px, 100%); height: 8px; margin: 6px auto 0; border-radius: 999px; overflow: hidden; background: rgba(219,234,254,.82); box-shadow: inset 0 1px 3px rgba(30,64,175,.12); }
+    .deck-progress-bar { display: block; position: relative; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #06b6d4, #14b8a6); transition: width .45s ease; }
+    .deck-progress-bar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.52), transparent); animation: deck-flow 1.4s ease-in-out infinite; }
     .deck-loading-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-    .deck-loading-step { position: relative; padding: 11px 12px 11px 34px; border: 1px solid var(--line); border-radius: 6px; background: rgba(255,255,255,.82); color: #64748b; font-size: 12px; font-weight: 800; transition: border-color .25s ease, color .25s ease, transform .25s ease; }
-    .deck-loading-step::before { content: ""; position: absolute; left: 13px; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transform: translateY(-50%); }
-    .deck-loading-step.is-active { border-color: #93c5fd; color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(37,99,235,.08); }
-    .deck-loading-step.is-active::before { background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.14), 0 0 12px rgba(34,211,238,.8); animation: deck-pulse 1.25s ease-in-out infinite; }
+    .deck-loading-step { position: relative; min-height: 54px; display: flex; align-items: center; justify-content: center; padding: 11px 12px; border: 1px solid rgba(203,213,225,.82); border-radius: 8px; background: rgba(255,255,255,.78); color: #64748b; font-size: 12px; font-weight: 850; transition: border-color .25s ease, color .25s ease, transform .25s ease, background .25s ease; }
+    .deck-loading-step::before { content: ""; width: 8px; height: 8px; margin-right: 9px; border-radius: 50%; background: #cbd5e1; }
+    .deck-loading-step.is-active { border-color: #93c5fd; background: rgba(239,246,255,.94); color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 14px 28px rgba(37,99,235,.08); }
+    .deck-loading-step.is-active::before { background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.14), 0 0 12px rgba(34,211,238,.72); animation: deck-pulse 1.25s ease-in-out infinite; }
     .deck-loading-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .deck-loading-slide {
       display: grid; gap: 10px; aspect-ratio: 16 / 9; padding: 8.5% 9%; border-radius: 8px;
@@ -1656,16 +1668,25 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line { height: 9px; border-radius: 999px; background: #cbd5e1; }
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
-    .deck-preview-progress { position: absolute; top: 14px; right: 18px; z-index: 8; width: 210px; padding: 12px 14px; pointer-events: none; border: 1px solid rgba(37,99,235,.24); background: rgba(255,255,255,.94); box-shadow: 0 16px 34px rgba(15,23,42,.16); backdrop-filter: blur(10px); }
-    .deck-preview-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #334155; font-size: 11px; font-weight: 800; }
-    .deck-preview-progress-head strong { color: #1d4ed8; font-size: 18px; font-variant-numeric: tabular-nums; }
-    .deck-preview-progress .deck-progress { height: 6px; margin-top: 8px; }
-    .deck-preview-progress .deck-progress-stage { display: block; margin-top: 7px; font-size: 10px; }
+    .deck-preview-progress { position: absolute; left: 50%; top: var(--deck-preview-progress-top, 280px); z-index: 8; width: 174px; min-height: 174px; display: grid; place-items: center; padding: 16px; pointer-events: none; border: 1px solid rgba(191,219,254,.72); border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 0) * 1%), rgba(219,234,254,.92) 0); box-shadow: 0 22px 46px rgba(15,23,42,.16), 0 0 0 10px rgba(239,246,255,.52); backdrop-filter: blur(8px); transform: translate(-50%, -50%); transition: top .28s ease, background .45s ease; }
+    .deck-preview-progress::before { content: ""; position: absolute; inset: 6px; z-index: 1; border-radius: inherit; background: conic-gradient(from 0deg, transparent 0 18%, rgba(37,99,235,.95) 22% 30%, rgba(20,184,166,.88) 34% 42%, transparent 47% 100%); -webkit-mask: radial-gradient(circle, transparent 0 70px, #000 72px 78px, transparent 80px); mask: radial-gradient(circle, transparent 0 70px, #000 72px 78px, transparent 80px); animation: deck-orbit 1.05s linear infinite; }
+    .deck-preview-progress::after { content: ""; position: absolute; inset: 18px; z-index: 0; border-radius: inherit; background: rgba(255,255,255,.94); box-shadow: inset 0 0 24px rgba(219,234,254,.56); }
+    .deck-preview-spinner { position: absolute; inset: 4px; z-index: 3; border-radius: 50%; border: 4px solid rgba(219,234,254,.55); border-top-color: #2563eb; border-right-color: #14b8a6; border-bottom-color: rgba(37,99,235,.22); animation: deck-spinner-spin .72s linear infinite; }
+    .deck-preview-spinner::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; border: 2px solid transparent; border-left-color: rgba(37,99,235,.72); border-bottom-color: rgba(20,184,166,.66); animation: deck-spinner-spin 1.15s linear infinite reverse; }
+    .deck-preview-orbit { position: absolute; inset: 14px; z-index: 2; border-radius: 50%; animation: deck-orbit 1.45s linear infinite; }
+    .deck-preview-orbit::before,
+    .deck-preview-orbit::after { content: ""; position: absolute; left: 50%; top: 0; width: 9px; height: 9px; border-radius: 999px; background: #2563eb; box-shadow: 0 0 14px rgba(37,99,235,.72); transform: translate(-50%, -50%); }
+    .deck-preview-orbit::after { top: auto; bottom: 0; width: 7px; height: 7px; background: #14b8a6; box-shadow: 0 0 14px rgba(20,184,166,.72); }
+    .deck-preview-progress-head { position: relative; z-index: 4; display: grid; justify-items: center; gap: 7px; color: #334155; font-size: 11px; font-weight: 850; text-align: center; }
+    .deck-preview-progress-head strong { order: -1; color: #1d4ed8; font-size: 27px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 6px 18px rgba(37,99,235,.14); }
+    .deck-preview-progress .deck-progress { position: absolute; left: 18%; right: 18%; bottom: 34px; z-index: 2; width: auto; height: 5px; margin: 0; }
+    .deck-preview-progress .deck-progress-stage { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 2; display: block; color: #1d4ed8; font-size: 10px; font-weight: 850; text-align: center; }
     @keyframes deck-scan { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translateY(580px); opacity: 0; } }
     @keyframes deck-orbit { to { transform: rotate(360deg); } }
-    @keyframes deck-flow { to { transform: translateX(32px); } }
-    @keyframes deck-pulse { 50% { transform: translateY(-50%) scale(1.35); } }
-    @media (max-width: 720px) { .deck-loading { padding: 16px; } .deck-loading-dashboard { grid-template-columns: 1fr; text-align: center; } .deck-progress-ring { margin: 0 auto; } .deck-progress-meta { flex-direction: column; } .deck-loading-grid { grid-template-columns: 1fr; } .preview.is-deck-loaded.has-generation-progress { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 8px; } .preview.is-deck-loaded.has-generation-progress .preview-frame { grid-row: 2; min-height: 0; } .deck-preview-progress { position: relative; inset: auto; grid-row: 1; width: auto; padding: 9px 12px; } }
+    @keyframes deck-spinner-spin { to { transform: rotate(360deg); } }
+    @keyframes deck-flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes deck-pulse { 50% { transform: scale(1.35); } }
+    @media (max-width: 720px) { .deck-loading { padding: 16px; } .deck-loading-dashboard { min-height: 280px; text-align: center; } .deck-progress-ring { margin: 0 auto; } .deck-progress-meta { flex-direction: column; } .deck-loading-steps, .deck-loading-grid { grid-template-columns: 1fr; } .deck-preview-progress { width: 142px; min-height: 142px; } .deck-preview-progress-head strong { font-size: 23px; } }
     @media (prefers-reduced-motion: reduce) { .deck-progress-scan, .deck-progress-ring::after, .deck-progress-bar::after, .deck-loading-step.is-active::before, .deck-loading-slide { animation: none; } .deck-progress-ring, .deck-progress-bar, .deck-loading-step { transition: none; } }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 92px; }
@@ -1808,13 +1829,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .sidebar-panel { box-shadow: none; }
     body[data-workspace-page="assets"] .context { order: 1; }
     body[data-workspace-page="assets"] .preview-shell { order: 2; }
+    body[data-workspace-page="assets"] .asset-slide-edit-context { order: 3; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] { overflow: hidden; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] main { grid-template-columns: minmax(280px, 360px) minmax(620px, 1fr) minmax(300px, 380px); height: calc(100vh - 78px); max-height: calc(100vh - 78px); align-items: stretch; overflow: hidden; }
+    /* 资产库预览态保持侧栏为单列滚动，避免响应式三列规则把编辑卡片和日志卡片挤到同一行。 */
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .context { grid-column: auto; grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .sidebar-panel { min-width: 0; overflow: hidden; }
+    /* 左侧整列负责滚动，编辑卡片保持完整高度，避免表单内容被压缩到只露出一部分。 */
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-modal { max-height: none; overflow: visible; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-dialog { display: block; max-height: none; min-height: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-body { min-height: 0; overflow: visible; padding-right: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-body textarea { min-height: 96px; max-height: 160px; resize: vertical; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-actions { position: static; margin: 0; padding-top: 4px; background: transparent; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] #status { max-height: 180px; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .preview-shell { height: 100%; min-height: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .asset-slide-edit-context { display: grid; align-content: start; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] .context { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] .asset-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
     .is-hidden { display: none !important; }
     @media (max-width: 1180px) { header { flex-wrap: wrap; } main { grid-template-columns: minmax(300px, 380px) 1fr; } .context { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } .preview-shell { min-height: 620px; } .status-grid { grid-template-columns: 1fr; } }
     @media (min-width: 1021px) and (max-width: 1320px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(280px, 320px) minmax(520px, 1fr) minmax(280px, 320px); } }
-    @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } }
+    @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"], body[data-workspace-page="assets"][data-asset-preview-open="true"] { overflow: auto; } body[data-workspace-page="create"][data-flow-stage="preview"] main, body[data-workspace-page="assets"][data-asset-preview-open="true"] main { grid-template-columns: 1fr; height: auto; max-height: none; overflow: visible; } body[data-workspace-page="create"][data-flow-stage="preview"] .workflow, body[data-workspace-page="create"][data-flow-stage="preview"] .context, body[data-workspace-page="assets"][data-asset-preview-open="true"] .context, body[data-workspace-page="assets"][data-asset-preview-open="true"] .asset-slide-edit-context { max-height: none; overflow: visible; padding-right: 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-modal[aria-hidden="false"] { height: auto; max-height: none; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-dialog { display: block; height: auto; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-body { overflow: visible; padding-right: 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-actions { position: static; margin: 0; padding: 4px 0 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .preview-shell, body[data-workspace-page="assets"][data-asset-preview-open="true"] .preview-shell { height: auto; min-height: 620px; } }
     @media (max-width: 980px) { body[data-workspace-page="templates"] main { grid-template-columns: 1fr; } }
     @media (max-width: 1180px) { .template-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"], body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] { padding: 20px; } body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-header .outline-toolbar { grid-template-columns: 1fr; gap: 10px; } .outline-header .outline-action-retry, .outline-header .outline-action-save { justify-self: stretch; width: 100%; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .template-category-tabs { gap: 22px; } .top-status { justify-content: flex-start; } }
@@ -1968,8 +2004,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="preview-stage">
         <div id="preview" class="preview"><div class="empty-preview"><div class="empty-slide"><h3>等待生成预览</h3><p>保存大纲并选择模板后，这里会展示每一页 PPT 的真实排版、配色和导出效果。</p><div class="empty-line"></div></div></div></div>
         <div id="preview-polish-loading" class="preview-polish-loading" aria-live="polite"><div class="polish-loading-card"><span class="polish-spinner"></span><span>AI 正在润色本页...</span></div></div>
-        <div id="slide-edit-modal" class="slide-edit-modal" aria-hidden="true">
-          <div class="slide-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="slide-edit-title">
+      </div>
+    </section>
+    <aside class="context" aria-label="上下文信息" data-page-panel="create assets status" data-flow-panel="outline preview">
+      <div class="panel sidebar-panel" data-page-panel="create" data-flow-panel="outline">
+        <div class="panel-head"><h2>大纲信息</h2></div>
+        <div id="outline-summary" class="outline-summary">
+          <div class="outline-stat"><span>大纲确认</span><strong>等待大纲</strong></div>
+          <div class="outline-stat"><span>当前状态</span><strong>未开始</strong></div>
+          <div class="outline-stat"><span>页数</span><strong>0</strong></div>
+          <div class="outline-stat"><span>可编辑要点</span><strong>0</strong></div>
+        </div>
+      </div>
+      <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
+        <div class="panel-head"><h2>下载文件</h2></div>
+        <p class="panel-note">生成 PPT 预览后，可下载 PPTX 或 PDF 文件。</p>
+        <div class="download-panel">
+          <button id="export-pptx" class="secondary download-button">下载 PPTX</button>
+          <button id="export-pdf" class="secondary download-button">下载 PDF</button>
+        </div>
+      </div>
+      <div id="slide-edit-modal" class="panel sidebar-panel slide-edit-modal" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true" aria-hidden="true">
+          <div class="slide-edit-dialog" role="dialog" aria-modal="false" aria-labelledby="slide-edit-title">
             <div class="slide-edit-head">
               <div>
                 <h2 id="slide-edit-title">编辑当前页面</h2>
@@ -1995,26 +2051,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
             </div>
           </div>
         </div>
-      </div>
-    </section>
-    <aside class="context" aria-label="上下文信息" data-page-panel="create assets status" data-flow-panel="outline preview">
-      <div class="panel sidebar-panel" data-page-panel="create" data-flow-panel="outline">
-        <div class="panel-head"><h2>大纲信息</h2></div>
-        <div id="outline-summary" class="outline-summary">
-          <div class="outline-stat"><span>大纲确认</span><strong>等待大纲</strong></div>
-          <div class="outline-stat"><span>当前状态</span><strong>未开始</strong></div>
-          <div class="outline-stat"><span>页数</span><strong>0</strong></div>
-          <div class="outline-stat"><span>可编辑要点</span><strong>0</strong></div>
-        </div>
-      </div>
-      <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
-        <div class="panel-head"><h2>下载文件</h2></div>
-        <p class="panel-note">生成 PPT 预览后，可下载 PPTX 或 PDF 文件。</p>
-        <div class="download-panel">
-          <button id="export-pptx" class="secondary download-button">下载 PPTX</button>
-          <button id="export-pdf" class="secondary download-button">下载 PDF</button>
-        </div>
-      </div>
+      <span id="slide-edit-home" class="is-hidden" aria-hidden="true"></span>
       <div class="panel sidebar-panel structure-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
         <div class="panel-head"><h2>PPT 结构调整</h2></div>
         <p class="panel-note">在中间预览中选择页面后，可调整标题、要点和版式角色，再按当前模板重新预览。</p>
@@ -2090,6 +2127,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         </div>
       </section>
     </aside>
+    <aside id="asset-slide-edit-context" class="asset-slide-edit-context" aria-label="当前页面编辑" data-page-panel="assets" data-flow-panel="preview" data-asset-preview-panel="true"></aside>
   </main>
   <script>
     const state = { outlineId: null, deckId: null, taskId: null, outlineSlides: [], selectedSlideId: null, selectedSlideNumber: null, previewRevision: 0, assetPreviewOpen: false, currentAssetId: null };
@@ -2106,6 +2144,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const outlineSummaryEl = document.querySelector("#outline-summary");
     const selectedSlideLabelEl = document.querySelector("#selected-slide-label");
     const slideEditModalEl = document.querySelector("#slide-edit-modal");
+    const slideEditHomeEl = document.querySelector("#slide-edit-home");
+    const assetSlideEditContextEl = document.querySelector("#asset-slide-edit-context");
     const slideEditSelectedEl = document.querySelector("#slide-edit-selected");
     const singlePageAiToggleEl = document.querySelector("#single-page-ai-toggle");
     const structureSlideTitleEl = document.querySelector("#structure-slide-title");
@@ -2966,12 +3006,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       stopDeckRevealTimer();
       if (options.bustCache) state.previewRevision += 1;
       previewEl.classList.add("is-deck-loaded");
-      previewEl.classList.remove("has-generation-progress");
-      previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览" src="/api/ppt/decks/'
-        + encodeURIComponent(deckId)
-        + '/preview?v=' + encodeURIComponent(state.previewRevision) + '"></iframe>';
-      const frame = previewEl.querySelector(".preview-frame");
-      frame.addEventListener("load", attachPreviewSlidePicker);
+      const frame = ensurePreviewFrame();
+      frame.removeAttribute("srcdoc");
+      frame.src = "/api/ppt/decks/" + encodeURIComponent(deckId) + "/preview?v=" + encodeURIComponent(state.previewRevision);
     }
 
     async function refreshDeckPreviewFrame(deckId) {
@@ -2984,11 +3021,22 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         return text;
       });
       previewEl.classList.add("is-deck-loaded");
-      previewEl.classList.remove("has-generation-progress");
-      previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
-      const frame = previewEl.querySelector(".preview-frame");
-      frame.addEventListener("load", attachPreviewSlidePicker);
+      const frame = ensurePreviewFrame();
+      frame.removeAttribute("src");
       frame.srcdoc = html;
+    }
+
+    function ensurePreviewFrame() {
+      let frame = previewEl.querySelector(".preview-frame");
+      if (!frame) {
+        const progressEl = previewEl.querySelector("[data-deck-preview-progress]");
+        // 在线预览 iframe 独立于生成进度层复用，避免每页刷新时销毁圆形 loading 动画。
+        previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
+        if (progressEl) previewEl.appendChild(progressEl);
+        frame = previewEl.querySelector(".preview-frame");
+      }
+      frame.onload = attachPreviewSlidePicker;
+      return frame;
     }
 
     function attachPreviewSlidePicker() {
@@ -3245,9 +3293,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         + '<div class="deck-loading-dashboard">'
         + '<div class="deck-progress-ring" aria-hidden="true"><div class="deck-progress-core">'
         + '<strong class="deck-progress-value" data-deck-progress-value>0%</strong>'
-        + '<span class="deck-progress-unit">AI RENDERING</span></div></div>'
+        + '<span class="deck-progress-unit">智能生成</span></div></div>'
         + '<div class="deck-loading-head"><strong>正在生成专业 PPT</strong>'
-        + '<span>系统正在把确认后的大纲转换为页面内容、版式和预览文件。</span>'
+        + '<span>正在解析大纲、匹配模板版式，并逐页生成可预览的演示内容。</span>'
         + '<div class="deck-progress-meta"><span class="deck-progress-stage" data-deck-progress-stage>正在解析模板结构</span>'
         + '<span class="deck-progress-count" data-deck-progress-count>已完成 0 / ' + normalized.length + ' 页</span></div>'
         + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div></div></div>'
@@ -3299,13 +3347,27 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (!previewEl.querySelector("[data-deck-preview-progress]")) {
         previewEl.insertAdjacentHTML("beforeend", ''
           + '<div class="deck-preview-progress" data-deck-preview-progress role="status" aria-live="polite">'
+          + '<span class="deck-preview-spinner" aria-hidden="true"></span>'
+          + '<span class="deck-preview-orbit" aria-hidden="true"></span>'
           + '<div class="deck-preview-progress-head"><span data-deck-progress-count>已完成 0 / 0 页</span>'
           + '<strong data-deck-progress-value>0%</strong></div>'
           + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div>'
           + '<span class="deck-progress-stage" data-deck-progress-stage>正在生成页面内容</span></div>');
       }
       previewEl.classList.add("has-generation-progress");
+      positionDeckPreviewProgress();
       updateDeckGeneratingPreview({ progress, slides: state.outlineSlides, completedSlides, totalSlides });
+    }
+
+    function positionDeckPreviewProgress() {
+      if (!previewEl.querySelector("[data-deck-preview-progress]")) return;
+      const previewWidth = Math.max(Number(previewEl.clientWidth || 0), 320);
+      const slideWidth = Math.max(280, Math.min(previewWidth - 40, 960));
+      const slideTop = previewWidth <= 720 ? 18 : 28;
+      const slideCenterY = slideTop + (slideWidth * 9 / 16) / 2;
+      // 预览中的生成进度要落在首页幻灯片区域，而不是整个滚动容器的视觉中心。
+      const progressTop = Math.max(132, Math.min(slideCenterY, 420));
+      previewEl.style.setProperty("--deck-preview-progress-top", Math.round(progressTop) + "px");
     }
 
     function clearDeckGenerationProgress(errorMessage = "") {
@@ -3564,6 +3626,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           setFlowStage("preview");
           ensureDeckPreviewProgress({ progress: task.progress, completedSlides, totalSlides });
         }
+        // 生成任务进行中时，即使本轮没有新增页面，也要持续保留预览区中央的百分比圆环。
+        if ((task.status === "running" || task.status === "pending") && state.deckId) {
+          ensureDeckPreviewProgress({ progress: task.progress, completedSlides, totalSlides });
+        }
         statusEl.textContent = "任务状态: " + task.status + "\\n"
           + "进度: " + task.progress + "%\\n"
           + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\\n"
@@ -3581,6 +3647,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (state.deckId) {
             await waitForDeckLoadingRhythm(state.outlineSlides);
             renderDeckPreviewFrame(state.deckId, { bustCache: true });
+            // 任务成功后最终预览已经就绪，需要清掉生成中的圆形进度层。
+            clearDeckGenerationProgress();
             setFlowStage("preview");
             setDeckGenerationBusy(false);
             await loadBalance();
@@ -3618,9 +3686,26 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (location.hash.slice(1) !== nextPage) history.replaceState(null, "", "#" + nextPage);
     }
 
+    function syncSlideEditPlacement(currentPage) {
+      if (!slideEditModalEl || !slideEditHomeEl || !assetSlideEditContextEl) return;
+      const shouldUseAssetRightPanel = currentPage === "assets" && state.assetPreviewOpen;
+      const targetParent = shouldUseAssetRightPanel ? assetSlideEditContextEl : slideEditHomeEl.parentElement;
+      if (!targetParent) return;
+      if (shouldUseAssetRightPanel) {
+        if (slideEditModalEl.parentElement !== assetSlideEditContextEl) {
+          assetSlideEditContextEl.appendChild(slideEditModalEl);
+        }
+        return;
+      }
+      if (slideEditModalEl.nextElementSibling !== slideEditHomeEl) {
+        targetParent.insertBefore(slideEditModalEl, slideEditHomeEl);
+      }
+    }
+
     function applyWorkspaceVisibility() {
       const currentPage = document.body.dataset.workspacePage || "create";
       document.body.dataset.assetPreviewOpen = state.assetPreviewOpen ? "true" : "false";
+      syncSlideEditPlacement(currentPage);
       if (backToOutlineButton) {
         backToOutlineButton.textContent = currentPage === "assets" && state.assetPreviewOpen ? "返回资产库" : "返回大纲内容";
       }
@@ -3905,6 +3990,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         setSlideRegenerationBusy(false);
       }
     });
+    window.addEventListener("resize", positionDeckPreviewProgress);
     async function exportDeck(format, button) {
       const idleLabel = format === "pptx" ? "下载 PPTX" : "下载 PDF";
       try {
