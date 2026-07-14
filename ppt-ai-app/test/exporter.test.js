@@ -145,6 +145,47 @@ test("PptExportService uses dedicated top-band decorations for business minimal 
   assert.equal(coverTitleSize, 4300);
 });
 
+test("PptExportService uses editable boardroom decorations for business executive theme", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      templateId: "business",
+      theme: "executive",
+      slides: [
+        { title: "董事会经营汇报", bullets: ["收入 12% 稳定增长", "利润率 18% 改善", "达成率 92%", "风险项 3 项"], layout: "cover" },
+        { title: "会议议程", bullets: ["经营概览", "关键指标", "问题诊断", "战略判断", "行动计划"], layout: "agenda" },
+        { title: "经营概览", bullets: ["收入 12% 稳定增长", "利润率 18% 改善", "达成率 92%", "风险项 3 项"], layout: "metrics" },
+        { title: "关键指标趋势", bullets: ["收入 12% 稳定增长", "利润率 18% 改善", "达成率 92%", "风险项 3 项"], layout: "metrics" },
+        { title: "问题诊断", bullets: ["供应链交付波动", "费用结构需要复盘", "重点客户流失预警", "组织协同卡点"], layout: "retrospective" },
+        { title: "战略判断", bullets: ["聚焦高质量增长", "资源向关键战役倾斜", "建立经营闭环", "明确授权边界"], layout: "three-steps" },
+        { title: "行动计划", bullets: ["修复关键风险", "明确责任人", "同步里程碑", "复盘经营动作"], layout: "next-plan" },
+        { title: "决策事项", bullets: ["确认资源投入", "授权专项推进", "锁定下轮节奏"], layout: "closing" },
+      ],
+    },
+    format: "pptx",
+  });
+  const text = result.content.toString("latin1");
+  const slide1 = pptPartText(text, "ppt/slides/slide1.xml");
+  const slide2 = pptPartText(text, "ppt/slides/slide2.xml");
+  const slide5 = pptPartText(text, "ppt/slides/slide5.xml");
+  const slide6 = pptPartText(text, "ppt/slides/slide6.xml");
+  const slide7 = pptPartText(text, "ppt/slides/slide7.xml");
+  const slide8 = pptPartText(text, "ppt/slides/slide8.xml");
+
+  assert.match(slide1, /name="Executive Boardroom Main Canvas"/);
+  assert.match(slide1, /name="Executive Boardroom KPI Dashboard"/);
+  assert.match(slide1, /name="Executive Boardroom KPI Card 1"/);
+  assert.match(slide2, /name="Executive Boardroom Agenda Item 1"/);
+  assert.match(slide5, /name="Executive Boardroom Diagnosis Matrix"/);
+  assert.match(slide6, /name="Executive Boardroom Strategy Path Rail"/);
+  assert.match(slide7, /name="Executive Boardroom Action Plan Card 1"/);
+  assert.match(slide8, /name="Executive Boardroom Decision Ring"/);
+  assert.doesNotMatch(slide1, /name="Top Band Surface"/);
+  assert.doesNotMatch(slide1, /<a:t>高管深蓝<\/a:t>/);
+  assert.doesNotMatch(slide1, /<a:t>高管商务汇报<\/a:t>/);
+});
+
 test("PptExportService uses commercial project status weekly decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({

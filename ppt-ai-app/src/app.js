@@ -118,7 +118,10 @@ export function createApp(dependencies) {
       const session = await requireSession(request, sessions, sessionCookieName, dependencies.database);
       const ownerUserId = Number(session.identity.user_id);
       const sessionEntitlementId = session.entitlementId || dependencies.defaultEntitlementId;
-      enforceUserRateLimit({ buckets: rateLimitBuckets, rateLimit, ownerUserId });
+      // 模板墙会并发加载大量缩略图；缩略图是只读静态资源，不应挤占生成/编辑等业务操作的用户限流额度。
+      if (!isTemplateThumbnailRequest(request, url)) {
+        enforceUserRateLimit({ buckets: rateLimitBuckets, rateLimit, ownerUserId });
+      }
 
       if (request.method === "GET" && url.pathname === "/") {
         sendHtml(response, renderWorkspace({ defaultEntitlementId: sessionEntitlementId }));
@@ -471,6 +474,16 @@ function routeForMetrics(pathName) {
     .replace(/^\/api\/ppt\/decks\/[^/]+\/slides\/[^/]+\/regenerate$/, "/api/ppt/decks/:id/slides/:id/regenerate")
     .replace(/^\/api\/ppt\/tasks\/[^/]+\/retry$/, "/api/ppt/tasks/:id/retry")
     .replace(/^\/api\/ppt\/tasks\/[^/]+$/, "/api/ppt/tasks/:id");
+}
+
+/**
+ * 判断当前请求是否只是读取已登录用户可见的模板缩略图。
+ * @param {import("node:http").IncomingMessage} request
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isTemplateThumbnailRequest(request, url) {
+  return request.method === "GET" && /^\/api\/templates\/[^/]+\/thumbnail$/.test(url.pathname);
 }
 
 /**
@@ -1048,6 +1061,17 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     body[data-workspace-page="create"][data-flow-stage="input"] main { grid-template-columns: minmax(0, 760px); justify-content: center; align-items: start; padding-top: 34px; }
     body[data-workspace-page="create"][data-flow-stage="outline"] main { grid-template-columns: minmax(0, 1180px); justify-content: center; align-items: start; }
     body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(300px, 360px) minmax(640px, 1fr) minmax(280px, 340px); }
+    body[data-workspace-page="create"][data-flow-stage="preview"] { overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] main { height: calc(100vh - 78px); max-height: calc(100vh - 78px); align-items: stretch; overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .workflow,
+    body[data-workspace-page="create"][data-flow-stage="preview"] .context { min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .preview-shell { height: 100%; min-height: 0; }
+    /* 编辑表单只在自己的卡片内滚动，避免内容越过卡片边界遮住下方任务日志。 */
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-modal[aria-hidden="false"] { max-height: min(680px, calc(100vh - 340px)); height: min(680px, calc(100vh - 340px)); overflow: hidden; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-dialog { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; min-height: 0; }
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    /* 操作按钮固定在助手卡片底部，滚动快捷建议和优化指令时仍可直接提交。 */
+    body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-actions { position: sticky; bottom: 0; z-index: 2; margin: 0 -4px -4px; padding: 12px 4px 4px; background: #fff; }
     body[data-workspace-page="templates"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .workflow { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="templates"] .template-gallery-wrap { width: 100%; }
@@ -1150,6 +1174,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-category-preview-actions { grid-column: 1 / -1; display: flex; justify-content: center; padding: 2px 0 4px; }
     .template-category-more-button { min-width: 220px; min-height: 42px; border-radius: 999px; background: #fff; color: #1d4ed8; border: 1px solid #c9d9f4; box-shadow: 0 10px 22px rgba(31,94,255,.08); }
     .template-category-more-button:hover { background: #f3f7ff; border-color: #b8ccf0; box-shadow: 0 14px 28px rgba(31,94,255,.12); }
+    .template-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 16px; min-height: 36px; }
+    .template-pagination:empty { display: none; }
+    .template-pagination button { min-width: 34px; min-height: 32px; padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+    .template-pagination button[aria-current="page"] { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 8px 18px rgba(31,94,255,.16); }
+    .template-pagination-info { color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .template-page-size { min-height: 32px; padding: 6px 30px 6px 10px; border: 1px solid #dbe5f2; border-radius: 999px; background-color: #fff; color: #334155; font-size: 12px; font-weight: 800; }
     .template-category-block { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 14px; box-shadow: var(--shadow); }
     .template-category-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid #e8eef7; }
     .template-category-head h3 { margin: 0; font-size: 13px; letter-spacing: 0; color: #1e3a8a; font-weight: 800; }
@@ -1193,6 +1223,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
     }
     .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
+    .template-thumb-img { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; z-index: 1; }
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-img { display: block; }
     .template-thumb[data-has-thumbnail="true"]::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(15,23,42,.10)); }
     .template-thumb[data-has-thumbnail="true"]::after,
     .template-thumb[data-has-thumbnail="true"] .template-thumb-back,
@@ -1532,6 +1564,18 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-thumb[data-layout="red-gold"] .template-thumb-summary { color: rgba(82,5,12,.78); }
     .template-thumb[data-layout="red-gold"] .template-thumb-tag { background: var(--thumb-primary); color: #fff7ed; }
     .template-thumb[data-layout="red-gold"] .template-thumb-band { background: linear-gradient(135deg, rgba(255,248,204,.94), color-mix(in srgb, var(--thumb-accent) 82%, #ffffff 18%) 36%, rgba(184,15,26,.25) 37%, color-mix(in srgb, var(--thumb-primary) 80%, #3f0308 20%)); clip-path: polygon(0 64%, 15% 48%, 29% 58%, 45% 34%, 61% 53%, 76% 31%, 100% 44%, 100% 100%, 0 100%); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] { background: linear-gradient(135deg, #081426 0%, #10243a 58%, #071a2f 100%); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"]::before { background: radial-gradient(circle at 78% 18%, rgba(59,165,199,.24), transparent 24%), radial-gradient(circle at 18% 82%, rgba(200,169,106,.18), transparent 25%), repeating-linear-gradient(90deg, rgba(183,198,214,.09) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, rgba(183,198,214,.06) 0 1px, transparent 1px 26px); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-cover { left: 8%; right: 8%; top: 15%; bottom: 13%; border-radius: 8px; background: linear-gradient(135deg, rgba(16,36,58,.96), rgba(7,26,47,.90)); border: 1px solid rgba(200,169,106,.35); box-shadow: 0 16px 30px rgba(0,0,0,.26); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-band { left: 8%; right: 37%; top: 15%; height: 6px; background: linear-gradient(90deg, var(--thumb-accent), var(--thumb-secondary)); border-radius: 8px 0 0 0; }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-image { right: 12%; top: 27%; width: 29%; height: 34%; border-radius: 8px; background: linear-gradient(180deg, rgba(7,26,47,.92), rgba(16,36,58,.84)); border: 1px solid rgba(200,169,106,.24); box-shadow: none; }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-image::before { background: linear-gradient(var(--thumb-accent), var(--thumb-accent)) 18% 70% / 10% 28% no-repeat, linear-gradient(var(--thumb-secondary), var(--thumb-secondary)) 36% 58% / 10% 40% no-repeat, linear-gradient(var(--thumb-accent), var(--thumb-accent)) 54% 66% / 10% 32% no-repeat, linear-gradient(var(--thumb-secondary), var(--thumb-secondary)) 72% 48% / 10% 50% no-repeat; }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-wave { left: 12%; right: 44%; bottom: 22%; height: 10%; background: linear-gradient(90deg, var(--thumb-accent) 0 10%, transparent 10% 25%, var(--thumb-secondary) 25% 34%, transparent 34% 50%, var(--thumb-accent) 50% 58%, transparent 58% 75%, var(--thumb-secondary) 75%); clip-path: none; opacity: .95; }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-heading { color: var(--thumb-title); text-shadow: 0 0 12px rgba(59,165,199,.16); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-date,
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-kicker,
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-summary { color: color-mix(in srgb, var(--thumb-body) 90%, #ffffff 10%); }
+    .template-thumb[data-layout="executive-deepblue-boardroom"] .template-thumb-tag { background: var(--thumb-accent); color: #071a2f; }
     .template-thumb[data-thumb-variant="left-title"] .template-thumb-heading { max-width: 100%; }
     .template-thumb[data-thumb-variant="left-title"] .template-thumb-summary { max-width: 86%; }
     .template-thumb[data-thumb-variant="center-card"] .template-thumb-cover { text-align: center; padding-left: 9%; padding-right: 9%; }
@@ -1555,12 +1599,13 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .preview-meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
     .preview-actions { display: flex; gap: 8px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
     .preview-actions button { min-height: 40px; padding: 9px 13px; }
-    .preview-stage { position: relative; display: grid; min-height: 0; padding: 20px; background: linear-gradient(135deg, #edf3fb 0%, #f5f8fc 100%); overflow: auto; }
+    .preview-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-height: 0; padding: 20px; background: linear-gradient(135deg, #edf3fb 0%, #f5f8fc 100%); overflow: auto; overscroll-behavior: contain; }
     .preview {
       min-height: 620px; background: #ffffff; color: var(--text); border-radius: 14px; padding: 20px; overflow: auto;
       box-shadow: inset 0 0 0 1px rgba(31,94,255,.08), 0 22px 52px rgba(16,24,40,.13);
     }
     .preview.is-deck-loaded { height: 100%; min-height: 0; padding: 0; background: #edf3fb; overflow: hidden; }
+    .preview.is-deck-loaded.has-generation-progress { position: relative; }
     .preview-frame { display: block; width: 100%; min-height: 620px; border: 0; border-radius: 12px; background: #edf3fb; }
     .preview.is-deck-loaded .preview-frame { height: 100%; min-height: 0; }
     .preview-polish-loading { position: absolute; z-index: 20; inset: 18px; display: none; place-items: center; border-radius: 8px; background: rgba(237,243,251,.62); backdrop-filter: blur(2px); pointer-events: none; }
@@ -1570,50 +1615,59 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .button-spinner { position: relative; z-index: 1; flex: 0 0 auto; width: 13px; height: 13px; margin-right: 2px; border-color: rgba(255,255,255,.42); border-top-color: #fff; vertical-align: -2px; }
     button.secondary .button-spinner { border-color: rgba(37,99,235,.24); border-top-color: #2563eb; }
     .button-label { position: relative; z-index: 1; }
-    .structure-side-panel, .ai-polish-side-panel { display: none !important; }
-    .slide-edit-modal { position: absolute; z-index: 30; inset: 18px; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15,23,42,.20); backdrop-filter: blur(2px); }
-    .slide-edit-modal[aria-hidden="false"] { display: flex; }
-    .slide-edit-dialog { width: min(720px, 100%); max-height: min(760px, 92vh); overflow: auto; border: 1px solid #cfe0ff; border-radius: 14px; background: #fff; box-shadow: 0 26px 70px rgba(15,23,42,.24); }
-    .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .slide-edit-modal { position: relative; z-index: 30; display: none; min-width: 0; min-height: 0; }
+    .slide-edit-modal[aria-hidden="false"] { display: block; }
+    .slide-edit-dialog { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .slide-edit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 0 0 14px; border-bottom: 1px solid var(--line); }
     .slide-edit-head h2 { font-size: 16px; margin: 0 0 5px; color: var(--text); }
     .slide-edit-selected { color: var(--muted); font-size: 12px; font-weight: 800; }
     .slide-edit-close { width: 34px; height: 34px; padding: 0; border: 1px solid #d8e2f0; background: #fff; color: #475569; box-shadow: none; }
-    .slide-edit-body { display: grid; gap: 12px; padding: 16px 18px 18px; }
-    .slide-edit-body textarea { min-height: 116px; }
-    .slide-ai-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; }
-    .slide-ai-choice label { display: flex; align-items: center; gap: 8px; margin: 0; color: #1e3a8a; font-size: 13px; font-weight: 850; }
-    .slide-ai-choice input[type="checkbox"] { width: 16px; height: 16px; padding: 0; }
+    .slide-edit-body { display: grid; gap: 12px; padding-top: 14px; }
+    .slide-edit-body textarea { min-height: 146px; resize: vertical; }
+    .slide-ai-assistant { display: grid; gap: 14px; }
+    .slide-ai-welcome { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; }
+    .slide-ai-robot { position: relative; width: 44px; height: 44px; border: 1px solid #93c5fd; border-radius: 8px; background: #2563eb; box-shadow: 0 8px 18px rgba(37,99,235,.18); }
+    .slide-ai-robot::before { content: ""; position: absolute; left: 9px; right: 9px; top: 11px; height: 18px; border-radius: 6px; background: #eff6ff; box-shadow: inset 0 -4px 0 #dbeafe; }
+    .slide-ai-robot::after { content: ""; position: absolute; left: 15px; top: 17px; width: 5px; height: 5px; border-radius: 50%; background: #2563eb; box-shadow: 10px 0 0 #14b8a6; }
+    .slide-ai-message { min-width: 0; padding: 11px 12px; border: 1px solid #dbeafe; border-radius: 8px; background: #f8fbff; color: #334155; font-size: 12px; line-height: 1.55; }
+    .slide-ai-prompt-label { color: #64748b; font-size: 11px; font-weight: 800; }
+    .slide-ai-prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .slide-ai-prompt { min-width: 0; min-height: 36px; padding: 8px 9px; border: 1px solid #d8e2f0; border-radius: 8px; background: #fff; color: #1e3a8a; box-shadow: none; font-size: 11px; line-height: 1.3; }
+    .slide-ai-prompt:hover:not(:disabled) { border-color: #93c5fd; background: #eff6ff; transform: none; box-shadow: none; }
+    .slide-ai-input { display: grid; gap: 8px; }
+    .slide-ai-input label { margin: 0; }
     .slide-edit-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+    .slide-edit-actions #regenerate-slide { width: 100%; justify-content: center; }
     .empty-preview { min-height: 584px; display: grid; place-items: center; border: 1px dashed #bfd0e6; border-radius: 14px; background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 62%, #e8f1ff 100%); }
     .empty-slide { width: min(560px, 90%); aspect-ratio: 16 / 9; border-radius: 16px; background: linear-gradient(135deg, #fff 0%, #fff 58%, #f2f7ff 100%); border: 1px solid #d9e5f5; box-shadow: 0 26px 68px rgba(31,94,255,.13); padding: 48px 58px; }
     .empty-slide h3 { margin: 0 0 14px; font-size: 30px; line-height: 1.16; color: #173b8f; letter-spacing: 0; }
     .empty-slide p { margin: 0; color: var(--muted); line-height: 1.7; }
     .empty-line { width: 58px; height: 4px; margin: 28px 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--teal)); }
-    .deck-loading { position: relative; display: grid; gap: 18px; min-height: 584px; overflow: hidden; padding: 24px; border: 1px solid #cbd8ea; background: #f8fbff; isolation: isolate; }
-    .deck-loading::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(rgba(37,99,235,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.055) 1px, transparent 1px); background-size: 34px 34px; }
-    .deck-loading::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, rgba(255,255,255,.96) 0 32%, rgba(235,244,255,.82) 58%, rgba(232,250,247,.84) 100%); }
-    .deck-progress-scan { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: #22d3ee; box-shadow: 0 0 18px rgba(34,211,238,.9); animation: deck-scan 2.8s linear infinite; }
-    .deck-loading-dashboard { display: grid; grid-template-columns: 176px minmax(0, 1fr); align-items: center; gap: 26px; min-height: 188px; padding: 22px 26px; border: 1px solid rgba(37,99,235,.18); background: rgba(255,255,255,.88); box-shadow: 0 18px 44px rgba(30,64,175,.10); }
-    .deck-progress-ring { position: relative; width: 148px; height: 148px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 8) * 1%), #dbeafe 0); transition: background .45s ease; box-shadow: 0 0 0 8px rgba(219,234,254,.72), 0 16px 32px rgba(37,99,235,.18); }
-    .deck-progress-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #fff; border: 1px solid #dbeafe; }
-    .deck-progress-ring::after { content: ""; position: absolute; inset: -7px; border: 1px dashed rgba(15,118,110,.48); border-radius: 50%; animation: deck-orbit 7s linear infinite; }
+    .deck-loading { position: relative; display: grid; gap: 18px; min-height: 584px; overflow: hidden; padding: 30px; border: 1px solid #d8e6f5; border-radius: 8px; background: #f8fbff; isolation: isolate; }
+    .deck-loading::before { content: ""; position: absolute; inset: 0; z-index: -2; background: radial-gradient(circle at 50% 20%, rgba(37,99,235,.16), transparent 32%), radial-gradient(circle at 72% 72%, rgba(20,184,166,.14), transparent 30%), linear-gradient(135deg, #ffffff 0%, #f5f9ff 52%, #eefaf7 100%); }
+    .deck-loading::after { content: ""; position: absolute; inset: 18px; z-index: -1; border: 1px solid rgba(148,163,184,.18); border-radius: 8px; background-image: linear-gradient(rgba(37,99,235,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.04) 1px, transparent 1px); background-size: 42px 42px; mask-image: radial-gradient(circle at 50% 34%, #000 0 42%, transparent 72%); }
+    .deck-progress-scan { position: absolute; left: 10%; right: 10%; top: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(37,99,235,.58), transparent); box-shadow: 0 0 18px rgba(37,99,235,.35); animation: deck-scan 3.4s ease-in-out infinite; }
+    .deck-loading-dashboard { display: grid; justify-items: center; align-content: center; gap: 18px; min-height: 310px; padding: 22px 26px; text-align: center; }
+    .deck-progress-ring { position: relative; width: 154px; height: 154px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 8) * 1%), rgba(219,234,254,.78) 0); transition: background .45s ease; box-shadow: 0 22px 48px rgba(37,99,235,.18), 0 0 0 12px rgba(255,255,255,.72); }
+    .deck-progress-ring::before { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: rgba(255,255,255,.96); border: 1px solid rgba(191,219,254,.86); box-shadow: inset 0 0 28px rgba(219,234,254,.62); }
+    .deck-progress-ring::after { content: ""; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid rgba(37,99,235,.18); border-top-color: #2563eb; border-right-color: rgba(20,184,166,.75); animation: deck-orbit 2.4s linear infinite; }
     .deck-progress-core { position: relative; z-index: 1; text-align: center; }
     .deck-progress-value { display: block; color: #163b8f; font-size: 34px; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; }
-    .deck-progress-unit { display: block; margin-top: 7px; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
-    .deck-loading-head { min-width: 0; }
-    .deck-loading-head strong { display: block; margin-bottom: 7px; color: #172554; font-size: 21px; }
-    .deck-loading-head > span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .deck-progress-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: #334155; font-size: 12px; font-weight: 800; }
+    .deck-progress-unit { display: block; margin-top: 7px; color: #0f766e; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+    .deck-loading-head { display: grid; gap: 8px; justify-items: center; max-width: 560px; min-width: 0; }
+    .deck-loading-head strong { display: block; color: #172554; font-size: 23px; line-height: 1.25; }
+    .deck-loading-head > span { display: block; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .deck-progress-meta { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 4px; color: #334155; font-size: 12px; font-weight: 800; }
     .deck-progress-stage { color: #1d4ed8; }
     .deck-progress-count { font-variant-numeric: tabular-nums; }
-    .deck-progress { height: 10px; margin-top: 9px; border-radius: 999px; overflow: hidden; background: #dbeafe; box-shadow: inset 0 1px 3px rgba(30,64,175,.14); }
-    .deck-progress-bar { display: block; position: relative; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #06b6d4, #0f766e); transition: width .45s ease; }
-    .deck-progress-bar::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(120deg, transparent 0 12px, rgba(255,255,255,.35) 12px 20px); animation: deck-flow 1.1s linear infinite; }
+    .deck-progress { width: min(520px, 100%); height: 8px; margin: 6px auto 0; border-radius: 999px; overflow: hidden; background: rgba(219,234,254,.82); box-shadow: inset 0 1px 3px rgba(30,64,175,.12); }
+    .deck-progress-bar { display: block; position: relative; width: var(--deck-progress, 12%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #06b6d4, #14b8a6); transition: width .45s ease; }
+    .deck-progress-bar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.52), transparent); animation: deck-flow 1.4s ease-in-out infinite; }
     .deck-loading-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-    .deck-loading-step { position: relative; padding: 11px 12px 11px 34px; border: 1px solid var(--line); border-radius: 6px; background: rgba(255,255,255,.82); color: #64748b; font-size: 12px; font-weight: 800; transition: border-color .25s ease, color .25s ease, transform .25s ease; }
-    .deck-loading-step::before { content: ""; position: absolute; left: 13px; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transform: translateY(-50%); }
-    .deck-loading-step.is-active { border-color: #93c5fd; color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(37,99,235,.08); }
-    .deck-loading-step.is-active::before { background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.14), 0 0 12px rgba(34,211,238,.8); animation: deck-pulse 1.25s ease-in-out infinite; }
+    .deck-loading-step { position: relative; min-height: 54px; display: flex; align-items: center; justify-content: center; padding: 11px 12px; border: 1px solid rgba(203,213,225,.82); border-radius: 8px; background: rgba(255,255,255,.78); color: #64748b; font-size: 12px; font-weight: 850; transition: border-color .25s ease, color .25s ease, transform .25s ease, background .25s ease; }
+    .deck-loading-step::before { content: ""; width: 8px; height: 8px; margin-right: 9px; border-radius: 50%; background: #cbd5e1; }
+    .deck-loading-step.is-active { border-color: #93c5fd; background: rgba(239,246,255,.94); color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 14px 28px rgba(37,99,235,.08); }
+    .deck-loading-step.is-active::before { background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.14), 0 0 12px rgba(34,211,238,.72); animation: deck-pulse 1.25s ease-in-out infinite; }
     .deck-loading-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .deck-loading-slide {
       display: grid; gap: 10px; aspect-ratio: 16 / 9; padding: 8.5% 9%; border-radius: 8px;
@@ -1623,16 +1677,25 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .deck-loading-line { height: 9px; border-radius: 999px; background: #cbd5e1; }
     .deck-loading-line:nth-child(3) { width: 82%; }
     .deck-loading-line:nth-child(4) { width: 68%; }
-    .deck-preview-progress { position: absolute; top: 14px; right: 18px; z-index: 8; width: 210px; padding: 12px 14px; pointer-events: none; border: 1px solid rgba(37,99,235,.24); background: rgba(255,255,255,.94); box-shadow: 0 16px 34px rgba(15,23,42,.16); backdrop-filter: blur(10px); }
-    .deck-preview-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #334155; font-size: 11px; font-weight: 800; }
-    .deck-preview-progress-head strong { color: #1d4ed8; font-size: 18px; font-variant-numeric: tabular-nums; }
-    .deck-preview-progress .deck-progress { height: 6px; margin-top: 8px; }
-    .deck-preview-progress .deck-progress-stage { display: block; margin-top: 7px; font-size: 10px; }
+    .deck-preview-progress { position: absolute; left: 50%; top: var(--deck-preview-progress-top, 280px); z-index: 8; width: 174px; min-height: 174px; display: grid; place-items: center; padding: 16px; pointer-events: none; border: 1px solid rgba(191,219,254,.72); border-radius: 50%; background: conic-gradient(#2563eb calc(var(--deck-progress-number, 0) * 1%), rgba(219,234,254,.92) 0); box-shadow: 0 22px 46px rgba(15,23,42,.16), 0 0 0 10px rgba(239,246,255,.52); backdrop-filter: blur(8px); transform: translate(-50%, -50%); transition: top .28s ease, background .45s ease; }
+    .deck-preview-progress::before { content: ""; position: absolute; inset: 6px; z-index: 1; border-radius: inherit; background: conic-gradient(from 0deg, transparent 0 18%, rgba(37,99,235,.95) 22% 30%, rgba(20,184,166,.88) 34% 42%, transparent 47% 100%); -webkit-mask: radial-gradient(circle, transparent 0 70px, #000 72px 78px, transparent 80px); mask: radial-gradient(circle, transparent 0 70px, #000 72px 78px, transparent 80px); animation: deck-orbit 1.05s linear infinite; }
+    .deck-preview-progress::after { content: ""; position: absolute; inset: 18px; z-index: 0; border-radius: inherit; background: rgba(255,255,255,.94); box-shadow: inset 0 0 24px rgba(219,234,254,.56); }
+    .deck-preview-spinner { position: absolute; inset: 4px; z-index: 3; border-radius: 50%; border: 4px solid rgba(219,234,254,.55); border-top-color: #2563eb; border-right-color: #14b8a6; border-bottom-color: rgba(37,99,235,.22); animation: deck-spinner-spin .72s linear infinite; }
+    .deck-preview-spinner::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; border: 2px solid transparent; border-left-color: rgba(37,99,235,.72); border-bottom-color: rgba(20,184,166,.66); animation: deck-spinner-spin 1.15s linear infinite reverse; }
+    .deck-preview-orbit { position: absolute; inset: 14px; z-index: 2; border-radius: 50%; animation: deck-orbit 1.45s linear infinite; }
+    .deck-preview-orbit::before,
+    .deck-preview-orbit::after { content: ""; position: absolute; left: 50%; top: 0; width: 9px; height: 9px; border-radius: 999px; background: #2563eb; box-shadow: 0 0 14px rgba(37,99,235,.72); transform: translate(-50%, -50%); }
+    .deck-preview-orbit::after { top: auto; bottom: 0; width: 7px; height: 7px; background: #14b8a6; box-shadow: 0 0 14px rgba(20,184,166,.72); }
+    .deck-preview-progress-head { position: relative; z-index: 4; display: grid; justify-items: center; gap: 7px; color: #334155; font-size: 11px; font-weight: 850; text-align: center; }
+    .deck-preview-progress-head strong { order: -1; color: #1d4ed8; font-size: 27px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 6px 18px rgba(37,99,235,.14); }
+    .deck-preview-progress .deck-progress { position: absolute; left: 18%; right: 18%; bottom: 34px; z-index: 2; width: auto; height: 5px; margin: 0; }
+    .deck-preview-progress .deck-progress-stage { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 2; display: block; color: #1d4ed8; font-size: 10px; font-weight: 850; text-align: center; }
     @keyframes deck-scan { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translateY(580px); opacity: 0; } }
     @keyframes deck-orbit { to { transform: rotate(360deg); } }
-    @keyframes deck-flow { to { transform: translateX(32px); } }
-    @keyframes deck-pulse { 50% { transform: translateY(-50%) scale(1.35); } }
-    @media (max-width: 720px) { .deck-loading { padding: 16px; } .deck-loading-dashboard { grid-template-columns: 1fr; text-align: center; } .deck-progress-ring { margin: 0 auto; } .deck-progress-meta { flex-direction: column; } .deck-loading-grid { grid-template-columns: 1fr; } .preview.is-deck-loaded.has-generation-progress { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 8px; } .preview.is-deck-loaded.has-generation-progress .preview-frame { grid-row: 2; min-height: 0; } .deck-preview-progress { position: relative; inset: auto; grid-row: 1; width: auto; padding: 9px 12px; } }
+    @keyframes deck-spinner-spin { to { transform: rotate(360deg); } }
+    @keyframes deck-flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes deck-pulse { 50% { transform: scale(1.35); } }
+    @media (max-width: 720px) { .deck-loading { padding: 16px; } .deck-loading-dashboard { min-height: 280px; text-align: center; } .deck-progress-ring { margin: 0 auto; } .deck-progress-meta { flex-direction: column; } .deck-loading-steps, .deck-loading-grid { grid-template-columns: 1fr; } .deck-preview-progress { width: 142px; min-height: 142px; } .deck-preview-progress-head strong { font-size: 23px; } }
     @media (prefers-reduced-motion: reduce) { .deck-progress-scan, .deck-progress-ring::after, .deck-progress-bar::after, .deck-loading-step.is-active::before, .deck-loading-slide { animation: none; } .deck-progress-ring, .deck-progress-bar, .deck-loading-step { transition: none; } }
     @keyframes deckReveal { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .outline-shell { position: relative; min-height: calc(100vh - 118px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; padding-bottom: 92px; }
@@ -1775,13 +1838,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .sidebar-panel { box-shadow: none; }
     body[data-workspace-page="assets"] .context { order: 1; }
     body[data-workspace-page="assets"] .preview-shell { order: 2; }
+    body[data-workspace-page="assets"] .asset-slide-edit-context { order: 3; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] { overflow: hidden; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] main { grid-template-columns: minmax(280px, 360px) minmax(620px, 1fr) minmax(300px, 380px); height: calc(100vh - 78px); max-height: calc(100vh - 78px); align-items: stretch; overflow: hidden; }
+    /* 资产库预览态保持侧栏为单列滚动，避免响应式三列规则把编辑卡片和日志卡片挤到同一行。 */
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .context { grid-column: auto; grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .sidebar-panel { min-width: 0; overflow: hidden; }
+    /* 左侧整列负责滚动，编辑卡片保持完整高度，避免表单内容被压缩到只露出一部分。 */
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-modal { max-height: none; overflow: visible; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-dialog { display: block; max-height: none; min-height: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-body { min-height: 0; overflow: visible; padding-right: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-body textarea { min-height: 96px; max-height: 160px; resize: vertical; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .slide-edit-actions { position: static; margin: 0; padding-top: 4px; background: transparent; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] #status { max-height: 180px; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .preview-shell { height: 100%; min-height: 0; }
+    body[data-workspace-page="assets"][data-asset-preview-open="true"] .asset-slide-edit-context { display: grid; align-content: start; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] main { grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] .context { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); }
     body[data-workspace-page="assets"][data-asset-preview-open="false"] .asset-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
     .is-hidden { display: none !important; }
     @media (max-width: 1180px) { header { flex-wrap: wrap; } main { grid-template-columns: minmax(300px, 380px) 1fr; } .context { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } .preview-shell { min-height: 620px; } .status-grid { grid-template-columns: 1fr; } }
     @media (min-width: 1021px) and (max-width: 1320px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: minmax(280px, 320px) minmax(520px, 1fr) minmax(280px, 320px); } }
-    @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } }
+    @media (max-width: 1020px) { body[data-workspace-page="create"][data-flow-stage="preview"], body[data-workspace-page="assets"][data-asset-preview-open="true"] { overflow: auto; } body[data-workspace-page="create"][data-flow-stage="preview"] main, body[data-workspace-page="assets"][data-asset-preview-open="true"] main { grid-template-columns: 1fr; height: auto; max-height: none; overflow: visible; } body[data-workspace-page="create"][data-flow-stage="preview"] .workflow, body[data-workspace-page="create"][data-flow-stage="preview"] .context, body[data-workspace-page="assets"][data-asset-preview-open="true"] .context, body[data-workspace-page="assets"][data-asset-preview-open="true"] .asset-slide-edit-context { max-height: none; overflow: visible; padding-right: 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .context { grid-template-columns: 1fr; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-modal[aria-hidden="false"] { height: auto; max-height: none; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-dialog { display: block; height: auto; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-body { overflow: visible; padding-right: 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .slide-edit-actions { position: static; margin: 0; padding: 4px 0 0; } body[data-workspace-page="create"][data-flow-stage="preview"] .preview-shell, body[data-workspace-page="assets"][data-asset-preview-open="true"] .preview-shell { height: auto; min-height: 620px; } }
     @media (max-width: 980px) { body[data-workspace-page="templates"] main { grid-template-columns: 1fr; } }
     @media (max-width: 1180px) { .template-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 860px) { header { align-items: flex-start; padding: 14px 16px; } .page-nav { width: 100%; overflow-x: auto; } .page-nav button { flex: 0 0 auto; } main, body[data-workspace-page="create"][data-flow-stage="input"] main, body[data-workspace-page="create"][data-flow-stage="outline"] main, body[data-workspace-page="create"][data-flow-stage="preview"] main { grid-template-columns: 1fr; padding: 12px; } body[data-workspace-page="create"][data-flow-stage="input"] .workflow > .panel[data-flow-panel~="input"], body[data-workspace-page="create"][data-flow-stage="outline"] .workflow > .panel[data-flow-panel~="outline"] { padding: 20px; } body[data-workspace-page="create"][data-flow-stage="input"] .flow-guide, body[data-workspace-page="create"][data-flow-stage="outline"] .flow-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); } .context { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } .preview-shell, .outline-shell { min-height: auto; } .preview, .preview-frame, .preview.is-deck-loaded, .preview.is-deck-loaded .preview-frame { min-height: 420px; } .outline-header { align-items: flex-start; flex-direction: column; } .outline-toolbar { justify-content: flex-start; } .outline-header .outline-toolbar { grid-template-columns: 1fr; gap: 10px; } .outline-header .outline-action-retry, .outline-header .outline-action-save { justify-self: stretch; width: 100%; } .outline-summary { grid-template-columns: 1fr; } .outline-empty { min-height: 320px; } .template-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } .template-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .template-category-tabs { gap: 22px; } .top-status { justify-content: flex-start; } }
@@ -1878,6 +1956,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="template-gallery-wrap">
         <div id="template-gallery" class="template-gallery" aria-label="模板内容样式预览"></div>
       </div>
+      <div id="template-pagination" class="template-pagination" aria-label="模板分页"></div>
       <div class="template-manage-split"></div>
       <div class="panel-head">
         <div class="panel-title"><span class="step-number">4</span><h2>个人模板</h2></div>
@@ -1934,33 +2013,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="preview-stage">
         <div id="preview" class="preview"><div class="empty-preview"><div class="empty-slide"><h3>等待生成预览</h3><p>保存大纲并选择模板后，这里会展示每一页 PPT 的真实排版、配色和导出效果。</p><div class="empty-line"></div></div></div></div>
         <div id="preview-polish-loading" class="preview-polish-loading" aria-live="polite"><div class="polish-loading-card"><span class="polish-spinner"></span><span>AI 正在润色本页...</span></div></div>
-        <div id="slide-edit-modal" class="slide-edit-modal" aria-hidden="true">
-          <div class="slide-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="slide-edit-title">
-            <div class="slide-edit-head">
-              <div>
-                <h2 id="slide-edit-title">编辑当前页面</h2>
-                <div id="slide-edit-selected" class="slide-edit-selected">请选择一页 PPT</div>
-              </div>
-              <button id="close-slide-edit-modal" class="slide-edit-close" type="button" aria-label="关闭">×</button>
-            </div>
-            <div class="slide-edit-body">
-              <label for="structure-slide-title">页面标题</label>
-              <input id="structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
-              <label for="structure-slide-layout">页面版式</label>
-              <select id="structure-slide-layout" disabled></select>
-              <label for="structure-slide-bullets">页面要点</label>
-              <textarea id="structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
-              <div class="slide-ai-choice">
-                <label for="single-page-ai-toggle"><input id="single-page-ai-toggle" type="checkbox" />需要 AI 单页优化</label>
-                <textarea id="slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
-              </div>
-              <div class="slide-edit-actions">
-                <button id="apply-structure-preview" type="button" class="secondary">仅更新预览</button>
-                <button id="regenerate-slide" type="button">AI 优化本页</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
     <aside class="context" aria-label="上下文信息" data-page-panel="create assets status" data-flow-panel="outline preview">
@@ -1981,32 +2033,40 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           <button id="export-pdf" class="secondary download-button">下载 PDF</button>
         </div>
       </div>
-      <div class="panel sidebar-panel structure-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
-        <div class="panel-head"><h2>PPT 结构调整</h2></div>
-        <p class="panel-note">在中间预览中选择页面后，可调整标题、要点和版式角色，再按当前模板重新预览。</p>
-        <div class="structure-editor">
-          <label for="legacy-structure-slide-title">页面标题</label>
-          <input id="legacy-structure-slide-title" placeholder="选择页面后可编辑标题" disabled />
-          <label for="legacy-structure-slide-layout">页面版式</label>
-          <select id="legacy-structure-slide-layout" disabled></select>
-          <label for="legacy-structure-slide-bullets">页面要点</label>
-          <textarea id="legacy-structure-slide-bullets" placeholder="每行一个要点" disabled></textarea>
-          <div class="structure-editor-note">调整会先同步到大纲结构，再重新生成在线预览。</div>
-          <div class="structure-editor-actions">
-            <button id="legacy-apply-structure-preview" type="button" class="secondary">应用结构并重新预览</button>
+      <div id="slide-edit-modal" class="panel sidebar-panel slide-edit-modal" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true" aria-hidden="true">
+          <div class="slide-edit-dialog" role="dialog" aria-modal="false" aria-labelledby="slide-edit-title">
+            <div class="slide-edit-head">
+              <div>
+                <h2 id="slide-edit-title">AI 单页助手</h2>
+                <div id="slide-edit-selected" class="slide-edit-selected">请选择一页 PPT</div>
+              </div>
+              <button id="close-slide-edit-modal" class="slide-edit-close" type="button" aria-label="关闭">×</button>
+            </div>
+            <div class="slide-edit-body">
+              <div class="slide-ai-assistant">
+                <div class="slide-ai-welcome">
+                  <span class="slide-ai-robot" aria-hidden="true"></span>
+                  <div id="slide-ai-message" class="slide-ai-message">先在中间预览中选择一页，我会针对该页的内容和表达进行优化。</div>
+                </div>
+                <div class="slide-ai-prompt-label">快捷优化</div>
+                <div class="slide-ai-prompts" aria-label="快捷优化建议">
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="提炼核心观点">提炼核心观点</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="强化高层表达">强化高层表达</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="优化数据叙事">优化数据叙事</button>
+                  <button type="button" class="slide-ai-prompt" data-slide-ai-prompt="压缩冗余文字">压缩冗余文字</button>
+                </div>
+                <div class="slide-ai-input">
+                  <label for="slide-instruction">优化指令</label>
+                  <textarea id="slide-instruction" placeholder="告诉 AI 希望这一页如何调整，例如：突出利润下滑原因，并给出三条可执行建议。"></textarea>
+                </div>
+              </div>
+              <div class="slide-edit-actions">
+                <button id="regenerate-slide" type="button">发送并优化本页</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="panel sidebar-panel ai-polish-side-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
-        <div class="panel-head"><h2>AI 单页润色</h2></div>
-        <p class="panel-note">在中间预览中点击要优化的页面，再输入润色建议。</p>
-        <div id="legacy-selected-slide-label" class="selected-slide-box">未选择页面<span>请先在在线预览中点击一页 PPT。</span></div>
-        <label for="legacy-slide-instruction">润色建议</label>
-        <textarea id="legacy-slide-instruction" placeholder="例如：让这一页更适合高层汇报，标题更有力度，要点更精炼。"></textarea>
-        <div class="actions">
-          <button id="legacy-regenerate-slide" class="secondary">AI 润色本页</button>
-        </div>
-      </div>
+      <span id="slide-edit-home" class="is-hidden" aria-hidden="true"></span>
       <div class="panel sidebar-panel" data-page-panel="create assets" data-flow-panel="preview" data-asset-preview-panel="true">
         <div class="panel-head"><h2>任务状态 / 日志</h2></div>
         <pre id="status">ready</pre>
@@ -2056,6 +2116,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         </div>
       </section>
     </aside>
+    <aside id="asset-slide-edit-context" class="asset-slide-edit-context" aria-label="当前页面编辑" data-page-panel="assets" data-flow-panel="preview" data-asset-preview-panel="true"></aside>
   </main>
   <script>
     const state = { outlineId: null, deckId: null, taskId: null, outlineSlides: [], selectedSlideId: null, selectedSlideNumber: null, previewRevision: 0, assetPreviewOpen: false, currentAssetId: null };
@@ -2070,18 +2131,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const outlineEditorEl = document.querySelector("#outline-editor");
     const outlineBoardEl = document.querySelector("#outline-board");
     const outlineSummaryEl = document.querySelector("#outline-summary");
-    const selectedSlideLabelEl = document.querySelector("#selected-slide-label");
     const slideEditModalEl = document.querySelector("#slide-edit-modal");
+    const slideEditHomeEl = document.querySelector("#slide-edit-home");
+    const assetSlideEditContextEl = document.querySelector("#asset-slide-edit-context");
     const slideEditSelectedEl = document.querySelector("#slide-edit-selected");
-    const singlePageAiToggleEl = document.querySelector("#single-page-ai-toggle");
-    const structureSlideTitleEl = document.querySelector("#structure-slide-title");
-    const structureSlideLayoutEl = document.querySelector("#structure-slide-layout");
-    const structureSlideBulletsEl = document.querySelector("#structure-slide-bullets");
-    const applyStructurePreviewButton = document.querySelector("#apply-structure-preview");
     const templateGalleryEl = document.querySelector("#template-gallery");
     const templateGalleryCountEl = document.querySelector("#template-gallery-count");
     const templateCategoryTabsEl = document.querySelector("#template-category-tabs");
     const templateSearchEl = document.querySelector("#template-search");
+    const templatePaginationEl = document.querySelector("#template-pagination");
     const selectedTemplatePreviewEl = document.querySelector("#selected-template-preview");
     const assetSearchEl = document.querySelector("#asset-search");
     const assetTimeFilterEl = document.querySelector("#asset-time-filter");
@@ -2096,11 +2154,14 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const DECK_MIN_LOADING_MS = 2200;
     const ASSET_PAGE_SIZE = 20;
     const TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10;
+    const TEMPLATE_DEFAULT_PAGE_SIZE = 12;
     let flowStage = "input";
     let templateCategories = [{ id: "business", name: "Business" }];
     let templateCatalog = [{ id: "business", name: "Business", category: { id: "business", name: "Business" }, themes: [{ id: "modern", name: "Modern" }] }];
     let templateSearchQuery = "";
     let expandedTemplateCategoryId = "";
+    let templatePage = 1;
+    let templatePageSize = TEMPLATE_DEFAULT_PAGE_SIZE;
     let assetCatalog = [];
     let assetSearchQuery = "";
     let assetTimeFilter = "all";
@@ -2109,21 +2170,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     let deckRevealTimer = null;
     let deckRevealTargetCount = 0;
     let deckRevealSlides = [];
-    const STRUCTURE_LAYOUT_OPTIONS = [
-      ["", "自动匹配"],
-      ["cover", "封面页"],
-      ["agenda", "目录页"],
-      ["section-divider", "章节页"],
-      ["image-report", "图文汇报"],
-      ["metrics", "数据指标"],
-      ["three-steps", "三步骤流程"],
-      ["four-steps", "四步骤流程"],
-      ["showcase", "成果展示"],
-      ["retrospective", "问题复盘"],
-      ["next-plan", "下一步计划"],
-      ["closing", "结束页"],
-      ["content", "普通内容"]
-    ];
     const json = (url, body, method = "POST") => fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -2242,6 +2288,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         button.addEventListener("click", () => {
           const categoryEl = document.querySelector("#template-category");
           expandedTemplateCategoryId = "";
+          templatePage = 1;
           categoryEl.value = button.dataset.templateCategoryTab || "";
           loadTemplates();
         });
@@ -2306,34 +2353,71 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         ? sourceTemplates.filter((template) => templateMatchesSearch(template, keyword))
         : sourceTemplates;
       renderTemplateCategoryTabs();
+      const pageCount = Math.max(1, Math.ceil(templates.length / templatePageSize));
+      templatePage = Math.min(Math.max(templatePage, 1), pageCount);
+      const pageStart = (templatePage - 1) * templatePageSize;
+      const visibleTemplates = templates.slice(pageStart, pageStart + templatePageSize);
       if (templateGalleryCountEl) {
-        const collapsed = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
-        templateGalleryCountEl.textContent = collapsed
-          ? "\u5f53\u524d\u663e\u793a " + TEMPLATE_CATEGORY_PREVIEW_LIMIT + " / " + templates.length + " \u4e2a\u6a21\u677f"
-          : templates.length + " \u4e2a\u53ef\u7528\u6a21\u677f";
+        const start = templates.length ? pageStart + 1 : 0;
+        const end = Math.min(pageStart + visibleTemplates.length, templates.length);
+        templateGalleryCountEl.textContent = templates.length
+          ? "当前显示 " + start + "-" + end + " / " + templates.length + " 个模板"
+          : "0 个可用模板";
       }
       if (!templates.length) {
         templateGalleryEl.innerHTML = '<div class="hint">' + (keyword ? '\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f' : '\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f') + '</div>';
         if (templateGalleryCountEl) templateGalleryCountEl.textContent = keyword ? "\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f" : "\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f";
+        if (templatePaginationEl) templatePaginationEl.innerHTML = "";
         return;
       }
-      // 分类模式默认只露出前 10 个模板，避免列表过长；用户点击后再展开完整分类。
-      const shouldLimitCategory = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
-      const visibleTemplates = shouldLimitCategory ? templates.slice(0, TEMPLATE_CATEGORY_PREVIEW_LIMIT) : templates;
       const categoryName = categoryId ? selectedTemplateCategoryName(categoryId, templates) : "";
       const categoryHeader = categoryId && !keyword
-        ? '<div class="template-category-preview-head"><div><strong>' + escapeHtml(categoryName) + '</strong><span>' + (shouldLimitCategory ? "\u5148\u5c55\u793a\u524d 10 \u4e2a\u6a21\u677f\uff0c\u70b9\u51fb\u4e0b\u65b9\u6309\u94ae\u53ef\u67e5\u770b\u5168\u90e8\u7f29\u7565\u56fe\u3002" : "\u5df2\u5c55\u793a\u8be5\u5206\u7c7b\u5168\u90e8\u6a21\u677f\u7f29\u7565\u56fe\u3002") + '</span></div><span class="template-gallery-count">' + visibleTemplates.length + " / " + templates.length + ' \u4e2a</span></div>'
+        ? '<div class="template-category-preview-head"><div><strong>' + escapeHtml(categoryName) + '</strong><span>分页浏览该分类的模板缩略图，切换页码不会改变当前已选模板。</span></div><span class="template-gallery-count">' + (pageStart + 1) + "-" + Math.min(pageStart + visibleTemplates.length, templates.length) + " / " + templates.length + ' 个</span></div>'
         : "";
-      const categoryMore = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT
-        ? '<div class="template-category-preview-actions"><button type="button" class="template-category-more-button" data-template-category-toggle="' + escapeHtml(categoryId) + '">' + (shouldLimitCategory ? "\u5c55\u5f00\u5168\u90e8\u6a21\u677f" : "\u6536\u8d77\uff0c\u4ec5\u663e\u793a\u524d 10 \u4e2a") + '</button></div>'
-        : "";
-      templateGalleryEl.innerHTML = categoryHeader + visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("") + categoryMore;
+      templateGalleryEl.innerHTML = categoryHeader + visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("");
       templateGalleryEl.querySelectorAll("[data-template-card]").forEach((button) => {
         button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
       });
-      templateGalleryEl.querySelector("[data-template-category-toggle]")?.addEventListener("click", (event) => {
-        const toggleCategoryId = event.currentTarget.dataset.templateCategoryToggle || "";
-        expandedTemplateCategoryId = expandedTemplateCategoryId === toggleCategoryId ? "" : toggleCategoryId;
+      renderTemplatePagination({ total: templates.length, pageCount });
+    }
+    function renderTemplatePagination({ total, pageCount }) {
+      if (!templatePaginationEl) return;
+      if (total <= templatePageSize && templatePageSize === TEMPLATE_DEFAULT_PAGE_SIZE) {
+        templatePaginationEl.innerHTML = "";
+        return;
+      }
+      // 模板页码只显示当前页附近的几个按钮，避免模板量增加后工具栏被页码挤满。
+      const pages = [];
+      const firstPage = 1;
+      const lastPage = pageCount;
+      const startPage = Math.max(firstPage, templatePage - 2);
+      const endPage = Math.min(lastPage, templatePage + 2);
+      for (let page = startPage; page <= endPage; page += 1) pages.push(page);
+      if (!pages.includes(firstPage)) pages.unshift(firstPage);
+      if (!pages.includes(lastPage)) pages.push(lastPage);
+      const pageButtons = pages.map((page, index) => {
+        const previous = pages[index - 1];
+        const gap = previous && page - previous > 1 ? '<span class="template-pagination-info">...</span>' : "";
+        return gap + '<button type="button" class="secondary" data-template-page="' + page + '" aria-current="' + (page === templatePage ? 'page' : 'false') + '">' + page + '</button>';
+      }).join("");
+      templatePaginationEl.innerHTML = ''
+        + '<button type="button" class="secondary" data-template-page="prev" ' + (templatePage <= 1 ? "disabled" : "") + '>上一页</button>'
+        + pageButtons
+        + '<span class="template-pagination-info">第 ' + templatePage + ' / ' + pageCount + ' 页</span>'
+        + '<select class="template-page-size" aria-label="每页模板数量">'
+        + [12, 24, 48].map((size) => '<option value="' + size + '" ' + (size === templatePageSize ? "selected" : "") + '>每页 ' + size + ' 个</option>').join("")
+        + '</select>'
+        + '<button type="button" class="secondary" data-template-page="next" ' + (templatePage >= pageCount ? "disabled" : "") + '>下一页</button>';
+      templatePaginationEl.querySelectorAll("[data-template-page]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = button.dataset.templatePage;
+          templatePage = target === "next" ? templatePage + 1 : target === "prev" ? templatePage - 1 : Number(target);
+          renderTemplateGallery();
+        });
+      });
+      templatePaginationEl.querySelector(".template-page-size")?.addEventListener("change", (event) => {
+        templatePageSize = Number(event.target.value) || TEMPLATE_DEFAULT_PAGE_SIZE;
+        templatePage = 1;
         renderTemplateGallery();
       });
     }
@@ -2464,8 +2548,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout, display);
       const thumbnailUrl = display.thumbnailUrl ? "url('" + cssUrl(display.thumbnailUrl) + "')" : "";
       const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-secondary:#" + displayVisual.secondary + ";--thumb-warning:#" + displayVisual.warning + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
+      const thumbnailImg = display.thumbnailUrl ? '<img class="template-thumb-img" src="' + escapeHtml(display.thumbnailUrl) + '" alt="" loading="lazy" decoding="async">' : "";
       return ''
         + '<span class="template-thumb" data-template="' + escapeHtml(display.id || "") + '" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
+        + thumbnailImg
         + '<span class="template-thumb-back template-thumb-back-left"></span><span class="template-thumb-back template-thumb-back-right"></span>'
         + '<span class="template-thumb-cover"><span class="template-thumb-date">' + escapeHtml(copy.date) + '</span><span class="template-thumb-kicker">' + escapeHtml(copy.kicker) + '</span><span class="template-thumb-heading">' + escapeHtml(copy.title) + '</span><span class="template-thumb-summary"><span class="template-thumb-line">' + escapeHtml(copy.lines[0]) + '</span><span class="template-thumb-line">' + escapeHtml(copy.lines[1]) + '</span></span><span class="template-thumb-tag">' + escapeHtml(copy.tag) + '</span></span>'
         + '<span class="template-thumb-image"></span><span class="template-thumb-band"></span><span class="template-thumb-wave"></span><span class="template-thumb-accent"></span>'
@@ -2536,6 +2622,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         "venture": { date: "2026/09/10", kicker: "PLAN 01", title: "项目计划", lines: ["商业模式与市场机会", "阶段目标及执行节奏"], tag: "商业计划" },
         "status-report": { date: "2026/07/28", kicker: "STATUS 01", title: "进展同步", lines: ["里程碑完成情况", "风险阻塞与资源请求"], tag: "项目周报" },
         "top-band": { date: "2026/05/20", kicker: "SECTION 01", title: "方案总览", lines: ["背景洞察与问题拆解", "策略路径与落地安排"], tag: "方案演示" },
+        "executive-deepblue-boardroom": { date: "2026/07/14", kicker: "BOARD BRIEF", title: "经营决策", lines: ["经营概览与关键指标", "问题诊断与行动计划"], tag: "决策汇报" },
         "hero": { date: "2026/10/12", kicker: "IDEA 01", title: "主题发布", lines: ["核心亮点集中呈现", "视觉主张清晰传达"], tag: "产品发布" }
       };
       return themeCopies[String(display.id || "") + ":" + themeId] || copies[display.id] || copies[display.style] || copies[display.categoryId] || layoutCopies[display.visual?.layout] || { date: "2026/06/05", kicker: "PART 01", title: "内容概览", lines: ["核心信息结构展示", "重点内容层级清晰"], tag: "演示文稿" };
@@ -2593,7 +2680,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(visual.surface, "FFFFFF"),
         title: normalizeHexColor(visual.title, "0F172A"),
         body: normalizeHexColor(visual.body, "475569"),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(visual.layout) ? visual.layout : "top-band",
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "executive-deepblue-boardroom", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(visual.layout) ? visual.layout : "top-band",
         variant: typeof visual.variant === "string" ? visual.variant : ""
       };
     }
@@ -2609,7 +2696,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         surface: normalizeHexColor(theme.visual.surface, baseVisual.surface),
         title: normalizeHexColor(theme.visual.title, baseVisual.title),
         body: normalizeHexColor(theme.visual.body, baseVisual.body),
-        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(theme.visual.layout)
+        layout: ["top-band", "left-rail", "hero", "executive", "academy", "venture", "marketing", "social-video-growth", "pre-a-market-validation", "status-report", "red-gold", "education-course", "public-course-enrollment", "feature-priority-matrix", "experience-journey-map", "capability-radar-map", "product-interview-insight", "startup-product-highlights", "investor-update-progress-sync", "pitch-project-return", "enterprise-digital-blueprint", "business-model-value-chain", "product-pricing-strategy", "channel-recruitment-policy", "operating-problem-tree", "knowledge-blackboard", "exam-review-keypoints", "corporate-training", "onboarding-guide", "annual-summary", "quarterly-dashboard", "quarterly-diagnosis", "quarterly-action-loop", "industry-research", "industry-trend-forecast", "strategy-swot-map", "strategy-region-entry", "sales-enterprise-proposal", "sales-key-account-decision-chain", "sales-training-objection-handling", "presales-architecture-solution", "bi-executive-cockpit", "executive-deepblue-boardroom", "user-path-funnel", "market-trend-radar", "channel-traffic-quality", "data-governance-standard", "data-insight-dashboard-console", "data-insight-workbench", "brand-story-editorial", "brand-identity-system", "luxury-brand-story"].includes(theme.visual.layout)
           ? theme.visual.layout
           : baseVisual.layout,
         variant: typeof theme.visual.variant === "string" ? theme.visual.variant : baseVisual.variant,
@@ -2887,12 +2974,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       stopDeckRevealTimer();
       if (options.bustCache) state.previewRevision += 1;
       previewEl.classList.add("is-deck-loaded");
-      previewEl.classList.remove("has-generation-progress");
-      previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览" src="/api/ppt/decks/'
-        + encodeURIComponent(deckId)
-        + '/preview?v=' + encodeURIComponent(state.previewRevision) + '"></iframe>';
-      const frame = previewEl.querySelector(".preview-frame");
-      frame.addEventListener("load", attachPreviewSlidePicker);
+      const frame = ensurePreviewFrame();
+      frame.removeAttribute("srcdoc");
+      frame.src = "/api/ppt/decks/" + encodeURIComponent(deckId) + "/preview?v=" + encodeURIComponent(state.previewRevision);
     }
 
     async function refreshDeckPreviewFrame(deckId) {
@@ -2905,11 +2989,22 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         return text;
       });
       previewEl.classList.add("is-deck-loaded");
-      previewEl.classList.remove("has-generation-progress");
-      previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
-      const frame = previewEl.querySelector(".preview-frame");
-      frame.addEventListener("load", attachPreviewSlidePicker);
+      const frame = ensurePreviewFrame();
+      frame.removeAttribute("src");
       frame.srcdoc = html;
+    }
+
+    function ensurePreviewFrame() {
+      let frame = previewEl.querySelector(".preview-frame");
+      if (!frame) {
+        const progressEl = previewEl.querySelector("[data-deck-preview-progress]");
+        // 在线预览 iframe 独立于生成进度层复用，避免每页刷新时销毁圆形 loading 动画。
+        previewEl.innerHTML = '<iframe class="preview-frame" title="PPT 在线预览"></iframe>';
+        if (progressEl) previewEl.appendChild(progressEl);
+        frame = previewEl.querySelector(".preview-frame");
+      }
+      frame.onload = attachPreviewSlidePicker;
+      return frame;
     }
 
     function attachPreviewSlidePicker() {
@@ -2954,7 +3049,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         page.dataset.selected = page.dataset.slideNumber === String(state.selectedSlideNumber);
       });
       renderSelectedSlideLabel();
-      renderStructureEditor();
+      syncSinglePageAiAssistant();
       if (openEditor) openSlideEditModal();
     }
 
@@ -3059,44 +3154,28 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
 
     function renderSelectedSlideLabel() {
+      const assistantMessageEl = document.querySelector("#slide-ai-message");
       if (slideEditSelectedEl) {
         slideEditSelectedEl.textContent = state.selectedSlideNumber
-          ? "已选择第 " + state.selectedSlideNumber + " 页，可直接修改内容，或勾选 AI 单页优化。"
+          ? "已连接第 " + state.selectedSlideNumber + " 页"
           : "请选择一页 PPT";
       }
-      if (!selectedSlideLabelEl) return;
-      if (!state.selectedSlideNumber) {
-        selectedSlideLabelEl.innerHTML = '未选择页面<span>请先在在线预览中点击一页 PPT。</span>';
-        return;
+      if (assistantMessageEl) {
+        assistantMessageEl.textContent = state.selectedSlideNumber
+          ? "我已读取第 " + state.selectedSlideNumber + " 页。选择一个快捷方向，或直接告诉我希望如何优化。"
+          : "先在中间预览中选择一页，我会针对该页的内容和表达进行优化。";
       }
-      selectedSlideLabelEl.innerHTML = '已选择第 ' + state.selectedSlideNumber + ' 页<span>点击中间预览中的其他页面可切换。</span>';
     }
 
-    function selectedOutlineSlideIndex() {
-      const index = Number(state.selectedSlideNumber) - 1;
-      return Number.isInteger(index) && index >= 0 && index < state.outlineSlides.length ? index : -1;
-    }
-
-    function renderStructureLayoutOptions(selectedLayout = "") {
-      if (!structureSlideLayoutEl) return;
-      structureSlideLayoutEl.innerHTML = STRUCTURE_LAYOUT_OPTIONS.map(([value, label]) => (
-        '<option value="' + escapeHtml(value) + '">' + escapeHtml(label) + '</option>'
-      )).join("");
-      structureSlideLayoutEl.value = STRUCTURE_LAYOUT_OPTIONS.some(([value]) => value === selectedLayout) ? selectedLayout : "";
-    }
-
-    function setStructureEditorDisabled(isDisabled) {
-      [structureSlideTitleEl, structureSlideLayoutEl, structureSlideBulletsEl, applyStructurePreviewButton].forEach((element) => {
-        if (element) element.disabled = isDisabled;
-      });
-    }
-
-    function syncSinglePageAiChoice() {
+    function syncSinglePageAiAssistant() {
       const instructionEl = document.querySelector("#slide-instruction");
-      const enabled = singlePageAiToggleEl?.checked === true;
-      if (instructionEl) instructionEl.disabled = !enabled;
+      const hasSelectedSlide = Boolean(state.selectedSlideId && state.selectedSlideNumber);
+      if (instructionEl) instructionEl.disabled = !hasSelectedSlide;
       const regenerateButton = document.querySelector("#regenerate-slide");
-      if (regenerateButton) regenerateButton.disabled = !enabled || !state.selectedSlideId;
+      if (regenerateButton) regenerateButton.disabled = !hasSelectedSlide;
+      document.querySelectorAll("[data-slide-ai-prompt]").forEach((button) => {
+        button.disabled = !hasSelectedSlide;
+      });
     }
 
     function formatAssetDate(value) {
@@ -3104,53 +3183,6 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return String(value);
       return date.toLocaleString("zh-CN", { hour12: false });
-    }
-
-    function renderStructureEditor() {
-      if (!structureSlideTitleEl || !structureSlideLayoutEl || !structureSlideBulletsEl) return;
-      const index = selectedOutlineSlideIndex();
-      renderStructureLayoutOptions(index >= 0 ? String(state.outlineSlides[index]?.layout || "") : "");
-      if (index < 0) {
-        structureSlideTitleEl.value = "";
-        structureSlideBulletsEl.value = "";
-        setStructureEditorDisabled(true);
-        syncSinglePageAiChoice();
-        return;
-      }
-      const slide = state.outlineSlides[index] || {};
-      structureSlideTitleEl.value = slide.title || "";
-      structureSlideBulletsEl.value = normalizePreviewBullets(slide.bullets).join("\\n");
-      setStructureEditorDisabled(false);
-      syncSinglePageAiChoice();
-    }
-
-    function applyStructureEditorToSelectedSlide() {
-      const index = selectedOutlineSlideIndex();
-      if (index < 0) throw new Error("请先在在线预览中选择要调整结构的页面");
-      const title = structureSlideTitleEl.value.trim();
-      const bullets = String(structureSlideBulletsEl.value || "")
-        .split(/\\r?\\n/)
-        .map((line) => line.trim())
-        .filter(Boolean);
-      if (!title) throw new Error("页面标题不能为空");
-      if (!bullets.length) throw new Error("页面至少需要一个要点");
-      const layout = structureSlideLayoutEl.value;
-      const nextSlide = {
-        ...state.outlineSlides[index],
-        title,
-        bullets,
-        ...(layout ? { layout } : {})
-      };
-      if (!layout) delete nextSlide.layout;
-      state.outlineSlides = state.outlineSlides.map((slide, slideIndex) => (
-        slideIndex === index ? nextSlide : slide
-      ));
-      renderOutlineBoard(state.outlineSlides);
-      state.selectedSlideNumber = index + 1;
-      state.selectedSlideId = slideIdForNumber({ slides: state.outlineSlides }, state.selectedSlideNumber);
-      renderStructureEditor();
-      renderSelectedSlideLabel();
-      return state.outlineSlides;
     }
 
     function renderDeckGeneratingPreview(slides = []) {
@@ -3166,9 +3198,9 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         + '<div class="deck-loading-dashboard">'
         + '<div class="deck-progress-ring" aria-hidden="true"><div class="deck-progress-core">'
         + '<strong class="deck-progress-value" data-deck-progress-value>0%</strong>'
-        + '<span class="deck-progress-unit">AI RENDERING</span></div></div>'
+        + '<span class="deck-progress-unit">智能生成</span></div></div>'
         + '<div class="deck-loading-head"><strong>正在生成专业 PPT</strong>'
-        + '<span>系统正在把确认后的大纲转换为页面内容、版式和预览文件。</span>'
+        + '<span>正在解析大纲、匹配模板版式，并逐页生成可预览的演示内容。</span>'
         + '<div class="deck-progress-meta"><span class="deck-progress-stage" data-deck-progress-stage>正在解析模板结构</span>'
         + '<span class="deck-progress-count" data-deck-progress-count>已完成 0 / ' + normalized.length + ' 页</span></div>'
         + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div></div></div>'
@@ -3220,13 +3252,27 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (!previewEl.querySelector("[data-deck-preview-progress]")) {
         previewEl.insertAdjacentHTML("beforeend", ''
           + '<div class="deck-preview-progress" data-deck-preview-progress role="status" aria-live="polite">'
+          + '<span class="deck-preview-spinner" aria-hidden="true"></span>'
+          + '<span class="deck-preview-orbit" aria-hidden="true"></span>'
           + '<div class="deck-preview-progress-head"><span data-deck-progress-count>已完成 0 / 0 页</span>'
           + '<strong data-deck-progress-value>0%</strong></div>'
           + '<div class="deck-progress" aria-hidden="true"><span class="deck-progress-bar"></span></div>'
           + '<span class="deck-progress-stage" data-deck-progress-stage>正在生成页面内容</span></div>');
       }
       previewEl.classList.add("has-generation-progress");
+      positionDeckPreviewProgress();
       updateDeckGeneratingPreview({ progress, slides: state.outlineSlides, completedSlides, totalSlides });
+    }
+
+    function positionDeckPreviewProgress() {
+      if (!previewEl.querySelector("[data-deck-preview-progress]")) return;
+      const previewWidth = Math.max(Number(previewEl.clientWidth || 0), 320);
+      const slideWidth = Math.max(280, Math.min(previewWidth - 40, 960));
+      const slideTop = previewWidth <= 720 ? 18 : 28;
+      const slideCenterY = slideTop + (slideWidth * 9 / 16) / 2;
+      // 预览中的生成进度要落在首页幻灯片区域，而不是整个滚动容器的视觉中心。
+      const progressTop = Math.max(132, Math.min(slideCenterY, 420));
+      previewEl.style.setProperty("--deck-preview-progress-top", Math.round(progressTop) + "px");
     }
 
     function clearDeckGenerationProgress(errorMessage = "") {
@@ -3375,7 +3421,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       }
       outlineEditorEl.value = JSON.stringify(state.outlineSlides, null, 2);
       renderOutlineSummary(state.outlineSlides);
-      renderStructureEditor();
+      syncSinglePageAiAssistant();
       if (!state.outlineSlides.length) {
         outlineBoardEl.innerHTML = '<div class="outline-empty"><div><strong>先生成大纲</strong><span>生成后会以每页卡片展示，直接修改标题和要点即可。</span></div></div>';
         return;
@@ -3458,8 +3504,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
 
     function setSlideRegenerationBusy(isBusy) {
       const button = document.querySelector("#regenerate-slide");
-      setButtonWaiting(button, isBusy, isBusy ? "AI 优化中..." : "AI 优化本页");
-      if (!isBusy) syncSinglePageAiChoice();
+      setButtonWaiting(button, isBusy, isBusy ? "AI 正在优化..." : "发送并优化本页");
+      if (!isBusy) syncSinglePageAiAssistant();
       if (previewStageEl) previewStageEl.classList.toggle("is-polishing", isBusy);
       if (previewPolishLoadingEl) previewPolishLoadingEl.setAttribute("aria-hidden", isBusy ? "false" : "true");
     }
@@ -3485,6 +3531,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           setFlowStage("preview");
           ensureDeckPreviewProgress({ progress: task.progress, completedSlides, totalSlides });
         }
+        // 生成任务进行中时，即使本轮没有新增页面，也要持续保留预览区中央的百分比圆环。
+        if ((task.status === "running" || task.status === "pending") && state.deckId) {
+          ensureDeckPreviewProgress({ progress: task.progress, completedSlides, totalSlides });
+        }
         statusEl.textContent = "任务状态: " + task.status + "\\n"
           + "进度: " + task.progress + "%\\n"
           + "重试: " + (task.retryable ? "可重试" : "不可重试") + "\\n"
@@ -3502,6 +3552,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
           if (state.deckId) {
             await waitForDeckLoadingRhythm(state.outlineSlides);
             renderDeckPreviewFrame(state.deckId, { bustCache: true });
+            // 任务成功后最终预览已经就绪，需要清掉生成中的圆形进度层。
+            clearDeckGenerationProgress();
             setFlowStage("preview");
             setDeckGenerationBusy(false);
             await loadBalance();
@@ -3539,9 +3591,26 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       if (location.hash.slice(1) !== nextPage) history.replaceState(null, "", "#" + nextPage);
     }
 
+    function syncSlideEditPlacement(currentPage) {
+      if (!slideEditModalEl || !slideEditHomeEl || !assetSlideEditContextEl) return;
+      const shouldUseAssetRightPanel = currentPage === "assets" && state.assetPreviewOpen;
+      const targetParent = shouldUseAssetRightPanel ? assetSlideEditContextEl : slideEditHomeEl.parentElement;
+      if (!targetParent) return;
+      if (shouldUseAssetRightPanel) {
+        if (slideEditModalEl.parentElement !== assetSlideEditContextEl) {
+          assetSlideEditContextEl.appendChild(slideEditModalEl);
+        }
+        return;
+      }
+      if (slideEditModalEl.nextElementSibling !== slideEditHomeEl) {
+        targetParent.insertBefore(slideEditModalEl, slideEditHomeEl);
+      }
+    }
+
     function applyWorkspaceVisibility() {
       const currentPage = document.body.dataset.workspacePage || "create";
       document.body.dataset.assetPreviewOpen = state.assetPreviewOpen ? "true" : "false";
+      syncSlideEditPlacement(currentPage);
       if (backToOutlineButton) {
         backToOutlineButton.textContent = currentPage === "assets" && state.assetPreviewOpen ? "返回资产库" : "返回大纲内容";
       }
@@ -3581,7 +3650,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     }
     setWorkspacePage(location.hash.slice(1) || "create");
     setFlowStage("input");
-    renderStructureEditor();
+    syncSinglePageAiAssistant();
     document.querySelector("#template").addEventListener("change", () => {
       renderThemeOptions();
       renderTemplateGallery();
@@ -3593,10 +3662,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     templateSearchEl?.addEventListener("input", () => {
       templateSearchQuery = templateSearchEl.value;
       expandedTemplateCategoryId = "";
+      templatePage = 1;
       renderTemplateGallery();
     });
     document.querySelector("#template-category").addEventListener("change", () => {
       expandedTemplateCategoryId = "";
+      templatePage = 1;
       loadTemplates();
     });
     document.querySelector("#upload-personal-template")?.addEventListener("click", uploadPersonalTemplate);
@@ -3776,34 +3847,38 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       } catch (error) { statusEl.textContent = error.message; }
       finally { setButtonWaiting(retryButton, false, "重试失败任务"); }
     });
-    document.querySelector("#apply-structure-preview").addEventListener("click", async () => {
-      try {
-        if (!state.outlineId) throw new Error("请先生成大纲");
-        applyStructureEditorToSelectedSlide();
-        statusEl.textContent = "已更新第 " + state.selectedSlideNumber + " 页结构，正在重新生成在线预览...";
-        closeSlideEditModal();
-        document.querySelector("#generate-deck").click();
-      } catch (error) {
-        statusEl.textContent = error.message;
-      }
-    });
     document.querySelector("#close-slide-edit-modal")?.addEventListener("click", closeSlideEditModal);
     document.querySelector("#slide-edit-modal")?.addEventListener("click", (event) => {
       if (event.target === event.currentTarget) closeSlideEditModal();
     });
-    singlePageAiToggleEl?.addEventListener("change", syncSinglePageAiChoice);
+    // 快捷指令只是填充对话输入框，用户仍可继续补充自己的要求。
+    document.querySelectorAll("[data-slide-ai-prompt]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const instructionEl = document.querySelector("#slide-instruction");
+        if (!instructionEl) return;
+        const prompt = String(button.dataset.slideAiPrompt || "").trim();
+        const promptInstructions = {
+          "提炼核心观点": "提炼本页核心观点，保留最重要的三条结论，删除重复表达。",
+          "强化高层表达": "将本页改成适合高层汇报的表达，结论前置，突出业务影响和决策建议。",
+          "优化数据叙事": "优化本页的数据叙事，明确关键指标、变化原因和可执行结论。",
+          "压缩冗余文字": "压缩本页冗余文字，使用更短的句子和更清晰的层级，保持信息完整。"
+        };
+        instructionEl.value = promptInstructions[prompt] || prompt;
+        instructionEl.focus();
+      });
+    });
     document.querySelector("#regenerate-slide").addEventListener("click", async () => {
+      const assistantMessageEl = document.querySelector("#slide-ai-message");
       try {
-        if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 润色单页");
-        if (!singlePageAiToggleEl?.checked) throw new Error("请先勾选需要 AI 单页优化");
-        setSlideRegenerationBusy(true);
-        applyStructureEditorToSelectedSlide();
+        if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 单页助手");
         const entitlementValue = document.querySelector("#entitlement").value.trim();
         const slideId = state.selectedSlideId;
         const instruction = document.querySelector("#slide-instruction").value.trim();
-        if (!slideId) throw new Error("请先用鼠标在在线预览中选择要润色的页面");
-        if (!instruction) throw new Error("请输入 AI 润色建议");
-        statusEl.textContent = "AI 正在润色第 " + (state.selectedSlideNumber || slideId) + " 页...";
+        if (!slideId) throw new Error("请先用鼠标在在线预览中选择要优化的页面");
+        if (!instruction) throw new Error("请输入希望 AI 如何优化这一页");
+        setSlideRegenerationBusy(true);
+        if (assistantMessageEl) assistantMessageEl.textContent = "正在分析第 " + state.selectedSlideNumber + " 页并重新组织内容，请稍候...";
+        statusEl.textContent = "AI 正在优化第 " + (state.selectedSlideNumber || slideId) + " 页...";
         const data = await json("/api/ppt/decks/" + state.deckId + "/slides/" + slideId + "/regenerate", {
           instruction,
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
@@ -3817,13 +3892,15 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = JSON.stringify(data.slide, null, 2);
         await refreshDeckPreviewFrame(state.deckId);
         await loadBalance();
-        closeSlideEditModal();
+        if (assistantMessageEl) assistantMessageEl.textContent = "第 " + state.selectedSlideNumber + " 页已优化完成。可以继续输入要求进行下一轮调整。";
       } catch (error) {
         statusEl.textContent = error.message;
+        if (assistantMessageEl) assistantMessageEl.textContent = error.message;
       } finally {
         setSlideRegenerationBusy(false);
       }
     });
+    window.addEventListener("resize", positionDeckPreviewProgress);
     async function exportDeck(format, button) {
       const idleLabel = format === "pptx" ? "下载 PPTX" : "下载 PDF";
       try {

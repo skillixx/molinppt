@@ -1041,6 +1041,7 @@ function shouldRenderTemplateBodyList(visual, role) {
   if (visual.layout === "capability-radar-map") return false;
   if (visual.layout === "product-retention-path") return false;
   if (visual.layout === "bi-executive-cockpit") return false;
+  if (visual.layout === "executive-deepblue-boardroom") return false;
   if (visual.layout === "user-path-funnel") return false;
   if (visual.layout === "channel-traffic-quality") return false;
   if (visual.layout === "market-trend-radar") return false;
@@ -1103,6 +1104,7 @@ function shouldRenderTemplateTitle(visual, role) {
   if (visual.layout === "finance-profit-bridge") return false;
   if (visual.layout === "finance-investment-roi-model") return false;
   if (visual.layout === "product-interview-insight") return false;
+  if (visual.layout === "executive-deepblue-boardroom") return false;
   if (visual.layout === "business-model-value-chain") return false;
   if (visual.layout === "sales-enterprise-proposal") return false;
   if (visual.layout === "sales-proposal-solution") return false;
@@ -1346,6 +1348,9 @@ function templateDecorationsXml(visual, index, layout, role, slide, total = 0) {
   }
   if (visual.layout === "bi-executive-cockpit") {
     return base + biExecutiveCockpitDecorationsXml({ visual, index, layout, role, slide });
+  }
+  if (visual.layout === "executive-deepblue-boardroom") {
+    return base + executiveDeepblueBoardroomDecorationsXml({ visual, index, layout, role, slide, total });
   }
   if (visual.layout === "user-path-funnel") {
     return base + userPathFunnelDecorationsXml({ visual, index, layout, role, slide });
@@ -3780,6 +3785,20 @@ function templateLayout(visual, index, role = index === 0 ? "cover" : "content")
       content: { x: 731520, y: 2438400, cx: 3657600, cy: 914400 },
       titleSize: index === 0 ? 3000 : 2520,
       bodySize: 980,
+      titleColor: visual.title,
+      bodyColor: visual.body,
+    };
+  }
+  if (visual.layout === "executive-deepblue-boardroom") {
+    return {
+      surface: { x: 457200, y: 401320, cx: 8229600, cy: 4384040 },
+      accent: { x: 457200, y: 401320, cx: 5486400, cy: 45720 },
+      secondaryAccent: { x: 731520, y: 3048000, cx: 3657600, cy: 30480 },
+      label: { x: 731520, y: 670560, cx: 2895600, cy: 243840 },
+      title: { x: 731520, y: 990600, cx: 3962400, cy: 914400 },
+      content: { x: 731520, y: 2438400, cx: 3657600, cy: 914400 },
+      titleSize: index === 0 ? 3000 : 2500,
+      bodySize: 940,
       titleColor: visual.title,
       bodyColor: visual.body,
     };
@@ -15918,6 +15937,182 @@ function biCockpitColorPalette(visual) {
     lime: visual.secondary || "A3E635",
     panel: blendHexColor(visual.surface, visual.background, 0.08),
     warningPanel: blendHexColor("F59E0B", visual.surface, 0.84),
+  };
+}
+
+function executiveDeepblueBoardroomDecorationsXml({ visual, index, role, slide, total }) {
+  const scene = executiveDeepblueBoardroomScene({ slide, index, role, total });
+  const palette = executiveBoardroomColorPalette(visual);
+  // 高管深蓝用可编辑形状搭出董事会经营驾驶舱，不使用整页图片背景，保证下载后可继续改指标和路径。
+  const base = solidShapeXml({ id: 19000, name: "Executive Deepblue Background", x: 0, y: 0, cx: 9144000, cy: 5143500, fill: visual.background })
+    + executiveBoardroomGridXml({ visual, palette })
+    + solidShapeXml({ id: 19001, name: "Executive Boardroom Main Canvas", geom: "roundRect", x: 457200, y: 401320, cx: 8229600, cy: 4384040, fill: palette.canvas })
+    + lineFrameShapeXml({ id: 19002, name: "Executive Boardroom Canvas Frame", geom: "roundRect", x: 457200, y: 401320, cx: 8229600, cy: 4384040, stroke: palette.frame, width: 15240 })
+    + rectShapeXml({ id: 19003, name: "Executive Boardroom Gold Rule", x: 457200, y: 401320, cx: 3505200, cy: 45720, fill: visual.accent })
+    + rectShapeXml({ id: 19004, name: "Executive Boardroom Cyan Rule", x: 3962400, y: 401320, cx: 2133600, cy: 45720, fill: visual.secondary || "3BA5C7" })
+    + textShapeXml({ id: 19005, name: "Executive Boardroom Kicker", x: 731520, y: 670560, cx: 2895600, cy: 198120, text: scene.kicker, size: 760, bold: true, color: visual.accent })
+    + textShapeXml({ id: 19006, name: "Executive Boardroom Title", x: 731520, y: 990600, cx: 3962400, cy: 914400, text: scene.title, size: index === 0 ? 2450 : 2200, bold: true, color: visual.title })
+    + executiveBoardroomBulletCardsXml({ visual, palette, bullets: scene.bullets });
+  const visualPanel = ["cover", "overview", "data"].includes(scene.kind)
+    ? executiveBoardroomDashboardXml({ visual, palette })
+    : scene.kind === "agenda"
+      ? executiveBoardroomAgendaXml({ visual, palette, cards: scene.cards })
+      : scene.kind === "diagnosis"
+        ? executiveBoardroomMatrixXml({ visual, palette })
+        : scene.kind === "strategy"
+          ? executiveBoardroomPathXml({ visual, palette, cards: scene.cards })
+          : scene.kind === "action"
+            ? executiveBoardroomActionXml({ visual, palette, cards: scene.cards })
+            : executiveBoardroomDecisionXml({ visual, palette, cards: scene.cards });
+  return base
+    + visualPanel
+    + (["action", "decision"].includes(scene.kind) ? "" : executiveBoardroomMetricCardsXml({ visual, palette, metrics: scene.metrics }));
+}
+
+function executiveBoardroomGridXml({ visual, palette }) {
+  const vertical = [0, 1, 2, 3, 4, 5].map((itemIndex) => rectShapeXml({ id: 19020 + itemIndex, name: `Executive Boardroom Vertical Grid ${itemIndex + 1}`, x: 914400 + itemIndex * 1219200, y: 609600, cx: 7620, cy: 3962400, fill: palette.grid })).join("");
+  const horizontal = [0, 1, 2, 3].map((itemIndex) => rectShapeXml({ id: 19030 + itemIndex, name: `Executive Boardroom Horizontal Grid ${itemIndex + 1}`, x: 609600, y: 1066800 + itemIndex * 762000, cx: 7924800, cy: 7620, fill: palette.grid })).join("");
+  return vertical + horizontal
+    + solidShapeXml({ id: 19038, name: "Executive Boardroom Meeting Glow", geom: "ellipse", x: 6553200, y: 365760, cx: 1676400, cy: 1676400, fill: palette.cyanGlow })
+    + solidShapeXml({ id: 19039, name: "Executive Boardroom Gold Glow", geom: "ellipse", x: 304800, y: 3581400, cx: 1219200, cy: 1219200, fill: palette.goldGlow });
+}
+
+function executiveBoardroomDashboardXml({ visual, palette }) {
+  return solidShapeXml({ id: 19050, name: "Executive Boardroom KPI Dashboard", geom: "roundRect", x: 5486400, y: 1127760, cx: 2895600, cy: 1981200, fill: palette.panel })
+    + lineFrameShapeXml({ id: 19051, name: "Executive Boardroom Dashboard Frame", geom: "roundRect", x: 5486400, y: 1127760, cx: 2895600, cy: 1981200, stroke: palette.frame, width: 11430 })
+    + [0, 1, 2].map((itemIndex) => rectShapeXml({ id: 19052 + itemIndex, name: `Executive Boardroom Trend Baseline ${itemIndex + 1}`, x: 5791200, y: 2545080 - itemIndex * 426720, cx: 2286000, cy: 15240, fill: palette.grid })).join("")
+    + arcLineShapeXml({ id: 19060, name: "Executive Boardroom Trend Curve", x: 5791200, y: 1524000, cx: 2286000, cy: 914400, stroke: visual.secondary || "3BA5C7", width: 38100 })
+    + arcLineShapeXml({ id: 19061, name: "Executive Boardroom Gold Forecast Curve", x: 5943600, y: 1714500, cx: 2133600, cy: 762000, stroke: visual.accent, width: 30480 })
+    + [0, 1, 2, 3].map((itemIndex) => solidShapeXml({ id: 19062 + itemIndex, name: `Executive Boardroom KPI Bar ${itemIndex + 1}`, geom: "roundRect", x: 5867400 + itemIndex * 411480, y: 2667000 - itemIndex * 152400, cx: 152400, cy: 335280 + itemIndex * 121920, fill: itemIndex % 2 ? visual.secondary || "3BA5C7" : visual.accent })).join("");
+}
+
+function executiveBoardroomAgendaXml({ visual, palette, cards }) {
+  return cards.slice(0, 5).map((card, index) => {
+    const y = 1097280 + index * 411480;
+    return solidShapeXml({ id: 19080 + index * 4, name: `Executive Boardroom Agenda Item ${index + 1}`, geom: "roundRect", x: 5486400, y, cx: 2895600, cy: 304800, fill: palette.panel })
+      + rectShapeXml({ id: 19081 + index * 4, name: `Executive Boardroom Agenda Rule ${index + 1}`, x: 5684520, y: y + 129540, cx: 304800, cy: 38100, fill: index === 0 ? visual.accent : visual.secondary || "3BA5C7" })
+      + textShapeXml({ id: 19082 + index * 4, name: `Executive Boardroom Agenda Text ${index + 1}`, x: 6096000, y: y + 76200, cx: 1676400, cy: 137160, text: card, size: 700, bold: true, color: visual.title });
+  }).join("");
+}
+
+function executiveBoardroomMatrixXml({ visual, palette }) {
+  return solidShapeXml({ id: 19110, name: "Executive Boardroom Diagnosis Matrix", geom: "roundRect", x: 5486400, y: 1127760, cx: 2895600, cy: 1981200, fill: palette.panel })
+    + rectShapeXml({ id: 19111, name: "Executive Boardroom Matrix Vertical Axis", x: 6934200, y: 1280160, cx: 15240, cy: 1676400, fill: palette.frame })
+    + rectShapeXml({ id: 19112, name: "Executive Boardroom Matrix Horizontal Axis", x: 5638800, y: 2118360, cx: 2590800, cy: 15240, fill: palette.frame })
+    + [0, 1, 2, 3].map((itemIndex) => {
+      const x = [7315200, 6096000, 7162800, 6019800][itemIndex];
+      const y = [1463040, 1737360, 2392680, 2499360][itemIndex];
+      const fill = [visual.accent, visual.secondary || "3BA5C7", "F59E0B", "EF4444"][itemIndex];
+      return solidShapeXml({ id: 19113 + itemIndex, name: `Executive Boardroom Diagnosis Signal ${itemIndex + 1}`, geom: "ellipse", x, y, cx: 167640, cy: 167640, fill });
+    }).join("");
+}
+
+function executiveBoardroomPathXml({ visual, palette, cards }) {
+  const stages = cards.slice(0, 4);
+  return rectShapeXml({ id: 19140, name: "Executive Boardroom Strategy Path Rail", x: 5638800, y: 2133600, cx: 2590800, cy: 30480, fill: palette.frame })
+    + stages.map((card, index) => {
+      const x = 5486400 + index * 701040;
+      return solidShapeXml({ id: 19141 + index * 4, name: `Executive Boardroom Strategy Gate ${index + 1}`, geom: "roundRect", x, y: 1447800, cx: 609600, cy: 914400, fill: palette.panel })
+        + solidShapeXml({ id: 19142 + index * 4, name: `Executive Boardroom Strategy Node ${index + 1}`, geom: "ellipse", x: x + 228600, y: 2057400, cx: 152400, cy: 152400, fill: index % 2 ? visual.secondary || "3BA5C7" : visual.accent })
+        + textShapeXml({ id: 19143 + index * 4, name: `Executive Boardroom Strategy Text ${index + 1}`, x: x + 76200, y: 1600200, cx: 457200, cy: 274320, text: card, size: 620, bold: true, color: visual.title });
+    }).join("");
+}
+
+function executiveBoardroomActionXml({ visual, palette, cards }) {
+  return cards.slice(0, 4).map((card, index) => {
+    const x = 731520 + index * 1981200;
+    return solidShapeXml({ id: 19170 + index * 4, name: `Executive Boardroom Action Plan Card ${index + 1}`, geom: "roundRect", x, y: 3352800, cx: 1676400, cy: 731520, fill: palette.panel })
+      + rectShapeXml({ id: 19171 + index * 4, name: `Executive Boardroom Action Priority ${index + 1}`, x: x + 137160, y: 3505200, cx: 609600, cy: 38100, fill: index === 1 ? visual.secondary || "3BA5C7" : visual.accent })
+      + textShapeXml({ id: 19172 + index * 4, name: `Executive Boardroom Action Text ${index + 1}`, x: x + 137160, y: 3733800, cx: 1219200, cy: 198120, text: card, size: 720, bold: true, color: visual.title });
+  }).join("");
+}
+
+function executiveBoardroomDecisionXml({ visual, palette, cards }) {
+  const actionCards = executiveBoardroomActionXml({ visual, palette, cards });
+  return solidShapeXml({ id: 19200, name: "Executive Boardroom Decision Ring", geom: "ellipse", x: 5943600, y: 1219200, cx: 1981200, cy: 1981200, fill: palette.panel })
+    + arcLineShapeXml({ id: 19201, name: "Executive Boardroom Decision Gold Arc", x: 5943600, y: 1219200, cx: 1981200, cy: 1981200, stroke: visual.accent, width: 60960 })
+    + arcLineShapeXml({ id: 19202, name: "Executive Boardroom Decision Blue Arc", x: 6248400, y: 1524000, cx: 1371600, cy: 1371600, stroke: visual.secondary || "3BA5C7", width: 38100 })
+    + solidShapeXml({ id: 19203, name: "Executive Boardroom Decision Seal", geom: "roundRect", x: 6629400, y: 1905000, cx: 609600, cy: 609600, fill: visual.primary })
+    + actionCards;
+}
+
+function executiveBoardroomMetricCardsXml({ visual, palette, metrics }) {
+  return metrics.slice(0, 4).map((metric, index) => {
+    const x = 731520 + index * 1981200;
+    return solidShapeXml({ id: 19220 + index * 4, name: `Executive Boardroom KPI Card ${index + 1}`, geom: "roundRect", x, y: 3794760, cx: 1676400, cy: 609600, fill: palette.card })
+      + textShapeXml({ id: 19221 + index * 4, name: `Executive Boardroom KPI Value ${index + 1}`, x: x + 137160, y: 3909060, cx: 731520, cy: 182880, text: metric.value, size: 1180, bold: true, color: visual.title })
+      + textShapeXml({ id: 19222 + index * 4, name: `Executive Boardroom KPI Label ${index + 1}`, x: x + 137160, y: 4152900, cx: 1066800, cy: 137160, text: metric.label, size: 680, bold: true, color: visual.body })
+      + rectShapeXml({ id: 19223 + index * 4, name: `Executive Boardroom KPI Signal ${index + 1}`, x: x + 137160, y: 4351020, cx: 670560 + index * 91440, cy: 30480, fill: index % 2 ? visual.secondary || "3BA5C7" : visual.accent });
+  }).join("");
+}
+
+function executiveBoardroomBulletCardsXml({ visual, palette, bullets }) {
+  return bullets.slice(0, 3).map((bullet, index) => {
+    const y = 2240280 + index * 365760;
+    return solidShapeXml({ id: 19250 + index * 3, name: `Executive Boardroom Insight Card ${index + 1}`, geom: "roundRect", x: 731520, y, cx: 3505200, cy: 243840, fill: palette.card })
+      + solidShapeXml({ id: 19251 + index * 3, name: `Executive Boardroom Insight Dot ${index + 1}`, geom: "ellipse", x: 883920, y: y + 76200, cx: 91440, cy: 91440, fill: index === 1 ? visual.secondary || "3BA5C7" : visual.accent })
+      + textShapeXml({ id: 19252 + index * 3, name: `Executive Boardroom Insight Text ${index + 1}`, x: 1066800, y: y + 60960, cx: 2895600, cy: 121920, text: executiveBoardroomCompactText(bullet, "关键经营信号", 28), size: 700, bold: true, color: visual.body });
+  }).join("");
+}
+
+function executiveDeepblueBoardroomScene({ slide, index, role, total }) {
+  const bullets = executiveBoardroomBulletTexts(slide);
+  const metrics = ["收入", "利润", "达成率", "风险项"].map((fallback, itemIndex) => executiveBoardroomMetricFromText(bullets[itemIndex], fallback, itemIndex));
+  const cards = ["经营概览", "关键指标", "问题诊断", "战略判断", "行动计划"].map((fallback, itemIndex) => executiveBoardroomCompactText(bullets[itemIndex], fallback, 12));
+  const kinds = ["cover", "agenda", "overview", "data", "diagnosis", "strategy", "action"];
+  const kind = role === "closing" || (index === total - 1 && total > 2) ? "decision" : kinds[Math.min(index, kinds.length - 1)];
+  const kickerMap = {
+    cover: "BOARD BRIEF",
+    agenda: "EXECUTIVE AGENDA",
+    overview: "OPERATING SNAPSHOT",
+    data: "KPI TREND",
+    diagnosis: "ISSUE DIAGNOSIS",
+    strategy: "STRATEGIC JUDGEMENT",
+    action: "ACTION PLAN",
+    decision: "DECISION REQUEST",
+  };
+  return {
+    kind,
+    kicker: kickerMap[kind],
+    title: executiveBoardroomCompactText(slide?.title, "经营决策汇报", index === 0 ? 30 : 28),
+    bullets,
+    metrics,
+    cards: kind === "decision" ? ["本次确认", "授权事项", "下轮节奏"].map((fallback, itemIndex) => executiveBoardroomCompactText(bullets[itemIndex], fallback, 14)) : cards,
+  };
+}
+
+function executiveBoardroomBulletTexts(slide) {
+  const values = Array.isArray(slide?.bullets) ? slide.bullets.map((item) => {
+    if (typeof item === "string") return item.trim();
+    if (item && typeof item === "object") return String(item.text || item.title || item.label || item.value || "").trim();
+    return "";
+  }).filter(Boolean) : [];
+  return values.length ? values : ["核心经营指标保持稳定，关键问题需要管理层决策", "业务增长、利润质量和现金流进入同屏复盘", "下一阶段围绕战略判断、资源投入和行动闭环推进"];
+}
+
+function executiveBoardroomMetricFromText(text, fallback, index) {
+  const raw = String(text || "").trim();
+  const match = raw.match(/([+-]?\d+(?:\.\d+)?%?|[A-Za-z]{2,}|[零一二三四五六七八九十百千万亿]+项?)/);
+  const value = match?.[1] || ["KPI", "GMV", "92%", "3"][index] || "KPI";
+  const label = executiveBoardroomCompactText(raw.replace(value, "").replace(/[：:，,。]/g, " ").trim(), fallback, 8);
+  return { value, label };
+}
+
+function executiveBoardroomCompactText(text, fallback, maxLength) {
+  const value = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (Array.from(value).length <= maxLength) return value;
+  return `${Array.from(value).slice(0, maxLength).join("")}...`;
+}
+
+function executiveBoardroomColorPalette(visual) {
+  return {
+    canvas: blendHexColor(visual.surface, visual.background, 0.20),
+    card: blendHexColor(visual.surface, visual.background, 0.32),
+    cyanGlow: blendHexColor(visual.secondary || "3BA5C7", visual.background, 0.76),
+    frame: blendHexColor(visual.accent, visual.surface, 0.60),
+    goldGlow: blendHexColor(visual.accent, visual.background, 0.78),
+    grid: blendHexColor(visual.secondary || "3BA5C7", visual.background, 0.84),
+    panel: blendHexColor(visual.surface, visual.background, 0.08),
   };
 }
 

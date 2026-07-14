@@ -7,24 +7,28 @@
       "id": "executive",
       "name": "高管深蓝",
       "visual": {
-        "primary": "102A43",
-        "accent": "BFA46A",
-        "background": "E6EDF5",
-        "surface": "FFFFFF",
-        "title": "0B1F33",
-        "body": "334155",
-        "layout": "top-band"
+        "primary": "071A2F",
+        "accent": "C8A96A",
+        "secondary": "3BA5C7",
+        "background": "081426",
+        "surface": "10243A",
+        "title": "F3F7FA",
+        "body": "B7C6D6",
+        "layout": "executive-deepblue-boardroom",
+        "variant": "boardroom"
       }
     }
   ],
   "visual": {
-    "primary": "102A43",
-    "accent": "BFA46A",
-    "background": "E6EDF5",
-    "surface": "FFFFFF",
-    "title": "0B1F33",
-    "body": "334155",
-    "layout": "top-band"
+    "primary": "071A2F",
+    "accent": "C8A96A",
+    "secondary": "3BA5C7",
+    "background": "081426",
+    "surface": "10243A",
+    "title": "F3F7FA",
+    "body": "B7C6D6",
+    "layout": "executive-deepblue-boardroom",
+    "variant": "boardroom"
   },
   "layoutSchema": {
     "defaultCoverLayout": "cover",

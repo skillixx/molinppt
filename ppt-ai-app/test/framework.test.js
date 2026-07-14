@@ -363,18 +363,18 @@ test("resolveTemplateVisual applies business theme visual overrides", () => {
   assert.equal(classicVisual.background, "E8ECEF");
   assert.equal(classicVisual.title, "111827");
   assert.equal(classicVisual.body, "374151");
-  assert.equal(executiveVisual.primary, "102A43");
-  assert.equal(executiveVisual.accent, "BFA46A");
-  assert.equal(executiveVisual.background, "E6EDF5");
-  assert.equal(executiveVisual.title, "0B1F33");
-  assert.equal(executiveVisual.body, "334155");
+  assert.equal(executiveVisual.primary, "071A2F");
+  assert.equal(executiveVisual.accent, "C8A96A");
+  assert.equal(executiveVisual.background, "081426");
+  assert.equal(executiveVisual.title, "F3F7FA");
+  assert.equal(executiveVisual.body, "B7C6D6");
   assert.equal(minimalVisual.accent, "6B7280");
   assert.equal(minimalVisual.background, "E9EEF5");
   assert.equal(minimalVisual.title, "0F172A");
   assert.equal(minimalVisual.layout, "top-band");
   assert.equal(defaultVisual.layout, "top-band");
   assert.equal(classicVisual.layout, "top-band");
-  assert.equal(executiveVisual.layout, "top-band");
+  assert.equal(executiveVisual.layout, "executive-deepblue-boardroom");
 });
 
 test("resolveTemplateVisual applies project status weekly commercial visual", () => {

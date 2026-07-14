@@ -4273,6 +4273,58 @@ test("HTTP API preview reflects business minimal theme layout override", async (
   }
 });
 
+test("HTTP API preview renders business executive deepblue boardroom layout", async () => {
+  const context = await createBusinessContext();
+  const app = createApp({
+    database: context.database,
+    logger: { info() {}, error() {}, warn() {}, debug() {} },
+    molingClient: { verifyLaunchTicket: async () => ({ user_id: 7, app_id: 15, product_id: 73 }) },
+    storage: context.storage,
+    taskCenter: context.taskCenter,
+    templateManager: context.templateManager,
+    aiProvider: context.aiProvider,
+    pptService: context.pptService,
+    billingClient: context.billingClient,
+    sessionCookieName: "sid",
+  });
+  await new Promise((resolve) => app.listen(0, "127.0.0.1", resolve));
+  const baseUrl = `http://127.0.0.1:${app.address().port}`;
+  try {
+    const enter = await fetch(`${baseUrl}/enter?ticket=ok`, { redirect: "manual" });
+    const cookie = enter.headers.get("set-cookie").split(";")[0];
+    const outlineResponse = await postJson(`${baseUrl}/api/ppt/outlines`, cookie, {
+      topic: "Executive operating review",
+      slide_count: 8,
+      template_id: "business",
+      theme: "executive",
+    });
+    const outline = await outlineResponse.json();
+    const deckResponse = await postJson(`${baseUrl}/api/ppt/decks`, cookie, {
+      outline_id: outline.outline.id,
+      entitlement_id: 88,
+    });
+    const deckBody = await deckResponse.json();
+    const preview = await fetch(`${baseUrl}/api/ppt/decks/${deckBody.deck.id}/preview`, { headers: { cookie } });
+    const html = await preview.text();
+
+    assert.equal(deckBody.deck.templateId, "business");
+    assert.equal(deckBody.deck.theme, "executive");
+    assert.equal(preview.status, 200);
+    assert.match(html, /data-layout="executive-deepblue-boardroom"/);
+    assert.match(html, /--template-primary:#071A2F/);
+    assert.match(html, /class="boardroom-dashboard"/);
+    assert.match(html, /class="boardroom-agenda"/);
+    assert.match(html, /class="boardroom-matrix"/);
+    assert.match(html, /class="boardroom-path"/);
+    assert.match(html, /class="boardroom-actions"/);
+    assert.match(html, /class="boardroom-decision"/);
+    assert.doesNotMatch(html, />高管深蓝</);
+    assert.doesNotMatch(html, />高管商务汇报</);
+  } finally {
+    await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test("PptService preview renders dome role classes and business image assets", async () => {
   const context = await createBusinessContext();
   const deck = await context.database.insert("decks", {
@@ -4872,12 +4924,16 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /\/api\/templates/);
     assert.match(html, /id="template-gallery"/);
     assert.match(html, /id="template-search"/);
+    assert.match(html, /id="template-pagination"/);
     assert.match(html, /type="search"/);
     assert.match(html, /templateSearchQuery/);
     assert.match(html, /templateMatchesSearch/);
+    assert.match(html, /TEMPLATE_DEFAULT_PAGE_SIZE = 12/);
+    assert.match(html, /templatePageSize/);
+    assert.match(html, /data-template-page/);
+    assert.match(html, /template-page-size/);
     assert.match(html, /TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10/);
     assert.match(html, /expandedTemplateCategoryId/);
-    assert.match(html, /data-template-category-toggle/);
     assert.match(html, /data-create-template-card-list/);
     assert.match(html, /data-create-template-category-toggle/);
     assert.match(html, /create-template-grid/);
@@ -4911,28 +4967,30 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /生成后可直接查看排版效果/);
     assert.match(html, /下载文件/);
     assert.match(html, /download-button/);
-    assert.match(html, /PPT 结构调整/);
-    assert.match(html, /id="structure-slide-title"/);
-    assert.match(html, /id="structure-slide-layout"/);
-    assert.match(html, /id="structure-slide-bullets"/);
-    assert.match(html, /id="apply-structure-preview"/);
     assert.match(html, /id="slide-edit-modal"/);
-    assert.match(html, /id="single-page-ai-toggle"/);
-    assert.match(html, /AI 优化本页/);
-    assert.match(html, /structure-side-panel/);
-    assert.match(html, /ai-polish-side-panel/);
-    assert.match(html, /应用结构并重新预览/);
-    assert.match(html, /renderStructureEditor/);
-    assert.match(html, /applyStructureEditorToSelectedSlide/);
-    assert.match(html, /AI 单页润色/);
-    assert.match(html, /在中间预览中点击要优化的页面/);
-    assert.doesNotMatch(html, /id="selected-slide-label"/);
-    assert.match(html, /未选择页面/);
+    assert.match(html, /id="export-pdf"[\s\S]*id="slide-edit-modal"[\s\S]*id="status"/);
+    assert.doesNotMatch(html, /has-slide-editor/);
+    assert.doesNotMatch(html, /id="structure-slide-title"/);
+    assert.doesNotMatch(html, /id="structure-slide-layout"/);
+    assert.doesNotMatch(html, /id="structure-slide-bullets"/);
+    assert.doesNotMatch(html, /id="apply-structure-preview"/);
+    assert.doesNotMatch(html, /id="single-page-ai-toggle"/);
+    assert.doesNotMatch(html, /applyStructureEditorToSelectedSlide/);
+    assert.doesNotMatch(html, /PPT 结构调整/);
+    assert.doesNotMatch(html, /应用结构并重新预览/);
+    assert.match(html, /AI 单页助手/);
+    assert.match(html, /class="slide-ai-robot"/);
+    assert.match(html, /data-slide-ai-prompt="提炼核心观点"/);
+    assert.match(html, /data-slide-ai-prompt="强化高层表达"/);
+    assert.match(html, /data-slide-ai-prompt="优化数据叙事"/);
+    assert.match(html, /id="slide-instruction"/);
+    assert.match(html, /发送并优化本页/);
+    assert.match(html, /syncSinglePageAiAssistant/);
+    assert.match(html, /data-slide-ai-prompt/);
     assert.match(html, /attachPreviewSlidePicker/);
     assert.match(html, /selectPreviewSlide/);
     assert.match(html, /点击第 /);
-    assert.match(html, /润色建议/);
-    assert.match(html, /请先勾选需要 AI 单页优化/);
+    assert.match(html, /优化指令/);
     assert.match(html, /setSlideRegenerationBusy/);
     assert.match(html, /preview-polish-loading/);
     assert.match(html, /polish-spinner/);
@@ -4942,8 +5000,8 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /function setButtonWaiting/);
     assert.match(html, /classList\.toggle\("is-waiting"/);
     assert.match(html, /is-polishing/);
-    assert.match(html, /请先应用模板生成 PPT，再使用 AI 润色单页/);
-    assert.match(html, /请先用鼠标在在线预览中选择要润色的页面/);
+    assert.match(html, /请先应用模板生成 PPT，再使用 AI 单页助手/);
+    assert.match(html, /请先用鼠标在在线预览中选择要优化的页面/);
     assert.match(html, /class="preview-frame"/);
     assert.match(html, /deck-loading/);
     assert.match(html, /正在应用当前模板生成 PPT/);
@@ -4953,6 +5011,11 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /data-deck-progress-stage/);
     assert.match(html, /data-deck-progress-count/);
     assert.match(html, /deck-progress-scan/);
+    assert.match(html, /deck-preview-spinner/);
+    assert.match(html, /deck-spinner-spin \.72s linear infinite/);
+    assert.match(html, /@keyframes deck-spinner-spin/);
+    const reducedMotionRule = html.match(/@media \(prefers-reduced-motion: reduce\) \{[^}]+\}/)?.[0] || "";
+    assert.doesNotMatch(reducedMotionRule, /deck-preview-spinner/);
     assert.match(html, /Math\.max\(0, Math\.min\(100,/);
     assert.match(html, /ensureDeckPreviewProgress/);
     assert.match(html, /clearDeckGenerationProgress/);
@@ -4967,11 +5030,19 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /DECK_REVEAL_INTERVAL_MS = 700/);
     assert.match(html, /DECK_MIN_LOADING_MS = 2200/);
     assert.match(html, /waitForDeckLoadingRhythm/);
-    assert.match(html, /\.preview-stage \{ position: relative; display: grid; min-height: 0;/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \{ overflow: hidden; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] main \{ height: calc\(100vh - 78px\); max-height: calc\(100vh - 78px\); align-items: stretch; overflow: hidden; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \.workflow,[\s\S]*?\.context \{ min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \.slide-edit-modal\[aria-hidden="false"\] \{ max-height: min\(680px, calc\(100vh - 340px\)\); height: min\(680px, calc\(100vh - 340px\)\); overflow: hidden; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \.slide-edit-dialog \{ display: grid; grid-template-rows: auto minmax\(0, 1fr\); height: 100%; min-height: 0; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \.slide-edit-body \{ min-height: 0; overflow: auto; overscroll-behavior: contain; padding-right: 4px; \}/);
+    assert.match(html, /body\[data-workspace-page="create"\]\[data-flow-stage="preview"\] \.slide-edit-actions \{ position: sticky; bottom: 0; z-index: 2; margin: 0 -4px -4px; padding: 12px 4px 4px; background: #fff; \}/);
+    assert.match(html, /\.preview-stage \{ position: relative; display: grid; grid-template-columns: minmax\(0, 1fr\);/);
     assert.match(html, /\.preview\.is-deck-loaded \{ height: 100%; min-height: 0;/);
     assert.match(html, /\.preview\.is-deck-loaded \.preview-frame \{ height: 100%; min-height: 0;/);
     assert.match(html, /\.preview, \.preview-frame, \.preview\.is-deck-loaded, \.preview\.is-deck-loaded \.preview-frame \{ min-height: 420px;/);
     assert.match(html, /renderDeckPreviewFrame/);
+    assert.match(html, /renderDeckPreviewFrame\(state\.deckId, \{ bustCache: true \}\);\s*\/\/ [^\n]*\n\s*clearDeckGenerationProgress\(\);/);
     assert.doesNotMatch(html, /fetch\("\/api\/ppt\/decks\/" \+ state\.deckId \+ "\/preview"\)\.then\(\(res\) => res\.text\(\)\)/);
     assert.match(html, /id="asset-list"/);
     assert.match(html, /id="asset-search"/);
@@ -4990,6 +5061,17 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /assetPreviewOpen/);
     assert.match(html, /data-asset-preview-panel="true"/);
     assert.match(html, /data-asset-preview-open="false"/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] \{ overflow: hidden; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] main \{ grid-template-columns: minmax\(280px, 360px\) minmax\(620px, 1fr\) minmax\(300px, 380px\); height: calc\(100vh - 78px\); max-height: calc\(100vh - 78px\); align-items: stretch; overflow: hidden; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] \.context \{ grid-column: auto; grid-template-columns: minmax\(0, 1fr\); grid-auto-flow: row; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; padding-right: 4px; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] \.slide-edit-modal \{ max-height: none; overflow: visible; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] \.slide-edit-dialog \{ display: block; max-height: none; min-height: 0; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] \.slide-edit-body \{ min-height: 0; overflow: visible; padding-right: 0; \}/);
+    assert.match(html, /body\[data-workspace-page="assets"\]\[data-asset-preview-open="true"\] #status \{ max-height: 180px; \}/);
+    assert.match(html, /id="asset-slide-edit-context"/);
+    assert.match(html, /syncSlideEditPlacement/);
+    assert.match(html, /assetSlideEditContextEl\.appendChild\(slideEditModalEl\)/);
+    assert.match(html, /targetParent\.insertBefore\(slideEditModalEl, slideEditHomeEl\)/);
     assert.match(html, /打开预览/);
     assert.match(html, /assetCatalog = data\.assets \|\| \[\]/);
     assert.match(html, /state\.assetPreviewOpen = true/);
