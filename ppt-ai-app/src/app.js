@@ -118,7 +118,10 @@ export function createApp(dependencies) {
       const session = await requireSession(request, sessions, sessionCookieName, dependencies.database);
       const ownerUserId = Number(session.identity.user_id);
       const sessionEntitlementId = session.entitlementId || dependencies.defaultEntitlementId;
-      enforceUserRateLimit({ buckets: rateLimitBuckets, rateLimit, ownerUserId });
+      // 模板墙会并发加载大量缩略图；缩略图是只读静态资源，不应挤占生成/编辑等业务操作的用户限流额度。
+      if (!isTemplateThumbnailRequest(request, url)) {
+        enforceUserRateLimit({ buckets: rateLimitBuckets, rateLimit, ownerUserId });
+      }
 
       if (request.method === "GET" && url.pathname === "/") {
         sendHtml(response, renderWorkspace({ defaultEntitlementId: sessionEntitlementId }));
@@ -471,6 +474,16 @@ function routeForMetrics(pathName) {
     .replace(/^\/api\/ppt\/decks\/[^/]+\/slides\/[^/]+\/regenerate$/, "/api/ppt/decks/:id/slides/:id/regenerate")
     .replace(/^\/api\/ppt\/tasks\/[^/]+\/retry$/, "/api/ppt/tasks/:id/retry")
     .replace(/^\/api\/ppt\/tasks\/[^/]+$/, "/api/ppt/tasks/:id");
+}
+
+/**
+ * 判断当前请求是否只是读取已登录用户可见的模板缩略图。
+ * @param {import("node:http").IncomingMessage} request
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isTemplateThumbnailRequest(request, url) {
+  return request.method === "GET" && /^\/api\/templates\/[^/]+\/thumbnail$/.test(url.pathname);
 }
 
 /**
@@ -1193,6 +1206,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       background: var(--thumb-bg); color: var(--thumb-body); box-shadow: inset 0 0 0 1px rgba(255,255,255,.70), 0 12px 26px rgba(15,23,42,.08);
     }
     .template-thumb[data-has-thumbnail="true"] { background-image: var(--template-thumbnail); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,.30), 0 14px 28px rgba(15,23,42,.10); }
+    .template-thumb-img { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; z-index: 1; }
+    .template-thumb[data-has-thumbnail="true"] .template-thumb-img { display: block; }
     .template-thumb[data-has-thumbnail="true"]::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(15,23,42,.10)); }
     .template-thumb[data-has-thumbnail="true"]::after,
     .template-thumb[data-has-thumbnail="true"] .template-thumb-back,
@@ -2476,8 +2491,10 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       const variant = templateThumbVariant(display.id || display.style || display.categoryId || displayLayout, display);
       const thumbnailUrl = display.thumbnailUrl ? "url('" + cssUrl(display.thumbnailUrl) + "')" : "";
       const style = "--thumb-primary:#" + displayVisual.primary + ";--thumb-accent:#" + displayVisual.accent + ";--thumb-secondary:#" + displayVisual.secondary + ";--thumb-warning:#" + displayVisual.warning + ";--thumb-bg:#" + displayVisual.background + ";--thumb-surface:#" + displayVisual.surface + ";--thumb-title:#" + displayVisual.title + ";--thumb-body:#" + displayVisual.body + ";--thumb-cover-left:" + variant.coverLeft + "%;--thumb-cover-right:" + variant.coverRight + "%;--thumb-cover-top:" + variant.coverTop + "%;--thumb-image-top:" + variant.imageTop + "%;--thumb-image-width:" + variant.imageWidth + "%;--thumb-wave-height:" + variant.waveHeight + "%;" + (thumbnailUrl ? "--template-thumbnail:" + thumbnailUrl + ";" : "");
+      const thumbnailImg = display.thumbnailUrl ? '<img class="template-thumb-img" src="' + escapeHtml(display.thumbnailUrl) + '" alt="" loading="lazy" decoding="async">' : "";
       return ''
         + '<span class="template-thumb" data-template="' + escapeHtml(display.id || "") + '" data-layout="' + escapeHtml(displayLayout) + '" data-thumb-variant="' + escapeHtml(variant.name) + '" data-has-dome-asset="' + (hasDomeAsset ? 'true' : 'false') + '" data-has-thumbnail="' + (thumbnailUrl ? 'true' : 'false') + '" style="' + style + '">'
+        + thumbnailImg
         + '<span class="template-thumb-back template-thumb-back-left"></span><span class="template-thumb-back template-thumb-back-right"></span>'
         + '<span class="template-thumb-cover"><span class="template-thumb-date">' + escapeHtml(copy.date) + '</span><span class="template-thumb-kicker">' + escapeHtml(copy.kicker) + '</span><span class="template-thumb-heading">' + escapeHtml(copy.title) + '</span><span class="template-thumb-summary"><span class="template-thumb-line">' + escapeHtml(copy.lines[0]) + '</span><span class="template-thumb-line">' + escapeHtml(copy.lines[1]) + '</span></span><span class="template-thumb-tag">' + escapeHtml(copy.tag) + '</span></span>'
         + '<span class="template-thumb-image"></span><span class="template-thumb-band"></span><span class="template-thumb-wave"></span><span class="template-thumb-accent"></span>'
