@@ -1,0 +1,21 @@
+{
+  "slug": "sales-sales-proposal-enterprise",
+  "name": "销售提案方案 - 企业客户",
+  "description": "适合企业客户销售提案、组织痛点、采购决策、部署方案、ROI 预估和服务保障汇报的客户决策材料模板。",
+  "category_slug": "sales",
+  "category_name": "销售方案",
+  "category_sort_order": 40,
+  "status": "active",
+  "tags": [
+    "sales",
+    "sales-proposal",
+    "enterprise",
+    "proposal",
+    "decision-chain",
+    "roi",
+    "sla"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

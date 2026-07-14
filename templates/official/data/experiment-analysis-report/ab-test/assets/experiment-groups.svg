@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="实验分组装饰图">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8f7f7"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#16a3a3"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="32" fill="url(#panel)"/>
+  <path d="M95 176h450" stroke="url(#line)" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  <g fill="#12355b">
+    <rect x="72" y="92" width="176" height="128" rx="28" opacity=".94"/>
+    <rect x="392" y="92" width="176" height="128" rx="28" opacity=".94"/>
+  </g>
+  <g fill="#ffffff" font-family="Arial, Microsoft YaHei, sans-serif" text-anchor="middle" font-weight="700">
+    <text x="160" y="151" font-size="46">A</text>
+    <text x="480" y="151" font-size="46">B</text>
+  </g>
+  <g fill="#16a3a3">
+    <circle cx="320" cy="176" r="34"/>
+    <circle cx="160" cy="256" r="10"/>
+    <circle cx="480" cy="256" r="10"/>
+  </g>
+  <g fill="#f59e0b">
+    <rect x="287" y="170" width="66" height="12" rx="6"/>
+    <rect x="120" y="252" width="80" height="8" rx="4"/>
+    <rect x="440" y="252" width="80" height="8" rx="4"/>
+  </g>
+</svg>

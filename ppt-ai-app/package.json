@@ -1,0 +1,31 @@
+{
+  "name": "ppt-ai-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "mysql2": "^3.11.5"
+  },
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "test": "node --test",
+    "migrate": "node scripts/migrate.js",
+    "migrate:official-template-dirs": "node --env-file=.env scripts/migrate-default-templates-to-official-dir.js",
+    "seed:official-template-categories": "node --env-file=.env scripts/seed-official-template-categories.js",
+    "seed:official-templates": "node --env-file=.env scripts/seed-official-templates.js",
+    "list:official-templates": "node --env-file=.env scripts/list-official-templates.js",
+    "admin:disable-user": "node --env-file=.env scripts/admin-disable-user.js",
+    "admin:restore-user": "node --env-file=.env scripts/admin-restore-user.js",
+    "admin:recalculate-usage": "node --env-file=.env scripts/admin-recalculate-usage.js",
+    "admin:soft-delete-ppt-asset": "node --env-file=.env scripts/admin-soft-delete-ppt-asset.js",
+    "admin:soft-delete-personal-template": "node --env-file=.env scripts/admin-soft-delete-personal-template.js",
+    "admin:cleanup-storage": "node --env-file=.env scripts/admin-cleanup-storage.js",
+    "validate:moling-config": "node --env-file=.env scripts/validate-moling-config.js",
+    "acceptance": "node scripts/acceptance.js",
+    "acceptance:moling": "node scripts/moling-acceptance.js",
+    "acceptance:production": "node --env-file=.env scripts/production-acceptance.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

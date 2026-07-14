@@ -1,0 +1,52 @@
+{
+  "baseTemplateId": "strategy-consulting",
+  "themeId": "matrix",
+  "style": "consulting-matrix",
+  "themes": [
+    {
+      "id": "matrix",
+      "name": "矩阵分类",
+      "visual": {
+        "primary": "17233B",
+        "accent": "2E7D75",
+        "secondary": "D97706",
+        "warning": "B91C1C",
+        "background": "F4F7F8",
+        "surface": "FFFFFF",
+        "title": "111827",
+        "body": "334155",
+        "layout": "strategy-matrix-consulting",
+        "variant": "matrix"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "17233B",
+    "accent": "2E7D75",
+    "secondary": "D97706",
+    "warning": "B91C1C",
+    "background": "F4F7F8",
+    "surface": "FFFFFF",
+    "title": "111827",
+    "body": "334155",
+    "layout": "strategy-matrix-consulting",
+    "variant": "matrix"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "strategy-matrix-cover",
+    "defaultContentLayout": "strategy-matrix-portfolio",
+    "allowedLayouts": [
+      "strategy-matrix-cover",
+      "strategy-matrix-portfolio",
+      "strategy-matrix-quadrant",
+      "strategy-matrix-bubble",
+      "strategy-matrix-priority",
+      "strategy-matrix-resource",
+      "strategy-matrix-actions",
+      "strategy-matrix-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

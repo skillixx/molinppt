@@ -1,0 +1,37 @@
+{
+  "baseTemplateId": "business-model-design",
+  "themeId": "value-chain",
+  "style": "business-model-value-chain",
+  "themes": [
+    {
+      "id": "value-chain",
+      "name": "价值链"
+    }
+  ],
+  "visual": {
+    "primary": "10233D",
+    "accent": "18A999",
+    "secondary": "D6A756",
+    "warning": "F97316",
+    "background": "EEF5F3",
+    "surface": "FFFFFF",
+    "title": "102033",
+    "body": "334155",
+    "layout": "business-model-value-chain",
+    "variant": "value-chain"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "business-model-system-cover",
+    "defaultContentLayout": "business-model-value-flow",
+    "allowedLayouts": [
+      "business-model-system-cover",
+      "business-model-value-flow",
+      "profit-model-map",
+      "ecosystem-platform-map",
+      "risk-opportunity-matrix",
+      "business-model-roadmap",
+      "title",
+      "content"
+    ]
+  }
+}

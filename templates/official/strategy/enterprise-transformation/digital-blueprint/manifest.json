@@ -1,0 +1,21 @@
+{
+  "slug": "strategy-enterprise-transformation-digital-blueprint",
+  "name": "企业转型方案 - 数字化蓝图",
+  "description": "适合数字化转型规划、组织能力升级、系统建设路线和转型阶段汇报的官方战略咨询模板，突出转型蓝图、能力模块、系统架构、组织治理和阶段路线。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "enterprise-transformation",
+    "digital-blueprint",
+    "digital-transformation",
+    "capability-upgrade",
+    "system-roadmap",
+    "transformation-office"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

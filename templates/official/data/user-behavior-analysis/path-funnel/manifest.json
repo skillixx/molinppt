@@ -1,0 +1,19 @@
+{
+  "slug": "data-user-behavior-analysis-path-funnel",
+  "name": "用户行为分析 - 路径漏斗",
+  "description": "适合用户转化分析、产品使用路径复盘和增长实验数据汇报的路径漏斗官方模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "user-behavior",
+    "path-funnel",
+    "conversion-analysis",
+    "growth-experiment"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

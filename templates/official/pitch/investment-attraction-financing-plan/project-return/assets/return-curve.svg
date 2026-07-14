@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320" role="img" aria-label="return curve decoration">
+  <defs>
+    <linearGradient id="curveGold" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#D6A84F"/>
+      <stop offset=".55" stop-color="#F6D58B"/>
+      <stop offset="1" stop-color="#1FB6A6"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="24" width="680" height="272" rx="28" fill="#FFFFFF" opacity=".72"/>
+  <g stroke="#CBD5E1" stroke-width="1" opacity=".48">
+    <path d="M74 246h566M74 198h566M74 150h566M74 102h566"/>
+    <path d="M116 72v174M204 72v174M292 72v174M380 72v174M468 72v174M556 72v174"/>
+  </g>
+  <path d="M82 234 C154 216 176 184 234 178 C286 172 314 204 370 168 C438 124 482 126 540 92 C584 66 620 56 654 44" fill="none" stroke="url(#curveGold)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M82 238 C154 220 176 188 234 182 C286 176 314 208 370 172 C438 128 482 130 540 96 C584 70 620 60 654 48 L654 246 L82 246Z" fill="#D6A84F" opacity=".12"/>
+  <g fill="#0F172A">
+    <circle cx="234" cy="178" r="10"/>
+    <circle cx="370" cy="168" r="10"/>
+    <circle cx="540" cy="92" r="10"/>
+  </g>
+  <circle cx="654" cy="44" r="16" fill="#1FB6A6"/>
+</svg>

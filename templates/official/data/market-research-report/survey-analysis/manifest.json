@@ -1,0 +1,20 @@
+{
+  "slug": "data-market-research-report-survey-analysis",
+  "name": "市场调研报告 - 问卷分析",
+  "description": "适合市场调研、样本结构分析、问卷题项结论和策略建议输出的商业化数据洞悉模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 120,
+  "status": "active",
+  "tags": [
+    "data",
+    "market-research-report",
+    "survey-analysis",
+    "questionnaire",
+    "sample-structure",
+    "research-findings"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

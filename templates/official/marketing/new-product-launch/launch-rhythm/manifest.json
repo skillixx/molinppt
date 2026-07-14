@@ -1,0 +1,20 @@
+{
+  "slug": "marketing-new-product-launch-launch-rhythm",
+  "name": "新品上市方案 - 首发节奏",
+  "description": "适合新品上市计划、发布节奏安排、渠道预热和上市 KPI 汇报的商业化营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 50,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "new-product-launch",
+    "launch-rhythm",
+    "timeline",
+    "product-launch",
+    "kpi"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

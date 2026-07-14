@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "metric-anomaly-diagnosis",
+  "themeId": "attribution-analysis",
+  "style": "metric-anomaly-attribution",
+  "themes": [
+    {
+      "id": "attribution-analysis",
+      "name": "归因分析",
+        "visual": {
+        "primary": "0F172A",
+        "accent": "06B6D4",
+        "secondary": "F97316",
+        "warning": "EF4444",
+        "background": "F4F8FB",
+        "surface": "FFFFFF",
+        "title": "0B1220",
+        "body": "334155",
+        "layout": "metric-anomaly-attribution",
+        "variant": "attribution-analysis"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0F172A",
+    "accent": "06B6D4",
+    "secondary": "F97316",
+    "warning": "EF4444",
+    "background": "F4F8FB",
+    "surface": "FFFFFF",
+    "title": "0B1220",
+    "body": "334155",
+    "layout": "metric-anomaly-attribution",
+    "variant": "attribution-analysis"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "metric-anomaly-attribution-cover",
+    "defaultContentLayout": "metric-anomaly-attribution-diagnosis",
+    "allowedLayouts": [
+      "metric-anomaly-attribution-cover",
+      "metric-anomaly-attribution-overview",
+      "metric-anomaly-attribution-diagnosis",
+      "metric-anomaly-attribution-analysis",
+      "metric-anomaly-attribution-impact",
+      "metric-anomaly-attribution-action",
+      "metric-anomaly-attribution-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

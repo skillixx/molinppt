@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "product-commercialization-plan",
+  "themeId": "pricing-strategy",
+  "style": "product-commercialization",
+  "themes": [
+    {
+      "id": "pricing-strategy",
+      "name": "定价策略",
+      "visual": {
+        "primary": "14213D",
+        "accent": "F4B740",
+        "secondary": "2EC4B6",
+        "warning": "EF476F",
+        "background": "F3F6FA",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "334155",
+        "layout": "product-pricing-strategy",
+        "variant": "pricing-strategy"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "14213D",
+    "accent": "F4B740",
+    "secondary": "2EC4B6",
+    "warning": "EF476F",
+    "background": "F3F6FA",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "334155",
+    "layout": "product-pricing-strategy",
+    "variant": "pricing-strategy"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-pricing-cover",
+    "defaultContentLayout": "product-pricing-content",
+    "allowedLayouts": [
+      "product-pricing-cover",
+      "product-pricing-tier-cards",
+      "product-pricing-value-anchor",
+      "product-pricing-benefit-matrix",
+      "product-pricing-commercial-loop",
+      "product-pricing-closing",
+      "title",
+      "content"
+    ]
+  }
+}

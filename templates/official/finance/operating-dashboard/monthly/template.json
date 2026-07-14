@@ -1,0 +1,44 @@
+{
+  "baseTemplateId": "operating-dashboard",
+  "themeId": "monthly",
+  "style": "operating-dashboard",
+  "themes": [
+    {
+      "id": "monthly",
+      "name": "月度经营",
+      "visual": {
+        "primary": "164E63",
+        "accent": "22C55E",
+        "background": "EEF6F7",
+        "surface": "FFFFFF",
+        "title": "0F2F3A",
+        "body": "3F5660",
+        "layout": "executive",
+        "variant": "monthly"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "164E63",
+    "accent": "22C55E",
+    "background": "EEF6F7",
+    "surface": "FFFFFF",
+    "title": "0F2F3A",
+    "body": "3F5660",
+    "layout": "executive",
+    "variant": "monthly"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "metrics",
+      "retrospective",
+      "next-plan",
+      "title",
+      "content"
+    ]
+  }
+}

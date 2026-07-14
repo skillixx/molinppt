@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "experiment-analysis-report",
+  "themeId": "ab-test",
+  "style": "experiment-ab-test",
+  "themes": [
+    {
+      "id": "ab-test",
+      "name": "A/B 测试",
+      "visual": {
+        "primary": "12355B",
+        "accent": "16A3A3",
+        "secondary": "F59E0B",
+        "warning": "EF4444",
+        "background": "EEF7F8",
+        "surface": "FFFFFF",
+        "title": "0B172A",
+        "body": "334155",
+        "layout": "experiment-ab-test",
+        "variant": "ab-test"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "12355B",
+    "accent": "16A3A3",
+    "secondary": "F59E0B",
+    "warning": "EF4444",
+    "background": "EEF7F8",
+    "surface": "FFFFFF",
+    "title": "0B172A",
+    "body": "334155",
+    "layout": "experiment-ab-test",
+    "variant": "ab-test"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "experiment-ab-test-cover",
+    "defaultContentLayout": "experiment-ab-test-design",
+    "allowedLayouts": [
+      "experiment-ab-test-cover",
+      "experiment-ab-test-design",
+      "experiment-ab-test-result",
+      "experiment-ab-test-funnel",
+      "experiment-ab-test-decision",
+      "experiment-ab-test-next",
+      "experiment-ab-test-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

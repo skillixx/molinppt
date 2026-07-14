@@ -1,0 +1,35 @@
+{
+  "baseTemplateId": "growth-funding-pitch",
+  "themeId": "growth-flywheel",
+  "style": "growth-funding-flywheel",
+  "themes": [
+    {
+      "id": "growth-flywheel",
+      "name": "增长飞轮"
+    }
+  ],
+  "visual": {
+    "primary": "0B1220",
+    "accent": "22C55E",
+    "background": "EAF1F8",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "growth-funding-flywheel",
+    "variant": "growth-flywheel"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "growth-funding-cover",
+    "defaultContentLayout": "growth-funding-content",
+    "allowedLayouts": [
+      "growth-funding-cover",
+      "growth-overview-dashboard",
+      "growth-flywheel-model",
+      "commercialization-progress",
+      "growth-data-proof",
+      "market-expansion-plan",
+      "funding-use-milestones",
+      "growth-funding-closing"
+    ]
+  }
+}

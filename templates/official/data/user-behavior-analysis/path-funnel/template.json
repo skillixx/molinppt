@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "user-behavior-analysis",
+  "themeId": "path-funnel",
+  "style": "conversion-path-workbench",
+  "themes": [
+    {
+      "id": "path-funnel",
+      "name": "路径漏斗",
+      "visual": {
+        "primary": "172554",
+        "accent": "06B6D4",
+        "secondary": "22C55E",
+        "warning": "F97316",
+        "background": "F6FAFF",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "user-path-funnel",
+        "variant": "path-funnel"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "172554",
+    "accent": "06B6D4",
+    "secondary": "22C55E",
+    "warning": "F97316",
+    "background": "F6FAFF",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "user-path-funnel",
+    "variant": "path-funnel"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "path-cover",
+    "defaultContentLayout": "path-analysis",
+    "allowedLayouts": [
+      "path-cover",
+      "path-overview",
+      "path-funnel",
+      "path-experiment",
+      "path-actions",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

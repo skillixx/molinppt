@@ -1,0 +1,20 @@
+{
+  "slug": "education-teaching-achievement-report-showcase",
+  "name": "教学成果汇报 - 成果展示",
+  "description": "适合教学项目总结、课程成果展示、学生表现分析和教育项目复盘的教学成果汇报模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 80,
+  "status": "active",
+  "tags": [
+    "education",
+    "teaching-achievement-report",
+    "showcase",
+    "teaching-result",
+    "student-growth",
+    "education-review"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "business",
+  "themeId": "minimal",
+  "style": "executive-report",
+  "themes": [
+    {
+      "id": "minimal",
+      "name": "极简灰蓝",
+      "visual": {
+        "primary": "1E3A8A",
+        "accent": "6B7280",
+        "background": "E9EEF5",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "top-band"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E3A8A",
+    "accent": "6B7280",
+    "background": "E9EEF5",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "top-band"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cover",
+    "defaultContentLayout": "image-report",
+    "allowedLayouts": [
+      "cover",
+      "agenda",
+      "section-divider",
+      "image-report",
+      "three-steps",
+      "four-steps",
+      "metrics",
+      "showcase",
+      "retrospective",
+      "next-plan",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

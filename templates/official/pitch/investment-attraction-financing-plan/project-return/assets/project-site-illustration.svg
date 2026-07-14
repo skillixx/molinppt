@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="abstract commercial project site">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#E8EEF3"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#F6D58B"/>
+      <stop offset="1" stop-color="#C9942E"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#203047"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="34" fill="url(#sky)"/>
+  <path d="M112 382 C236 310 342 336 446 280 C556 222 668 232 836 152" fill="none" stroke="#D6A84F" stroke-width="18" stroke-linecap="round" opacity=".26"/>
+  <path d="M92 414 C226 340 353 366 484 300 C606 238 718 248 862 184" fill="none" stroke="#1FB6A6" stroke-width="6" stroke-linecap="round" opacity=".48"/>
+  <g opacity=".18" stroke="#0F172A" stroke-width="1">
+    <path d="M98 126h764M98 178h764M98 230h764M98 282h764M98 334h764M98 386h764"/>
+    <path d="M138 94v334M226 94v334M314 94v334M402 94v334M490 94v334M578 94v334M666 94v334M754 94v334M842 94v334"/>
+  </g>
+  <g transform="translate(178 178)">
+    <path d="M0 194 134 88 246 152 380 46 560 164 560 256 0 256Z" fill="#FFFFFF" opacity=".84"/>
+    <path d="M134 88 134 256M246 152 246 256M380 46 380 256" stroke="#B8C2CF" stroke-width="2"/>
+    <rect x="98" y="104" width="72" height="152" rx="10" fill="url(#ink)"/>
+    <rect x="306" y="70" width="104" height="186" rx="12" fill="#23334D"/>
+    <rect x="452" y="148" width="78" height="108" rx="10" fill="#34435A"/>
+    <g fill="url(#gold)">
+      <rect x="118" y="130" width="14" height="22" rx="3"/>
+      <rect x="142" y="130" width="14" height="22" rx="3"/>
+      <rect x="326" y="98" width="16" height="24" rx="3"/>
+      <rect x="354" y="98" width="16" height="24" rx="3"/>
+      <rect x="382" y="98" width="16" height="24" rx="3"/>
+      <rect x="472" y="170" width="14" height="22" rx="3"/>
+      <rect x="496" y="170" width="14" height="22" rx="3"/>
+    </g>
+  </g>
+</svg>

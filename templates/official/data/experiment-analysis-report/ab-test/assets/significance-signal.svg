@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="显著性信号装饰图">
+  <rect width="640" height="360" rx="32" fill="#ffffff"/>
+  <rect x="70" y="78" width="500" height="204" rx="30" fill="#eef7f8" stroke="#c9e6e8" stroke-width="3"/>
+  <path d="M112 226c44-74 88-102 132-86 44 16 88 82 132 54 44-28 88-108 152-92" fill="none" stroke="#16a3a3" stroke-width="10" stroke-linecap="round"/>
+  <path d="M112 244c44-38 88-52 132-39 44 13 88 42 132 24 44-18 88-54 152-46" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" opacity=".85"/>
+  <g fill="#12355b">
+    <circle cx="528" cy="102" r="32"/>
+    <rect x="118" y="102" width="126" height="14" rx="7"/>
+    <rect x="118" y="126" width="88" height="10" rx="5" opacity=".42"/>
+  </g>
+  <path d="M513 101l12 13 24-31" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,21 @@
+{
+  "slug": "pitch-investment-attraction-financing-plan-project-return",
+  "name": "招商融资方案 - 项目收益",
+  "description": "适合项目招商、收益测算、合作模式说明和融资方案汇报的官方融资路演模板，突出项目价值、投入产出、合作权益和资金回收路径。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 100,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "investment-attraction",
+    "investment-attraction-financing-plan",
+    "project-return",
+    "revenue-model",
+    "partnership",
+    "financing-plan"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

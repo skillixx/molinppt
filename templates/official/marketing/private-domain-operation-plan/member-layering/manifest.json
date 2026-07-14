@@ -1,0 +1,20 @@
+{
+  "slug": "marketing-private-domain-operation-plan-member-layering",
+  "name": "私域运营方案 - 会员分层",
+  "description": "适合私域增长、会员分层运营、触达路径设计和复购闭环汇报的商业化营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "private-domain-operation-plan",
+    "member-layering",
+    "private-growth",
+    "retention",
+    "repurchase"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

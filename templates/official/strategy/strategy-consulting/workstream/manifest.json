@@ -1,0 +1,22 @@
+{
+  "slug": "strategy-strategy-consulting-workstream",
+  "name": "战略咨询方案 - 工作流程推进",
+  "description": "适合咨询项目推进、工作流拆解、阶段交付、责任分工、风险阻塞和下一步计划汇报的 PMO 项目推进模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "strategy-consulting",
+    "workstream",
+    "consulting-case",
+    "pmo",
+    "delivery",
+    "workflow",
+    "risk-blocker"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

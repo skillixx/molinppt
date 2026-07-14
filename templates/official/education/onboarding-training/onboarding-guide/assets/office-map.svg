@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="220" viewBox="0 0 360 220" role="img" aria-label="office map">
+  <rect x="24" y="24" width="312" height="172" rx="22" fill="#f4f8fb" stroke="#cbd8e6" stroke-width="4"/>
+  <path d="M62 72h82v42H62zM164 72h134v42H164zM62 132h112v34H62zM194 132h104v34H194z" fill="#ffffff" stroke="#d6e1ec" stroke-width="3"/>
+  <path d="M103 93c58 7 69 54 142 55" fill="none" stroke="#14b8a6" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 16"/>
+  <circle cx="103" cy="93" r="13" fill="#f59e0b"/>
+  <circle cx="245" cy="148" r="13" fill="#1e3a5f"/>
+  <path d="M245 148l-16-8v16z" fill="#ffffff"/>
+</svg>

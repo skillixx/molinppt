@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Corporate training classroom decoration">
+  <defs>
+    <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e7f3f2"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" x2="1">
+      <stop stop-color="#1F3A5F"/>
+      <stop offset="1" stop-color="#20A39E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#F4F7FA"/>
+  <rect x="74" y="70" width="1052" height="535" rx="32" fill="url(#panel)" stroke="#d9e4ee"/>
+  <rect x="118" y="116" width="520" height="304" rx="18" fill="#ffffff" stroke="#dbe5ef"/>
+  <rect x="154" y="154" width="230" height="18" rx="9" fill="#1F3A5F"/>
+  <rect x="154" y="198" width="390" height="12" rx="6" fill="#9fb2c8"/>
+  <rect x="154" y="232" width="340" height="12" rx="6" fill="#c8d5e2"/>
+  <rect x="154" y="266" width="280" height="12" rx="6" fill="#d6e1ec"/>
+  <path d="M704 134h300c28 0 50 22 50 50v270c0 28-22 50-50 50H704c-28 0-50-22-50-50V184c0-28 22-50 50-50z" fill="url(#brand)" opacity=".96"/>
+  <circle cx="768" cy="238" r="52" fill="#ffffff" opacity=".18"/>
+  <rect x="836" y="202" width="148" height="16" rx="8" fill="#ffffff" opacity=".72"/>
+  <rect x="836" y="246" width="106" height="12" rx="6" fill="#ffffff" opacity=".42"/>
+  <rect x="710" y="354" width="288" height="22" rx="11" fill="#ffffff" opacity=".22"/>
+  <rect x="710" y="402" width="220" height="22" rx="11" fill="#F3A712" opacity=".92"/>
+  <path d="M214 500c98-62 214-62 312 0 98 62 214 62 312 0" fill="none" stroke="#20A39E" stroke-width="12" stroke-linecap="round" opacity=".5"/>
+  <circle cx="214" cy="500" r="18" fill="#F3A712"/>
+  <circle cx="526" cy="500" r="18" fill="#20A39E"/>
+  <circle cx="838" cy="500" r="18" fill="#1F3A5F"/>
+</svg>

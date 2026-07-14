@@ -1,0 +1,11 @@
+[
+  { "id": "business", "name": "商业汇报", "sortOrder": 10 },
+  { "id": "strategy", "name": "战略咨询", "sortOrder": 20 },
+  { "id": "finance", "name": "财务经营", "sortOrder": 30 },
+  { "id": "sales", "name": "销售方案", "sortOrder": 40 },
+  { "id": "product", "name": "产品规划", "sortOrder": 50 },
+  { "id": "marketing", "name": "市场营销", "sortOrder": 60 },
+  { "id": "data", "name": "数据洞察", "sortOrder": 70 },
+  { "id": "education", "name": "教育培训", "sortOrder": 80 },
+  { "id": "pitch", "name": "融资路演", "sortOrder": 90 }
+]

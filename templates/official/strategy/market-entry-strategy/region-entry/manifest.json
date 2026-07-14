@@ -1,0 +1,20 @@
+{
+  "slug": "strategy-market-entry-strategy-region-entry",
+  "name": "市场进入策略 - 区域进入",
+  "description": "适合新市场进入、区域拓展、渠道布局和客群切入策略的战略咨询官方模板，突出区域优先级、进入路径、渠道铺排和资源风险判断。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "market-entry-strategy",
+    "region-entry",
+    "regional-expansion",
+    "channel-layout",
+    "consulting-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

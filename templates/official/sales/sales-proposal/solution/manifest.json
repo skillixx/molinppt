@@ -1,0 +1,18 @@
+{
+  "slug": "sales-sales-proposal-solution",
+  "name": "销售提案方案 - 解决方案",
+  "description": "适合客户提案、需求诊断、方案架构、实施路径、价值收益和合作推进展示的 B2B 解决方案提案模板。",
+  "category_slug": "sales",
+  "category_name": "销售方案",
+  "category_sort_order": 40,
+  "status": "active",
+  "tags": [
+    "sales",
+    "sales-proposal",
+    "solution",
+    "proposal"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

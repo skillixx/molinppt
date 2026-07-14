@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="180" viewBox="0 0 720 180" role="img" aria-label="Market entry path decoration">
+  <rect width="720" height="180" rx="24" fill="#eef6f8"/>
+  <path d="M82 94 H230 C287 94 278 50 336 50 H480 C542 50 526 94 602 94" fill="none" stroke="#102a43" stroke-width="8" stroke-linecap="round"/>
+  <path d="M584 71 L630 94 L584 117 Z" fill="#14b8a6"/>
+  <g>
+    <circle cx="82" cy="94" r="20" fill="#14b8a6"/>
+    <circle cx="336" cy="50" r="20" fill="#f2b84b"/>
+    <circle cx="602" cy="94" r="20" fill="#f97316"/>
+  </g>
+</svg>

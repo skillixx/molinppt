@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" role="img" aria-label="投资情景矩阵">
+  <rect width="520" height="360" rx="30" fill="#F8FAFC"/>
+  <g fill="#FFFFFF" stroke="#D8E1EC" stroke-width="3">
+    <rect x="42" y="58" width="128" height="244" rx="22"/>
+    <rect x="196" y="38" width="128" height="264" rx="22"/>
+    <rect x="350" y="78" width="128" height="224" rx="22"/>
+  </g>
+  <g font-family="Microsoft YaHei, Arial, sans-serif" text-anchor="middle" font-weight="900">
+    <text x="106" y="105" font-size="24" fill="#0F2742">保守</text>
+    <text x="260" y="85" font-size="24" fill="#0F2742">基准</text>
+    <text x="414" y="125" font-size="24" fill="#0F2742">乐观</text>
+    <text x="106" y="178" font-size="34" fill="#EF4444">8%</text>
+    <text x="260" y="158" font-size="38" fill="#16A34A">16%</text>
+    <text x="414" y="198" font-size="34" fill="#F59E0B">24%</text>
+  </g>
+  <path d="M84 236h44M238 220h44M392 252h44" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round"/>
+</svg>

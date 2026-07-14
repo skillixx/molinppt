@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "private-domain-operation-plan",
+  "themeId": "member-layering",
+  "style": "private-domain-member-layering",
+  "themes": [
+    {
+      "id": "member-layering",
+      "name": "会员分层",
+      "visual": {
+        "primary": "123C35",
+        "accent": "D6A84F",
+        "secondary": "F06A4B",
+        "background": "F3F7F1",
+        "surface": "FFFFFF",
+        "title": "10231F",
+        "body": "43514C",
+        "layout": "private-domain-member-layering",
+        "variant": "member-layering"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123C35",
+    "accent": "D6A84F",
+    "secondary": "F06A4B",
+    "background": "F3F7F1",
+    "surface": "FFFFFF",
+    "title": "10231F",
+    "body": "43514C",
+    "layout": "private-domain-member-layering",
+    "variant": "member-layering"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "private-domain-member-layering-cover",
+    "defaultContentLayout": "private-domain-member-layering-content",
+    "allowedLayouts": [
+      "private-domain-member-layering-cover",
+      "private-domain-member-layering-pyramid",
+      "private-domain-member-layering-touch-path",
+      "private-domain-member-layering-benefits",
+      "private-domain-member-layering-repurchase-loop",
+      "private-domain-member-layering-dashboard",
+      "private-domain-member-layering-action-plan",
+      "title",
+      "content"
+    ]
+  }
+}

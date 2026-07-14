@@ -1,0 +1,54 @@
+{
+  "baseTemplateId": "investment-return-analysis",
+  "themeId": "roi-model",
+  "style": "finance-investment-roi-model",
+  "themes": [
+    {
+      "id": "roi-model",
+      "name": "ROI 模型",
+      "visual": {
+        "primary": "0F2742",
+        "accent": "16A34A",
+        "secondary": "F59E0B",
+        "warning": "EF4444",
+        "background": "F5F8FB",
+        "surface": "FFFFFF",
+        "title": "0B1726",
+        "body": "334155",
+        "layout": "finance-investment-roi-model",
+        "variant": "roi-model"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0F2742",
+    "accent": "16A34A",
+    "secondary": "F59E0B",
+    "warning": "EF4444",
+    "background": "F5F8FB",
+    "surface": "FFFFFF",
+    "title": "0B1726",
+    "body": "334155",
+    "layout": "finance-investment-roi-model",
+    "variant": "roi-model"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-roi-model-cover",
+    "defaultContentLayout": "finance-roi-model-content",
+    "allowedLayouts": [
+      "finance-roi-model-cover",
+      "finance-roi-model-overview",
+      "finance-roi-model-formula",
+      "finance-roi-model-return-curve",
+      "finance-roi-model-payback",
+      "finance-roi-model-scenario",
+      "finance-roi-model-decision",
+      "title",
+      "content"
+    ]
+  },
+  "assetPolicy": {
+    "allowDecorativeImages": true,
+    "fullPageBackgroundImage": false
+  }
+}

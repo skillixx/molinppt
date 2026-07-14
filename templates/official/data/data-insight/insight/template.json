@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "data-insight",
+  "themeId": "insight",
+  "style": "analytics-report",
+  "themes": [
+    {
+      "id": "insight",
+      "name": "洞察分析",
+      "visual": {
+        "primary": "172554",
+        "accent": "F59E0B",
+        "secondary": "14B8A6",
+        "warning": "EF4444",
+        "background": "F6F8FB",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "data-insight-workbench",
+        "variant": "insight"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "172554",
+    "accent": "F59E0B",
+    "secondary": "14B8A6",
+    "warning": "EF4444",
+    "background": "F6F8FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "data-insight-workbench",
+    "variant": "insight"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "data-insight-workbench-cover",
+    "defaultContentLayout": "data-insight-workbench-trend",
+    "allowedLayouts": [
+      "data-insight-workbench-cover",
+      "data-insight-workbench-trend",
+      "data-insight-workbench-attribution",
+      "data-insight-workbench-correlation",
+      "data-insight-workbench-evidence",
+      "data-insight-workbench-priority",
+      "data-insight-workbench-closing",
+      "title",
+      "content"
+    ]
+  }
+}

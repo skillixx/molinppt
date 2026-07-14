@@ -1,0 +1,20 @@
+{
+  "slug": "pitch-pitch-investor",
+  "name": "创业融资路演 - 投资人版",
+  "description": "适合融资沟通、市场空间、商业模式、增长数据、融资金额和资金用途汇报的投资备忘录风格模板。",
+  "category_slug": "pitch",
+  "category_name": "融资路演",
+  "category_sort_order": 90,
+  "status": "active",
+  "tags": [
+    "pitch",
+    "investor",
+    "investor-memo",
+    "tam-sam-som",
+    "unit-economics",
+    "capital-plan"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

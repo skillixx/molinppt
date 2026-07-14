@@ -1,0 +1,41 @@
+{
+  "baseTemplateId": "education",
+  "themeId": "workshop",
+  "style": "learning-workshop",
+  "themes": [
+    {
+      "id": "workshop",
+      "name": "互动工作坊",
+      "visual": {
+        "primary": "3F4A8A",
+        "accent": "F28C6B",
+        "background": "F3F1FA",
+        "surface": "FFFFFF",
+        "title": "20264B",
+        "body": "515A7A",
+        "layout": "education-course",
+        "variant": "workshop"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "3F4A8A",
+    "accent": "F28C6B",
+    "background": "F3F1FA",
+    "surface": "FFFFFF",
+    "title": "20264B",
+    "body": "515A7A",
+    "layout": "education-course",
+    "variant": "workshop"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "academy-cover",
+    "defaultContentLayout": "academy-content",
+    "allowedLayouts": [
+      "academy-cover",
+      "academy-content",
+      "lesson-title",
+      "lesson-content"
+    ]
+  }
+}

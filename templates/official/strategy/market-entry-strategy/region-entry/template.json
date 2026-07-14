@@ -1,0 +1,64 @@
+{
+  "baseTemplateId": "market-entry-strategy",
+  "themeId": "region-entry",
+  "style": "strategy-region-entry",
+  "themes": [
+    {
+      "id": "region-entry",
+      "name": "区域进入",
+      "visual": {
+        "id": "strategy-market-entry-strategy-region-entry",
+        "primary": "102A43",
+        "accent": "14B8A6",
+        "secondary": "F2B84B",
+        "warning": "F97316",
+        "background": "EEF6F8",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "334155",
+        "layout": "strategy-region-entry",
+        "variant": "region-entry"
+      }
+    }
+  ],
+  "visual": {
+    "id": "strategy-market-entry-strategy-region-entry",
+    "primary": "102A43",
+    "accent": "14B8A6",
+    "secondary": "F2B84B",
+    "warning": "F97316",
+    "background": "EEF6F8",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "334155",
+    "layout": "strategy-region-entry",
+    "variant": "region-entry"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "region-entry-cover",
+    "defaultContentLayout": "region-entry-map",
+    "allowedLayouts": [
+      "region-entry-cover",
+      "region-entry-map",
+      "region-entry-sequence",
+      "region-entry-segments",
+      "region-entry-channel",
+      "region-entry-risk-plan",
+      "region-entry-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  },
+  "contentSchema": {
+    "fields": [
+      "目标区域",
+      "进入理由",
+      "目标客群",
+      "渠道策略",
+      "进入阶段",
+      "资源需求",
+      "风险应对"
+    ]
+  }
+}

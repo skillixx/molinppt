@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "user-experience-redesign",
+  "themeId": "experience-journey",
+  "style": "experience-journey-map",
+  "themes": [
+    {
+      "id": "experience-journey",
+      "name": "体验旅程",
+      "visual": {
+        "primary": "1E2A5A",
+        "accent": "18B7A6",
+        "secondary": "F9735B",
+        "background": "EEF5FA",
+        "surface": "FFFFFF",
+        "title": "102033",
+        "body": "405166",
+        "layout": "experience-journey-map",
+        "variant": "experience-journey"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1E2A5A",
+    "accent": "18B7A6",
+    "secondary": "F9735B",
+    "background": "EEF5FA",
+    "surface": "FFFFFF",
+    "title": "102033",
+    "body": "405166",
+    "layout": "experience-journey-map",
+    "variant": "experience-journey"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "experience-journey-cover",
+    "defaultContentLayout": "experience-journey-content",
+    "allowedLayouts": [
+      "experience-journey-cover",
+      "experience-journey-content",
+      "experience-journey-diagnosis",
+      "experience-journey-redesign",
+      "experience-journey-roadmap",
+      "experience-journey-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

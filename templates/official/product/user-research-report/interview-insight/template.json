@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "user-research-report",
+  "themeId": "interview-insight",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "interview-insight",
+      "name": "访谈洞察",
+      "visual": {
+        "primary": "155E75",
+        "accent": "F59E0B",
+        "secondary": "7C3AED",
+        "background": "F6F8FB",
+        "surface": "FFFFFF",
+        "title": "132238",
+        "body": "475569",
+        "layout": "product-interview-insight",
+        "variant": "interview-insight"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "155E75",
+    "accent": "F59E0B",
+    "secondary": "7C3AED",
+    "background": "F6F8FB",
+    "surface": "FFFFFF",
+    "title": "132238",
+    "body": "475569",
+    "layout": "product-interview-insight",
+    "variant": "interview-insight"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-interview-insight-cover",
+    "defaultContentLayout": "product-interview-insight-content",
+    "allowedLayouts": [
+      "product-interview-insight-cover",
+      "product-interview-insight-sample",
+      "product-interview-insight-quotes",
+      "product-interview-insight-cluster",
+      "product-interview-insight-opportunity",
+      "product-interview-insight-recommendation",
+      "product-interview-insight-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

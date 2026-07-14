@@ -1,0 +1,17 @@
+{
+  "slug": "business-business-modern",
+  "name": "高管商务汇报 - 现代红金",
+  "description": "适合经营复盘、管理层汇报和董事会沟通的稳重商务模板。",
+  "category_slug": "business",
+  "category_name": "商业汇报",
+  "category_sort_order": 10,
+  "status": "active",
+  "tags": [
+    "business",
+    "modern",
+    "executive-report"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

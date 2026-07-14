@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "workshop-seminar",
+  "themeId": "practice-review",
+  "style": "workshop-review-canvas",
+  "themes": [
+    {
+      "id": "practice-review",
+      "name": "实践复盘",
+      "visual": {
+        "primary": "14505A",
+        "accent": "18A999",
+        "secondary": "F6C85F",
+        "warning": "EF8354",
+        "background": "F7F5EE",
+        "surface": "FFFFFF",
+        "title": "12263A",
+        "body": "435466",
+        "layout": "education-workshop-practice-review",
+        "variant": "practice-review"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "14505A",
+    "accent": "18A999",
+    "secondary": "F6C85F",
+    "warning": "EF8354",
+    "background": "F7F5EE",
+    "surface": "FFFFFF",
+    "title": "12263A",
+    "body": "435466",
+    "layout": "education-workshop-practice-review",
+    "variant": "practice-review"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "education-workshop-practice-cover",
+    "defaultContentLayout": "education-workshop-practice-board",
+    "allowedLayouts": [
+      "education-workshop-practice-cover",
+      "education-workshop-practice-flow",
+      "education-workshop-practice-cocreation",
+      "education-workshop-practice-feedback",
+      "education-workshop-practice-retro",
+      "education-workshop-practice-actions",
+      "education-workshop-practice-summary",
+      "title",
+      "content"
+    ]
+  }
+}

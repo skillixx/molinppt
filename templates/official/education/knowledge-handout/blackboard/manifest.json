@@ -1,0 +1,13 @@
+{
+  "slug": "education-knowledge-handout-blackboard",
+  "name": "知识课程讲义 - 课堂板书",
+  "description": "适合知识点讲解、课程内容拆解、培训教材制作和教学课件交付的黑板式讲义模板。",
+  "category_slug": "education",
+  "category_name": "教育培训",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": ["education", "knowledge-handout", "blackboard", "courseware"],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

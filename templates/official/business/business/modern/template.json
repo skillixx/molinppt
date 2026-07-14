@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "business",
+  "themeId": "modern",
+  "style": "executive-report",
+  "themes": [
+    {
+      "id": "modern",
+      "name": "现代红金",
+      "visual": {
+        "primary": "B91C1C",
+        "accent": "D97706",
+        "background": "FFF1E6",
+        "surface": "FFFFFF",
+        "title": "3B0A0A",
+        "body": "5B3328",
+        "layout": "top-band"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "B91C1C",
+    "accent": "D97706",
+    "background": "FFF1E6",
+    "surface": "FFFFFF",
+    "title": "3B0A0A",
+    "body": "5B3328",
+    "layout": "top-band"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cover",
+    "defaultContentLayout": "image-report",
+    "allowedLayouts": [
+      "cover",
+      "agenda",
+      "section-divider",
+      "image-report",
+      "three-steps",
+      "four-steps",
+      "metrics",
+      "showcase",
+      "retrospective",
+      "next-plan",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

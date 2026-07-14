@@ -1,0 +1,19 @@
+{
+  "slug": "strategy-industry-research-competition-map",
+  "name": "行业研究报告 - 竞争地图",
+  "description": "适合竞品分析、市场定位、竞争格局判断和差异化策略汇报的咨询白底风官方模板。",
+  "category_slug": "strategy",
+  "category_name": "战略咨询",
+  "category_sort_order": 20,
+  "status": "active",
+  "tags": [
+    "strategy",
+    "industry-research",
+    "competition-map",
+    "competitive-analysis",
+    "market-positioning"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

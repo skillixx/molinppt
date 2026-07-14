@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="matrix grid texture">
+  <rect width="640" height="360" fill="#F4F7F8"/>
+  <g stroke="#CBD5E1" stroke-width="1" opacity=".55">
+    <path d="M0 45H640M0 90H640M0 135H640M0 180H640M0 225H640M0 270H640M0 315H640"/>
+    <path d="M80 0V360M160 0V360M240 0V360M320 0V360M400 0V360M480 0V360M560 0V360"/>
+  </g>
+  <g stroke="#2E7D75" stroke-width="2" opacity=".28">
+    <path d="M320 40V320"/>
+    <path d="M80 180H560"/>
+  </g>
+</svg>

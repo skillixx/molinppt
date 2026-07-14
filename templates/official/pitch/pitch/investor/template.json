@@ -1,0 +1,49 @@
+{
+  "baseTemplateId": "pitch",
+  "themeId": "investor",
+  "style": "pitch-investor-memo",
+  "themes": [
+    {
+      "id": "investor",
+      "name": "投资人版",
+      "visual": {
+        "primary": "101828",
+        "accent": "12B76A",
+        "background": "F8FAFC",
+        "surface": "FFFFFF",
+        "title": "101828",
+        "body": "475467",
+        "secondary": "F79009",
+        "layout": "pitch-investor-memo",
+        "variant": "investor"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "101828",
+    "accent": "12B76A",
+    "background": "F8FAFC",
+    "surface": "FFFFFF",
+    "title": "101828",
+    "body": "475467",
+    "secondary": "F79009",
+    "layout": "pitch-investor-memo",
+    "variant": "investor"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "pitch-investor-memo-cover",
+    "defaultContentLayout": "pitch-investor-memo-market",
+    "allowedLayouts": [
+      "pitch-investor-memo-cover",
+      "pitch-investor-memo-summary",
+      "pitch-investor-memo-market",
+      "pitch-investor-memo-revenue",
+      "pitch-investor-memo-unit-economics",
+      "pitch-investor-memo-moat",
+      "pitch-investor-memo-funding",
+      "pitch-investor-memo-closing",
+      "title",
+      "content"
+    ]
+  }
+}

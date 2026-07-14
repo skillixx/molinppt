@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "internal-control-compliance-report",
+  "themeId": "risk-inspection",
+  "style": "audit-risk-control",
+  "themes": [
+    {
+      "id": "risk-inspection",
+      "name": "风险检查",
+      "visual": {
+        "primary": "14213D",
+        "accent": "F97316",
+        "secondary": "16A34A",
+        "warning": "DC2626",
+        "background": "EEF3F7",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "finance-risk-inspection",
+        "variant": "risk-inspection"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "14213D",
+    "accent": "F97316",
+    "secondary": "16A34A",
+    "warning": "DC2626",
+    "background": "EEF3F7",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "finance-risk-inspection",
+    "variant": "risk-inspection"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-risk-inspection-cover",
+    "defaultContentLayout": "finance-risk-inspection-finding",
+    "allowedLayouts": [
+      "finance-risk-inspection-cover",
+      "finance-risk-inspection-overview",
+      "finance-risk-inspection-checklist",
+      "finance-risk-inspection-finding",
+      "finance-risk-inspection-rating",
+      "finance-risk-inspection-remediation",
+      "finance-risk-inspection-closing",
+      "title",
+      "content"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "baseTemplateId": "public-courseware",
+  "themeId": "enrollment-conversion",
+  "style": "public-course-enrollment",
+  "themes": [
+    {
+      "id": "enrollment-conversion",
+      "name": "招生转化",
+      "visual": {
+        "primary": "173A6A",
+        "accent": "FF6B3D",
+        "secondary": "24C6DC",
+        "success": "20B486",
+        "warning": "F7B731",
+        "background": "F2F7FB",
+        "surface": "FFFFFF",
+        "title": "10233B",
+        "body": "34445C",
+        "layout": "public-course-enrollment",
+        "variant": "enrollment-conversion"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "173A6A",
+    "accent": "FF6B3D",
+    "secondary": "24C6DC",
+    "success": "20B486",
+    "warning": "F7B731",
+    "background": "F2F7FB",
+    "surface": "FFFFFF",
+    "title": "10233B",
+    "body": "34445C",
+    "layout": "public-course-enrollment",
+    "variant": "enrollment-conversion"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "public-course-enrollment-cover",
+    "defaultContentLayout": "public-course-enrollment-value",
+    "allowedLayouts": [
+      "public-course-enrollment-cover",
+      "public-course-enrollment-hook",
+      "public-course-enrollment-value",
+      "public-course-enrollment-agenda",
+      "public-course-enrollment-path",
+      "public-course-enrollment-action",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

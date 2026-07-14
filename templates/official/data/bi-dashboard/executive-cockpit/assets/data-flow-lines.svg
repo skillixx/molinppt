@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="220" viewBox="0 0 420 220" role="img" aria-label="data flow lines">
+  <rect width="420" height="220" rx="24" fill="#08111F"/>
+  <g fill="none" stroke-linecap="round" stroke-width="4">
+    <path d="M24 148C92 72 138 186 204 108s122-46 192-84" stroke="#22D3EE" opacity=".9"/>
+    <path d="M24 176c72-34 130-8 192-58s116-34 180-8" stroke="#A3E635" opacity=".72"/>
+    <path d="M24 104c70-52 138-28 200-58 55-27 104-24 172-12" stroke="#38BDF8" opacity=".48"/>
+  </g>
+  <g fill="#22D3EE">
+    <circle cx="84" cy="94" r="7"/>
+    <circle cx="204" cy="108" r="7"/>
+    <circle cx="318" cy="52" r="7"/>
+  </g>
+</svg>

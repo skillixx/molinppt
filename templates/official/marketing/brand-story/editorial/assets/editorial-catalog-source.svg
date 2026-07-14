@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="portrait" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#232731"/>
+      <stop offset="0.62" stop-color="#5a514c"/>
+      <stop offset="1" stop-color="#c7825a"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#171b26" flood-opacity="0.22"/>
+    </filter>
+    <pattern id="paper" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 1H10" stroke="#171b26" stroke-opacity="0.026"/>
+      <path d="M1 0V10" stroke="#171b26" stroke-opacity="0.014"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="720" fill="#ece6dd"/>
+  <rect width="1280" height="720" fill="url(#paper)"/>
+  <text x="64" y="54" font-family="Arial,Microsoft YaHei,sans-serif" font-size="15" font-weight="900" letter-spacing="3" fill="#171b26" opacity=".58">BRAND ANNUAL / EDITORIAL NARRATIVE SYSTEM</text>
+  <text x="1090" y="54" font-family="Arial" font-size="15" font-weight="900" letter-spacing="2" fill="#c7825a">VOL. 01</text>
+
+  <g transform="translate(58 92) rotate(-4 270 160)" filter="url(#shadow)">
+    <rect width="540" height="322" rx="4" fill="#fffdf9"/>
+    <rect x="24" y="22" width="492" height="278" fill="none" stroke="#2a2f3f" stroke-opacity="0.32"/>
+    <text x="42" y="48" font-family="Arial" font-size="13" font-weight="800" letter-spacing="1.5" fill="#171b26">ARCHIVE / BRAND TIMELINE</text>
+    <text x="474" y="48" font-family="Arial" font-size="18" font-weight="900" fill="#c7825a">03</text>
+    <line x1="42" y1="61" x2="498" y2="61" stroke="#171b26" stroke-width="2.5"/>
+    <text x="42" y="113" font-family="Arial,Microsoft YaHei,sans-serif" font-size="31" font-weight="900" fill="#171b26">从起点，到长期价值</text>
+    <text x="368" y="93" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="800" fill="#4a5160">每一次选择</text>
+    <text x="368" y="112" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="800" fill="#4a5160">都定义品牌</text>
+    <line x1="42" y1="184" x2="498" y2="184" stroke="#171b26" stroke-width="3"/>
+    <g font-family="Arial,Microsoft YaHei,sans-serif">
+      <g transform="translate(42 0)"><circle cx="0" cy="184" r="6" fill="#c7825a"/><text x="0" y="218" font-size="20" font-weight="900" fill="#c7825a">2012</text><text x="0" y="242" font-size="10" fill="#4a5160">真实问题成为起点</text></g>
+      <g transform="translate(158 0)"><circle cx="0" cy="184" r="6" fill="#c7825a"/><text x="0" y="218" font-size="20" font-weight="900" fill="#c7825a">2016</text><text x="0" y="242" font-size="10" fill="#4a5160">产品方法沉淀</text></g>
+      <g transform="translate(274 0)"><circle cx="0" cy="184" r="6" fill="#c7825a"/><text x="0" y="218" font-size="20" font-weight="900" fill="#c7825a">2020</text><text x="0" y="242" font-size="10" fill="#4a5160">用户共同塑造</text></g>
+      <g transform="translate(390 0)"><circle cx="0" cy="184" r="6" fill="#c7825a"/><text x="0" y="218" font-size="20" font-weight="900" fill="#c7825a">2026</text><text x="0" y="242" font-size="10" fill="#4a5160">走向长期价值</text></g>
+    </g>
+  </g>
+
+  <g transform="translate(690 96) rotate(4 248 154)" filter="url(#shadow)">
+    <rect width="496" height="308" rx="4" fill="#fffdf9"/>
+    <rect x="24" y="22" width="448" height="264" fill="none" stroke="#2a2f3f" stroke-opacity="0.32"/>
+    <text x="42" y="48" font-family="Arial" font-size="13" font-weight="800" letter-spacing="1.5" fill="#171b26">INTERVIEW / PEOPLE QUOTE</text>
+    <text x="432" y="48" font-family="Arial" font-size="18" font-weight="900" fill="#c7825a">04</text>
+    <line x1="42" y1="61" x2="454" y2="61" stroke="#171b26" stroke-width="2.5"/>
+    <rect x="42" y="86" width="190" height="178" fill="url(#portrait)"/>
+    <circle cx="137" cy="130" r="32" fill="#d5a786"/>
+    <path d="M76 264c8-68 34-98 62-98 31 0 58 30 66 98" fill="#171b26"/>
+    <text x="258" y="126" font-family="Georgia,serif" font-size="76" font-weight="700" fill="#c7825a">“</text>
+    <text x="264" y="164" font-family="Arial,Microsoft YaHei,sans-serif" font-size="22" font-weight="900" fill="#171b26">品牌不是一句话</text>
+    <text x="264" y="196" font-family="Arial,Microsoft YaHei,sans-serif" font-size="22" font-weight="900" fill="#171b26">而是一系列选择</text>
+    <line x1="264" y1="236" x2="440" y2="236" stroke="#171b26"/>
+    <text x="264" y="258" font-family="Arial,Microsoft YaHei,sans-serif" font-size="10" font-weight="800" fill="#4a5160">PEOPLE QUOTE · 核心引语</text>
+  </g>
+
+  <g transform="translate(872 392) rotate(2 156 98)" filter="url(#shadow)">
+    <rect width="312" height="196" rx="4" fill="#fffdf9"/>
+    <rect x="22" y="20" width="268" height="156" fill="none" stroke="#2a2f3f" stroke-opacity="0.32"/>
+    <text x="38" y="46" font-family="Arial" font-size="11" font-weight="900" letter-spacing="1.2" fill="#171b26">PROOF / VALUE</text>
+    <text x="254" y="46" font-family="Arial" font-size="16" font-weight="900" fill="#c7825a">07</text>
+    <g transform="translate(42 78)" font-family="Arial">
+      <text x="0" y="0" font-size="28" font-weight="900" fill="#c7825a">68%</text>
+      <text x="90" y="0" font-size="28" font-weight="900" fill="#c7825a">12Y</text>
+      <text x="176" y="0" font-size="28" font-weight="900" fill="#c7825a">3.6X</text>
+      <rect x="0" y="38" width="38" height="52" fill="#2a2f3f"/>
+      <rect x="52" y="18" width="38" height="72" fill="#c7825a"/>
+      <rect x="104" y="30" width="38" height="60" fill="#2a2f3f"/>
+      <rect x="156" y="8" width="38" height="82" fill="#c7825a"/>
+      <rect x="208" y="24" width="38" height="66" fill="#2a2f3f"/>
+    </g>
+  </g>
+
+  <g transform="translate(198 206)" filter="url(#shadow)">
+    <rect width="850" height="480" rx="5" fill="#f6f1ea"/>
+    <rect x="30" y="26" width="790" height="428" fill="none" stroke="#2a2f3f" stroke-opacity="0.42"/>
+    <text x="54" y="60" font-family="Arial" font-size="15" font-weight="900" letter-spacing="2.8" fill="#171b26">BRAND JOURNAL / ANNUAL ISSUE</text>
+    <text x="760" y="60" font-family="Arial" font-size="22" font-weight="900" fill="#c7825a">01</text>
+    <line x1="54" y1="76" x2="790" y2="76" stroke="#171b26" stroke-width="3"/>
+    <text x="60" y="158" font-family="Arial,Microsoft YaHei,sans-serif" font-size="55" font-weight="900" fill="#171b26">讲述品牌</text>
+    <text x="60" y="222" font-family="Arial,Microsoft YaHei,sans-serif" font-size="55" font-weight="900" fill="#171b26">真正相信的事</text>
+    <rect x="60" y="258" width="196" height="7" fill="#c7825a"/>
+    <text x="60" y="298" font-family="Arial,Microsoft YaHei,sans-serif" font-size="16" font-weight="800" fill="#4a5160">从创始初心、人物选择到长期价值，</text>
+    <text x="60" y="323" font-family="Arial,Microsoft YaHei,sans-serif" font-size="16" font-weight="800" fill="#4a5160">用真实叙事建立可被信任的品牌。</text>
+    <g font-family="Arial" font-size="10" font-weight="900">
+      <text x="60" y="414" fill="#c7825a">01 ORIGIN</text>
+      <text x="166" y="414" fill="#171b26">02 TIME</text>
+      <text x="258" y="414" fill="#171b26">03 PEOPLE</text>
+      <text x="370" y="414" fill="#171b26">04 VALUES</text>
+    </g>
+    <rect x="548" y="100" width="214" height="302" fill="url(#portrait)"/>
+    <circle cx="655" cy="178" r="46" fill="#d5a786"/>
+    <path d="M577 402c10-104 46-150 79-150 38 0 76 46 86 150" fill="#171b26"/>
+    <rect x="562" y="116" width="186" height="268" fill="none" stroke="#fff" stroke-opacity="0.64"/>
+    <text x="572" y="374" font-family="Arial" font-size="9" font-weight="900" letter-spacing="1" fill="#fff">COVER / STORY</text>
+  </g>
+</svg>

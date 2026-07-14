@@ -1,0 +1,52 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "roadmap",
+  "style": "product-strategy-roadmap",
+  "themes": [
+    {
+      "id": "roadmap",
+      "name": "路线图",
+      "visual": {
+        "primary": "0B1F3A",
+        "accent": "14B8A6",
+        "secondary": "F59E0B",
+        "warning": "DC2626",
+        "background": "F6FAFC",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "product-strategy-roadmap",
+        "variant": "roadmap"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "warning": "DC2626",
+    "background": "F6FAFC",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "product-strategy-roadmap",
+    "variant": "roadmap"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-strategy-roadmap-cover",
+    "defaultContentLayout": "product-strategy-roadmap-content",
+    "allowedLayouts": [
+      "product-strategy-roadmap-cover",
+      "product-strategy-roadmap-overview",
+      "product-strategy-roadmap-capabilities",
+      "product-strategy-roadmap-milestones",
+      "product-strategy-roadmap-dependencies",
+      "product-strategy-roadmap-priority",
+      "product-strategy-roadmap-closing",
+      "product-strategy-roadmap-content",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

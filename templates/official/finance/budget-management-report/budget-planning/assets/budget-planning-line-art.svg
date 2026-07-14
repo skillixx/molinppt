@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="budget planning line art">
+  <rect width="960" height="540" fill="#EEF4F8"/>
+  <rect x="82" y="78" width="348" height="248" rx="24" fill="#FFFFFF" stroke="#B9C8D6" stroke-width="3"/>
+  <rect x="114" y="120" width="284" height="34" rx="8" fill="#102A43"/>
+  <g fill="#DDE8F0">
+    <rect x="114" y="184" width="82" height="30" rx="6"/>
+    <rect x="214" y="184" width="82" height="30" rx="6"/>
+    <rect x="314" y="184" width="82" height="30" rx="6"/>
+    <rect x="114" y="234" width="82" height="30" rx="6"/>
+    <rect x="214" y="234" width="82" height="30" rx="6"/>
+    <rect x="314" y="234" width="82" height="30" rx="6"/>
+  </g>
+  <circle cx="644" cy="220" r="106" fill="#FFFFFF" stroke="#B9C8D6" stroke-width="3"/>
+  <path d="M644 114a106 106 0 0 1 96 151H644Z" fill="#2A9D8F" opacity=".82"/>
+  <path d="M644 220 560 286a106 106 0 0 1-22-66Z" fill="#D6A84F" opacity=".86"/>
+  <path d="M644 220V114" stroke="#102A43" stroke-width="5"/>
+  <g stroke="#2A9D8F" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M130 402h160"/>
+    <path d="M330 402h160"/>
+    <path d="M530 402h160"/>
+    <path d="M286 402l-18-14m18 14-18 14"/>
+    <path d="M486 402l-18-14m18 14-18 14"/>
+  </g>
+  <g fill="#FFFFFF" stroke="#B9C8D6" stroke-width="3">
+    <rect x="94" y="370" width="92" height="64" rx="14"/>
+    <rect x="294" y="370" width="92" height="64" rx="14"/>
+    <rect x="494" y="370" width="92" height="64" rx="14"/>
+    <rect x="694" y="370" width="92" height="64" rx="14"/>
+  </g>
+</svg>

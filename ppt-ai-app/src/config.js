@@ -1,0 +1,182 @@
+/**
+ * Loads all application configuration from environment variables.
+ * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
+ * @returns {object}
+ */
+export function loadConfig(env = process.env) {
+  const missing = [];
+  for (const name of ["MOLING_API_BASE_URL", "INTERNAL_API_TOKEN"]) {
+    if (!env[name]) missing.push(name);
+  }
+  const llmProvider = env.LLM_PROVIDER || "mock";
+  if (llmProvider === "http" && !env.LLM_API_URL) {
+    missing.push("LLM_API_URL");
+  }
+  const visionProvider = env.VISION_PROVIDER || "none";
+  if (visionProvider === "http" && !env.VISION_API_URL) {
+    missing.push("VISION_API_URL");
+  }
+  const imageProvider = env.IMAGE_PROVIDER || "none";
+  if (imageProvider === "http" && !env.IMAGE_API_URL) {
+    missing.push("IMAGE_API_URL");
+  }
+  if (missing.length) {
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
+  }
+
+  return {
+    app: {
+      env: env.APP_ENV || "development",
+      port: readPositiveInteger(firstDefined(env.APP_PORT, env.PORT), 5177, "APP_PORT"),
+      baseUrl: env.APP_BASE_URL || "",
+      molingAppId: readOptionalPositiveInteger(firstDefined(env.MOLING_APP_ID, env.PPT_APP_ID), "MOLING_APP_ID"),
+      molingProductId: readOptionalPositiveInteger(firstDefined(env.MOLING_PRODUCT_ID, env.PPT_PRODUCT_ID), "MOLING_PRODUCT_ID"),
+    },
+    moling: {
+      baseUrl: env.MOLING_API_BASE_URL,
+      internalToken: env.INTERNAL_API_TOKEN,
+      localMock: env.LOCAL_MOLING_MOCK === "true",
+      localUserId: readOptionalPositiveInteger(env.LOCAL_MOLING_USER_ID, "LOCAL_MOLING_USER_ID"),
+      defaultEntitlementId: readOptionalPositiveInteger(
+        firstDefined(env.MOLING_DEFAULT_ENTITLEMENT_ID, env.PPT_DEFAULT_ENTITLEMENT_ID),
+        "MOLING_DEFAULT_ENTITLEMENT_ID",
+      ),
+      userEntitlementMap: readUserEntitlementMap(env.MOLING_USER_ENTITLEMENT_MAP),
+      localEntitlementId: readOptionalPositiveInteger(
+        firstDefined(env.LOCAL_MOLING_ENTITLEMENT_ID, env.MOLING_DEFAULT_ENTITLEMENT_ID, env.PPT_DEFAULT_ENTITLEMENT_ID),
+        "LOCAL_MOLING_ENTITLEMENT_ID",
+      ),
+      localInitialCredits: env.LOCAL_MOLING_INITIAL_CREDITS || "100",
+    },
+    test: {
+      account: env.TEST_ACCOUNT || "",
+      password: env.TEST_PASSWORD || "",
+    },
+    database: {
+      url: env.DATABASE_URL || "json:./data/ppt-ai-db.json",
+    },
+    storage: {
+      directory: env.STORAGE_DIR || "./data/storage",
+      endpoint: env.STORAGE_ENDPOINT || "",
+      bucket: env.STORAGE_BUCKET || "",
+      accessKeyId: env.STORAGE_ACCESS_KEY_ID || "",
+      secretAccessKey: env.STORAGE_SECRET_ACCESS_KEY || "",
+    },
+    preview: {
+      rendererCommand: env.PPT_PREVIEW_RENDERER_COMMAND || "",
+      imageRendererCommand: env.PPT_PREVIEW_IMAGE_RENDERER_COMMAND || "",
+      rendererTimeoutMs: readPositiveInteger(env.PPT_PREVIEW_RENDERER_TIMEOUT_MS, 30_000, "PPT_PREVIEW_RENDERER_TIMEOUT_MS"),
+    },
+    logging: {
+      level: env.LOG_LEVEL || "info",
+    },
+    limits: {
+      rateLimitMaxRequests: readPositiveInteger(env.RATE_LIMIT_MAX_REQUESTS, 120, "RATE_LIMIT_MAX_REQUESTS"),
+      rateLimitWindowMs: readPositiveInteger(env.RATE_LIMIT_WINDOW_MS, 60_000, "RATE_LIMIT_WINDOW_MS"),
+    },
+    ai: {
+      llmProvider,
+      llmApiUrl: env.LLM_API_URL || "",
+      llmApiKey: env.LLM_API_KEY || "",
+      llmModel: env.LLM_MODEL || "",
+      llmTimeoutMs: readPositiveInteger(env.LLM_TIMEOUT_MS, 30000, "LLM_TIMEOUT_MS"),
+      llmMaxRetries: readNonNegativeInteger(env.LLM_MAX_RETRIES, 0, "LLM_MAX_RETRIES"),
+      visionProvider,
+      visionApiUrl: env.VISION_API_URL || "",
+      visionApiKey: env.VISION_API_KEY || "",
+      visionModel: env.VISION_MODEL || "",
+      imageProvider,
+      imageApiUrl: env.IMAGE_API_URL || "",
+      imageApiKey: env.IMAGE_API_KEY || "",
+      imageModel: env.IMAGE_MODEL || "",
+    },
+    auth: {
+      sessionCookieName: env.SESSION_COOKIE_NAME || "ppt_ai_session",
+      sessionTtlMs: readPositiveInteger(env.SESSION_TTL_SECONDS, 7 * 24 * 60 * 60, "SESSION_TTL_SECONDS") * 1000,
+      sessionCookieSecure: readBoolean(env.SESSION_COOKIE_SECURE, (env.APP_ENV || "development") === "production"),
+    },
+  };
+}
+
+/**
+ * Returns the first non-empty env value.
+ * @param {...(string | undefined)} values
+ * @returns {string | undefined}
+ */
+function firstDefined(...values) {
+  return values.find((value) => value !== undefined && value !== "");
+}
+
+/**
+ * Reads a positive integer env value.
+ * @param {string | undefined} value
+ * @param {number} fallback
+ * @param {string} name
+ * @returns {number}
+ */
+function readPositiveInteger(value, fallback, name) {
+  const normalized = value === "" || value === undefined ? undefined : value;
+  const parsed = Number(normalized ?? fallback);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive integer`);
+  }
+  return parsed;
+}
+
+/**
+ * Reads an optional positive integer env value.
+ * @param {string | undefined} value
+ * @param {string} name
+ * @returns {number | undefined}
+ */
+function readOptionalPositiveInteger(value, name) {
+  if (value === undefined || value === "") return undefined;
+  return readPositiveInteger(value, undefined, name);
+}
+
+/**
+ * Reads comma-separated user to entitlement mappings in the form "user_id:entitlement_id".
+ * @param {string | undefined} value
+ * @returns {Map<number, number>}
+ */
+function readUserEntitlementMap(value) {
+  const map = new Map();
+  if (value === undefined || value.trim() === "") return map;
+  for (const pair of value.split(",")) {
+    const [rawUserId, rawEntitlementId, extra] = pair.split(":");
+    const userId = readOptionalPositiveInteger(rawUserId?.trim(), "MOLING_USER_ENTITLEMENT_MAP");
+    const entitlementId = readOptionalPositiveInteger(rawEntitlementId?.trim(), "MOLING_USER_ENTITLEMENT_MAP");
+    if (extra !== undefined || !userId || !entitlementId) {
+      throw new Error("MOLING_USER_ENTITLEMENT_MAP must use user_id:entitlement_id pairs");
+    }
+    map.set(userId, entitlementId);
+  }
+  return map;
+}
+
+/**
+ * Reads a zero-or-positive integer env value.
+ * @param {string | undefined} value
+ * @param {number} fallback
+ * @param {string} name
+ * @returns {number}
+ */
+function readNonNegativeInteger(value, fallback, name) {
+  const normalized = value === "" || value === undefined ? undefined : value;
+  const parsed = Number(normalized ?? fallback);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${name} must be a non-negative integer`);
+  }
+  return parsed;
+}
+
+/**
+ * Reads a boolean env value with an explicit fallback.
+ * @param {string | undefined} value
+ * @param {boolean} fallback
+ * @returns {boolean}
+ */
+function readBoolean(value, fallback) {
+  if (value === undefined || value === "") return fallback;
+  return value === "true";
+}

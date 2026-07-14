@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="投资模型芯片">
+  <rect x="54" y="54" width="212" height="212" rx="36" fill="#0F2742"/>
+  <rect x="88" y="88" width="144" height="144" rx="24" fill="#FFFFFF" opacity=".12"/>
+  <path d="M112 198h96M112 162h62M112 126h96" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <path d="M218 116l-42 55-30-26-34 42" fill="none" stroke="#16A34A" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="218" cy="116" r="18" fill="#F59E0B"/>
+  <g stroke="#0F2742" stroke-width="12" stroke-linecap="round" opacity=".25">
+    <path d="M92 32v34M160 32v34M228 32v34M92 254v34M160 254v34M228 254v34M32 92h34M32 160h34M32 228h34M254 92h34M254 160h34M254 228h34"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+services:
+  ppt-ai-app:
+    build:
+      context: ./ppt-ai-app
+    env_file:
+      - ./ppt-ai-app/.env
+    environment:
+      APP_ENV: production
+      APP_PORT: 5177
+      DATABASE_URL: json:/data/ppt-ai-db.json
+      STORAGE_DIR: /data/storage
+      LOG_LEVEL: info
+    ports:
+      - "5177:5177"
+    volumes:
+      - ppt_ai_prod_data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5177/api/health').then((r) => {if (!r.ok) process.exit(1);})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  ppt_ai_prod_data:

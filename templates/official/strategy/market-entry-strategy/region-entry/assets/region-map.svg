@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420" role="img" aria-label="Regional market map decoration">
+  <rect width="720" height="420" rx="30" fill="#eef6f8"/>
+  <path d="M90 276 C132 228 154 192 212 198 C263 203 286 153 339 164 C410 178 439 107 505 132 C562 153 602 219 642 270 C578 305 512 296 458 327 C394 363 327 327 270 346 C202 368 149 323 90 276Z" fill="#ffffff" stroke="#9fb8c7" stroke-width="3"/>
+  <path d="M143 271 C207 238 276 231 334 204 C407 170 488 172 580 223" fill="none" stroke="#14b8a6" stroke-width="9" stroke-linecap="round" stroke-dasharray="1 20"/>
+  <g fill="#102a43">
+    <circle cx="145" cy="270" r="13"/>
+    <circle cx="335" cy="204" r="13"/>
+    <circle cx="579" cy="223" r="13"/>
+  </g>
+  <g fill="#f2b84b">
+    <circle cx="251" cy="232" r="10"/>
+    <circle cx="463" cy="178" r="10"/>
+  </g>
+  <path d="M514 205 L590 225 L518 250 Z" fill="#14b8a6"/>
+</svg>

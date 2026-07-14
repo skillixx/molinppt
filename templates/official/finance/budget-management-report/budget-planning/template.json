@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "budget-management-report",
+  "themeId": "budget-planning",
+  "style": "finance-plan",
+  "themes": [
+    {
+      "id": "budget-planning",
+      "name": "预算编制",
+      "visual": {
+        "primary": "102A43",
+        "accent": "2A9D8F",
+        "background": "E6F2F0",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "405163",
+        "layout": "finance-budget-planning",
+        "variant": "budget-planning"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "102A43",
+    "accent": "2A9D8F",
+    "background": "E6F2F0",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "405163",
+    "layout": "finance-budget-planning",
+    "variant": "budget-planning"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-budget-planning-cover",
+    "defaultContentLayout": "finance-budget-planning-content",
+    "allowedLayouts": [
+      "finance-budget-planning-cover",
+      "finance-budget-planning-overview",
+      "finance-budget-planning-allocation",
+      "finance-budget-planning-table",
+      "finance-budget-planning-flow",
+      "finance-budget-planning-closing",
+      "title",
+      "content"
+    ]
+  }
+}

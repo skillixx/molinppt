@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "release",
+  "style": "product-release-committee",
+  "themes": [
+    {
+      "id": "release",
+      "name": "版本发布",
+      "visual": {
+        "primary": "0B1F3A",
+        "accent": "14B8A6",
+        "secondary": "F59E0B",
+        "warning": "DC2626",
+        "background": "EEF4F8",
+        "surface": "FFFFFF",
+        "title": "0A1730",
+        "body": "405166",
+        "layout": "product-release-committee",
+        "variant": "release"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "14B8A6",
+    "secondary": "F59E0B",
+    "warning": "DC2626",
+    "background": "EEF4F8",
+    "surface": "FFFFFF",
+    "title": "0A1730",
+    "body": "405166",
+    "layout": "product-release-committee",
+    "variant": "release"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-release-committee-cover",
+    "defaultContentLayout": "product-release-committee-content",
+    "allowedLayouts": [
+      "product-release-committee-cover",
+      "product-release-committee-scope",
+      "product-release-committee-timeline",
+      "product-release-committee-gray",
+      "product-release-committee-risk",
+      "product-release-committee-metrics",
+      "product-release-committee-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

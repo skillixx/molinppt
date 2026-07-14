@@ -1,0 +1,19 @@
+{
+  "slug": "data-bi-dashboard-executive-cockpit",
+  "name": "BI 数据看板 - 管理驾驶舱",
+  "description": "适合经营数据汇总、核心指标监控、部门数据汇报和管理层数据复盘的深色驾驶舱官方模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "bi-dashboard",
+    "executive-cockpit",
+    "management-dashboard",
+    "kpi-monitoring"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

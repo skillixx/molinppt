@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" role="img" aria-label="概念拆解卡片装饰">
+  <rect width="640" height="420" rx="34" fill="#fffdf7"/>
+  <rect x="58" y="52" width="430" height="108" rx="24" fill="#e8f3ef"/>
+  <rect x="92" y="86" width="170" height="18" rx="9" fill="#245b5a"/>
+  <rect x="92" y="118" width="290" height="12" rx="6" fill="#9eb7b2"/>
+  <rect x="118" y="188" width="430" height="108" rx="24" fill="#fff2da"/>
+  <rect x="152" y="222" width="196" height="18" rx="9" fill="#f59e0b"/>
+  <rect x="152" y="254" width="312" height="12" rx="6" fill="#e6be84"/>
+  <rect x="74" y="324" width="430" height="52" rx="18" fill="#e9efff"/>
+  <circle cx="532" cy="100" r="46" fill="#3b82f6" opacity=".18"/>
+  <path d="M494 104h76M532 66v76" stroke="#3b82f6" stroke-width="14" stroke-linecap="round"/>
+</svg>

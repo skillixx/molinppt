@@ -1,0 +1,24 @@
+{
+  "slug": "marketing-marketing-campaign-growth",
+  "name": "营销活动方案 - 增长营销",
+  "description": "适合用户增长、渠道投放、转化漏斗、AARRR 模型、复购和 ROI 复盘的增长实验室风格营销模板。",
+  "category_slug": "marketing",
+  "category_name": "市场营销",
+  "category_sort_order": 60,
+  "status": "active",
+  "tags": [
+    "marketing",
+    "marketing-campaign",
+    "growth",
+    "growth-lab",
+    "aarrr",
+    "conversion-funnel",
+    "channel-matrix",
+    "experiment-card",
+    "roi",
+    "retention"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

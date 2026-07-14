@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="转化漏斗装饰图">
+  <rect width="640" height="360" rx="32" fill="#f7fbfc"/>
+  <g transform="translate(110 72)">
+    <path d="M0 0h420l-54 58H54z" fill="#12355b"/>
+    <path d="M66 76h288l-45 58H111z" fill="#16a3a3"/>
+    <path d="M132 152h156l-36 58h-84z" fill="#f59e0b"/>
+  </g>
+  <g stroke="#d8e9ec" stroke-width="3">
+    <path d="M90 284h460"/>
+    <path d="M132 250v58M508 250v58"/>
+  </g>
+  <g fill="#12355b" opacity=".22">
+    <circle cx="90" cy="80" r="12"/>
+    <circle cx="556" cy="112" r="9"/>
+    <circle cx="520" cy="270" r="14"/>
+  </g>
+</svg>

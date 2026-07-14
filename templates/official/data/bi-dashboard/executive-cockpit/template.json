@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "bi-dashboard",
+  "themeId": "executive-cockpit",
+  "style": "management-dashboard",
+  "themes": [
+    {
+      "id": "executive-cockpit",
+      "name": "管理驾驶舱",
+      "visual": {
+        "primary": "071A2F",
+        "accent": "22D3EE",
+        "secondary": "A3E635",
+        "background": "08111F",
+        "surface": "0E2238",
+        "title": "E6F7FF",
+        "body": "A8C7D8",
+        "layout": "bi-executive-cockpit",
+        "variant": "executive-cockpit"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "071A2F",
+    "accent": "22D3EE",
+    "secondary": "A3E635",
+    "background": "08111F",
+    "surface": "0E2238",
+    "title": "E6F7FF",
+    "body": "A8C7D8",
+    "layout": "bi-executive-cockpit",
+    "variant": "executive-cockpit"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cockpit-cover",
+    "defaultContentLayout": "cockpit-dashboard",
+    "allowedLayouts": [
+      "cockpit-cover",
+      "cockpit-dashboard",
+      "cockpit-trend",
+      "cockpit-distribution",
+      "cockpit-alert",
+      "cockpit-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

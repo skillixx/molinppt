@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" fill="none">
+  <rect width="640" height="420" rx="34" fill="#0F172A"/>
+  <path d="M318 210L164 100M318 210L478 92M318 210L154 316M318 210L498 308" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="318" cy="210" r="66" fill="#EF4444"/>
+  <circle cx="318" cy="210" r="92" stroke="#EF4444" stroke-width="4" opacity=".22"/>
+  <g fill="#FFFFFF" font-family="Arial, Microsoft YaHei" font-weight="700" text-anchor="middle">
+    <text x="318" y="204" font-size="22">异常指标</text>
+    <text x="318" y="232" font-size="15" opacity=".82">Root Cause</text>
+  </g>
+  <g>
+    <circle cx="164" cy="100" r="44" fill="#06B6D4"/>
+    <circle cx="478" cy="92" r="44" fill="#F97316"/>
+    <circle cx="154" cy="316" r="44" fill="#8B5CF6"/>
+    <circle cx="498" cy="308" r="44" fill="#22C55E"/>
+  </g>
+  <g fill="#FFFFFF" font-family="Arial, Microsoft YaHei" font-size="18" font-weight="700" text-anchor="middle">
+    <text x="164" y="106">流量</text>
+    <text x="478" y="98">转化</text>
+    <text x="154" y="322">客单</text>
+    <text x="498" y="314">履约</text>
+  </g>
+</svg>

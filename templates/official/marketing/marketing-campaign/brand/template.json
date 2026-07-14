@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "marketing-campaign",
+  "themeId": "brand",
+  "style": "brand-communication-command-center",
+  "themes": [
+    {
+      "id": "brand",
+      "name": "品牌传播",
+      "visual": {
+        "primary": "172033",
+        "accent": "E64B6A",
+        "secondary": "21A6A1",
+        "background": "F5F7FA",
+        "surface": "FFFFFF",
+        "title": "101827",
+        "body": "334155",
+        "layout": "marketing-brand-communication-console",
+        "variant": "brand-console"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "172033",
+    "accent": "E64B6A",
+    "secondary": "21A6A1",
+    "background": "F5F7FA",
+    "surface": "FFFFFF",
+    "title": "101827",
+    "body": "334155",
+    "layout": "marketing-brand-communication-console",
+    "variant": "brand-console"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "brand-communication-cover",
+    "defaultContentLayout": "brand-communication-content",
+    "allowedLayouts": [
+      "brand-communication-cover",
+      "brand-communication-proposition",
+      "brand-communication-audience",
+      "brand-communication-content-matrix",
+      "brand-communication-media-matrix",
+      "brand-communication-rhythm",
+      "brand-communication-dashboard",
+      "brand-communication-closing",
+      "hero",
+      "story",
+      "content"
+    ]
+  }
+}

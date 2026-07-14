@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "industry-solution",
+  "themeId": "manufacturing-industry",
+  "style": "manufacturing-solution",
+  "themes": [
+    {
+      "id": "manufacturing-industry",
+      "name": "制造行业",
+      "visual": {
+        "primary": "123A5A",
+        "accent": "17A7B8",
+        "background": "E6ECF2",
+        "surface": "FFFFFF",
+        "title": "1F2933",
+        "body": "4B5B68",
+        "layout": "sales-manufacturing-solution",
+        "variant": "manufacturing-industry"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "123A5A",
+    "accent": "17A7B8",
+    "background": "E6ECF2",
+    "surface": "FFFFFF",
+    "title": "1F2933",
+    "body": "4B5B68",
+    "layout": "sales-manufacturing-solution",
+    "variant": "manufacturing-industry"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "sales-manufacturing-solution-cover",
+    "defaultContentLayout": "sales-manufacturing-solution-content",
+    "allowedLayouts": [
+      "sales-manufacturing-solution-cover",
+      "sales-manufacturing-solution-painpoints",
+      "sales-manufacturing-solution-architecture",
+      "sales-manufacturing-solution-process",
+      "sales-manufacturing-solution-dashboard",
+      "sales-manufacturing-solution-value",
+      "sales-manufacturing-solution-roadmap",
+      "sales-manufacturing-solution-closing",
+      "title",
+      "content"
+    ]
+  }
+}

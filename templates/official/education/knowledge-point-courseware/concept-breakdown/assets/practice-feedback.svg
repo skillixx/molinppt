@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="420" viewBox="0 0 620 420" role="img" aria-label="课堂练习反馈装饰">
+  <rect width="620" height="420" rx="34" fill="#f5f2e9"/>
+  <rect x="64" y="58" width="492" height="284" rx="28" fill="#fffdf7" stroke="#d8e4df" stroke-width="4"/>
+  <path d="M124 144h142M124 190h248M124 236h198" stroke="#245b5a" stroke-width="18" stroke-linecap="round" opacity=".78"/>
+  <path d="M426 126l42 42 84-92" fill="none" stroke="#16a34a" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="144" cy="304" r="24" fill="#f59e0b"/>
+  <circle cx="222" cy="304" r="24" fill="#3b82f6"/>
+  <circle cx="300" cy="304" r="24" fill="#16a34a"/>
+</svg>

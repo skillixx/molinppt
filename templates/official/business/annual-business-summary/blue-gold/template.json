@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "annual-business-summary",
+  "themeId": "blue-gold",
+  "style": "annual-business-summary",
+  "themes": [
+    {
+      "id": "blue-gold",
+      "name": "蓝金年度版",
+      "visual": {
+        "primary": "3159F6",
+        "accent": "39D5E8",
+        "background": "EAF7FF",
+        "surface": "FFFFFF",
+        "title": "102A6B",
+        "body": "375A89",
+        "layout": "annual-summary",
+        "variant": "blue-gold"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "3159F6",
+    "accent": "39D5E8",
+    "background": "EAF7FF",
+    "surface": "FFFFFF",
+    "title": "102A6B",
+    "body": "375A89",
+    "layout": "annual-summary",
+    "variant": "blue-gold"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "annual-cover",
+    "defaultContentLayout": "annual-review",
+    "allowedLayouts": [
+      "annual-cover",
+      "annual-overview",
+      "annual-review",
+      "annual-milestone",
+      "annual-action-plan",
+      "closing",
+      "title",
+      "content"
+    ]
+  }
+}

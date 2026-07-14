@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="260" viewBox="0 0 720 260" role="img" aria-label="voice wave">
+  <defs>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1d9bf0" stop-opacity=".08"/>
+      <stop offset=".48" stop-color="#1d9bf0" stop-opacity=".54"/>
+      <stop offset="1" stop-color="#f59e0b" stop-opacity=".12"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="260" fill="none"/>
+  <path d="M12 132C72 58 128 202 194 126C256 55 316 204 378 126C442 47 500 201 564 126C626 54 666 172 708 118" fill="none" stroke="url(#wave)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M12 164C84 96 144 220 214 158C284 96 336 202 406 150C478 96 538 198 614 142C656 112 682 110 708 122" fill="none" stroke="#12355b" stroke-width="4" stroke-linecap="round" opacity=".18"/>
+  <g fill="#1d9bf0" opacity=".38">
+    <circle cx="194" cy="126" r="9"/>
+    <circle cx="378" cy="126" r="9"/>
+    <circle cx="564" cy="126" r="9"/>
+  </g>
+</svg>

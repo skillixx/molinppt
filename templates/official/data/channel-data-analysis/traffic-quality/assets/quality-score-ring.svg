@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" fill="none">
+  <rect width="360" height="360" rx="48" fill="#F8FBFF"/>
+  <circle cx="180" cy="180" r="118" stroke="#E3ECF6" stroke-width="30"/>
+  <path d="M180 62A118 118 0 1 1 86.4 251.8" stroke="#22C55E" stroke-width="30" stroke-linecap="round"/>
+  <path d="M86.4 251.8A118 118 0 0 1 125.8 75.2" stroke="#F59E0B" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="180" cy="180" r="70" fill="white" stroke="#D8E5F3"/>
+  <text x="180" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#172554">82</text>
+  <text x="180" y="207" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#64748B">QUALITY</text>
+</svg>

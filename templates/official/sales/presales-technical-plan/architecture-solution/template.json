@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "presales-technical-plan",
+  "themeId": "architecture-solution",
+  "style": "technical-blueprint",
+  "themes": [
+    {
+      "id": "architecture-solution",
+      "name": "架构方案",
+      "visual": {
+        "primary": "0B1F3A",
+        "accent": "22D3EE",
+        "secondary": "38BDF8",
+        "warning": "F59E0B",
+        "background": "EAF3FB",
+        "surface": "FFFFFF",
+        "title": "071827",
+        "body": "334155",
+        "layout": "presales-architecture-solution",
+        "variant": "architecture-solution"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "22D3EE",
+    "secondary": "38BDF8",
+    "warning": "F59E0B",
+    "background": "EAF3FB",
+    "surface": "FFFFFF",
+    "title": "071827",
+    "body": "334155",
+    "layout": "presales-architecture-solution",
+    "variant": "architecture-solution"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "presales-architecture-cover",
+    "defaultContentLayout": "presales-architecture-content",
+    "allowedLayouts": [
+      "presales-architecture-cover",
+      "presales-requirement-map",
+      "presales-architecture-blueprint",
+      "presales-module-capability",
+      "presales-deployment-topology",
+      "presales-delivery-assurance",
+      "presales-next-step",
+      "title",
+      "content"
+    ]
+  }
+}

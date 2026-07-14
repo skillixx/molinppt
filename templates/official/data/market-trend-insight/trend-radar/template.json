@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "market-trend-insight",
+  "themeId": "trend-radar",
+  "style": "market-intelligence-radar",
+  "themes": [
+    {
+      "id": "trend-radar",
+      "name": "趋势雷达",
+      "visual": {
+        "primary": "08111F",
+        "accent": "38BDF8",
+        "secondary": "A78BFA",
+        "warning": "F59E0B",
+        "background": "050B18",
+        "surface": "0F1E33",
+        "title": "E6F7FF",
+        "body": "B7C9DA",
+        "layout": "market-trend-radar",
+        "variant": "trend-radar"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "08111F",
+    "accent": "38BDF8",
+    "secondary": "A78BFA",
+    "warning": "F59E0B",
+    "background": "050B18",
+    "surface": "0F1E33",
+    "title": "E6F7FF",
+    "body": "B7C9DA",
+    "layout": "market-trend-radar",
+    "variant": "trend-radar"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "trend-radar-cover",
+    "defaultContentLayout": "trend-radar-scan",
+    "allowedLayouts": [
+      "trend-radar-cover",
+      "trend-radar-scan",
+      "trend-opportunity-map",
+      "trend-competition-shift",
+      "trend-risk-signal",
+      "trend-action-roadmap",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

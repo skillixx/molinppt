@@ -1,0 +1,18 @@
+{
+  "slug": "finance-operating-dashboard-monthly",
+  "name": "经营数据看板 - 月度经营",
+  "description": "适合月度经营例会、财务复盘、重点事项追踪和下月经营动作安排的报表型模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "operating-dashboard",
+    "monthly",
+    "review"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

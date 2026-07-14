@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "strategy-consulting",
+  "themeId": "workstream",
+  "style": "consulting-case",
+  "themes": [
+    {
+      "id": "workstream",
+      "name": "工作流程推进",
+      "visual": {
+        "primary": "27364A",
+        "accent": "2563EB",
+        "secondary": "14B8A6",
+        "warning": "F59E0B",
+        "background": "F6F8FB",
+        "surface": "FFFFFF",
+        "title": "172033",
+        "body": "475569",
+        "layout": "strategy-workstream-pmo",
+        "variant": "workstream"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "27364A",
+    "accent": "2563EB",
+    "secondary": "14B8A6",
+    "warning": "F59E0B",
+    "background": "F6F8FB",
+    "surface": "FFFFFF",
+    "title": "172033",
+    "body": "475569",
+    "layout": "strategy-workstream-pmo",
+    "variant": "workstream"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "strategy-workstream-cover",
+    "defaultContentLayout": "strategy-workstream-overview",
+    "allowedLayouts": [
+      "strategy-workstream-cover",
+      "strategy-workstream-overview",
+      "strategy-workstream-swimlane",
+      "strategy-workstream-deliverables",
+      "strategy-workstream-raci",
+      "strategy-workstream-risks",
+      "strategy-workstream-next-plan",
+      "title",
+      "content"
+    ]
+  }
+}

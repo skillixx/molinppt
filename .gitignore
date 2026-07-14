@@ -1,0 +1,17 @@
+.worktrees/
+worktrees/
+.env
+.env.*
+!.env.example
+ppt-ai-app/.env
+ppt-ai-app/.env.*
+!ppt-ai-app/.env.example
+ppt-ai-app/data/
+ppt-ai-app/data-backups/
+ppt-ai-app/logs/
+ppt-ai-app/runtime-*.log
+ppt-ai-app/runtime-*.err.log
+ppt-ai-app/test-results/
+/data/
+backups/
+node_modules/

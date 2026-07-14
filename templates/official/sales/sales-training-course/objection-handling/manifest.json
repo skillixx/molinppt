@@ -1,0 +1,20 @@
+{
+  "slug": "sales-sales-training-course-objection-handling",
+  "name": "销售培训课件 - 异议处理",
+  "description": "适合销售培训、客户异议处理、话术框架拆解和场景演练的官方课件模板。",
+  "category_slug": "sales",
+  "category_name": "销售方案",
+  "category_sort_order": 40,
+  "status": "active",
+  "tags": [
+    "sales",
+    "sales-training-course",
+    "objection-handling",
+    "talk-track",
+    "role-play",
+    "training"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "corporate-training",
+  "themeId": "management",
+  "style": "enterprise-learning",
+  "themes": [
+    {
+      "id": "management",
+      "name": "管理培训",
+      "visual": {
+        "primary": "1F3A5F",
+        "accent": "20A39E",
+        "background": "F4F7FA",
+        "surface": "FFFFFF",
+        "title": "10233D",
+        "body": "40516A",
+        "layout": "corporate-training",
+        "variant": "management"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1F3A5F",
+    "accent": "20A39E",
+    "background": "F4F7FA",
+    "surface": "FFFFFF",
+    "title": "10233D",
+    "body": "40516A",
+    "layout": "corporate-training",
+    "variant": "management"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "corporate-training-cover",
+    "defaultContentLayout": "corporate-training-content",
+    "allowedLayouts": [
+      "corporate-training-cover",
+      "corporate-training-agenda",
+      "corporate-training-chapter",
+      "corporate-training-model",
+      "corporate-training-case",
+      "corporate-training-tool",
+      "corporate-training-practice",
+      "corporate-training-summary",
+      "title",
+      "content"
+    ]
+  }
+}

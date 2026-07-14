@@ -1,0 +1,20 @@
+{
+  "slug": "data-metric-anomaly-diagnosis-attribution-analysis",
+  "name": "指标异常诊断 - 归因分析",
+  "description": "适合业务异常复盘、指标波动分析、问题定位与改进建议汇报的商业化数据洞悉模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 100,
+  "status": "active",
+  "tags": [
+    "data",
+    "metric-anomaly-diagnosis",
+    "attribution-analysis",
+    "metric-alert",
+    "root-cause",
+    "business-review"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1,0 +1,53 @@
+{
+  "baseTemplateId": "marketing-campaign",
+  "themeId": "launch",
+  "style": "campaign-story",
+  "themes": [
+    {
+      "id": "launch",
+      "name": "新品发布",
+      "visual": {
+        "primary": "0B1020",
+        "accent": "FF3B5C",
+        "secondary": "22D3EE",
+        "warning": "F8C14A",
+        "background": "0B1020",
+        "surface": "FFFFFF",
+        "title": "F8FAFC",
+        "body": "CBD5E1",
+        "layout": "marketing-product-premiere",
+        "variant": "product-premiere"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1020",
+    "accent": "FF3B5C",
+    "secondary": "22D3EE",
+    "warning": "F8C14A",
+    "background": "0B1020",
+    "surface": "FFFFFF",
+    "title": "F8FAFC",
+    "body": "CBD5E1",
+    "layout": "marketing-product-premiere",
+    "variant": "product-premiere"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-premiere-cover",
+    "defaultContentLayout": "product-premiere-content",
+    "allowedLayouts": [
+      "product-premiere-cover",
+      "product-premiere-overview",
+      "product-premiere-selling-points",
+      "product-premiere-scenario",
+      "product-premiere-audience",
+      "product-premiere-timeline",
+      "product-premiere-channel",
+      "product-premiere-data",
+      "product-premiere-closing",
+      "hero",
+      "story",
+      "content"
+    ]
+  }
+}

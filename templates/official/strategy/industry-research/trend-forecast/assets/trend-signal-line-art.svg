@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="trend signal line art">
+  <rect width="640" height="360" fill="#F5F8FB"/>
+  <path d="M64 268 C154 230 172 178 250 192 C336 208 348 116 430 126 C496 134 528 84 584 66" fill="none" stroke="#16A3B8" stroke-width="14" stroke-linecap="round"/>
+  <path d="M64 286 L584 286" stroke="#102A56" stroke-width="4" opacity=".18"/>
+  <path d="M98 86 H300" stroke="#102A56" stroke-width="8" stroke-linecap="round"/>
+  <path d="M98 114 H238" stroke="#22C55E" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="250" cy="192" r="18" fill="#102A56"/>
+  <circle cx="430" cy="126" r="18" fill="#22C55E"/>
+  <circle cx="584" cy="66" r="18" fill="#F59E0B"/>
+</svg>

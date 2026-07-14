@@ -1,0 +1,39 @@
+{
+  "baseTemplateId": "enterprise-transformation",
+  "themeId": "digital-blueprint",
+  "style": "enterprise-digital-blueprint",
+  "themes": [
+    {
+      "id": "digital-blueprint",
+      "name": "数字化蓝图"
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "22D3EE",
+    "secondary": "38BDF8",
+    "warning": "F59E0B",
+    "background": "EAF4FB",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "enterprise-digital-blueprint",
+    "variant": "digital-blueprint"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "digital-blueprint-cover",
+    "defaultContentLayout": "transformation-blueprint",
+    "allowedLayouts": [
+      "digital-blueprint-cover",
+      "current-state-diagnosis",
+      "target-digital-blueprint",
+      "capability-upgrade-map",
+      "system-roadmap",
+      "organization-governance",
+      "risk-and-enablement",
+      "transformation-next-actions",
+      "title",
+      "content"
+    ]
+  }
+}

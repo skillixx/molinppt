@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "product-review",
+  "style": "product-planning",
+  "themes": [
+    {
+      "id": "product-review",
+      "name": "产品复盘",
+      "visual": {
+          "primary": "173B3A",
+          "accent": "20B486",
+          "secondary": "F59E0B",
+          "warning": "E76F51",
+          "background": "F4F7F6",
+          "surface": "FFFFFF",
+          "title": "102A2A",
+          "body": "405A58",
+          "layout": "product-review-canvas",
+          "variant": "product-review"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "173B3A",
+    "accent": "20B486",
+    "secondary": "F59E0B",
+    "warning": "E76F51",
+    "background": "F4F7F6",
+    "surface": "FFFFFF",
+    "title": "102A2A",
+    "body": "405A58",
+    "layout": "product-review-canvas",
+    "variant": "product-review"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-review-cover",
+    "defaultContentLayout": "product-review-content",
+    "allowedLayouts": [
+      "product-review-cover",
+      "product-review-content",
+      "goal-result-compare",
+      "behavior-change",
+      "feature-adoption",
+      "feedback-cluster",
+      "root-cause",
+      "iteration-hypothesis",
+      "product-review-closing"
+    ]
+  }
+}

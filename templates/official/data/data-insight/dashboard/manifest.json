@@ -1,0 +1,20 @@
+{
+  "slug": "data-data-insight-dashboard",
+  "name": "数据洞察报告 - 仪表盘",
+  "description": "适合经营监控、核心指标汇报、趋势分析、异常预警和管理驾驶舱的数据控制台模板。",
+  "category_slug": "data",
+  "category_name": "数据洞察",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "data-insight",
+    "dashboard",
+    "analytics-report",
+    "management-cockpit",
+    "data-console"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

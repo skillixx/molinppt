@@ -1,0 +1,19 @@
+{
+  "slug": "data-channel-data-analysis-traffic-quality",
+  "name": "渠道数据分析 - 流量质量",
+  "description": "适合渠道来源分析、投放质量评估、转化链路诊断和渠道优化建议的数据洞悉官方模板。",
+  "category_slug": "data",
+  "category_name": "数据洞悉",
+  "category_sort_order": 70,
+  "status": "active",
+  "tags": [
+    "data",
+    "channel-analysis",
+    "traffic-quality",
+    "conversion-diagnosis",
+    "campaign-quality"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

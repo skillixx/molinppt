@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="360" viewBox="0 0 520 360" role="img" aria-label="metric map">
+  <rect width="520" height="360" rx="32" fill="#F8FBFC"/>
+  <g fill="none" stroke="#D7E6EC" stroke-width="2">
+    <path d="M260 178 92 88M260 178l164-96M260 178 106 266M260 178l156 90M260 178V58M260 178v124"/>
+  </g>
+  <circle cx="260" cy="178" r="54" fill="#102A43"/>
+  <circle cx="260" cy="178" r="42" fill="#173B5C"/>
+  <text x="260" y="171" text-anchor="middle" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="22" font-weight="800" fill="#FFFFFF">指标</text>
+  <text x="260" y="199" text-anchor="middle" font-family="Arial,'Microsoft YaHei',sans-serif" font-size="18" font-weight="700" fill="#BDEFF4">标准</text>
+  <g font-family="Arial,'Microsoft YaHei',sans-serif" font-weight="800" font-size="18" text-anchor="middle">
+    <rect x="42" y="56" width="100" height="52" rx="18" fill="#FFFFFF" stroke="#C9DCE5"/>
+    <text x="92" y="88" fill="#102A43">业务域</text>
+    <rect x="374" y="50" width="100" height="52" rx="18" fill="#FFFFFF" stroke="#C9DCE5"/>
+    <text x="424" y="82" fill="#102A43">数据源</text>
+    <rect x="56" y="238" width="100" height="52" rx="18" fill="#FFFFFF" stroke="#C9DCE5"/>
+    <text x="106" y="270" fill="#102A43">负责人</text>
+    <rect x="366" y="240" width="100" height="52" rx="18" fill="#FFFFFF" stroke="#C9DCE5"/>
+    <text x="416" y="272" fill="#102A43">系统表</text>
+    <rect x="210" y="24" width="100" height="48" rx="18" fill="#E8F8FA" stroke="#00A7B5"/>
+    <text x="260" y="55" fill="#006F78">规则</text>
+    <rect x="208" y="290" width="104" height="48" rx="18" fill="#FFF6DE" stroke="#D9A441"/>
+    <text x="260" y="321" fill="#7A5415">版本</text>
+  </g>
+</svg>

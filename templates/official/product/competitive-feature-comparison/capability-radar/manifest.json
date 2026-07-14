@@ -1,0 +1,20 @@
+{
+  "slug": "product-competitive-feature-comparison-capability-radar",
+  "name": "竞品功能对比 - 能力雷达",
+  "description": "适合竞品分析、功能差异对比、产品定位讨论和路线规划输入的产品规划模板。",
+  "category_slug": "product",
+  "category_name": "产品规划",
+  "category_sort_order": 50,
+  "status": "active",
+  "tags": [
+    "product",
+    "competitive-feature-comparison",
+    "capability-radar",
+    "competitor-analysis",
+    "feature-comparison",
+    "roadmap-input"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="240" viewBox="0 0 720 240" role="img" aria-label="系统连接线装饰">
+  <rect width="720" height="240" fill="none"/>
+  <path d="M58 178C154 72 252 72 350 152S552 236 664 82" fill="none" stroke="#22D3EE" stroke-width="10" stroke-linecap="round"/>
+  <path d="M64 92C174 152 246 160 338 96S530 30 650 132" fill="none" stroke="#0B1F3A" stroke-width="4" stroke-linecap="round" stroke-dasharray="18 18" opacity=".72"/>
+  <g fill="#FFFFFF" stroke="#38BDF8" stroke-width="5">
+    <circle cx="58" cy="178" r="18"/>
+    <circle cx="220" cy="88" r="18"/>
+    <circle cx="350" cy="152" r="18"/>
+    <circle cx="520" cy="190" r="18"/>
+    <circle cx="664" cy="82" r="18"/>
+  </g>
+  <g fill="#F59E0B">
+    <circle cx="64" cy="92" r="9"/>
+    <circle cx="338" cy="96" r="9"/>
+    <circle cx="650" cy="132" r="9"/>
+  </g>
+</svg>

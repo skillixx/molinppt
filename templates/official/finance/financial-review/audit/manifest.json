@@ -1,0 +1,20 @@
+{
+  "slug": "finance-financial-review-audit",
+  "name": "财务经营复盘 - 审计分析",
+  "description": "适合审计复盘、内控检查、异常交易分析、整改进度和风险闭环汇报的审计委员会材料模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "financial-review",
+    "audit",
+    "finance-audit-review",
+    "internal-control",
+    "remediation"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

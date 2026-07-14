@@ -1,0 +1,20 @@
+{
+  "slug": "sales-industry-solution-financial-industry",
+  "name": "行业解决方案 - 金融行业",
+  "description": "适合银行、证券、保险等金融客户的解决方案提案，突出合规安全、数字化架构和业务价值。",
+  "category_slug": "sales",
+  "category_name": "销售方案",
+  "category_sort_order": 40,
+  "status": "active",
+  "tags": [
+    "sales",
+    "industry-solution",
+    "financial-industry",
+    "banking",
+    "compliance",
+    "digital-proposal"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

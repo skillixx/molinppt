@@ -1,0 +1,44 @@
+{
+  "baseTemplateId": "operating-dashboard",
+  "themeId": "control-room",
+  "style": "operating-dashboard",
+  "themes": [
+    {
+      "id": "control-room",
+      "name": "管理驾驶舱",
+      "visual": {
+        "primary": "0B1F3A",
+        "accent": "2DD4BF",
+        "background": "EAF2F6",
+        "surface": "FFFFFF",
+        "title": "071827",
+        "body": "334155",
+        "layout": "executive",
+        "variant": "control-room"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "2DD4BF",
+    "background": "EAF2F6",
+    "surface": "FFFFFF",
+    "title": "071827",
+    "body": "334155",
+    "layout": "executive",
+    "variant": "control-room"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "executive-cover",
+    "defaultContentLayout": "executive-content",
+    "allowedLayouts": [
+      "executive-cover",
+      "executive-content",
+      "metrics",
+      "retrospective",
+      "next-plan",
+      "title",
+      "content"
+    ]
+  }
+}

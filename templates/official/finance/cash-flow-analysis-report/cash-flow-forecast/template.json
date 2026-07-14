@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "cash-flow-analysis-report",
+  "themeId": "cash-flow-forecast",
+  "style": "cash-flow-forecast",
+  "themes": [
+    {
+      "id": "cash-flow-forecast",
+      "name": "现金流预测",
+      "visual": {
+        "primary": "0F3D4A",
+        "accent": "20B486",
+        "secondary": "3A7BD5",
+        "warning": "E05F3F",
+        "background": "EAF4F2",
+        "surface": "FFFFFF",
+        "title": "082A35",
+        "body": "334155",
+        "layout": "finance-cash-flow-forecast",
+        "variant": "cash-flow-forecast"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0F3D4A",
+    "accent": "20B486",
+    "secondary": "3A7BD5",
+    "warning": "E05F3F",
+    "background": "EAF4F2",
+    "surface": "FFFFFF",
+    "title": "082A35",
+    "body": "334155",
+    "layout": "finance-cash-flow-forecast",
+    "variant": "cash-flow-forecast"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "cash-flow-forecast-cover",
+    "defaultContentLayout": "cash-flow-forecast-content",
+    "allowedLayouts": [
+      "cash-flow-forecast-cover",
+      "cash-flow-waterfall",
+      "cash-turnover-cycle",
+      "receivables-management",
+      "cash-risk-warning",
+      "cash-forecast-dashboard",
+      "cash-flow-forecast-closing",
+      "title",
+      "content"
+    ]
+  }
+}

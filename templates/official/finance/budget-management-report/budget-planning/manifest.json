@@ -1,0 +1,18 @@
+{
+  "slug": "finance-budget-management-report-budget-planning",
+  "name": "预算管理报告 - 预算编制",
+  "description": "适合年度预算规划、部门预算分配、预算编制流程和财务计划汇报的蓝灰财务计划模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "budget-management-report",
+    "budget-planning",
+    "finance-plan"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

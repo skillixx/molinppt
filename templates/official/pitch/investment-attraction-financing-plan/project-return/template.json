@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "investment-attraction-financing-plan",
+  "themeId": "project-return",
+  "style": "pitch-project-return",
+  "themes": [
+    {
+      "id": "project-return",
+      "name": "项目收益",
+      "visual": {
+        "primary": "111827",
+        "accent": "D6A84F",
+        "secondary": "1FB6A6",
+        "warning": "F59E0B",
+        "background": "E8EEF3",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "3A4656",
+        "layout": "pitch-project-return",
+        "variant": "project-return"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "111827",
+    "accent": "D6A84F",
+    "secondary": "1FB6A6",
+    "warning": "F59E0B",
+    "background": "E8EEF3",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "3A4656",
+    "layout": "pitch-project-return",
+    "variant": "project-return"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "pitch-project-return-cover",
+    "defaultContentLayout": "project-value-map",
+    "allowedLayouts": [
+      "pitch-project-return-cover",
+      "project-value-map",
+      "return-calculation-model",
+      "partner-rights-matrix",
+      "cooperation-path",
+      "funding-use-plan",
+      "pitch-project-return-closing"
+    ]
+  }
+}

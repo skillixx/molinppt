@@ -1,0 +1,18 @@
+{
+  "slug": "product-product-roadmap-roadmap",
+  "name": "产品路线规划 - 路线图",
+  "description": "适合产品路线图汇报、阶段目标、能力建设、里程碑、资源投入和跨团队协同沟通。",
+  "category_slug": "product",
+  "category_name": "产品规划",
+  "category_sort_order": 50,
+  "status": "active",
+  "tags": [
+    "product",
+    "product-roadmap",
+    "roadmap",
+    "product-planning"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

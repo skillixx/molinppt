@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "strategy-consulting",
+  "themeId": "board",
+  "style": "strategy-board-report",
+  "themes": [
+    {
+      "id": "board",
+      "name": "董事会汇报",
+      "visual": {
+        "primary": "172033",
+        "accent": "B68A3A",
+        "secondary": "2F7D68",
+        "warning": "B94A48",
+        "background": "F3F5F7",
+        "surface": "FFFFFF",
+        "title": "101828",
+        "body": "344054",
+        "layout": "strategy-board-report",
+        "variant": "board"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "172033",
+    "accent": "B68A3A",
+    "secondary": "2F7D68",
+    "warning": "B94A48",
+    "background": "F3F5F7",
+    "surface": "FFFFFF",
+    "title": "101828",
+    "body": "344054",
+    "layout": "strategy-board-report",
+    "variant": "board"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "strategy-board-cover",
+    "defaultContentLayout": "strategy-board-decision-summary",
+    "allowedLayouts": [
+      "strategy-board-cover",
+      "strategy-board-decision-summary",
+      "strategy-board-background",
+      "strategy-board-option-matrix",
+      "strategy-board-risk-return",
+      "strategy-board-resolution",
+      "strategy-board-closing",
+      "title",
+      "content"
+    ]
+  }
+}

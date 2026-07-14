@@ -1,0 +1,6 @@
+interface:
+  display_name: "PPT 模板开发"
+  short_description: "开发本项目官方 PPT 模板和主题样式"
+  default_prompt: "Use $ppt-template-developer to implement a new official PPT template for this project."
+policy:
+  allow_implicit_invocation: true

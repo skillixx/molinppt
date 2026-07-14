@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "competitive-feature-comparison",
+  "themeId": "capability-radar",
+  "style": "capability-radar-map",
+  "themes": [
+    {
+      "id": "capability-radar",
+      "name": "能力雷达",
+      "visual": {
+        "primary": "17233F",
+        "accent": "16B8A6",
+        "secondary": "FF8A3D",
+        "background": "EEF4F8",
+        "surface": "FFFFFF",
+        "title": "0D1B2A",
+        "body": "3D4B5C",
+        "layout": "capability-radar-map",
+        "variant": "capability-radar"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "17233F",
+    "accent": "16B8A6",
+    "secondary": "FF8A3D",
+    "background": "EEF4F8",
+    "surface": "FFFFFF",
+    "title": "0D1B2A",
+    "body": "3D4B5C",
+    "layout": "capability-radar-map",
+    "variant": "capability-radar"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "capability-radar-cover",
+    "defaultContentLayout": "capability-radar-content",
+    "allowedLayouts": [
+      "capability-radar-cover",
+      "capability-radar-comparison",
+      "capability-radar-analysis",
+      "capability-radar-gap",
+      "capability-radar-roadmap",
+      "capability-radar-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "slug": "finance-budget-management-report-budget-adjustment",
+  "name": "预算管理报告 - 预算调整",
+  "description": "适合预算调整方案、资源重配、审批路径和经营影响分析汇报的深靛蓝财务决策模板。",
+  "category_slug": "finance",
+  "category_name": "财务经营",
+  "category_sort_order": 30,
+  "status": "active",
+  "tags": [
+    "finance",
+    "budget-management-report",
+    "budget-adjustment",
+    "resource-reallocation",
+    "approval-path"
+  ],
+  "template_file": "template.json",
+  "renderer_file": "renderer.js",
+  "thumbnail_file": "thumbnail.png"
+}

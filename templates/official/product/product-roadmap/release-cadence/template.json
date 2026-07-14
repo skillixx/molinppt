@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "product-roadmap",
+  "themeId": "release-cadence",
+  "style": "product-release-cadence",
+  "themes": [
+    {
+      "id": "release-cadence",
+      "name": "版本节奏",
+      "visual": {
+        "primary": "0B1F3A",
+        "accent": "22D3EE",
+        "secondary": "F97316",
+        "background": "EFF6FF",
+        "surface": "FFFFFF",
+        "title": "0A1730",
+        "body": "405166",
+        "layout": "product-release-cadence",
+        "variant": "release-cadence"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0B1F3A",
+    "accent": "22D3EE",
+    "secondary": "F97316",
+    "background": "EFF6FF",
+    "surface": "FFFFFF",
+    "title": "0A1730",
+    "body": "405166",
+    "layout": "product-release-cadence",
+    "variant": "release-cadence"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "product-release-cadence-cover",
+    "defaultContentLayout": "product-release-cadence-content",
+    "allowedLayouts": [
+      "product-release-cadence-cover",
+      "product-release-cadence-content",
+      "product-release-cadence-analysis",
+      "product-release-cadence-lanes",
+      "product-release-cadence-risk",
+      "product-release-cadence-summary",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "baseTemplateId": "brand-story",
+  "themeId": "premium",
+  "style": "brand-narrative",
+  "themes": [
+    {
+      "id": "premium",
+      "name": "高端质感",
+      "visual": {
+        "primary": "181C24",
+        "accent": "BFA06A",
+        "background": "F6F1E8",
+        "surface": "FFFEFA",
+        "title": "151922",
+        "body": "474B55",
+        "secondary": "D8C7A5",
+        "layout": "luxury-brand-story",
+        "variant": "premium"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "181C24",
+    "accent": "BFA06A",
+    "background": "F6F1E8",
+    "surface": "FFFEFA",
+    "title": "151922",
+    "body": "474B55",
+    "secondary": "D8C7A5",
+    "layout": "luxury-brand-story",
+    "variant": "premium"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "luxury-brand-cover",
+    "defaultContentLayout": "luxury-brand-story",
+    "allowedLayouts": [
+      "luxury-brand-cover",
+      "luxury-brand-story",
+      "luxury-brand-gallery",
+      "luxury-brand-proof",
+      "luxury-brand-launch",
+      "luxury-brand-closing",
+      "hero",
+      "story"
+    ]
+  }
+}

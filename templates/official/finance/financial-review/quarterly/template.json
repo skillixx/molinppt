@@ -1,0 +1,50 @@
+{
+  "baseTemplateId": "financial-review",
+  "themeId": "quarterly",
+  "style": "finance-quarterly-review",
+  "themes": [
+    {
+      "id": "quarterly",
+      "name": "季度复盘",
+      "visual": {
+        "primary": "12263A",
+        "accent": "2F9E6D",
+        "secondary": "D9902F",
+        "warning": "C94B4B",
+        "background": "F5F7FA",
+        "surface": "FFFFFF",
+        "title": "0F172A",
+        "body": "334155",
+        "layout": "finance-quarterly-review",
+        "variant": "quarterly"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "12263A",
+    "accent": "2F9E6D",
+    "secondary": "D9902F",
+    "warning": "C94B4B",
+    "background": "F5F7FA",
+    "surface": "FFFFFF",
+    "title": "0F172A",
+    "body": "334155",
+    "layout": "finance-quarterly-review",
+    "variant": "quarterly"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "finance-quarterly-cover",
+    "defaultContentLayout": "finance-quarterly-overview",
+    "allowedLayouts": [
+      "finance-quarterly-cover",
+      "finance-quarterly-overview",
+      "finance-quarterly-profit-bridge",
+      "finance-quarterly-budget-variance",
+      "finance-quarterly-risk-matrix",
+      "finance-quarterly-action-loop",
+      "finance-quarterly-closing",
+      "title",
+      "content"
+    ]
+  }
+}

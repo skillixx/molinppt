@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "quarterly-business-review",
+  "themeId": "action-loop",
+  "style": "quarterly-business-review",
+  "themes": [
+    {
+      "id": "action-loop",
+      "name": "行动闭环",
+      "visual": {
+        "primary": "1F5FBF",
+        "accent": "1CC8A0",
+        "background": "F3F7FE",
+        "surface": "FFFFFF",
+        "title": "10233F",
+        "body": "40516C",
+        "layout": "quarterly-action-loop",
+        "variant": "action-loop"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "1F5FBF",
+    "accent": "1CC8A0",
+    "background": "F3F7FE",
+    "surface": "FFFFFF",
+    "title": "10233F",
+    "body": "40516C",
+    "layout": "quarterly-action-loop",
+    "variant": "action-loop"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "quarterly-action-cover",
+    "defaultContentLayout": "quarterly-action-content",
+    "allowedLayouts": [
+      "quarterly-action-cover",
+      "quarterly-action-summary",
+      "quarterly-action-matrix",
+      "quarterly-action-roadmap",
+      "quarterly-action-closing",
+      "title",
+      "content",
+      "closing"
+    ]
+  }
+}

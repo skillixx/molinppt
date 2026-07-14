@@ -1,0 +1,45 @@
+{
+  "baseTemplateId": "industry-research",
+  "themeId": "industry-landscape",
+  "style": "consulting-report",
+  "themes": [
+    {
+      "id": "industry-landscape",
+      "name": "行业格局",
+      "visual": {
+        "primary": "12325A",
+        "accent": "18A7A7",
+        "background": "F3F7FA",
+        "surface": "FFFFFF",
+        "title": "0B1F33",
+        "body": "334155",
+        "layout": "industry-research",
+        "variant": "industry-landscape"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "12325A",
+    "accent": "18A7A7",
+    "background": "F3F7FA",
+    "surface": "FFFFFF",
+    "title": "0B1F33",
+    "body": "334155",
+    "layout": "industry-research",
+    "variant": "industry-landscape"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "industry-research-cover",
+    "defaultContentLayout": "industry-research-content",
+    "allowedLayouts": [
+      "industry-research-cover",
+      "industry-overview",
+      "industry-value-chain",
+      "industry-competition",
+      "industry-opportunity-risk",
+      "industry-research-closing",
+      "title",
+      "content"
+    ]
+  }
+}

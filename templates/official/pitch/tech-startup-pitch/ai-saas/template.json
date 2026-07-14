@@ -1,0 +1,48 @@
+{
+  "baseTemplateId": "tech-startup-pitch",
+  "themeId": "ai-saas",
+  "style": "pitch-ai-saas",
+  "themes": [
+    {
+      "id": "ai-saas",
+      "name": "AI SaaS",
+      "visual": {
+        "primary": "07111F",
+        "accent": "2DD4BF",
+        "background": "EAF4FF",
+        "surface": "F8FBFF",
+        "title": "0B1220",
+        "body": "334155",
+        "layout": "pitch-ai-saas",
+        "variant": "ai-saas"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "07111F",
+    "accent": "2DD4BF",
+    "secondary": "60A5FA",
+    "warning": "F59E0B",
+    "background": "EAF4FF",
+    "surface": "F8FBFF",
+    "title": "0B1220",
+    "body": "334155",
+    "layout": "pitch-ai-saas",
+    "variant": "ai-saas"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "pitch-ai-saas-cover",
+    "defaultContentLayout": "pitch-ai-saas-product-architecture",
+    "allowedLayouts": [
+      "pitch-ai-saas-cover",
+      "pitch-ai-saas-market-opportunity",
+      "pitch-ai-saas-product-architecture",
+      "pitch-ai-saas-technical-moat",
+      "pitch-ai-saas-growth-dashboard",
+      "pitch-ai-saas-capital-plan",
+      "pitch-ai-saas-closing",
+      "title",
+      "content"
+    ]
+  }
+}

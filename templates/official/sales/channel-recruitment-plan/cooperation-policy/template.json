@@ -1,0 +1,51 @@
+{
+  "baseTemplateId": "channel-recruitment-plan",
+  "themeId": "cooperation-policy",
+  "style": "channel-recruitment-policy",
+  "description": "以渠道网络、合作政策卡、权益矩阵、收益测算和招商流程为核心的正式商务招商模板。",
+  "themes": [
+    {
+      "id": "cooperation-policy",
+      "name": "合作政策",
+      "visual": {
+        "primary": "0F2D4A",
+        "accent": "10B981",
+        "background": "F3F8F7",
+        "surface": "FFFFFF",
+        "title": "10233D",
+        "body": "40566D",
+        "secondary": "D9A441",
+        "warning": "F97316",
+        "layout": "channel-recruitment-policy",
+        "variant": "cooperation-policy"
+      }
+    }
+  ],
+  "visual": {
+    "primary": "0F2D4A",
+    "accent": "10B981",
+    "background": "F3F8F7",
+    "surface": "FFFFFF",
+    "title": "10233D",
+    "body": "40566D",
+    "secondary": "D9A441",
+    "warning": "F97316",
+    "layout": "channel-recruitment-policy",
+    "variant": "cooperation-policy"
+  },
+  "layoutSchema": {
+    "defaultCoverLayout": "channel-recruitment-policy-cover",
+    "defaultContentLayout": "channel-recruitment-policy-content",
+    "allowedLayouts": [
+      "channel-recruitment-policy-cover",
+      "channel-recruitment-policy-content",
+      "channel-recruitment-policy-overview",
+      "channel-recruitment-policy-rights-matrix",
+      "channel-recruitment-policy-revenue-model",
+      "channel-recruitment-policy-process",
+      "channel-recruitment-policy-closing",
+      "title",
+      "content"
+    ]
+  }
+}
