@@ -1163,6 +1163,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     .template-category-preview-actions { grid-column: 1 / -1; display: flex; justify-content: center; padding: 2px 0 4px; }
     .template-category-more-button { min-width: 220px; min-height: 42px; border-radius: 999px; background: #fff; color: #1d4ed8; border: 1px solid #c9d9f4; box-shadow: 0 10px 22px rgba(31,94,255,.08); }
     .template-category-more-button:hover { background: #f3f7ff; border-color: #b8ccf0; box-shadow: 0 14px 28px rgba(31,94,255,.12); }
+    .template-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 16px; min-height: 36px; }
+    .template-pagination:empty { display: none; }
+    .template-pagination button { min-width: 34px; min-height: 32px; padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+    .template-pagination button[aria-current="page"] { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 8px 18px rgba(31,94,255,.16); }
+    .template-pagination-info { color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .template-page-size { min-height: 32px; padding: 6px 30px 6px 10px; border: 1px solid #dbe5f2; border-radius: 999px; background-color: #fff; color: #334155; font-size: 12px; font-weight: 800; }
     .template-category-block { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 14px; box-shadow: var(--shadow); }
     .template-category-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid #e8eef7; }
     .template-category-head h3 { margin: 0; font-size: 13px; letter-spacing: 0; color: #1e3a8a; font-weight: 800; }
@@ -1905,6 +1911,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       <div class="template-gallery-wrap">
         <div id="template-gallery" class="template-gallery" aria-label="模板内容样式预览"></div>
       </div>
+      <div id="template-pagination" class="template-pagination" aria-label="模板分页"></div>
       <div class="template-manage-split"></div>
       <div class="panel-head">
         <div class="panel-title"><span class="step-number">4</span><h2>个人模板</h2></div>
@@ -2109,6 +2116,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const templateGalleryCountEl = document.querySelector("#template-gallery-count");
     const templateCategoryTabsEl = document.querySelector("#template-category-tabs");
     const templateSearchEl = document.querySelector("#template-search");
+    const templatePaginationEl = document.querySelector("#template-pagination");
     const selectedTemplatePreviewEl = document.querySelector("#selected-template-preview");
     const assetSearchEl = document.querySelector("#asset-search");
     const assetTimeFilterEl = document.querySelector("#asset-time-filter");
@@ -2123,11 +2131,14 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     const DECK_MIN_LOADING_MS = 2200;
     const ASSET_PAGE_SIZE = 20;
     const TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10;
+    const TEMPLATE_DEFAULT_PAGE_SIZE = 12;
     let flowStage = "input";
     let templateCategories = [{ id: "business", name: "Business" }];
     let templateCatalog = [{ id: "business", name: "Business", category: { id: "business", name: "Business" }, themes: [{ id: "modern", name: "Modern" }] }];
     let templateSearchQuery = "";
     let expandedTemplateCategoryId = "";
+    let templatePage = 1;
+    let templatePageSize = TEMPLATE_DEFAULT_PAGE_SIZE;
     let assetCatalog = [];
     let assetSearchQuery = "";
     let assetTimeFilter = "all";
@@ -2269,6 +2280,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         button.addEventListener("click", () => {
           const categoryEl = document.querySelector("#template-category");
           expandedTemplateCategoryId = "";
+          templatePage = 1;
           categoryEl.value = button.dataset.templateCategoryTab || "";
           loadTemplates();
         });
@@ -2333,34 +2345,71 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         ? sourceTemplates.filter((template) => templateMatchesSearch(template, keyword))
         : sourceTemplates;
       renderTemplateCategoryTabs();
+      const pageCount = Math.max(1, Math.ceil(templates.length / templatePageSize));
+      templatePage = Math.min(Math.max(templatePage, 1), pageCount);
+      const pageStart = (templatePage - 1) * templatePageSize;
+      const visibleTemplates = templates.slice(pageStart, pageStart + templatePageSize);
       if (templateGalleryCountEl) {
-        const collapsed = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
-        templateGalleryCountEl.textContent = collapsed
-          ? "\u5f53\u524d\u663e\u793a " + TEMPLATE_CATEGORY_PREVIEW_LIMIT + " / " + templates.length + " \u4e2a\u6a21\u677f"
-          : templates.length + " \u4e2a\u53ef\u7528\u6a21\u677f";
+        const start = templates.length ? pageStart + 1 : 0;
+        const end = Math.min(pageStart + visibleTemplates.length, templates.length);
+        templateGalleryCountEl.textContent = templates.length
+          ? "当前显示 " + start + "-" + end + " / " + templates.length + " 个模板"
+          : "0 个可用模板";
       }
       if (!templates.length) {
         templateGalleryEl.innerHTML = '<div class="hint">' + (keyword ? '\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f' : '\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f') + '</div>';
         if (templateGalleryCountEl) templateGalleryCountEl.textContent = keyword ? "\u6ca1\u6709\u5339\u914d\u7684\u6a21\u677f" : "\u5f53\u524d\u5206\u7c7b\u6682\u65e0\u53ef\u7528\u6a21\u677f";
+        if (templatePaginationEl) templatePaginationEl.innerHTML = "";
         return;
       }
-      // 分类模式默认只露出前 10 个模板，避免列表过长；用户点击后再展开完整分类。
-      const shouldLimitCategory = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT && expandedTemplateCategoryId !== categoryId;
-      const visibleTemplates = shouldLimitCategory ? templates.slice(0, TEMPLATE_CATEGORY_PREVIEW_LIMIT) : templates;
       const categoryName = categoryId ? selectedTemplateCategoryName(categoryId, templates) : "";
       const categoryHeader = categoryId && !keyword
-        ? '<div class="template-category-preview-head"><div><strong>' + escapeHtml(categoryName) + '</strong><span>' + (shouldLimitCategory ? "\u5148\u5c55\u793a\u524d 10 \u4e2a\u6a21\u677f\uff0c\u70b9\u51fb\u4e0b\u65b9\u6309\u94ae\u53ef\u67e5\u770b\u5168\u90e8\u7f29\u7565\u56fe\u3002" : "\u5df2\u5c55\u793a\u8be5\u5206\u7c7b\u5168\u90e8\u6a21\u677f\u7f29\u7565\u56fe\u3002") + '</span></div><span class="template-gallery-count">' + visibleTemplates.length + " / " + templates.length + ' \u4e2a</span></div>'
+        ? '<div class="template-category-preview-head"><div><strong>' + escapeHtml(categoryName) + '</strong><span>分页浏览该分类的模板缩略图，切换页码不会改变当前已选模板。</span></div><span class="template-gallery-count">' + (pageStart + 1) + "-" + Math.min(pageStart + visibleTemplates.length, templates.length) + " / " + templates.length + ' 个</span></div>'
         : "";
-      const categoryMore = categoryId && !keyword && templates.length > TEMPLATE_CATEGORY_PREVIEW_LIMIT
-        ? '<div class="template-category-preview-actions"><button type="button" class="template-category-more-button" data-template-category-toggle="' + escapeHtml(categoryId) + '">' + (shouldLimitCategory ? "\u5c55\u5f00\u5168\u90e8\u6a21\u677f" : "\u6536\u8d77\uff0c\u4ec5\u663e\u793a\u524d 10 \u4e2a") + '</button></div>'
-        : "";
-      templateGalleryEl.innerHTML = categoryHeader + visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("") + categoryMore;
+      templateGalleryEl.innerHTML = categoryHeader + visibleTemplates.map((template) => templateCardHtml(template, selectedId)).join("");
       templateGalleryEl.querySelectorAll("[data-template-card]").forEach((button) => {
         button.addEventListener("click", () => selectTemplateCard(button.dataset.templateCard));
       });
-      templateGalleryEl.querySelector("[data-template-category-toggle]")?.addEventListener("click", (event) => {
-        const toggleCategoryId = event.currentTarget.dataset.templateCategoryToggle || "";
-        expandedTemplateCategoryId = expandedTemplateCategoryId === toggleCategoryId ? "" : toggleCategoryId;
+      renderTemplatePagination({ total: templates.length, pageCount });
+    }
+    function renderTemplatePagination({ total, pageCount }) {
+      if (!templatePaginationEl) return;
+      if (total <= templatePageSize && templatePageSize === TEMPLATE_DEFAULT_PAGE_SIZE) {
+        templatePaginationEl.innerHTML = "";
+        return;
+      }
+      // 模板页码只显示当前页附近的几个按钮，避免模板量增加后工具栏被页码挤满。
+      const pages = [];
+      const firstPage = 1;
+      const lastPage = pageCount;
+      const startPage = Math.max(firstPage, templatePage - 2);
+      const endPage = Math.min(lastPage, templatePage + 2);
+      for (let page = startPage; page <= endPage; page += 1) pages.push(page);
+      if (!pages.includes(firstPage)) pages.unshift(firstPage);
+      if (!pages.includes(lastPage)) pages.push(lastPage);
+      const pageButtons = pages.map((page, index) => {
+        const previous = pages[index - 1];
+        const gap = previous && page - previous > 1 ? '<span class="template-pagination-info">...</span>' : "";
+        return gap + '<button type="button" class="secondary" data-template-page="' + page + '" aria-current="' + (page === templatePage ? 'page' : 'false') + '">' + page + '</button>';
+      }).join("");
+      templatePaginationEl.innerHTML = ''
+        + '<button type="button" class="secondary" data-template-page="prev" ' + (templatePage <= 1 ? "disabled" : "") + '>上一页</button>'
+        + pageButtons
+        + '<span class="template-pagination-info">第 ' + templatePage + ' / ' + pageCount + ' 页</span>'
+        + '<select class="template-page-size" aria-label="每页模板数量">'
+        + [12, 24, 48].map((size) => '<option value="' + size + '" ' + (size === templatePageSize ? "selected" : "") + '>每页 ' + size + ' 个</option>').join("")
+        + '</select>'
+        + '<button type="button" class="secondary" data-template-page="next" ' + (templatePage >= pageCount ? "disabled" : "") + '>下一页</button>';
+      templatePaginationEl.querySelectorAll("[data-template-page]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = button.dataset.templatePage;
+          templatePage = target === "next" ? templatePage + 1 : target === "prev" ? templatePage - 1 : Number(target);
+          renderTemplateGallery();
+        });
+      });
+      templatePaginationEl.querySelector(".template-page-size")?.addEventListener("change", (event) => {
+        templatePageSize = Number(event.target.value) || TEMPLATE_DEFAULT_PAGE_SIZE;
+        templatePage = 1;
         renderTemplateGallery();
       });
     }
@@ -3623,10 +3672,12 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
     templateSearchEl?.addEventListener("input", () => {
       templateSearchQuery = templateSearchEl.value;
       expandedTemplateCategoryId = "";
+      templatePage = 1;
       renderTemplateGallery();
     });
     document.querySelector("#template-category").addEventListener("change", () => {
       expandedTemplateCategoryId = "";
+      templatePage = 1;
       loadTemplates();
     });
     document.querySelector("#upload-personal-template")?.addEventListener("click", uploadPersonalTemplate);

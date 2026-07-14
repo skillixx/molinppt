@@ -4924,12 +4924,16 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /\/api\/templates/);
     assert.match(html, /id="template-gallery"/);
     assert.match(html, /id="template-search"/);
+    assert.match(html, /id="template-pagination"/);
     assert.match(html, /type="search"/);
     assert.match(html, /templateSearchQuery/);
     assert.match(html, /templateMatchesSearch/);
+    assert.match(html, /TEMPLATE_DEFAULT_PAGE_SIZE = 12/);
+    assert.match(html, /templatePageSize/);
+    assert.match(html, /data-template-page/);
+    assert.match(html, /template-page-size/);
     assert.match(html, /TEMPLATE_CATEGORY_PREVIEW_LIMIT = 10/);
     assert.match(html, /expandedTemplateCategoryId/);
-    assert.match(html, /data-template-category-toggle/);
     assert.match(html, /data-create-template-card-list/);
     assert.match(html, /data-create-template-category-toggle/);
     assert.match(html, /create-template-grid/);
