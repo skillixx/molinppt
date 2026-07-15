@@ -21,6 +21,7 @@ test("second-stage deployment and documentation deliverables exist", async () =>
     new URL("docs/modules/platform.md", repoRoot),
     new URL("docs/modules/api.md", repoRoot),
     new URL("docs/modules/ppt-service.md", repoRoot),
+    new URL("docs/docker-deployment.md", repoRoot),
     new URL("docs/third-stage-business-design.md", repoRoot),
     new URL("src/prompt-manager.js", appRoot),
     new URL("src/ppt-exporter.js", appRoot),
