@@ -1,0 +1,16 @@
+.git
+.github
+.agents
+.codex
+**/node_modules
+**/.env
+**/*.log
+**/data
+**/output
+templates_files
+presenton
+
+# 生产镜像只需要应用运行代码和官方模板，排除本地开发及生成产物。
+ppt-ai-app/test
+ppt-ai-app/test-results
+ppt-ai-app/coverage

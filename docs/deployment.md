@@ -187,10 +187,16 @@ npm start
 Docker Compose 示例：
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml run --rm ppt-ai-app npm run migrate
+docker compose -f docker-compose.prod.yml run --rm ppt-ai-app node scripts/seed-official-template-categories.js
+docker compose -f docker-compose.prod.yml run --rm ppt-ai-app node scripts/seed-official-templates.js
+docker compose -f docker-compose.prod.yml up -d
 ```
 
-`docker-compose.prod.yml` 默认加载 `ppt-ai-app/.env`，并挂载持久化 volume 到 `/data`。
+`docker-compose.prod.yml` 默认加载 `ppt-ai-app/.env`，并挂载持久化 volume 到 `/data`。镜像会从仓库根目录复制 `templates/official/`，容器内通过 `/app/templates/official` 读取官方模板。
+
+`DATABASE_URL` 必须在 `ppt-ai-app/.env` 中设置，Compose 不会覆盖它。使用 JSON 数据库时可配置 `DATABASE_URL=json:/data/ppt-ai-db.json`；使用 MySQL 时应填写生产连接串。MySQL 在宿主机上运行时，容器中的 `127.0.0.1` 指向容器自身，需要改用数据库服务名或 Docker 可访问的宿主机地址。
 
 ## 7. 反向代理建议
 

@@ -8,6 +8,7 @@ const repoRoot = new URL("../../", import.meta.url);
 test("second-stage deployment and documentation deliverables exist", async () => {
   const requiredFiles = [
     new URL("Dockerfile", appRoot),
+    new URL(".dockerignore", repoRoot),
     new URL("docker-compose.yml", repoRoot),
     new URL(".github/workflows/ci.yml", repoRoot),
     new URL("changelog.md", repoRoot),
@@ -59,6 +60,18 @@ test("production compose loads app env file without interpolating secrets", asyn
   assert.match(compose, /env_file:\s*\n\s*-\s*\.\/ppt-ai-app\/\.env/);
   assert.doesNotMatch(compose, /\$\{(?:MOLING_|INTERNAL_API_TOKEN|LLM_)/);
   assert.doesNotMatch(compose, /SESSION_COOKIE_SECURE:\s*true/);
+});
+
+test("production Docker image installs dependencies and includes official templates", async () => {
+  const dockerfile = await readFile(new URL("Dockerfile", appRoot), "utf8");
+  const compose = await readFile(new URL("docker-compose.prod.yml", repoRoot), "utf8");
+
+  assert.match(dockerfile, /RUN npm ci --omit=dev/);
+  assert.match(dockerfile, /COPY templates \/app\/templates/);
+  assert.match(compose, /^\s+context:\s*\.\s*$/m);
+  assert.match(compose, /^\s+dockerfile:\s*ppt-ai-app\/Dockerfile\s*$/m);
+  assert.match(compose, /OFFICIAL_TEMPLATES_DIR:\s*\/app\/templates\/official/);
+  assert.doesNotMatch(compose, /DATABASE_URL:\s*json:/);
 });
 
 test("local acceptance verifies exported file downloads", async () => {
