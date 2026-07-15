@@ -363,6 +363,7 @@ export function createApp(dependencies) {
           ownerUserId,
           deckId: parts[4],
           slideId: parts[6],
+          slideNumber: body.slide_number,
           instruction: body.instruction,
           entitlementId: resolveEntitlementId(body.entitlement_id, sessionEntitlementId),
         });
@@ -3872,6 +3873,7 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
       try {
         if (!state.deckId) throw new Error("请先应用模板生成 PPT，再使用 AI 单页助手");
         const entitlementValue = document.querySelector("#entitlement").value.trim();
+        // URL 保留页面稳定 ID，请求体另带预览页码以消除历史重复 ID 的定位歧义。
         const slideId = state.selectedSlideId;
         const instruction = document.querySelector("#slide-instruction").value.trim();
         if (!slideId) throw new Error("请先用鼠标在在线预览中选择要优化的页面");
@@ -3881,6 +3883,8 @@ function renderWorkspace({ defaultEntitlementId } = {}) {
         statusEl.textContent = "AI 正在优化第 " + (state.selectedSlideNumber || slideId) + " 页...";
         const data = await json("/api/ppt/decks/" + state.deckId + "/slides/" + slideId + "/regenerate", {
           instruction,
+          // 显式页码用于消除历史重复 ID 的歧义，URL 中仍保留稳定 ID 以兼容既有 API 语义。
+          slide_number: state.selectedSlideNumber,
           ...(entitlementValue ? { entitlement_id: Number(entitlementValue) } : {})
         });
         if (data.deck?.slides) {

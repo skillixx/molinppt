@@ -522,8 +522,9 @@ export class PptService {
           const mergedSlide = { ...sourceSlide, ...generated };
           generatedSlots[index] = {
             ...generated,
-            id: sourceSlide.id || generated.id || `slide-${index + 1}`,
-            sortOrder: sourceSlide.sortOrder || index + 1,
+            // 渐进式生成每次只请求一页，模型/大纲常重复给出 slide-1；必须用全局页序建立唯一身份。
+            id: stableSlideId(index),
+            sortOrder: index + 1,
             layout: normalizeSlideLayout({ layout: generated.layout || sourceSlide.layout, template, index, total: sourceSlides.length, slide: mergedSlide }),
             theme: selectedTheme,
           };
@@ -717,13 +718,13 @@ export class PptService {
 
   /**
    * Regenerates one slide and consumes known-cost credits.
-   * @param {{ownerUserId: number, deckId: string, slideId: string, instruction: string, entitlementId: number}} input
+   * @param {{ownerUserId: number, deckId: string, slideId: string, slideNumber?: number, instruction: string, entitlementId: number}} input
    * @returns {Promise<{deck: object, slide: object}>}
    */
-  async regenerateSlide({ ownerUserId, deckId, slideId, instruction, entitlementId }) {
+  async regenerateSlide({ ownerUserId, deckId, slideId, slideNumber, instruction, entitlementId }) {
     const deck = await this.#getOwned("decks", deckId, ownerUserId, "DECK_NOT_FOUND");
     assertDeckReady(deck);
-    const slide = resolveSlide(deck.slides, slideId);
+    const slide = resolveSlide(deck.slides, slideId, slideNumber);
     if (!slide) throw new AppError({ code: "SLIDE_NOT_FOUND", status: 404, message: "Slide not found" });
     const resolvedSlideId = slide.id || String(slide.sortOrder || slideId);
     const reserveKey = `${deckId}:${resolvedSlideId}:ppt_slide_regenerate:reserve`;
@@ -760,7 +761,12 @@ export class PptService {
       await this.#log({ ownerUserId, action: "slide_regeneration_failed", resourceType: "deck", resourceId: deck.id, metadata: { error: error.message } });
       throw new AppError({ code: "AI_PROVIDER_FAILED", status: 502, message: `AI_PROVIDER_FAILED: ${error.message}` });
     }
-    const slides = deck.slides.map((item) => (item === slide ? regenerated : item));
+    // 旧 deck 可能已经保存了模型重复返回的 slide ID；只修复缺失/重复身份，
+    // 唯一 ID 和原有 sortOrder 保持不变，避免影响其他页面引用。
+    const regeneratedSlides = deck.slides.map((item) => (item === slide ? regenerated : item));
+    const stableIds = normalizeSlideIdentities(regeneratedSlides);
+    const slides = regeneratedSlides.map((item, index) => ({ ...item, id: stableIds[index] }));
+    const updatedSlide = slides[deck.slides.indexOf(slide)] || regenerated;
     try {
       await this.billingClient.settleCredits({
         holdId: reserve.hold_id,
@@ -781,7 +787,7 @@ export class PptService {
     await this.#recordBilling({ ownerUserId, taskId: deckId, eventType: "settle", amount: REGENERATE_SLIDE_AMOUNT, status: "settled", holdId: reserve.hold_id, idempotencyKey: settleKey });
     const updatedDeck = await this.database.update("decks", deck.id, { slides, status: "ready" });
     await this.#log({ ownerUserId, action: "slide_regenerated", resourceType: "deck", resourceId: deck.id });
-    return { deck: updatedDeck, slide: regenerated };
+    return { deck: updatedDeck, slide: updatedSlide };
   }
 
   /**
@@ -13400,6 +13406,7 @@ function normalizeGeneratedSlides({ slides, outline, template, globalIndexOffset
   if (slides.length !== outlineSlides.length) {
     throwSlideSchemaError(`slides length must match outline length ${outlineSlides.length}`);
   }
+  const stableIds = normalizeSlideIdentities(slides, { globalIndexOffset });
   return slides.map((slide, index) => {
     const globalIndex = globalIndexOffset + index;
     if (!slide || typeof slide !== "object" || Array.isArray(slide)) {
@@ -13418,8 +13425,9 @@ function normalizeGeneratedSlides({ slides, outline, template, globalIndexOffset
     return {
       ...slide,
       ...structuredMetadata,
-      id: normalizeSlideId(slide.id, index),
-      sortOrder: normalizeSortOrder(slide.sortOrder, index),
+      // 合法且唯一的模型 ID 继续保留；重复或缺失时按全局页序生成稳定身份。
+      id: stableIds[index],
+      sortOrder: globalIndex + 1,
       title,
       bullets: slide.bullets,
       speakerNotes: typeof slide.speakerNotes === "string" ? slide.speakerNotes : "",
@@ -13497,25 +13505,40 @@ function isSlideSchemaError(error) {
 }
 
 /**
- * Normalizes a generated slide ID.
- * @param {unknown} value
+ * Creates the stable internal ID for one deck slide.
  * @param {number} index
  * @returns {string}
  */
-function normalizeSlideId(value, index) {
-  const normalized = typeof value === "string" ? value.trim() : "";
-  return normalized || `slide_${index + 1}`;
+function stableSlideId(index) {
+  return `slide_${index + 1}`;
 }
 
 /**
- * Normalizes a generated slide sort order.
- * @param {unknown} value
- * @param {number} index
- * @returns {number}
+ * 保留输入中原本唯一的页面 ID，并为重复或缺失项生成不会碰撞的稳定身份。
+ * @param {object[]} slides
+ * @param {{globalIndexOffset?: number}} options
+ * @returns {string[]}
  */
-function normalizeSortOrder(value, index) {
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : index + 1;
+function normalizeSlideIdentities(slides, { globalIndexOffset = 0 } = {}) {
+  const providerIds = slides.map((slide) => (typeof slide?.id === "string" ? slide.id.trim() : ""));
+  const counts = providerIds.reduce((result, id) => {
+    if (id) result.set(id, (result.get(id) || 0) + 1);
+    return result;
+  }, new Map());
+  // 先预留全部原本唯一的 ID，避免前面的缺失项抢占后续页面已有的稳定身份。
+  const usedSlideIds = new Set(providerIds.filter((id) => id && counts.get(id) === 1));
+  return providerIds.map((providerId, index) => {
+    if (providerId && counts.get(providerId) === 1) return providerId;
+    const baseId = stableSlideId(globalIndexOffset + index);
+    let candidate = baseId;
+    let suffix = 2;
+    while (usedSlideIds.has(candidate)) {
+      candidate = `${baseId}_${suffix}`;
+      suffix += 1;
+    }
+    usedSlideIds.add(candidate);
+    return candidate;
+  });
 }
 
 /**
@@ -13594,16 +13617,23 @@ function normalizeBulletList(bullets) {
  * Resolves a slide by stable ID, sort order, or one-based display index.
  * @param {object[]} slides
  * @param {unknown} requestedSlideId
+ * @param {unknown} requestedSlideNumber
  * @returns {object | undefined}
  */
-function resolveSlide(slides, requestedSlideId) {
+function resolveSlide(slides, requestedSlideId, requestedSlideNumber) {
+  const explicitPageNumber = Number(requestedSlideNumber);
+  if (Number.isInteger(explicitPageNumber) && explicitPageNumber >= 1) {
+    return slides[explicitPageNumber - 1];
+  }
   const normalized = String(requestedSlideId ?? "").trim();
   if (!normalized) return undefined;
   const exact = slides.find((slide) => String(slide.id) === normalized);
   if (exact) return exact;
   const numeric = Number(normalized);
-  if (!Number.isInteger(numeric) || numeric < 1) return undefined;
-  return slides.find((slide) => Number(slide.sortOrder) === numeric) || slides[numeric - 1];
+  if (Number.isInteger(numeric) && numeric >= 1) {
+    return slides[numeric - 1] || slides.find((slide) => Number(slide.sortOrder) === numeric);
+  }
+  return undefined;
 }
 
 /**

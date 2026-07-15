@@ -3217,6 +3217,176 @@ test("PptService regenerates a slide when the UI sends a one-based slide number"
   assert.equal(regenerated.slide.title.includes("Tighten this page"), true);
 });
 
+test("PptService keeps repeated provider slide IDs unique so polish updates preview and PPTX on the selected page", async () => {
+  let renderedPreviewPptxText = "";
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async ({ outline }) => outline.slides.map((slide, index) => ({
+    ...slide,
+    // 模拟真实模型把每一页都错误地返回成同一个 ID；应用层必须自行建立稳定页面身份。
+    id: "slide-1",
+    sortOrder: index + 1,
+    title: `Original Page ${index + 1}`,
+    bullets: [`Original Bullet ${index + 1}`],
+    layout: index === 0 ? "title" : "content",
+    theme: outline.theme,
+  }));
+  aiProvider.regenerateSlide = async ({ slide }) => ({
+    ...slide,
+    title: "POLISHED TARGET PAGE 3",
+    bullets: ["POLISHED BULLET PAGE 3"],
+  });
+  const context = await createBusinessContext({
+    aiProvider,
+    pptPreviewRenderer: {
+      render: async ({ pptx }) => {
+        // 真实预览渲染器接收的也是刚生成的 PPTX 字节，不能只验证 HTML fallback。
+        renderedPreviewPptxText = pptx.toString("latin1");
+        return null;
+      },
+    },
+  });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Repeated slide identities",
+    slideCount: 3,
+    templateId: "business",
+  });
+  const { deck } = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  assert.deepEqual(deck.slides.map((slide) => slide.id), ["slide_1", "slide_2", "slide_3"]);
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deck.id,
+    slideId: deck.slides[2].id,
+    slideNumber: 3,
+    instruction: "Polish only the third page",
+    entitlementId: 88,
+  });
+  const preview = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+  const exported = await context.pptService.exportDeck({ ownerUserId: 7, deckId: deck.id, format: "pptx" });
+  const downloaded = await context.storage.download({ ownerUserId: 7, fileId: exported.file.id });
+  const pptxText = downloaded.content.toString("latin1");
+
+  assert.equal(regenerated.deck.slides[1].title, "Original Page 2");
+  assert.equal(regenerated.deck.slides[2].title, "POLISHED TARGET PAGE 3");
+  assert.match(preview, /aria-label="第 3 页"[\s\S]*POLISHED TARGET PAGE 3/);
+  assert.doesNotMatch(pptSlidePartText(pptxText, 2), /POLISHED TARGET PAGE 3/);
+  assert.match(pptSlidePartText(pptxText, 3), /POLISHED TARGET PAGE 3/);
+  assert.match(pptSlidePartText(renderedPreviewPptxText, 3), /POLISHED TARGET PAGE 3/);
+});
+
+test("PptService repairs legacy repeated slide IDs while polishing by one-based page number", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async ({ slide }) => ({
+    ...slide,
+    title: "LEGACY PAGE 3 POLISHED",
+    bullets: ["LEGACY PAGE 3 BULLET"],
+  });
+  const context = await createBusinessContext({ aiProvider });
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "legacy-duplicate-outline",
+    title: "Legacy duplicate deck",
+    templateId: "business",
+    templateName: "Executive Business",
+    theme: "modern",
+    status: "ready",
+    // 线上历史数据曾出现第 2-N 页共用 slide-1；页码定位必须仍能选中真实目标页。
+    slides: [1, 2, 3].map((number) => ({
+      id: "slide-1",
+      sortOrder: number,
+      title: `Legacy Page ${number}`,
+      bullets: [`Legacy Bullet ${number}`],
+      layout: number === 1 ? "title" : "content",
+      theme: "modern",
+    })),
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deck.id,
+    slideId: "slide-1",
+    slideNumber: 3,
+    instruction: "Polish the third legacy page",
+    entitlementId: 88,
+  });
+
+  assert.equal(regenerated.deck.slides[1].title, "Legacy Page 2");
+  assert.equal(regenerated.deck.slides[2].title, "LEGACY PAGE 3 POLISHED");
+  assert.deepEqual(regenerated.deck.slides.map((slide) => slide.id), ["slide_1", "slide_2", "slide_3"]);
+  assert.equal(regenerated.slide.id, regenerated.deck.slides[2].id);
+});
+
+test("PptService preserves a later unique provider ID when an earlier slide ID is missing", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.generateSlides = async ({ outline }) => outline.slides.map((slide, index) => ({
+    ...slide,
+    id: index === 0 ? "" : "slide_1",
+    sortOrder: index + 1,
+    title: `Collision Page ${index + 1}`,
+    bullets: [`Collision Bullet ${index + 1}`],
+  }));
+  const context = await createBusinessContext({ aiProvider });
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Slide identity collision",
+    slideCount: 2,
+    templateId: "business",
+  });
+
+  const { deck } = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  assert.deepEqual(deck.slides.map((slide) => slide.id), ["slide_1_2", "slide_1"]);
+});
+
+test("PptService treats a numeric UI selector as page number before a provider-owned numeric ID", async () => {
+  const aiProvider = new MockAiProvider();
+  aiProvider.regenerateSlide = async ({ slide, instruction }) => ({ ...slide, title: instruction });
+  const context = await createBusinessContext({ aiProvider });
+  const deck = await context.database.insert("decks", {
+    ownerUserId: 7,
+    outlineId: "numeric-provider-id-outline",
+    title: "Numeric provider ID deck",
+    templateId: "business",
+    templateName: "Executive Business",
+    theme: "modern",
+    status: "ready",
+    slides: [
+      { id: "2", sortOrder: 1, title: "First Page", bullets: ["First"], layout: "title" },
+      { id: "page-two", sortOrder: 2, title: "Second Page", bullets: ["Second"], layout: "content" },
+    ],
+  });
+
+  const regenerated = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deck.id,
+    slideId: "2",
+    slideNumber: 2,
+    instruction: "SECOND PAGE POLISHED",
+    entitlementId: 88,
+  });
+
+  assert.equal(regenerated.deck.slides[0].title, "First Page");
+  assert.equal(regenerated.deck.slides[1].title, "SECOND PAGE POLISHED");
+
+  const directNumericId = await context.pptService.regenerateSlide({
+    ownerUserId: 7,
+    deckId: deck.id,
+    slideId: "2",
+    instruction: "DIRECT NUMERIC ID POLISHED",
+    entitlementId: 88,
+  });
+  assert.equal(directNumericId.deck.slides[0].title, "DIRECT NUMERIC ID POLISHED");
+});
+
 test("PptService preserves slide identity when regenerated slide omits ids", async () => {
   const aiProvider = new MockAiProvider();
   aiProvider.regenerateSlide = async ({ slide, instruction }) => ({
@@ -5002,6 +5172,7 @@ test("workspace page exposes the AI PPT generation controls after login", async 
     assert.match(html, /is-polishing/);
     assert.match(html, /请先应用模板生成 PPT，再使用 AI 单页助手/);
     assert.match(html, /请先用鼠标在在线预览中选择要优化的页面/);
+    assert.match(html, /slide_number: state\.selectedSlideNumber/);
     assert.match(html, /class="preview-frame"/);
     assert.match(html, /deck-loading/);
     assert.match(html, /正在应用当前模板生成 PPT/);
@@ -5728,6 +5899,21 @@ async function waitForCondition(predicate, timeoutMs = 1000) {
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
   throw new Error("Timed out waiting for condition");
+}
+
+/**
+ * 从未压缩的测试 PPTX ZIP 字节中截取指定页面 XML，便于验证润色内容落在正确页。
+ * @param {string} zipText
+ * @param {number} slideNumber
+ * @returns {string}
+ */
+function pptSlidePartText(zipText, slideNumber) {
+  const partPath = `ppt/slides/slide${slideNumber}.xml`;
+  const marker = "PK\x03\x04";
+  const start = zipText.indexOf(`${partPath}<?xml`);
+  if (start === -1) return "";
+  const nextPart = zipText.indexOf(marker, start + partPath.length);
+  return zipText.slice(start, nextPart === -1 ? undefined : nextPart);
 }
 
 async function createBusinessContext(options = {}) {
