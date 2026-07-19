@@ -120,6 +120,36 @@ test("PptService falls back to HTML preview when PPTX renderer is unavailable", 
   assert.doesNotMatch(preview, /data-preview-source="rendered-pptx"/);
 });
 
+test("PptService HTML preview scales a fixed 1120 by 630 canvas without mobile reflow", async () => {
+  const context = await createBusinessContext();
+  const outline = await context.pptService.generateOutline({
+    ownerUserId: 7,
+    topic: "Responsive preview canvas",
+    slideCount: 2,
+    templateId: "business",
+    theme: "modern",
+  });
+  const { deck } = await context.pptService.generateDeck({
+    ownerUserId: 7,
+    outlineId: outline.id,
+    entitlementId: 88,
+  });
+
+  const html = await context.pptService.previewDeck({ ownerUserId: 7, deckId: deck.id });
+
+  assert.equal([...html.matchAll(/class="slide-viewport"/g)].length, deck.slides.length);
+  assert.match(html, /\.slide-viewport\{[^}]*max-width:1120px;[^}]*margin:0 auto;[^}]*aspect-ratio:16\/9/);
+  assert.match(html, /\.slide\{[^}]*width:1120px;[^}]*height:630px;[^}]*transform:scale\(var\(--preview-scale\)\)/);
+  assert.match(html, /const DESIGN_WIDTH=1120,DESIGN_HEIGHT=630;/);
+  assert.match(html, /new ResizeObserver\(resizeSlides\)/);
+
+  const mobileRuleStart = html.lastIndexOf("@media (max-width:720px)");
+  const mobileRuleEnd = html.indexOf("</style>", mobileRuleStart);
+  const mobileRule = html.slice(mobileRuleStart, mobileRuleEnd);
+  assert.notEqual(mobileRuleStart, -1);
+  assert.doesNotMatch(mobileRule, /font-size|display:none|grid-template-columns|\.slide\{/);
+});
+
 test("PptService renders product premiere launch preview with generated assets", async () => {
   const pptPreviewRenderer = { render: async () => null };
   const context = await createBusinessContext({ pptPreviewRenderer });
