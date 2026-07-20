@@ -4587,6 +4587,29 @@ test("PptExportService applies template-specific visual colors to PDF output", (
   assert.notEqual(businessText, pitchText);
 });
 
+test("PptExportService keeps light template text readable on the white PDF page", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      title: "Readable document title",
+      templateVisual: {
+        primary: "0A2540",
+        title: "FFFFFF",
+        body: "DCE7F5",
+      },
+      slides: [{ title: "Readable section", bullets: ["Readable body copy"] }],
+    },
+    format: "pdf",
+  });
+  const text = result.content.toString("latin1");
+
+  // 深色幻灯片模板常用浅色文字；导出到白底文档时必须切换为高对比度颜色。
+  assert.match(text, new RegExp(`0\\.039 0\\.145 0\\.251 rg \\/F1 18[^<]*${pdfHex("Readable document title")}`));
+  assert.match(text, new RegExp(`0\\.216 0\\.255 0\\.318 rg \\/F1 11[^<]*${pdfHex("- Readable body copy")}`));
+  assert.doesNotMatch(text, new RegExp(`1\\.0 1\\.0 1\\.0 rg \\/F1 18[^<]*${pdfHex("Readable document title")}`));
+});
+
 test("PptExportService uses public courseware enrollment conversion decorations", () => {
   const exporter = new PptExportService();
   const result = exporter.exportDeck({
@@ -4645,6 +4668,70 @@ test("PptExportService creates a minimal PDF document with xref and trailer", ()
   assert.match(text, /trailer/);
   assert.match(text, /%%EOF$/);
   assert.match(text, /<FEFF0045007800650063007500740069007600650020005200650076006900650077>/);
+});
+
+test("PptExportService keeps short slide summaries in one continuous PDF page", () => {
+  const exporter = new PptExportService();
+  const result = exporter.exportDeck({
+    deck: {
+      ...deck,
+      title: "Quarterly Strategy",
+      slides: [
+        { title: "Opening Context", bullets: ["North star and scope"] },
+        { title: "Market Evidence", bullets: ["Conversion increased by 18%"] },
+        { title: "Closing Actions", bullets: ["Assign owners and deadlines"] },
+      ],
+    },
+    format: "pdf",
+  });
+  const text = result.content.toString("latin1");
+  const pageObjects = [...text.matchAll(/\d+ 0 obj\n<< \/Type \/Page\b[\s\S]*?\nendobj/g)].map((match) => match[0]);
+
+  assert.equal(pageObjects.length, 1);
+  assert.match(text, /\/Type \/Pages \/Kids \[[^\]]+\] \/Count 1/);
+  assert.match(pageObjects[0], /\/MediaBox \[0 0 612 792\]/);
+  for (const line of [
+    "1. Opening Context",
+    "- North star and scope",
+    "2. Market Evidence",
+    "- Conversion increased by 18%",
+    "3. Closing Actions",
+    "- Assign owners and deadlines",
+  ]) assert.match(text, new RegExp(pdfHex(line)));
+});
+
+test("PptExportService continues overflowing slide summaries on additional PDF pages", () => {
+  const exporter = new PptExportService();
+  const slides = Array.from({ length: 14 }, (_, index) => ({
+    title: `Section ${index + 1}`,
+    bullets: [`Distinct content ${index + 1}`, `Supporting detail ${index + 1}`],
+  }));
+  const result = exporter.exportDeck({
+    deck: { ...deck, title: "Long Strategy Document", slides },
+    format: "pdf",
+  });
+  const text = result.content.toString("latin1");
+  const pageObjects = [...text.matchAll(/\d+ 0 obj\n<< \/Type \/Page\b[\s\S]*?\nendobj/g)].map((match) => match[0]);
+
+  assert.equal(pageObjects.length > 1, true);
+  assert.equal(pageObjects.length < slides.length, true);
+  assert.match(text, new RegExp(pdfHex("1. Section 1")));
+  assert.match(text, new RegExp(pdfHex("14. Section 14")));
+  assert.match(text, new RegExp(pdfHex("- Supporting detail 14")));
+
+  const lastContentReference = pageObjects.at(-1).match(/\/Contents (\d+) 0 R/)?.[1];
+  assert.ok(lastContentReference, "最后一页必须引用独立的内容流");
+  const lastContentObject = text.match(new RegExp(`${lastContentReference} 0 obj\\n([\\s\\S]*?)\\nendobj`))?.[1] || "";
+  assert.match(lastContentObject, new RegExp(pdfHex("- Supporting detail 14")));
+});
+
+test("PptExportService rejects empty PDF exports with a clear error", () => {
+  const exporter = new PptExportService();
+
+  assert.throws(
+    () => exporter.exportDeck({ deck: { ...deck, slides: [] }, format: "pdf" }),
+    { code: "PDF_EXPORT_INVALID_DECK", message: "PDF export requires at least one slide" },
+  );
 });
 
 test("PptExportService writes slide titles and bullet content as separate PDF text lines", () => {

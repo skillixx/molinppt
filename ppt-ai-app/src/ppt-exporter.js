@@ -207,18 +207,38 @@ export class PptExportService {
    * @returns {{fileName: string, mimeType: string, content: Buffer}}
    */
   #exportPdf(deck) {
+    if (!Array.isArray(deck?.slides) || deck.slides.length === 0) {
+      throw new AppError({
+        code: "PDF_EXPORT_INVALID_DECK",
+        status: 422,
+        message: "PDF export requires at least one slide",
+      });
+    }
     const visual = resolveDeckVisual(deck);
-    const stream = buildPdfTextStream(deck, visual);
+    const streams = buildPdfTextStreams(deck, visual);
+    const pageCount = streams.length;
+    const firstPageObjectId = 3;
+    const fontObjectId = firstPageObjectId + pageCount;
+    const descendantFontObjectId = fontObjectId + 1;
+    const fontDescriptorObjectId = fontObjectId + 2;
+    const firstContentObjectId = fontObjectId + 3;
+    const pageObjectIds = streams.map((_, index) => firstPageObjectId + index);
+    const contentObjectIds = streams.map((_, index) => firstContentObjectId + index);
+    const pageObjects = streams.map((_, index) => (
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /Contents ${contentObjectIds[index]} 0 R >>`
+    ));
+    const contentObjects = streams.map((stream) => `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`);
     const objects = [
       "<< /Type /Catalog /Pages 2 0 R >>",
-      "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-      "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 7 0 R >>",
-      "<< /Type /Font /Subtype /Type0 /BaseFont /STSong-Light /Encoding /UniGB-UCS2-H /DescendantFonts [5 0 R] >>",
-      "<< /Type /Font /Subtype /CIDFontType0 /BaseFont /STSong-Light /CIDSystemInfo << /Registry (Adobe) /Ordering (GB1) /Supplement 2 >> /FontDescriptor 6 0 R >>",
+      `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageCount} >>`,
+      ...pageObjects,
+      `<< /Type /Font /Subtype /Type0 /BaseFont /STSong-Light /Encoding /UniGB-UCS2-H /DescendantFonts [${descendantFontObjectId} 0 R] >>`,
+      `<< /Type /Font /Subtype /CIDFontType0 /BaseFont /STSong-Light /CIDSystemInfo << /Registry (Adobe) /Ordering (GB1) /Supplement 2 >> /FontDescriptor ${fontDescriptorObjectId} 0 R >>`,
       "<< /Type /FontDescriptor /FontName /STSong-Light /Flags 4 /FontBBox [-25 -254 1000 880] /ItalicAngle 0 /Ascent 880 /Descent -254 /CapHeight 880 /StemV 80 >>",
-      `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`,
+      ...contentObjects,
     ];
     const content = buildPdf(objects);
+    assertCompletePdfExport(content, pageCount);
     return {
       fileName: exportFileName({ deck, format: "pdf" }),
       mimeType: "application/pdf",
@@ -228,34 +248,95 @@ export class PptExportService {
 }
 
 /**
- * 鏋勫缓 PDF 鏂囨湰娴侊紝姣忚鍐呭瀵瑰簲涓€涓粷瀵瑰畾浣嶇殑鏂囨湰鎿嶄綔銆?
+ * 构建连续内容型 PDF 的分页文本流。
+ * 多张短幻灯片可以排在同一页；只有内容超过纵向文档页的可用高度时才创建后续页面。
  * @param {object} deck
- * @returns {string}
+ * @param {object} visual
+ * @returns {string[]}
  */
-function buildPdfTextStream(deck, visual = resolveDeckVisual(deck)) {
-  const operations = [
-    pdfColor(visual.primary),
-    "0 774 612 18 re f",
-    "BT",
-    pdfColor(visual.title),
-    pdfTextLine({ text: deck.title, size: 18, x: 72, y: 760 }),
-  ];
-  let y = 726;
+function buildPdfTextStreams(deck, visual = resolveDeckVisual(deck)) {
+  const pages = [];
+  const bottomY = 72;
+  const textColors = resolvePdfTextColors(visual);
+  let operations = [];
+  let y = 0;
+
+  const finishPage = () => {
+    operations.push("ET");
+    pages.push(operations.join(" "));
+  };
+  const startPage = (continuationTitle = "") => {
+    operations = [
+      pdfColor(visual.primary),
+      "0 774 612 18 re f",
+      "BT",
+      pdfColor(textColors.title),
+      pdfTextLine({ text: deck.title, size: 18, x: 72, y: 760 }),
+    ];
+    y = 726;
+    if (continuationTitle) {
+      operations.push(pdfColor(textColors.title));
+      operations.push(pdfTextLine({ text: `${continuationTitle}（续）`, size: 13, x: 72, y }));
+      y -= 22;
+    }
+  };
+  const continueOnNextPage = (continuationTitle = "") => {
+    finishPage();
+    startPage(continuationTitle);
+  };
+
+  startPage();
   for (const [slideIndex, slide] of deck.slides.entries()) {
-    operations.push(pdfColor(visual.title));
-    operations.push(pdfTextLine({ text: `${slideIndex + 1}. ${slide.title}`, size: 13, x: 72, y }));
-    y -= 22;
-    operations.push(pdfColor(visual.body));
-    for (const bullet of slide.bullets || []) {
-      for (const line of wrapPdfLine(`- ${bullet}`)) {
+    const slideTitle = `${slideIndex + 1}. ${exportTextValue(slide.title)}`;
+    const titleLines = wrapPdfLine(slideTitle);
+    const bulletLines = (slide.bullets || []).map((bullet) => wrapPdfLine(`- ${exportTextValue(bullet)}`));
+    const firstBulletHeight = bulletLines.length ? 18 : 0;
+
+    // 标题至少与首行正文留在同一页，避免页尾只剩一个孤立标题。
+    if (y - titleLines.length * 22 - firstBulletHeight < bottomY) continueOnNextPage();
+    operations.push(pdfColor(textColors.title));
+    for (const line of titleLines) {
+      operations.push(pdfTextLine({ text: line, size: 13, x: 72, y }));
+      y -= 22;
+    }
+
+    operations.push(pdfColor(textColors.body));
+    for (const lines of bulletLines) {
+      for (const line of lines) {
+        // 正文跨页时重复当前章节标题，说明新页承接的是哪一张幻灯片的内容。
+        if (y < bottomY) {
+          continueOnNextPage(slideTitle);
+          operations.push(pdfColor(textColors.body));
+        }
         operations.push(pdfTextLine({ text: line, size: 11, x: 90, y }));
         y -= 18;
       }
     }
     y -= 10;
   }
-  operations.push("ET");
-  return operations.join(" ");
+  finishPage();
+  return pages;
+}
+
+/**
+ * 检查最终 PDF 的页面树和内容流数量，避免对象编号回归时静默返回缺页文件。
+ * 当前导出完全同步且不读取外部字体或图片，因此无需等待超时；结构后置条件用于阻止缺页文件被静默保存。
+ * @param {string} content
+ * @param {number} expectedPages
+ * @returns {void}
+ */
+function assertCompletePdfExport(content, expectedPages) {
+  const pageCount = (content.match(/\/Type \/Page\b/g) || []).length;
+  const contentStreamCount = (content.match(/\nstream\n/g) || []).length;
+  const pageTreeCount = Number(content.match(/\/Type \/Pages \/Kids \[[^\]]*\] \/Count (\d+)/)?.[1]);
+  if (pageCount !== expectedPages || contentStreamCount !== expectedPages || pageTreeCount !== expectedPages) {
+    throw new AppError({
+      code: "PDF_EXPORT_INCOMPLETE",
+      status: 500,
+      message: `PDF export is incomplete: expected ${expectedPages} pages but generated ${pageCount}`,
+      publicDetails: { expected_pages: expectedPages, generated_pages: pageCount },
+    });
+  }
 }
 
 /**
@@ -269,6 +350,66 @@ function resolveDeckVisual(deck) {
     theme: deck.theme,
     template: { id: deck.templateId, name: deck.templateName, visual: deck.templateVisual },
   });
+}
+
+/**
+ * 为白底连续文档选择可读文字颜色。
+ * PPT 模板可能为深色画布配置白色或浅色文字，直接复用到白底 PDF 会造成截图中的“文字消失”问题。
+ * @param {object} visual
+ * @returns {{title: string, body: string}}
+ */
+function resolvePdfTextColors(visual) {
+  return {
+    title: readablePdfTextColor({ candidate: visual.title, preferredFallback: visual.primary, finalFallback: "1F2937" }),
+    body: readablePdfTextColor({ candidate: visual.body, preferredFallback: "374151", finalFallback: "374151" }),
+  };
+}
+
+/**
+ * 保留满足 WCAG 正文对比度的模板颜色；不足 4.5:1 时改用高对比度备用色。
+ * @param {{candidate: string, preferredFallback: string, finalFallback: string}} input
+ * @returns {string}
+ */
+function readablePdfTextColor({ candidate, preferredFallback, finalFallback }) {
+  const background = "FFFFFF";
+  for (const color of [candidate, preferredFallback, finalFallback]) {
+    const normalized = normalizePdfHexColor(color);
+    if (normalized && pdfContrastRatio(normalized, background) >= 4.5) return normalized;
+  }
+  return finalFallback;
+}
+
+/**
+ * 计算两个十六进制颜色的 WCAG 对比度。
+ * @param {string} first
+ * @param {string} second
+ * @returns {number}
+ */
+function pdfContrastRatio(first, second) {
+  const firstLuminance = pdfRelativeLuminance(first);
+  const secondLuminance = pdfRelativeLuminance(second);
+  const lighter = Math.max(firstLuminance, secondLuminance);
+  const darker = Math.min(firstLuminance, secondLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * @param {string} hex
+ * @returns {number}
+ */
+function pdfRelativeLuminance(hex) {
+  const channels = [0, 2, 4].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16) / 255);
+  const linear = channels.map((value) => (value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4));
+  return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string|null}
+ */
+function normalizePdfHexColor(value) {
+  const normalized = String(value || "").replace(/^#/, "").toUpperCase();
+  return /^[0-9A-F]{6}$/.test(normalized) ? normalized : null;
 }
 
 /**

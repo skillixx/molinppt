@@ -4283,6 +4283,8 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
     const pptxBody = await pptx.json();
     const pdfBody = await pdf.json();
     const downloadedPptx = await fetch(`${baseUrl}/api/files/${pptxBody.file.id}`, { headers: { cookie } });
+    const downloadedPdf = await fetch(`${baseUrl}/api/files/${pdfBody.file.id}`, { headers: { cookie } });
+    const downloadedPdfText = Buffer.from(await downloadedPdf.arrayBuffer()).toString("latin1");
     const logs = await fetch(`${baseUrl}/api/logs`, { headers: { cookie } });
     const logsBody = await logs.json();
 
@@ -4295,9 +4297,17 @@ test("HTTP API runs acceptance flow from login to outline, deck, preview, export
     assert.equal(pptxBody.file.mimeType.includes("presentationml"), true);
     assert.equal(pdfBody.file.mimeType, "application/pdf");
     assert.equal(downloadedPptx.status, 200);
+    assert.equal(downloadedPdf.status, 200);
     assert.match(downloadedPptx.headers.get("content-disposition"), /filename="PPT-Board-update-business-2p-\d{8}-\d{4}-[a-zA-Z0-9]+\.pptx"/);
+    assert.match(downloadedPdf.headers.get("content-disposition"), /filename="PPT-Board-update-business-2p-\d{8}-\d{4}-[a-zA-Z0-9]+\.pdf"/);
+    assert.equal(downloadedPdf.headers.get("cache-control"), "no-store");
+    // PDF 是连续内容文档；短内容允许同页排版，内容溢出时才自动增加后续页面。
+    assert.equal((downloadedPdfText.match(/\/Type \/Page\b/g) || []).length, 1);
+    assert.match(downloadedPdfText, /\/Type \/Pages \/Kids \[[^\]]+\] \/Count 1/);
+    assert.match(downloadedPdfText, /\/MediaBox \[0 0 612 792\]/);
     assert.equal((await downloadedPptx.arrayBuffer()).byteLength > 0, true);
     assert.equal(logsBody.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pptxBody.file.id), true);
+    assert.equal(logsBody.logs.some((log) => log.action === "file_downloaded" && log.resourceId === pdfBody.file.id), true);
   } finally {
     await new Promise((resolve, reject) => app.close((error) => (error ? reject(error) : resolve())));
   }
